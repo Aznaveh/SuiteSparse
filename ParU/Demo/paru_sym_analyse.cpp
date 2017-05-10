@@ -59,6 +59,11 @@ paru_symbolic * paru_sym_analyse
 
     LUsym=(paru_symbolic *)paralloc(1,sizeof(paru_symbolic),cc);
     // ... check for LUsym NULL ...
+    if(LUsym == NULL){
+        //out of memory
+        return NULL;
+    }
+        
 
     spqr_symbolic *QRsym;
     cc->SPQR_grain = 1;
@@ -177,7 +182,7 @@ paru_symbolic * paru_sym_analyse
 
     }
 
-    //brian transplant
+    //brain transplant
     LUsym->nf = QRsym->nf;
     LUsym->Parent = QRsym->Parent; QRsym->Parent=NULL;
     LUsym->Child= QRsym->Child; QRsym->Child=NULL;
