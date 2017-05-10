@@ -1,0 +1,206 @@
+Include/trash/spqrgpu.hpp:    Long *CompleteStair,
+Include/trash/spqr.hpp:    Long *Stair1 ;          // size maxfn if H not kept
+Include/trash/spqr.hpp:    Long *Stair,            // size n; column j is dead if Stair [j] == 0.
+Include/trash/spqr.hpp:    Long *Stair             // size fn, from QRwork
+Include/trash/spqr.hpp:    Long *Stair,
+Include/trash/spqr.hpp:    Long *Stair,            // size npiv; column j is dead if Stair [j] == 0.
+Include/trash/spqr.hpp:    Long *Stair,        // size n, entries F (Stair[k]:m-1, k) are all zero,
+Include/trash/SuiteSparseQR.hpp:    SuiteSparse_long *HStair ;   // size rjsize.  The list Hstair [Rp [f] ...
+Source/trash/spqr_analyze.cpp:    Long *Parent, *Child, *Childp, *W, *Rj, *Rp, *Super, *Stair, *Fmap, *Sleft,
+Source/trash/spqr_analyze.cpp:    // The space for Stair and Fmap (total size 2*n+2) is later used for
+Source/trash/spqr_analyze.cpp:    Stair = W ;             // size n+1 [
+Source/trash/spqr_analyze.cpp:    Fmap = Stair + (n+1) ;  // size n+1 [
+Source/trash/spqr_analyze.cpp:            Stair [j] = Sleft [col+1] - Sleft [col] ;
+Source/trash/spqr_analyze.cpp:            Stair [j] = 0 ;
+Source/trash/spqr_analyze.cpp:                Stair [j]++ ;               // add row ci to jth Stair
+Source/trash/spqr_analyze.cpp:        // replace Stair with cumsum (Stair), and find # rows of F
+Source/trash/spqr_analyze.cpp:            fm += Stair [j] ;
+Source/trash/spqr_analyze.cpp:            Stair [j] = fm ;
+Source/trash/spqr_analyze.cpp:            PR (("j %ld Stair %ld\n", j, Stair [j])) ;
+Source/trash/spqr_analyze.cpp:            t = MAX (j+1, Stair [j]) ;      // assume diagonal is present
+Source/trash/spqr_analyze.cpp:            PR (("   j %ld Stair %ld t %ld\n", j, Stair [j], t)) ;
+Source/trash/spqr_analyze.cpp:    // Stair, Fmap no longer needed ] ]
+Source/trash/spqr_analyze.cpp:    // Since Stair and Fmap are no longer needed, we can use that workspace for
+Source/trash/spqr_assemble.cpp:    column in j = 0:6 is [4 4 4 2 1 1 1], which is Stair [0:fn-1]
+Source/trash/spqr_assemble.cpp:    Stair [0:fn-1] is [0 4 8 12 14 15 16].
+Source/trash/spqr_assemble.cpp:    row indices which correspond to the initial and final values of Stair.
+Source/trash/spqr_assemble.cpp:    After the front is assembled, Stair is [4 8 12 14 15 16 17], because Stair
+Source/trash/spqr_assemble.cpp:        4    - # x x x x x   <- Stair [0] = 4
+Source/trash/spqr_assemble.cpp:        8      - # x x x x   <- Stair [1] = 8
+Source/trash/spqr_assemble.cpp:       12        - # x x x   <- Stair [2] = 12
+Source/trash/spqr_assemble.cpp:       14          - # x x   <- Stair [3] = 14
+Source/trash/spqr_assemble.cpp:       15            - # x   <- Stair [4] = 15
+Source/trash/spqr_assemble.cpp:       16              - #   <- Stair [5] = 16
+Source/trash/spqr_assemble.cpp:                         -   <- Stair [6] = 17
+Source/trash/spqr_assemble.cpp:        3     :                 <- Stair [0] = 3 (was 0)
+Source/trash/spqr_assemble.cpp:        6     :                 <- Stair [1] = 6 (was 4)
+Source/trash/spqr_assemble.cpp:       10     :                 <- Stair [2] = 10 (was 8)
+Source/trash/spqr_assemble.cpp:       12     :                 <- Stair [3] = 12
+Source/trash/spqr_assemble.cpp:       14     :                 <- Stair [4] = 14
+Source/trash/spqr_assemble.cpp:       15     :                 <- Stair [5] = 15
+Source/trash/spqr_assemble.cpp:       16     :                 <- Stair [6] = 16
+Source/trash/spqr_assemble.cpp:        3     :                 <- Stair [0] = 3
+Source/trash/spqr_assemble.cpp:        7     :                 <- Stair [1] = 7 (was 6)
+Source/trash/spqr_assemble.cpp:       10     :                 <- Stair [2] = 10
+Source/trash/spqr_assemble.cpp:       13     :                 <- Stair [3] = 13 (was 12)
+Source/trash/spqr_assemble.cpp:       14     :                 <- Stair [4] = 14
+Source/trash/spqr_assemble.cpp:       16     :                 <- Stair [5] = 16 (was 15)
+Source/trash/spqr_assemble.cpp:                                   Stair [5] = 16
+Source/trash/spqr_assemble.cpp:        3     :                 <- Stair [0] = 3
+Source/trash/spqr_assemble.cpp:        8   21:     # . . x x   <- Stair [1] = 8 (was 7)
+Source/trash/spqr_assemble.cpp:       11     :                 <- Stair [2] = 11 (was 10)
+Source/trash/spqr_assemble.cpp:       14     :                 <- Stair [3] = 14 (was 13)
+Source/trash/spqr_assemble.cpp:                                   Stair [4] = 14
+Source/trash/spqr_assemble.cpp:       16   c4:             #   <- Stair [5] = 16
+Source/trash/spqr_assemble.cpp:                                   Stair [6] = 17 (was 16)
+Source/trash/spqr_assemble.cpp:    pointed to by Stair.
+Source/trash/spqr_assemble.cpp:        4   19: - # x . x . x   <- Stair [0] = 4 (was 3)
+Source/trash/spqr_assemble.cpp:        8   21:   - # . . x x   <- Stair [1] = 8
+Source/trash/spqr_assemble.cpp:       12   b2:     - # . x .   <- Stair [2] = 12 (was 11)
+Source/trash/spqr_assemble.cpp:       14   d3:       - # x .   <- Stair [3] = 14
+Source/trash/spqr_assemble.cpp:       15   b3:         - # .   <- Stair [4] = 15 (was 14)
+Source/trash/spqr_assemble.cpp:       16   c4:           - #   <- Stair [5] = 16
+Source/trash/spqr_assemble.cpp:                            -   <- Stair [6] = 17
+Source/trash/spqr_assemble.cpp:    The final Stair [0:fn-1] = [4 8 12 14 15 16 17].  Note that column j in F
+Source/trash/spqr_assemble.cpp:    has entries in rows 0 through Stair [j]-1, inclusive.  The staircase of the
+Source/trash/spqr_assemble.cpp:    Long *Stair,
+Source/trash/spqr_assemble.cpp:    for (k = 0 ; k < fn ; k++) PR (("stair [%ld] = %ld\n", k, Stair [k])) ;
+Source/trash/spqr_assemble.cpp:            i = Stair [k]++ ;
+Source/trash/spqr_assemble.cpp:            i = Stair [j]++ ;           /* add row F(i,:) to jth staircase */
+Source/trash/spqr_assemble.cpp:    /* the Stair is now complete */
+Source/trash/spqr_assemble.cpp:    ASSERT (Stair [fn-1] == fm) ;
+Source/trash/spqr_assemble.cpp:    Long *Stair,
+Source/trash/spqr_assemble.cpp:    Long *Stair,
+Source/trash/spqr_debug.cpp:    Long *Stair,            // size n; column j is dead if Stair [j] == 0.
+Source/trash/spqr_debug.cpp:        t = Stair [k] ;                 // F (0:t-1,k) contains R and H
+Source/trash/spqr_debug.cpp:        PR (("  for RHSIZE, k %ld Stair %ld t %ld (piv)\n", k, Stair[k], t)) ;
+Source/trash/spqr_debug.cpp:        t = Stair [k] ;
+Source/trash/spqr_debug.cpp:        PR (("  for RHSIZE, k %ld Stair %ld t %ld\n", k, Stair[k], t)) ;
+Source/trash/spqr_factorize.cpp:            // Staircase is a permanent part of H
+Source/trash/spqr_factorize.cpp:            Work [stack].Stair1 = NULL ;
+Source/trash/spqr_factorize.cpp:            // Staircase workspace reused for each front
+Source/trash/spqr_factorize.cpp:            Work [stack].Stair1 =
+Source/trash/spqr_factorize.cpp:            cholmod_l_free (maxfn,  sizeof (Long),   Work [stack].Stair1, cc) ;
+Source/trash/spqr_factorize.cpp:            Work [stack].Stair1 = NULL ;
+Source/trash/spqr_factorize.cpp:        // allocate permanent space for Stair, Tau, Hii for each front
+Source/trash/spqr_factorize.cpp:        QRnum->HStair= (Long *)  cholmod_l_malloc (rjsize, sizeof (Long),  cc) ;
+Source/trash/spqr_factorize.cpp:        QRnum->HStair = NULL ;
+Source/trash/spqr_freenum.cpp:        cholmod_l_free (rjsize, sizeof (Long),  QRnum->HStair,  cc) ;
+Source/trash/spqr_front.cpp:        4    - # x x x x x   <- Stair [0] = 4
+Source/trash/spqr_front.cpp:        8      - # x x x x   <- Stair [1] = 8
+Source/trash/spqr_front.cpp:       12        - # x x x   <- Stair [2] = 12
+Source/trash/spqr_front.cpp:       14          - # x x   <- Stair [3] = 14
+Source/trash/spqr_front.cpp:       15            - # x   <- Stair [4] = 15
+Source/trash/spqr_front.cpp:       16              - #   <- Stair [5] = 16
+Source/trash/spqr_front.cpp:                         -   <- Stair [6] = 17
+Source/trash/spqr_front.cpp:        4    - h h h C c c   <- Stair [0] = 4
+Source/trash/spqr_front.cpp:        8      - h h h h h   <- Stair [1] = 8
+Source/trash/spqr_front.cpp:       12        - h h h h   <- Stair [2] = 12
+Source/trash/spqr_front.cpp:       14          - h h h   <- Stair [3] = 14
+Source/trash/spqr_front.cpp:       15            - h h   <- Stair [4] = 15
+Source/trash/spqr_front.cpp:       16              - h   <- Stair [5] = 16
+Source/trash/spqr_front.cpp:                         -   <- Stair [6] = 17
+Source/trash/spqr_front.cpp:        0    R r r r r r r   <- Stair [1] = 0 to denote a dead pivot column
+Source/trash/spqr_front.cpp:        4    - - h h h C c   <- Stair [0] = 4
+Source/trash/spqr_front.cpp:       12        - h h h h   <- Stair [2] = 12
+Source/trash/spqr_front.cpp:       14          - h h h   <- Stair [3] = 14
+Source/trash/spqr_front.cpp:       15            - h h   <- Stair [4] = 15
+Source/trash/spqr_front.cpp:       16              - h   <- Stair [5] = 16
+Source/trash/spqr_front.cpp:                         -   <- Stair [6] = 17
+Source/trash/spqr_front.cpp:    If columns are found "dead", the staircase may be updated.  Stair[k] is
+Source/trash/spqr_front.cpp:    set to zero if k is dead.  Also, Stair[k] is increased, if necessary, to
+Source/trash/spqr_front.cpp:    with npiv = 2 has a Stair = [ 0 1 2 ] on output, to reflect the C block:
+Source/trash/spqr_front.cpp:    Long *Stair,        // size n, entries F (Stair[k]:m-1, k) are all zero,
+Source/trash/spqr_front.cpp:    ASSERT (Stair != NULL) ;
+Source/trash/spqr_front.cpp:        t = Stair [k] ;     // t = staircase of this column k
+Source/trash/spqr_front.cpp:                Stair [k] = 0 ;         // remaining pivot columns all dead
+Source/trash/spqr_front.cpp:                Stair [k] = m ;         // non-pivotal columns
+Source/trash/spqr_front.cpp:        Stair [k] = t ;
+Source/trash/spqr_front.cpp:            Stair [k] = 0 ;
+Source/trash/spqr_front.cpp:    Long *Stair,        // size n, entries F (Stair[k]:m-1, k) are all zero,
+Source/trash/spqr_front.cpp:    Long *Stair,        // size n, entries F (Stair[k]:m-1, k) are all zero,
+Source/trash/spqr_fsize.cpp:    Long *Stair             // size fn
+Source/trash/spqr_fsize.cpp:        Stair [j] = Sleft [col+1] - Sleft [col] ;
+Source/trash/spqr_fsize.cpp:        PR (("init rows, j: %ld count %ld\n", j, Stair [j])) ;
+Source/trash/spqr_fsize.cpp:        Stair [j] = 0 ;
+Source/trash/spqr_fsize.cpp:            Stair [j]++ ;               // add this row to jth staircase
+Source/trash/spqr_fsize.cpp:    // replace Stair with cumsum ([0 Stair]), and find # rows of F
+Source/trash/spqr_fsize.cpp:        fm += Stair [j] ;
+Source/trash/spqr_fsize.cpp:        Stair [j] = t ;
+Source/trash/spqr_fsize.cpp:    PR (("fm %ld %ld\n", fm, Stair [fn-1])) ;
+Source/trash/spqr_fsize.cpp:    // Stair [j+1]-1 of F.  Once the rows of S and the children of F are
+Source/trash/spqr_fsize.cpp:    // assembled, this will change to Stair [j]-1.
+Source/trash/spqr_fsize.cpp:    // as row Stair [j], which is then incremented to accommodate the next row
+Source/trash/spqr_fsize.cpp:    // with leftmost column j.  At that point, Stair [0:fn-1] will then "equal"
+Source/trash/spqr_fsize.cpp:    // Stair [0:fn-1] in the symbolic analysis (except that the latter is an
+Source/trash/spqr_kernel.cpp:    Long *   HStair = QRnum->HStair ;
+Source/trash/spqr_kernel.cpp:    // if H kept, Tau and Stair will point to permanent space in QRnum
+Source/trash/spqr_kernel.cpp:    Long *  Stair = keepH ? NULL : Work [stack].Stair1 ;
+Source/trash/spqr_kernel.cpp:            // get the permanent Stair and Tau vectors for this front
+Source/trash/spqr_kernel.cpp:            Stair = HStair + Rp [f] ;
+Source/trash/spqr_kernel.cpp:            Fmap, Stair) ;
+Source/trash/spqr_kernel.cpp:            Hr, Stair, Hii, Hip, F, Cmap) ;
+Source/trash/spqr_kernel.cpp:            fchunk, F, Stair, Rdead + col1, Tau, W,
+Source/trash/spqr_kernel.cpp:        Long rsize = spqr_rhpack (keepH, fm, fn, fp, Stair, F, F, &rm) ;
+Source/trash/spqr_kernel.cpp:            ASSERT (spqrDebug_rhsize (fm, fn, fp, Stair, cc) == rsize) ;
+Source/trash/spqr_kernel.cpp:            ASSERT (spqrDebug_rhsize (fm, fn, fp, Stair, cc) >= rsize) ;
+Source/trash/spqr_rconvert.cpp:    Long *Rp, *Rj, *Super, *HStair, *Hii, *Stair, *Hip, *Hm, *Hi ;
+Source/trash/spqr_rconvert.cpp:    HStair = QRnum->HStair ;
+Source/trash/spqr_rconvert.cpp:    Stair = NULL ;
+Source/trash/spqr_rconvert.cpp:            Stair = HStair + pr ;           // staircase of front F
+Source/trash/spqr_rconvert.cpp:                    t = Stair [k] ;             // length of R+H vector
+Source/trash/spqr_rconvert.cpp:                    t = Stair [k] ;             // length of R+H vector
+Source/trash/spqr_rcount.cpp:    Long *Rp, *Rj, *Super, *HStair, *Stair, *Hm ;
+Source/trash/spqr_rcount.cpp:    HStair = QRnum->HStair ;
+Source/trash/spqr_rcount.cpp:    Stair = NULL ;
+Source/trash/spqr_rcount.cpp:            Stair = HStair + pr ;           // staircase of front F
+Source/trash/spqr_rcount.cpp:                    t = Stair [k] ;             // length of R+H vector
+Source/trash/spqr_rcount.cpp:                    t = Stair [k] ;             // length of R+H vector
+Source/trash/spqr_rhpack.cpp:    and the 3rd column is dead (Stair [2] == 0).
+Source/trash/spqr_rhpack.cpp:        0:  r r r r r r     <- Stair [2] = 0, denotes dead column
+Source/trash/spqr_rhpack.cpp:        4:  - h . h h c     <- Stair [0] = 4
+Source/trash/spqr_rhpack.cpp:        6:  . - . h h h     <- Stair [1] = 6
+Source/trash/spqr_rhpack.cpp:        7:  . . . - - h     <- Stair [3] = Stair [4] = 6
+Source/trash/spqr_rhpack.cpp:                      -     <- Stair [5] = 9
+Source/trash/spqr_rhpack.cpp:    Long *Stair,            // size npiv; column j is dead if Stair [j] == 0.
+Source/trash/spqr_rhpack.cpp:        t = Stair [k] ;                 // F (0:t-1,k) contains R and H
+Source/trash/spqr_rhpack.cpp:            t = Stair [k] ;             // get the staircase
+Source/trash/spqr_rhpack.cpp:    Long *Stair,            // size npiv; column j is dead if Stair [j] == 0.
+Source/trash/spqr_rhpack.cpp:    Long *Stair,            // size npiv; column j is dead if Stair [j] == 0.
+Source/trash/spqr_rsolve.cpp:    Long *Rp, *Rj, *Super, *HStair, *Hm, *Stair ;
+Source/trash/spqr_rsolve.cpp:    HStair = QRnum->HStair ;
+Source/trash/spqr_rsolve.cpp:    Stair = NULL ;
+Source/trash/spqr_rsolve.cpp:            Stair = HStair + pr ;           // staircase of front F
+Source/trash/spqr_rsolve.cpp:                t = Stair [k] ;             // length of R+H vector
+Source/trash/spqr_rsolve.cpp:                t = Stair [k] ;             // length of R+H vector
+Source/trash/SuiteSparseQR_expert.cpp:    Long *R1p, *R1j, *Rmap, *Rp, *Rj, *Super, *HStair, *Hm, *Stair, *Q1fill,
+Source/trash/SuiteSparseQR_expert.cpp:    HStair = QRnum->HStair ;
+Source/trash/SuiteSparseQR_expert.cpp:    Stair = NULL ;
+Source/trash/SuiteSparseQR_expert.cpp:            Stair = HStair + pr ;           // staircase of front F
+Source/trash/SuiteSparseQR_expert.cpp:                t = Stair [k] ;             // length of R+H vector
+Source/trash/SuiteSparseQR_expert.cpp:                t = Stair [k] ;             // length of R+H vector
+Source/trash/SuiteSparseQR_expert.cpp:    Long *Rj, *Stair ;
+Source/trash/SuiteSparseQR_expert.cpp:    Stair = QRnum->HStair + pr ;        // staircase of front F
+Source/trash/SuiteSparseQR_expert.cpp:            t = Stair [k] ;                 // length of R+H vector
+Source/trash/SuiteSparseQR_expert.cpp:            t = Stair [k] ;                 // length of R+H vector
+trash/SPQRGPU/spqrgpu_buildAssemblyMaps.cpp:    Long *CompleteStair,
+trash/SPQRGPU/spqrgpu_buildAssemblyMaps.cpp:    /* Use Fmap and Stair to map a front's local rows to global rows. */
+trash/SPQRGPU/spqrgpu_buildAssemblyMaps.cpp:        Long *Stair = CompleteStair + Rp[f];
+trash/SPQRGPU/spqrgpu_buildAssemblyMaps.cpp:            Stair[j] = Sleft [col+1] - Sleft [col] ;
+trash/SPQRGPU/spqrgpu_buildAssemblyMaps.cpp:            PR (("GPU init rows, j: %ld count %ld\n", j, Stair[j])) ;
+trash/SPQRGPU/spqrgpu_buildAssemblyMaps.cpp:        for (Long j = fp ; j < fn ; j++){ Stair[j] = 0; }
+trash/SPQRGPU/spqrgpu_buildAssemblyMaps.cpp:        /* Build Rjmap and Stair for each child of the current front. */
+trash/SPQRGPU/spqrgpu_buildAssemblyMaps.cpp:                Stair[j]++ ;                   // add this row to jth staircase
+trash/SPQRGPU/spqrgpu_buildAssemblyMaps.cpp:        // replace Stair with cumsum ([0 Stair]), and find # rows of F
+trash/SPQRGPU/spqrgpu_buildAssemblyMaps.cpp:            fm += Stair[j] ;
+trash/SPQRGPU/spqrgpu_buildAssemblyMaps.cpp:            Stair[j] = t ;
+trash/SPQRGPU/spqrgpu_buildAssemblyMaps.cpp:        PR (("fm %ld %ld\n", fm, Stair[fn-1])) ;
+trash/SPQRGPU/spqrgpu_buildAssemblyMaps.cpp:                    Long i = Stair[k]++;
+trash/SPQRGPU/spqrgpu_buildAssemblyMaps.cpp:                Long i = Stair[j]++ ;         // add row F(i,:) to jth staircase
+trash/SPQRGPU/spqrgpu_kernel.cpp:    // use one mongo Stair for the entire problem
+trash/SPQRGPU/spqrgpu_kernel.cpp:    Long *Stair = (Long*) cholmod_l_malloc (stairsize, sizeof(Long), cc);
+trash/SPQRGPU/spqrgpu_kernel.cpp:        Stair = (Long*) cholmod_l_free (stairsize, sizeof(Long), Stair, cc) ; \
+trash/SPQRGPU/spqrgpu_kernel.cpp:        || !Stair || !LimboDirectory || !wsMondoS || !wsRimap || !wsRjmap)
+trash/SPQRGPU/spqrgpu_kernel.cpp:        Stair,      // StairOffsets not needed because Rp suffices as offsets
+trash/SPQRGPU/spqrgpu_kernel.cpp:            // attach the Stair
+trash/SPQRGPU/spqrgpu_kernel.cpp:            front->Stair = Stair + Rp[f];

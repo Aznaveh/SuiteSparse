@@ -1,0 +1,307 @@
+./testazny < ../Matrix/GD98_a.mtx
+
+=========== Start ======================
+38 x 38 nnz:50
+15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,
+nf=15 
+Front=0 #col=1 #row=0 #pivotCol=1 Par=15 #expected pivot col= 1
+list of children:	
+
+Front=1 #col=9 #row=10 #pivotCol=9 Par=15 #expected pivot col= 9
+list of children:	
+
+Front=2 #col=1 #row=0 #pivotCol=1 Par=15 #expected pivot col= 1
+list of children:	
+
+Front=3 #col=1 #row=0 #pivotCol=1 Par=15 #expected pivot col= 1
+list of children:	
+
+Front=4 #col=1 #row=0 #pivotCol=1 Par=15 #expected pivot col= 1
+list of children:	
+
+Front=5 #col=1 #row=1 #pivotCol=1 Par=15 #expected pivot col= 1
+list of children:	
+
+Front=6 #col=1 #row=0 #pivotCol=1 Par=15 #expected pivot col= 1
+list of children:	
+
+Front=7 #col=16 #row=2 #pivotCol=16 Par=15 #expected pivot col= 16
+list of children:	
+
+Front=8 #col=1 #row=0 #pivotCol=1 Par=15 #expected pivot col= 1
+list of children:	
+
+Front=9 #col=1 #row=0 #pivotCol=1 Par=15 #expected pivot col= 1
+list of children:	
+
+Front=10 #col=1 #row=1 #pivotCol=1 Par=15 #expected pivot col= 1
+list of children:	
+
+Front=11 #col=1 #row=0 #pivotCol=1 Par=15 #expected pivot col= 1
+list of children:	
+
+Front=12 #col=1 #row=1 #pivotCol=1 Par=15 #expected pivot col= 1
+list of children:	
+
+Front=13 #col=1 #row=0 #pivotCol=1 Par=15 #expected pivot col= 1
+list of children:	
+
+Front=14 #col=1 #row=1 #pivotCol=1 Par=15 #expected pivot col= 1
+list of children:	
+
+
+~~~~~~~~The End~~~~~~~~~~~~~~
+./testazny < ../Matrix/Groebner_id2003_aug.mtx
+
+=========== Start ======================
+4967 x 2456 nnz:173670
+10,10,10,10,10,10,10,10,10,10,11,
+nf=11 
+Front=0 #col=396 #row=3 #pivotCol=1 Par=10 #expected pivot col= 1
+list of children:	
+
+Front=1 #col=497 #row=7 #pivotCol=3 Par=10 #expected pivot col= 3
+list of children:	
+
+Front=2 #col=205 #row=3 #pivotCol=1 Par=10 #expected pivot col= 1
+list of children:	
+
+Front=3 #col=207 #row=3 #pivotCol=1 Par=10 #expected pivot col= 1
+list of children:	
+
+Front=4 #col=239 #row=3 #pivotCol=1 Par=10 #expected pivot col= 1
+list of children:	
+
+Front=5 #col=314 #row=3 #pivotCol=1 Par=10 #expected pivot col= 1
+list of children:	
+
+Front=6 #col=346 #row=3 #pivotCol=1 Par=10 #expected pivot col= 1
+list of children:	
+
+Front=7 #col=233 #row=3 #pivotCol=1 Par=10 #expected pivot col= 1
+list of children:	
+
+Front=8 #col=269 #row=3 #pivotCol=1 Par=10 #expected pivot col= 1
+list of children:	
+
+Front=9 #col=292 #row=3 #pivotCol=1 Par=10 #expected pivot col= 1
+list of children:	
+
+Front=10 #col=2444 #row=4955 #pivotCol=2444 Par=11 #expected pivot col= 2444
+list of children:	0 1 2 3 4 5 6 7 8 9 
+
+
+~~~~~~~~The End~~~~~~~~~~~~~~
+./testazny < ../Matrix/LFAT5.mtx
+
+=========== Start ======================
+14 x 14 nnz:46
+3,3,3,
+nf=3 
+Front=0 #col=8 #row=8 #pivotCol=8 Par=3 #expected pivot col= 8
+list of children:	
+
+Front=1 #col=3 #row=3 #pivotCol=3 Par=3 #expected pivot col= 3
+list of children:	
+
+Front=2 #col=3 #row=3 #pivotCol=3 Par=3 #expected pivot col= 3
+list of children:	
+
+
+~~~~~~~~The End~~~~~~~~~~~~~~
+./testazny < ../Matrix/Ragusa16.mtx
+
+=========== Start ======================
+24 x 24 nnz:81
+9,5,5,5,5,9,9,9,9,
+nf=9 
+Front=0 #col=1 #row=0 #pivotCol=1 Par=9 #expected pivot col= 1
+list of children:	
+
+Front=1 #col=5 #row=1 #pivotCol=1 Par=5 #expected pivot col= 1
+list of children:	
+
+Front=2 #col=5 #row=1 #pivotCol=1 Par=5 #expected pivot col= 1
+list of children:	
+
+Front=3 #col=8 #row=2 #pivotCol=1 Par=5 #expected pivot col= 1
+list of children:	
+
+Front=4 #col=9 #row=2 #pivotCol=1 Par=5 #expected pivot col= 1
+list of children:	
+
+Front=5 #col=16 #row=15 #pivotCol=16 Par=9 #expected pivot col= 16
+list of children:	1 2 3 4 
+
+Front=6 #col=1 #row=0 #pivotCol=1 Par=9 #expected pivot col= 1
+list of children:	
+
+Front=7 #col=1 #row=0 #pivotCol=1 Par=9 #expected pivot col= 1
+list of children:	
+
+Front=8 #col=1 #row=0 #pivotCol=1 Par=9 #expected pivot col= 1
+list of children:	
+
+
+~~~~~~~~The End~~~~~~~~~~~~~~
+./testazny < ../Matrix/Tina_AskCal.mtx
+
+=========== Start ======================
+11 x 11 nnz:29
+2,2,
+nf=2 
+Front=0 #col=10 #row=11 #pivotCol=10 Par=2 #expected pivot col= 10
+list of children:	
+
+Front=1 #col=1 #row=0 #pivotCol=1 Par=2 #expected pivot col= 1
+list of children:	
+
+
+~~~~~~~~The End~~~~~~~~~~~~~~
+./testazny < ../Matrix/a0.mtx
+
+=========== Start ======================
+0 x 0 nnz:0
+
+nf=0 
+
+~~~~~~~~The End~~~~~~~~~~~~~~
+./testazny < ../Matrix/a04.mtx
+
+=========== Start ======================
+0 x 4 nnz:0
+4,4,4,4,
+nf=4 
+Front=0 #col=1 #row=0 #pivotCol=1 Par=4 #expected pivot col= 1
+list of children:	
+
+Front=1 #col=1 #row=0 #pivotCol=1 Par=4 #expected pivot col= 1
+list of children:	
+
+Front=2 #col=1 #row=0 #pivotCol=1 Par=4 #expected pivot col= 1
+list of children:	
+
+Front=3 #col=1 #row=0 #pivotCol=1 Par=4 #expected pivot col= 1
+list of children:	
+
+
+~~~~~~~~The End~~~~~~~~~~~~~~
+./testazny < ../Matrix/a1.mtx
+
+=========== Start ======================
+4 x 4 nnz:7
+1,
+nf=1 
+Front=0 #col=4 #row=2 #pivotCol=4 Par=1 #expected pivot col= 4
+list of children:	
+
+
+~~~~~~~~The End~~~~~~~~~~~~~~
+./testazny < ../Matrix/a4.mtx
+
+=========== Start ======================
+4 x 2 nnz:4
+1,
+nf=1 
+Front=0 #col=2 #row=2 #pivotCol=2 Par=1 #expected pivot col= 2
+list of children:	
+
+
+~~~~~~~~The End~~~~~~~~~~~~~~
+./testazny < ../Matrix/a2.mtx
+
+=========== Start ======================
+2 x 2 nnz:3
+1,
+nf=1 
+Front=0 #col=2 #row=2 #pivotCol=2 Par=1 #expected pivot col= 2
+list of children:	
+
+
+~~~~~~~~The End~~~~~~~~~~~~~~
+./testazny < ../Matrix/arrow.mtx
+
+=========== Start ======================
+46500 x 46500 nnz:139498
+1,
+nf=1 
+Front=0 #col=46500 #row=46500 #pivotCol=46500 Par=1 #expected pivot col= 46500
+list of children:	
+
+
+~~~~~~~~The End~~~~~~~~~~~~~~
+./testazny < ../Matrix/ash219.mtx
+
+=========== Start ======================
+219 x 85 nnz:438
+13,3,3,13,13,13,12,12,12,12,12,12,13,14,
+nf=14 
+Front=0 #col=19 #row=36 #pivotCol=13 Par=13 #expected pivot col= 13
+list of children:	
+
+Front=1 #col=4 #row=3 #pivotCol=1 Par=3 #expected pivot col= 1
+list of children:	
+
+Front=2 #col=4 #row=3 #pivotCol=1 Par=3 #expected pivot col= 1
+list of children:	
+
+Front=3 #col=22 #row=48 #pivotCol=16 Par=13 #expected pivot col= 16
+list of children:	1 2 
+
+Front=4 #col=7 #row=6 #pivotCol=1 Par=13 #expected pivot col= 1
+list of children:	
+
+Front=5 #col=9 #row=12 #pivotCol=3 Par=13 #expected pivot col= 3
+list of children:	
+
+Front=6 #col=6 #row=5 #pivotCol=1 Par=12 #expected pivot col= 1
+list of children:	
+
+Front=7 #col=10 #row=13 #pivotCol=4 Par=12 #expected pivot col= 4
+list of children:	
+
+Front=8 #col=6 #row=5 #pivotCol=1 Par=12 #expected pivot col= 1
+list of children:	
+
+Front=9 #col=6 #row=5 #pivotCol=1 Par=12 #expected pivot col= 1
+list of children:	
+
+Front=10 #col=16 #row=29 #pivotCol=10 Par=12 #expected pivot col= 10
+list of children:	
+
+Front=11 #col=5 #row=5 #pivotCol=2 Par=12 #expected pivot col= 2
+list of children:	
+
+Front=12 #col=23 #row=62 #pivotCol=16 Par=13 #expected pivot col= 16
+list of children:	11 6 8 9 7 10 
+
+Front=13 #col=15 #row=48 #pivotCol=15 Par=14 #expected pivot col= 15
+list of children:	4 5 0 3 12 
+
+
+~~~~~~~~The End~~~~~~~~~~~~~~
+./testazny < ../Matrix/b1_ss.mtx
+
+=========== Start ======================
+7 x 7 nnz:15
+1,
+nf=1 
+Front=0 #col=7 #row=7 #pivotCol=7 Par=1 #expected pivot col= 7
+list of children:	
+
+
+~~~~~~~~The End~~~~~~~~~~~~~~
+./testazny < ../Matrix/test.mtx
+
+=========== Start ======================
+18 x 18 nnz:37
+2,2,
+nf=2 
+Front=0 #col=5 #row=4 #pivotCol=5 Par=2 #expected pivot col= 5
+list of children:	
+
+Front=1 #col=13 #row=14 #pivotCol=13 Par=2 #expected pivot col= 13
+list of children:	
+
+
+~~~~~~~~The End~~~~~~~~~~~~~~
