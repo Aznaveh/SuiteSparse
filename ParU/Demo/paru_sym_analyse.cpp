@@ -70,25 +70,25 @@ paru_symbolic * paru_sym_analyse
     cc->useGPU = -1;
     QRsym = spqr_analyze (A, SPQR_ORDERING_CHOLMOD, FALSE,FALSE , FALSE, cc) ;
 
-    SuiteSparse_long m, n, anz ; 
+    Int m, n, anz,nf ; 
     m=LUsym->m=QRsym->m;
     n=LUsym->n=QRsym->n;
     anz=LUsym->anz=QRsym->anz;
+    nf = LUsym->nf = QRsym->nf;
 
-    Long nf, *Parent, *Child, *Childp, *Rp, *ColCount, *Super;
-    nf = QRsym->nf;
-    Parent = QRsym->Parent;
-    Child= QRsym->Child;
-    Childp= QRsym->Childp;
-    Super=QRsym->Super;
+    Int *Parent, *Child, *Childp, *Rp, *ColCount, *Super;
+    //brain transplant
+    Parent= LUsym->Parent= QRsym->Parent; QRsym->Parent=NULL;
+    Child=  LUsym->Child=  QRsym->Child;  QRsym->Child=NULL;
+    Childp= LUsym->Childp= QRsym->Childp; QRsym->Childp=NULL;
+    Super=  LUsym->Super=  QRsym->Super;  QRsym->Super=NULL;
 
     //Staircase structure
-    Long *Sp, *Sj, *Sleft, *Qfill, *PLinv;
-    Sp=QRsym->Sp;
-    Sj=QRsym->Sj;
-    Qfill=QRsym->Qfill;
-    PLinv=QRsym->PLinv;
-    Sleft = QRsym->Sleft;
+    Int *Sp, *Sj, *Sleft;
+    Sp=     LUsym->Sp=QRsym->Sp; QRsym->Sp=NULL;
+    Sj=     LUsym->Sj=QRsym->Sj; QRsym->Sj=NULL;
+    Sleft=  LUsym->Sleft = QRsym->Sleft; QRsym->Sleft=NULL;
+
 
 #ifndef NDEBUG
     /* print fronts*/
@@ -96,7 +96,7 @@ paru_symbolic * paru_sym_analyse
         SuiteSparse_long fm, fn, fp;
         fm = QRsym->Fm[f];
         fn = QRsym->Rp[f+1]-QRsym->Rp[f];
-        fp = QRsym->Super[f+1]-QRsym->Super[f];
+        fp = Super[f+1]-Super[f];
 
         PR (("Front=%ld #col=%ld #row=%ld #pivotCol=%ld Par=%ld", 
                     f, fn, fm, fp,Parent[f]));
@@ -110,16 +110,16 @@ paru_symbolic * paru_sym_analyse
 
 
     /*Computing augmented tree */
-    SuiteSparse_long *aParent; //augmented tree size m+nf+1
-    SuiteSparse_long *aChild; // size m+nf+1
-    SuiteSparse_long *aChildp; // size m+nf+2
-    aParent=(SuiteSparse_long *)    paralloc(m+nf+1 ,sizeof(SuiteSparse_long),cc);
-    aChild=(SuiteSparse_long *)     paralloc(m+nf+1 ,sizeof(SuiteSparse_long),cc);
-    aChildp=(SuiteSparse_long *)    paralloc(m+nf+2 ,sizeof(SuiteSparse_long),cc);
+    Int *aParent; //augmented tree size m+nf+1
+    Int *aChild;  // size m+nf+1
+    Int *aChildp; // size m+nf+2
+    aParent= (Int *) paralloc(m+nf+1, sizeof(Int),cc);
+    aChild=  (Int *) paralloc(m+nf+1, sizeof(Int),cc);
+    aChildp= (Int *) paralloc(m+nf+2, sizeof(Int),cc);
 
-    SuiteSparse_long *rM, *snM; // row map and supernode map
-    rM=(SuiteSparse_long *)         paralloc(m      ,sizeof(SuiteSparse_long),cc);
-    snM=(SuiteSparse_long *)        paralloc(nf     ,sizeof(SuiteSparse_long),cc);
+    Int *rM, *snM; // row map and supernode map
+    rM=  (Int *) paralloc(m  ,sizeof(Int), cc);
+    snM= (Int *) paralloc(nf ,sizeof(Int), cc);
 
 
     //initialization
@@ -182,25 +182,14 @@ paru_symbolic * paru_sym_analyse
 
     }
 
-    //brain transplant
-    LUsym->nf = QRsym->nf;
-    LUsym->Parent = QRsym->Parent; QRsym->Parent=NULL;
-    LUsym->Child= QRsym->Child; QRsym->Child=NULL;
-    LUsym->Childp= QRsym->Childp; QRsym->Childp=NULL;
-    LUsym->Super=QRsym->Super;  QRsym->Super=NULL;
-
-    LUsym->Sp=QRsym->Sp; QRsym->Sp=NULL;
-    LUsym->Sj=QRsym->Sj; QRsym->Sj=NULL;
-    LUsym->Sleft = QRsym->Sleft; QRsym->Sleft=NULL;
-
-    spqr_freesym (&QRsym, cc) ;
+     spqr_freesym (&QRsym, cc) ;
 
 
-    LUsym->aParent=aParent;
-    LUsym->aChildp=aChildp;
-    LUsym->aChild=aChild;
-    LUsym->row2atree=rM;
-    LUsym->super2atree=snM;
+    LUsym->aParent=     aParent;
+    LUsym->aChildp=     aChildp;
+    LUsym->aChild=      aChild;
+    LUsym->row2atree=   rM;
+    LUsym->super2atree= snM;
 
 #ifndef NDEBUG
     PR (("\nsuper node->aP ")); 
