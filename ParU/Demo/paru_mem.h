@@ -3,8 +3,8 @@
 void *paralloc(int n, int size, cholmod_common* cc)
 {
 //    return malloc(n*size);
-    // return cholmod_l_malloc(n,size,cc);
-    return cholmod_l_calloc(n,size,cc);
+     return cholmod_l_malloc(n,size,cc);
+    //return cholmod_l_calloc(n,size,cc);
 }
 //void *parfree(void *p)
 //{
@@ -27,7 +27,7 @@ void paru_freesym(paru_symbolic** LUsym_handle,
     paru_symbolic *LUsym ;
     LUsym = *LUsym_handle  ;
 
-    Long m, n, anz, nf, rjsize, ns, ntasks ;
+    Long m, n, anz, nf; 
 
     m = LUsym->m ;
     n = LUsym->n ;
