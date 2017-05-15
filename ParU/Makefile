@@ -1,5 +1,5 @@
 #-------------------------------------------------------------------------------
-# SuiteSparseQR Makefile
+# ParU Makefile
 #-------------------------------------------------------------------------------
 
 SUITESPARSE ?= $(realpath $(CURDIR)/..)
@@ -29,23 +29,23 @@ demos:
 purge:
 	( cd Lib ; $(MAKE) purge )
 	( cd Demo ; $(MAKE) purge )
-	( cd Tcov ; $(MAKE) purge )
-	( cd Doc ; $(MAKE) purge )
-	( cd MATLAB ; $(RM) $(CLEAN) rename.h *.mex* )
+	# ( cd Tcov ; $(MAKE) purge )
+	# ( cd Doc ; $(MAKE) purge )
+	# ( cd MATLAB ; $(RM) $(CLEAN) rename.h *.mex* )
 
 clean:
 	( cd Lib ; $(MAKE) clean )
 	( cd Demo ; $(MAKE) clean )
-	( cd MATLAB ; $(RM) $(CLEAN) rename.h )
+	# ( cd MATLAB ; $(RM) $(CLEAN) rename.h )
 
 distclean: purge
 
 ccode: demos
 
-# install SPQR
+# install ParU
 install:
 	( cd Lib ; $(MAKE) install )
 
-# uninstall SPQR
+# uninstall ParU
 uninstall:
 	( cd Lib ; $(MAKE) uninstall )

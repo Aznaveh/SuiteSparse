@@ -2,6 +2,10 @@
 // === Parallel_LU.hpp =======================================================
 // =============================================================================
 
+#include "spqr.hpp"
+
+#define Int SuiteSparse_long
+
 // =============================================================================
 // === paru_symbolic ===========================================================
 // =============================================================================
@@ -96,4 +100,13 @@ struct paru_symbolic
     SuiteSparse_long *super2atree;               //Mapping from super nodes to augmented tree size m
 
 } ;
+
+/* Wrappers for managing memory */
+void *paralloc(int n, int size, cholmod_common* cc);
+void paru_freesym(paru_symbolic** LUsym_handle,cholmod_common *cc);
+
+
+paru_symbolic *paru_sym_analyse
+( cholmod_sparse *A, cholmod_common *cc) ;
+
 

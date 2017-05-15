@@ -2,7 +2,7 @@ default: all
 
 include ../../SuiteSparse_config/SuiteSparse_config.mk
 
-CLIB = $(LDFLAGS) -L../../lib -lspqr -lsuitesparseconfig -lcholmod -lamd \
+CLIB = $(LDFLAGS) -L../../lib -lparu -lspqr -lsuitesparseconfig -lcholmod -lamd \
         -lcolamd $(LIB_WITH_PARTITION) $(LIB_WITH_SPQRGPU) $(LDLIBS)
 FLIB = $(LAPACK) $(BLAS)
 
@@ -16,16 +16,8 @@ C = $(CXX) $(CF) $(SPQR_CONFIG) $(CONFIG_PARTITION) $(CONFIG_GPU) $(I) \
 
 LIBS = $(CLIB) $(FLIB) $(TBB) $(GPULIB)
 
-old:
-	g++    -O3 -fexceptions -fPIC -I../../include ./paru_sym_analyse.cpp -o testazny \
-        -L../../lib -lspqr -lsuitesparseconfig -lcholmod -lamd -lcolamd -lccolamd \
-        -lcamd -lmetis  -lm -lrt -Wl,-rpath=../../lib -llapack -lopenblas 
-
 all:
-	$(C) paru_sym_analyse.cpp -o testazny $(LIBS)
-
-mem:
-	$(C) paru_mem.cpp -c $(LIBS)
+	$(C) testazny.cpp -o testazny $(LIBS)
 
 run:
 #	./testazny < ../Matrix/c2.mtx #2x2 4nz
@@ -69,10 +61,22 @@ run:
 #	./testazny < ../Matrix/Franz6_id1959_aug.mtx #!
 
 val:
-	valgrind --tool=memcheck --leak-check=yes --show-reachable=yes --num-callers=20 --track-fds=yes ./testazny  < ../Matrix/c2.mtx 
+	valgrind --tool=memcheck --leak-check=yes --show-reachable=yes \
+            --num-callers=20 --track-fds=yes ./testazny  < ../Matrix/c2.mtx 
+
 debug:
 	g++ -g   -O3 -fexceptions -fPIC -fopenmp   -I../../include   aztest.cpp -o \
             dtest.out -L../../lib -lspqr -lsuitesparseconfig -lcholmod -lamd \
             -lcolamd -lccolamd -lcamd -lmetis  -lm -lrt \
             -Wl,-rpath=../../lib -llapack -lopenblas 
 
+
+purge: distclean
+
+distclean: clean
+	- $(RM) testazny
+	- $(RM) *.dot pfile tfile
+	- $(RM) -r $(PURGE)
+
+clean:
+	- $(RM) -r $(CLEAN)
