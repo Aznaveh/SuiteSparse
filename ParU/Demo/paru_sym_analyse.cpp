@@ -1,9 +1,9 @@
 // =============================================================================
 // ===paru_sym_analyse============================================================
 // =============================================================================
-#include "../../SPQR/Include/spqr.hpp"
+#include "spqr.hpp"
 //#include "../../CHOLMOD/Include/cholmod_internal.h"
-//#include "../Include/Parallel_LU.hpp"
+//#include "Parallel_LU.hpp"
 #include "./paru_mem.h"
 paru_symbolic *paru_sym_analyse
 ( cholmod_sparse *A, cholmod_common *cc) ;
@@ -76,6 +76,8 @@ paru_symbolic * paru_sym_analyse
     anz=LUsym->anz=QRsym->anz;
     nf = LUsym->nf = QRsym->nf;
 
+    LUsym->maxfn= LUsym->maxfn;
+
     Int *Parent, *Child, *Childp, *Rp, *ColCount, *Super;
     //brain transplant
     Parent= LUsym->Parent= QRsym->Parent; QRsym->Parent=NULL;
@@ -83,18 +85,21 @@ paru_symbolic * paru_sym_analyse
     Childp= LUsym->Childp= QRsym->Childp; QRsym->Childp=NULL;
     Super=  LUsym->Super=  QRsym->Super;  QRsym->Super=NULL;
 
+    LUsym->Fm= QRsym->Fm; QRsym->Fm=NULL;
+    LUsym->Cm= QRsym->Cm; QRsym->Cm=NULL;
+
     //Staircase structure
     Int *Sp, *Sj, *Sleft;
-    Sp=     LUsym->Sp=QRsym->Sp; QRsym->Sp=NULL;
-    Sj=     LUsym->Sj=QRsym->Sj; QRsym->Sj=NULL;
-    Sleft=  LUsym->Sleft = QRsym->Sleft; QRsym->Sleft=NULL;
+    Sp=    LUsym->Sp=    QRsym->Sp;     QRsym->Sp=NULL;
+    Sj=    LUsym->Sj=    QRsym->Sj;     QRsym->Sj=NULL;
+    Sleft= LUsym->Sleft= QRsym->Sleft;  QRsym->Sleft=NULL;
 
 
 #ifndef NDEBUG
     /* print fronts*/
-    for (SuiteSparse_long f = 0; f < nf; f++) {
-        SuiteSparse_long fm, fn, fp;
-        fm = QRsym->Fm[f];
+    for (Int f = 0; f < nf; f++) {
+        Int fm, fn, fp;
+        fm = LUsym->Fm[f];
         fn = QRsym->Rp[f+1]-QRsym->Rp[f];
         fp = Super[f+1]-Super[f];
 

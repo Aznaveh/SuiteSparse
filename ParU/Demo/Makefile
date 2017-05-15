@@ -8,7 +8,8 @@ FLIB = $(LAPACK) $(BLAS)
 
 I_WITH_SPQRGPU = 
 
-I = -I../../include $(I_WITH_SPQRGPU)
+I = -I../../include $(I_WITH_SPQRGPU) -I ../Include
+
 
 C = $(CXX) $(CF) $(SPQR_CONFIG) $(CONFIG_PARTITION) $(CONFIG_GPU) $(I) \
 	$(CHOLMOD_CONFIG)
@@ -22,6 +23,9 @@ old:
 
 all:
 	$(C) paru_sym_analyse.cpp -o testazny $(LIBS)
+
+mem:
+	$(C) paru_mem.cpp -c $(LIBS)
 
 run:
 #	./testazny < ../Matrix/c2.mtx #2x2 4nz
