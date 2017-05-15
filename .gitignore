@@ -83,6 +83,7 @@ LDL/Demo/ldlmain
 LDL/Demo/ldlsimple
 RBio/Demo/RBdemo
 RBio/Demo/temp.rb
+ParU/Demo/testazny
 SPQR/Demo/qrdemo
 SPQR/Demo/qrsimple
 SPQR/Demo/qrsimplec
@@ -101,8 +102,6 @@ UMFPACK/Demo/umfpack_dl_demo
 UMFPACK/Demo/umfpack_simple
 UMFPACK/Demo/umfpack_zi_demo
 UMFPACK/Demo/umfpack_zl_demo
-
-ParU/Demo/testazny
 
 # ignore these specific programs in the Package/Tcov directories
 CHOLMOD/Tcov/cl
