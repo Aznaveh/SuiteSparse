@@ -29,10 +29,14 @@ int main (int argc, char **argv)
     paru_freesym(&LUsym,cc);
     ASSERT (LUsym == NULL) ;
 
-    printf ("malloc_count %ld inuse %ld\n", cc->malloc_count, cc->memory_inuse);
+    //Valgrind :)
+    fclose(stdin);
+    fclose(stdout);
+    fclose(stderr);
+//    printf ("malloc_count %ld inuse %ld\n", cc->malloc_count, cc->memory_inuse);
 
     cholmod_l_finish (cc) ;
-    printf ("malloc_count %ld inuse %ld\n", cc->malloc_count, cc->memory_inuse);
+ //   printf ("malloc_count %ld inuse %ld\n", cc->malloc_count, cc->memory_inuse);
 
 }
 
