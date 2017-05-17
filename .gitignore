@@ -102,6 +102,9 @@ UMFPACK/Demo/umfpack_simple
 UMFPACK/Demo/umfpack_zi_demo
 UMFPACK/Demo/umfpack_zl_demo
 ParU/Demo/testazny
+ParU/Demo/pfile
+ParU/Demo/tfile
+ParU/Demo/tmp
 
 # ignore these specific programs in the Package/Tcov directories
 CHOLMOD/Tcov/cl
