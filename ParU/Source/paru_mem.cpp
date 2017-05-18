@@ -1,19 +1,14 @@
 /* Wrappers for managing memory */
 #include "Parallel_LU.hpp"
 
-void *paralloc(int n, int size, cholmod_common* cc)
-{
-//    return malloc(n*size);
+void *paralloc(int n, int size, cholmod_common* cc){
      return cholmod_l_malloc(n,size,cc);
-    //return cholmod_l_calloc(n,size,cc);
 }
 
 void paru_freesym(paru_symbolic** LUsym_handle,
             // workspace and parameters
     cholmod_common *cc
-)
-{
-    //uncomplete
+){
 
     if (LUsym_handle == NULL || *LUsym_handle == NULL)
     {
