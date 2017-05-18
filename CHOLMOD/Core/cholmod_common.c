@@ -572,36 +572,36 @@ int CHOLMOD(free_work)
     RETURN_IF_NULL_COMMON (FALSE) ;
 
     /* Aznaveh */
-    printf ("free CHOLMOD work, nrow %ld iworksize %ld xworksize %ld\n",
-        Common->nrow, Common->iworksize, Common->xworksize) ;
+    //printf ("free CHOLMOD work, nrow %ld iworksize %ld xworksize %ld\n",
+       // Common->nrow, Common->iworksize, Common->xworksize) ;
 
     Common->Flag  = CHOLMOD(free) (Common->nrow, sizeof (Int),
 	    Common->Flag, Common) ;
 
     /* Aznaveh */
-    printf ("free CHOLMOD work, nrow %ld iworksize %ld xworksize %ld\n",
-        Common->nrow, Common->iworksize, Common->xworksize) ;
+    //printf ("free CHOLMOD work, nrow %ld iworksize %ld xworksize %ld\n",
+      //  Common->nrow, Common->iworksize, Common->xworksize) ;
 
     Common->Head  = CHOLMOD(free) (Common->nrow+1, sizeof (Int),
 	    Common->Head, Common) ;
 
     /* Aznaveh */
-    printf ("free CHOLMOD work, nrow %ld iworksize %ld xworksize %ld\n",
-        Common->nrow, Common->iworksize, Common->xworksize) ;
+    //printf ("free CHOLMOD work, nrow %ld iworksize %ld xworksize %ld\n",
+     //   Common->nrow, Common->iworksize, Common->xworksize) ;
 
     Common->Iwork = CHOLMOD(free) (Common->iworksize, sizeof (Int),
 	    Common->Iwork, Common) ;
 
     /* Aznaveh */
-    printf ("free CHOLMOD work, nrow %ld iworksize %ld xworksize %ld\n",
-        Common->nrow, Common->iworksize, Common->xworksize) ;
+    //printf ("free CHOLMOD work, nrow %ld iworksize %ld xworksize %ld\n",
+    //    Common->nrow, Common->iworksize, Common->xworksize) ;
 
     Common->Xwork = CHOLMOD(free) (Common->xworksize, sizeof (double),
 	    Common->Xwork, Common) ;
 
     /* Aznaveh */
-    printf ("free CHOLMOD work, nrow %ld iworksize %ld xworksize %ld\n",
-        Common->nrow, Common->iworksize, Common->xworksize) ;
+   // printf ("free CHOLMOD work, nrow %ld iworksize %ld xworksize %ld\n",
+   //     Common->nrow, Common->iworksize, Common->xworksize) ;
 
     Common->nrow = 0 ;
     Common->iworksize = 0 ;

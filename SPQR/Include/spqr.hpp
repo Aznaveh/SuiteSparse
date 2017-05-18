@@ -36,15 +36,17 @@ typedef std::complex<double> Complex ;
 #define NPRINT
 #endif
 
+//Aznaveh
 // uncomment the following line to turn on debugging (SPQR will be slow!)
 /*
-*/
 #undef NDEBUG
+*/
 
+//Aznaveh
 // uncomment the following line to turn on printing (LOTS of output!)
 /*
-*/
 #undef NPRINT
+*/
 
 // uncomment the following line to turn on expensive debugging (very slow!)
 /*

@@ -2244,7 +2244,7 @@ int CHOLMOD(print_triplet)
 
 /* The global variables present only when debugging enabled. */
 int CHOLMOD(dump) = 0 ;
-int CHOLMOD(dump_malloc) = 1 ;  /* TODO Aznaveh use -1 to turn off memory printing */
+int CHOLMOD(dump_malloc) = -1 ;  /* TODO Aznaveh use -1 to turn off memory printing */
 
 /* workspace: no debug routines use workspace in Common */
 
