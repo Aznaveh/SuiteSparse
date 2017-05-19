@@ -3,6 +3,16 @@
 // =============================================================================
 
 #include "spqr.hpp"
+#ifndef NPRINT
+//int print_level = 0 ;
+#define print_level 0
+#define PRLEVEL(level,param) { if (print_level >= level) PR (param) ; }
+#define DEBUGLEVEL(level) { print_level = level ; }
+#else
+#define PRLEVEL(level,param)
+#define DEBUGLEVEL(level)
+#endif
+
 
 #define Int SuiteSparse_long
 
@@ -130,4 +140,3 @@ typedef struct /* Element */
      * double C[0..nrows*ncols-1] * Numerical values
      */
 } Element;
-
