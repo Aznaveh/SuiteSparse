@@ -1,11 +1,9 @@
-
 #include "Parallel_LU.hpp"
 
 // =============================================================================
-
 int main (int argc, char **argv)
 {
-    // DEBUG(3);
+    DEBUGLEVEL(0); 
     cholmod_common Common, *cc ;
     cholmod_sparse *A ;
     int mtype ;
@@ -29,14 +27,15 @@ int main (int argc, char **argv)
     paru_freesym(&LUsym,cc);
     ASSERT (LUsym == NULL) ;
 
-    //Valgrind :)
-    fclose(stdin);
-    fclose(stdout);
-    fclose(stderr);
-//    printf ("malloc_count %ld inuse %ld\n", cc->malloc_count, cc->memory_inuse);
+
+    PRLEVEL (1, ("malloc_count %ld inuse %ld\n", cc->malloc_count, cc->memory_inuse));
+
 
     cholmod_l_finish (cc) ;
  //   printf ("malloc_count %ld inuse %ld\n", cc->malloc_count, cc->memory_inuse);
-
+//Valgrind :)
+    fclose(stdin);
+    fclose(stdout);
+    fclose(stderr);
 }
 
