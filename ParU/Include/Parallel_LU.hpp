@@ -1,18 +1,23 @@
 // =============================================================================
 // === Parallel_LU.hpp =======================================================
 // =============================================================================
-
+#include <stdio.h>
 #include "spqr.hpp"
-#ifndef NPRINT
-//int print_level = 0 ;
-#define print_level 0
-#define PRLEVEL(level,param) { if (print_level >= level) PR (param) ; }
+#ifndef NPR
+#define NPR
+#endif
+//for printing debug
+#undef NPR
+
+
+#ifndef NPR
+static int print_level = 1 ;
+#define PRLEVEL(level,param) { if (print_level >= level) printf param ; }
 #define DEBUGLEVEL(level) { print_level = level ; }
 #else
 #define PRLEVEL(level,param)
 #define DEBUGLEVEL(level)
 #endif
-
 
 #define Int SuiteSparse_long
 
