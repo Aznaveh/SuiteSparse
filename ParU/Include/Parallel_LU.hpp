@@ -6,12 +6,12 @@
 #ifndef NPR
 #define NPR
 #endif
-//for printing debug
+//for printing information uncomment this
 #undef NPR
 
 
 #ifndef NPR
-static int print_level = 1 ;
+static int print_level = 0 ;
 #define PRLEVEL(level,param) { if (print_level >= level) printf param ; }
 #define DEBUGLEVEL(level) { print_level = level ; }
 #else
@@ -134,14 +134,28 @@ typedef struct /* Tuple */
         f;  /*   offest */
 } Tuple;
 
-typedef struct /* Element */
+/* -------------------------------------------------------------------------- */
+/* An element */
+/* -------------------------------------------------------------------------- */
+
+typedef struct	/* Element */
 {
-    int 
-        nrows,
-        ncols;
-    /* followed by 
-     * int col[0..ncols-1], //column indices of the element
-     * int row[0..nrows-1]; row indices of the element
-     * double C[0..nrows*ncols-1] * Numerical values
-     */
-} Element;
+    Int
+
+	nrowsleft,	/* number of rows remaining */
+	ncolsleft,	/* number of columns remaining */
+	nrows,		/* number of rows */
+	ncols;		/* number of columns */
+
+    /* followed in memory by:
+    Int
+	col [0..ncols-1],	column indices of this element
+	row [0..nrows-1] ;	row indices of this element
+    Entry			(suitably aligned, see macro below)
+	C [0...nrows-1, 0...ncols-1] ;
+	size of C is nrows*ncols Entry's
+    */
+
+} Element ;
+
+
