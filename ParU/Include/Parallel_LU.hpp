@@ -46,20 +46,20 @@ struct paru_symbolic
     // indices in each row of S are in strictly ascending order, even though
     // the input matrix A need not be sorted.
 
-    SuiteSparse_long m, n, anz ; // S is m-by-n with anz entries
+    Int m, n, anz ; // S is m-by-n with anz entries
 
-    SuiteSparse_long *Sp ;       // size m+1, row pointers of S
+    Int *Sp ;       // size m+1, row pointers of S
 
-    SuiteSparse_long *Sj ;       // size anz = Sp [n], column indices of S
+    Int *Sj ;       // size anz = Sp [n], column indices of S
 
-//    SuiteSparse_long *Qfill ;    // size n, fill-reducing column permutation.
+//    Int *Qfill ;    // size n, fill-reducing column permutation.
                         // Qfill [k] = j if column k of A is column j of S.
 
-//    SuiteSparse_long *PLinv ;    // size m, inverse row permutation that places
+//    Int *PLinv ;    // size m, inverse row permutation that places
                         // S=A(P,Q) in increasing order of leftmost column
                         // index.  PLinv [i] = k if row i of A is row k of S.
 
-    SuiteSparse_long *Sleft ;    // size n+2.  The list of rows of S whose
+    Int *Sleft ;    // size n+2.  The list of rows of S whose
             // leftmost column index is j is given by
             // Sleft [j] ... Sleft [j+1]-1.  This can be empty (that is, Sleft
             // [j] can equal Sleft [j+1]).  Sleft [n] is the number of
@@ -79,13 +79,13 @@ struct paru_symbolic
     // vectors are kept, the row indices are computed dynamically during
     // numerical factorization.
 
-    SuiteSparse_long nf ;        // number of frontal matrices; nf <= MIN (m,n)
-    SuiteSparse_long maxfn ;     // max # of columns in any front
+    Int nf ;        // number of frontal matrices; nf <= MIN (m,n)
+    Int maxfn ;     // max # of columns in any front
 
     // parent, child, and childp define the row merge tree or etree (A'A)
-    SuiteSparse_long *Parent ;   // size nf+1
-    SuiteSparse_long *Child ;    // size nf+1
-    SuiteSparse_long *Childp ;   // size nf+2
+    Int *Parent ;   // size nf+1
+    Int *Child ;    // size nf+1
+    Int *Childp ;   // size nf+2
 
     // The parent of a front f is Parent [f], or EMPTY if f=nf.
     // A list of children of f can be obtained in the list
@@ -96,25 +96,25 @@ struct paru_symbolic
     // placeholder node nf as their parent.  Thus, the tree of nodes 0:nf is
     // truly a tree, with just one parent (node nf).
 
-    SuiteSparse_long *aParent; // size m+nf+1
-    SuiteSparse_long *aChild; // size m+nf+1
-    SuiteSparse_long *aChildp; // size m+nf+2
+    Int *aParent; // size m+nf+1
+    Int *aChild; // size m+nf+1
+    Int *aChildp; // size m+nf+2
 
-    SuiteSparse_long *Super ;    // size nf+1.  Super [f] gives the first
+    Int *Super ;    // size nf+1.  Super [f] gives the first
         // pivot column in the front F.  This refers to a column of S.  The
         // number of expected pivot columns in F is thus
         // Super [f+1] - Super [f].
 
    //Upper bound number of rows for each front
-    SuiteSparse_long *Fm ;               // size nf+1
+    Int *Fm ;               // size nf+1
 
     //Upper bound  number of rows in the contribution block of each front
-    SuiteSparse_long *Cm ;               // size nf+1
+    Int *Cm ;               // size nf+1
 
-    SuiteSparse_long *row2atree;               //Mapping from rows to augmented tree size m
-    SuiteSparse_long *super2atree;               //Mapping from super nodes to augmented tree size m
+    Int *row2atree;               //Mapping from rows to augmented tree size m
+    Int *super2atree;               //Mapping from super nodes to augmented tree size m
 
-} ;
+};
 
 /* Wrappers for managing memory */
 void *paralloc(int n, int size, cholmod_common* cc);
@@ -142,20 +142,45 @@ typedef struct	/* Element */
 {
     Int
 
-	nrowsleft,	/* number of rows remaining */
-	ncolsleft,	/* number of columns remaining */
-	nrows,		/* number of rows */
-	ncols;		/* number of columns */
+        nrowsleft,	/* number of rows remaining */
+        ncolsleft,	/* number of columns remaining */
+        nrows,		/* number of rows */
+        ncols;		/* number of columns */
 
     /* followed in memory by:
-    Int
-	col [0..ncols-1],	column indices of this element
-	row [0..nrows-1] ;	row indices of this element
-    Entry			(suitably aligned, see macro below)
-	C [0...nrows-1, 0...ncols-1] ;
-	size of C is nrows*ncols Entry's
-    */
+       Int
+       col [0..ncols-1],	column indices of this element
+       row [0..nrows-1] ;	row indices of this element
+       Entry			(suitably aligned, see macro below)
+       C [0...nrows-1, 0...ncols-1] ;
+       size of C is nrows*ncols Entry's
+       */
 
 } Element ;
 
+/* My next challenge is how to write Row/Col_list
+ * I want a dynamic size list and want to access them in parallel
+ * Col_list must be sorted somehow
+ * implement a datastructure whcih holds these lists with other information of the matrix
+ */
+typedef struct  /*List element */
+{
+    /*element of a column or a row*/
+    Int
+        numTuple,   /*  number of Tuples in this element */
+        numFree;    /*  number of free spaces for newer tuples */
+    Tuple* list;    /* list of tuples regarding to this element */
+}   listEl;
 
+
+
+typedef struct  /*Matrix */
+{
+    Int
+        nrows,
+        ncols;
+    paru_symbolic *sym;
+    listEl* Row_list;
+    listEl* Col_list;  
+
+}   Matrix;
