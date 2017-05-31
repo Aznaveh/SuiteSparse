@@ -22,14 +22,22 @@ void paru_init_rowFronts(
         cholmod_common *cc
         ){
 
-   paru_work* Amat;
-   Amat = (paru_work *) paralloc (1,sizeof(paru_work),cc);
+   paru_matrix* Amat;
+   Amat = (paru_matrix*) paralloc (1,sizeof(paru_matrix),cc);
    if (Amat == NULL){   //out of memory
        return;
    }
-   Int m,n;
-   m= Amat->nrows= LUsym->m;   n= Amat->ncols= LUsym->n;
-   Amat->Row_list =(listEl*) paralloc (1,m*sizeof(listEl),cc);
-   Amat->Col_list =(listEl*) paralloc (1,n*sizeof(listEl),cc);
+   Int m,n;     Int slackRow=2,slackCol=2;
+   m= Amat->m= LUsym->m;   n= Amat->n= LUsym->n;
+   Amat->Row_list =(listEl*) paralloc (slackRow, m*sizeof(listEl), cc);
+   Amat->Col_list =(listEl*) paralloc (slackCol, n*sizeof(listEl), cc);
+
+   for(Int i=0; i<m ; i++){
+       Int e= LUsym->row2atree[i]; //element number in augmented tree
+       Int nrows,ncols;
+    //   (Element*) paralloc (1,sizeof(Element)+nrows*ncols, cc);
+       //assemble nth row
+       //Add nth row to Row list and update Col list
+   }
 
 }
