@@ -34,8 +34,8 @@ void paru_init_rowFronts(
 
    for(Int i=0; i<m ; i++){
        Int e= LUsym->row2atree[i]; //element number in augmented tree
-       Int nrows,ncols;
-    //   (Element*) paralloc (1,sizeof(Element)+nrows*ncols, cc);
+       Int nrows=1,ncols; // Initializing number of columns of current element
+    //(Element*) paralloc (1,sizeof(Element)+nrows+ncols + nrows*ncols, cc);
        //assemble nth row
        //Add nth row to Row list and update Col list
    }
