@@ -1,6 +1,6 @@
-// =============================================================================
-// === Parallel_LU.hpp =======================================================
-// =============================================================================
+// ============================================================================/  
+// ======================= Parallel_LU.hpp ====================================/
+// ============================================================================/
 #include <stdio.h>
 #include "spqr.hpp"
 #ifndef NPR
@@ -158,29 +158,29 @@ typedef struct	/* Element */
 
 } Element ;
 
-/* My next challenge is how to write Row/Col_list
+/* My next challenge is how to write Row/ColList
  * I want a dynamic size list and want to access them in parallel
  * Col_list must be sorted somehow
  * implement a datastructure whcih holds these lists with other information of the matrix
  */
-typedef struct  /*List element */
+typedef struct  /*List of tuples */
 {
     /*element of a column or a row*/
     Int
         numTuple,   /*  number of Tuples in this element */
         numFree;    /*  number of free spaces for newer tuples */
     Tuple* list;    /* list of tuples regarding to this element */
-}   listEl;
+}   tupleList;
 
 
 
 typedef struct  /*Matrix */
 {
-    Int
-        nrows,
-        ncols;
+    Int m, n;
     paru_symbolic *sym;
-    listEl* Row_list;
-    listEl* Col_list;  
+    tupleList* RowList;
+    tupleList* ColList;  
+    Element** elementList; //pointers to all elements, size = m+nf+1 
 
-}   Matrix;
+    
+}   paru_matrix;

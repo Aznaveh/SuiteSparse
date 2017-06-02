@@ -1,6 +1,6 @@
-// =============================================================================
-// ===paru_sym_analyse============================================================
-// =============================================================================
+// ============================================================================/
+// ============================== paru_sym_analyse ============================/
+// ============================================================================/
 #include "Parallel_LU.hpp"
 paru_symbolic * paru_sym_analyse
 (
@@ -9,6 +9,7 @@ paru_symbolic * paru_sym_analyse
  // workspace and parameters
  cholmod_common *cc
  ){   
+    DEBUGLEVEL(0);
     paru_symbolic *LUsym;
 
     LUsym=(paru_symbolic *)paralloc(1,sizeof(paru_symbolic),cc);
@@ -17,7 +18,7 @@ paru_symbolic * paru_sym_analyse
         //out of memory
         return NULL;
     }
-        
+
 
     spqr_symbolic *QRsym;
     cc->SPQR_grain = 1;
@@ -49,7 +50,6 @@ paru_symbolic * paru_sym_analyse
     Sleft= LUsym->Sleft= QRsym->Sleft;  QRsym->Sleft=NULL;
 
 
-//#ifndef NDEBUG
     /* print fronts*/
     for (Int f = 0; f < nf; f++) {
         Int fm, fn, fp;
@@ -65,7 +65,7 @@ paru_symbolic * paru_sym_analyse
             PRLEVEL (1,("%ld ",Child[i]));
         PRLEVEL (1,("\n\n"));
     }
-//#endif
+    //#endif
 
 
     /*Computing augmented tree */
@@ -96,13 +96,13 @@ paru_symbolic * paru_sym_analyse
     for (Int f = 0; f < nf; f++) {
         PRLEVEL (1,("Front %ld\n", f)) ;
         PRLEVEL (1,("pivot columns [ %ld to %ld ] n: %ld \n",
-            Super [f], Super [f+1]-1, n)) ;
+                    Super [f], Super [f+1]-1, n)) ;
         ASSERT(Super[f+1] <= n);
         Int numRow =Sleft[Super[f+1]]-Sleft[Super[f]] ;
-//#ifndef NDEBUG
+        //#ifndef NDEBUG
         PRLEVEL (1,("~numRow=%ld",numRow));
         PRLEVEL (1,("\n#offset=%ld\n",offset));
-//#endif
+        //#endif
 
         Int numoforiginalChild=0;
         if (lastChildFlag){  // the current node is the parent
@@ -141,7 +141,7 @@ paru_symbolic * paru_sym_analyse
 
     }
 
-     spqr_freesym (&QRsym, cc) ;
+    spqr_freesym (&QRsym, cc) ;
 
 
     LUsym->aParent=     aParent;

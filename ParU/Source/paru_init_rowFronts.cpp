@@ -22,22 +22,52 @@ void paru_init_rowFronts(
         cholmod_common *cc
         ){
 
-   paru_matrix* Amat;
-   Amat = (paru_matrix*) paralloc (1,sizeof(paru_matrix),cc);
-   if (Amat == NULL){   //out of memory
-       return;
-   }
-   Int m,n;     Int slackRow=2,slackCol=2;
-   m= Amat->m= LUsym->m;   n= Amat->n= LUsym->n;
-   Amat->Row_list =(listEl*) paralloc (slackRow, m*sizeof(listEl), cc);
-   Amat->Col_list =(listEl*) paralloc (slackCol, n*sizeof(listEl), cc);
+    paru_matrix* Amat;
+    Amat = (paru_matrix*) paralloc (1,sizeof(paru_matrix),cc);
+    if (Amat == NULL){   //out of memory
+        return;
+    }
 
-   for(Int i=0; i<m ; i++){
-       Int e= LUsym->row2atree[i]; //element number in augmented tree
-       Int nrows=1,ncols; // Initializing number of columns of current element
-    //(Element*) paralloc (1,sizeof(Element)+nrows+ncols + nrows*ncols, cc);
-       //assemble nth row
-       //Add nth row to Row list and update Col list
-   }
+    Int m,n;     Int slackRow=2,slackCol=2;
+    m= Amat->m= LUsym->m;   n= Amat->n= LUsym->n;
+
+    tupleList *RowList,*ColList;
+    RowList=Amat->RowList =
+        (tupleList*) paralloc (slackRow, m*sizeof(tupleList), cc);
+    ColList=Amat->ColList =
+        (tupleList*) paralloc (slackCol, n*sizeof(tupleList), cc);
+    Element** elementList; Int nf=LUsym->nf;
+    elementList=Amat->elementList=
+        (Element**) paralloc (1, (m+nf+1)*sizeof(Element), cc);
+
+
+    for(Int i=0; i<m ; i++){
+        Int e= LUsym->row2atree[i]; //element number in augmented tree
+        Int nrows=1,ncols; // Initializing number of columns of current element
+        /*TODO*/
+        //INITIALIZE NROWS and numberCols
+        Element* curEl= elementList[e]=
+           (Element*) paralloc (1,
+                   sizeof(Element)+nrows+ncols+ nrows*ncols, cc);
+        curEl->nrowsleft=curEl->nrows=nrows;
+        curEl->ncolsleft=curEl->ncols=ncols;
+
+        double *colrowIndex = (double *)(curEl+1);
+        for (Int j = 0;  j<ncols ; j++) {
+            /*TODO Initalizing indices and Update tuple list*/
+            //initializae colrowIndex[j]
+        }
+        colrowIndex[j++]=i;  //initializing row /TODO update rowtuplelist
+        double *numericIndex= (double *)(curEl+1)+ncols+1;
+         for (Int j = 0;  j<ncols ; j++) {
+            /*TODO Numerics*/
+            //numericIndex[j]
+        }
+        //TODO assemble nth row
+        //
+
+        //Add nth row to Row list and update Col list
+    }
 
 }
+
