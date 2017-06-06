@@ -2,7 +2,7 @@
 // ============================== paru_sym_analyse ============================/
 // ============================================================================/
 #include "Parallel_LU.hpp"
-paru_symbolic * paru_sym_analyse
+paru_symbolic *paru_sym_analyse
 (
  // inputs, not modified
  cholmod_sparse *A,
@@ -12,7 +12,7 @@ paru_symbolic * paru_sym_analyse
     DEBUGLEVEL(0);
     paru_symbolic *LUsym;
 
-    LUsym=(paru_symbolic *)paralloc(1,sizeof(paru_symbolic),cc);
+    LUsym=(paru_symbolic*)paralloc(1,sizeof(paru_symbolic),cc);
     // ... check for LUsym NULL ...
     if(LUsym == NULL){
         //out of memory
@@ -72,13 +72,13 @@ paru_symbolic * paru_sym_analyse
     Int *aParent; //augmented tree size m+nf+1
     Int *aChild;  // size m+nf+1
     Int *aChildp; // size m+nf+2
-    aParent= (Int *) paralloc(m+nf+1, sizeof(Int),cc);
-    aChild=  (Int *) paralloc(m+nf+1, sizeof(Int),cc);
-    aChildp= (Int *) paralloc(m+nf+2, sizeof(Int),cc);
+    aParent= (Int*) paralloc(m+nf+1, sizeof(Int),cc);
+    aChild=  (Int*) paralloc(m+nf+1, sizeof(Int),cc);
+    aChildp= (Int*) paralloc(m+nf+2, sizeof(Int),cc);
 
     Int *rM, *snM; // row map and supernode map
-    rM=  (Int *) paralloc(m  ,sizeof(Int), cc);
-    snM= (Int *) paralloc(nf ,sizeof(Int), cc);
+    rM=  (Int*) paralloc(m  ,sizeof(Int), cc);
+    snM= (Int*) paralloc(nf ,sizeof(Int), cc);
 
 
     //initialization

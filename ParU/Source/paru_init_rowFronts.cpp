@@ -34,7 +34,7 @@ void paru_init_rowFronts(
     tupleList *RowList,*ColList;
     RowList=Amat->RowList =
         (tupleList*) paralloc (slackRow, m*sizeof(tupleList), cc);
-    ColList=Amat->ColList =
+    ColList=Amat->ColList=
         (tupleList*) paralloc (slackCol, n*sizeof(tupleList), cc);
     Element** elementList; Int nf=LUsym->nf;
     elementList=Amat->elementList=
@@ -61,42 +61,26 @@ void paru_init_rowFronts(
         Int nrows=1,
             ncols=Cnz[i]; 
 
-        Element* curEl= elementList[e]=
-            (Element*) paralloc (1,
-                    sizeof(Element)+nrows+ncols+ nrows*ncols, cc);
+        Element *curEl= elementList[e]=
+            (Element*) paralloc(1,
+                    sizeof(Element)+sizeof(Int)*(nrows+ncols)+ 
+                    sizeof(double)*nrows*ncols, cc);
         curEl->nrowsleft=curEl->nrows=nrows;
         curEl->ncolsleft=curEl->ncols=ncols;
 
-        double *colrowIndex = (double *)(curEl+1);
+        Int *colrowIndex = (Int*)(curEl+1);
+        double *colrowNum= (double*)(colrowIndex+nrows+ncols);
         Int j= 0;
-        /* TODO: put numbers and indices  */
-        //
-        //
-        //        for (j = 0 ; j < ncolC ; j++)
-        //        {
-        //            p = Cp [j] ;
-        //            pend = p + Cnz [j] ;
-        //            for ( ; p < pend ; p++)
-        //            {//
-        //                //    = Ci [p] ;
-        //                //    = Cx [p] ;
-        //            }//
-        //        }
-        //
-        //
-        for (;  j<ncols ; j++) {
-            /*TODO Initalizing indices and Update tuple list*/
-            //initializae colrowIndex[j]
+        /* TODO: Initializing tuple list */
+        p = Cp [i] ;
+        pend = p + Cnz [i] ;
+        for ( ; p < pend ; p++){
+            colrowIndex[j]= Ci [p];
+            colrowNum[j++]=   Cx [p];
+            /* TODO Add col tuples:  <06-06-17, Me> */
         }
-        colrowIndex[j++]=i;  //initializing row one item  /TODO 
-        double *numericIndex= (double *)(curEl+1)+ncols+1;
-        for (Int j = 0;  j<ncols ; j++) {
-            /*TODO Numerics*/
-            //numericIndex[j]
-        }
-        //TODO assemble nth row
-
-
-        //Add nth row to Row list and update Col list
+        colrowIndex[j++]=i;  //initializing row one item  
+        /*! TODO: add Row tuple	 */
+        
     }
 }

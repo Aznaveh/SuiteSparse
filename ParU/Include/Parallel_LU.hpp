@@ -117,8 +117,8 @@ struct paru_symbolic
 };
 
 /* Wrappers for managing memory */
-void *paralloc(int n, int size, cholmod_common* cc);
-void paru_freesym(paru_symbolic** LUsym_handle,cholmod_common *cc);
+void *paralloc(int n, int size, cholmod_common *cc);
+void paru_freesym(paru_symbolic **LUsym_handle,cholmod_common *cc);
 
 
 paru_symbolic *paru_sym_analyse
@@ -169,7 +169,7 @@ typedef struct  /*List of tuples */
     Int
         numTuple,   /*  number of Tuples in this element */
         numFree;    /*  number of free spaces for newer tuples */
-    Tuple* list;    /* list of tuples regarding to this element */
+    Tuple *list;    /* list of tuples regarding to this element */
 }   tupleList;
 
 
@@ -178,9 +178,9 @@ typedef struct  /*Matrix */
 {
     Int m, n;
     paru_symbolic *sym;
-    tupleList* RowList;
-    tupleList* ColList;  
-    Element** elementList; //pointers to all elements, size = m+nf+1 
+    tupleList *RowList;
+    tupleList *ColList;  
+    Element **elementList; //pointers to all elements, size = m+nf+1 
 
     
 }   paru_matrix;
