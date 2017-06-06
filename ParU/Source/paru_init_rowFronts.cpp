@@ -40,44 +40,50 @@ void paru_init_rowFronts(
     elementList=Amat->elementList=
         (Element**) paralloc (1, (m+nf+1)*sizeof(Element), cc);
 
+    //Double check with Dr Davis
+	cholmod_sparse *C = cholmod_transpose (A, 2, cc) ;
+    double *Cx;
+    Int *Cp, *Ci, *Cnz;
+    Int p, pend, ncolC, xtype ;
+    ncolC = C->ncol;     Cp =(Int*) C->p;
+    Ci = (Int*) C->i;          Cx = (double*) C->x;
+    Cnz = (Int*) C->nz;        xtype = C->xtype;
+    ASSERT(ncolC == m);
+    if(xtype != CHOLMOD_REAL){
+        printf("Error: Input matrix is not double\n");
+        return; // Error: Just working with real for now
+    }
+
+
 
     for(Int i=0; i<m ; i++){
         Int e= LUsym->row2atree[i]; //element number in augmented tree
-        Int nrows=1,ncols; // Initializing number of columns of current element
-        /*TODO*/
-        //INITIALIZE NROWS and numberCols
+        Int nrows=1,
+            ncols=Cnz[i]; 
 
         Element* curEl= elementList[e]=
-           (Element*) paralloc (1,
-                   sizeof(Element)+nrows+ncols+ nrows*ncols, cc);
+            (Element*) paralloc (1,
+                    sizeof(Element)+nrows+ncols+ nrows*ncols, cc);
         curEl->nrowsleft=curEl->nrows=nrows;
         curEl->ncolsleft=curEl->ncols=ncols;
 
         double *colrowIndex = (double *)(curEl+1);
         Int j= 0;
-        
-        double *Ax;
-        Int *Ap, *Ai, *Anz;
-        Int p, pend, ncol, xtype ;
-        /* TODO:transpose A  <05-06-17, Me> */
-        ncol = A->ncol;     Ap =(Int*) A->p;
-        Ai = (Int*) A->i;          Ax = (double*) A->x;
-        Anz = (Int*) A->nz;        xtype = A->xtype;
-        if(xtype != CHOLMOD_REAL)
-            return; // Just working with real for now
-
-        for (j = 0 ; j < ncol ; j++)
-        {
-            p = Ap [j] ;
-            pend = p + Anz [j] ;
-            for ( ; p < pend ; p++)
-            {//
-                //    = Ai [p] ;
-                //    = Ax [p] ;
-            }//
-        }
-
-
+        /* TODO: put numbers and indices  */
+        //
+        //
+        //        for (j = 0 ; j < ncolC ; j++)
+        //        {
+        //            p = Cp [j] ;
+        //            pend = p + Cnz [j] ;
+        //            for ( ; p < pend ; p++)
+        //            {//
+        //                //    = Ci [p] ;
+        //                //    = Cx [p] ;
+        //            }//
+        //        }
+        //
+        //
         for (;  j<ncols ; j++) {
             /*TODO Initalizing indices and Update tuple list*/
             //initializae colrowIndex[j]
@@ -93,6 +99,4 @@ void paru_init_rowFronts(
 
         //Add nth row to Row list and update Col list
     }
-
 }
-
