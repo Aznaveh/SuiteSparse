@@ -40,7 +40,7 @@ void paru_init_rowFronts(
         (Element**) parcalloc (1, (m+nf+1)*sizeof(Element), cc);
 
     //Double check with Dr Davis
-    cholmod_sparse *C = cholmod_transpose (A, 2, cc);
+    cholmod_sparse *C = cholmod_l_transpose (A, 1, cc);
 
     double *Cx;
     Int *Cp, *Ci, *Cnz;
