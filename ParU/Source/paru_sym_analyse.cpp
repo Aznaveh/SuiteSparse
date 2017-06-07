@@ -12,7 +12,7 @@ paru_symbolic *paru_sym_analyse
     DEBUGLEVEL(0);
     paru_symbolic *LUsym;
 
-    LUsym=(paru_symbolic*)paralloc(1,sizeof(paru_symbolic),cc);
+    LUsym = (paru_symbolic*)paralloc(1,sizeof(paru_symbolic),cc);
     // ... check for LUsym NULL ...
     if(LUsym == NULL){
         //out of memory
@@ -23,35 +23,35 @@ paru_symbolic *paru_sym_analyse
     spqr_symbolic *QRsym;
     cc->SPQR_grain = 1;
     cc->useGPU = -1;
-    QRsym = spqr_analyze (A, SPQR_ORDERING_CHOLMOD, FALSE,FALSE , FALSE, cc) ;
+    QRsym = spqr_analyze (A, SPQR_ORDERING_CHOLMOD, FALSE,FALSE , FALSE, cc);
 
     Int m, n, anz,nf ; 
-    m=LUsym->m=QRsym->m;
-    n=LUsym->n=QRsym->n;
-    anz=LUsym->anz=QRsym->anz;
-    nf = LUsym->nf = QRsym->nf;
+    m = LUsym->m = QRsym->m;
+    n = LUsym->n = QRsym->n;
+    anz = LUsym->anz = QRsym->anz;
+    nf =  LUsym->nf = QRsym->nf;
 
-    LUsym->maxfn= LUsym->maxfn;
+    LUsym->maxfn = LUsym->maxfn;
 
     Int *Parent, *Child, *Childp, *Rp, *ColCount, *Super;
     //brain transplant
-    Parent= LUsym->Parent= QRsym->Parent; QRsym->Parent=NULL;
-    Child=  LUsym->Child=  QRsym->Child;  QRsym->Child=NULL;
-    Childp= LUsym->Childp= QRsym->Childp; QRsym->Childp=NULL;
-    Super=  LUsym->Super=  QRsym->Super;  QRsym->Super=NULL;
+    Parent = LUsym->Parent = QRsym->Parent; QRsym->Parent = NULL;
+    Child =  LUsym->Child =  QRsym->Child;  QRsym->Child = NULL;
+    Childp = LUsym->Childp = QRsym->Childp; QRsym->Childp = NULL;
+    Super =  LUsym->Super =  QRsym->Super;  QRsym->Super = NULL;
 
-    LUsym->Fm= QRsym->Fm; QRsym->Fm=NULL;
-    LUsym->Cm= QRsym->Cm; QRsym->Cm=NULL;
+    LUsym->Fm = QRsym->Fm; QRsym->Fm = NULL;
+    LUsym->Cm = QRsym->Cm; QRsym->Cm = NULL;
 
     //Staircase structure
     Int *Sp, *Sj, *Sleft;
-    Sp=    LUsym->Sp=    QRsym->Sp;     QRsym->Sp=NULL;
-    Sj=    LUsym->Sj=    QRsym->Sj;     QRsym->Sj=NULL;
-    Sleft= LUsym->Sleft= QRsym->Sleft;  QRsym->Sleft=NULL;
+    Sp =  LUsym->Sp = QRsym->Sp;     QRsym->Sp = NULL;
+    Sj =  LUsym->Sj = QRsym->Sj;     QRsym->Sj = NULL;
+    Sleft = LUsym->Sleft = QRsym->Sleft;  QRsym->Sleft = NULL;
 
 
     /* print fronts*/
-    for (Int f = 0; f < nf; f++) {
+    for (Int f = 0; f < nf; f++){
         Int fm, fn, fp;
         fm = LUsym->Fm[f];
         fn = QRsym->Rp[f+1]-QRsym->Rp[f];
@@ -72,26 +72,26 @@ paru_symbolic *paru_sym_analyse
     Int *aParent; //augmented tree size m+nf+1
     Int *aChild;  // size m+nf+1
     Int *aChildp; // size m+nf+2
-    aParent= (Int*) paralloc(m+nf+1, sizeof(Int),cc);
-    aChild=  (Int*) paralloc(m+nf+1, sizeof(Int),cc);
-    aChildp= (Int*) paralloc(m+nf+2, sizeof(Int),cc);
+    aParent = (Int*) paralloc(m+nf+1, sizeof(Int),cc);
+    aChild =  (Int*) paralloc(m+nf+1, sizeof(Int),cc);
+    aChildp = (Int*) paralloc(m+nf+2, sizeof(Int),cc);
 
     Int *rM, *snM; // row map and supernode map
-    rM=  (Int*) paralloc(m  ,sizeof(Int), cc);
-    snM= (Int*) paralloc(nf ,sizeof(Int), cc);
+    rM =  (Int*) paralloc(m  ,sizeof(Int), cc);
+    snM = (Int*) paralloc(nf ,sizeof(Int), cc);
 
 
     //initialization
-    for (Int f = 0; f < nf; f++) snM[f]=-1;
-    for (Int i = 0; i < m; i++) rM[i]=-1;
-    for (Int i = 0; i < m+nf+1; i++) aParent[i]=-1;
-    for (Int i = 0; i < m+nf+1; i++) aChild[i]=-1;
-    for (Int i = 0; i < m+nf+2; i++) aChildp[i]=-1;
+    for (Int f = 0; f < nf; f++) snM[f] = -1;
+    for (Int i = 0; i < m; i++) rM[i] = -1;
+    for (Int i = 0; i < m+nf+1; i++) aParent[i] = -1;
+    for (Int i = 0; i < m+nf+1; i++) aChild[i] = -1;
+    for (Int i = 0; i < m+nf+2; i++) aChildp[i] = -1;
 
-    aChildp[0]=0;
-    Int offset=0; //number of rows visited in each iteration orig front+ rows
-    Int lastChildFlag=0;
-    Int childpointer=0;
+    aChildp[0] = 0;
+    Int offset = 0; //number of rows visited in each iteration orig front+ rows
+    Int lastChildFlag = 0;
+    Int childpointer = 0;
 
     for (Int f = 0; f < nf; f++) {
         PRLEVEL (1,("Front %ld\n", f)) ;
@@ -113,42 +113,41 @@ paru_symbolic *paru_sym_analyse
                 ASSERT(snM[i] < m+nf+1);
                 aParent[ snM[i]]=offset+numRow;
                 ASSERT(childpointer < m+nf+1);
-                aChild[childpointer++]=snM[i];
+                aChild[childpointer++] = snM[i];
             }
         }
 
-        for(Int i=offset ; i < offset+numRow ; i++)
-            aChildp[i+1]=aChildp[i];
+        for(Int i = offset ; i < offset+numRow ; i++)
+            aChildp[i+1] = aChildp[i];
 
         for (Int i = Sleft[Super[f]]; i < Sleft[Super[f]+1]; i++){ // number of rows
             ASSERT(i < m);
-            rM[i]=i+f;
+            rM[i] = i+f;
             ASSERT(i+f < m+nf+1);
-            aParent[i+f]=offset+numRow;
+            aParent[i+f] = offset+numRow;
             ASSERT(childpointer < m+nf+1);
-            aChild[childpointer++]=i+f;
+            aChild[childpointer++] = i+f;
         }
 
-        offset+=numRow;
-        snM[f]=offset++;
+        offset += numRow;
+        snM[f] = offset++;
         ASSERT(offset < m+nf+1);
         aChildp[offset] = aChildp[offset-1]+numRow+numoforiginalChild;
 
         if( Parent[f] == f+1)  //last child
-            lastChildFlag=1;  
+            lastChildFlag = 1;  
         else
-            lastChildFlag=0;  
-
+            lastChildFlag = 0;  
     }
 
-    spqr_freesym (&QRsym, cc) ;
+    spqr_freesym (&QRsym, cc);
 
 
-    LUsym->aParent=     aParent;
-    LUsym->aChildp=     aChildp;
-    LUsym->aChild=      aChild;
-    LUsym->row2atree=   rM;
-    LUsym->super2atree= snM;
+    LUsym->aParent = aParent;
+    LUsym->aChildp = aChildp;
+    LUsym->aChild = aChild;
+    LUsym->row2atree = rM;
+    LUsym->super2atree = snM;
 
 #ifndef NDEBUG
     PRLEVEL (1,("\nsuper node->aP ")); 

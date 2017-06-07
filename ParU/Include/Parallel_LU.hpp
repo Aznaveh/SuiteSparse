@@ -118,6 +118,7 @@ struct paru_symbolic
 
 /* Wrappers for managing memory */
 void *paralloc(int n, int size, cholmod_common *cc);
+void *parcalloc(int n, int size, cholmod_common *cc);
 void paru_freesym(paru_symbolic **LUsym_handle,cholmod_common *cc);
 
 
