@@ -52,10 +52,10 @@ struct paru_symbolic
 
     Int *Sj ;       // size anz = Sp [n], column indices of S
 
-//    Int *Qfill ;    // size n, fill-reducing column permutation.
+    Int *Qfill ;    // size n, fill-reducing column permutation.
                         // Qfill [k] = j if column k of A is column j of S.
 
-//    Int *PLinv ;    // size m, inverse row permutation that places
+    Int *PLinv ;    // size m, inverse row permutation that places
                         // S=A(P,Q) in increasing order of leftmost column
                         // index.  PLinv [i] = k if row i of A is row k of S.
 

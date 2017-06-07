@@ -42,6 +42,36 @@ void paru_init_rowFronts(
     //Double check with Dr Davis
     cholmod_sparse *C = cholmod_l_transpose (A, 1, cc);
 
+    /*! TODO: cholmod_l_transpose doesnt work here
+     *  I should use spqr_stranspose2
+     *  I will copy the content of spqr_stranspose2
+     *  I should allocate memory here too
+     *  The code here must come frome spqr_stranspose2 
+     *  and malloc can com frome spqr_factorize line 277
+     * */
+    Int *Qfill = LUsym->Qfill;
+    Int *PLinv = LUsym->PLinv;
+    Int anz = LUsym->anz;
+    /* Wi I am not sure if I should alloc:  <07-06-17, Me> */
+    Int *Wi = (Int *) cc->Iwork ;   // size m, aliased with the rest of Iwork
+
+    // create numeric values of S = A(p,q) in row-form in Sx
+    double *Sx = (double*) cholmod_l_malloc (anz, sizeof (double), cc) ;
+    Int *Sp = (Int*) cholmod_l_malloc (anz, sizeof (Int), cc) ;
+
+    if (cc->status == CHOLMOD_OK)
+    {
+        // use Wi as workspace (Iwork (0:m-1)) [
+        spqr_stranspose2 (A, Qfill, Sp, PLinv, Sx, Wi) ;
+        // Wi no longer needed ]
+    }
+
+
+    
+    
+
+
+
     double *Cx;
     Int *Cp, *Ci, *Cnz;
     Int p, pend, ncolC, xtype;

@@ -33,12 +33,15 @@ paru_symbolic *paru_sym_analyse
 
     LUsym->maxfn = LUsym->maxfn;
 
-    Int *Parent, *Child, *Childp, *Rp, *ColCount, *Super;
+    Int *Parent, *Child, *Childp, 
+        *Rp, *ColCount, *Super, *Qfill, *PLinv;
     //brain transplant
     Parent = LUsym->Parent = QRsym->Parent; QRsym->Parent = NULL;
     Child =  LUsym->Child =  QRsym->Child;  QRsym->Child = NULL;
     Childp = LUsym->Childp = QRsym->Childp; QRsym->Childp = NULL;
     Super =  LUsym->Super =  QRsym->Super;  QRsym->Super = NULL;
+    Qfill =  LUsym->Qfill =  QRsym->Qfill ;  QRsym->Qfill = NULL;
+    PLinv =  LUsym->PLinv=  QRsym->PLinv;  QRsym->PLinv = NULL;
 
     LUsym->Fm = QRsym->Fm; QRsym->Fm = NULL;
     LUsym->Cm = QRsym->Cm; QRsym->Cm = NULL;
