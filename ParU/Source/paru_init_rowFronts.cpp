@@ -39,42 +39,56 @@ void paru_init_rowFronts(
     elementList = Amat->elementList = // Initialize with NULL
         (Element**) parcalloc (1, (m+nf+1)*sizeof(Element), cc);
 
-    //Double check with Dr Davis
-    cholmod_sparse *C = cholmod_l_transpose (A, 1, cc);
-
-    /*! TODO: cholmod_l_transpose doesnt work here
-     *  I should use spqr_stranspose2
-     *  I will copy the content of spqr_stranspose2
-     *  I should allocate memory here too
-     *  The code here must come frome spqr_stranspose2 
-     *  and malloc can com frome spqr_factorize line 277
-     * */
+    /// -------------------------------------------------------------------------
+    // create S = A (p,q)', or S=A(p,q) if S is considered to be in row-form
+    // -------------------------------------------------------------------------
     Int *Qfill = LUsym->Qfill;
     Int *PLinv = LUsym->PLinv;
     Int anz = LUsym->anz;
-    /* Wi I am not sure if I should alloc:  <07-06-17, Me> */
     Int *Wi = (Int *) cc->Iwork ;   // size m, aliased with the rest of Iwork
 
     // create numeric values of S = A(p,q) in row-form in Sx
+    /*! TODO: dont forget to free all allocated memories	 */
     double *Sx = (double*) cholmod_l_malloc (anz, sizeof (double), cc) ;
-    Int *Sp = (Int*) cholmod_l_malloc (anz, sizeof (Int), cc) ;
+    Int *W = (Int*) cholmod_l_malloc (m, sizeof (Int), cc) ;
+    Int *Sp = LUsym->Sp;
+    Int *Ai = (Int*) A->i;
+    Int *Ap = (Int*) A->p;
+    double *Ax = (double*) A->x;
 
-    if (cc->status == CHOLMOD_OK)
+    /*  I can either run the function or copy it here */
+    //    if (cc->status == CHOLMOD_OK)
+    //    {
+    //        // use Wi as workspace (Iwork (0:m-1)) [
+    //        spqr_stranspose2 (A, Qfill, Sp, PLinv, Sx, Wi) ;
+    //        // Wi no longer needed ]
+    //    }
+    for (Int row = 0 ; row < m ; row++)
     {
-        // use Wi as workspace (Iwork (0:m-1)) [
-        spqr_stranspose2 (A, Qfill, Sp, PLinv, Sx, Wi) ;
-        // Wi no longer needed ]
+        W [row] = Sp [row] ;
+    }
+
+    for (Int col = 0 ; col < n ; col++)     // for each column of A(:,Qfill)
+    {
+        Int j = Qfill ? Qfill [col] : col ; // col of S is column j of A
+        Int pend = Ap [j+1] ;
+        for (Int p = Ap [j] ; p < pend ; p++)
+        {
+            Int i = Ai [p] ;                // the entry A(i,j)
+            Int row = PLinv [i] ;           // row of S is row i of A
+            Int s = W [row]++ ;             // place S(row,col) in position
+            Sx [s] = Ax [p] ;
+        }
     }
 
 
-    
-    
-
-
-
+    /*! TODO: Substitute C matrix with S
+     * Sj?*/
+    Int *Sj= LUsym->Sj;
+    cholmod_sparse *C = cholmod_l_transpose (A, 1, cc);
     double *Cx;
     Int *Cp, *Ci, *Cnz;
-    Int p, pend, ncolC, xtype;
+    Int p, ncolC, xtype;
     ncolC = C->ncol;        Cp = (Int*) C->p;
     Ci = (Int*) C->i;       Cx = (double*) C->x;
     Cnz = (Int*) C->nz;     xtype = C->xtype;
@@ -101,7 +115,7 @@ void paru_init_rowFronts(
         Int j = 0;
         /* TODO: Initializing tuple list */
         p = Cp [i];
-        pend = p + Cnz[i];
+        Int pend = p + Cnz[i];
         for ( ; p < pend ; p++){
             colrowIndex[j] = Ci[p];
             colrowNum[j++] =   Cx[p];
