@@ -48,7 +48,6 @@ void paru_init_rowFronts(
     Int *Wi = (Int *) cc->Iwork ;   // size m, aliased with the rest of Iwork
 
     // create numeric values of S = A(p,q) in row-form in Sx
-    /*! TODO: dont forget to free all allocated memories	 */
     double *Sx = (double*) cholmod_l_malloc (anz, sizeof (double), cc) ;
     Int *W = (Int*) cholmod_l_malloc (m, sizeof (Int), cc) ;
     Int *Sp = LUsym->Sp;
@@ -85,23 +84,28 @@ void paru_init_rowFronts(
     /*! TODO: Substitute C matrix with S
      * Sj?*/
     Int *Sj= LUsym->Sj;
-    cholmod_sparse *C = cholmod_l_transpose (A, 1, cc);
-    double *Cx;
-    Int *Cp, *Ci, *Cnz;
-    Int p, ncolC, xtype;
-    ncolC = C->ncol;        Cp = (Int*) C->p;
-    Ci = (Int*) C->i;       Cx = (double*) C->x;
-    Cnz = (Int*) C->nz;     xtype = C->xtype;
-    ASSERT(ncolC == m);
-    if(xtype != CHOLMOD_REAL){
-        printf("Error: Input matrix is not double\n");
-        return; // Error: Just working with real for now
-    }
+
+
+//    cholmod_sparse *C = cholmod_l_transpose (A, 1, cc);
+//    double *Cx;
+//    Int *Cp, *Ci, *Cnz;
+//    Int p, ncolC, xtype;
+//    ncolC = C->ncol;        Cp = (Int*) C->p;
+//    Ci = (Int*) C->i;       Cx = (double*) C->x;
+//    Cnz = (Int*) C->nz;     xtype = C->xtype;
+//    ASSERT(ncolC == m);
+//    if(xtype != CHOLMOD_REAL){
+//        printf("Error: Input matrix is not double\n");
+//        return; // Error: Just working with real for now
+//    }
+
+
 
     for(Int i = 0; i < m ; i++){
         Int e = LUsym->row2atree[i]; //element number in augmented tree
         Int nrows = 1,
-            ncols = Cnz[i]; 
+           // ncols = Cnz[i]; 
+           ncols = Sp[i+1]-Sp[i];
 
         Element *curEl = elementList[e] =
             (Element*) paralloc(1,
@@ -114,15 +118,18 @@ void paru_init_rowFronts(
         double *colrowNum = (double*)(colrowIndex+nrows+ncols);
         Int j = 0;
         /* TODO: Initializing tuple list */
-        p = Cp [i];
-        Int pend = p + Cnz[i];
+        Int p = Sp [i];
+        Int pend = p + ncols;
         for ( ; p < pend ; p++){
-            colrowIndex[j] = Ci[p];
-            colrowNum[j++] =   Cx[p];
+            colrowIndex[j] = Sj[p];
+            colrowNum[j++] =   Sx[p];
             /* TODO Add col tuples:  <06-06-17, Me> */
         }
         colrowIndex[j++] = i;  //initializing row one item  
         /*! TODO: add Row tuple	 */
 
     }
+
+    parfree (anz, sizeof (double), Sx , cc) ;
+    parfree (m, sizeof (Int), W, cc) ;
 }

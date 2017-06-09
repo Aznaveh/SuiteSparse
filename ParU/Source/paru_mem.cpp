@@ -8,6 +8,9 @@ void *parcalloc(int n, int size, cholmod_common *cc){
      return cholmod_l_calloc(n,size,cc);        }
 
 
+void parfree(int n, int size, void *p,  cholmod_common *cc){
+    cholmod_l_free (n,   size, p, cc); }
+
 void paru_freesym(paru_symbolic **LUsym_handle,
             // workspace and parameters
     cholmod_common *cc

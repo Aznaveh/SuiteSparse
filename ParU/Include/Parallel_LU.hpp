@@ -53,18 +53,18 @@ struct paru_symbolic
     Int *Sj ;       // size anz = Sp [n], column indices of S
 
     Int *Qfill ;    // size n, fill-reducing column permutation.
-                        // Qfill [k] = j if column k of A is column j of S.
+    // Qfill [k] = j if column k of A is column j of S.
 
     Int *PLinv ;    // size m, inverse row permutation that places
-                        // S=A(P,Q) in increasing order of leftmost column
-                        // index.  PLinv [i] = k if row i of A is row k of S.
+    // S=A(P,Q) in increasing order of leftmost column
+    // index.  PLinv [i] = k if row i of A is row k of S.
 
     Int *Sleft ;    // size n+2.  The list of rows of S whose
-            // leftmost column index is j is given by
-            // Sleft [j] ... Sleft [j+1]-1.  This can be empty (that is, Sleft
-            // [j] can equal Sleft [j+1]).  Sleft [n] is the number of
-            // non-empty rows of S, and Sleft [n+1] == m.  That is, Sleft [n]
-            // ... Sleft [n+1]-1 gives the empty rows of S, if any.
+    // leftmost column index is j is given by
+    // Sleft [j] ... Sleft [j+1]-1.  This can be empty (that is, Sleft
+    // [j] can equal Sleft [j+1]).  Sleft [n] is the number of
+    // non-empty rows of S, and Sleft [n+1] == m.  That is, Sleft [n]
+    // ... Sleft [n+1]-1 gives the empty rows of S, if any.
 
     // -------------------------------------------------------------------------
     // frontal matrices: pattern and tree
@@ -74,7 +74,7 @@ struct paru_symbolic
     // column indices are given by a set of size fnpiv pivot columns, defined
     // by Super, followed by the pattern Rj [ Rp[f] ...  Rp[f+1]-1 ].
 
-     // The row indices of the front are not kept.  If the Householder vectors
+    // The row indices of the front are not kept.  If the Householder vectors
     // are not kept, the row indices are not needed.  If the Householder
     // vectors are kept, the row indices are computed dynamically during
     // numerical factorization.
@@ -101,24 +101,25 @@ struct paru_symbolic
     Int *aChildp; // size m+nf+2
 
     Int *Super ;    // size nf+1.  Super [f] gives the first
-        // pivot column in the front F.  This refers to a column of S.  The
-        // number of expected pivot columns in F is thus
-        // Super [f+1] - Super [f].
+    // pivot column in the front F.  This refers to a column of S.  The
+    // number of expected pivot columns in F is thus
+    // Super [f+1] - Super [f].
 
-   //Upper bound number of rows for each front
+    //Upper bound number of rows for each front
     Int *Fm ;               // size nf+1
 
     //Upper bound  number of rows in the contribution block of each front
     Int *Cm ;               // size nf+1
 
-    Int *row2atree;               //Mapping from rows to augmented tree size m
-    Int *super2atree;               //Mapping from super nodes to augmented tree size m
+    Int *row2atree;       //Mapping from rows to augmented tree size m
+    Int *super2atree;     //Mapping from super nodes to augmented tree size m
 
 };
 
 /* Wrappers for managing memory */
 void *paralloc(int n, int size, cholmod_common *cc);
 void *parcalloc(int n, int size, cholmod_common *cc);
+void parfree(int n, int size, void *p,  cholmod_common *cc);
 void paru_freesym(paru_symbolic **LUsym_handle,cholmod_common *cc);
 
 
@@ -162,7 +163,8 @@ typedef struct	/* Element */
 /* My next challenge is how to write Row/ColList
  * I want a dynamic size list and want to access them in parallel
  * Col_list must be sorted somehow
- * implement a datastructure whcih holds these lists with other information of the matrix
+ * implement a datastructure whcih holds these lists with other information of
+ * the matrix
  */
 typedef struct  /*List of tuples */
 {
@@ -183,5 +185,5 @@ typedef struct  /*Matrix */
     tupleList *ColList;  
     Element **elementList; //pointers to all elements, size = m+nf+1 
 
-    
+
 }   paru_matrix;
