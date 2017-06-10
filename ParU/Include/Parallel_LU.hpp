@@ -117,9 +117,9 @@ struct paru_symbolic
 };
 
 /* Wrappers for managing memory */
-void *paralloc(int n, int size, cholmod_common *cc);
-void *parcalloc(int n, int size, cholmod_common *cc);
-void parfree(int n, int size, void *p,  cholmod_common *cc);
+void *paru_alloc(int n, int size, cholmod_common *cc);
+void *paru_calloc(int n, int size, cholmod_common *cc);
+void paru_free(int n, int size, void *p,  cholmod_common *cc);
 void paru_freesym(paru_symbolic **LUsym_handle,cholmod_common *cc);
 
 
@@ -180,7 +180,8 @@ typedef struct  /*List of tuples */
 typedef struct  /*Matrix */
 {
     Int m, n;
-    paru_symbolic *sym;
+    Int slackRow, slackCol;
+    paru_symbolic *LUsym;
     tupleList *RowList;
     tupleList *ColList;  
     Element **elementList; //pointers to all elements, size = m+nf+1 

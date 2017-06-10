@@ -1,14 +1,14 @@
 /* Wrappers for managing memory */
 #include "Parallel_LU.hpp"
 
-void *paralloc(int n, int size, cholmod_common *cc){
+void *paru_alloc(int n, int size, cholmod_common *cc){
      return cholmod_l_malloc(n,size,cc);        }
 
-void *parcalloc(int n, int size, cholmod_common *cc){
+void *paru_calloc(int n, int size, cholmod_common *cc){
      return cholmod_l_calloc(n,size,cc);        }
 
 
-void parfree(int n, int size, void *p,  cholmod_common *cc){
+void paru_free(int n, int size, void *p,  cholmod_common *cc){
     cholmod_l_free (n,   size, p, cc); }
 
 void paru_freesym(paru_symbolic **LUsym_handle,
@@ -49,7 +49,42 @@ void paru_freesym(paru_symbolic **LUsym_handle,
 
     *LUsym_handle = NULL;
 }
-/*! TODO: free matrix and elements workspace	 */
+/*! It uses LUsym, Do not free LUsym before*/
+void paru_freemat(paru_matrix **paruMatInfo_handle,
+    cholmod_common *cc
+){
+    if (paruMatInfo_handle == NULL || *paruMatInfo_handle == NULL ){
+        return;
+    }
+    paru_matrix *paruMatInfo;
+    paruMatInfo = *paruMatInfo_handle;
 
+    Int m,n;  
+    m = paruMatInfo->m;       n = paruMatInfo->n; 
+    Int slackRow = paruMatInfo->slackRow;
+    Int slackCol = paruMatInfo->slackCol;
 
+    tupleList *RowList,*ColList;
+    RowList= paruMatInfo->RowList; 
+    cholmod_l_free (slackRow, m*sizeof(tupleList), RowList, cc);
+    ColList= paruMatInfo->ColList;
+    cholmod_l_free (slackCol, n*sizeof(tupleList), ColList, cc);
+
+    paru_symbolic *LUsym = paruMatInfo-> LUsym;
+    Element **elementList; 
+    elementList = paruMatInfo->elementList;
+
+    for(Int i = 0; i < m ; i++){        // freeing all elements
+        Int e = LUsym->row2atree[i];    //element number in augmented tree
+        Element *curEl = elementList[e];
+        if (curEl == NULL) continue;
+        Int nrows = curEl->nrows,
+           ncols = curEl->ncols;
+        cholmod_l_free (1, sizeof(Element)+sizeof(Int)*(nrows+ncols)+
+                    sizeof(double)*nrows*ncols, curEl, cc);
+    }
+    Int nf = LUsym->nf;
+    cholmod_l_free (1, (m+nf+1)*sizeof(Element), elementList, cc);
+    *paruMatInfo_handle = NULL;
+} 
 

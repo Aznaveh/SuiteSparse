@@ -22,22 +22,29 @@ void paru_init_rowFronts(
         cholmod_common *cc
 ){
 
-    paru_matrix *Amat;
-    Amat = (paru_matrix*) paralloc (1,sizeof(paru_matrix),cc);
-    if (Amat == NULL){   //out of memory
+    paru_matrix *paruMatInfo;
+    paruMatInfo = (paru_matrix*) paru_alloc (1,sizeof(paru_matrix),cc);
+    if (paruMatInfo == NULL){   //out of memory
         return;
     }
 
-    Int m,n;     Int slackRow=2,slackCol=2;
-    m= Amat->m= LUsym->m;   n= Amat->n= LUsym->n; 
+    
+    Int m,n;  
+    m = paruMatInfo->m = LUsym->m;   
+    n = paruMatInfo->n = LUsym->n; 
+
+    //constants for initialzing lists
+    Int slackRow = paruMatInfo->slackRow = 2;
+    Int slackCol = paruMatInfo->slackCol = 2;
+
     tupleList *RowList,*ColList;
-    RowList=Amat->RowList =
-        (tupleList*) paralloc (slackRow, m*sizeof(tupleList), cc);
-    ColList=Amat->ColList =
-        (tupleList*) paralloc (slackCol, n*sizeof(tupleList), cc);
+    RowList= paruMatInfo->RowList =
+        (tupleList*) paru_alloc (slackRow, m*sizeof(tupleList), cc);
+    ColList= paruMatInfo->ColList =
+        (tupleList*) paru_alloc (slackCol, n*sizeof(tupleList), cc);
     Element **elementList; Int nf = LUsym->nf;
-    elementList = Amat->elementList = // Initialize with NULL
-        (Element**) parcalloc (1, (m+nf+1)*sizeof(Element), cc);
+    elementList = paruMatInfo->elementList = // Initialize with NULL
+        (Element**) paru_calloc (1, (m+nf+1)*sizeof(Element), cc);
 
     /// -------------------------------------------------------------------------
     // create S = A (p,q)', or S=A(p,q) if S is considered to be in row-form
@@ -85,7 +92,7 @@ void paru_init_rowFronts(
      * Sj?*/
     Int *Sj= LUsym->Sj;
 
-
+//      I am not using CHOLMOD for transposing
 //    cholmod_sparse *C = cholmod_l_transpose (A, 1, cc);
 //    double *Cx;
 //    Int *Cp, *Ci, *Cnz;
@@ -108,7 +115,7 @@ void paru_init_rowFronts(
            ncols = Sp[i+1]-Sp[i];
 
         Element *curEl = elementList[e] =
-            (Element*) paralloc(1,
+            (Element*) paru_alloc(1,
                     sizeof(Element)+sizeof(Int)*(nrows+ncols)+ 
                     sizeof(double)*nrows*ncols, cc);
         curEl->nrowsleft = curEl->nrows = nrows;
@@ -130,6 +137,6 @@ void paru_init_rowFronts(
 
     }
 
-    parfree (anz, sizeof (double), Sx , cc) ;
-    parfree (m, sizeof (Int), W, cc) ;
+    paru_free (anz, sizeof (double), Sx , cc) ;
+    paru_free (m, sizeof (Int), W, cc) ;
 }
