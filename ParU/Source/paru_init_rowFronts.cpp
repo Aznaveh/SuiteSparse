@@ -11,7 +11,7 @@
  * 
  * Updating row and column list and allocating memory for fronts will
  *  be implemnted in different files and will be reused for other fronts      */
-
+/*! TODO: error checking for all memmory allocation	 */
 #include "Parallel_LU.hpp"
 void paru_init_rowFronts(
         // inputs, not modified
@@ -33,15 +33,13 @@ void paru_init_rowFronts(
     m = paruMatInfo->m = LUsym->m;   
     n = paruMatInfo->n = LUsym->n; 
 
-    //constants for initialzing lists
-    Int slackRow = paruMatInfo->slackRow = 2;
-    Int slackCol = paruMatInfo->slackCol = 2;
-
     tupleList *RowList,*ColList;
     RowList= paruMatInfo->RowList =
-        (tupleList*) paru_alloc (slackRow, m*sizeof(tupleList), cc);
+        (tupleList*) paru_alloc (1, m*sizeof(tupleList), cc);
+
     ColList= paruMatInfo->ColList =
-        (tupleList*) paru_alloc (slackCol, n*sizeof(tupleList), cc);
+        (tupleList*) paru_alloc (1, n*sizeof(tupleList), cc);
+
     Element **elementList; Int nf = LUsym->nf;
     elementList = paruMatInfo->elementList = // Initialize with NULL
         (Element**) paru_calloc (1, (m+nf+1)*sizeof(Element), cc);
@@ -62,7 +60,7 @@ void paru_init_rowFronts(
     Int *Ap = (Int*) A->p;
     double *Ax = (double*) A->x;
 
-    /*  I can either run the function or copy it here */
+    /*  I can either run the function or copy the content here */
     //    if (cc->status == CHOLMOD_OK)
     //    {
     //        // use Wi as workspace (Iwork (0:m-1)) [
@@ -87,9 +85,6 @@ void paru_init_rowFronts(
         }
     }
 
-
-    /*! TODO: Substitute C matrix with S
-     * Sj?*/
     Int *Sj= LUsym->Sj;
 
 //      I am not using CHOLMOD for transposing
@@ -106,13 +101,30 @@ void paru_init_rowFronts(
 //        return; // Error: Just working with real for now
 //    }
 
+    //constants for initialzing lists
+    Int slackRow = paruMatInfo->slackRow = 2;
+    Int slackCol = paruMatInfo->slackCol = 2;
 
+        /* TODO: Initializing tuple list */
+    /* allocating column list must happend beforehand
+     *  I think I should use Qfill inverse 
+     *  I need number of column members of S
+     *  while S is row based I am using A so 
+     */
+    for (Int col = 0 ; col < n ; col++){     //allocating Column list tuple 
+        Int j = Qfill ? Qfill [col] : col ;  // col of S is column j of A
+        Int ncols = Ap[j+1]-Ap[j];
+         ColList[col].list = 
+            (Tuple*) paru_alloc (1, slackCol*ncols*sizeof(Tuple), cc);
+        // /*! TODO: Error in allocating memory	 */
+    }
+  
 
-    for(Int i = 0; i < m ; i++){
-        Int e = LUsym->row2atree[i]; //element number in augmented tree
+    for(Int row = 0; row < m ; row++){
+        Int e = LUsym->row2atree[row]; //element number in augmented tree
         Int nrows = 1,
-           // ncols = Cnz[i]; 
-           ncols = Sp[i+1]-Sp[i];
+           // ncols = Cnz[row]; 
+           ncols = Sp[row+1]-Sp[row];
 
         Element *curEl = elementList[e] =
             (Element*) paru_alloc(1,
@@ -124,15 +136,26 @@ void paru_init_rowFronts(
         Int *colrowIndex = (Int*)(curEl+1);
         double *colrowNum = (double*)(colrowIndex+nrows+ncols);
         Int j = 0;
-        /* TODO: Initializing tuple list */
-        Int p = Sp [i];
+
+        RowList[row].list =
+            (Tuple*) paru_alloc (1, slackRow*nrows*sizeof(Tuple), cc);
+        // /*! TODO: Error in allocating memory	 */
+        Tuple curTuple;
+        curTuple.e = e;  
+        curTuple.f = 1;  
+        RowList[row].list[1] = curTuple; /* structure assignment          */
+        /* there is no pointer in Tuple  */
+        RowList[row].numTuple = 1;
+        RowList[row].len = slackRow;
+
+         Int p = Sp [row];
         Int pend = p + ncols;
         for ( ; p < pend ; p++){
             colrowIndex[j] = Sj[p];
             colrowNum[j++] =   Sx[p];
             /* TODO Add col tuples:  <06-06-17, Me> */
         }
-        colrowIndex[j++] = i;  //initializing row one item  
+        colrowIndex[j++] = row;  //initializing row one item  
         /*! TODO: add Row tuple	 */
 
     }

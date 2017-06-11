@@ -64,11 +64,13 @@ void paru_freemat(paru_matrix **paruMatInfo_handle,
     Int slackRow = paruMatInfo->slackRow;
     Int slackCol = paruMatInfo->slackCol;
 
+    /*! TODO: I am changing tuple list allocation
+     *  I have to change the free mechanism here too*/
     tupleList *RowList,*ColList;
     RowList= paruMatInfo->RowList; 
-    cholmod_l_free (slackRow, m*sizeof(tupleList), RowList, cc);
+    cholmod_l_free (1, m*sizeof(tupleList), RowList, cc);
     ColList= paruMatInfo->ColList;
-    cholmod_l_free (slackCol, n*sizeof(tupleList), ColList, cc);
+    cholmod_l_free (1, n*sizeof(tupleList), ColList, cc);
 
     paru_symbolic *LUsym = paruMatInfo-> LUsym;
     Element **elementList; 

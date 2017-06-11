@@ -171,7 +171,7 @@ typedef struct  /*List of tuples */
     /*element of a column or a row*/
     Int
         numTuple,   /*  number of Tuples in this element */
-        numFree;    /*  number of free spaces for newer tuples */
+        len;    /*  length of allocated space for current list*/
     Tuple *list;    /* list of tuples regarding to this element */
 }   tupleList;
 
