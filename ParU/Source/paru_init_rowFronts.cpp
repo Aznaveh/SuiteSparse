@@ -11,7 +11,6 @@
  * 
  * Updating row and column list and allocating memory for fronts will
  *  be implemnted in different files and will be reused for other fronts      */
-/*! TODO: error checking for all memmory allocation	 */
 #include "Parallel_LU.hpp"
 void paru_init_rowFronts(
         // inputs, not modified
@@ -25,6 +24,7 @@ void paru_init_rowFronts(
     paru_matrix *paruMatInfo;
     paruMatInfo = (paru_matrix*) paru_alloc (1,sizeof(paru_matrix),cc);
     if (paruMatInfo == NULL){   //out of memory
+        printf("Out of memory: paruMatInfo\n");
         return;
     }
 
@@ -36,13 +36,27 @@ void paru_init_rowFronts(
     tupleList *RowList,*ColList;
     RowList= paruMatInfo->RowList =
         (tupleList*) paru_alloc (1, m*sizeof(tupleList), cc);
+    if (RowList == NULL){   //out of memory
+        printf("Out of memory: RowList\n");
+        return;
+    }
 
     ColList= paruMatInfo->ColList =
         (tupleList*) paru_alloc (1, n*sizeof(tupleList), cc);
+    if (ColList== NULL){   //out of memory
+        printf("Out of memory: ColList\n");
+        return;
+    }
+
 
     Element **elementList; Int nf = LUsym->nf;
     elementList = paruMatInfo->elementList = // Initialize with NULL
         (Element**) paru_calloc (1, (m+nf+1)*sizeof(Element), cc);
+    if (elementList == NULL){   //out of memory
+        printf("Out of memory: elementList\n");
+        return;
+    }
+
 
     /// -------------------------------------------------------------------------
     // create S = A (p,q)', or S=A(p,q) if S is considered to be in row-form
@@ -54,7 +68,15 @@ void paru_init_rowFronts(
 
     // create numeric values of S = A(p,q) in row-form in Sx
     double *Sx = (double*) cholmod_l_malloc (anz, sizeof (double), cc) ;
+    if (Sx == NULL){   //out of memory
+        printf("Out of memory: Sx\n");
+        return;
+    }
     Int *W = (Int*) cholmod_l_malloc (m, sizeof (Int), cc) ;
+    if (W == NULL){   //out of memory
+        printf("Out of memory: W\n");
+        return;
+    }
     Int *Sp = LUsym->Sp;
     Int *Ai = (Int*) A->i;
     Int *Ap = (Int*) A->p;
@@ -87,19 +109,19 @@ void paru_init_rowFronts(
 
     Int *Sj= LUsym->Sj;
 
-//      I am not using CHOLMOD for transposing
-//    cholmod_sparse *C = cholmod_l_transpose (A, 1, cc);
-//    double *Cx;
-//    Int *Cp, *Ci, *Cnz;
-//    Int p, ncolC, xtype;
-//    ncolC = C->ncol;        Cp = (Int*) C->p;
-//    Ci = (Int*) C->i;       Cx = (double*) C->x;
-//    Cnz = (Int*) C->nz;     xtype = C->xtype;
-//    ASSERT(ncolC == m);
-//    if(xtype != CHOLMOD_REAL){
-//        printf("Error: Input matrix is not double\n");
-//        return; // Error: Just working with real for now
-//    }
+    //      I am not using CHOLMOD for transposing
+    //    cholmod_sparse *C = cholmod_l_transpose (A, 1, cc);
+    //    double *Cx;
+    //    Int *Cp, *Ci, *Cnz;
+    //    Int p, ncolC, xtype;
+    //    ncolC = C->ncol;        Cp = (Int*) C->p;
+    //    Ci = (Int*) C->i;       Cx = (double*) C->x;
+    //    Cnz = (Int*) C->nz;     xtype = C->xtype;
+    //    ASSERT(ncolC == m);
+    //    if(xtype != CHOLMOD_REAL){
+    //        printf("Error: Input matrix is not double\n");
+    //        return; // Error: Just working with real for now
+    //    }
 
     //constants for initialzing lists
     Int slackRow = paruMatInfo->slackRow = 2;
@@ -115,21 +137,31 @@ void paru_init_rowFronts(
         Int j = Qfill ? Qfill [col] : col ;  // col of S is column j of A
         Int ncols = Ap[j+1]-Ap[j];
          ColList[col].list = 
-            (Tuple*) paru_alloc (1, slackCol*ncols*sizeof(Tuple), cc);
-        // /*! TODO: Error in allocating memory	 */
+             (Tuple*) paru_alloc (1, slackCol*ncols*sizeof(Tuple), cc);
+         if (ColList[col].list == NULL){   //out of memory
+             printf("Out of memory: ColList[col].list\n");
+             return;
+         }
+
     }
-  
+
 
     for(Int row = 0; row < m ; row++){
         Int e = LUsym->row2atree[row]; //element number in augmented tree
         Int nrows = 1,
-           // ncols = Cnz[row]; 
-           ncols = Sp[row+1]-Sp[row];
+            // ncols = Cnz[row]; 
+            ncols = Sp[row+1]-Sp[row];
 
         Element *curEl = elementList[e] =
             (Element*) paru_alloc(1,
                     sizeof(Element)+sizeof(Int)*(nrows+ncols)+ 
                     sizeof(double)*nrows*ncols, cc);
+         if (curEl == NULL){   //out of memory
+             printf("Out of memory: curEl\n");
+             return;
+         }
+
+
         curEl->nrowsleft = curEl->nrows = nrows;
         curEl->ncolsleft = curEl->ncols = ncols;
 
@@ -139,7 +171,12 @@ void paru_init_rowFronts(
 
         RowList[row].list =
             (Tuple*) paru_alloc (1, slackRow*nrows*sizeof(Tuple), cc);
-        // /*! TODO: Error in allocating memory	 */
+         if (RowList[row].list == NULL){   //out of memory
+             printf("Out of memory: RowList[row].list \n");
+             return;
+         }
+
+
         Tuple curTuple;
         curTuple.e = e;  
         curTuple.f = 1;  
@@ -148,7 +185,7 @@ void paru_init_rowFronts(
         RowList[row].numTuple = 1;
         RowList[row].len = slackRow;
 
-         Int p = Sp [row];
+        Int p = Sp [row];
         Int pend = p + ncols;
         for ( ; p < pend ; p++){
             colrowIndex[j] = Sj[p];
