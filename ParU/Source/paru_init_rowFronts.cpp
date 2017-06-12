@@ -82,30 +82,31 @@ void paru_init_rowFronts(
     Int *Ap = (Int*) A->p;
     double *Ax = (double*) A->x;
 
+    /*! TODO: Use the spqr_stranspose2 */
     /*  I can either run the function or copy the content here */
-    //    if (cc->status == CHOLMOD_OK)
-    //    {
-    //        // use Wi as workspace (Iwork (0:m-1)) [
-    //        spqr_stranspose2 (A, Qfill, Sp, PLinv, Sx, Wi) ;
-    //        // Wi no longer needed ]
-    //    }
-    for (Int row = 0 ; row < m ; row++)
-    {
-        W [row] = Sp [row] ;
-    }
-
-    for (Int col = 0 ; col < n ; col++)     // for each column of A(:,Qfill)
-    {
-        Int j = Qfill ? Qfill [col] : col ; // col of S is column j of A
-        Int pend = Ap [j+1] ;
-        for (Int p = Ap [j] ; p < pend ; p++)
+        if (cc->status == CHOLMOD_OK)
         {
-            Int i = Ai [p] ;                // the entry A(i,j)
-            Int row = PLinv [i] ;           // row of S is row i of A
-            Int s = W [row]++ ;             // place S(row,col) in position
-            Sx [s] = Ax [p] ;
+            // use Wi as workspace (Iwork (0:m-1)) [
+            spqr_stranspose2 (A, Qfill, Sp, PLinv, Sx, Wi) ;
+            // Wi no longer needed ]
         }
-    }
+ //   for (Int row = 0 ; row < m ; row++)
+ //   {
+ //       W [row] = Sp [row] ;
+ //   }
+
+ //   for (Int col = 0 ; col < n ; col++)     // for each column of A(:,Qfill)
+ //   {
+ //       Int j = Qfill ? Qfill [col] : col ; // col of S is column j of A
+ //       Int pend = Ap [j+1] ;
+ //       for (Int p = Ap [j] ; p < pend ; p++)
+ //       {
+ //           Int i = Ai [p] ;                // the entry A(i,j)
+ //           Int row = PLinv [i] ;           // row of S is row i of A
+ //           Int s = W [row]++ ;             // place S(row,col) in position
+ //           Sx [s] = Ax [p] ;
+ //       }
+ //   }
 
     Int *Sj= LUsym->Sj;
 
