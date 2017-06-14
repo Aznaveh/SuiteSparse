@@ -20,10 +20,15 @@ void paru_init_rowFronts(
         // workspace and parameters
         cholmod_common *cc
 ){
+    if (!A->packed){
+        printf("A is not packed; Wrong format \n");
+        return;
+    }
 
     paru_matrix *paruMatInfo;
     paruMatInfo = (paru_matrix*) paru_alloc (1,sizeof(paru_matrix),cc);
     if (paruMatInfo == NULL){   //out of memory
+        paru_freemat (&paruMatInfo, cc);
         printf("Out of memory: paruMatInfo\n");
         return;
     }
@@ -37,6 +42,7 @@ void paru_init_rowFronts(
     RowList= paruMatInfo->RowList =
         (tupleList*) paru_alloc (1, m*sizeof(tupleList), cc);
     if (RowList == NULL){   //out of memory
+        paru_freemat (&paruMatInfo, cc);
         printf("Out of memory: RowList\n");
         return;
     }
@@ -44,6 +50,7 @@ void paru_init_rowFronts(
     ColList= paruMatInfo->ColList =
         (tupleList*) paru_alloc (1, n*sizeof(tupleList), cc);
     if (ColList== NULL){   //out of memory
+        paru_freemat (&paruMatInfo, cc);
         printf("Out of memory: ColList\n");
         return;
     }
@@ -53,6 +60,7 @@ void paru_init_rowFronts(
     elementList = paruMatInfo->elementList = // Initialize with NULL
         (Element**) paru_calloc (1, (m+nf+1)*sizeof(Element), cc);
     if (elementList == NULL){   //out of memory
+        paru_freemat (&paruMatInfo, cc);
         printf("Out of memory: elementList\n");
         return;
     }
@@ -69,11 +77,13 @@ void paru_init_rowFronts(
     // create numeric values of S = A(p,q) in row-form in Sx
     double *Sx = (double*) cholmod_l_malloc (anz, sizeof (double), cc) ;
     if (Sx == NULL){   //out of memory
+        paru_freemat (&paruMatInfo, cc);
         printf("Out of memory: Sx\n");
         return;
     }
     Int *W = (Int*) cholmod_l_malloc (m, sizeof (Int), cc) ;
     if (W == NULL){   //out of memory
+        paru_freemat (&paruMatInfo, cc);
         printf("Out of memory: W\n");
         return;
     }
@@ -82,7 +92,6 @@ void paru_init_rowFronts(
     Int *Ap = (Int*) A->p;
     double *Ax = (double*) A->x;
 
-    /*! TODO: Use the spqr_stranspose2 */
     /*  I can either run the function or copy the content here */
         if (cc->status == CHOLMOD_OK)
         {
@@ -90,39 +99,8 @@ void paru_init_rowFronts(
             spqr_stranspose2 (A, Qfill, Sp, PLinv, Sx, Wi) ;
             // Wi no longer needed ]
         }
- //   for (Int row = 0 ; row < m ; row++)
- //   {
- //       W [row] = Sp [row] ;
- //   }
-
- //   for (Int col = 0 ; col < n ; col++)     // for each column of A(:,Qfill)
- //   {
- //       Int j = Qfill ? Qfill [col] : col ; // col of S is column j of A
- //       Int pend = Ap [j+1] ;
- //       for (Int p = Ap [j] ; p < pend ; p++)
- //       {
- //           Int i = Ai [p] ;                // the entry A(i,j)
- //           Int row = PLinv [i] ;           // row of S is row i of A
- //           Int s = W [row]++ ;             // place S(row,col) in position
- //           Sx [s] = Ax [p] ;
- //       }
- //   }
 
     Int *Sj= LUsym->Sj;
-
-    //      I am not using CHOLMOD for transposing
-    //    cholmod_sparse *C = cholmod_l_transpose (A, 1, cc);
-    //    double *Cx;
-    //    Int *Cp, *Ci, *Cnz;
-    //    Int p, ncolC, xtype;
-    //    ncolC = C->ncol;        Cp = (Int*) C->p;
-    //    Ci = (Int*) C->i;       Cx = (double*) C->x;
-    //    Cnz = (Int*) C->nz;     xtype = C->xtype;
-    //    ASSERT(ncolC == m);
-    //    if(xtype != CHOLMOD_REAL){
-    //        printf("Error: Input matrix is not double\n");
-    //        return; // Error: Just working with real for now
-    //    }
 
     //constants for initialzing lists
     Int slackRow = paruMatInfo->slackRow = 2;
@@ -140,17 +118,16 @@ void paru_init_rowFronts(
          ColList[col].list = 
              (Tuple*) paru_alloc (1, slackCol*ncols*sizeof(Tuple), cc);
          if (ColList[col].list == NULL){   //out of memory
+             paru_freemat (&paruMatInfo, cc);
              printf("Out of memory: ColList[col].list\n");
              return;
          }
-
     }
 
 
     for(Int row = 0; row < m ; row++){
         Int e = LUsym->row2atree[row]; //element number in augmented tree
         Int nrows = 1,
-            // ncols = Cnz[row]; 
             ncols = Sp[row+1]-Sp[row];
 
         Element *curEl = elementList[e] =
@@ -158,43 +135,64 @@ void paru_init_rowFronts(
                     sizeof(Element)+sizeof(Int)*(nrows+ncols)+ 
                     sizeof(double)*nrows*ncols, cc);
          if (curEl == NULL){   //out of memory
+             paru_freemat (&paruMatInfo, cc);
              printf("Out of memory: curEl\n");
              return;
          }
 
-
         curEl->nrowsleft = curEl->nrows = nrows;
         curEl->ncolsleft = curEl->ncols = ncols;
 
-        Int *colrowIndex = (Int*)(curEl+1);
-        double *colrowNum = (double*)(colrowIndex+nrows+ncols);
-        Int j = 0;
-
         RowList[row].list =
             (Tuple*) paru_alloc (1, slackRow*nrows*sizeof(Tuple), cc);
-         if (RowList[row].list == NULL){   //out of memory
-             printf("Out of memory: RowList[row].list \n");
-             return;
-         }
+        if (RowList[row].list == NULL){   //out of memory
+            paru_freemat (&paruMatInfo, cc);
+            printf("Out of memory: RowList[row].list \n");
+            return;
+        }
 
 
-        Tuple curTuple;
-        curTuple.e = e;  
-        curTuple.f = 1;  
-        RowList[row].list[1] = curTuple; /* structure assignment          */
-        /* there is no pointer in Tuple  */
+        Tuple colTuple;
+        colTuple.e = e;  
+        colTuple.f = 1;  
+        RowList[row].list[1] = colTuple; /* structure assignment          */
+                                         /*It is ok while
+                                          * there is no pointer in Tuple  */
         RowList[row].numTuple = 1;
         RowList[row].len = slackRow;
 
         Int p = Sp [row];
         Int pend = p + ncols;
+
+        // pointers to elemt index and values
+        Int *colrowIndex = (Int*)(curEl+1);
+        double *colrowNum = (double*)(colrowIndex+nrows+ncols);
+        Int j = 0;
+
         for ( ; p < pend ; p++){
             colrowIndex[j] = Sj[p];
             colrowNum[j++] =   Sx[p];
-            /* TODO Add col tuples:  <06-06-17, Me> */
+            // adding column tuple
+            Tuple colTuple;
+            colTuple.e = e;
+            colTuple.f = j;
+            if ( !paru_add_colTuple (ColList, col, colTuple, cc) ){
+                paru_freemat (&paruMatInfo, cc);
+                printf("Out of memory: add_colTuple \n");
+                return;
+            }
+
         }
         colrowIndex[j++] = row;  //initializing row one item  
-        /*! TODO: add Row tuple	 */
+        // adding row tuple
+        Tuple rowTuple;
+        rowTuple.e = e;
+        rowTuple.f = 1;
+        if ( !paru_add_rowTuple (RowList, row, rowTuple, cc) ){
+            paru_freemat (&paruMatInfo, cc);
+            printf("Out of memory: add_rowTuple \n");
+            return;
+        }
 
     }
 

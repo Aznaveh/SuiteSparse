@@ -34,6 +34,7 @@ my_*.out
 *.swp
 .DS_Store
 .nfs*
+tags
 
 # ignore these specific programs in the Package/Demo directories
 AMD/Demo/amd_demo

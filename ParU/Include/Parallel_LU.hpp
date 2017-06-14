@@ -100,7 +100,6 @@ struct paru_symbolic
     Int *aChild; // size m+nf+1
     Int *aChildp; // size m+nf+2
 
-    Int *Super ;    // size nf+1.  Super [f] gives the first
     // pivot column in the front F.  This refers to a column of S.  The
     // number of expected pivot columns in F is thus
     // Super [f+1] - Super [f].
@@ -111,17 +110,15 @@ struct paru_symbolic
     //Upper bound  number of rows in the contribution block of each front
     Int *Cm ;               // size nf+1
 
+    Int *Super ;    // size nf+1.  Super [f] gives the first
+        // pivot column in the front F.  This refers to a column of S.  The
+        // number of expected pivot columns in F is thus
+        // Super [f+1] - Super [f].
+ 
     Int *row2atree;       //Mapping from rows to augmented tree size m
     Int *super2atree;     //Mapping from super nodes to augmented tree size m
 
 };
-
-/* Wrappers for managing memory */
-void *paru_alloc(int n, int size, cholmod_common *cc);
-void *paru_calloc(int n, int size, cholmod_common *cc);
-void paru_free(int n, int size, void *p,  cholmod_common *cc);
-void paru_freesym(paru_symbolic **LUsym_handle,cholmod_common *cc);
-
 
 paru_symbolic *paru_sym_analyse
 ( cholmod_sparse *A, cholmod_common *cc) ;
@@ -160,6 +157,7 @@ typedef struct	/* Element */
 
 } Element ;
 
+/*! TODO: */
 /* My next challenge is how to write Row/ColList
  * I want a dynamic size list and want to access them in parallel
  * Col_list must be sorted somehow
@@ -188,3 +186,17 @@ typedef struct  /*Matrix */
 
 
 }   paru_matrix;
+
+
+/* Wrappers for managing memory */
+void *paru_alloc(int n, int size, cholmod_common *cc);
+void *paru_calloc(int n, int size, cholmod_common *cc);
+void paru_free(int n, int size, void *p,  cholmod_common *cc);
+void paru_freesym(paru_symbolic **LUsym_handle,cholmod_common *cc);
+void paru_freemat(paru_matrix **paruMatInfo_handle, cholmod_common *cc);
+
+/* add tuple functions defintions */
+int paru_add_rowTuple (tupleList *RowList, Int row, Tuple T, 
+        cholmod_common *cc);
+int paru_add_colTuple (tupleList *ColList, Int col, 
+        Tuple T, cholmod_common *cc);

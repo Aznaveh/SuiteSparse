@@ -36,7 +36,8 @@ INC = ../Include/Parallel_LU.hpp
 OBJ = \
     paru_mem.o \
     paru_sym_analyse.o \
-	paru_init_rowFronts.o
+	paru_init_rowFronts.o\
+	paru_add_tuples.o
 
 $(OBJ): $(INC)
 
@@ -60,6 +61,9 @@ paru_sym_analyse.o: ../Source/paru_sym_analyse.cpp
 	$(C) -c $<
 
 paru_init_rowFronts.o: ../Source/paru_init_rowFronts.cpp
+	$(C) -c $<
+
+paru_add_tuples.o: ../Source/paru_add_tuples.c
 	$(C) -c $<
 
 #-------------------------------------------------------------------------------
