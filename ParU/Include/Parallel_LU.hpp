@@ -155,15 +155,9 @@ typedef struct	/* Element */
        size of C is nrows*ncols Entry's
        */
 
-} Element ;
+} Element ; // contribution block
 
-/*! TODO: */
-/* My next challenge is how to write Row/ColList
- * I want a dynamic size list and want to access them in parallel
- * Col_list must be sorted somehow
- * implement a datastructure whcih holds these lists with other information of
- * the matrix
- */
+
 typedef struct  /*List of tuples */
 {
     /*element of a column or a row*/
@@ -171,6 +165,7 @@ typedef struct  /*List of tuples */
         numTuple,   /*  number of Tuples in this element */
         len;    /*  length of allocated space for current list*/
     Tuple *list;    /* list of tuples regarding to this element */
+
 }   tupleList;
 
 
@@ -178,12 +173,10 @@ typedef struct  /*List of tuples */
 typedef struct  /*Matrix */
 {
     Int m, n;
-    Int slackRow, slackCol;
     paru_symbolic *LUsym;
     tupleList *RowList;
     tupleList *ColList;  
     Element **elementList; //pointers to all elements, size = m+nf+1 
-
 
 }   paru_matrix;
 

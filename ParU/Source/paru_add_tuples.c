@@ -10,18 +10,18 @@
 int paru_add_rowTuple (tupleList *RowList, Int row, 
         Tuple T, cholmod_common *cc)
 {
-    tupleList cur= RowList[row];
+    tupleList cur = RowList[row];
     if (cur.len > cur.numTuple)
         cur.list [++cur.numTuple] = T;
     else{
-            Int newLen = (cur.len*2)+1;
+            Int newLen = cur.len*2 + 1;
             Tuple *newList = 
                 (Tuple*) paru_alloc (1, newLen*sizeof(Tuple), cc);
-            if( newList == NULL)
+            if (newList == NULL)    // Error in allocating memory
                 return 1;
-            paru_free (cur.len, sizeof(Tuple), cur.list, cc); 
             for (int i = 0; i < cur.len; ++i) //copy old to new
                 newList [i] = cur.list [i];
+            paru_free (cur.len, sizeof(Tuple), cur.list, cc); 
             cur.len = newLen;
             cur.list = newList;
             cur.list [++cur.numTuple] = T;
@@ -30,20 +30,20 @@ int paru_add_rowTuple (tupleList *RowList, Int row,
 }
    
 int paru_add_colTuple (tupleList *ColList, Int col, 
-        Tuple T, cholmod_common *cc)
+        Tuple T, cholmod_common *cc)  /*! TODO: Sort for parallel case	 */
 {
-    tupleList cur= ColList [col];
+    tupleList cur = ColList [col];
     if (cur.len > cur.numTuple)
         cur.list [++cur.numTuple] = T;
     else{
-            Int newLen = (cur.len*2)+1;
+            Int newLen = cur.len*2 + 1;
             Tuple *newList = 
                 (Tuple*) paru_alloc (1, newLen*sizeof(Tuple), cc);
-            if( newList == NULL)
+            if (newList == NULL)    // Error in allocating memory
                 return 1;
-            paru_free (cur.len, sizeof(Tuple), cur.list, cc); 
             for (int i = 0; i < cur.len; ++i) //copy old to new
                 newList [i] = cur.list [i];
+            paru_free (cur.len, sizeof(Tuple), cur.list, cc); 
             cur.len = newLen;
             cur.list = newList;
             cur.list [++cur.numTuple] = T;
