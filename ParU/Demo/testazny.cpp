@@ -22,18 +22,23 @@ int main (int argc, char **argv)
     }
     // paru_sym_analyse(A,cc,LUsym);
     LUsym = paru_sym_analyse (A, cc) ;
+    paru_matrix *paruMatInfo = paru_init_rowFronts (A, LUsym, cc);
 
+    
     cholmod_l_free_sparse (&A, cc) ;
-    paru_freesym(&LUsym,cc);
+//    paru_freemat (&paruMatInfo, cc);
+
+    paru_freesym (&LUsym,cc);
     ASSERT (LUsym == NULL) ;
 
 
-    PRLEVEL (1, ("malloc_count %ld inuse %ld\n", cc->malloc_count, cc->memory_inuse));
+    PRLEVEL (1, ("malloc_count %ld inuse %ld\n", 
+                cc->malloc_count, cc->memory_inuse));
 
-
+    printf("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%\n");
     cholmod_l_finish (cc) ;
- //   printf ("malloc_count %ld inuse %ld\n", cc->malloc_count, cc->memory_inuse);
-//Valgrind :)
+    //   printf ("malloc_count %ld inuse %ld\n", cc->malloc_count, cc->memory_inuse);
+    //Valgrind :)
     fclose(stdin);
     fclose(stdout);
     fclose(stderr);

@@ -31,7 +31,7 @@ void paru_freesym (paru_symbolic **LUsym_handle,
     n = LUsym->n;
     nf = LUsym->nf; anz = LUsym->anz; 
     cholmod_l_free (nf+1, sizeof (SuiteSparse_long), LUsym->Super, cc);
-    cholmod_l_free (nf+1, sizeof (SuiteSparse_long), LUsym->Parent, cc);
+//    cholmod_l_free (nf+1, sizeof (SuiteSparse_long), LUsym->Parent, cc);
     cholmod_l_free (nf+2, sizeof (SuiteSparse_long), LUsym->Childp, cc);
     cholmod_l_free (nf+1, sizeof (SuiteSparse_long), LUsym->Child, cc);
     cholmod_l_free (n+2,  sizeof (SuiteSparse_long), LUsym->Sleft, cc);

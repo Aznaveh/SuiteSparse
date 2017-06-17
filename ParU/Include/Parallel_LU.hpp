@@ -120,9 +120,6 @@ struct paru_symbolic
 
 };
 
-paru_symbolic *paru_sym_analyse
-( cholmod_sparse *A, cholmod_common *cc) ;
-
 // =============================================================================
 //      Tuple, Row and Column data structure 
 // =============================================================================
@@ -180,6 +177,12 @@ typedef struct  /*Matrix */
 
 }   paru_matrix;
 
+
+paru_symbolic *paru_sym_analyse
+( cholmod_sparse *A, cholmod_common *cc) ;
+
+paru_matrix *paru_init_rowFronts 
+(cholmod_sparse *A, paru_symbolic *LUsym, cholmod_common *cc);
 
 /* Wrappers for managing memory */
 void *paru_alloc(int n, int size, cholmod_common *cc);

@@ -1,15 +1,15 @@
-// ============================================================================/
-// ============================== paru_sym_analyse ============================/
-// ============================================================================/
+// =========================================================================   /
+// ============================== paru_sym_analyse =========================   /
+// =========================================================================   /
 #include "Parallel_LU.hpp"
 paru_symbolic *paru_sym_analyse
 (
  // inputs, not modified
  cholmod_sparse *A,
  // workspace and parameters
- cholmod_common *cc
- ){   
-    DEBUGLEVEL(0);
+ cholmod_common *cc ){   
+
+    DEBUGLEVEL(1);
     paru_symbolic *LUsym;
 
     LUsym = (paru_symbolic*)paru_alloc(1,sizeof(paru_symbolic),cc);
@@ -36,21 +36,41 @@ paru_symbolic *paru_sym_analyse
     Int *Parent, *Child, *Childp, 
         *Rp, *ColCount, *Super, *Qfill, *PLinv;
     //brain transplant
-    Parent = LUsym->Parent = QRsym->Parent; QRsym->Parent = NULL;
-    Child =  LUsym->Child =  QRsym->Child;  QRsym->Child = NULL;
-    Childp = LUsym->Childp = QRsym->Childp; QRsym->Childp = NULL;
-    Super =  LUsym->Super =  QRsym->Super;  QRsym->Super = NULL;
-    Qfill =  LUsym->Qfill =  QRsym->Qfill ;  QRsym->Qfill = NULL;
-    PLinv =  LUsym->PLinv=  QRsym->PLinv;  QRsym->PLinv = NULL;
+    Parent = LUsym->Parent = QRsym->Parent;
+    QRsym->Parent = NULL;
+    Child =  LUsym->Child =  QRsym->Child;  
+    QRsym->Child = NULL;
+    Childp = LUsym->Childp = QRsym->Childp; 
+    QRsym->Childp = NULL;
+    Super =  LUsym->Super =  QRsym->Super;  
+    QRsym->Super = NULL;
+    Qfill =  LUsym->Qfill =  QRsym->Qfill ;  
+    QRsym->Qfill = NULL;
+    PLinv =  LUsym->PLinv=  QRsym->PLinv;  
+    QRsym->PLinv = NULL;
 
     LUsym->Fm = QRsym->Fm; QRsym->Fm = NULL;
     LUsym->Cm = QRsym->Cm; QRsym->Cm = NULL;
 
     //Staircase structure
     Int *Sp, *Sj, *Sleft;
-    Sp =  LUsym->Sp = QRsym->Sp;     QRsym->Sp = NULL;
-    Sj =  LUsym->Sj = QRsym->Sj;     QRsym->Sj = NULL;
-    Sleft = LUsym->Sleft = QRsym->Sleft;  QRsym->Sleft = NULL;
+    Sp =  LUsym->Sp = QRsym->Sp;     
+    QRsym->Sp = NULL;
+    Sj =  LUsym->Sj = QRsym->Sj;     
+    QRsym->Sj = NULL;
+    Sleft = LUsym->Sleft = QRsym->Sleft;  
+    QRsym->Sleft = NULL;
+
+    /*! TODO: test code here	 */
+    for (Int row = 0; row < m; row++){
+
+        PRLEVEL (2,("Sprow[%ld]=%ld\n", row, Sp[row]));
+        if (Sp [row] == Sp[row+1]){
+            printf("Empty Row\n");
+            return NULL;
+        }
+
+    }
 
 
     /* print fronts*/
@@ -62,13 +82,12 @@ paru_symbolic *paru_sym_analyse
 
         PRLEVEL (1,("Front=%ld #col=%ld #row=%ld #pivotCol=%ld Par=%ld", 
                     f, fn, fm, fp,Parent[f]));
-        PRLEVEL (1,(" #pivot col= %ld",Super[f+1]-Super[f]));
-        PRLEVEL (1,("\nlist of children:\t"));
+        PRLEVEL (2,(" #pivot col= %ld",Super[f+1]-Super[f]));
+        PRLEVEL (2,("\nlist of children:\t"));
         for (Int i = Childp[f]; i <= Childp[f+1]-1; i++) 
-            PRLEVEL (1,("%ld ",Child[i]));
+            PRLEVEL (2,("%ld ",Child[i]));
         PRLEVEL (1,("\n\n"));
     }
-    //#endif
 
 
     /*Computing augmented tree */
@@ -97,15 +116,14 @@ paru_symbolic *paru_sym_analyse
     Int childpointer = 0;
 
     for (Int f = 0; f < nf; f++) {
-        PRLEVEL (1,("Front %ld\n", f)) ;
-        PRLEVEL (1,("pivot columns [ %ld to %ld ] n: %ld \n",
+        PRLEVEL (2,("Front %ld\n", f)) ;
+        PRLEVEL (2,("pivot columns [ %ld to %ld ] n: %ld \n",
                     Super [f], Super [f+1]-1, n)) ;
         ASSERT(Super[f+1] <= n);
         Int numRow =Sleft[Super[f+1]]-Sleft[Super[f]] ;
-        //#ifndef NDEBUG
-        PRLEVEL (1,("~numRow=%ld",numRow));
-        PRLEVEL (1,("\n#offset=%ld\n",offset));
-        //#endif
+        
+        PRLEVEL (2,("~numRow=%ld",numRow));
+        PRLEVEL (2,("\n#offset=%ld\n",offset));
 
         Int numoforiginalChild=0;
         if (lastChildFlag){  // the current node is the parent
@@ -123,14 +141,20 @@ paru_symbolic *paru_sym_analyse
         for(Int i = offset ; i < offset+numRow ; i++)
             aChildp[i+1] = aChildp[i];
 
-        for (Int i = Sleft[Super[f]]; i < Sleft[Super[f]+1]; i++){ // number of rows
+        PRLEVEL (1,("$$  %ld %ld\n",Sleft[Super[f]], Sleft[Super[f+1]]));
+//        for (Int i = Sleft[Super[f]]; i < Sleft[Super[f]+1]; i++){ 
+        for (Int i = Sleft[Super[f]]; i < Sleft[Super[f+1]]; i++){ 
+            // number of rows
             ASSERT(i < m);
+           
             rM[i] = i+f;
             ASSERT(i+f < m+nf+1);
             aParent[i+f] = offset+numRow;
             ASSERT(childpointer < m+nf+1);
             aChild[childpointer++] = i+f;
         }
+
+        PRLEVEL (1,("\n"));
 
         offset += numRow;
         snM[f] = offset++;
@@ -143,8 +167,8 @@ paru_symbolic *paru_sym_analyse
             lastChildFlag = 0;  
     }
 
+    
     spqr_freesym (&QRsym, cc);
-
 
     LUsym->aParent = aParent;
     LUsym->aChildp = aChildp;
@@ -152,24 +176,30 @@ paru_symbolic *paru_sym_analyse
     LUsym->row2atree = rM;
     LUsym->super2atree = snM;
 
-#ifndef NDEBUG
+//#ifndef NDEBUG
     PRLEVEL (1,("\nsuper node->aP ")); 
-    for (Int f = 0; f < nf; f++)     PRLEVEL (1,("%ld ",snM[f]));       PRLEVEL (1,("\n"));
+    for (Int f = 0; f < nf; f++)     PRLEVEL (1,("%ld ",snM[f]));     
+    PRLEVEL (1,("\n"));
     PRLEVEL (1,("row->aP "));  
-    for (Int i = 0; i < m; i++)      PRLEVEL (1,("%ld ",rM[i]));        PRLEVEL (1,("\n"));
+    for (Int i = 0; i < m; i++)      PRLEVEL (1,("%ld ",rM[i]));        
+    PRLEVEL (1,("\n"));
     PRLEVEL (1,("aP: ")); 
-    for (Int i = 0; i < m+nf+1; i++) PRLEVEL (1,("%ld ",aParent[i]));   PRLEVEL (1,("\n"));
+    for (Int i = 0; i < m+nf+1; i++) PRLEVEL (1,("%ld ",aParent[i]));   
+    PRLEVEL (1,("\n"));
     PRLEVEL (1,("aChildp: "));
-    for (Int i = 0; i < m+nf+1; i++) PRLEVEL (1,("%ld ",aChildp[i]));   PRLEVEL (1,("\n"));
+    for (Int i = 0; i < m+nf+1; i++) PRLEVEL (1,("%ld ",aChildp[i]));   
+    PRLEVEL (1,("\n"));
     PRLEVEL (1,("aChild: ")); 
-    for (Int i = 0; i < m+nf+1; i++) PRLEVEL (1,("%ld ",aChild[i]));    PRLEVEL (1,("\n"));
+    for (Int i = 0; i < m+nf+1; i++) PRLEVEL (1,("%ld ",aChild[i]));    
+    PRLEVEL (1,("\n"));
 
     for(Int i=0; i< m+nf; i++){
         PRLEVEL (1,("anode:%ld",i));
         for(Int c=aChildp[i]; c< aChildp[i+1]; c++)
-            PRLEVEL (1,(" %ld,",aChild[c]));                            PRLEVEL (1,("\n"));
+            PRLEVEL (1,(" %ld,",aChild[c]));  
+        PRLEVEL (1,("\n"));
     }
-#endif
+//#endif
 
     return (LUsym) ;
 }
