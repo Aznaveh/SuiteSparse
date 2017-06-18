@@ -30,28 +30,29 @@ void paru_freesym (paru_symbolic **LUsym_handle,
     m = LUsym->m;
     n = LUsym->n;
     nf = LUsym->nf; anz = LUsym->anz; 
-    cholmod_l_free (nf+1, sizeof (SuiteSparse_long), LUsym->Super, cc);
-//    cholmod_l_free (nf+1, sizeof (SuiteSparse_long), LUsym->Parent, cc);
-    cholmod_l_free (nf+2, sizeof (SuiteSparse_long), LUsym->Childp, cc);
-    cholmod_l_free (nf+1, sizeof (SuiteSparse_long), LUsym->Child, cc);
-    cholmod_l_free (n+2,  sizeof (SuiteSparse_long), LUsym->Sleft, cc);
-    cholmod_l_free (m+1,  sizeof (SuiteSparse_long), LUsym->Sp, cc);
-    cholmod_l_free (anz,  sizeof (SuiteSparse_long), LUsym->Sj, cc);
-    cholmod_l_free (nf+1, sizeof (SuiteSparse_long), LUsym->Fm, cc);
-    cholmod_l_free (nf+1, sizeof (SuiteSparse_long), LUsym->Cm, cc);
-
-    cholmod_l_free (m+nf+1, sizeof (SuiteSparse_long), LUsym->aParent, cc);
-    cholmod_l_free (m+nf+1, sizeof (SuiteSparse_long), LUsym->aChild, cc);
-    cholmod_l_free (m+nf+2, sizeof (SuiteSparse_long), LUsym->aChildp, cc);
-    cholmod_l_free (m,      sizeof (SuiteSparse_long), LUsym->row2atree, cc);
-    cholmod_l_free (nf,     sizeof (SuiteSparse_long), LUsym->super2atree, cc);
-    cholmod_l_free (1,      sizeof (paru_symbolic), LUsym, cc);
-
+    cholmod_l_free (nf+1, sizeof (Int), LUsym->Parent, cc);
+    cholmod_l_free (nf+1, sizeof (Int), LUsym->Child, cc);
+    cholmod_l_free (nf+2, sizeof (Int), LUsym->Childp, cc);
+    cholmod_l_free (nf+1, sizeof (Int), LUsym->Super, cc);
+    cholmod_l_free (n, sizeof (Int), LUsym->Qfill , cc);
+    cholmod_l_free (m, sizeof (Int), LUsym->PLinv, cc);
+    cholmod_l_free (nf+1, sizeof (Int), LUsym->Fm, cc);
+    cholmod_l_free (nf+1, sizeof (Int), LUsym->Cm, cc);
+    cholmod_l_free (m+1, sizeof (Int), LUsym->Sp, cc);
+    cholmod_l_free (anz, sizeof (Int), LUsym->Sj, cc);
+    cholmod_l_free (n+2, sizeof (Int), LUsym->Sleft, cc);
+    cholmod_l_free (m+nf+1, sizeof (Int), LUsym->aParent, cc);
+    cholmod_l_free (m+nf+1, sizeof (Int), LUsym->aChild, cc);
+    cholmod_l_free (m+nf+2, sizeof (Int), LUsym->aChildp, cc);
+    cholmod_l_free (m, sizeof (Int), LUsym->row2atree, cc);
+    cholmod_l_free (nf, sizeof (Int), LUsym->super2atree, cc);
+    cholmod_l_free (1, sizeof (paru_symbolic), LUsym, cc);
     *LUsym_handle = NULL;
 }
+
 /*! It uses LUsym, Do not free LUsym before*/
 void paru_freemat (paru_matrix **paruMatInfo_handle,
-    cholmod_common *cc){
+        cholmod_common *cc){
 
     DEBUGLEVEL(0); 
     if (paruMatInfo_handle == NULL || *paruMatInfo_handle == NULL ){
@@ -65,8 +66,9 @@ void paru_freemat (paru_matrix **paruMatInfo_handle,
     n = paruMatInfo->n; 
 
     tupleList *RowList = paruMatInfo->RowList;
+    PRLEVEL (0, ("RowList =%p\n", RowList));
     tupleList *ColList = paruMatInfo->ColList;
- 
+    PRLEVEL (0, ("ColList =%p\n", ColList));
 
     // free tuple lists 
     for (int col = 0; col < n; col++) {
@@ -80,20 +82,25 @@ void paru_freemat (paru_matrix **paruMatInfo_handle,
         cholmod_l_free (len , sizeof (Tuple), RowList[row].list, cc);
     }
     cholmod_l_free (1, m*sizeof(tupleList), RowList, cc);
-    
+
 
     paru_symbolic *LUsym = paruMatInfo-> LUsym;
     Element **elementList; 
     elementList = paruMatInfo->elementList;
 
-    for(Int i = 0; i < m ; i++){        // freeing all elements
+    /*! TODO: This code just work for row initialized elements	
+     * this code must be more general
+     *
+     * I should free other elements later 
+     * */
+    for(Int i = 0; i < m ; i++){        // freeing all row elements
         if(LUsym == NULL){
             printf ("Probably LUsym has been freed before! Wrong usage\n");
             return;
         }
-        PRLEVEL (1, ("Here %p\n",LUsym));
+        PRLEVEL (1, ("LUsym = %p\n",LUsym));
         Int e = LUsym->row2atree[i];    //element number in augmented tree
-        PRLEVEL (1, ("e =%ld\n", e));
+        PRLEVEL (1, ("e =%ld\t", e));
         Element *curEl = elementList[e];
         if (curEl == NULL) continue;
         Int nrows = curEl->nrows,
@@ -107,6 +114,7 @@ void paru_freemat (paru_matrix **paruMatInfo_handle,
 
     Int nf = LUsym->nf;
     cholmod_l_free (1, (m+nf+1)*sizeof(Element), elementList, cc);
+    cholmod_l_free (1, sizeof(paru_matrix), paruMatInfo, cc);
     *paruMatInfo_handle = NULL;
 } 
 

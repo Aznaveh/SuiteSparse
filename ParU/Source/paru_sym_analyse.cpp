@@ -31,7 +31,7 @@ paru_symbolic *paru_sym_analyse
     anz = LUsym->anz = QRsym->anz;
     nf =  LUsym->nf = QRsym->nf;
 
-    LUsym->maxfn = LUsym->maxfn;
+    LUsym->maxfn = QRsym->maxfn;
 
     Int *Parent, *Child, *Childp, 
         *Rp, *ColCount, *Super, *Qfill, *PLinv;
@@ -44,13 +44,14 @@ paru_symbolic *paru_sym_analyse
     QRsym->Childp = NULL;
     Super =  LUsym->Super =  QRsym->Super;  
     QRsym->Super = NULL;
-    Qfill =  LUsym->Qfill =  QRsym->Qfill ;  
+    Qfill =  LUsym->Qfill =  QRsym->Qfill;  
     QRsym->Qfill = NULL;
-    PLinv =  LUsym->PLinv=  QRsym->PLinv;  
+    PLinv =  LUsym->PLinv =  QRsym->PLinv;  
     QRsym->PLinv = NULL;
-
-    LUsym->Fm = QRsym->Fm; QRsym->Fm = NULL;
-    LUsym->Cm = QRsym->Cm; QRsym->Cm = NULL;
+    LUsym->Fm = QRsym->Fm; 
+    QRsym->Fm = NULL;
+    LUsym->Cm = QRsym->Cm; 
+    QRsym->Cm = NULL;
 
     //Staircase structure
     Int *Sp, *Sj, *Sleft;
@@ -61,18 +62,19 @@ paru_symbolic *paru_sym_analyse
     Sleft = LUsym->Sleft = QRsym->Sleft;  
     QRsym->Sleft = NULL;
 
-    /*! TODO: test code here	 */
+    /*! Check if there exist empty row*/
     for (Int row = 0; row < m; row++){
 
         PRLEVEL (2,("Sprow[%ld]=%ld\n", row, Sp[row]));
         if (Sp [row] == Sp[row+1]){
             printf("Empty Row\n");
+            spqr_freesym (&QRsym, cc);
+            cholmod_l_free (1, sizeof (paru_symbolic), &LUsym, cc);
             return NULL;
         }
-
     }
 
-
+#ifndef NDEBUG
     /* print fronts*/
     for (Int f = 0; f < nf; f++){
         Int fm, fn, fp;
@@ -88,7 +90,7 @@ paru_symbolic *paru_sym_analyse
             PRLEVEL (2,("%ld ",Child[i]));
         PRLEVEL (1,("\n\n"));
     }
-
+#endif /* end of NDEBUG */
 
     /*Computing augmented tree */
     Int *aParent; //augmented tree size m+nf+1
