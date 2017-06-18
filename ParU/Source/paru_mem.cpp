@@ -66,9 +66,9 @@ void paru_freemat (paru_matrix **paruMatInfo_handle,
     n = paruMatInfo->n; 
 
     tupleList *RowList = paruMatInfo->RowList;
-    PRLEVEL (0, ("RowList =%p\n", RowList));
+    PRLEVEL (1, ("RowList =%p\n", RowList));
     tupleList *ColList = paruMatInfo->ColList;
-    PRLEVEL (0, ("ColList =%p\n", ColList));
+    PRLEVEL (1, ("ColList =%p\n", ColList));
 
     // free tuple lists 
     for (int col = 0; col < n; col++) {
@@ -110,7 +110,6 @@ void paru_freemat (paru_matrix **paruMatInfo_handle,
         cholmod_l_free (1, sizeof(Element)+sizeof(Int)*(nrows+ncols)+
                 sizeof(double)*nrows*ncols, curEl, cc);
     }
-
 
     Int nf = LUsym->nf;
     cholmod_l_free (1, (m+nf+1)*sizeof(Element), elementList, cc);
