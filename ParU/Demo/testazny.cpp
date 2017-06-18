@@ -26,7 +26,7 @@ int main (int argc, char **argv)
 
     
     cholmod_l_free_sparse (&A, cc) ;
-//    paru_freemat (&paruMatInfo, cc);
+    paru_freemat (&paruMatInfo, cc);
 
     paru_freesym (&LUsym,cc);
     ASSERT (LUsym == NULL) ;
@@ -35,12 +35,12 @@ int main (int argc, char **argv)
     PRLEVEL (1, ("malloc_count %ld inuse %ld\n", 
                 cc->malloc_count, cc->memory_inuse));
 
-    printf("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%\n");
     cholmod_l_finish (cc) ;
-    //   printf ("malloc_count %ld inuse %ld\n", cc->malloc_count, cc->memory_inuse);
+    printf("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%\n");
+    //   printf 
+    //   ("malloc_count %ld inuse %ld\n", cc->malloc_count, cc->memory_inuse);
     //Valgrind :)
     fclose(stdin);
     fclose(stdout);
     fclose(stderr);
 }
-

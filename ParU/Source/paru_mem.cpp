@@ -53,6 +53,7 @@ void paru_freesym (paru_symbolic **LUsym_handle,
 void paru_freemat (paru_matrix **paruMatInfo_handle,
     cholmod_common *cc){
 
+    DEBUGLEVEL(0); 
     if (paruMatInfo_handle == NULL || *paruMatInfo_handle == NULL ){
         return;
     }
@@ -79,20 +80,31 @@ void paru_freemat (paru_matrix **paruMatInfo_handle,
         cholmod_l_free (len , sizeof (Tuple), RowList[row].list, cc);
     }
     cholmod_l_free (1, m*sizeof(tupleList), RowList, cc);
+    
 
     paru_symbolic *LUsym = paruMatInfo-> LUsym;
     Element **elementList; 
     elementList = paruMatInfo->elementList;
 
     for(Int i = 0; i < m ; i++){        // freeing all elements
+        if(LUsym == NULL){
+            printf ("Probably LUsym has been freed before! Wrong usage\n");
+            return;
+        }
+        PRLEVEL (1, ("Here %p\n",LUsym));
         Int e = LUsym->row2atree[i];    //element number in augmented tree
+        PRLEVEL (1, ("e =%ld\n", e));
         Element *curEl = elementList[e];
         if (curEl == NULL) continue;
         Int nrows = curEl->nrows,
             ncols = curEl->ncols;
+        PRLEVEL (1, ("nrows =%ld ", nrows));
+        PRLEVEL (1, ("ncols =%ld\n", ncols));
         cholmod_l_free (1, sizeof(Element)+sizeof(Int)*(nrows+ncols)+
                 sizeof(double)*nrows*ncols, curEl, cc);
     }
+
+
     Int nf = LUsym->nf;
     cholmod_l_free (1, (m+nf+1)*sizeof(Element), elementList, cc);
     *paruMatInfo_handle = NULL;

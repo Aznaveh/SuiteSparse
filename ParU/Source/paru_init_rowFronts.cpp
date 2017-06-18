@@ -44,6 +44,7 @@ paru_matrix *paru_init_rowFronts (
 
     Int m,n;  
 
+    paruMatInfo->LUsym = LUsym;
     m = paruMatInfo->m = LUsym->m;   
     n = paruMatInfo->n = LUsym->n; 
 
@@ -152,7 +153,7 @@ paru_matrix *paru_init_rowFronts (
         curEl->nrowsleft = curEl->nrows = nrows;
         curEl->ncolsleft = curEl->ncols = ncols;
 
-        PRLEVEL (1, ("element %ld= %ld x %ld\n", e, nrows, ncols));
+        PRLEVEL (2, ("element %ld= %ld x %ld\n", e, nrows, ncols));
 
         // Allocating Rowlist and updating its tuples
         RowList[row].list =
