@@ -22,7 +22,7 @@ paru_matrix *paru_init_rowFronts (
         cholmod_common *cc
         ){
 
-    DEBUGLEVEL(0);
+    DEBUGLEVEL(1);
     if (!A->packed){
         printf ("A is not packed; Wrong format \n");
         return NULL;
@@ -51,6 +51,12 @@ paru_matrix *paru_init_rowFronts (
     PRLEVEL (1, ("m=%ld, n=%ld\n",m,n));
     // RowList, ColList and elementList are place holders 
     // pointers to pointers that are allocated
+    if (m == 0 || n == 0) {
+        printf("The dimension of matrix is zero: %ld x %ld \n",m,n);
+        paru_free (1, sizeof(paru_matrix), paruMatInfo, cc);
+        return NULL;
+        
+    }
 
     tupleList *RowList= paruMatInfo->RowList =
         (tupleList*) paru_alloc (1, m*sizeof(tupleList), cc);
