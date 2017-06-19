@@ -29,17 +29,16 @@ run:
 	./testazny < ../Matrix/GD06_theory.mtx
 	./testazny < ../Matrix/lfat5b.mtx
 	./testazny < ../Matrix/pwr01b.mtx
-	./testazny < ../Matrix/west0067.mtx #a 67x67 matrix
 	./testazny < ../Matrix/cage5.mtx
-	
 
+
+	./testazny < ../Matrix/Tina_AskCal.mtx
 #
 #	
 #	./testazny < ../Matrix/n3c4-b4.mtx
 #	./testazny < ../Matrix/problem.mtx
 #	./testazny < ../Matrix/r2.mtx
 #	./testazny < ../Matrix/s32.mtx
-#	./testazny < ../Matrix/Tina_AskCal.mtx
 #	./testazny < ../Matrix/Tina_AskCal_perm.mtx
 #	./testazny < ../Matrix/lpi_itest6.mtx
 #	./testazny < ../Matrix/lpi_galenet.mtx
@@ -66,17 +65,18 @@ VGFLAGS = --tool=memcheck --leak-check=yes --show-reachable=yes -v\
 		  --num-callers=20 --track-fds=yes
 
 val:
-	valgrind	$(VGFLAGS)	./testazny  < ../Matrix/GD01_b.mtx
-	valgrind	$(VGFLAGS)	./testazny < ../Matrix/LFAT5.mtx
-	valgrind	$(VGFLAGS)	./testazny < ../Matrix/a2.mtx #2x2
-	valgrind	$(VGFLAGS)	./testazny < ../Matrix/b1_ss.mtx
-	valgrind	$(VGFLAGS)	./testazny < ../Matrix/bcspwr01.mtx
-	valgrind	$(VGFLAGS)	./testazny < ../Matrix/bfwa62.mtx
-	valgrind	$(VGFLAGS)	./testazny < ../Matrix/GD06_theory.mtx
-	valgrind	$(VGFLAGS)	./testazny < ../Matrix/lfat5b.mtx
-	valgrind	$(VGFLAGS)	./testazny < ../Matrix/pwr01b.mtx
-	valgrind	$(VGFLAGS)	./testazny < ../Matrix/west0067.mtx #a 67x67 matrix
-	valgrind	$(VGFLAGS)	./testazny < ../Matrix/cage5.mtx
+#	valgrind	$(VGFLAGS)	./testazny  < ../Matrix/GD01_b.mtx
+#	valgrind	$(VGFLAGS)	./testazny < ../Matrix/LFAT5.mtx
+#	valgrind	$(VGFLAGS)	./testazny < ../Matrix/a2.mtx #2x2
+#	valgrind	$(VGFLAGS)	./testazny < ../Matrix/b1_ss.mtx
+#	valgrind	$(VGFLAGS)	./testazny < ../Matrix/bcspwr01.mtx
+#	valgrind	$(VGFLAGS)	./testazny < ../Matrix/bfwa62.mtx
+#	valgrind	$(VGFLAGS)	./testazny < ../Matrix/GD06_theory.mtx
+#	valgrind	$(VGFLAGS)	./testazny < ../Matrix/lfat5b.mtx
+#	valgrind	$(VGFLAGS)	./testazny < ../Matrix/pwr01b.mtx
+#	valgrind	$(VGFLAGS)	./testazny < ../Matrix/west0067.mtx #a 67x67 matrix
+#	valgrind	$(VGFLAGS)	./testazny < ../Matrix/cage5.mtx
+	valgrind	$(VGFLAGS)	./testazny <  ../Matrix/Tina_AskCal.mtx
 
 
 # Test these:

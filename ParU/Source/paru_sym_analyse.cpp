@@ -62,14 +62,22 @@ paru_symbolic *paru_sym_analyse
     Sleft = LUsym->Sleft = QRsym->Sleft;  
     QRsym->Sleft = NULL;
 
+    //initializing with NULL to avoid freeing not allocated memory
+    LUsym->aParent = NULL; 
+    LUsym->aChildp = NULL;
+    LUsym->aChild = NULL;
+    LUsym->row2atree = NULL;
+    LUsym->super2atree = NULL;
+
+
     /*! Check if there exist empty row*/
     for (Int row = 0; row < m; row++){
-
+        Int *Ap =(Int*) A->p;
         PRLEVEL (2,("Sprow[%ld]=%ld\n", row, Sp[row]));
-        if (Sp [row] == Sp[row+1]){
-            printf("Empty Row\n");
+        if (Sp [row] == Sp[row+1] || Ap [row] == Ap [row+1]){
+            printf("Empty Row or Column\n");
             spqr_freesym (&QRsym, cc);
-            cholmod_l_free (1, sizeof (paru_symbolic), &LUsym, cc);
+            paru_freesym (&LUsym , cc);
             return NULL;
         }
     }
