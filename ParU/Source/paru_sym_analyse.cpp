@@ -11,14 +11,14 @@ paru_symbolic *paru_sym_analyse
 
     DEBUGLEVEL(0);
     paru_symbolic *LUsym;
-
+    
+    
     LUsym = (paru_symbolic*)paru_alloc(1,sizeof(paru_symbolic),cc);
     // ... check for LUsym NULL ...
     if(LUsym == NULL){
         //out of memory
         return NULL;
     }
-
 
     spqr_symbolic *QRsym;
     cc->SPQR_grain = 1;

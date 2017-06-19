@@ -31,12 +31,11 @@ run:
 	./testazny < ../Matrix/pwr01b.mtx
 	./testazny < ../Matrix/cage5.mtx
 
-
 	./testazny < ../Matrix/Tina_AskCal.mtx
+	./testazny < ../Matrix/problem.mtx
 #
 #	
 #	./testazny < ../Matrix/n3c4-b4.mtx
-#	./testazny < ../Matrix/problem.mtx
 #	./testazny < ../Matrix/r2.mtx
 #	./testazny < ../Matrix/s32.mtx
 #	./testazny < ../Matrix/Tina_AskCal_perm.mtx
@@ -76,7 +75,10 @@ val:
 #	valgrind	$(VGFLAGS)	./testazny < ../Matrix/pwr01b.mtx
 #	valgrind	$(VGFLAGS)	./testazny < ../Matrix/west0067.mtx #a 67x67 matrix
 #	valgrind	$(VGFLAGS)	./testazny < ../Matrix/cage5.mtx
-	valgrind	$(VGFLAGS)	./testazny <  ../Matrix/Tina_AskCal.mtx
+#
+#
+#	valgrind	$(VGFLAGS)	./testazny <  ../Matrix/Tina_AskCal.mtx
+	valgrind	$(VGFLAGS)	./testazny < ../Matrix/problem.mtx
 
 
 # Test these:
@@ -89,7 +91,6 @@ val:
 #	valgrind	$(VGFLAGS)	./testazny < ../Matrix/lpi_itest6.mtx
 #	valgrind	$(VGFLAGS)	./testazny < ../Matrix/Tina_AskCal.mtx
 #	valgrind	$(VGFLAGS)	./testazny < ../Matrix/n3c4-b4.mtx
-#	valgrind	$(VGFLAGS)	./testazny < ../Matrix/problem.mtx
 debug:
 	g++ -g   -O3 -fexceptions -fPIC -fopenmp   -I../../include   aztest.cpp -o \
             dtest.out -L../../lib -lspqr -lsuitesparseconfig -lcholmod -lamd \

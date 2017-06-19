@@ -60,7 +60,7 @@ paru_matrix *paru_init_rowFronts (
         return NULL;
     }
 
-    PRLEVEL (1, ("$RowList =%p\n", RowList));
+    PRLEVEL (2, ("$RowList =%p\n", RowList));
 
     tupleList *ColList= paruMatInfo->ColList =
         (tupleList*) paru_alloc (1, n*sizeof(tupleList), cc);
@@ -69,7 +69,7 @@ paru_matrix *paru_init_rowFronts (
         printf("Out of memory: ColList\n");
         return NULL;
     }
-    PRLEVEL (1, ("$ColList =%p\n", ColList));
+    PRLEVEL (2, ("$ColList =%p\n", ColList));
 
     Element **elementList; 
     Int nf = LUsym->nf;
@@ -80,6 +80,7 @@ paru_matrix *paru_init_rowFronts (
         printf("Out of memory: elementList\n");
         return NULL;
     }
+
 
 
     /// ------------------------------------------------------------------------
