@@ -114,9 +114,14 @@ struct paru_symbolic
         // pivot column in the front F.  This refers to a column of S.  The
         // number of expected pivot columns in F is thus
         // Super [f+1] - Super [f].
+
+    Int *Rp ;       // size nf+1
+    Int *Rj ;       // size rjsize; compressed supernodal form of R
+
+    Int rjsize ;    // size of Rj
  
     Int *row2atree;       //Mapping from rows to augmented tree size m
-    Int *super2atree;     //Mapping from super nodes to augmented tree size m
+    Int *super2atree;     //Mapping from super nodes to augmented tree size nf
 
 };
 

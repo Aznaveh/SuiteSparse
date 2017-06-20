@@ -12,7 +12,6 @@ paru_symbolic *paru_sym_analyse
     DEBUGLEVEL(0);
     paru_symbolic *LUsym;
     
-    
     LUsym = (paru_symbolic*)paru_alloc(1,sizeof(paru_symbolic),cc);
     // ... check for LUsym NULL ...
     if(LUsym == NULL){
@@ -25,16 +24,18 @@ paru_symbolic *paru_sym_analyse
     cc->useGPU = -1;
     QRsym = spqr_analyze (A, SPQR_ORDERING_CHOLMOD, FALSE,FALSE , FALSE, cc);
 
-    Int m, n, anz,nf ; 
+    Int m, n, anz,nf, rjsize ; 
     m = LUsym->m = QRsym->m;
     n = LUsym->n = QRsym->n;
     anz = LUsym->anz = QRsym->anz;
     nf =  LUsym->nf = QRsym->nf;
+    rjsize =  LUsym->rjsize = QRsym->rjsize;
 
+    PRLEVEL (1, ("A  is  %ld x %ld \n",m,n ));
     LUsym->maxfn = QRsym->maxfn;
 
     Int *Parent, *Child, *Childp, 
-        *Rp, *ColCount, *Super, *Qfill, *PLinv;
+        *ColCount, *Super, *Qfill, *PLinv;
     //brain transplant
     Parent = LUsym->Parent = QRsym->Parent;
     QRsym->Parent = NULL;
@@ -52,6 +53,12 @@ paru_symbolic *paru_sym_analyse
     QRsym->Fm = NULL;
     LUsym->Cm = QRsym->Cm; 
     QRsym->Cm = NULL;
+    LUsym->Rj = QRsym->Rj; 
+    QRsym->Rj = NULL;
+    LUsym->Rp = QRsym->Rp; 
+    QRsym->Rp = NULL;
+
+
 
     //Staircase structure
     Int *Sp, *Sj, *Sleft;
@@ -62,6 +69,12 @@ paru_symbolic *paru_sym_analyse
     Sleft = LUsym->Sleft = QRsym->Sleft;  
     QRsym->Sleft = NULL;
 
+    
+    spqr_freesym (&QRsym, cc); //No longer needed
+    ASSERT(QRsym == NULL);
+
+
+
     //initializing with NULL to avoid freeing not allocated memory
     LUsym->aParent = NULL; 
     LUsym->aChildp = NULL;
@@ -69,14 +82,12 @@ paru_symbolic *paru_sym_analyse
     LUsym->row2atree = NULL;
     LUsym->super2atree = NULL;
 
-
     /*! Check if there exist empty row*/
     for (Int row = 0; row < m; row++){
         Int *Ap =(Int*) A->p;
         PRLEVEL (2,("Sprow[%ld]=%ld\n", row, Sp[row]));
         if (Sp [row] == Sp[row+1] || Ap [row] == Ap [row+1]){
             printf("Empty Row or Column\n");
-            spqr_freesym (&QRsym, cc);
             paru_freesym (&LUsym , cc);
             return NULL;
         }
@@ -87,7 +98,7 @@ paru_symbolic *paru_sym_analyse
     for (Int f = 0; f < nf; f++){
         Int fm, fn, fp;
         fm = LUsym->Fm[f];
-        fn = QRsym->Rp[f+1]-QRsym->Rp[f];
+        fn = LUsym->Rp[f+1]-LUsym->Rp[f];
         fp = Super[f+1]-Super[f];
 
         PRLEVEL (1,("Front=%ld #col=%ld #row=%ld #pivotCol=%ld Par=%ld", 
@@ -96,7 +107,7 @@ paru_symbolic *paru_sym_analyse
         PRLEVEL (2,("\nlist of children:\t"));
         for (Int i = Childp[f]; i <= Childp[f+1]-1; i++) 
             PRLEVEL (2,("%ld ",Child[i]));
-        PRLEVEL (1,("\n\n"));
+        PRLEVEL (2,("\n"));
     }
 #endif /* end of NDEBUG */
 
@@ -112,6 +123,12 @@ paru_symbolic *paru_sym_analyse
     rM =  (Int*) paru_alloc(m  ,sizeof(Int), cc);
     snM = (Int*) paru_alloc(nf ,sizeof(Int), cc);
 
+    if(aParent == NULL || aChild == NULL || aChildp == NULL ||
+            rM == NULL  || snM == NULL ){
+        printf ("Out of memory");
+        paru_freesym (&LUsym , cc);
+        return NULL;
+    }
 
     //initialization
     for (Int f = 0; f < nf; f++) snM[f] = -1;
@@ -131,16 +148,16 @@ paru_symbolic *paru_sym_analyse
                     Super [f], Super [f+1]-1, n)) ;
         ASSERT(Super[f+1] <= n);
         Int numRow =Sleft[Super[f+1]]-Sleft[Super[f]] ;
-        
+
         PRLEVEL (2,("~numRow=%ld",numRow));
         PRLEVEL (2,("\n#offset=%ld\n",offset));
 
         Int numoforiginalChild=0;
         if (lastChildFlag){  // the current node is the parent
-            PRLEVEL (1,("Childs of %ld: ",f)) ;
+            PRLEVEL (2,("Childs of %ld: ",f)) ;
             numoforiginalChild=Child[Childp[f+1]-1]-Child[Childp[f]]+1;
             for (Int i = Child[Childp[f]]; i < Child[Childp[f+1]]; i++){
-                PRLEVEL (1,("%ld,", i));
+                PRLEVEL (2,("%ld,", i));
                 ASSERT(snM[i] < m+nf+1);
                 aParent[ snM[i]]=offset+numRow;
                 ASSERT(childpointer < m+nf+1);
@@ -151,20 +168,16 @@ paru_symbolic *paru_sym_analyse
         for(Int i = offset ; i < offset+numRow ; i++)
             aChildp[i+1] = aChildp[i];
 
-        PRLEVEL (1,("$$  %ld %ld\n",Sleft[Super[f]], Sleft[Super[f+1]]));
-//        for (Int i = Sleft[Super[f]]; i < Sleft[Super[f]+1]; i++){ 
         for (Int i = Sleft[Super[f]]; i < Sleft[Super[f+1]]; i++){ 
             // number of rows
             ASSERT(i < m);
-           
+
             rM[i] = i+f;
             ASSERT(i+f < m+nf+1);
             aParent[i+f] = offset+numRow;
             ASSERT(childpointer < m+nf+1);
             aChild[childpointer++] = i+f;
         }
-
-        PRLEVEL (1,("\n"));
 
         offset += numRow;
         snM[f] = offset++;
@@ -177,28 +190,35 @@ paru_symbolic *paru_sym_analyse
             lastChildFlag = 0;  
     }
 
-    
-    spqr_freesym (&QRsym, cc);
-
     LUsym->aParent = aParent;
     LUsym->aChildp = aChildp;
     LUsym->aChild = aChild;
     LUsym->row2atree = rM;
     LUsym->super2atree = snM;
 
-//#ifndef NDEBUG
-    PRLEVEL (1,("\nsuper node->aP ")); 
-    for (Int f = 0; f < nf; f++)     PRLEVEL (1,("%ld ",snM[f]));     
+    //#ifndef NDEBUG
+    PRLEVEL (1,("super node mapping (snM): ")); 
+    for (Int f = 0; f < nf; f++){
+        ASSERT (snM [f] != -1)
+        PRLEVEL (1,("%ld ",snM[f]));     
+    }
     PRLEVEL (1,("\n"));
-    PRLEVEL (1,("row->aP "));  
-    for (Int i = 0; i < m; i++)      PRLEVEL (1,("%ld ",rM[i]));        
+
+    PRLEVEL (1,("row mapping (rM): "));  
+    for (Int i = 0; i < m; i++){
+        ASSERT (rM [f] != -1)
+        PRLEVEL (1,("%ld ",rM[i]));        
+    }
     PRLEVEL (1,("\n"));
+
     PRLEVEL (1,("aP: ")); 
     for (Int i = 0; i < m+nf+1; i++) PRLEVEL (1,("%ld ",aParent[i]));   
     PRLEVEL (1,("\n"));
+
     PRLEVEL (1,("aChildp: "));
-    for (Int i = 0; i < m+nf+1; i++) PRLEVEL (1,("%ld ",aChildp[i]));   
+    for (Int i = 0; i < m+nf+2; i++) PRLEVEL (1,("%ld ",aChildp[i]));   
     PRLEVEL (1,("\n"));
+
     PRLEVEL (1,("aChild: ")); 
     for (Int i = 0; i < m+nf+1; i++) PRLEVEL (1,("%ld ",aChild[i]));    
     PRLEVEL (1,("\n"));
@@ -209,7 +229,7 @@ paru_symbolic *paru_sym_analyse
             PRLEVEL (1,(" %ld,",aChild[c]));  
         PRLEVEL (1,("\n"));
     }
-//#endif
+    //#endif
 
     return (LUsym) ;
 }

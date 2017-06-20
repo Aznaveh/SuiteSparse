@@ -30,7 +30,6 @@ void spqr_freesym
     nf = QRsym->nf ;
     anz = QRsym->anz ;
     rjsize = QRsym->rjsize ;
-
     cholmod_l_free (n,      sizeof (Long), QRsym->Qfill, cc) ;
     cholmod_l_free (nf+1,   sizeof (Long), QRsym->Super, cc) ;
     cholmod_l_free (nf+1,   sizeof (Long), QRsym->Rp, cc) ;
@@ -48,6 +47,7 @@ void spqr_freesym
 
     cholmod_l_free (nf+1,   sizeof (Long), QRsym->Fm, cc) ;
     cholmod_l_free (nf+1,   sizeof (Long), QRsym->Cm, cc) ;
+    
 
     cholmod_l_free (n,      sizeof (Long), QRsym->ColCount, cc) ;
 
