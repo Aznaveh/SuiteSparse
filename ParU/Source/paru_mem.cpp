@@ -17,11 +17,12 @@ void paru_freesym (paru_symbolic **LUsym_handle,
             // workspace and parameters
     cholmod_common *cc
 ){
+    DEBUGLEVEL (1);
     if (LUsym_handle == NULL || *LUsym_handle == NULL){
         // nothing to do; caller probably ran out of memory
         return;
     }
-
+    
     paru_symbolic *LUsym;
     LUsym = *LUsym_handle;
 
@@ -32,6 +33,9 @@ void paru_freesym (paru_symbolic **LUsym_handle,
     nf = LUsym->nf; 
     anz = LUsym->anz; 
     rjsize = LUsym->rjsize;
+    PRLEVEL (1, ("In free sym: m=%ld n=%ld\n nf=%ld\
+                anz=%ld rjsize=%ld\n", m, n, nf, anz, rjsize ));
+
     cholmod_l_free (nf+1, sizeof (Int), LUsym->Parent, cc);
     cholmod_l_free (nf+1, sizeof (Int), LUsym->Child, cc);
     cholmod_l_free (nf+2, sizeof (Int), LUsym->Childp, cc);

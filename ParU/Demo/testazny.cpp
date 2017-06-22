@@ -4,6 +4,7 @@
 int main (int argc, char **argv)
 {
     DEBUGLEVEL(0); 
+    printf("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$\n");
     cholmod_common Common, *cc;
     cholmod_sparse *A;
     int mtype;
@@ -28,7 +29,8 @@ int main (int argc, char **argv)
     cholmod_l_free_sparse (&A, cc);
     paru_freemat (&paruMatInfo, cc);
 
-    //paru_freesym (&LUsym,cc);
+    paru_freesym (&LUsym,cc);
+
 
  //  spqr_symbolic *QRsym = 
  //      spqr_analyze (A, SPQR_ORDERING_CHOLMOD, FALSE,FALSE , FALSE, cc);
@@ -37,7 +39,7 @@ int main (int argc, char **argv)
    //cc->malloc_count, cc->memory_inuse));
 
     cholmod_l_finish (cc);
-    printf("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%\n");
+    printf("***************************************************************\n");
     //   printf 
     //   ("malloc_count %ld inuse %ld\n", cc->malloc_count, cc->memory_inuse);
 }

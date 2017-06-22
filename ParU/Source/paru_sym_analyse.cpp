@@ -11,8 +11,8 @@ paru_symbolic *paru_sym_analyse
 
     DEBUGLEVEL(0);
     paru_symbolic *LUsym;
-    
-    LUsym = (paru_symbolic*)paru_alloc(1,sizeof(paru_symbolic),cc);
+
+    LUsym = (paru_symbolic*) paru_alloc (1, sizeof(paru_symbolic), cc);
     // ... check for LUsym NULL ...
     if(LUsym == NULL){
         //out of memory
@@ -31,11 +31,15 @@ paru_symbolic *paru_sym_analyse
     nf =  LUsym->nf = QRsym->nf;
     rjsize =  LUsym->rjsize = QRsym->rjsize;
 
-    PRLEVEL (1, ("A  is  %ld x %ld \n",m,n ));
+
+    PRLEVEL (0, ("A  is  %ld x %ld \n",m, n ));
+    PRLEVEL (0, ("anz = %ld  nf=%ld rjsize=%ld\n",anz ,nf, rjsize ));
+
+
     LUsym->maxfn = QRsym->maxfn;
 
     Int *Parent, *Child, *Childp, 
-        *ColCount, *Super, *Qfill, *PLinv;
+        *Super, *Qfill, *PLinv;
     //brain transplant
     Parent = LUsym->Parent = QRsym->Parent;
     QRsym->Parent = NULL;
@@ -58,8 +62,6 @@ paru_symbolic *paru_sym_analyse
     LUsym->Rp = QRsym->Rp; 
     QRsym->Rp = NULL;
 
-
-
     //Staircase structure
     Int *Sp, *Sj, *Sleft;
     Sp =  LUsym->Sp = QRsym->Sp;     
@@ -69,18 +71,20 @@ paru_symbolic *paru_sym_analyse
     Sleft = LUsym->Sleft = QRsym->Sleft;  
     QRsym->Sleft = NULL;
 
-    
     spqr_freesym (&QRsym, cc); //No longer needed
-    ASSERT(QRsym == NULL);
 
-
+    /*Computing augmented tree */
+    Int *aParent; //augmented tree size m+nf+1
+    Int *aChild;  // size m+nf+1
+    Int *aChildp; // size m+nf+2
+    Int *rM, *snM; // row map and supernode map
 
     //initializing with NULL to avoid freeing not allocated memory
-    LUsym->aParent = NULL; 
-    LUsym->aChildp = NULL;
-    LUsym->aChild = NULL;
-    LUsym->row2atree = NULL;
-    LUsym->super2atree = NULL;
+    aParent = LUsym->aParent = NULL; 
+    aChildp = LUsym->aChildp = NULL;
+    aChild = LUsym->aChild = NULL;
+    rM = LUsym->row2atree = NULL;
+    snM = LUsym->super2atree = NULL;
 
     /*! Check if there exist empty row*/
     for (Int row = 0; row < m; row++){
@@ -93,7 +97,7 @@ paru_symbolic *paru_sym_analyse
         }
     }
 
-#ifndef NDEBUG
+    //#ifndef NDEBUG
     /* print fronts*/
     for (Int f = 0; f < nf; f++){
         Int fm, fn, fp;
@@ -103,23 +107,19 @@ paru_symbolic *paru_sym_analyse
 
         PRLEVEL (1,("Front=%ld #col=%ld #row=%ld #pivotCol=%ld Par=%ld", 
                     f, fn, fm, fp,Parent[f]));
-        PRLEVEL (2,(" #pivot col= %ld",Super[f+1]-Super[f]));
-        PRLEVEL (2,("\nlist of children:\t"));
+        PRLEVEL (1,(" #pivot col= %ld",Super[f+1]-Super[f]));
+        PRLEVEL (1,("\nlist of children: "));
         for (Int i = Childp[f]; i <= Childp[f+1]-1; i++) 
-            PRLEVEL (2,("%ld ",Child[i]));
+            PRLEVEL (1,("%ld ",Child[i]));
         PRLEVEL (2,("\n"));
     }
-#endif /* end of NDEBUG */
+    //#endif /* end of NDEBUG */
 
-    /*Computing augmented tree */
-    Int *aParent; //augmented tree size m+nf+1
-    Int *aChild;  // size m+nf+1
-    Int *aChildp; // size m+nf+2
-    aParent = (Int*) paru_alloc(m+nf+1, sizeof(Int),cc);
-    aChild =  (Int*) paru_alloc(m+nf+1, sizeof(Int),cc);
-    aChildp = (Int*) paru_alloc(m+nf+2, sizeof(Int),cc);
+    aParent = (Int*) paru_alloc (m+nf+1, sizeof(Int),cc);
+    aChild =  (Int*) paru_alloc (m+nf+1, sizeof(Int),cc);
+    aChildp = (Int*) paru_alloc (m+nf+2, sizeof(Int),cc);
 
-    Int *rM, *snM; // row map and supernode map
+
     rM =  (Int*) paru_alloc(m  ,sizeof(Int), cc);
     snM = (Int*) paru_alloc(nf ,sizeof(Int), cc);
 
@@ -131,6 +131,7 @@ paru_symbolic *paru_sym_analyse
     }
 
     //initialization
+    /*! TODO: Not all of them need initialization this is for debug for now	 */
     for (Int f = 0; f < nf; f++) snM[f] = -1;
     for (Int i = 0; i < m; i++) rM[i] = -1;
     for (Int i = 0; i < m+nf+1; i++) aParent[i] = -1;
@@ -143,30 +144,38 @@ paru_symbolic *paru_sym_analyse
     Int childpointer = 0;
 
     for (Int f = 0; f < nf; f++) {
-        PRLEVEL (2,("Front %ld\n", f)) ;
-        PRLEVEL (2,("pivot columns [ %ld to %ld ] n: %ld \n",
+        //for (Int f = 0; f < 1; f++) {
+        PRLEVEL (1,("Front %ld\n", f)) ;
+        PRLEVEL (1,("pivot columns [ %ld to %ld ] n: %ld \n",
                     Super [f], Super [f+1]-1, n)) ;
         ASSERT(Super[f+1] <= n);
         Int numRow =Sleft[Super[f+1]]-Sleft[Super[f]] ;
 
-        PRLEVEL (2,("~numRow=%ld",numRow));
-        PRLEVEL (2,("\n#offset=%ld\n",offset));
-
         Int numoforiginalChild=0;
         if (lastChildFlag){  // the current node is the parent
-            PRLEVEL (2,("Childs of %ld: ",f)) ;
-            numoforiginalChild=Child[Childp[f+1]-1]-Child[Childp[f]]+1;
-            for (Int i = Child[Childp[f]]; i < Child[Childp[f+1]]; i++){
-                PRLEVEL (2,("%ld,", i));
-                ASSERT(snM[i] < m+nf+1);
-                aParent[ snM[i]]=offset+numRow;
+            PRLEVEL (1,("Childs of %ld: ",f)) ;
+            numoforiginalChild= Childp[f+1] - Childp[f];
+
+            for (Int i = Childp[f]; i <= Childp[f+1]-1; i++) {
+                PRLEVEL (1,("%ld ",Child[i]));
+                Int c= Child [i];
+                ASSERT(snM[c] < m+nf+1);
+                aParent[ snM[c]]=offset+numRow;
+                PRLEVEL (1, ("aParent[%ld] =%ld\n", 
+                            aParent[snM [c]], offset+numRow));
                 ASSERT(childpointer < m+nf+1);
-                aChild[childpointer++] = snM[i];
+                aChild[childpointer++] = snM[c];
             }
         }
 
-        for(Int i = offset ; i < offset+numRow ; i++)
+        PRLEVEL (1,("numRow=%ld ",numRow));
+        PRLEVEL (1,("#offset=%ld\n",offset));
+        for(Int i = offset ; i < offset+numRow ; i++){
+            ASSERT (aChildp [i+1] == -1);
             aChildp[i+1] = aChildp[i];
+            PRLEVEL (1, ("@i=%ld aCp[%ld]=%ld aCp[%ld]=%ld",
+                        i, i+1, aChildp[i+1], i, aChildp[i]));
+        }
 
         for (Int i = Sleft[Super[f]]; i < Sleft[Super[f+1]]; i++){ 
             // number of rows
@@ -182,11 +191,14 @@ paru_symbolic *paru_sym_analyse
         offset += numRow;
         snM[f] = offset++;
         ASSERT(offset < m+nf+1);
+        ASSERT (aChildp [offset] == -1);
         aChildp[offset] = aChildp[offset-1]+numRow+numoforiginalChild;
+        PRLEVEL (1, ("\n f=%ld numoforiginalChild=%ld\n", f, numoforiginalChild));
 
-        if( Parent[f] == f+1)  //last child
+        if( Parent[f] == f+1){  //last child due to staircase
+            PRLEVEL (1, ("last Child =%ld\n", f));
             lastChildFlag = 1;  
-        else
+        }else
             lastChildFlag = 0;  
     }
 
@@ -200,18 +212,18 @@ paru_symbolic *paru_sym_analyse
     PRLEVEL (1,("super node mapping (snM): ")); 
     for (Int f = 0; f < nf; f++){
         ASSERT (snM [f] != -1)
-        PRLEVEL (1,("%ld ",snM[f]));     
+            PRLEVEL (1,("%ld ",snM[f]));     
     }
     PRLEVEL (1,("\n"));
 
     PRLEVEL (1,("row mapping (rM): "));  
     for (Int i = 0; i < m; i++){
         ASSERT (rM [f] != -1)
-        PRLEVEL (1,("%ld ",rM[i]));        
+            PRLEVEL (1,("%ld ",rM[i]));        
     }
     PRLEVEL (1,("\n"));
 
-    PRLEVEL (1,("aP: ")); 
+    PRLEVEL (1,("aParent: ")); 
     for (Int i = 0; i < m+nf+1; i++) PRLEVEL (1,("%ld ",aParent[i]));   
     PRLEVEL (1,("\n"));
 
@@ -230,6 +242,5 @@ paru_symbolic *paru_sym_analyse
         PRLEVEL (1,("\n"));
     }
     //#endif
-
     return (LUsym) ;
 }
