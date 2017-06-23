@@ -22,7 +22,7 @@ paru_matrix *paru_init_rowFronts (
         cholmod_common *cc
         ){
 
-    DEBUGLEVEL(1);
+    DEBUGLEVEL(0);
     if (!A->packed){
         printf ("A is not packed; Wrong format \n");
         return NULL;
@@ -163,7 +163,7 @@ paru_matrix *paru_init_rowFronts (
         curEl->nrowsleft = curEl->nrows = nrows;
         curEl->ncolsleft = curEl->ncols = ncols;
 
-        PRLEVEL (2, ("element %ld= %ld x %ld\n", e, nrows, ncols));
+        PRLEVEL (1, ("element %ld= %ld x %ld\n", e, nrows, ncols));
 
         // Allocating Rowlist and updating its tuples
         RowList[row].list =
@@ -189,11 +189,14 @@ paru_matrix *paru_init_rowFronts (
 
         Int *el_colrowIndex = (Int*)(curEl+1);     // pointers to element index 
         double *el_colrowNum = (double*)(el_colrowIndex+nrows+ncols); //and values
+        PRLEVEL (1, ("el_colrowIndex =%p, el_colrowNum = %p \n", 
+                    el_colrowIndex, el_colrowNum));
         Int j = 0;  //Index inside an element
 
         for ( Int p = Sp [row]; p < Sp [row+1]; p++){
             el_colrowIndex[j] = Sj[p];
             el_colrowNum[j++] =   Sx[p];
+            PRLEVEL (1, ("Sj[%ld] =%ld Sx[%ld]=%lf\n", p, Sj[p], p, Sx[p] ));
             // adding column tuple
             Tuple colTuple;
             colTuple.e = e;

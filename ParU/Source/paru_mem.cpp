@@ -17,7 +17,7 @@ void paru_freesym (paru_symbolic **LUsym_handle,
             // workspace and parameters
     cholmod_common *cc
 ){
-    DEBUGLEVEL (1);
+    DEBUGLEVEL (0);
     if (LUsym_handle == NULL || *LUsym_handle == NULL){
         // nothing to do; caller probably ran out of memory
         return;
@@ -45,8 +45,8 @@ void paru_freesym (paru_symbolic **LUsym_handle,
     cholmod_l_free (nf+1, sizeof (Int), LUsym->Fm, cc);
     cholmod_l_free (nf+1, sizeof (Int), LUsym->Cm, cc);
 
-    cholmod_l_free (nf+1,   sizeof (Int), LUsym->Rp, cc) ;
-    cholmod_l_free (rjsize, sizeof (Int), LUsym->Rj, cc) ;
+    cholmod_l_free (nf+1,   sizeof (Int), LUsym->Rp, cc);
+    cholmod_l_free (rjsize, sizeof (Int), LUsym->Rj, cc);
 
     cholmod_l_free (m+1, sizeof (Int), LUsym->Sp, cc);
     cholmod_l_free (anz, sizeof (Int), LUsym->Sj, cc);
@@ -60,7 +60,6 @@ void paru_freesym (paru_symbolic **LUsym_handle,
     cholmod_l_free (nf, sizeof (Int), LUsym->super2atree, cc);
 
     cholmod_l_free (1, sizeof (paru_symbolic), LUsym, cc);
-
 
     *LUsym_handle = NULL;
 }

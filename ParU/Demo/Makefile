@@ -52,13 +52,13 @@ run:
 #	./testazny < ../Matrix/a04.mtx
 #	./testazny < ../Matrix/a0.mtx #all zeros
 #
-#	./testazny < ../Matrix/lp_share1b.mtx 
+	./testazny < ../Matrix/lp_share1b.mtx 
 #	./testazny < ../Matrix/lp_e226.mtx
 #	./testazny < ../Matrix/lp_e226_transposed.mtx 
 #	./testazny < ../Matrix/young1c.mtx 
 #	./testazny < ../Matrix/Franz6_id1959_aug.mtx 
 #	./testazny < ../Matrix/arrow.mtx 
-	./testazny < ../Matrix/ash219.mtx
+#	./testazny < ../Matrix/ash219.mtx
 
 VGFLAGS = --tool=memcheck --leak-check=yes --show-reachable=yes -v\
 		  --num-callers=20 --track-fds=yes

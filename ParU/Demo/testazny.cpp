@@ -1,6 +1,55 @@
 #include "Parallel_LU.hpp"
 
 // =============================================================================
+void paru_print_element (paru_matrix *paruMatInfo, Int e){
+    DEBUGLEVEL(1);
+    // print out contribution blocks
+    Element **elementList; 
+    elementList = paruMatInfo->elementList;
+    Element *curEl = elementList[e];
+
+    Int morign = paruMatInfo->m;
+    Int nf = paruMatInfo->LUsym->nf;
+
+    if ( e > morign + nf +1){
+        printf("Element %ld is out of range; just %ld elements \n", 
+                e,  morign + nf +1);
+        return;
+    }
+
+    if (curEl == NULL){
+        printf("Element %ld is empty\n",e );
+        return;
+    }
+
+    Int m,n;
+    m = curEl->nrows;
+    n = curEl->ncols;
+   
+    Int *el_colrowIndex = (Int*)(curEl+1);     // pointers to element index 
+    double *el_colrowNum = (double*)(el_colrowIndex + m + n); //and values
+
+    PRLEVEL (1, ("el_colrowIndex =%p, el_colrowNum = %p \n", 
+                el_colrowIndex, el_colrowNum));
+
+    printf("\n"); 
+    printf("Element %ld is %ld x %ld:\n", e, m, n);
+
+
+    printf("\t"); 
+    for (int j = 0; j < n; j++) 
+        printf("%ld\t", el_colrowIndex [j] );
+    printf("\n"); 
+    for (int i = 0; i < m; i++) {
+        printf("%ld\t",el_colrowIndex [n+i] );
+        for (int j = 0; j < n; j++) {
+            double value =  el_colrowNum [i*m + j];
+            printf("%2.2lf\t",value );
+        }
+        printf("\n"); 
+    }
+
+}
 int main (int argc, char **argv)
 {
     DEBUGLEVEL(0); 
@@ -23,8 +72,18 @@ int main (int argc, char **argv)
     }
 
     LUsym = paru_sym_analyse (A, cc);
-    paru_matrix *paruMatInfo = paru_init_rowFronts (A, LUsym, cc);
+    if (LUsym == NULL) {
+        exit(0);
+    }
 
+
+    paru_matrix *paruMatInfo = paru_init_rowFronts (A, LUsym, cc);
+    if (paruMatInfo == NULL) {
+        exit(0);
+    }
+
+
+    paru_print_element (paruMatInfo, 4);
 
     cholmod_l_free_sparse (&A, cc);
     paru_freemat (&paruMatInfo, cc);
