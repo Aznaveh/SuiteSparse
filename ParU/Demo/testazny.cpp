@@ -2,7 +2,7 @@
 
 // =============================================================================
 void paru_print_element (paru_matrix *paruMatInfo, Int e){
-    DEBUGLEVEL(1);
+    DEBUGLEVEL(0);
     // print out contribution blocks
     Element **elementList; 
     elementList = paruMatInfo->elementList;
@@ -50,6 +50,27 @@ void paru_print_element (paru_matrix *paruMatInfo, Int e){
     }
 
 }
+
+void paru_print_tupleList (tupleList *listSet, Int index){
+    DEBUGLEVEL(1);
+    PRLEVEL (1, ("listSet =%p\n", listSet));
+
+    if (listSet == NULL) {
+       printf("Empty tuple\n"); 
+       return;
+    }
+
+    tupleList cur= listSet [index];
+    Int numTuple = cur.numTuple;
+    Tuple *l = cur.list;
+
+    printf(" There are %ld tuples in this list:\n", numTuple);
+    for (int i = 0; i < numTuple; i++) {
+       Tuple curTpl = l [i];
+        printf(" (%ld,%ld)", curTpl.e, curTpl.f);
+    }
+    printf("\n"); 
+}
 int main (int argc, char **argv)
 {
     DEBUGLEVEL(0); 
@@ -83,7 +104,18 @@ int main (int argc, char **argv)
     }
 
 
-    paru_print_element (paruMatInfo, 4);
+    paru_print_element (paruMatInfo, 0);
+
+    tupleList *RowList = paruMatInfo -> RowList;
+    tupleList *ColList = paruMatInfo -> ColList;  
+ 
+    Int m,n;
+    m = paruMatInfo-> m;
+    n = paruMatInfo-> n;
+    for (int i = 0; i < m; ++i) {
+        paru_print_tupleList (RowList , i);
+    }
+
 
     cholmod_l_free_sparse (&A, cc);
     paru_freemat (&paruMatInfo, cc);
@@ -91,11 +123,11 @@ int main (int argc, char **argv)
     paru_freesym (&LUsym,cc);
 
 
- //  spqr_symbolic *QRsym = 
- //      spqr_analyze (A, SPQR_ORDERING_CHOLMOD, FALSE,FALSE , FALSE, cc);
- //           spqr_freesym (&QRsym, cc);
-  //  PRLEVEL (1, ("malloc_count %ld inuse %ld\n", 
-   //cc->malloc_count, cc->memory_inuse));
+    //  spqr_symbolic *QRsym = 
+    //      spqr_analyze (A, SPQR_ORDERING_CHOLMOD, FALSE,FALSE , FALSE, cc);
+    //           spqr_freesym (&QRsym, cc);
+    //  PRLEVEL (1, ("malloc_count %ld inuse %ld\n", 
+    //cc->malloc_count, cc->memory_inuse));
 
     cholmod_l_finish (cc);
     printf("***************************************************************\n");

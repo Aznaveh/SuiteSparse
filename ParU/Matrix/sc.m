@@ -1,8 +1,8 @@
 [m n]= size(A)
-mn= min(m,n)
+mn= min(m,n);
 
-%pcol=metis(A,'col');
-pcol=colamd(A);
+pcol=metis(A,'col');
+%pcol=colamd(A);
 A=A(:,pcol);
 [p,q]=etree(A,'col');
 

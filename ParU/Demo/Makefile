@@ -20,7 +20,7 @@ all:
 	$(C) testazny.cpp -o testazny $(LIBS)
 
 run:
-#	./testazny < ../Matrix/GD01_b.mtx
+	./testazny < ../Matrix/GD01_b.mtx
 #	./testazny < ../Matrix/LFAT5.mtx
 #	./testazny < ../Matrix/a2.mtx #2x2
 #	./testazny < ../Matrix/b1_ss.mtx
@@ -52,7 +52,7 @@ run:
 #	./testazny < ../Matrix/a04.mtx
 #	./testazny < ../Matrix/a0.mtx #all zeros
 #
-	./testazny < ../Matrix/lp_share1b.mtx 
+#	./testazny < ../Matrix/lp_share1b.mtx 
 #	./testazny < ../Matrix/lp_e226.mtx
 #	./testazny < ../Matrix/lp_e226_transposed.mtx 
 #	./testazny < ../Matrix/young1c.mtx 
