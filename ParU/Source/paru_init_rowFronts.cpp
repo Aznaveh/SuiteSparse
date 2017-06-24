@@ -136,12 +136,9 @@ paru_matrix *paru_init_rowFronts (
         PRLEVEL (2, ("ncols[%ld]=%ld\n",col,ncols));
 
         ColList[col].numTuple = 0;
-        /*! TODO: for test	 */
-//        ColList[col].len = slackCol*ncols;
-        ColList[col].len = 1;
+        ColList[col].len = slackCol*ncols;
         ColList[col].list = 
-          //  (Tuple*) paru_alloc (slackCol*ncols, sizeof(Tuple), cc);
-            (Tuple*) paru_alloc (1, sizeof(Tuple), cc);
+            (Tuple*) paru_alloc (slackCol*ncols, sizeof(Tuple), cc);
         if (ColList[col].list == NULL){   //out of memory
             paru_freemat (&paruMatInfo, cc);
             printf("Out of memory: ColList[col].list\n");

@@ -20,18 +20,18 @@ all:
 	$(C) testazny.cpp -o testazny $(LIBS)
 
 run:
-#	./testazny < ../Matrix/GD01_b.mtx
-#	./testazny < ../Matrix/LFAT5.mtx
-#	./testazny < ../Matrix/a2.mtx #2x2
-#	./testazny < ../Matrix/b1_ss.mtx
-#	./testazny < ../Matrix/bcspwr01.mtx
-#	./testazny < ../Matrix/bfwa62.mtx
-#	./testazny < ../Matrix/GD06_theory.mtx
-#	./testazny < ../Matrix/lfat5b.mtx
-#	./testazny < ../Matrix/pwr01b.mtx
-#	./testazny < ../Matrix/cage5.mtx
-#	./testazny < ../Matrix/az23.mtx
-#
+	./testazny < ../Matrix/GD01_b.mtx
+	./testazny < ../Matrix/LFAT5.mtx
+	./testazny < ../Matrix/a2.mtx #2x2
+	./testazny < ../Matrix/b1_ss.mtx
+	./testazny < ../Matrix/bcspwr01.mtx
+	./testazny < ../Matrix/bfwa62.mtx
+	./testazny < ../Matrix/GD06_theory.mtx
+	./testazny < ../Matrix/lfat5b.mtx
+	./testazny < ../Matrix/pwr01b.mtx
+	./testazny < ../Matrix/cage5.mtx
+	./testazny < ../Matrix/az23.mtx
+
 #	./testazny < ../Matrix/Tina_AskCal.mtx
 #	./testazny < ../Matrix/problem.mtx
 #	./testazny < ../Matrix/Tina_AskCal_perm.mtx
