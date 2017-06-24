@@ -20,7 +20,7 @@ all:
 	$(C) testazny.cpp -o testazny $(LIBS)
 
 run:
-	./testazny < ../Matrix/GD01_b.mtx
+#	./testazny < ../Matrix/GD01_b.mtx
 #	./testazny < ../Matrix/LFAT5.mtx
 #	./testazny < ../Matrix/a2.mtx #2x2
 #	./testazny < ../Matrix/b1_ss.mtx
@@ -64,7 +64,7 @@ VGFLAGS = --tool=memcheck --leak-check=yes --show-reachable=yes -v\
 		  --num-callers=20 --track-fds=yes
 
 val:
-#	valgrind	$(VGFLAGS)	./testazny  < ../Matrix/GD01_b.mtx
+	valgrind	$(VGFLAGS)	./testazny  < ../Matrix/GD01_b.mtx
 #	valgrind	$(VGFLAGS)	./testazny < ../Matrix/LFAT5.mtx
 #	valgrind	$(VGFLAGS)	./testazny < ../Matrix/a2.mtx 
 #	valgrind	$(VGFLAGS)	./testazny < ../Matrix/b1_ss.mtx
@@ -76,8 +76,8 @@ val:
 #	valgrind	$(VGFLAGS)	./testazny < ../Matrix/west0067.mtx 
 #	valgrind	$(VGFLAGS)	./testazny < ../Matrix/cage5.mtx
 #	valgrind	$(VGFLAGS)	./testazny < ../Matrix/az23.mtx
-#
-#
+
+
 #	valgrind	$(VGFLAGS)	./testazny <  ../Matrix/Tina_AskCal.mtx
 #	valgrind	$(VGFLAGS)	./testazny < ../Matrix/problem.mtx
 #	valgrind	$(VGFLAGS)	./testazny < ../Matrix/problem.mtx

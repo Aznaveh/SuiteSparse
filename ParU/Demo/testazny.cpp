@@ -52,7 +52,7 @@ void paru_print_element (paru_matrix *paruMatInfo, Int e){
 }
 
 void paru_print_tupleList (tupleList *listSet, Int index){
-    DEBUGLEVEL(1);
+    DEBUGLEVEL(0);
     PRLEVEL (1, ("listSet =%p\n", listSet));
 
     if (listSet == NULL) {
@@ -103,18 +103,30 @@ int main (int argc, char **argv)
         exit(0);
     }
 
+    Int m,n,nf;
+    m = paruMatInfo-> m;
+    n = paruMatInfo-> n;
+    nf = paruMatInfo->LUsym->nf;
+ 
 
-    paru_print_element (paruMatInfo, 0);
+    for (int i = 0; i < m+nf+1; ++i) 
+        paru_print_element (paruMatInfo, i);
 
     tupleList *RowList = paruMatInfo -> RowList;
     tupleList *ColList = paruMatInfo -> ColList;  
- 
-    Int m,n;
-    m = paruMatInfo-> m;
-    n = paruMatInfo-> n;
-    for (int i = 0; i < m; ++i) {
+
+    printf ("RowList:\n");
+    for (int i = 0; i < m; ++i){ 
+        printf("row %ld :",i);
         paru_print_tupleList (RowList , i);
     }
+
+    printf ("ColList:\n");
+    for (int i = 0; i < n; ++i) {
+        printf("col %ld :",i);
+        paru_print_tupleList (ColList , i);
+    }
+
 
 
     cholmod_l_free_sparse (&A, cc);

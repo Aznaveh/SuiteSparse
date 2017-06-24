@@ -66,7 +66,7 @@ paru_matrix *paru_init_rowFronts (
         return NULL;
     }
 
-    PRLEVEL (0, ("$RowList =%p\n", RowList));
+    PRLEVEL (1, ("$RowList =%p\n", RowList));
 
     tupleList *ColList= paruMatInfo->ColList =
         (tupleList*) paru_alloc (1, n*sizeof(tupleList), cc);
@@ -75,7 +75,7 @@ paru_matrix *paru_init_rowFronts (
         printf("Out of memory: ColList\n");
         return NULL;
     }
-    PRLEVEL (0, ("$ColList =%p\n", ColList));
+    PRLEVEL (1, ("$ColList =%p\n", ColList));
 
     Element **elementList; 
     Int nf = LUsym->nf;
@@ -136,9 +136,12 @@ paru_matrix *paru_init_rowFronts (
         PRLEVEL (2, ("ncols[%ld]=%ld\n",col,ncols));
 
         ColList[col].numTuple = 0;
-        ColList[col].len = slackCol*ncols;
+        /*! TODO: for test	 */
+//        ColList[col].len = slackCol*ncols;
+        ColList[col].len = 1;
         ColList[col].list = 
-            (Tuple*) paru_alloc (1, slackCol*ncols*sizeof(Tuple), cc);
+          //  (Tuple*) paru_alloc (slackCol*ncols, sizeof(Tuple), cc);
+            (Tuple*) paru_alloc (1, sizeof(Tuple), cc);
         if (ColList[col].list == NULL){   //out of memory
             paru_freemat (&paruMatInfo, cc);
             printf("Out of memory: ColList[col].list\n");
@@ -152,6 +155,7 @@ paru_matrix *paru_init_rowFronts (
         Int nrows = 1, 
             ncols = Sp[row+1]-Sp[row]; //nrows and ncols of current front/row
 
+        PRLEVEL (1, ("element %ld= %ld x %ld\n", e, nrows, ncols));
         Element *curEl = elementList[e] =
             (Element*) paru_alloc(1, sizeof(Element)+sizeof(Int)*(nrows+ncols)+
                     sizeof(double)*nrows*ncols, cc);
@@ -163,11 +167,10 @@ paru_matrix *paru_init_rowFronts (
         curEl->nrowsleft = curEl->nrows = nrows;
         curEl->ncolsleft = curEl->ncols = ncols;
 
-        PRLEVEL (1, ("element %ld= %ld x %ld\n", e, nrows, ncols));
 
         // Allocating Rowlist and updating its tuples
         RowList[row].list =
-            (Tuple*) paru_alloc (1, slackRow*nrows*sizeof(Tuple), cc);
+            (Tuple*) paru_alloc (slackRow*nrows, sizeof(Tuple), cc);
         if (RowList[row].list == NULL){   //out of memory
             paru_freemat (&paruMatInfo, cc);
             printf("Out of memory: RowList[row].list \n");
