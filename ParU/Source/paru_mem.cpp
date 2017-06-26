@@ -45,15 +45,15 @@ void paru_freesym (paru_symbolic **LUsym_handle,
     cholmod_l_free (nf+1, sizeof (Int), LUsym->Fm, cc);
     cholmod_l_free (nf+1, sizeof (Int), LUsym->Cm, cc);
 
-    cholmod_l_free (nf+1,   sizeof (Int), LUsym->Rp, cc);
     cholmod_l_free (rjsize, sizeof (Int), LUsym->Rj, cc);
+    cholmod_l_free (nf+1,   sizeof (Int), LUsym->Rp, cc);
 
     cholmod_l_free (m+1, sizeof (Int), LUsym->Sp, cc);
     cholmod_l_free (anz, sizeof (Int), LUsym->Sj, cc);
     cholmod_l_free (n+2, sizeof (Int), LUsym->Sleft, cc);
 
 
-    cholmod_l_free (m+nf+1, sizeof (Int), LUsym->aParent, cc);
+    cholmod_l_free (m+nf, sizeof (Int), LUsym->aParent, cc);
     cholmod_l_free (m+nf+1, sizeof (Int), LUsym->aChild, cc);
     cholmod_l_free (m+nf+2, sizeof (Int), LUsym->aChildp, cc);
     cholmod_l_free (m, sizeof (Int), LUsym->row2atree, cc);

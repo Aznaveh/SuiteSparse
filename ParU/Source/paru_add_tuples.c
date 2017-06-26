@@ -10,6 +10,7 @@
  * \param  a list of tuples and the the tuple we want to add
  * \return 0 on sucess 
  */
+/*! TODO: I have to take into account deleted tuples	 */
 int paru_add_rowTuple (tupleList *RowList, Int row, 
         Tuple T, cholmod_common *cc)
 {
@@ -46,7 +47,7 @@ int paru_add_colTuple (tupleList *ColList, Int col,
     if (cur->len > cur->numTuple)
         cur->list [cur->numTuple++] = T;
     else{
-        PRLEVEL (1, ("Col Tuple reallocating space\n"));
+        PRLEVEL (0, ("Col Tuple reallocating space\n"));
         Int newLen = cur->len*2 + 1;
         Tuple *newList = 
             (Tuple*) paru_alloc (newLen, sizeof(Tuple), cc);

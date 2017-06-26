@@ -96,7 +96,7 @@ struct paru_symbolic
     // placeholder node nf as their parent.  Thus, the tree of nodes 0:nf is
     // truly a tree, with just one parent (node nf).
 
-    Int *aParent; // size m+nf+1
+    Int *aParent; // size m+nf
     Int *aChild; // size m+nf+1
     Int *aChildp; // size m+nf+2
 

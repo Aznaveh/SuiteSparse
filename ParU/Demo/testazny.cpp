@@ -1,4 +1,5 @@
 #include "Parallel_LU.hpp"
+#define PRINTCBsTUPLES 0
 
 // =============================================================================
 void paru_print_element (paru_matrix *paruMatInfo, Int e){
@@ -109,24 +110,26 @@ int main (int argc, char **argv)
     nf = paruMatInfo->LUsym->nf;
  
 
-    for (int i = 0; i < m+nf+1; ++i) 
-        paru_print_element (paruMatInfo, i);
+    if (PRINTCBsTUPLES){
+        for (int i = 0; i < m+nf+1; ++i) 
+            paru_print_element (paruMatInfo, i);
 
-    tupleList *RowList = paruMatInfo -> RowList;
-    tupleList *ColList = paruMatInfo -> ColList;  
+        tupleList *RowList = paruMatInfo -> RowList;
+        tupleList *ColList = paruMatInfo -> ColList;  
 
-    printf ("RowList:\n");
-    for (int i = 0; i < m; ++i){ 
-        printf("row %ld :",i);
-        paru_print_tupleList (RowList , i);
+        printf ("RowList:\n");
+        for (int i = 0; i < m; ++i){ 
+            printf("row %ld :",i);
+            paru_print_tupleList (RowList , i);
+        }
+
+        printf ("ColList:\n");
+        for (int i = 0; i < n; ++i) {
+            printf("col %ld :",i);
+            paru_print_tupleList (ColList , i);
+        }
+
     }
-
-    printf ("ColList:\n");
-    for (int i = 0; i < n; ++i) {
-        printf("col %ld :",i);
-        paru_print_tupleList (ColList , i);
-    }
-
 
 
     cholmod_l_free_sparse (&A, cc);
