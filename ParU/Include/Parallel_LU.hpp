@@ -31,7 +31,7 @@ static int print_level = 0 ;
 // This makes parallelism easier to manage, since all threads can
 // have access to this object without synchronization.
 //
-struct paru_symbolic
+typedef struct /* paru_symbolic*/
 {
 
     // -------------------------------------------------------------------------
@@ -123,7 +123,7 @@ struct paru_symbolic
     Int *row2atree;       //Mapping from rows to augmented tree size m
     Int *super2atree;     //Mapping from super nodes to augmented tree size nf
 
-};
+} paru_symbolic;
 
 // =============================================================================
 //      Tuple, Row and Column data structure 

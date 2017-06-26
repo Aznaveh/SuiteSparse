@@ -63,7 +63,7 @@ paru_sym_analyse.o: ../Source/paru_sym_analyse.cpp
 paru_init_rowFronts.o: ../Source/paru_init_rowFronts.cpp
 	$(C) -c $<
 
-paru_add_tuples.o: ../Source/paru_add_tuples.c
+paru_add_tuples.o: ../Source/paru_add_tuples.cpp
 	$(C) -c $<
 
 #-------------------------------------------------------------------------------

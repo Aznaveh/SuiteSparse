@@ -130,4 +130,3 @@ void paru_freemat (paru_matrix **paruMatInfo_handle,
     cholmod_l_free (1, sizeof(paru_matrix), paruMatInfo, cc);
     *paruMatInfo_handle = NULL;
 } 
-
