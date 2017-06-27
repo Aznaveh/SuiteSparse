@@ -104,6 +104,7 @@ int main (int argc, char **argv)
         exit(0);
     }
 
+    paru_assemble (paruMatInfo, 1);
     Int m,n,nf;
     m = paruMatInfo-> m;
     n = paruMatInfo-> n;

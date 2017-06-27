@@ -3,20 +3,24 @@
 // ============================================================================/
 #include <stdio.h>
 #include "spqr.hpp"
+
+// -----------------------------------------------------------------------------
+// debugging and printing macros
+// -----------------------------------------------------------------------------
 #ifndef NPR
-#define NPR
+    #define NPR
 #endif
 //for printing information uncomment this
 #undef NPR
 
 
 #ifndef NPR
-static int print_level = 0 ;
-#define PRLEVEL(level,param) { if (print_level >= level) printf param ; }
-#define DEBUGLEVEL(level) { print_level = level ; }
+    static int print_level = 0 ;
+    #define PRLEVEL(level,param) { if (print_level >= level) printf param ; }
+    #define DEBUGLEVEL(level) { print_level = level ; }
 #else
-#define PRLEVEL(level,param)
-#define DEBUGLEVEL(level)
+    #define PRLEVEL(level,param)
+    #define DEBUGLEVEL(level)
 #endif
 
 #define Int SuiteSparse_long
@@ -201,3 +205,4 @@ int paru_add_rowTuple (tupleList *RowList, Int row, Tuple T,
         cholmod_common *cc);
 int paru_add_colTuple (tupleList *ColList, Int col, 
         Tuple T, cholmod_common *cc);
+void paru_assemble(paru_matrix *paruMatInfo, Int f);

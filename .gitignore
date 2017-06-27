@@ -102,8 +102,8 @@ UMFPACK/Demo/umfpack_dl_demo
 UMFPACK/Demo/umfpack_simple
 UMFPACK/Demo/umfpack_zi_demo
 UMFPACK/Demo/umfpack_zl_demo
-ParU/Demo/testazny
 
+ParU/Demo/testazny
 ParU/Demo/pfile
 ParU/Demo/tfile
 ParU/Demo/tmp

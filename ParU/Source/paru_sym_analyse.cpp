@@ -49,7 +49,8 @@ paru_symbolic *paru_sym_analyse
 
 
     PRLEVEL (0, ("A  is  %ld x %ld \n",m, n ));
-    PRLEVEL (0, ("anz = %ld  nf=%ld rjsize=%ld\n",anz ,nf, rjsize ));
+    PRLEVEL (0, ("nf=%ld\n",nf ));
+    PRLEVEL (1, ("anz = %ld  rjsize=%ld\n", anz, rjsize));
 
 
     LUsym->maxfn = QRsym->maxfn;
@@ -129,12 +130,11 @@ paru_symbolic *paru_sym_analyse
         fn = LUsym->Rp[f+1]-LUsym->Rp[f];
         fp = Super[f+1]-Super[f];
 
-        PRLEVEL (0,("Front=%ld #col=%ld #row=%ld #pivotCol=%ld Par=%ld\n", 
-                    f, fn, fm, fp,Parent[f]));
+        PRLEVEL (0,("Front=%ld Parent=%ld\n", f,  Parent[f]));
         PRLEVEL (1,("\nlist of children: "));
         for (Int i = Childp[f]; i <= Childp[f+1]-1; i++) 
             PRLEVEL (1,("%ld ",Child[i]));
-        PRLEVEL (2,("\n"));
+        PRLEVEL (1,("\n"));
     }
     //#endif /* end of NDEBUG */
 
@@ -168,7 +168,6 @@ paru_symbolic *paru_sym_analyse
     Int childpointer = 0;
 
     for (Int f = 0; f < nf; f++) {
-        //for (Int f = 0; f < 1; f++) {
         PRLEVEL (1,("Front %ld\n", f)) ;
         PRLEVEL (1,("pivot columns [ %ld to %ld ] n: %ld \n",
                     Super [f], Super [f+1]-1, n)) ;
@@ -232,24 +231,24 @@ paru_symbolic *paru_sym_analyse
     LUsym->row2atree = rM;
     LUsym->super2atree = snM;
 
-    //#ifndef NDEBUG
-    PRLEVEL (0,("super node mapping (snM): ")); 
+#ifndef NDEBUG
+    PRLEVEL (1,("super node mapping (snM): ")); 
     for (Int f = 0; f < nf; f++){
-        ASSERT (snM [f] != -1)
-            PRLEVEL (0,("%ld ",snM[f]));     
-    }
-    PRLEVEL (0,("\n"));
-
-    PRLEVEL (1,("row mapping (rM): "));  
-    for (Int i = 0; i < m; i++){
-        ASSERT (rM [f] != -1)
-            PRLEVEL (1,("%ld ",rM[i]));        
+        ASSERT (snM [f] != -1);
+        PRLEVEL (1,("%ld ",snM[f]));     
     }
     PRLEVEL (1,("\n"));
 
-    PRLEVEL (0,("aParent: ")); 
-    for (Int i = 0; i < m+nf; i++) PRLEVEL (0,("%ld ",aParent[i]));   
-    PRLEVEL (0,("\n"));
+    PRLEVEL (1,("row mapping (rM): "));  
+    for (Int i = 0; i < m; i++){
+        ASSERT (rM [i] != -1);
+        PRLEVEL (1,("%ld ",rM[i]));        
+    }
+    PRLEVEL (1,("\n"));
+
+    PRLEVEL (1,("aParent: ")); 
+    for (Int i = 0; i < m+nf; i++) PRLEVEL (1,("%ld ",aParent[i]));   
+    PRLEVEL (1,("\n"));
 
     PRLEVEL (1,("aChildp: "));
     for (Int i = 0; i < m+nf+2; i++) PRLEVEL (1,("%ld ",aChildp[i]));   
@@ -265,6 +264,6 @@ paru_symbolic *paru_sym_analyse
             PRLEVEL (1,(" %ld,",aChild[c]));  
         PRLEVEL (1,("\n"));
     }
-    //#endif
+#endif
     return (LUsym) ;
 }
