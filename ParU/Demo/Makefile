@@ -21,9 +21,9 @@ all:
 
 run:
 #	./testazny < ../Matrix/GD01_b.mtx
-#	./testazny < ../Matrix/LFAT5.mtx
-	./testazny < ../Matrix/a2.mtx 
-	./testazny < ../Matrix/b1_ss.mtx
+	./testazny < ../Matrix/LFAT5.mtx
+#	./testazny < ../Matrix/a2.mtx 
+#	./testazny < ../Matrix/b1_ss.mtx
 #	./testazny < ../Matrix/bcspwr01.mtx
 #	./testazny < ../Matrix/bfwa62.mtx
 #	./testazny < ../Matrix/GD06_theory.mtx

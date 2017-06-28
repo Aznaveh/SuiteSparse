@@ -50,7 +50,7 @@ paru_symbolic *paru_sym_analyse
 
     PRLEVEL (0, ("A  is  %ld x %ld \n",m, n ));
     PRLEVEL (0, ("nf=%ld\n",nf ));
-    PRLEVEL (1, ("anz = %ld  rjsize=%ld\n", anz, rjsize));
+    PRLEVEL (0, ("anz = %ld  rjsize=%ld\n", anz, rjsize));
 
 
     LUsym->maxfn = QRsym->maxfn;

@@ -1,5 +1,5 @@
 #include "Parallel_LU.hpp"
-#define PRINTCBsTUPLES 0
+#define PRINTCBsTUPLES 1
 
 // =============================================================================
 void paru_print_element (paru_matrix *paruMatInfo, Int e){
@@ -45,7 +45,7 @@ void paru_print_element (paru_matrix *paruMatInfo, Int e){
         printf("%ld\t",el_colrowIndex [n+i] );
         for (int j = 0; j < n; j++) {
             double value =  el_colrowNum [i*m + j];
-            printf("%2.2lf\t",value );
+            printf("%2.4lf\t",value );
         }
         printf("\n"); 
     }
@@ -104,12 +104,15 @@ int main (int argc, char **argv)
         exit(0);
     }
 
-    paru_assemble (paruMatInfo, 1);
     Int m,n,nf;
     m = paruMatInfo-> m;
     n = paruMatInfo-> n;
     nf = paruMatInfo->LUsym->nf;
  
+   for (Int i = 0; i < nf; i++) {
+    paru_assemble (paruMatInfo, i);
+   }
+    
 
     if (PRINTCBsTUPLES){
         for (int i = 0; i < m+nf+1; ++i) 
