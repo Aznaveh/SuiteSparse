@@ -36,10 +36,10 @@ void paru_assemble(
     Int p1 = Rp [f];        /* Rj [p1:p2-1] = columns in F */
     Int p2 = Rp [f+1];
     Int fp = col2 - col1;   /* first fp columns are pivotal */ 
-    Int fn = p2 - p1;           /* upper bound in number of columns of F */
+    Int fn = p2 - p1;          /* exact number of columns of F */ 
 
     PRLEVEL (1, ("%ld pivotal columns:%ld...%ld\n", fp, col1, col2));
-    PRLEVEL (1, ("upper bound on columns: %ld ... %ld\n", Rj [p1], Rj [p2-1]));
+    PRLEVEL (1, ("exact number of columns: %ld ... %ld\n", Rj [p1], Rj [p2-1]));
     PRLEVEL (1, ("p1=%ld p2=%ld\n",p1 ,p2));
     ASSERT (fp > 0 );
     ASSERT (fp <= fn );
