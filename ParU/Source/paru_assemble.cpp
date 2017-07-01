@@ -17,7 +17,7 @@ void paru_assemble (
     cholmod_common *cc)
 
 {
-    DEBUGLEVEL(1);
+    DEBUGLEVEL(0);
     paru_symbolic *LUsym =  paruMatInfo->LUsym;
 
     Int m,n,nf;
@@ -57,6 +57,7 @@ void paru_assemble (
         Int numTuple = cur->numTuple;
         ASSERT (numTuple >= 0);
         Tuple *l = cur->list;
+        PRLEVEL (1, ("numTuple =%ld\n", numTuple));
         for (Int i = 0; i < numTuple; i++){
             Tuple curTpl = l [i];
             Int e = curTpl.e;
@@ -64,25 +65,34 @@ void paru_assemble (
             Element *curEl = elementList[e];
             Int mEl = curEl->nrows;
             Int *el_colrowIndex = (Int*)(curEl+1);     // pointers to element index 
+            PRLEVEL (1, ("Tuple %ld\n",i));
             for (Int rEl = 0; rEl < mEl; rEl++){
-                for (Int rS = 0; rS < rowsP; rS++){
-                   if (el_colrowIndex [rEl] == rowSet [rS])
-                       continue; // row is already counted
-                   if ( rS == rowsP){ // count the new row
-                       rowSet [rowsP++] = el_colrowIndex [rEl] ;
-                   }
+                Int rS;
+                for (rS = 0; rS < rowsP; rS++){
+                    PRLEVEL (1, (" %ld %ld\n", rowSet[rS], el_colrowIndex [rEl]));
+                    if (el_colrowIndex [rEl] == rowSet [rS])
+                        break; // row is already counted
+                }
+                if ( rS == rowsP){ // count the new row
+                    PRLEVEL (1, (" rS=%ld rEl=%ld\n", rS, rEl));
+                    if (setSize < rowsP)
+                        rowSet [rowsP++] = el_colrowIndex [rEl] ;
+                    else{//realloc
+//                        Int *rowSettem = 
+                    }
 
                 }
-                
+
+
             }
         }
     }
 
 #ifndef NDEBUG
-    PRLEVEL (1, ("There are %ld rows in this front: ", rowsP));
+    PRLEVEL (0, ("There are %ld rows in this front: ", rowsP));
     for (Int i = 0; i < rowsP; i++)
-        PRLEVEL (1, (" %ld", rowSet[i]));
-    PRLEVEL (1, ("\n"));
+        PRLEVEL (0, (" %ld", rowSet[i]));
+    PRLEVEL (0, ("\n"));
 #endif 
 
     paru_free (setSize, sizeof (Int), rowSet, cc);

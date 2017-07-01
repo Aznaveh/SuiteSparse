@@ -61,7 +61,7 @@ run:
 	./testazny < ../Matrix/a04.mtx
 	./testazny < ../Matrix/a0.mtx #all zeros
 
-	./testazny < ../Matrix/arrow.mtx 
+#	./testazny < ../Matrix/arrow.mtx 
 
 VGFLAGS = --tool=memcheck --leak-check=full --show-reachable=yes -v\
 		  --num-callers=20 --track-fds=yes --log-file="valgrindlogfile.log"

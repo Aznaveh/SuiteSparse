@@ -113,6 +113,7 @@ int main (int argc, char **argv)
     paru_assemble (paruMatInfo, i, cc);
    }
     
+//    paru_assemble (paruMatInfo, 0, cc);
 
     if (PRINTCBsTUPLES){
         for (int i = 0; i < m+nf+1; ++i) 

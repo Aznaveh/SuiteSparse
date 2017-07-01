@@ -9,6 +9,9 @@ void *paru_alloc (int n, int size, cholmod_common *cc){
 void *paru_calloc(int n, int size, cholmod_common *cc){
      return cholmod_l_calloc (n,size,cc);        }
 
+//void *paru_realloc(int n, int size, cholmod_common *cc){
+//     return cholmod_l_realloc (n,size,cc);        }
+
 
 void paru_free (int n, int size, void *p,  cholmod_common *cc){
     cholmod_l_free (n,   size, p, cc); }
