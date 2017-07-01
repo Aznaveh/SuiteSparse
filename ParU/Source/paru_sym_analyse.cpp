@@ -156,6 +156,7 @@ paru_symbolic *paru_sym_analyse
     //initialization
     /*! TODO: Not all of them need initialization this is for debug for now
      * aParent needs initialization*/
+    /*! TODO: USE MEMSET     */
     for (Int f = 0; f < nf; f++) snM[f] = -1;
     for (Int i = 0; i < m; i++) rM[i] = -1;
     for (Int i = 0; i < m+nf; i++) aParent[i] = -1;

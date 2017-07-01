@@ -1,0 +1,231 @@
+==1348== Memcheck, a memory error detector
+==1348== Copyright (C) 2002-2015, and GNU GPL'd, by Julian Seward et al.
+==1348== Using Valgrind-3.11.0 and LibVEX; rerun with -h for copyright info
+==1348== Command: ./testazny
+==1348== Parent PID: 1347
+==1348== 
+--1348-- 
+--1348-- Valgrind options:
+--1348--    --tool=memcheck
+--1348--    --leak-check=full
+--1348--    --show-reachable=yes
+--1348--    -v
+--1348--    --num-callers=20
+--1348--    --track-fds=yes
+--1348--    --log-file=valgrindlogfile.log
+--1348-- Contents of /proc/version:
+--1348--   Linux version 3.10.0-514.21.1.el7.x86_64 (builder@kbuilder.dev.centos.org) (gcc version 4.8.5 20150623 (Red Hat 4.8.5-11) (GCC) ) #1 SMP Thu May 25 17:04:51 UTC 2017
+--1348-- 
+--1348-- Arch and hwcaps: AMD64, LittleEndian, amd64-cx16-lzcnt-rdtscp-sse3-avx-avx2-bmi
+--1348-- Page sizes: currently 4096, max supported 4096
+--1348-- Valgrind library directory: /usr/lib64/valgrind
+--1348-- Reading syms from /users/aznaveh/SuiteSparse/ParU/Demo/testazny
+--1348-- Reading syms from /usr/lib64/ld-2.17.so
+--1348-- Reading syms from /usr/lib64/valgrind/memcheck-amd64-linux
+--1348--    object doesn't have a symbol table
+--1348--    object doesn't have a dynamic symbol table
+--1348-- Scheduler: using generic scheduler lock implementation.
+--1348-- Reading suppressions file: /usr/lib64/valgrind/default.supp
+==1348== embedded gdbserver: reading from /tmp/vgdb-pipe-from-vgdb-to-1348-by-aznaveh-on-multifrontal.cs.tamu.edu
+==1348== embedded gdbserver: writing to   /tmp/vgdb-pipe-to-vgdb-from-1348-by-aznaveh-on-multifrontal.cs.tamu.edu
+==1348== embedded gdbserver: shared mem   /tmp/vgdb-pipe-shared-mem-vgdb-1348-by-aznaveh-on-multifrontal.cs.tamu.edu
+==1348== 
+==1348== TO CONTROL THIS PROCESS USING vgdb (which you probably
+==1348== don't want to do, unless you know exactly what you're doing,
+==1348== or are doing some strange experiment):
+==1348==   /usr/lib64/valgrind/../../bin/vgdb --pid=1348 ...command...
+==1348== 
+==1348== TO DEBUG THIS PROCESS USING GDB: start GDB like this
+==1348==   /path/to/gdb ./testazny
+==1348== and then give GDB the following command
+==1348==   target remote | /usr/lib64/valgrind/../../bin/vgdb --pid=1348
+==1348== --pid is optional if only one valgrind process is running
+==1348== 
+--1348-- REDIR: 0x4019200 (ld-linux-x86-64.so.2:strlen) redirected to 0x38056d91 (???)
+--1348-- REDIR: 0x4018fd0 (ld-linux-x86-64.so.2:index) redirected to 0x38056dab (???)
+--1348-- Reading syms from /usr/lib64/valgrind/vgpreload_core-amd64-linux.so
+--1348-- Reading syms from /usr/lib64/valgrind/vgpreload_memcheck-amd64-linux.so
+==1348== WARNING: new redirection conflicts with existing -- ignoring it
+--1348--     old: 0x04019200 (strlen              ) R-> (0000.0) 0x38056d91 ???
+--1348--     new: 0x04019200 (strlen              ) R-> (2007.0) 0x04c2ba90 strlen
+--1348-- REDIR: 0x4019180 (ld-linux-x86-64.so.2:strcmp) redirected to 0x4c2cbe0 (strcmp)
+--1348-- REDIR: 0x4019d70 (ld-linux-x86-64.so.2:mempcpy) redirected to 0x4c2fc20 (mempcpy)
+--1348-- Reading syms from /users/aznaveh/SuiteSparse/lib/libparu.so.0.0.1
+--1348-- Reading syms from /users/aznaveh/SuiteSparse/lib/libspqr.so.2.0.8
+--1348-- Reading syms from /users/aznaveh/SuiteSparse/lib/libsuitesparseconfig.so.4.5.5
+--1348-- Reading syms from /users/aznaveh/SuiteSparse/lib/libcholmod.so.3.0.11
+--1348-- Reading syms from /users/aznaveh/SuiteSparse/lib/libamd.so.2.4.6
+--1348-- Reading syms from /users/aznaveh/SuiteSparse/lib/libcolamd.so.2.9.6
+--1348-- Reading syms from /users/aznaveh/SuiteSparse/lib/libccolamd.so.2.9.6
+--1348-- Reading syms from /users/aznaveh/SuiteSparse/lib/libcamd.so.2.4.6
+--1348-- Reading syms from /users/aznaveh/SuiteSparse/lib/libmetis.so
+--1348-- Reading syms from /usr/lib64/librt-2.17.so
+--1348-- Reading syms from /usr/lib64/liblapack.so.3.4.2
+--1348--    object doesn't have a symbol table
+--1348-- Reading syms from /usr/lib64/libopenblas-r0.2.19.so
+--1348--    object doesn't have a symbol table
+--1348-- Reading syms from /usr/local/gnu/gcc-5.4.0/lib64/libstdc++.so.6.0.21
+--1348-- Reading syms from /usr/lib64/libm-2.17.so
+--1348-- Reading syms from /usr/local/gnu/gcc-5.4.0/lib64/libgomp.so.1.0.0
+--1348-- Reading syms from /usr/local/gnu/gcc-5.4.0/lib64/libgcc_s.so.1
+--1348-- Reading syms from /usr/lib64/libpthread-2.17.so
+--1348-- Reading syms from /usr/lib64/libc-2.17.so
+--1348-- Reading syms from /usr/lib64/libmetis.so.0
+--1348--    object doesn't have a symbol table
+--1348-- Reading syms from /usr/lib64/libblas.so.3.4.2
+--1348--    object doesn't have a symbol table
+--1348-- Reading syms from /usr/local/gnu/gcc-5.4.0/lib64/libgfortran.so.3.0.0
+--1348-- Reading syms from /usr/lib64/libdl-2.17.so
+--1348-- Reading syms from /usr/local/gnu/gcc-5.4.0/lib64/libquadmath.so.0.0.0
+--1348-- REDIR: 0x9d1bec0 (libc.so.6:strcasecmp) redirected to 0x4a237b0 (_vgnU_ifunc_wrapper)
+--1348-- REDIR: 0x9d18c40 (libc.so.6:strnlen) redirected to 0x4a237b0 (_vgnU_ifunc_wrapper)
+--1348-- REDIR: 0x9d1e190 (libc.so.6:strncasecmp) redirected to 0x4a237b0 (_vgnU_ifunc_wrapper)
+--1348-- REDIR: 0x9d1b6a0 (libc.so.6:memset) redirected to 0x4a237b0 (_vgnU_ifunc_wrapper)
+--1348-- REDIR: 0x9d1b650 (libc.so.6:memcpy@GLIBC_2.2.5) redirected to 0x4a237b0 (_vgnU_ifunc_wrapper)
+--1348-- REDIR: 0x9d1a5b0 (libc.so.6:strncpy) redirected to 0x4a237b0 (_vgnU_ifunc_wrapper)
+--1348-- REDIR: 0x9d18d20 (libc.so.6:strncmp) redirected to 0x4a237b0 (_vgnU_ifunc_wrapper)
+--1348-- REDIR: 0x9d18550 (libc.so.6:strcpy) redirected to 0x4a237b0 (_vgnU_ifunc_wrapper)
+--1348-- REDIR: 0x9d18b10 (libc.so.6:strlen) redirected to 0x4a237b0 (_vgnU_ifunc_wrapper)
+--1348-- REDIR: 0x9d17000 (libc.so.6:index) redirected to 0x4a237b0 (_vgnU_ifunc_wrapper)
+--1348-- REDIR: 0x9d1a5f0 (libc.so.6:rindex) redirected to 0x4a237b0 (_vgnU_ifunc_wrapper)
+--1348-- REDIR: 0x9d170c0 (libc.so.6:strcmp) redirected to 0x4a237b0 (_vgnU_ifunc_wrapper)
+--1348-- REDIR: 0x9d31b00 (libc.so.6:strstr) redirected to 0x4a237b0 (_vgnU_ifunc_wrapper)
+--1348-- REDIR: 0x9d18b60 (libc.so.6:__GI_strlen) redirected to 0x4c2b9f0 (__GI_strlen)
+--1348-- REDIR: 0x9d1a630 (libc.so.6:__GI_strrchr) redirected to 0x4c2b450 (__GI_strrchr)
+--1348-- REDIR: 0x9d12960 (libc.so.6:calloc) redirected to 0x4c2a8df (calloc)
+--1348-- REDIR: 0x9d11f70 (libc.so.6:malloc) redirected to 0x4c28b5c (malloc)
+--1348-- REDIR: 0x9d208d0 (libc.so.6:__GI_memcpy) redirected to 0x4c2d580 (__GI_memcpy)
+--1348-- REDIR: 0x9d1b4c0 (libc.so.6:__GI_memmove) redirected to 0x4c2f190 (__GI_memmove)
+--1348-- REDIR: 0x9d12370 (libc.so.6:free) redirected to 0x4c29c56 (free)
+--1348-- REDIR: 0x9d1b700 (libc.so.6:__GI_memset) redirected to 0x4c2ee80 (memset)
+--1348-- REDIR: 0x9d26930 (libc.so.6:__strncpy_sse2_unaligned) redirected to 0x4c2c060 (__strncpy_sse2_unaligned)
+--1348-- REDIR: 0x9d22150 (libc.so.6:strchrnul) redirected to 0x4c2f740 (strchrnul)
+--1348-- REDIR: 0x9d1ad30 (libc.so.6:memchr) redirected to 0x4c2cc80 (memchr)
+--1348-- REDIR: 0x9dc6350 (libc.so.6:__strncmp_sse42) redirected to 0x4c2c300 (__strncmp_sse42)
+--1348-- REDIR: 0x9d21f40 (libc.so.6:__GI___rawmemchr) redirected to 0x4c2f7a0 (__GI___rawmemchr)
+--1348-- REDIR: 0x9d31540 (libc.so.6:__GI_strstr) redirected to 0x4c2feb0 (__strstr_sse2)
+--1348-- REDIR: 0x9d1b870 (libc.so.6:__GI_mempcpy) redirected to 0x4c2f950 (__GI_mempcpy)
+==1348== 
+==1348== FILE DESCRIPTORS: 4 open at exit.
+==1348== Open file descriptor 3: /users/aznaveh/SuiteSparse/ParU/Demo/valgrindlogfile.log
+==1348==    <inherited from parent>
+==1348== 
+==1348== Open file descriptor 2: /dev/pts/1
+==1348==    <inherited from parent>
+==1348== 
+==1348== Open file descriptor 1: /dev/pts/1
+==1348==    <inherited from parent>
+==1348== 
+==1348== Open file descriptor 0: /users/aznaveh/SuiteSparse/ParU/Matrix/GD98_a.mtx
+==1348==    <inherited from parent>
+==1348== 
+==1348== 
+==1348== HEAP SUMMARY:
+==1348==     in use at exit: 76,680 bytes in 10 blocks
+==1348==   total heap usage: 119 allocs, 109 frees, 157,808 bytes allocated
+==1348== 
+==1348== Searching for pointers to 10 not-freed blocks
+==1348== Checked 1,559,344 bytes
+==1348== 
+==1348== 8 bytes in 1 blocks are still reachable in loss record 1 of 10
+==1348==    at 0x4C28BE3: malloc (vg_replace_malloc.c:299)
+==1348==    by 0x9645728: gomp_malloc (alloc.c:37)
+==1348==    by 0x964E127: gomp_init_num_threads (proc.c:91)
+==1348==    by 0x9643DF1: initialize_env (env.c:1203)
+==1348==    by 0x400F552: _dl_init (in /usr/lib64/ld-2.17.so)
+==1348==    by 0x40011A9: ??? (in /usr/lib64/ld-2.17.so)
+==1348== 
+==1348== 8 bytes in 1 blocks are still reachable in loss record 2 of 10
+==1348==    at 0x4C28BE3: malloc (vg_replace_malloc.c:299)
+==1348==    by 0x5282DD8: SuiteSparse_malloc (SuiteSparse_config.c:192)
+==1348==    by 0x5572D82: cholmod_l_malloc (cholmod_memory.c:141)
+==1348==    by 0x556A27A: cholmod_l_allocate_work (cholmod_common.c:535)
+==1348==    by 0x558FDA3: read_triplet (cholmod_read.c:566)
+==1348==    by 0x5591445: cholmod_l_read_matrix (cholmod_read.c:1287)
+==1348==    by 0x4010CC: main (testazny.cpp:89)
+==1348== 
+==1348== 88 bytes in 1 blocks are still reachable in loss record 3 of 10
+==1348==    at 0x4C28BE3: malloc (vg_replace_malloc.c:299)
+==1348==    by 0x5282DD8: SuiteSparse_malloc (SuiteSparse_config.c:192)
+==1348==    by 0x5572D82: cholmod_l_malloc (cholmod_memory.c:141)
+==1348==    by 0x5573FD2: cholmod_l_allocate_sparse (cholmod_sparse.c:98)
+==1348==    by 0x557F485: cholmod_l_triplet_to_sparse (cholmod_triplet.c:516)
+==1348==    by 0x5591477: cholmod_l_read_matrix (cholmod_read.c:1296)
+==1348==    by 0x4010CC: main (testazny.cpp:89)
+==1348== 
+==1348== 312 bytes in 1 blocks are still reachable in loss record 4 of 10
+==1348==    at 0x4C28BE3: malloc (vg_replace_malloc.c:299)
+==1348==    by 0x5282DD8: SuiteSparse_malloc (SuiteSparse_config.c:192)
+==1348==    by 0x5572D82: cholmod_l_malloc (cholmod_memory.c:141)
+==1348==    by 0x5574128: cholmod_l_allocate_sparse (cholmod_sparse.c:131)
+==1348==    by 0x557F485: cholmod_l_triplet_to_sparse (cholmod_triplet.c:516)
+==1348==    by 0x5591477: cholmod_l_read_matrix (cholmod_read.c:1296)
+==1348==    by 0x4010CC: main (testazny.cpp:89)
+==1348== 
+==1348== 312 bytes in 1 blocks are still reachable in loss record 5 of 10
+==1348==    at 0x4C28BE3: malloc (vg_replace_malloc.c:299)
+==1348==    by 0x5282DD8: SuiteSparse_malloc (SuiteSparse_config.c:192)
+==1348==    by 0x5572D82: cholmod_l_malloc (cholmod_memory.c:141)
+==1348==    by 0x556A067: cholmod_l_allocate_work (cholmod_common.c:462)
+==1348==    by 0x504CBFC: spqr_analyze(cholmod_sparse_struct*, int, long*, int, int, cholmod_common_struct*) (spqr_analyze.cpp:154)
+==1348==    by 0x4E35846: paru_sym_analyse(cholmod_sparse_struct*, cholmod_common_struct*) (paru_sym_analyse.cpp:41)
+==1348==    by 0x40110A: main (testazny.cpp:96)
+==1348== 
+==1348== 320 bytes in 1 blocks are still reachable in loss record 6 of 10
+==1348==    at 0x4C28BE3: malloc (vg_replace_malloc.c:299)
+==1348==    by 0x5282DD8: SuiteSparse_malloc (SuiteSparse_config.c:192)
+==1348==    by 0x5572D82: cholmod_l_malloc (cholmod_memory.c:141)
+==1348==    by 0x556A087: cholmod_l_allocate_work (cholmod_common.c:463)
+==1348==    by 0x504CBFC: spqr_analyze(cholmod_sparse_struct*, int, long*, int, int, cholmod_common_struct*) (spqr_analyze.cpp:154)
+==1348==    by 0x4E35846: paru_sym_analyse(cholmod_sparse_struct*, cholmod_common_struct*) (paru_sym_analyse.cpp:41)
+==1348==    by 0x40110A: main (testazny.cpp:96)
+==1348== 
+==1348== 400 bytes in 1 blocks are still reachable in loss record 7 of 10
+==1348==    at 0x4C28BE3: malloc (vg_replace_malloc.c:299)
+==1348==    by 0x5282DD8: SuiteSparse_malloc (SuiteSparse_config.c:192)
+==1348==    by 0x5572D82: cholmod_l_malloc (cholmod_memory.c:141)
+==1348==    by 0x55735DD: cholmod_l_realloc (cholmod_memory.c:342)
+==1348==    by 0x5573A95: cholmod_l_realloc_multiple (cholmod_memory.c:441)
+==1348==    by 0x55741A2: cholmod_l_allocate_sparse (cholmod_sparse.c:139)
+==1348==    by 0x557F485: cholmod_l_triplet_to_sparse (cholmod_triplet.c:516)
+==1348==    by 0x5591477: cholmod_l_read_matrix (cholmod_read.c:1296)
+==1348==    by 0x4010CC: main (testazny.cpp:89)
+==1348== 
+==1348== 400 bytes in 1 blocks are still reachable in loss record 8 of 10
+==1348==    at 0x4C28BE3: malloc (vg_replace_malloc.c:299)
+==1348==    by 0x5282DD8: SuiteSparse_malloc (SuiteSparse_config.c:192)
+==1348==    by 0x5572D82: cholmod_l_malloc (cholmod_memory.c:141)
+==1348==    by 0x55735DD: cholmod_l_realloc (cholmod_memory.c:342)
+==1348==    by 0x5573B05: cholmod_l_realloc_multiple (cholmod_memory.c:451)
+==1348==    by 0x55741A2: cholmod_l_allocate_sparse (cholmod_sparse.c:139)
+==1348==    by 0x557F485: cholmod_l_triplet_to_sparse (cholmod_triplet.c:516)
+==1348==    by 0x5591477: cholmod_l_read_matrix (cholmod_read.c:1296)
+==1348==    by 0x4010CC: main (testazny.cpp:89)
+==1348== 
+==1348== 2,128 bytes in 1 blocks are still reachable in loss record 9 of 10
+==1348==    at 0x4C28BE3: malloc (vg_replace_malloc.c:299)
+==1348==    by 0x5282DD8: SuiteSparse_malloc (SuiteSparse_config.c:192)
+==1348==    by 0x5572D82: cholmod_l_malloc (cholmod_memory.c:141)
+==1348==    by 0x556A1AF: cholmod_l_allocate_work (cholmod_common.c:502)
+==1348==    by 0x5594170: cholmod_l_analyze_p2 (cholmod_analyze.c:513)
+==1348==    by 0x504D08F: spqr_analyze(cholmod_sparse_struct*, int, long*, int, int, cholmod_common_struct*) (spqr_analyze.cpp:285)
+==1348==    by 0x4E35846: paru_sym_analyse(cholmod_sparse_struct*, cholmod_common_struct*) (paru_sym_analyse.cpp:41)
+==1348==    by 0x40110A: main (testazny.cpp:96)
+==1348== 
+==1348== 72,704 bytes in 1 blocks are still reachable in loss record 10 of 10
+==1348==    at 0x4C28BE3: malloc (vg_replace_malloc.c:299)
+==1348==    by 0x904917F: pool (eh_alloc.cc:117)
+==1348==    by 0x904917F: __static_initialization_and_destruction_0 (eh_alloc.cc:244)
+==1348==    by 0x904917F: _GLOBAL__sub_I_eh_alloc.cc (eh_alloc.cc:307)
+==1348==    by 0x400F552: _dl_init (in /usr/lib64/ld-2.17.so)
+==1348==    by 0x40011A9: ??? (in /usr/lib64/ld-2.17.so)
+==1348== 
+==1348== LEAK SUMMARY:
+==1348==    definitely lost: 0 bytes in 0 blocks
+==1348==    indirectly lost: 0 bytes in 0 blocks
+==1348==      possibly lost: 0 bytes in 0 blocks
+==1348==    still reachable: 76,680 bytes in 10 blocks
+==1348==         suppressed: 0 bytes in 0 blocks
+==1348== 
+==1348== ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)
+==1348== ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)

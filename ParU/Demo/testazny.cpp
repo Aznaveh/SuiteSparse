@@ -1,5 +1,5 @@
 #include "Parallel_LU.hpp"
-#define PRINTCBsTUPLES 1
+#define PRINTCBsTUPLES 0
 
 // =============================================================================
 void paru_print_element (paru_matrix *paruMatInfo, Int e){
@@ -66,7 +66,7 @@ void paru_print_tupleList (tupleList *listSet, Int index){
     Tuple *l = cur.list;
 
     printf(" There are %ld tuples in this list:\n", numTuple);
-    for (int i = 0; i < numTuple; i++) {
+    for (Int i = 0; i < numTuple; i++) {
        Tuple curTpl = l [i];
         printf(" (%ld,%ld)", curTpl.e, curTpl.f);
     }
@@ -110,7 +110,7 @@ int main (int argc, char **argv)
     nf = paruMatInfo->LUsym->nf;
  
    for (Int i = 0; i < nf; i++) {
-    paru_assemble (paruMatInfo, i);
+    paru_assemble (paruMatInfo, i, cc);
    }
     
 

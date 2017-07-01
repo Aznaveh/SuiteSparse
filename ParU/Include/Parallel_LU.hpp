@@ -205,4 +205,4 @@ int paru_add_rowTuple (tupleList *RowList, Int row, Tuple T,
         cholmod_common *cc);
 int paru_add_colTuple (tupleList *ColList, Int col, 
         Tuple T, cholmod_common *cc);
-void paru_assemble(paru_matrix *paruMatInfo, Int f);
+void paru_assemble(paru_matrix *paruMatInfo, Int f, cholmod_common *cc);

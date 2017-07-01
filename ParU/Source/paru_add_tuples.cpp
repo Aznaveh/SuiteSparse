@@ -11,8 +11,11 @@
  * \return 0 on sucess 
  */
 /*! TODO: I have to take into account deleted tuples	 */
-int paru_add_rowTuple (tupleList *RowList, Int row, 
-        Tuple T, cholmod_common *cc)
+int paru_add_rowTuple (
+        tupleList *RowList, 
+        Int row, 
+        Tuple T, 
+        cholmod_common *cc)
 {
     DEBUGLEVEL(0);
     PRLEVEL (1, ("row =%ld, (%ld,%ld)\n", row,T.e, T.f));
