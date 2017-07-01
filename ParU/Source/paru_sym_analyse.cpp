@@ -153,15 +153,13 @@ paru_symbolic *paru_sym_analyse
         return NULL;
     }
 
-    //initialization
-    /*! TODO: Not all of them need initialization this is for debug for now
-     * aParent needs initialization*/
-    /*! TODO: USE MEMSET     */
-    for (Int f = 0; f < nf; f++) snM[f] = -1;
-    for (Int i = 0; i < m; i++) rM[i] = -1;
-    for (Int i = 0; i < m+nf; i++) aParent[i] = -1;
-    for (Int i = 0; i < m+nf+1; i++) aChild[i] = -1;
-    for (Int i = 0; i < m+nf+2; i++) aChildp[i] = -1;
+    memset (aParent, -1, (m+nf)*sizeof(Int));
+#ifndef NDEBUG
+    memset (snM, -1, nf*sizeof(Int));
+    memset (rM, -1, m*sizeof(Int));
+    memset (aChild, -1, (m+nf+1)*sizeof(Int));
+    memset (aChildp, -1, (m+nf+2)*sizeof(Int));
+#endif /* end of include guard: NDEBUG */
 
     aChildp[0] = 0;
     Int offset = 0; //number of rows visited in each iteration orig front+ rows
