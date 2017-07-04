@@ -35,61 +35,63 @@
 // This makes parallelism easier to manage, since all threads can
 // have access to this object without synchronization.
 //
-typedef struct /* paru_symbolic*/
+class paru_symbolic/* paru_symbolic*/
 {
+    public:
+        paru_symbolic ( cholmod_sparse *A, cholmod_common *cc ); // constructor
 
-    // -------------------------------------------------------------------------
-    // row-form of the input matrix and its permutations
-    // -------------------------------------------------------------------------
+        / -------------------------------------------------------------------------
+        // row-form of the input matrix and its permutations
+        // -------------------------------------------------------------------------
 
-    // During symbolic analysis, the nonzero pattern of S = A(P,Q) is
-    // constructed, where A is the user's input matrix.  Its numerical values
-    // are also constructed, but they do not become part of the Symbolic
-    // object.  The matrix S is stored in row-oriented form.  The rows of S are
-    // sorted according to their leftmost column index (via PLinv).  Column
-    // indices in each row of S are in strictly ascending order, even though
-    // the input matrix A need not be sorted.
+        // During symbolic analysis, the nonzero pattern of S = A(P,Q) is
+        // constructed, where A is the user's input matrix.  Its numerical values
+        // are also constructed, but they do not become part of the Symbolic
+        // object.  The matrix S is stored in row-oriented form.  The rows of S are
+        // sorted according to their leftmost column index (via PLinv).  Column
+        // indices in each row of S are in strictly ascending order, even though
+        // the input matrix A need not be sorted.
 
-    Int m, n, anz ; // S is m-by-n with anz entries
+        Int m, n, anz ; // S is m-by-n with anz entries
 
-    Int *Sp ;       // size m+1, row pointers of S
+        Int *Sp ;       // size m+1, row pointers of S
 
-    Int *Sj ;       // size anz = Sp [n], column indices of S
+        Int *Sj ;       // size anz = Sp [n], column indices of S
 
-    Int *Qfill ;    // size n, fill-reducing column permutation.
-    // Qfill [k] = j if column k of A is column j of S.
+        Int *Qfill ;    // size n, fill-reducing column permutation.
+        // Qfill [k] = j if column k of A is column j of S.
 
-    Int *PLinv ;    // size m, inverse row permutation that places
-    // S=A(P,Q) in increasing order of leftmost column
-    // index.  PLinv [i] = k if row i of A is row k of S.
+        Int *PLinv ;    // size m, inverse row permutation that places
+        // S=A(P,Q) in increasing order of leftmost column
+        // index.  PLinv [i] = k if row i of A is row k of S.
 
-    Int *Sleft ;    // size n+2.  The list of rows of S whose
-    // leftmost column index is j is given by
-    // Sleft [j] ... Sleft [j+1]-1.  This can be empty (that is, Sleft
-    // [j] can equal Sleft [j+1]).  Sleft [n] is the number of
-    // non-empty rows of S, and Sleft [n+1] == m.  That is, Sleft [n]
-    // ... Sleft [n+1]-1 gives the empty rows of S, if any.
+        Int *Sleft ;    // size n+2.  The list of rows of S whose
+        // leftmost column index is j is given by
+        // Sleft [j] ... Sleft [j+1]-1.  This can be empty (that is, Sleft
+        // [j] can equal Sleft [j+1]).  Sleft [n] is the number of
+        // non-empty rows of S, and Sleft [n+1] == m.  That is, Sleft [n]
+        // ... Sleft [n+1]-1 gives the empty rows of S, if any.
 
-    // -------------------------------------------------------------------------
-    // frontal matrices: pattern and tree
-    // -------------------------------------------------------------------------
+        // -------------------------------------------------------------------------
+        // frontal matrices: pattern and tree
+        // -------------------------------------------------------------------------
 
-    // Each frontal matrix is fm-by-fn, with fnpiv pivot columns.  The fn
-    // column indices are given by a set of size fnpiv pivot columns, defined
-    // by Super, followed by the pattern Rj [ Rp[f] ...  Rp[f+1]-1 ].
+        // Each frontal matrix is fm-by-fn, with fnpiv pivot columns.  The fn
+        // column indices are given by a set of size fnpiv pivot columns, defined
+        // by Super, followed by the pattern Rj [ Rp[f] ...  Rp[f+1]-1 ].
 
-    // The row indices of the front are not kept.  If the Householder vectors
-    // are not kept, the row indices are not needed.  If the Householder
-    // vectors are kept, the row indices are computed dynamically during
-    // numerical factorization.
+        // The row indices of the front are not kept.  If the Householder vectors
+        // are not kept, the row indices are not needed.  If the Householder
+        // vectors are kept, the row indices are computed dynamically during
+        // numerical factorization.
 
-    Int nf ;        // number of frontal matrices; nf <= MIN (m,n)
-    Int maxfn ;     // max # of columns in any front
+        Int nf ;        // number of frontal matrices; nf <= MIN (m,n)
+        Int maxfn ;     // max # of columns in any front
 
-    // parent, child, and childp define the row merge tree or etree (A'A)
-    Int *Parent ;   // size nf+1
-    Int *Child ;    // size nf+1
-    Int *Childp ;   // size nf+2
+        // parent, child, and childp define the row merge tree or etree (A'A)
+        Int *Parent ;   // size nf+1
+        Int *Child ;    // size nf+1
+        Int *Childp ;   // size nf+2
 
     // The parent of a front f is Parent [f], or EMPTY if f=nf.
     // A list of children of f can be obtained in the list
@@ -127,7 +129,7 @@ typedef struct /* paru_symbolic*/
     Int *row2atree;       //Mapping from rows to augmented tree size m
     Int *super2atree;     //Mapping from super nodes to augmented tree size nf
 
-} paru_symbolic;
+};
 
 // =============================================================================
 //      Tuple, Row and Column data structure 
@@ -176,15 +178,16 @@ typedef struct  /*List of tuples */
 
 
 
-typedef struct  /*Matrix */
+class paru_matrix /*Matrix */
 {
-    Int m, n;
-    paru_symbolic *LUsym;
-    tupleList *RowList;
-    tupleList *ColList;  
-    Element **elementList; //pointers to all elements, size = m+nf+1 
+    public:
+        Int m, n;
+        paru_symbolic *LUsym;
+        tupleList *RowList;
+        tupleList *ColList;  
+        Element **elementList; //pointers to all elements, size = m+nf+1 
 
-}   paru_matrix;
+};
 
 
 paru_symbolic *paru_sym_analyse
@@ -194,11 +197,15 @@ paru_matrix *paru_init_rowFronts
 (cholmod_sparse *A, paru_symbolic *LUsym, cholmod_common *cc);
 
 /* Wrappers for managing memory */
-void *paru_alloc(int n, int size, cholmod_common *cc);
-void *paru_calloc(int n, int size, cholmod_common *cc);
-void paru_free(int n, int size, void *p,  cholmod_common *cc);
+void *paru_alloc(Int n, Int size, cholmod_common *cc);
+void *paru_calloc(Int n, Int size, cholmod_common *cc);
+void paru_free(Int n, Int size, void *p,  cholmod_common *cc);
 void paru_freesym(paru_symbolic **LUsym_handle,cholmod_common *cc);
 void paru_freemat(paru_matrix **paruMatInfo_handle, cholmod_common *cc);
+void *paru_realloc(Int newSize, Int size_Entry, void *oldp, Int *size,
+        cholmod_common *cc);
+
+
 
 /* add tuple functions defintions */
 int paru_add_rowTuple (tupleList *RowList, Int row, Tuple T, 

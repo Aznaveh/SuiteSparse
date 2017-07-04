@@ -79,7 +79,7 @@ int main (int argc, char **argv)
     cholmod_common Common, *cc;
     cholmod_sparse *A;
     int mtype;
-    paru_symbolic *LUsym;
+    //paru_symbolic *LUsym;
 
     // start CHOLMOD
     cc = &Common;
@@ -93,7 +93,9 @@ int main (int argc, char **argv)
         exit (1);
     }
 
-    LUsym = paru_sym_analyse (A, cc);
+//    LUsym = paru_sym_analyse (A, cc);
+    paru_symbolic LUsym (A,cc);
+
     if (LUsym == NULL) {
         exit(0);
     }
@@ -113,8 +115,6 @@ int main (int argc, char **argv)
     paru_assemble (paruMatInfo, i, cc);
    }
     
-//    paru_assemble (paruMatInfo, 0, cc);
-
     if (PRINTCBsTUPLES){
         for (int i = 0; i < m+nf+1; ++i) 
             paru_print_element (paruMatInfo, i);

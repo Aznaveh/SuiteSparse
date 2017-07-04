@@ -3,31 +3,26 @@
  * */
 #include "Parallel_LU.hpp"
 
-void *paru_alloc (int n, int size, cholmod_common *cc){
+void *paru_alloc (Int n, Int size, cholmod_common *cc){
      return cholmod_l_malloc (n,size,cc);        }
 
-void *paru_calloc(int n, int size, cholmod_common *cc){
+void *paru_calloc(Int n, Int size, cholmod_common *cc){
      return cholmod_l_calloc (n,size,cc);        }
 
-//void *paru_realloc(int n, int size, cholmod_common *cc){
-//     return cholmod_l_realloc (n,size,cc);        }
+void *paru_realloc(Int newSize, Int size_Entry, void *oldp, Int *size, 
+        cholmod_common *cc){
+    return cholmod_l_realloc (newSize, size_Entry, oldp, (size_t*) size, cc);
+}
 
 
-void paru_free (int n, int size, void *p,  cholmod_common *cc){
+
+void paru_free (Int n, Int size, void *p,  cholmod_common *cc){
     cholmod_l_free (n,   size, p, cc); }
 
-void paru_freesym (paru_symbolic **LUsym_handle,
-            // workspace and parameters
-    cholmod_common *cc
-){
+void paru_symbolic::~paru_symbolic( cholmod_common *cc){
     DEBUGLEVEL (0);
-    if (LUsym_handle == NULL || *LUsym_handle == NULL){
-        // nothing to do; caller probably ran out of memory
-        return;
-    }
-    
-    paru_symbolic *LUsym;
-    LUsym = *LUsym_handle;
+       
+    paru_symbolic *LUsym = this;
 
     Int m, n, anz, nf, rjsize; 
 
@@ -64,7 +59,6 @@ void paru_freesym (paru_symbolic **LUsym_handle,
 
     cholmod_l_free (1, sizeof (paru_symbolic), LUsym, cc);
 
-    *LUsym_handle = NULL;
 }
 
 /*! It uses LUsym, Do not free LUsym before*/

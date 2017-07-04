@@ -10,11 +10,11 @@
  * \return 0 on sucess 
  */
 void paru_assemble (
-    paru_matrix *paruMatInfo,
-    /* RowCol list/tuples and LUsym handle */
-    Int f,
-    /* front need to be assembled */
-    cholmod_common *cc)
+        paru_matrix *paruMatInfo,
+        /* RowCol list/tuples and LUsym handle */
+        Int f,
+        /* front need to be assembled */
+        cholmod_common *cc)
 
 {
     DEBUGLEVEL(0);
@@ -75,10 +75,18 @@ void paru_assemble (
                 }
                 if ( rS == rowsP){ // count the new row
                     PRLEVEL (1, (" rS=%ld rEl=%ld\n", rS, rEl));
-                    if (setSize < rowsP)
+                    if (rowsP < setSize)
                         rowSet [rowsP++] = el_colrowIndex [rEl] ;
                     else{//realloc
-//                        Int *rowSettem = 
+                        Int *rowSet_new = (Int*) paru_realloc
+                            (2*setSize, sizeof (Int), rowSet, &setSize, cc);
+                        if (rowSet_new == NULL){
+                            printf("reallocation error in assembly\n");
+                            paru_free (setSize, sizeof (Int), rowSet, cc);
+                        } else
+                            rowSet = rowSet_new;
+                        PRLEVEL (1, ("Realloc:\n"
+                                    "setSize=%ld rowSet=%p\n", setSize, rowSet));
                     }
 
                 }

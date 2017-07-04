@@ -18,7 +18,7 @@
  *              the augmented tree does not
  * */
 #include "Parallel_LU.hpp"
-paru_symbolic *paru_sym_analyse
+paru_symbolic::paru_symbolic
 (
  // inputs, not modified
  cholmod_sparse *A,
@@ -26,13 +26,13 @@ paru_symbolic *paru_sym_analyse
  cholmod_common *cc ){   
 
     DEBUGLEVEL(0);
-    paru_symbolic *LUsym;
+    paru_symbolic *LUsym= this;
 
     LUsym = (paru_symbolic*) paru_alloc (1, sizeof(paru_symbolic), cc);
     // ... check for LUsym NULL ...
     if(LUsym == NULL){
         //out of memory
-        return NULL;
+        return ;
     }
 
     spqr_symbolic *QRsym;
@@ -109,7 +109,7 @@ paru_symbolic *paru_sym_analyse
         if (Sp [row] == Sp[row+1] ){
             printf("Empty Row\n");
             paru_freesym (&LUsym , cc);
-            return NULL;
+            return;
         }
     }
     for (Int col = 0; col < n; col++){
@@ -117,7 +117,7 @@ paru_symbolic *paru_sym_analyse
         if (Ap [col] == Ap [col+1]){
             printf("Empty Column\n");
             paru_freesym (&LUsym , cc);
-            return NULL;
+            return;
         }
     }
 
@@ -150,7 +150,7 @@ paru_symbolic *paru_sym_analyse
             rM == NULL  || snM == NULL ){
         printf ("Out of memory");
         paru_freesym (&LUsym , cc);
-        return NULL;
+        return;
     }
 
     memset (aParent, -1, (m+nf)*sizeof(Int));
@@ -264,5 +264,5 @@ paru_symbolic *paru_sym_analyse
         PRLEVEL (1,("\n"));
     }
 #endif
-    return (LUsym) ;
+    return;
 }
