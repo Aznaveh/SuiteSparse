@@ -78,6 +78,9 @@ void paru_assemble (
         }
     }
 
+    double *pF = (double*) paru_alloc (rowsP*fp, sizeof (double), cc);
+
+
 #ifndef NDEBUG
     PRLEVEL (1, ("There are %ld rows in this front: ", rowsP));
     for (Int i = 0; i < rowsP; i++)
@@ -86,4 +89,5 @@ void paru_assemble (
 #endif 
 
     paru_free (setSize, sizeof (Int), rowSet, cc);
+    paru_free (rowsP*fp, sizeof (Int), pF, cc);
 }
