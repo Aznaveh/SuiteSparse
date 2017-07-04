@@ -39,6 +39,7 @@ class paru_symbolic/* paru_symbolic*/
 {
     public:
         paru_symbolic ( cholmod_sparse *A, cholmod_common *cc ); // constructor
+        ~paru_symbolic (cholmod_common *cc ); // constructor
 
         / -------------------------------------------------------------------------
         // row-form of the input matrix and its permutations
