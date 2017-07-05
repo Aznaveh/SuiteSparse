@@ -75,9 +75,9 @@ void paru_assemble (
                 }
                 if ( rS == rowsP){ // count the new row
                     if (rowsP >= setSize){
-                        PRLEVEL (0, ("rowsP =%ld setSize=%ld\n", 
+                        PRLEVEL (1, ("rowsP =%ld setSize=%ld\n", 
                                     rowsP, setSize));
-                        PRLEVEL (0, ("setSize*2 =%ld\n", setSize*2));
+                        PRLEVEL (1, ("setSize*2 =%ld\n", setSize*2));
                         Int *newSet= (Int*) paru_realloc (setSize*2, 
                                 sizeof (Int), rowSet, &setSize, cc);
 
@@ -92,7 +92,8 @@ void paru_assemble (
             }
         }
     }
-
+    //shrinking allocated space
+    rowSet= (Int*) paru_realloc (rowsP, sizeof (Int), rowSet, &setSize, cc);
 
 
     double *pF = (double*) paru_calloc (rowsP*fp, sizeof (double), cc);
