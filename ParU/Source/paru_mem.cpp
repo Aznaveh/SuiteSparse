@@ -4,25 +4,38 @@
 #include "Parallel_LU.hpp"
 
 void *paru_alloc (int n, int size, cholmod_common *cc){
-     return cholmod_l_malloc (n,size,cc);        }
+    return cholmod_l_malloc (n,size,cc);
+}
 
 void *paru_calloc(int n, int size, cholmod_common *cc){
-     return cholmod_l_calloc (n,size,cc);        }
+    return cholmod_l_calloc (n,size,cc);       
+}
+
+void *paru_realloc(
+        Int newsize,    // requested size
+        Int size_Entry, // size of each Entry
+        void *oldP,     // pointer to the old allocated space
+        Int *size,  // a single number, input: old size, output: new size
+        cholmod_common *cc){
+    return cholmod_l_realloc (newsize, size_Entry, oldP, (size_t*)size, cc);
+}
+
 
 
 void paru_free (int n, int size, void *p,  cholmod_common *cc){
-    cholmod_l_free (n,   size, p, cc); }
+    cholmod_l_free (n,   size, p, cc);
+}
 
 void paru_freesym (paru_symbolic **LUsym_handle,
-            // workspace and parameters
-    cholmod_common *cc
-){
+        // workspace and parameters
+        cholmod_common *cc
+        ){
     DEBUGLEVEL (0);
     if (LUsym_handle == NULL || *LUsym_handle == NULL){
         // nothing to do; caller probably ran out of memory
         return;
     }
-    
+
     paru_symbolic *LUsym;
     LUsym = *LUsym_handle;
 

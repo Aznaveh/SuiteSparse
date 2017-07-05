@@ -196,6 +196,9 @@ paru_matrix *paru_init_rowFronts
 /* Wrappers for managing memory */
 void *paru_alloc(int n, int size, cholmod_common *cc);
 void *paru_calloc(int n, int size, cholmod_common *cc);
+void *paru_realloc(Int newsize, Int size_Entry,
+        void *oldP, Int *size, cholmod_common *cc);
+ 
 void paru_free(int n, int size, void *p,  cholmod_common *cc);
 void paru_freesym(paru_symbolic **LUsym_handle,cholmod_common *cc);
 void paru_freemat(paru_matrix **paruMatInfo_handle, cholmod_common *cc);
