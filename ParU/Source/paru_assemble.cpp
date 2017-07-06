@@ -1,3 +1,7 @@
+#include <iostream>
+#include <algorithm>
+#include <set>
+
 #include "Parallel_LU.hpp"
 
 /** =========================================================================  /
@@ -50,7 +54,9 @@ void paru_assemble (
     tupleList *ColList = paruMatInfo->ColList;
     Int rowsP = 0;
     Int setSize = fn; /*! TODO: find a good initialize     */
-    Int *rowSet = (Int*) paru_alloc (setSize, sizeof (Int), cc);
+  //  Int *rowSet = (Int*) paru_alloc (setSize, sizeof (Int), cc);
+    std::set<Int> rowSet;
+    std::set<Int>::iterator it;
     /*! TODO: Check for memory in all places!!! DO IT    */
     for (Int c = col1; c < col2; c++){ /* computing number of rows, set union */
         tupleList *cur = &ColList[c];
@@ -65,48 +71,22 @@ void paru_assemble (
             Element *curEl = elementList[e];
             Int mEl = curEl->nrows;
             Int *el_colrowIndex = (Int*)(curEl+1);     // pointers to element index 
-            PRLEVEL (1, ("mEl =%ld rowsP=%ld\n", mEl, rowsP));
             Int rS;
             for (Int rEl = 0; rEl < mEl; rEl++){
-                for (rS = 0; rS < rowsP; rS++){
-                    PRLEVEL (1, ("rS =%ld rEl=%ld\n", rS, rEl));
-                    if (el_colrowIndex [rEl] == rowSet [rS])
-                        break; 
-                }
-                if ( rS == rowsP){ // count the new row
-                    if (rowsP >= setSize){
-                        PRLEVEL (1, ("rowsP =%ld setSize=%ld\n", 
-                                    rowsP, setSize));
-                        PRLEVEL (1, ("setSize*2 =%ld\n", setSize*2));
-                        Int *newSet= (Int*) paru_realloc (setSize*2, 
-                                sizeof (Int), rowSet, &setSize, cc);
-
-                        if(newSet== NULL){
-                            printf("Error in allocating memory for rows\n");
-                            return;
-                        }
-                        rowSet = newSet;
-                    }
-                    rowSet [rowsP++] = el_colrowIndex [rEl] ;
-                }
-            }
+                rowSet.insert(el_colrowIndex[rEl]);
+           }
         }
     }
     //shrinking allocated space
-    rowSet= (Int*) paru_realloc (rowsP, sizeof (Int), rowSet, &setSize, cc);
 
-
-    double *pF = (double*) paru_calloc (rowsP*fp, sizeof (double), cc);
-    /*! TODO: Here:     */
-    /* assembling the pivotal part of the front */
 
 #ifndef NDEBUG
     PRLEVEL (0, ("There are %ld rows in this front: ", rowsP));
-    for (Int i = 0; i < rowsP; i++)
-        PRLEVEL (0, (" %ld", rowSet[i]));
+    for (it = rowSet.begin(); it != rowSet.end() ; it++)
+        PRLEVEL (0, (" %ld", *it ));
     PRLEVEL (0, ("\n"));
 #endif 
 
-    paru_free (setSize, sizeof (Int), rowSet, cc);
-    paru_free (rowsP*fp, sizeof (Int), pF, cc);
+
+   
 }
