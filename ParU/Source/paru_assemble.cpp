@@ -1,5 +1,11 @@
 #include "Parallel_LU.hpp"
 
+#ifndef NDEBUG  // using stl for debugging
+    #include <iostream>
+    #include <algorithm>
+    #include <set>
+#endif
+
 /** =========================================================================  /
  * =======================  paru_assemble   =================================  /
  * ==========================================================================  /
@@ -51,6 +57,10 @@ void paru_assemble (
     Int rowsP = 0;
     Int setSize = fn; /*! TODO: find a good initialize     */
     Int *rowSet = (Int*) paru_alloc (setSize, sizeof (Int), cc);
+#ifndef NDEBUG
+    std::set<Int> stl_rowSet;
+    std::set<Int>::iterator it;
+#endif 
     /*! TODO: Check for memory in all places!!! DO IT    */
     for (Int c = col1; c < col2; c++){ /* computing number of rows, set union */
         tupleList *cur = &ColList[c];
@@ -68,6 +78,9 @@ void paru_assemble (
             PRLEVEL (1, ("mEl =%ld rowsP=%ld\n", mEl, rowsP));
             Int rS;
             for (Int rEl = 0; rEl < mEl; rEl++){
+#ifndef NDEBUG
+                stl_rowSet.insert (el_colrowIndex [rEl] );
+#endif
                 for (rS = 0; rS < rowsP; rS++){
                     PRLEVEL (1, ("rS =%ld rEl=%ld\n", rS, rEl));
                     if (el_colrowIndex [rEl] == rowSet [rS])
@@ -102,6 +115,8 @@ void paru_assemble (
 
 #ifndef NDEBUG
     PRLEVEL (0, ("There are %ld rows in this front: ", rowsP));
+    Int stl_size = stl_rowSet.size();
+    ASSERT (rowsP == stl_size );
     for (Int i = 0; i < rowsP; i++)
         PRLEVEL (0, (" %ld", rowSet[i]));
     PRLEVEL (0, ("\n"));
