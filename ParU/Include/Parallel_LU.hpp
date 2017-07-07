@@ -135,7 +135,7 @@ typedef struct /* paru_symbolic*/
 typedef struct /* Tuple */
 {
     /* The (e,f) tuples for element lists */
-    int e,   /*  element number */
+    Int e,   /*  element number */
         f;  /*   offest */
 } Tuple;
 
@@ -174,15 +174,21 @@ typedef struct  /*List of tuples */
 
 }   tupleList;
 
+typedef struct  /*work_struct*/
+{
+   Int *all_Zero;            
+   Int *scratch;        
 
+}   work_struct;
 
 typedef struct  /*Matrix */
 {
     Int m, n;
     paru_symbolic *LUsym;
-    tupleList *RowList;
-    tupleList *ColList;  
-    Element **elementList; //pointers to all elements, size = m+nf+1 
+    tupleList *RowList;     /* size n of dynamic list */
+    tupleList *ColList;     /* size m of dynamic list */
+    Element **elementList;  /* pointers to all elements, size = m+nf+1 */
+    work_struct *Work;             
 
 }   paru_matrix;
 
@@ -194,18 +200,18 @@ paru_matrix *paru_init_rowFronts
 (cholmod_sparse *A, paru_symbolic *LUsym, cholmod_common *cc);
 
 /* Wrappers for managing memory */
-void *paru_alloc(int n, int size, cholmod_common *cc);
-void *paru_calloc(int n, int size, cholmod_common *cc);
+void *paru_alloc(Int n, Int size, cholmod_common *cc);
+void *paru_calloc(Int n, Int size, cholmod_common *cc);
 void *paru_realloc(Int newsize, Int size_Entry,
         void *oldP, Int *size, cholmod_common *cc);
  
-void paru_free(int n, int size, void *p,  cholmod_common *cc);
+void paru_free(Int n, Int size, void *p,  cholmod_common *cc);
 void paru_freesym(paru_symbolic **LUsym_handle,cholmod_common *cc);
 void paru_freemat(paru_matrix **paruMatInfo_handle, cholmod_common *cc);
 
 /* add tuple functions defintions */
-int paru_add_rowTuple (tupleList *RowList, Int row, Tuple T, 
+Int paru_add_rowTuple (tupleList *RowList, Int row, Tuple T, 
         cholmod_common *cc);
-int paru_add_colTuple (tupleList *ColList, Int col, 
+Int paru_add_colTuple (tupleList *ColList, Int col, 
         Tuple T, cholmod_common *cc);
 void paru_assemble(paru_matrix *paruMatInfo, Int f, cholmod_common *cc);

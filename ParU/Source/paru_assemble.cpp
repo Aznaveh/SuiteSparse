@@ -23,7 +23,7 @@ void paru_assemble (
         cholmod_common *cc)
 
 {
-    DEBUGLEVEL(0);
+    DEBUGLEVEL(1);
     paru_symbolic *LUsym =  paruMatInfo->LUsym;
 
     Int m,n,nf;
@@ -53,16 +53,37 @@ void paru_assemble (
     ASSERT (fp > 0 );
     ASSERT (fp <= fn );
 
+    /* computing number of rows, set union */
     tupleList *ColList = paruMatInfo->ColList;
+
     Int rowsP = 0;
-    Int setSize = fn; /*! TODO: find a good initialize     */
+    Int setSize = fn; /*! TODO: find a good initialize, I should use fm     */
     Int *rowSet = (Int*) paru_alloc (setSize, sizeof (Int), cc);
+
+    Int listP= 0;
+    work_struct *Work =  paruMatInfo->Work;
+//    Int *rowList = Work+m+1; /*   point to the second part of Work array */
+//    Int *isInSet= Work;    /* The first part of Work is guaranteed to be zero. 
+//                             Must be cleared after use */
+                                
+    Int *isInSet = Work->all_Zero;
+    Int *rowList = Work->scratch;
+    PRLEVEL (1, ("rowList(scratch)=%p isInSet(all_Zero)=%p\n", 
+                rowList, isInSet));
+    
+#ifndef NDEBUG /* chekcing first part of Work to be zero */
+    Int s = 0;
+    for (Int i = 0; i < m; i++) s += isInSet [i];
+    ASSERT (s == 0);
+#endif 
+
+                            
 #ifndef NDEBUG
     std::set<Int> stl_rowSet;
     std::set<Int>::iterator it;
 #endif 
     /*! TODO: Check for memory in all places!!! DO IT    */
-    for (Int c = col1; c < col2; c++){ /* computing number of rows, set union */
+    for (Int c = col1; c < col2; c++){
         tupleList *cur = &ColList[c];
         Int numTuple = cur->numTuple;
         ASSERT (numTuple >= 0);
@@ -75,15 +96,28 @@ void paru_assemble (
             Element *curEl = elementList[e];
             Int mEl = curEl->nrows;
             Int *el_colrowIndex = (Int*)(curEl+1);     // pointers to element index 
-            PRLEVEL (1, ("mEl =%ld rowsP=%ld\n", mEl, rowsP));
+            PRLEVEL (2, ("mEl =%ld rowsP=%ld\n", mEl, rowsP));
             Int rS;
             for (Int rEl = 0; rEl < mEl; rEl++){
+                Int curRow = el_colrowIndex [rEl]; 
+                ASSERT (curRow < m ) ;
 #ifndef NDEBUG
-                stl_rowSet.insert (el_colrowIndex [rEl] );
+                stl_rowSet.insert (curRow );
 #endif
+                PRLEVEL (0, ("%p ---> isInSet [%ld]=%ld\n", 
+
+                            isInSet+curRow, curRow, isInSet[curRow]));
+                if (!isInSet[curRow]){
+                    PRLEVEL (0, ("curRow =%ld listP=%ld\n", curRow, listP));
+                    rowList [listP++] = curRow;
+                    isInSet [curRow] = 1; // set to true
+                }
+                ASSERT (listP < m); 
+
+
                 for (rS = 0; rS < rowsP; rS++){
-                    PRLEVEL (1, ("rS =%ld rEl=%ld\n", rS, rEl));
-                    if (el_colrowIndex [rEl] == rowSet [rS])
+                    PRLEVEL (2, ("rS =%ld rEl=%ld\n", rS, rEl));
+                    if (curRow == rowSet [rS])
                         break; 
                 }
                 if ( rS == rowsP){ // count the new row
@@ -100,7 +134,7 @@ void paru_assemble (
                         }
                         rowSet = newSet;
                     }
-                    rowSet [rowsP++] = el_colrowIndex [rEl] ;
+                    rowSet [rowsP++] = curRow;
                 }
             }
         }
@@ -116,10 +150,33 @@ void paru_assemble (
 #ifndef NDEBUG
     PRLEVEL (0, ("There are %ld rows in this front: ", rowsP));
     Int stl_size = stl_rowSet.size();
+    if (listP != stl_size){
+        PRLEVEL (1, ("#######################\n"));
+        PRLEVEL (1, ("STL %ld:\n",stl_size));
+        for (it = stl_rowSet.begin(); it != stl_rowSet.end(); it++)
+            PRLEVEL (0, (" %ld", *it));
+        PRLEVEL (1, ("\nMy Set %ld:\n",listP));
+        for (Int i = 0; i < listP; i++)
+            PRLEVEL (0, (" %ld", rowList [i]));
+        PRLEVEL (1, ("\n"));
+    }
+    //ASSERT (listP == stl_size );
     ASSERT (rowsP == stl_size );
-    for (Int i = 0; i < rowsP; i++)
-        PRLEVEL (0, (" %ld", rowSet[i]));
-    PRLEVEL (0, ("\n"));
+
+#endif 
+
+    /* clearing W for next iteration */
+    for (Int i = 0; i < listP; i++){
+        Int curRow = rowList [i];
+        ASSERT (curRow < m ) ;
+        ASSERT (isInSet [curRow] == 1);
+        isInSet  [curRow] = 0;
+    }
+
+#ifndef NDEBUG /* chekcing first part of Work to be zero */
+    s = 0;
+    for (Int i = 0; i < m; i++) s+=isInSet [i];
+    ASSERT (s == 0);
 #endif 
 
     paru_free (setSize, sizeof (Int), rowSet, cc);

@@ -42,11 +42,42 @@ paru_matrix *paru_init_rowFronts (
     }
 
 
+
     Int m,n;  
 
     paruMatInfo->LUsym = LUsym;
     m = paruMatInfo->m = LUsym->m;   
     n = paruMatInfo->n = LUsym->n; 
+
+    Int *all_Zero= (Int*) paru_calloc (m, sizeof (Int), cc);
+    if (all_Zero == NULL){   //out of memory
+        printf ("Out of memory: Work\n");
+        return NULL;
+    }
+    PRLEVEL (0, ("all_Zero =%p\n", all_Zero));
+
+    Int *scratch= (Int*) paru_alloc (m, sizeof (Int), cc);
+    if (scratch == NULL){   //out of memory
+        printf ("Out of memory: Work\n");
+        return NULL;
+    }
+    PRLEVEL (0, ("scratch=%p\n",scratch));
+
+    work_struct *Work= (work_struct*) paru_alloc (1, sizeof (work_struct), cc);
+    if (scratch == NULL){   //out of memory
+        printf ("Out of memory: Work\n");
+        return NULL;
+    }
+
+
+    Work->all_Zero = all_Zero;
+    Work->scratch = scratch;
+
+    PRLEVEL (0, ("Work =%p\n m=%ld ", Work, m ));
+    paruMatInfo->Work = Work;
+
+    //memset (Work, 0, m*sizeof(Int) );
+
 
     PRLEVEL (1, ("m=%ld, n=%ld\n",m,n));
     // RowList, ColList and elementList are place holders 
@@ -55,7 +86,7 @@ paru_matrix *paru_init_rowFronts (
         printf("The dimension of matrix is zero: %ld x %ld \n",m,n);
         paru_free (1, sizeof(paru_matrix), paruMatInfo, cc);
         return NULL;
-        
+
     }
 
     tupleList *RowList= paruMatInfo->RowList =

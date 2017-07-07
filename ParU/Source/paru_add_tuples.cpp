@@ -11,7 +11,7 @@
  * \return 0 on sucess 
  */
 /*! TODO: I have to take into account deleted tuples	 */
-int paru_add_rowTuple (
+Int paru_add_rowTuple (
         tupleList *RowList, 
         Int row, 
         Tuple T, 
@@ -32,7 +32,7 @@ int paru_add_rowTuple (
             (Tuple*) paru_alloc (newLen, sizeof(Tuple), cc);
         if (newList == NULL)    // Error in allocating memory
             return 1;
-        for (int i = 0; i < cur->len; ++i) //copy old to new
+        for (Int i = 0; i < cur->len; ++i) //copy old to new
             newList [i] = cur->list [i];
         paru_free (cur->len, sizeof(Tuple), cur->list, cc); 
         cur->len = newLen;
@@ -42,7 +42,7 @@ int paru_add_rowTuple (
     return 0;
 }
 
-int paru_add_colTuple (tupleList *ColList, Int col, 
+Int paru_add_colTuple (tupleList *ColList, Int col, 
         Tuple T, cholmod_common *cc)  /*! TODO: Sort for parallel case	 */
 {
     DEBUGLEVEL(1);
@@ -56,7 +56,7 @@ int paru_add_colTuple (tupleList *ColList, Int col,
             (Tuple*) paru_alloc (newLen, sizeof(Tuple), cc);
         if (newList == NULL)    // Error in allocating memory
             return 1;
-        for (int i = 0; i < cur->len; ++i) //copy old to new
+        for (Int i = 0; i < cur->len; ++i) //copy old to new
             newList [i] = cur->list [i];
         paru_free (cur->len, sizeof(Tuple), cur->list, cc); 
         cur->len = newLen;

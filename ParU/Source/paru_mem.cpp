@@ -3,11 +3,11 @@
  * */
 #include "Parallel_LU.hpp"
 
-void *paru_alloc (int n, int size, cholmod_common *cc){
+void *paru_alloc (Int n, Int size, cholmod_common *cc){
     return cholmod_l_malloc (n,size,cc);
 }
 
-void *paru_calloc(int n, int size, cholmod_common *cc){
+void *paru_calloc(Int n, Int size, cholmod_common *cc){
     return cholmod_l_calloc (n,size,cc);       
 }
 
@@ -22,7 +22,7 @@ void *paru_realloc(
 
 
 
-void paru_free (int n, int size, void *p,  cholmod_common *cc){
+void paru_free (Int n, Int size, void *p,  cholmod_common *cc){
     cholmod_l_free (n,   size, p, cc);
 }
 
@@ -98,13 +98,13 @@ void paru_freemat (paru_matrix **paruMatInfo_handle,
     PRLEVEL (2, ("ColList =%p\n", ColList));
 
     // free tuple lists 
-    for (int col = 0; col < n; col++) {
+    for (Int col = 0; col < n; col++) {
         Int len = ColList [col].len;
         cholmod_l_free (len , sizeof (Tuple), ColList[col].list, cc);
     }
     cholmod_l_free (1, n*sizeof(tupleList), ColList, cc);
 
-    for (int row = 0; row < m; row++) {
+    for (Int row = 0; row < m; row++) {
         Int len = RowList [row].len;
         cholmod_l_free (len , sizeof (Tuple), RowList[row].list, cc);
     }
@@ -140,6 +140,11 @@ void paru_freemat (paru_matrix **paruMatInfo_handle,
 
     Int nf = LUsym->nf;
     cholmod_l_free (1, (m+nf+1)*sizeof(Element), elementList, cc);
+    work_struct *Work = paruMatInfo->Work;
+    cholmod_l_free (m, sizeof(Int), Work->all_Zero, cc);
+    cholmod_l_free (m, sizeof(Int), Work->scratch, cc);
+    
+    cholmod_l_free (1, sizeof(work_struct), paruMatInfo->Work, cc);
     cholmod_l_free (1, sizeof(paru_matrix), paruMatInfo, cc);
     *paruMatInfo_handle = NULL;
 } 

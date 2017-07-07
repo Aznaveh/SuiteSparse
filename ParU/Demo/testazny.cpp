@@ -109,9 +109,13 @@ int main (int argc, char **argv)
     n = paruMatInfo-> n;
     nf = paruMatInfo->LUsym->nf;
  
-   for (Int i = 0; i < nf; i++) {
-    paru_assemble (paruMatInfo, i, cc);
-   }
+//   for (Int i = 0; i < nf; i++) {
+//    paru_assemble (paruMatInfo, i, cc);
+//   }
+   
+    Int el_num = LUsym->super2atree[25];
+    paru_print_element (paruMatInfo, el_num);
+    paru_assemble (paruMatInfo, 25, cc);
     
 
     if (PRINTCBsTUPLES){

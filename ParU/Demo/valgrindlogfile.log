@@ -1,231 +1,640 @@
-==14668== Memcheck, a memory error detector
-==14668== Copyright (C) 2002-2015, and GNU GPL'd, by Julian Seward et al.
-==14668== Using Valgrind-3.11.0 and LibVEX; rerun with -h for copyright info
-==14668== Command: ./testazny
-==14668== Parent PID: 14667
-==14668== 
---14668-- 
---14668-- Valgrind options:
---14668--    --tool=memcheck
---14668--    --leak-check=full
---14668--    --show-reachable=yes
---14668--    -v
---14668--    --num-callers=20
---14668--    --track-fds=yes
---14668--    --log-file=valgrindlogfile.log
---14668-- Contents of /proc/version:
---14668--   Linux version 3.10.0-514.21.1.el7.x86_64 (builder@kbuilder.dev.centos.org) (gcc version 4.8.5 20150623 (Red Hat 4.8.5-11) (GCC) ) #1 SMP Thu May 25 17:04:51 UTC 2017
---14668-- 
---14668-- Arch and hwcaps: AMD64, LittleEndian, amd64-cx16-lzcnt-rdtscp-sse3-avx-avx2-bmi
---14668-- Page sizes: currently 4096, max supported 4096
---14668-- Valgrind library directory: /usr/lib64/valgrind
---14668-- Reading syms from /users/aznaveh/SuiteSparse/ParU/Demo/testazny
---14668-- Reading syms from /usr/lib64/ld-2.17.so
---14668-- Reading syms from /usr/lib64/valgrind/memcheck-amd64-linux
---14668--    object doesn't have a symbol table
---14668--    object doesn't have a dynamic symbol table
---14668-- Scheduler: using generic scheduler lock implementation.
---14668-- Reading suppressions file: /usr/lib64/valgrind/default.supp
-==14668== embedded gdbserver: reading from /tmp/vgdb-pipe-from-vgdb-to-14668-by-aznaveh-on-multifrontal.cs.tamu.edu
-==14668== embedded gdbserver: writing to   /tmp/vgdb-pipe-to-vgdb-from-14668-by-aznaveh-on-multifrontal.cs.tamu.edu
-==14668== embedded gdbserver: shared mem   /tmp/vgdb-pipe-shared-mem-vgdb-14668-by-aznaveh-on-multifrontal.cs.tamu.edu
-==14668== 
-==14668== TO CONTROL THIS PROCESS USING vgdb (which you probably
-==14668== don't want to do, unless you know exactly what you're doing,
-==14668== or are doing some strange experiment):
-==14668==   /usr/lib64/valgrind/../../bin/vgdb --pid=14668 ...command...
-==14668== 
-==14668== TO DEBUG THIS PROCESS USING GDB: start GDB like this
-==14668==   /path/to/gdb ./testazny
-==14668== and then give GDB the following command
-==14668==   target remote | /usr/lib64/valgrind/../../bin/vgdb --pid=14668
-==14668== --pid is optional if only one valgrind process is running
-==14668== 
---14668-- REDIR: 0x4019200 (ld-linux-x86-64.so.2:strlen) redirected to 0x38056d91 (???)
---14668-- REDIR: 0x4018fd0 (ld-linux-x86-64.so.2:index) redirected to 0x38056dab (???)
---14668-- Reading syms from /usr/lib64/valgrind/vgpreload_core-amd64-linux.so
---14668-- Reading syms from /usr/lib64/valgrind/vgpreload_memcheck-amd64-linux.so
-==14668== WARNING: new redirection conflicts with existing -- ignoring it
---14668--     old: 0x04019200 (strlen              ) R-> (0000.0) 0x38056d91 ???
---14668--     new: 0x04019200 (strlen              ) R-> (2007.0) 0x04c2ba90 strlen
---14668-- REDIR: 0x4019180 (ld-linux-x86-64.so.2:strcmp) redirected to 0x4c2cbe0 (strcmp)
---14668-- REDIR: 0x4019d70 (ld-linux-x86-64.so.2:mempcpy) redirected to 0x4c2fc20 (mempcpy)
---14668-- Reading syms from /users/aznaveh/SuiteSparse/lib/libparu.so.0.0.1
---14668-- Reading syms from /users/aznaveh/SuiteSparse/lib/libspqr.so.2.0.8
---14668-- Reading syms from /users/aznaveh/SuiteSparse/lib/libsuitesparseconfig.so.4.5.5
---14668-- Reading syms from /users/aznaveh/SuiteSparse/lib/libcholmod.so.3.0.11
---14668-- Reading syms from /users/aznaveh/SuiteSparse/lib/libamd.so.2.4.6
---14668-- Reading syms from /users/aznaveh/SuiteSparse/lib/libcolamd.so.2.9.6
---14668-- Reading syms from /users/aznaveh/SuiteSparse/lib/libccolamd.so.2.9.6
---14668-- Reading syms from /users/aznaveh/SuiteSparse/lib/libcamd.so.2.4.6
---14668-- Reading syms from /users/aznaveh/SuiteSparse/lib/libmetis.so
---14668-- Reading syms from /usr/lib64/librt-2.17.so
---14668-- Reading syms from /usr/lib64/liblapack.so.3.4.2
---14668--    object doesn't have a symbol table
---14668-- Reading syms from /usr/lib64/libopenblas-r0.2.19.so
---14668--    object doesn't have a symbol table
---14668-- Reading syms from /usr/local/gnu/gcc-5.4.0/lib64/libstdc++.so.6.0.21
---14668-- Reading syms from /usr/lib64/libm-2.17.so
---14668-- Reading syms from /usr/local/gnu/gcc-5.4.0/lib64/libgomp.so.1.0.0
---14668-- Reading syms from /usr/local/gnu/gcc-5.4.0/lib64/libgcc_s.so.1
---14668-- Reading syms from /usr/lib64/libpthread-2.17.so
---14668-- Reading syms from /usr/lib64/libc-2.17.so
---14668-- Reading syms from /usr/lib64/libmetis.so.0
---14668--    object doesn't have a symbol table
---14668-- Reading syms from /usr/lib64/libblas.so.3.4.2
---14668--    object doesn't have a symbol table
---14668-- Reading syms from /usr/local/gnu/gcc-5.4.0/lib64/libgfortran.so.3.0.0
---14668-- Reading syms from /usr/lib64/libdl-2.17.so
---14668-- Reading syms from /usr/local/gnu/gcc-5.4.0/lib64/libquadmath.so.0.0.0
---14668-- REDIR: 0x9d1cec0 (libc.so.6:strcasecmp) redirected to 0x4a237b0 (_vgnU_ifunc_wrapper)
---14668-- REDIR: 0x9d19c40 (libc.so.6:strnlen) redirected to 0x4a237b0 (_vgnU_ifunc_wrapper)
---14668-- REDIR: 0x9d1f190 (libc.so.6:strncasecmp) redirected to 0x4a237b0 (_vgnU_ifunc_wrapper)
---14668-- REDIR: 0x9d1c6a0 (libc.so.6:memset) redirected to 0x4a237b0 (_vgnU_ifunc_wrapper)
---14668-- REDIR: 0x9d1c650 (libc.so.6:memcpy@GLIBC_2.2.5) redirected to 0x4a237b0 (_vgnU_ifunc_wrapper)
---14668-- REDIR: 0x9d1b5b0 (libc.so.6:strncpy) redirected to 0x4a237b0 (_vgnU_ifunc_wrapper)
---14668-- REDIR: 0x9d19d20 (libc.so.6:strncmp) redirected to 0x4a237b0 (_vgnU_ifunc_wrapper)
---14668-- REDIR: 0x9d19550 (libc.so.6:strcpy) redirected to 0x4a237b0 (_vgnU_ifunc_wrapper)
---14668-- REDIR: 0x9d19b10 (libc.so.6:strlen) redirected to 0x4a237b0 (_vgnU_ifunc_wrapper)
---14668-- REDIR: 0x9d18000 (libc.so.6:index) redirected to 0x4a237b0 (_vgnU_ifunc_wrapper)
---14668-- REDIR: 0x9d1b5f0 (libc.so.6:rindex) redirected to 0x4a237b0 (_vgnU_ifunc_wrapper)
---14668-- REDIR: 0x9d180c0 (libc.so.6:strcmp) redirected to 0x4a237b0 (_vgnU_ifunc_wrapper)
---14668-- REDIR: 0x9d32b00 (libc.so.6:strstr) redirected to 0x4a237b0 (_vgnU_ifunc_wrapper)
---14668-- REDIR: 0x9d19b60 (libc.so.6:__GI_strlen) redirected to 0x4c2b9f0 (__GI_strlen)
---14668-- REDIR: 0x9d1b630 (libc.so.6:__GI_strrchr) redirected to 0x4c2b450 (__GI_strrchr)
---14668-- REDIR: 0x9d13960 (libc.so.6:calloc) redirected to 0x4c2a8df (calloc)
---14668-- REDIR: 0x9d12f70 (libc.so.6:malloc) redirected to 0x4c28b5c (malloc)
---14668-- REDIR: 0x9d218d0 (libc.so.6:__GI_memcpy) redirected to 0x4c2d580 (__GI_memcpy)
---14668-- REDIR: 0x9d1c4c0 (libc.so.6:__GI_memmove) redirected to 0x4c2f190 (__GI_memmove)
---14668-- REDIR: 0x9d13370 (libc.so.6:free) redirected to 0x4c29c56 (free)
---14668-- REDIR: 0x9d1c700 (libc.so.6:__GI_memset) redirected to 0x4c2ee80 (memset)
---14668-- REDIR: 0x9d27930 (libc.so.6:__strncpy_sse2_unaligned) redirected to 0x4c2c060 (__strncpy_sse2_unaligned)
---14668-- REDIR: 0x9d23150 (libc.so.6:strchrnul) redirected to 0x4c2f740 (strchrnul)
---14668-- REDIR: 0x9d1bd30 (libc.so.6:memchr) redirected to 0x4c2cc80 (memchr)
---14668-- REDIR: 0x9dc7350 (libc.so.6:__strncmp_sse42) redirected to 0x4c2c300 (__strncmp_sse42)
---14668-- REDIR: 0x9d22f40 (libc.so.6:__GI___rawmemchr) redirected to 0x4c2f7a0 (__GI___rawmemchr)
---14668-- REDIR: 0x9d32540 (libc.so.6:__GI_strstr) redirected to 0x4c2feb0 (__strstr_sse2)
---14668-- REDIR: 0x9d1c870 (libc.so.6:__GI_mempcpy) redirected to 0x4c2f950 (__GI_mempcpy)
-==14668== 
-==14668== FILE DESCRIPTORS: 4 open at exit.
-==14668== Open file descriptor 3: /users/aznaveh/SuiteSparse/ParU/Demo/valgrindlogfile.log
-==14668==    <inherited from parent>
-==14668== 
-==14668== Open file descriptor 2: /dev/pts/1
-==14668==    <inherited from parent>
-==14668== 
-==14668== Open file descriptor 1: /dev/pts/1
-==14668==    <inherited from parent>
-==14668== 
-==14668== Open file descriptor 0: /users/aznaveh/SuiteSparse/ParU/Matrix/GD98_a.mtx
-==14668==    <inherited from parent>
-==14668== 
-==14668== 
-==14668== HEAP SUMMARY:
-==14668==     in use at exit: 76,680 bytes in 10 blocks
-==14668==   total heap usage: 119 allocs, 109 frees, 157,808 bytes allocated
-==14668== 
-==14668== Searching for pointers to 10 not-freed blocks
-==14668== Checked 1,559,584 bytes
-==14668== 
-==14668== 8 bytes in 1 blocks are still reachable in loss record 1 of 10
-==14668==    at 0x4C28BE3: malloc (vg_replace_malloc.c:299)
-==14668==    by 0x9646728: gomp_malloc (alloc.c:37)
-==14668==    by 0x964F127: gomp_init_num_threads (proc.c:91)
-==14668==    by 0x9644DF1: initialize_env (env.c:1203)
-==14668==    by 0x400F552: _dl_init (in /usr/lib64/ld-2.17.so)
-==14668==    by 0x40011A9: ??? (in /usr/lib64/ld-2.17.so)
-==14668== 
-==14668== 8 bytes in 1 blocks are still reachable in loss record 2 of 10
-==14668==    at 0x4C28BE3: malloc (vg_replace_malloc.c:299)
-==14668==    by 0x5283DD8: SuiteSparse_malloc (SuiteSparse_config.c:192)
-==14668==    by 0x5573D82: cholmod_l_malloc (cholmod_memory.c:141)
-==14668==    by 0x556B27A: cholmod_l_allocate_work (cholmod_common.c:535)
-==14668==    by 0x5590DA3: read_triplet (cholmod_read.c:566)
-==14668==    by 0x5592445: cholmod_l_read_matrix (cholmod_read.c:1287)
-==14668==    by 0x4010CC: main (testazny.cpp:89)
-==14668== 
-==14668== 88 bytes in 1 blocks are still reachable in loss record 3 of 10
-==14668==    at 0x4C28BE3: malloc (vg_replace_malloc.c:299)
-==14668==    by 0x5283DD8: SuiteSparse_malloc (SuiteSparse_config.c:192)
-==14668==    by 0x5573D82: cholmod_l_malloc (cholmod_memory.c:141)
-==14668==    by 0x5574FD2: cholmod_l_allocate_sparse (cholmod_sparse.c:98)
-==14668==    by 0x5580485: cholmod_l_triplet_to_sparse (cholmod_triplet.c:516)
-==14668==    by 0x5592477: cholmod_l_read_matrix (cholmod_read.c:1296)
-==14668==    by 0x4010CC: main (testazny.cpp:89)
-==14668== 
-==14668== 312 bytes in 1 blocks are still reachable in loss record 4 of 10
-==14668==    at 0x4C28BE3: malloc (vg_replace_malloc.c:299)
-==14668==    by 0x5283DD8: SuiteSparse_malloc (SuiteSparse_config.c:192)
-==14668==    by 0x5573D82: cholmod_l_malloc (cholmod_memory.c:141)
-==14668==    by 0x5575128: cholmod_l_allocate_sparse (cholmod_sparse.c:131)
-==14668==    by 0x5580485: cholmod_l_triplet_to_sparse (cholmod_triplet.c:516)
-==14668==    by 0x5592477: cholmod_l_read_matrix (cholmod_read.c:1296)
-==14668==    by 0x4010CC: main (testazny.cpp:89)
-==14668== 
-==14668== 312 bytes in 1 blocks are still reachable in loss record 5 of 10
-==14668==    at 0x4C28BE3: malloc (vg_replace_malloc.c:299)
-==14668==    by 0x5283DD8: SuiteSparse_malloc (SuiteSparse_config.c:192)
-==14668==    by 0x5573D82: cholmod_l_malloc (cholmod_memory.c:141)
-==14668==    by 0x556B067: cholmod_l_allocate_work (cholmod_common.c:462)
-==14668==    by 0x504DBFC: spqr_analyze(cholmod_sparse_struct*, int, long*, int, int, cholmod_common_struct*) (spqr_analyze.cpp:154)
-==14668==    by 0x4E35943: paru_sym_analyse(cholmod_sparse_struct*, cholmod_common_struct*) (paru_sym_analyse.cpp:41)
-==14668==    by 0x40110A: main (testazny.cpp:96)
-==14668== 
-==14668== 320 bytes in 1 blocks are still reachable in loss record 6 of 10
-==14668==    at 0x4C28BE3: malloc (vg_replace_malloc.c:299)
-==14668==    by 0x5283DD8: SuiteSparse_malloc (SuiteSparse_config.c:192)
-==14668==    by 0x5573D82: cholmod_l_malloc (cholmod_memory.c:141)
-==14668==    by 0x556B087: cholmod_l_allocate_work (cholmod_common.c:463)
-==14668==    by 0x504DBFC: spqr_analyze(cholmod_sparse_struct*, int, long*, int, int, cholmod_common_struct*) (spqr_analyze.cpp:154)
-==14668==    by 0x4E35943: paru_sym_analyse(cholmod_sparse_struct*, cholmod_common_struct*) (paru_sym_analyse.cpp:41)
-==14668==    by 0x40110A: main (testazny.cpp:96)
-==14668== 
-==14668== 400 bytes in 1 blocks are still reachable in loss record 7 of 10
-==14668==    at 0x4C28BE3: malloc (vg_replace_malloc.c:299)
-==14668==    by 0x5283DD8: SuiteSparse_malloc (SuiteSparse_config.c:192)
-==14668==    by 0x5573D82: cholmod_l_malloc (cholmod_memory.c:141)
-==14668==    by 0x55745DD: cholmod_l_realloc (cholmod_memory.c:342)
-==14668==    by 0x5574A95: cholmod_l_realloc_multiple (cholmod_memory.c:441)
-==14668==    by 0x55751A2: cholmod_l_allocate_sparse (cholmod_sparse.c:139)
-==14668==    by 0x5580485: cholmod_l_triplet_to_sparse (cholmod_triplet.c:516)
-==14668==    by 0x5592477: cholmod_l_read_matrix (cholmod_read.c:1296)
-==14668==    by 0x4010CC: main (testazny.cpp:89)
-==14668== 
-==14668== 400 bytes in 1 blocks are still reachable in loss record 8 of 10
-==14668==    at 0x4C28BE3: malloc (vg_replace_malloc.c:299)
-==14668==    by 0x5283DD8: SuiteSparse_malloc (SuiteSparse_config.c:192)
-==14668==    by 0x5573D82: cholmod_l_malloc (cholmod_memory.c:141)
-==14668==    by 0x55745DD: cholmod_l_realloc (cholmod_memory.c:342)
-==14668==    by 0x5574B05: cholmod_l_realloc_multiple (cholmod_memory.c:451)
-==14668==    by 0x55751A2: cholmod_l_allocate_sparse (cholmod_sparse.c:139)
-==14668==    by 0x5580485: cholmod_l_triplet_to_sparse (cholmod_triplet.c:516)
-==14668==    by 0x5592477: cholmod_l_read_matrix (cholmod_read.c:1296)
-==14668==    by 0x4010CC: main (testazny.cpp:89)
-==14668== 
-==14668== 2,128 bytes in 1 blocks are still reachable in loss record 9 of 10
-==14668==    at 0x4C28BE3: malloc (vg_replace_malloc.c:299)
-==14668==    by 0x5283DD8: SuiteSparse_malloc (SuiteSparse_config.c:192)
-==14668==    by 0x5573D82: cholmod_l_malloc (cholmod_memory.c:141)
-==14668==    by 0x556B1AF: cholmod_l_allocate_work (cholmod_common.c:502)
-==14668==    by 0x5595170: cholmod_l_analyze_p2 (cholmod_analyze.c:513)
-==14668==    by 0x504E08F: spqr_analyze(cholmod_sparse_struct*, int, long*, int, int, cholmod_common_struct*) (spqr_analyze.cpp:285)
-==14668==    by 0x4E35943: paru_sym_analyse(cholmod_sparse_struct*, cholmod_common_struct*) (paru_sym_analyse.cpp:41)
-==14668==    by 0x40110A: main (testazny.cpp:96)
-==14668== 
-==14668== 72,704 bytes in 1 blocks are still reachable in loss record 10 of 10
-==14668==    at 0x4C28BE3: malloc (vg_replace_malloc.c:299)
-==14668==    by 0x904A17F: pool (eh_alloc.cc:117)
-==14668==    by 0x904A17F: __static_initialization_and_destruction_0 (eh_alloc.cc:244)
-==14668==    by 0x904A17F: _GLOBAL__sub_I_eh_alloc.cc (eh_alloc.cc:307)
-==14668==    by 0x400F552: _dl_init (in /usr/lib64/ld-2.17.so)
-==14668==    by 0x40011A9: ??? (in /usr/lib64/ld-2.17.so)
-==14668== 
-==14668== LEAK SUMMARY:
-==14668==    definitely lost: 0 bytes in 0 blocks
-==14668==    indirectly lost: 0 bytes in 0 blocks
-==14668==      possibly lost: 0 bytes in 0 blocks
-==14668==    still reachable: 76,680 bytes in 10 blocks
-==14668==         suppressed: 0 bytes in 0 blocks
-==14668== 
-==14668== ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)
-==14668== ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)
+==23995== Memcheck, a memory error detector
+==23995== Copyright (C) 2002-2015, and GNU GPL'd, by Julian Seward et al.
+==23995== Using Valgrind-3.11.0 and LibVEX; rerun with -h for copyright info
+==23995== Command: ./testazny
+==23995== Parent PID: 23994
+==23995== 
+--23995-- 
+--23995-- Valgrind options:
+--23995--    --tool=memcheck
+--23995--    --leak-check=full
+--23995--    --show-reachable=yes
+--23995--    -v
+--23995--    --num-callers=20
+--23995--    --track-fds=yes
+--23995--    --log-file=valgrindlogfile.log
+--23995-- Contents of /proc/version:
+--23995--   Linux version 3.10.0-514.21.1.el7.x86_64 (builder@kbuilder.dev.centos.org) (gcc version 4.8.5 20150623 (Red Hat 4.8.5-11) (GCC) ) #1 SMP Thu May 25 17:04:51 UTC 2017
+--23995-- 
+--23995-- Arch and hwcaps: AMD64, LittleEndian, amd64-cx16-lzcnt-rdtscp-sse3-avx-avx2-bmi
+--23995-- Page sizes: currently 4096, max supported 4096
+--23995-- Valgrind library directory: /usr/lib64/valgrind
+--23995-- Reading syms from /users/aznaveh/SuiteSparse/ParU/Demo/testazny
+--23995-- Reading syms from /usr/lib64/ld-2.17.so
+--23995-- Reading syms from /usr/lib64/valgrind/memcheck-amd64-linux
+--23995--    object doesn't have a symbol table
+--23995--    object doesn't have a dynamic symbol table
+--23995-- Scheduler: using generic scheduler lock implementation.
+--23995-- Reading suppressions file: /usr/lib64/valgrind/default.supp
+==23995== embedded gdbserver: reading from /tmp/vgdb-pipe-from-vgdb-to-23995-by-aznaveh-on-multifrontal.cs.tamu.edu
+==23995== embedded gdbserver: writing to   /tmp/vgdb-pipe-to-vgdb-from-23995-by-aznaveh-on-multifrontal.cs.tamu.edu
+==23995== embedded gdbserver: shared mem   /tmp/vgdb-pipe-shared-mem-vgdb-23995-by-aznaveh-on-multifrontal.cs.tamu.edu
+==23995== 
+==23995== TO CONTROL THIS PROCESS USING vgdb (which you probably
+==23995== don't want to do, unless you know exactly what you're doing,
+==23995== or are doing some strange experiment):
+==23995==   /usr/lib64/valgrind/../../bin/vgdb --pid=23995 ...command...
+==23995== 
+==23995== TO DEBUG THIS PROCESS USING GDB: start GDB like this
+==23995==   /path/to/gdb ./testazny
+==23995== and then give GDB the following command
+==23995==   target remote | /usr/lib64/valgrind/../../bin/vgdb --pid=23995
+==23995== --pid is optional if only one valgrind process is running
+==23995== 
+--23995-- REDIR: 0x4019200 (ld-linux-x86-64.so.2:strlen) redirected to 0x38056d91 (???)
+--23995-- REDIR: 0x4018fd0 (ld-linux-x86-64.so.2:index) redirected to 0x38056dab (???)
+--23995-- Reading syms from /usr/lib64/valgrind/vgpreload_core-amd64-linux.so
+--23995-- Reading syms from /usr/lib64/valgrind/vgpreload_memcheck-amd64-linux.so
+==23995== WARNING: new redirection conflicts with existing -- ignoring it
+--23995--     old: 0x04019200 (strlen              ) R-> (0000.0) 0x38056d91 ???
+--23995--     new: 0x04019200 (strlen              ) R-> (2007.0) 0x04c2ba90 strlen
+--23995-- REDIR: 0x4019180 (ld-linux-x86-64.so.2:strcmp) redirected to 0x4c2cbe0 (strcmp)
+--23995-- REDIR: 0x4019d70 (ld-linux-x86-64.so.2:mempcpy) redirected to 0x4c2fc20 (mempcpy)
+--23995-- Reading syms from /users/aznaveh/SuiteSparse/lib/libparu.so.0.0.1
+--23995-- Reading syms from /users/aznaveh/SuiteSparse/lib/libspqr.so.2.0.8
+--23995-- Reading syms from /users/aznaveh/SuiteSparse/lib/libsuitesparseconfig.so.4.5.5
+--23995-- Reading syms from /users/aznaveh/SuiteSparse/lib/libcholmod.so.3.0.11
+--23995-- Reading syms from /users/aznaveh/SuiteSparse/lib/libamd.so.2.4.6
+--23995-- Reading syms from /users/aznaveh/SuiteSparse/lib/libcolamd.so.2.9.6
+--23995-- Reading syms from /users/aznaveh/SuiteSparse/lib/libccolamd.so.2.9.6
+--23995-- Reading syms from /users/aznaveh/SuiteSparse/lib/libcamd.so.2.4.6
+--23995-- Reading syms from /users/aznaveh/SuiteSparse/lib/libmetis.so
+--23995-- Reading syms from /usr/lib64/librt-2.17.so
+--23995-- Reading syms from /usr/lib64/liblapack.so.3.4.2
+--23995--    object doesn't have a symbol table
+--23995-- Reading syms from /usr/lib64/libopenblas-r0.2.19.so
+--23995--    object doesn't have a symbol table
+--23995-- Reading syms from /usr/local/gnu/gcc-5.4.0/lib64/libstdc++.so.6.0.21
+--23995-- Reading syms from /usr/lib64/libm-2.17.so
+--23995-- Reading syms from /usr/local/gnu/gcc-5.4.0/lib64/libgomp.so.1.0.0
+--23995-- Reading syms from /usr/local/gnu/gcc-5.4.0/lib64/libgcc_s.so.1
+--23995-- Reading syms from /usr/lib64/libpthread-2.17.so
+--23995-- Reading syms from /usr/lib64/libc-2.17.so
+--23995-- Reading syms from /usr/lib64/libmetis.so.0
+--23995--    object doesn't have a symbol table
+--23995-- Reading syms from /usr/lib64/libblas.so.3.4.2
+--23995--    object doesn't have a symbol table
+--23995-- Reading syms from /usr/local/gnu/gcc-5.4.0/lib64/libgfortran.so.3.0.0
+--23995-- Reading syms from /usr/lib64/libdl-2.17.so
+--23995-- Reading syms from /usr/local/gnu/gcc-5.4.0/lib64/libquadmath.so.0.0.0
+--23995-- REDIR: 0x9d21ec0 (libc.so.6:strcasecmp) redirected to 0x4a237b0 (_vgnU_ifunc_wrapper)
+--23995-- REDIR: 0x9d1ec40 (libc.so.6:strnlen) redirected to 0x4a237b0 (_vgnU_ifunc_wrapper)
+--23995-- REDIR: 0x9d24190 (libc.so.6:strncasecmp) redirected to 0x4a237b0 (_vgnU_ifunc_wrapper)
+--23995-- REDIR: 0x9d216a0 (libc.so.6:memset) redirected to 0x4a237b0 (_vgnU_ifunc_wrapper)
+--23995-- REDIR: 0x9d21650 (libc.so.6:memcpy@GLIBC_2.2.5) redirected to 0x4a237b0 (_vgnU_ifunc_wrapper)
+--23995-- REDIR: 0x9d205b0 (libc.so.6:strncpy) redirected to 0x4a237b0 (_vgnU_ifunc_wrapper)
+--23995-- REDIR: 0x9d1ed20 (libc.so.6:strncmp) redirected to 0x4a237b0 (_vgnU_ifunc_wrapper)
+--23995-- REDIR: 0x9d1e550 (libc.so.6:strcpy) redirected to 0x4a237b0 (_vgnU_ifunc_wrapper)
+--23995-- REDIR: 0x9d1eb10 (libc.so.6:strlen) redirected to 0x4a237b0 (_vgnU_ifunc_wrapper)
+--23995-- REDIR: 0x9d1d000 (libc.so.6:index) redirected to 0x4a237b0 (_vgnU_ifunc_wrapper)
+--23995-- REDIR: 0x9d205f0 (libc.so.6:rindex) redirected to 0x4a237b0 (_vgnU_ifunc_wrapper)
+--23995-- REDIR: 0x9d1d0c0 (libc.so.6:strcmp) redirected to 0x4a237b0 (_vgnU_ifunc_wrapper)
+--23995-- REDIR: 0x9d37b00 (libc.so.6:strstr) redirected to 0x4a237b0 (_vgnU_ifunc_wrapper)
+--23995-- REDIR: 0x9d1eb60 (libc.so.6:__GI_strlen) redirected to 0x4c2b9f0 (__GI_strlen)
+--23995-- REDIR: 0x9d20630 (libc.so.6:__GI_strrchr) redirected to 0x4c2b450 (__GI_strrchr)
+--23995-- REDIR: 0x9d18960 (libc.so.6:calloc) redirected to 0x4c2a8df (calloc)
+--23995-- REDIR: 0x9d17f70 (libc.so.6:malloc) redirected to 0x4c28b5c (malloc)
+--23995-- REDIR: 0x9d268d0 (libc.so.6:__GI_memcpy) redirected to 0x4c2d580 (__GI_memcpy)
+--23995-- REDIR: 0x9d214c0 (libc.so.6:__GI_memmove) redirected to 0x4c2f190 (__GI_memmove)
+--23995-- REDIR: 0x9d18370 (libc.so.6:free) redirected to 0x4c29c56 (free)
+--23995-- REDIR: 0x9d21700 (libc.so.6:__GI_memset) redirected to 0x4c2ee80 (memset)
+--23995-- REDIR: 0x9d2c930 (libc.so.6:__strncpy_sse2_unaligned) redirected to 0x4c2c060 (__strncpy_sse2_unaligned)
+--23995-- REDIR: 0x9d28150 (libc.so.6:strchrnul) redirected to 0x4c2f740 (strchrnul)
+--23995-- REDIR: 0x9d210c0 (libc.so.6:__GI_memcmp) redirected to 0x4c2e4d0 (__GI_memcmp)
+--23995-- REDIR: 0x9dcb5a0 (libc.so.6:__strcmp_sse42) redirected to 0x4c2cb90 (__strcmp_sse42)
+--23995-- REDIR: 0x9d20d30 (libc.so.6:memchr) redirected to 0x4c2cc80 (memchr)
+--23995-- REDIR: 0x9dcc350 (libc.so.6:__strncmp_sse42) redirected to 0x4c2c300 (__strncmp_sse42)
+--23995-- REDIR: 0x9d27f40 (libc.so.6:__GI___rawmemchr) redirected to 0x4c2f7a0 (__GI___rawmemchr)
+--23995-- REDIR: 0x9d37540 (libc.so.6:__GI_strstr) redirected to 0x4c2feb0 (__strstr_sse2)
+--23995-- REDIR: 0x9d21870 (libc.so.6:__GI_mempcpy) redirected to 0x4c2f950 (__GI_mempcpy)
+--23995-- REDIR: 0x9d1ed60 (libc.so.6:__GI_strncmp) redirected to 0x4c2c220 (__GI_strncmp)
+--23995-- REDIR: 0x9d21d60 (libc.so.6:__GI_stpcpy) redirected to 0x4c2e8d0 (__GI_stpcpy)
+--23995-- REDIR: 0x9d1e590 (libc.so.6:__GI_strcpy) redirected to 0x4c2bb90 (__GI_strcpy)
+==23995== 
+==23995== Process terminating with default action of signal 6 (SIGABRT)
+==23995==    at 0x9CCD1D7: raise (in /usr/lib64/libc-2.17.so)
+==23995==    by 0x9CCE8C7: abort (in /usr/lib64/libc-2.17.so)
+==23995==    by 0x9CC6145: __assert_fail_base (in /usr/lib64/libc-2.17.so)
+==23995==    by 0x9CC61F1: __assert_fail (in /usr/lib64/libc-2.17.so)
+==23995==    by 0x4E3B86C: paru_assemble(paru_matrix*, long, cholmod_common_struct*) (paru_assemble.cpp:103)
+==23995==    by 0x4011B3: main (testazny.cpp:116)
+==23995== 
+==23995== FILE DESCRIPTORS: 4 open at exit.
+==23995== Open file descriptor 3: /users/aznaveh/SuiteSparse/ParU/Demo/valgrindlogfile.log
+==23995==    <inherited from parent>
+==23995== 
+==23995== Open file descriptor 2: /dev/pts/1
+==23995==    <inherited from parent>
+==23995== 
+==23995== Open file descriptor 1: /dev/pts/1
+==23995==    <inherited from parent>
+==23995== 
+==23995== Open file descriptor 0: /users/aznaveh/SuiteSparse/ParU/Matrix/lp_share1b.mtx
+==23995==    <inherited from parent>
+==23995== 
+==23995== 
+==23995== HEAP SUMMARY:
+==23995==     in use at exit: 231,556 bytes in 540 blocks
+==23995==   total heap usage: 624 allocs, 84 frees, 549,984 bytes allocated
+==23995== 
+==23995== Searching for pointers to 540 not-freed blocks
+==23995== Checked 1,687,632 bytes
+==23995== 
+==23995== 6 bytes in 1 blocks are still reachable in loss record 1 of 56
+==23995==    at 0x4C28BE3: malloc (vg_replace_malloc.c:299)
+==23995==    by 0x9D1E889: strdup (in /usr/lib64/libc-2.17.so)
+==23995==    by 0xA602082: _gfortrani_init_units (unit.c:619)
+==23995==    by 0xA536727: init (main.c:265)
+==23995==    by 0x400F552: _dl_init (in /usr/lib64/ld-2.17.so)
+==23995==    by 0x40011A9: ??? (in /usr/lib64/ld-2.17.so)
+==23995== 
+==23995== 7 bytes in 1 blocks are still reachable in loss record 2 of 56
+==23995==    at 0x4C28BE3: malloc (vg_replace_malloc.c:299)
+==23995==    by 0x9D1E889: strdup (in /usr/lib64/libc-2.17.so)
+==23995==    by 0xA60213D: _gfortrani_init_units (unit.c:648)
+==23995==    by 0xA536727: init (main.c:265)
+==23995==    by 0x400F552: _dl_init (in /usr/lib64/ld-2.17.so)
+==23995==    by 0x40011A9: ??? (in /usr/lib64/ld-2.17.so)
+==23995== 
+==23995== 7 bytes in 1 blocks are still reachable in loss record 3 of 56
+==23995==    at 0x4C28BE3: malloc (vg_replace_malloc.c:299)
+==23995==    by 0x9D1E889: strdup (in /usr/lib64/libc-2.17.so)
+==23995==    by 0xA6021F1: _gfortrani_init_units (unit.c:676)
+==23995==    by 0xA536727: init (main.c:265)
+==23995==    by 0x400F552: _dl_init (in /usr/lib64/ld-2.17.so)
+==23995==    by 0x40011A9: ??? (in /usr/lib64/ld-2.17.so)
+==23995== 
+==23995== 8 bytes in 1 blocks are still reachable in loss record 4 of 56
+==23995==    at 0x4C28BE3: malloc (vg_replace_malloc.c:299)
+==23995==    by 0x964B728: gomp_malloc (alloc.c:37)
+==23995==    by 0x9654127: gomp_init_num_threads (proc.c:91)
+==23995==    by 0x9649DF1: initialize_env (env.c:1203)
+==23995==    by 0x400F552: _dl_init (in /usr/lib64/ld-2.17.so)
+==23995==    by 0x40011A9: ??? (in /usr/lib64/ld-2.17.so)
+==23995== 
+==23995== 8 bytes in 1 blocks are still reachable in loss record 5 of 56
+==23995==    at 0x4C28BE3: malloc (vg_replace_malloc.c:299)
+==23995==    by 0x5288DD8: SuiteSparse_malloc (SuiteSparse_config.c:192)
+==23995==    by 0x5578D82: cholmod_l_malloc (cholmod_memory.c:141)
+==23995==    by 0x557027A: cholmod_l_allocate_work (cholmod_common.c:535)
+==23995==    by 0x5595DA3: read_triplet (cholmod_read.c:566)
+==23995==    by 0x5597445: cholmod_l_read_matrix (cholmod_read.c:1287)
+==23995==    by 0x4010D6: main (testazny.cpp:89)
+==23995== 
+==23995== 16 bytes in 1 blocks are still reachable in loss record 6 of 56
+==23995==    at 0x4C28BE3: malloc (vg_replace_malloc.c:299)
+==23995==    by 0x5288DD8: SuiteSparse_malloc (SuiteSparse_config.c:192)
+==23995==    by 0x5578D82: cholmod_l_malloc (cholmod_memory.c:141)
+==23995==    by 0x4E3813A: paru_alloc(long, long, cholmod_common_struct*) (paru_mem.cpp:7)
+==23995==    by 0x4E3A3C9: paru_init_rowFronts(cholmod_sparse_struct*, paru_symbolic*, cholmod_common_struct*) (paru_init_rowFronts.cpp:66)
+==23995==    by 0x40114E: main (testazny.cpp:102)
+==23995== 
+==23995== 24 bytes in 1 blocks are still reachable in loss record 7 of 56
+==23995==    at 0x4C28BE3: malloc (vg_replace_malloc.c:299)
+==23995==    by 0xA537124: _gfortrani_xmalloc (memory.c:43)
+==23995==    by 0xA60998A: _gfortrani_fbuf_init (fbuf.c:42)
+==23995==    by 0xA602093: _gfortrani_init_units (unit.c:621)
+==23995==    by 0xA536727: init (main.c:265)
+==23995==    by 0x400F552: _dl_init (in /usr/lib64/ld-2.17.so)
+==23995==    by 0x40011A9: ??? (in /usr/lib64/ld-2.17.so)
+==23995== 
+==23995== 24 bytes in 1 blocks are still reachable in loss record 8 of 56
+==23995==    at 0x4C28BE3: malloc (vg_replace_malloc.c:299)
+==23995==    by 0xA537124: _gfortrani_xmalloc (memory.c:43)
+==23995==    by 0xA60998A: _gfortrani_fbuf_init (fbuf.c:42)
+==23995==    by 0xA60214E: _gfortrani_init_units (unit.c:650)
+==23995==    by 0xA536727: init (main.c:265)
+==23995==    by 0x400F552: _dl_init (in /usr/lib64/ld-2.17.so)
+==23995==    by 0x40011A9: ??? (in /usr/lib64/ld-2.17.so)
+==23995== 
+==23995== 24 bytes in 1 blocks are still reachable in loss record 9 of 56
+==23995==    at 0x4C28BE3: malloc (vg_replace_malloc.c:299)
+==23995==    by 0xA537124: _gfortrani_xmalloc (memory.c:43)
+==23995==    by 0xA60998A: _gfortrani_fbuf_init (fbuf.c:42)
+==23995==    by 0xA602205: _gfortrani_init_units (unit.c:678)
+==23995==    by 0xA536727: init (main.c:265)
+==23995==    by 0x400F552: _dl_init (in /usr/lib64/ld-2.17.so)
+==23995==    by 0x40011A9: ??? (in /usr/lib64/ld-2.17.so)
+==23995== 
+==23995== 56 bytes in 1 blocks are still reachable in loss record 10 of 56
+==23995==    at 0x4C28BE3: malloc (vg_replace_malloc.c:299)
+==23995==    by 0x5288DD8: SuiteSparse_malloc (SuiteSparse_config.c:192)
+==23995==    by 0x5578D82: cholmod_l_malloc (cholmod_memory.c:141)
+==23995==    by 0x4E3813A: paru_alloc(long, long, cholmod_common_struct*) (paru_mem.cpp:7)
+==23995==    by 0x4E3A27D: paru_init_rowFronts(cholmod_sparse_struct*, paru_symbolic*, cholmod_common_struct*) (paru_init_rowFronts.cpp:38)
+==23995==    by 0x40114E: main (testazny.cpp:102)
+==23995== 
+==23995== 88 bytes in 1 blocks are still reachable in loss record 11 of 56
+==23995==    at 0x4C2A975: calloc (vg_replace_malloc.c:711)
+==23995==    by 0xA5371D2: _gfortrani_xcalloc (memory.c:84)
+==23995==    by 0xA602A2E: fd_to_stream (unix.c:1017)
+==23995==    by 0xA602002: _gfortrani_init_units (unit.c:599)
+==23995==    by 0xA536727: init (main.c:265)
+==23995==    by 0x400F552: _dl_init (in /usr/lib64/ld-2.17.so)
+==23995==    by 0x40011A9: ??? (in /usr/lib64/ld-2.17.so)
+==23995== 
+==23995== 88 bytes in 1 blocks are still reachable in loss record 12 of 56
+==23995==    at 0x4C2A975: calloc (vg_replace_malloc.c:711)
+==23995==    by 0xA5371D2: _gfortrani_xcalloc (memory.c:84)
+==23995==    by 0xA602A2E: fd_to_stream (unix.c:1017)
+==23995==    by 0xA6020C4: _gfortrani_init_units (unit.c:629)
+==23995==    by 0xA536727: init (main.c:265)
+==23995==    by 0x400F552: _dl_init (in /usr/lib64/ld-2.17.so)
+==23995==    by 0x40011A9: ??? (in /usr/lib64/ld-2.17.so)
+==23995== 
+==23995== 88 bytes in 1 blocks are still reachable in loss record 13 of 56
+==23995==    at 0x4C2A975: calloc (vg_replace_malloc.c:711)
+==23995==    by 0xA5371D2: _gfortrani_xcalloc (memory.c:84)
+==23995==    by 0xA602A2E: fd_to_stream (unix.c:1017)
+==23995==    by 0xA60217F: _gfortrani_init_units (unit.c:658)
+==23995==    by 0xA536727: init (main.c:265)
+==23995==    by 0x400F552: _dl_init (in /usr/lib64/ld-2.17.so)
+==23995==    by 0x40011A9: ??? (in /usr/lib64/ld-2.17.so)
+==23995== 
+==23995== 88 bytes in 1 blocks are still reachable in loss record 14 of 56
+==23995==    at 0x4C28BE3: malloc (vg_replace_malloc.c:299)
+==23995==    by 0x5288DD8: SuiteSparse_malloc (SuiteSparse_config.c:192)
+==23995==    by 0x5578D82: cholmod_l_malloc (cholmod_memory.c:141)
+==23995==    by 0x5579FD2: cholmod_l_allocate_sparse (cholmod_sparse.c:98)
+==23995==    by 0x5585485: cholmod_l_triplet_to_sparse (cholmod_triplet.c:516)
+==23995==    by 0x5597477: cholmod_l_read_matrix (cholmod_read.c:1296)
+==23995==    by 0x4010D6: main (testazny.cpp:89)
+==23995== 
+==23995== 120 bytes in 1 blocks are still reachable in loss record 15 of 56
+==23995==    at 0x4C28BE3: malloc (vg_replace_malloc.c:299)
+==23995==    by 0x5288DD8: SuiteSparse_malloc (SuiteSparse_config.c:192)
+==23995==    by 0x5578D82: cholmod_l_malloc (cholmod_memory.c:141)
+==23995==    by 0x4E3813A: paru_alloc(long, long, cholmod_common_struct*) (paru_mem.cpp:7)
+==23995==    by 0x4E3B58E: paru_assemble(paru_matrix*, long, cholmod_common_struct*) (paru_assemble.cpp:61)
+==23995==    by 0x4011B3: main (testazny.cpp:116)
+==23995== 
+==23995== 192 bytes in 1 blocks are still reachable in loss record 16 of 56
+==23995==    at 0x4C28BE3: malloc (vg_replace_malloc.c:299)
+==23995==    by 0x5288DD8: SuiteSparse_malloc (SuiteSparse_config.c:192)
+==23995==    by 0x5578D82: cholmod_l_malloc (cholmod_memory.c:141)
+==23995==    by 0x4E3813A: paru_alloc(long, long, cholmod_common_struct*) (paru_mem.cpp:7)
+==23995==    by 0x4E38A16: paru_sym_analyse(cholmod_sparse_struct*, cholmod_common_struct*) (paru_sym_analyse.cpp:31)
+==23995==    by 0x401114: main (testazny.cpp:96)
+==23995== 
+==23995== 256 bytes in 1 blocks are still reachable in loss record 17 of 56
+==23995==    at 0x4C28BE3: malloc (vg_replace_malloc.c:299)
+==23995==    by 0xA537124: _gfortrani_xmalloc (memory.c:43)
+==23995==    by 0xA60999C: _gfortrani_fbuf_init (fbuf.c:43)
+==23995==    by 0xA602205: _gfortrani_init_units (unit.c:678)
+==23995==    by 0xA536727: init (main.c:265)
+==23995==    by 0x400F552: _dl_init (in /usr/lib64/ld-2.17.so)
+==23995==    by 0x40011A9: ??? (in /usr/lib64/ld-2.17.so)
+==23995== 
+==23995== 304 bytes in 1 blocks are still reachable in loss record 18 of 56
+==23995==    at 0x4C28BE3: malloc (vg_replace_malloc.c:299)
+==23995==    by 0x5288DD8: SuiteSparse_malloc (SuiteSparse_config.c:192)
+==23995==    by 0x5578D82: cholmod_l_malloc (cholmod_memory.c:141)
+==23995==    by 0x4E3813A: paru_alloc(long, long, cholmod_common_struct*) (paru_mem.cpp:7)
+==23995==    by 0x4E392D5: paru_sym_analyse(cholmod_sparse_struct*, cholmod_common_struct*) (paru_sym_analyse.cpp:147)
+==23995==    by 0x401114: main (testazny.cpp:96)
+==23995== 
+==23995== 312 bytes in 1 blocks are still reachable in loss record 19 of 56
+==23995==    at 0x4C28BE3: malloc (vg_replace_malloc.c:299)
+==23995==    by 0x5288DD8: SuiteSparse_malloc (SuiteSparse_config.c:192)
+==23995==    by 0x5578D82: cholmod_l_malloc (cholmod_memory.c:141)
+==23995==    by 0x556CBDD: simplicial_symbolic_to_super_symbolic (cholmod_change_factor.c:277)
+==23995==    by 0x556F27F: cholmod_l_change_factor (cholmod_change_factor.c:1092)
+==23995==    by 0x5632588: cholmod_l_super_symbolic2 (cholmod_super_symbolic.c:702)
+==23995==    by 0x559B486: cholmod_l_analyze_p2 (cholmod_analyze.c:925)
+==23995==    by 0x505308F: spqr_analyze(cholmod_sparse_struct*, int, long*, int, int, cholmod_common_struct*) (spqr_analyze.cpp:285)
+==23995==    by 0x4E38A89: paru_sym_analyse(cholmod_sparse_struct*, cholmod_common_struct*) (paru_sym_analyse.cpp:41)
+==23995==    by 0x401114: main (testazny.cpp:96)
+==23995== 
+==23995== 312 bytes in 1 blocks are still reachable in loss record 20 of 56
+==23995==    at 0x4C28BE3: malloc (vg_replace_malloc.c:299)
+==23995==    by 0x5288DD8: SuiteSparse_malloc (SuiteSparse_config.c:192)
+==23995==    by 0x5578D82: cholmod_l_malloc (cholmod_memory.c:141)
+==23995==    by 0x556CBF6: simplicial_symbolic_to_super_symbolic (cholmod_change_factor.c:278)
+==23995==    by 0x556F27F: cholmod_l_change_factor (cholmod_change_factor.c:1092)
+==23995==    by 0x5632588: cholmod_l_super_symbolic2 (cholmod_super_symbolic.c:702)
+==23995==    by 0x559B486: cholmod_l_analyze_p2 (cholmod_analyze.c:925)
+==23995==    by 0x505308F: spqr_analyze(cholmod_sparse_struct*, int, long*, int, int, cholmod_common_struct*) (spqr_analyze.cpp:285)
+==23995==    by 0x4E38A89: paru_sym_analyse(cholmod_sparse_struct*, cholmod_common_struct*) (paru_sym_analyse.cpp:41)
+==23995==    by 0x401114: main (testazny.cpp:96)
+==23995== 
+==23995== 312 bytes in 1 blocks are still reachable in loss record 21 of 56
+==23995==    at 0x4C28BE3: malloc (vg_replace_malloc.c:299)
+==23995==    by 0x5288DD8: SuiteSparse_malloc (SuiteSparse_config.c:192)
+==23995==    by 0x5578D82: cholmod_l_malloc (cholmod_memory.c:141)
+==23995==    by 0x505374D: spqr_analyze(cholmod_sparse_struct*, int, long*, int, int, cholmod_common_struct*) (spqr_analyze.cpp:378)
+==23995==    by 0x4E38A89: paru_sym_analyse(cholmod_sparse_struct*, cholmod_common_struct*) (paru_sym_analyse.cpp:41)
+==23995==    by 0x401114: main (testazny.cpp:96)
+==23995== 
+==23995== 312 bytes in 1 blocks are still reachable in loss record 22 of 56
+==23995==    at 0x4C2A975: calloc (vg_replace_malloc.c:711)
+==23995==    by 0x5288EC5: SuiteSparse_calloc (SuiteSparse_config.c:221)
+==23995==    by 0x5579351: cholmod_l_calloc (cholmod_memory.c:271)
+==23995==    by 0x50537C9: spqr_analyze(cholmod_sparse_struct*, int, long*, int, int, cholmod_common_struct*) (spqr_analyze.cpp:380)
+==23995==    by 0x4E38A89: paru_sym_analyse(cholmod_sparse_struct*, cholmod_common_struct*) (paru_sym_analyse.cpp:41)
+==23995==    by 0x401114: main (testazny.cpp:96)
+==23995== 
+==23995== 312 bytes in 1 blocks are still reachable in loss record 23 of 56
+==23995==    at 0x4C28BE3: malloc (vg_replace_malloc.c:299)
+==23995==    by 0x5288DD8: SuiteSparse_malloc (SuiteSparse_config.c:192)
+==23995==    by 0x5578D82: cholmod_l_malloc (cholmod_memory.c:141)
+==23995==    by 0x505391E: spqr_analyze(cholmod_sparse_struct*, int, long*, int, int, cholmod_common_struct*) (spqr_analyze.cpp:386)
+==23995==    by 0x4E38A89: paru_sym_analyse(cholmod_sparse_struct*, cholmod_common_struct*) (paru_sym_analyse.cpp:41)
+==23995==    by 0x401114: main (testazny.cpp:96)
+==23995== 
+==23995== 312 bytes in 1 blocks are still reachable in loss record 24 of 56
+==23995==    at 0x4C28BE3: malloc (vg_replace_malloc.c:299)
+==23995==    by 0x5288DD8: SuiteSparse_malloc (SuiteSparse_config.c:192)
+==23995==    by 0x5578D82: cholmod_l_malloc (cholmod_memory.c:141)
+==23995==    by 0x5053951: spqr_analyze(cholmod_sparse_struct*, int, long*, int, int, cholmod_common_struct*) (spqr_analyze.cpp:387)
+==23995==    by 0x4E38A89: paru_sym_analyse(cholmod_sparse_struct*, cholmod_common_struct*) (paru_sym_analyse.cpp:41)
+==23995==    by 0x401114: main (testazny.cpp:96)
+==23995== 
+==23995== 320 bytes in 1 blocks are still reachable in loss record 25 of 56
+==23995==    at 0x4C2A975: calloc (vg_replace_malloc.c:711)
+==23995==    by 0x5288EC5: SuiteSparse_calloc (SuiteSparse_config.c:221)
+==23995==    by 0x5579351: cholmod_l_calloc (cholmod_memory.c:271)
+==23995==    by 0x505378B: spqr_analyze(cholmod_sparse_struct*, int, long*, int, int, cholmod_common_struct*) (spqr_analyze.cpp:379)
+==23995==    by 0x4E38A89: paru_sym_analyse(cholmod_sparse_struct*, cholmod_common_struct*) (paru_sym_analyse.cpp:41)
+==23995==    by 0x401114: main (testazny.cpp:96)
+==23995== 
+==23995== 512 bytes in 1 blocks are still reachable in loss record 26 of 56
+==23995==    at 0x4C28BE3: malloc (vg_replace_malloc.c:299)
+==23995==    by 0xA537124: _gfortrani_xmalloc (memory.c:43)
+==23995==    by 0xA60999C: _gfortrani_fbuf_init (fbuf.c:43)
+==23995==    by 0xA602093: _gfortrani_init_units (unit.c:621)
+==23995==    by 0xA536727: init (main.c:265)
+==23995==    by 0x400F552: _dl_init (in /usr/lib64/ld-2.17.so)
+==23995==    by 0x40011A9: ??? (in /usr/lib64/ld-2.17.so)
+==23995== 
+==23995== 512 bytes in 1 blocks are still reachable in loss record 27 of 56
+==23995==    at 0x4C28BE3: malloc (vg_replace_malloc.c:299)
+==23995==    by 0xA537124: _gfortrani_xmalloc (memory.c:43)
+==23995==    by 0xA60999C: _gfortrani_fbuf_init (fbuf.c:43)
+==23995==    by 0xA60214E: _gfortrani_init_units (unit.c:650)
+==23995==    by 0xA536727: init (main.c:265)
+==23995==    by 0x400F552: _dl_init (in /usr/lib64/ld-2.17.so)
+==23995==    by 0x40011A9: ??? (in /usr/lib64/ld-2.17.so)
+==23995== 
+==23995== 688 bytes in 1 blocks are still reachable in loss record 28 of 56
+==23995==    at 0x4C2A975: calloc (vg_replace_malloc.c:711)
+==23995==    by 0xA5371D2: _gfortrani_xcalloc (memory.c:84)
+==23995==    by 0xA601986: insert_unit (unit.c:210)
+==23995==    by 0xA601FFA: _gfortrani_init_units (unit.c:598)
+==23995==    by 0xA536727: init (main.c:265)
+==23995==    by 0x400F552: _dl_init (in /usr/lib64/ld-2.17.so)
+==23995==    by 0x40011A9: ??? (in /usr/lib64/ld-2.17.so)
+==23995== 
+==23995== 688 bytes in 1 blocks are still reachable in loss record 29 of 56
+==23995==    at 0x4C2A975: calloc (vg_replace_malloc.c:711)
+==23995==    by 0xA5371D2: _gfortrani_xcalloc (memory.c:84)
+==23995==    by 0xA601986: insert_unit (unit.c:210)
+==23995==    by 0xA6020BC: _gfortrani_init_units (unit.c:628)
+==23995==    by 0xA536727: init (main.c:265)
+==23995==    by 0x400F552: _dl_init (in /usr/lib64/ld-2.17.so)
+==23995==    by 0x40011A9: ??? (in /usr/lib64/ld-2.17.so)
+==23995== 
+==23995== 688 bytes in 1 blocks are still reachable in loss record 30 of 56
+==23995==    at 0x4C2A975: calloc (vg_replace_malloc.c:711)
+==23995==    by 0xA5371D2: _gfortrani_xcalloc (memory.c:84)
+==23995==    by 0xA601986: insert_unit (unit.c:210)
+==23995==    by 0xA602177: _gfortrani_init_units (unit.c:657)
+==23995==    by 0xA536727: init (main.c:265)
+==23995==    by 0x400F552: _dl_init (in /usr/lib64/ld-2.17.so)
+==23995==    by 0x40011A9: ??? (in /usr/lib64/ld-2.17.so)
+==23995== 
+==23995== 936 bytes in 1 blocks are still reachable in loss record 31 of 56
+==23995==    at 0x4C28BE3: malloc (vg_replace_malloc.c:299)
+==23995==    by 0x5288DD8: SuiteSparse_malloc (SuiteSparse_config.c:192)
+==23995==    by 0x5578D82: cholmod_l_malloc (cholmod_memory.c:141)
+==23995==    by 0x505383E: spqr_analyze(cholmod_sparse_struct*, int, long*, int, int, cholmod_common_struct*) (spqr_analyze.cpp:382)
+==23995==    by 0x4E38A89: paru_sym_analyse(cholmod_sparse_struct*, cholmod_common_struct*) (paru_sym_analyse.cpp:41)
+==23995==    by 0x401114: main (testazny.cpp:96)
+==23995== 
+==23995== 936 bytes in 1 blocks are still reachable in loss record 32 of 56
+==23995==    at 0x4C28BE3: malloc (vg_replace_malloc.c:299)
+==23995==    by 0x5288DD8: SuiteSparse_malloc (SuiteSparse_config.c:192)
+==23995==    by 0x5578D82: cholmod_l_malloc (cholmod_memory.c:141)
+==23995==    by 0x4E3813A: paru_alloc(long, long, cholmod_common_struct*) (paru_mem.cpp:7)
+==23995==    by 0x4E392B0: paru_sym_analyse(cholmod_sparse_struct*, cholmod_common_struct*) (paru_sym_analyse.cpp:146)
+==23995==    by 0x401114: main (testazny.cpp:96)
+==23995== 
+==23995== 936 bytes in 1 blocks are still reachable in loss record 33 of 56
+==23995==    at 0x4C2A975: calloc (vg_replace_malloc.c:711)
+==23995==    by 0x5288EC5: SuiteSparse_calloc (SuiteSparse_config.c:221)
+==23995==    by 0x5579351: cholmod_l_calloc (cholmod_memory.c:271)
+==23995==    by 0x4E38167: paru_calloc(long, long, cholmod_common_struct*) (paru_mem.cpp:11)
+==23995==    by 0x4E3A30C: paru_init_rowFronts(cholmod_sparse_struct*, paru_symbolic*, cholmod_common_struct*) (paru_init_rowFronts.cpp:52)
+==23995==    by 0x40114E: main (testazny.cpp:102)
+==23995== 
+==23995== 936 bytes in 1 blocks are still reachable in loss record 34 of 56
+==23995==    at 0x4C28BE3: malloc (vg_replace_malloc.c:299)
+==23995==    by 0x5288DD8: SuiteSparse_malloc (SuiteSparse_config.c:192)
+==23995==    by 0x5578D82: cholmod_l_malloc (cholmod_memory.c:141)
+==23995==    by 0x4E3813A: paru_alloc(long, long, cholmod_common_struct*) (paru_mem.cpp:7)
+==23995==    by 0x4E3A36A: paru_init_rowFronts(cholmod_sparse_struct*, paru_symbolic*, cholmod_common_struct*) (paru_init_rowFronts.cpp:59)
+==23995==    by 0x40114E: main (testazny.cpp:102)
+==23995== 
+==23995== 944 bytes in 1 blocks are still reachable in loss record 35 of 56
+==23995==    at 0x4C28BE3: malloc (vg_replace_malloc.c:299)
+==23995==    by 0x5288DD8: SuiteSparse_malloc (SuiteSparse_config.c:192)
+==23995==    by 0x5578D82: cholmod_l_malloc (cholmod_memory.c:141)
+==23995==    by 0x50538AC: spqr_analyze(cholmod_sparse_struct*, int, long*, int, int, cholmod_common_struct*) (spqr_analyze.cpp:384)
+==23995==    by 0x4E38A89: paru_sym_analyse(cholmod_sparse_struct*, cholmod_common_struct*) (paru_sym_analyse.cpp:41)
+==23995==    by 0x401114: main (testazny.cpp:96)
+==23995== 
+==23995== 1,240 bytes in 1 blocks are still reachable in loss record 36 of 56
+==23995==    at 0x4C28BE3: malloc (vg_replace_malloc.c:299)
+==23995==    by 0x5288DD8: SuiteSparse_malloc (SuiteSparse_config.c:192)
+==23995==    by 0x5578D82: cholmod_l_malloc (cholmod_memory.c:141)
+==23995==    by 0x4E3813A: paru_alloc(long, long, cholmod_common_struct*) (paru_mem.cpp:7)
+==23995==    by 0x4E39225: paru_sym_analyse(cholmod_sparse_struct*, cholmod_common_struct*) (paru_sym_analyse.cpp:141)
+==23995==    by 0x401114: main (testazny.cpp:96)
+==23995== 
+==23995== 1,248 bytes in 1 blocks are still reachable in loss record 37 of 56
+==23995==    at 0x4C28BE3: malloc (vg_replace_malloc.c:299)
+==23995==    by 0x5288DD8: SuiteSparse_malloc (SuiteSparse_config.c:192)
+==23995==    by 0x5578D82: cholmod_l_malloc (cholmod_memory.c:141)
+==23995==    by 0x4E3813A: paru_alloc(long, long, cholmod_common_struct*) (paru_mem.cpp:7)
+==23995==    by 0x4E39258: paru_sym_analyse(cholmod_sparse_struct*, cholmod_common_struct*) (paru_sym_analyse.cpp:142)
+==23995==    by 0x401114: main (testazny.cpp:96)
+==23995== 
+==23995== 1,256 bytes in 1 blocks are still reachable in loss record 38 of 56
+==23995==    at 0x4C28BE3: malloc (vg_replace_malloc.c:299)
+==23995==    by 0x5288DD8: SuiteSparse_malloc (SuiteSparse_config.c:192)
+==23995==    by 0x5578D82: cholmod_l_malloc (cholmod_memory.c:141)
+==23995==    by 0x4E3813A: paru_alloc(long, long, cholmod_common_struct*) (paru_mem.cpp:7)
+==23995==    by 0x4E3928B: paru_sym_analyse(cholmod_sparse_struct*, cholmod_common_struct*) (paru_sym_analyse.cpp:143)
+==23995==    by 0x401114: main (testazny.cpp:96)
+==23995== 
+==23995== 2,024 bytes in 1 blocks are still reachable in loss record 39 of 56
+==23995==    at 0x4C28BE3: malloc (vg_replace_malloc.c:299)
+==23995==    by 0x5288DD8: SuiteSparse_malloc (SuiteSparse_config.c:192)
+==23995==    by 0x5578D82: cholmod_l_malloc (cholmod_memory.c:141)
+==23995==    by 0x5575F0A: cholmod_l_allocate_factor (cholmod_factor.c:108)
+==23995==    by 0x559A298: cholmod_l_analyze_p2 (cholmod_analyze.c:549)
+==23995==    by 0x505308F: spqr_analyze(cholmod_sparse_struct*, int, long*, int, int, cholmod_common_struct*) (spqr_analyze.cpp:285)
+==23995==    by 0x4E38A89: paru_sym_analyse(cholmod_sparse_struct*, cholmod_common_struct*) (paru_sym_analyse.cpp:41)
+==23995==    by 0x401114: main (testazny.cpp:96)
+==23995== 
+==23995== 2,032 bytes in 1 blocks are still reachable in loss record 40 of 56
+==23995==    at 0x4C28BE3: malloc (vg_replace_malloc.c:299)
+==23995==    by 0x5288DD8: SuiteSparse_malloc (SuiteSparse_config.c:192)
+==23995==    by 0x5578D82: cholmod_l_malloc (cholmod_memory.c:141)
+==23995==    by 0x557A128: cholmod_l_allocate_sparse (cholmod_sparse.c:131)
+==23995==    by 0x5585485: cholmod_l_triplet_to_sparse (cholmod_triplet.c:516)
+==23995==    by 0x5597477: cholmod_l_read_matrix (cholmod_read.c:1296)
+==23995==    by 0x4010D6: main (testazny.cpp:89)
+==23995== 
+==23995== 2,032 bytes in 1 blocks are still reachable in loss record 41 of 56
+==23995==    at 0x4C28BE3: malloc (vg_replace_malloc.c:299)
+==23995==    by 0x5288DD8: SuiteSparse_malloc (SuiteSparse_config.c:192)
+==23995==    by 0x5578D82: cholmod_l_malloc (cholmod_memory.c:141)
+==23995==    by 0x5570067: cholmod_l_allocate_work (cholmod_common.c:462)
+==23995==    by 0x5052BFC: spqr_analyze(cholmod_sparse_struct*, int, long*, int, int, cholmod_common_struct*) (spqr_analyze.cpp:154)
+==23995==    by 0x4E38A89: paru_sym_analyse(cholmod_sparse_struct*, cholmod_common_struct*) (paru_sym_analyse.cpp:41)
+==23995==    by 0x401114: main (testazny.cpp:96)
+==23995== 
+==23995== 2,040 bytes in 1 blocks are still reachable in loss record 42 of 56
+==23995==    at 0x4C28BE3: malloc (vg_replace_malloc.c:299)
+==23995==    by 0x5288DD8: SuiteSparse_malloc (SuiteSparse_config.c:192)
+==23995==    by 0x5578D82: cholmod_l_malloc (cholmod_memory.c:141)
+==23995==    by 0x5570087: cholmod_l_allocate_work (cholmod_common.c:463)
+==23995==    by 0x5052BFC: spqr_analyze(cholmod_sparse_struct*, int, long*, int, int, cholmod_common_struct*) (spqr_analyze.cpp:154)
+==23995==    by 0x4E38A89: paru_sym_analyse(cholmod_sparse_struct*, cholmod_common_struct*) (paru_sym_analyse.cpp:41)
+==23995==    by 0x401114: main (testazny.cpp:96)
+==23995== 
+==23995== 2,040 bytes in 1 blocks are still reachable in loss record 43 of 56
+==23995==    at 0x4C28BE3: malloc (vg_replace_malloc.c:299)
+==23995==    by 0x5288DD8: SuiteSparse_malloc (SuiteSparse_config.c:192)
+==23995==    by 0x5578D82: cholmod_l_malloc (cholmod_memory.c:141)
+==23995==    by 0x505386E: spqr_analyze(cholmod_sparse_struct*, int, long*, int, int, cholmod_common_struct*) (spqr_analyze.cpp:383)
+==23995==    by 0x4E38A89: paru_sym_analyse(cholmod_sparse_struct*, cholmod_common_struct*) (paru_sym_analyse.cpp:41)
+==23995==    by 0x401114: main (testazny.cpp:96)
+==23995== 
+==23995== 2,808 bytes in 1 blocks are still reachable in loss record 44 of 56
+==23995==    at 0x4C28BE3: malloc (vg_replace_malloc.c:299)
+==23995==    by 0x5288DD8: SuiteSparse_malloc (SuiteSparse_config.c:192)
+==23995==    by 0x5578D82: cholmod_l_malloc (cholmod_memory.c:141)
+==23995==    by 0x4E3813A: paru_alloc(long, long, cholmod_common_struct*) (paru_mem.cpp:7)
+==23995==    by 0x4E3A4E5: paru_init_rowFronts(cholmod_sparse_struct*, paru_symbolic*, cholmod_common_struct*) (paru_init_rowFronts.cpp:93)
+==23995==    by 0x40114E: main (testazny.cpp:102)
+==23995== 
+==23995== 3,744 bytes in 117 blocks are still reachable in loss record 45 of 56
+==23995==    at 0x4C28BE3: malloc (vg_replace_malloc.c:299)
+==23995==    by 0x5288DD8: SuiteSparse_malloc (SuiteSparse_config.c:192)
+==23995==    by 0x5578D82: cholmod_l_malloc (cholmod_memory.c:141)
+==23995==    by 0x4E3813A: paru_alloc(long, long, cholmod_common_struct*) (paru_mem.cpp:7)
+==23995==    by 0x4E3AB8F: paru_init_rowFronts(cholmod_sparse_struct*, paru_symbolic*, cholmod_common_struct*) (paru_init_rowFronts.cpp:201)
+==23995==    by 0x40114E: main (testazny.cpp:102)
+==23995== 
+==23995== 4,992 bytes in 1 blocks are still reachable in loss record 46 of 56
+==23995==    at 0x4C2A975: calloc (vg_replace_malloc.c:711)
+==23995==    by 0x5288EC5: SuiteSparse_calloc (SuiteSparse_config.c:221)
+==23995==    by 0x5579351: cholmod_l_calloc (cholmod_memory.c:271)
+==23995==    by 0x4E38167: paru_calloc(long, long, cholmod_common_struct*) (paru_mem.cpp:11)
+==23995==    by 0x4E3A622: paru_init_rowFronts(cholmod_sparse_struct*, paru_symbolic*, cholmod_common_struct*) (paru_init_rowFronts.cpp:114)
+==23995==    by 0x40114E: main (testazny.cpp:102)
+==23995== 
+==23995== 5,112 bytes in 1 blocks are still reachable in loss record 47 of 56
+==23995==    at 0x4C28BE3: malloc (vg_replace_malloc.c:299)
+==23995==    by 0x5288DD8: SuiteSparse_malloc (SuiteSparse_config.c:192)
+==23995==    by 0x5578D82: cholmod_l_malloc (cholmod_memory.c:141)
+==23995==    by 0x556CC28: simplicial_symbolic_to_super_symbolic (cholmod_change_factor.c:282)
+==23995==    by 0x556F27F: cholmod_l_change_factor (cholmod_change_factor.c:1092)
+==23995==    by 0x5632588: cholmod_l_super_symbolic2 (cholmod_super_symbolic.c:702)
+==23995==    by 0x559B486: cholmod_l_analyze_p2 (cholmod_analyze.c:925)
+==23995==    by 0x505308F: spqr_analyze(cholmod_sparse_struct*, int, long*, int, int, cholmod_common_struct*) (spqr_analyze.cpp:285)
+==23995==    by 0x4E38A89: paru_sym_analyse(cholmod_sparse_struct*, cholmod_common_struct*) (paru_sym_analyse.cpp:41)
+==23995==    by 0x401114: main (testazny.cpp:96)
+==23995== 
+==23995== 6,072 bytes in 1 blocks are still reachable in loss record 48 of 56
+==23995==    at 0x4C28BE3: malloc (vg_replace_malloc.c:299)
+==23995==    by 0x5288DD8: SuiteSparse_malloc (SuiteSparse_config.c:192)
+==23995==    by 0x5578D82: cholmod_l_malloc (cholmod_memory.c:141)
+==23995==    by 0x4E3813A: paru_alloc(long, long, cholmod_common_struct*) (paru_mem.cpp:7)
+==23995==    by 0x4E3A57B: paru_init_rowFronts(cholmod_sparse_struct*, paru_symbolic*, cholmod_common_struct*) (paru_init_rowFronts.cpp:103)
+==23995==    by 0x40114E: main (testazny.cpp:102)
+==23995== 
+==23995== 8,192 bytes in 1 blocks are still reachable in loss record 49 of 56
+==23995==    at 0x4C28BE3: malloc (vg_replace_malloc.c:299)
+==23995==    by 0xA537124: _gfortrani_xmalloc (memory.c:43)
+==23995==    by 0xA602AFD: buf_init (unix.c:693)
+==23995==    by 0xA602AFD: fd_to_stream (unix.c:1050)
+==23995==    by 0xA602002: _gfortrani_init_units (unit.c:599)
+==23995==    by 0xA536727: init (main.c:265)
+==23995==    by 0x400F552: _dl_init (in /usr/lib64/ld-2.17.so)
+==23995==    by 0x40011A9: ??? (in /usr/lib64/ld-2.17.so)
+==23995== 
+==23995== 9,432 bytes in 1 blocks are still reachable in loss record 50 of 56
+==23995==    at 0x4C28BE3: malloc (vg_replace_malloc.c:299)
+==23995==    by 0x5288DD8: SuiteSparse_malloc (SuiteSparse_config.c:192)
+==23995==    by 0x5578D82: cholmod_l_malloc (cholmod_memory.c:141)
+==23995==    by 0x55795DD: cholmod_l_realloc (cholmod_memory.c:342)
+==23995==    by 0x5579A95: cholmod_l_realloc_multiple (cholmod_memory.c:441)
+==23995==    by 0x557A1A2: cholmod_l_allocate_sparse (cholmod_sparse.c:139)
+==23995==    by 0x5585485: cholmod_l_triplet_to_sparse (cholmod_triplet.c:516)
+==23995==    by 0x5597477: cholmod_l_read_matrix (cholmod_read.c:1296)
+==23995==    by 0x4010D6: main (testazny.cpp:89)
+==23995== 
+==23995== 9,432 bytes in 1 blocks are still reachable in loss record 51 of 56
+==23995==    at 0x4C28BE3: malloc (vg_replace_malloc.c:299)
+==23995==    by 0x5288DD8: SuiteSparse_malloc (SuiteSparse_config.c:192)
+==23995==    by 0x5578D82: cholmod_l_malloc (cholmod_memory.c:141)
+==23995==    by 0x55795DD: cholmod_l_realloc (cholmod_memory.c:342)
+==23995==    by 0x5579B05: cholmod_l_realloc_multiple (cholmod_memory.c:451)
+==23995==    by 0x557A1A2: cholmod_l_allocate_sparse (cholmod_sparse.c:139)
+==23995==    by 0x5585485: cholmod_l_triplet_to_sparse (cholmod_triplet.c:516)
+==23995==    by 0x5597477: cholmod_l_read_matrix (cholmod_read.c:1296)
+==23995==    by 0x4010D6: main (testazny.cpp:89)
+==23995== 
+==23995== 9,432 bytes in 1 blocks are still reachable in loss record 52 of 56
+==23995==    at 0x4C28BE3: malloc (vg_replace_malloc.c:299)
+==23995==    by 0x5288DD8: SuiteSparse_malloc (SuiteSparse_config.c:192)
+==23995==    by 0x5578D82: cholmod_l_malloc (cholmod_memory.c:141)
+==23995==    by 0x50538E0: spqr_analyze(cholmod_sparse_struct*, int, long*, int, int, cholmod_common_struct*) (spqr_analyze.cpp:385)
+==23995==    by 0x4E38A89: paru_sym_analyse(cholmod_sparse_struct*, cholmod_common_struct*) (paru_sym_analyse.cpp:41)
+==23995==    by 0x401114: main (testazny.cpp:96)
+==23995== 
+==23995== 13,080 bytes in 1 blocks are still reachable in loss record 53 of 56
+==23995==    at 0x4C28BE3: malloc (vg_replace_malloc.c:299)
+==23995==    by 0x5288DD8: SuiteSparse_malloc (SuiteSparse_config.c:192)
+==23995==    by 0x5578D82: cholmod_l_malloc (cholmod_memory.c:141)
+==23995==    by 0x55701AF: cholmod_l_allocate_work (cholmod_common.c:502)
+==23995==    by 0x559A170: cholmod_l_analyze_p2 (cholmod_analyze.c:513)
+==23995==    by 0x505308F: spqr_analyze(cholmod_sparse_struct*, int, long*, int, int, cholmod_common_struct*) (spqr_analyze.cpp:285)
+==23995==    by 0x4E38A89: paru_sym_analyse(cholmod_sparse_struct*, cholmod_common_struct*) (paru_sym_analyse.cpp:41)
+==23995==    by 0x401114: main (testazny.cpp:96)
+==23995== 
+==23995== 23,544 bytes in 117 blocks are still reachable in loss record 54 of 56
+==23995==    at 0x4C28BE3: malloc (vg_replace_malloc.c:299)
+==23995==    by 0x5288DD8: SuiteSparse_malloc (SuiteSparse_config.c:192)
+==23995==    by 0x5578D82: cholmod_l_malloc (cholmod_memory.c:141)
+==23995==    by 0x4E3813A: paru_alloc(long, long, cholmod_common_struct*) (paru_mem.cpp:7)
+==23995==    by 0x4E3AAB8: paru_init_rowFronts(cholmod_sparse_struct*, paru_symbolic*, cholmod_common_struct*) (paru_init_rowFronts.cpp:188)
+==23995==    by 0x40114E: main (testazny.cpp:102)
+==23995== 
+==23995== 37,728 bytes in 253 blocks are still reachable in loss record 55 of 56
+==23995==    at 0x4C28BE3: malloc (vg_replace_malloc.c:299)
+==23995==    by 0x5288DD8: SuiteSparse_malloc (SuiteSparse_config.c:192)
+==23995==    by 0x5578D82: cholmod_l_malloc (cholmod_memory.c:141)
+==23995==    by 0x4E3813A: paru_alloc(long, long, cholmod_common_struct*) (paru_mem.cpp:7)
+==23995==    by 0x4E3A936: paru_init_rowFronts(cholmod_sparse_struct*, paru_symbolic*, cholmod_common_struct*) (paru_init_rowFronts.cpp:172)
+==23995==    by 0x40114E: main (testazny.cpp:102)
+==23995== 
+==23995== 72,704 bytes in 1 blocks are still reachable in loss record 56 of 56
+==23995==    at 0x4C28BE3: malloc (vg_replace_malloc.c:299)
+==23995==    by 0x904F17F: pool (eh_alloc.cc:117)
+==23995==    by 0x904F17F: __static_initialization_and_destruction_0 (eh_alloc.cc:244)
+==23995==    by 0x904F17F: _GLOBAL__sub_I_eh_alloc.cc (eh_alloc.cc:307)
+==23995==    by 0x400F552: _dl_init (in /usr/lib64/ld-2.17.so)
+==23995==    by 0x40011A9: ??? (in /usr/lib64/ld-2.17.so)
+==23995== 
+==23995== LEAK SUMMARY:
+==23995==    definitely lost: 0 bytes in 0 blocks
+==23995==    indirectly lost: 0 bytes in 0 blocks
+==23995==      possibly lost: 0 bytes in 0 blocks
+==23995==    still reachable: 231,556 bytes in 540 blocks
+==23995==         suppressed: 0 bytes in 0 blocks
+==23995== 
+==23995== ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)
+==23995== ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)
