@@ -1,6 +1,6 @@
 #include "Parallel_LU.hpp"
 
-#ifndef NDEBUG  // using stl for debugging
+#ifndef NDEBUG  // using STL for debugging
     #include <iostream>
     #include <algorithm>
     #include <set>
@@ -56,17 +56,15 @@ void paru_assemble (
     /* computing number of rows, set union */
     tupleList *ColList = paruMatInfo->ColList;
 
+#if 0
     Int rowsP = 0;
-    Int setSize = fn; /*! TODO: find a good initialize, I should use fm     */
+    Int setSize = fn; 
     Int *rowSet = (Int*) paru_alloc (setSize, sizeof (Int), cc);
+#endif
 
     Int listP= 0;
     work_struct *Work =  paruMatInfo->Work;
-//    Int *rowList = Work+m+1; /*   point to the second part of Work array */
-//    Int *isInSet= Work;    /* The first part of Work is guaranteed to be zero. 
-//                             Must be cleared after use */
-                                
-    Int *isInSet = Work->all_Zero;
+   Int *isInSet = Work->all_Zero;
     Int *rowList = Work->scratch;
     PRLEVEL (1, ("rowList(scratch)=%p isInSet(all_Zero)=%p\n", 
                 rowList, isInSet));
@@ -82,7 +80,6 @@ void paru_assemble (
     std::set<Int> stl_rowSet;
     std::set<Int>::iterator it;
 #endif 
-    /*! TODO: Check for memory in all places!!! DO IT    */
     for (Int c = col1; c < col2; c++){
         tupleList *cur = &ColList[c];
         Int numTuple = cur->numTuple;
@@ -117,7 +114,7 @@ void paru_assemble (
                 }
                 ASSERT (listP <= m); 
 
-
+#if 0
                 for (rS = 0; rS < rowsP; rS++){
                     PRLEVEL (1, ("rS =%ld rEl=%ld\n", rS, rEl));
                     if (curRow == rowSet [rS])
@@ -139,18 +136,17 @@ void paru_assemble (
                     }
                     rowSet [rowsP++] = curRow;
                 }
+#endif                
             }
         }
     }
+
+#if 0    
     //shrinking allocated space
     rowSet= (Int*) paru_realloc (rowsP, sizeof (Int), rowSet, &setSize, cc);
+#endif    
 
-
-    double *pF = (double*) paru_calloc (rowsP*fp, sizeof (double), cc);
-    /*! TODO: Here:     */
-    /* assembling the pivotal part of the front */
-
-#ifndef NDEBUG
+#ifndef NDEBUG /* Checking if pivotal rows are correct */
     PRLEVEL (0, ("There are %ld rows in this front: \n", listP));
     for (Int i = 0; i < listP; i++)
             PRLEVEL (0, (" %ld", rowList [i]));
@@ -166,15 +162,14 @@ void paru_assemble (
             PRLEVEL (1, (" %ld", rowList [i]));
         PRLEVEL (0, ("\n"));
     }
-    //ASSERT (listP == stl_size );
-    ASSERT (rowsP == stl_size );
+    ASSERT (listP == stl_size );
 
 #endif 
 
     /* clearing W for next iteration */
     for (Int i = 0; i < listP; i++){
         Int curRow = rowList [i];
-        ASSERT (curRow < m ) ;
+        ASSERT (curRow < m );
         ASSERT (isInSet [curRow] == 1);
         isInSet  [curRow] = 0;
     }
@@ -185,6 +180,18 @@ void paru_assemble (
     ASSERT (s == 0);
 #endif 
 
+
+
+    double *pF = (double*) paru_calloc (listP*fp, sizeof (double), cc);
+    /*! TODO: Here:     */
+    /* assembling the pivotal part of the front */
+
+
+
+    
+    paru_free (listP*fp, sizeof (Int), pF, cc);
+    
+#if 0
     paru_free (setSize, sizeof (Int), rowSet, cc);
-    paru_free (rowsP*fp, sizeof (Int), pF, cc);
+#endif
 }
