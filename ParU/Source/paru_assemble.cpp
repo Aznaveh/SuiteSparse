@@ -1,9 +1,9 @@
 #include "Parallel_LU.hpp"
 
 #ifndef NDEBUG  // using STL for debugging
-    #include <iostream>
-    #include <algorithm>
-    #include <set>
+#include <iostream>
+#include <algorithm>
+#include <set>
 #endif
 
 /** =========================================================================  /
@@ -58,24 +58,25 @@ void paru_assemble (
 
 #if 0
     Int rowsP = 0;
-    Int setSize = fn; 
+    Int setSize = fn;  // it can be initialized with fm
     Int *rowSet = (Int*) paru_alloc (setSize, sizeof (Int), cc);
 #endif
 
     Int listP= 0;
     work_struct *Work =  paruMatInfo->Work;
-   Int *isInSet = Work->all_Zero;
+    Int *isInSet = Work->all_Zero; /*  I can reduce the size with bitwise 
+                                       operation. it might cause race in GPU */
     Int *rowList = Work->scratch;
     PRLEVEL (1, ("rowList(scratch)=%p isInSet(all_Zero)=%p\n", 
                 rowList, isInSet));
-    
+
 #ifndef NDEBUG /* chekcing first part of Work to be zero */
     Int s = 0;
     for (Int i = 0; i < m; i++) s += isInSet [i];
     ASSERT (s == 0);
 #endif 
 
-                            
+
 #ifndef NDEBUG
     std::set<Int> stl_rowSet;
     std::set<Int>::iterator it;
@@ -109,8 +110,15 @@ void paru_assemble (
 
                 if (!isInSet[curRow]){
                     PRLEVEL (1, ("curRow =%ld listP=%ld\n", curRow, listP));
-                    rowList [listP++] = curRow;
-                    isInSet [curRow] = 1; // set to true
+                    rowList [listP] = curRow;
+                    isInSet [curRow] = FLIP (listP); /* set to some nonzero
+                                                        I want to use listP to
+                                                        know reverse perumtation
+                                                        too and listP can also 
+                                                        be zero */
+                    PRLEVEL (0, ("listP=%ld FLIP(listP)=%ld\n", 
+                                listP, FLIP (listP) ));
+                    listP++;
                 }
                 ASSERT (listP <= m); 
 
@@ -149,7 +157,7 @@ void paru_assemble (
 #ifndef NDEBUG /* Checking if pivotal rows are correct */
     PRLEVEL (0, ("There are %ld rows in this front: \n", listP));
     for (Int i = 0; i < listP; i++)
-            PRLEVEL (0, (" %ld", rowList [i]));
+        PRLEVEL (0, (" %ld", rowList [i]));
     PRLEVEL (0, ("\n"));
     Int stl_size = stl_rowSet.size();
     if (listP != stl_size){
@@ -170,7 +178,7 @@ void paru_assemble (
     for (Int i = 0; i < listP; i++){
         Int curRow = rowList [i];
         ASSERT (curRow < m );
-        ASSERT (isInSet [curRow] == 1);
+        ASSERT (isInSet [curRow] != 0);
         isInSet  [curRow] = 0;
     }
 
@@ -188,9 +196,9 @@ void paru_assemble (
 
 
 
-    
+
     paru_free (listP*fp, sizeof (Int), pF, cc);
-    
+
 #if 0
     paru_free (setSize, sizeof (Int), rowSet, cc);
 #endif
