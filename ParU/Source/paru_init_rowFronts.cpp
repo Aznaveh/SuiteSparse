@@ -54,14 +54,14 @@ paru_matrix *paru_init_rowFronts (
         printf ("Out of memory: Work\n");
         return NULL;
     }
-    PRLEVEL (0, ("all_Zero =%p\n", all_Zero));
+    PRLEVEL (1, ("all_Zero =%p\n", all_Zero));
 
     Int *scratch= (Int*) paru_alloc (m, sizeof (Int), cc);
     if (scratch == NULL){   //out of memory
         printf ("Out of memory: Work\n");
         return NULL;
     }
-    PRLEVEL (0, ("scratch=%p\n",scratch));
+    PRLEVEL (1, ("scratch=%p\n",scratch));
 
     work_struct *Work= (work_struct*) paru_alloc (1, sizeof (work_struct), cc);
     if (scratch == NULL){   //out of memory
@@ -73,7 +73,7 @@ paru_matrix *paru_init_rowFronts (
     Work->all_Zero = all_Zero;
     Work->scratch = scratch;
 
-    PRLEVEL (0, ("Work =%p\n m=%ld ", Work, m ));
+    PRLEVEL (1, ("Work =%p\n ", Work));
     paruMatInfo->Work = Work;
 
     //memset (Work, 0, m*sizeof(Int) );
@@ -219,6 +219,11 @@ paru_matrix *paru_init_rowFronts (
         //Allocating elements, and updating column tuple list
 
         Int *el_colrowIndex = (Int*)(curEl+1);     // pointers to element index 
+
+        /* Use these indeces if you need in your code:
+         * Int *colIndex = el_colrowIndex;
+         * Int *rowIndex = colIndex + ncols;
+         * */
         double *el_colrowNum = (double*)(el_colrowIndex+nrows+ncols); //and values
         PRLEVEL (1, ("el_colrowIndex =%p, el_colrowNum = %p \n", 
                     el_colrowIndex, el_colrowNum));

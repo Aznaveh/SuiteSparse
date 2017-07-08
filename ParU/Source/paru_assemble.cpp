@@ -23,7 +23,7 @@ void paru_assemble (
         cholmod_common *cc)
 
 {
-    DEBUGLEVEL(1);
+    DEBUGLEVEL(0);
     paru_symbolic *LUsym =  paruMatInfo->LUsym;
 
     Int m,n,nf;
@@ -95,28 +95,31 @@ void paru_assemble (
             Element **elementList = paruMatInfo->elementList;
             Element *curEl = elementList[e];
             Int mEl = curEl->nrows;
+            Int nEl = curEl->ncols;
             Int *el_colrowIndex = (Int*)(curEl+1);     // pointers to element index 
-            PRLEVEL (2, ("mEl =%ld rowsP=%ld\n", mEl, rowsP));
+            Int *el_rowIndex = el_colrowIndex + nEl;   // pointers to row indices
+            PRLEVEL (1, ("element= %ld  mEl =%ld \n",e, mEl));
             Int rS;
             for (Int rEl = 0; rEl < mEl; rEl++){
-                Int curRow = el_colrowIndex [rEl]; 
+                Int curRow = el_rowIndex [rEl]; 
+                PRLEVEL (1, ("curRow =%ld\n", curRow));
                 ASSERT (curRow < m ) ;
 #ifndef NDEBUG
                 stl_rowSet.insert (curRow );
 #endif
-                PRLEVEL (0, ("%p ---> isInSet [%ld]=%ld\n", 
-
+                PRLEVEL (1, ("%p ---> isInSet [%ld]=%ld\n", 
                             isInSet+curRow, curRow, isInSet[curRow]));
+
                 if (!isInSet[curRow]){
-                    PRLEVEL (0, ("curRow =%ld listP=%ld\n", curRow, listP));
+                    PRLEVEL (1, ("curRow =%ld listP=%ld\n", curRow, listP));
                     rowList [listP++] = curRow;
                     isInSet [curRow] = 1; // set to true
                 }
-                ASSERT (listP < m); 
+                ASSERT (listP <= m); 
 
 
                 for (rS = 0; rS < rowsP; rS++){
-                    PRLEVEL (2, ("rS =%ld rEl=%ld\n", rS, rEl));
+                    PRLEVEL (1, ("rS =%ld rEl=%ld\n", rS, rEl));
                     if (curRow == rowSet [rS])
                         break; 
                 }
@@ -148,17 +151,20 @@ void paru_assemble (
     /* assembling the pivotal part of the front */
 
 #ifndef NDEBUG
-    PRLEVEL (0, ("There are %ld rows in this front: ", rowsP));
+    PRLEVEL (0, ("There are %ld rows in this front: \n", listP));
+    for (Int i = 0; i < listP; i++)
+            PRLEVEL (0, (" %ld", rowList [i]));
+    PRLEVEL (0, ("\n"));
     Int stl_size = stl_rowSet.size();
     if (listP != stl_size){
-        PRLEVEL (1, ("#######################\n"));
-        PRLEVEL (1, ("STL %ld:\n",stl_size));
+        PRLEVEL (0, ("#######################\n"));
+        PRLEVEL (0, ("STL %ld:\n",stl_size));
         for (it = stl_rowSet.begin(); it != stl_rowSet.end(); it++)
             PRLEVEL (0, (" %ld", *it));
-        PRLEVEL (1, ("\nMy Set %ld:\n",listP));
+        PRLEVEL (0, ("\nMy Set %ld:\n",listP));
         for (Int i = 0; i < listP; i++)
-            PRLEVEL (0, (" %ld", rowList [i]));
-        PRLEVEL (1, ("\n"));
+            PRLEVEL (1, (" %ld", rowList [i]));
+        PRLEVEL (0, ("\n"));
     }
     //ASSERT (listP == stl_size );
     ASSERT (rowsP == stl_size );
@@ -173,7 +179,7 @@ void paru_assemble (
         isInSet  [curRow] = 0;
     }
 
-#ifndef NDEBUG /* chekcing first part of Work to be zero */
+#ifndef NDEBUG /* chekcing isInSet to be zero */
     s = 0;
     for (Int i = 0; i < m; i++) s+=isInSet [i];
     ASSERT (s == 0);
