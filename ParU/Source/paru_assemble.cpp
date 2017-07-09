@@ -46,7 +46,7 @@ void paru_assemble (
     Int fp = col2 - col1;   /* first fp columns are pivotal */ 
     Int fn = p2 - p1;          /* Upper bound number of columns of F */ 
 
-    PRLEVEL (1, ("fp=%ld pivotal columns:clo1=%ld...col2=%ld\n", 
+    PRLEVEL (0, ("fp=%ld pivotal columns:clo1=%ld...col2=%ld\n", 
                 fp, col1, col2-1));
     PRLEVEL (1, ("Upper bound number of columns: Rj[%ld]=%ld ... Rj[%ld]=%ld\n", 
                 p1, Rj [p1], p2, Rj [p2-1]));
@@ -97,7 +97,6 @@ void paru_assemble (
             Int *el_colrowIndex = (Int*)(curEl+1);     // pointers to element index 
             Int *el_rowIndex = el_colrowIndex + nEl;   // pointers to row indices
             PRLEVEL (1, ("element= %ld  mEl =%ld \n",e, mEl));
-            Int rS;
             for (Int rEl = 0; rEl < mEl; rEl++){
                 Int curRow = el_rowIndex [rEl]; 
                 PRLEVEL (1, ("curRow =%ld\n", curRow));
@@ -111,18 +110,18 @@ void paru_assemble (
                 if (!isInSet[curRow]){
                     PRLEVEL (1, ("curRow =%ld listP=%ld\n", curRow, listP));
                     rowList [listP] = curRow;
-                    isInSet [curRow] = FLIP (listP); /* set to some nonzero
+                     PRLEVEL (1, ("listP=%ld FLIP(listP)=%ld\n", 
+                                listP, FLIP (listP) ));
+                    isInSet [curRow] = FLIP (listP++); /* set to some nonzero
                                                         I want to use listP to
                                                         know reverse perumtation
                                                         too and listP can also 
                                                         be zero */
-                    PRLEVEL (0, ("listP=%ld FLIP(listP)=%ld\n", 
-                                listP, FLIP (listP) ));
-                    listP++;
                 }
                 ASSERT (listP <= m); 
 
 #if 0
+            Int rS;
                 for (rS = 0; rS < rowsP; rS++){
                     PRLEVEL (1, ("rS =%ld rEl=%ld\n", rS, rEl));
                     if (curRow == rowSet [rS])
@@ -155,24 +154,108 @@ void paru_assemble (
 #endif    
 
 #ifndef NDEBUG /* Checking if pivotal rows are correct */
-    PRLEVEL (0, ("There are %ld rows in this front: \n", listP));
+    Int p = 1;
+    PRLEVEL (p, ("There are %ld rows in this front: \n", listP));
     for (Int i = 0; i < listP; i++)
-        PRLEVEL (0, (" %ld", rowList [i]));
-    PRLEVEL (0, ("\n"));
+        PRLEVEL (p, (" %ld", rowList [i]));
+    PRLEVEL (p, ("\n"));
     Int stl_size = stl_rowSet.size();
     if (listP != stl_size){
-        PRLEVEL (0, ("#######################\n"));
-        PRLEVEL (0, ("STL %ld:\n",stl_size));
+        PRLEVEL (1, ("#######################\n"));
+        PRLEVEL (1, ("STL %ld:\n",stl_size));
         for (it = stl_rowSet.begin(); it != stl_rowSet.end(); it++)
-            PRLEVEL (0, (" %ld", *it));
-        PRLEVEL (0, ("\nMy Set %ld:\n",listP));
+            PRLEVEL (1, (" %ld", *it));
+        PRLEVEL (1, ("\nMy Set %ld:\n",listP));
         for (Int i = 0; i < listP; i++)
             PRLEVEL (1, (" %ld", rowList [i]));
-        PRLEVEL (0, ("\n"));
+        PRLEVEL (1, ("\n"));
     }
     ASSERT (listP == stl_size );
 
 #endif 
+
+
+
+    double *pF = (double*) paru_calloc (listP*fp, sizeof (double), cc);
+    /* assembling the pivotal part of the front */
+    /* 
+     *                  
+     *  curEl           nEl           
+     *              6, 7, 3, 10
+     *             ____________
+     *          23 | X  Y  .  .     stored in memory like this:
+     *      mEl 17 | X  Y  .  .     ...6, 7, 3, 10, 23, 17, 2, X, X, X, Y, Y, Y,
+     *           2 | X  Y  .  .
+     *  
+     *    It must be assembled in current pivotal fron like this:
+     *                                     fp
+     *                                 col1, ... , col
+     *                                
+     *                                  6, 7, 8, 9, 10
+     *                                  ______________
+     *                          0   23 | X  Y  .  .  . 
+     *               listP      1    2 | X  Y  .  .  .
+     *                          2    4 | *  *  .  .  .  isInSet[4] == FLIP(2)
+     *                          3   17 | X  Y  .  .  . 
+     * */
+
+    for (Int c = col1; c < col2; c++){
+        tupleList *cur = &ColList[c];
+        Int numTuple = cur->numTuple;
+        ASSERT (numTuple >= 0);
+        Tuple *l = cur->list;
+        PRLEVEL (1, ("c =%ld numTuple = %ld\n", c, numTuple));
+        for (Int i = 0; i < numTuple; i++){
+            Tuple curTpl = l [i];
+            Int e = curTpl.e;
+            Element **elementList = paruMatInfo->elementList;
+            Element *curEl = elementList[e];
+            Int mEl = curEl->nrows;
+            Int nEl = curEl->ncols;
+            Int *el_colIndex = (Int*)(curEl+1);     // pointers to element index 
+            Int *el_rowIndex = el_colIndex + nEl;   // pointers to row indices
+
+            Int curColIndex;
+            for (curColIndex = 0; curColIndex < nEl ; curColIndex++)
+                if (el_colIndex[curColIndex] == c)  break;
+            PRLEVEL (1, ("curColIndex =%ld\n", curColIndex));
+            ASSERT (curColIndex < nEl);
+            double *el_colrowNum = (double*)(el_colIndex + mEl + nEl); 
+            PRLEVEL (1, ("element= %ld  mEl =%ld \n",e, mEl));
+            for (Int rEl = 0; rEl < mEl; rEl++){
+                Int curRow = el_rowIndex [rEl]; 
+                PRLEVEL (1, ("curRow =%ld\n", curRow));
+                ASSERT (curRow < m ) ;
+                ASSERT (isInSet [curRow] != 0);
+                Int rowIndexF = UNFLIP (isInSet [curRow]);
+                Int colIndexF = c - col1;
+                PRLEVEL (1, ("rowIndexF = %ld\n", rowIndexF));
+                PRLEVEL (1, (" colIndexF*listP + rowIndexF=%ld\n",
+                            colIndexF*listP + rowIndexF));
+                ASSERT ( colIndexF*listP + rowIndexF < listP * fp);
+                ASSERT ( curColIndex*mEl + rEl < mEl*nEl);
+                pF [colIndexF*listP + rowIndexF] += el_colrowNum [ curColIndex*mEl + rEl];
+            }
+        }
+    }
+/*! TODO: Nullifying column     */
+    
+#ifndef NDEBUG
+    p = 0;
+    PRLEVEL (p, ("x\t"));
+    for (Int c = col1; c < col2; c++) {
+        PRLEVEL (0, ("%ld\t", c));
+    }
+    PRLEVEL (p, ("\n"));
+    for (int r = 0; r < listP; r++){
+        PRLEVEL (p, ("%ld\t", rowList [r]));
+        for (Int c = col1; c < col2; c++){
+            PRLEVEL (p, (" %2.2lf\t", pF [(c-col1)*listP + r]));
+        }
+        PRLEVEL (p, ("\n"));
+    }
+#endif
+
 
     /* clearing W for next iteration */
     for (Int i = 0; i < listP; i++){
@@ -186,15 +269,7 @@ void paru_assemble (
     s = 0;
     for (Int i = 0; i < m; i++) s+=isInSet [i];
     ASSERT (s == 0);
-#endif 
-
-
-
-    double *pF = (double*) paru_calloc (listP*fp, sizeof (double), cc);
-    /*! TODO: Here:     */
-    /* assembling the pivotal part of the front */
-
-
+#endif
 
 
     paru_free (listP*fp, sizeof (Int), pF, cc);
