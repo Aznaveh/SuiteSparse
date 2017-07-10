@@ -200,14 +200,19 @@ void paru_assemble (
      * */
 
     for (Int c = col1; c < col2; c++){
-        tupleList *cur = &ColList[c];
-        Int numTuple = cur->numTuple;
+        tupleList *curTupleList = &ColList[c];
+        Int numTuple = curTupleList->numTuple;
         ASSERT (numTuple >= 0);
-        Tuple *l = cur->list;
+        Tuple *l = curTupleList->list;
         PRLEVEL (1, ("c =%ld numTuple = %ld\n", c, numTuple));
+
         for (Int i = 0; i < numTuple; i++){
+
             Tuple curTpl = l [i];
             Int e = curTpl.e;
+            FLIP (curTpl.e); //Nullifying tuple
+            curTupleList->numTuple--;
+            
             Element **elementList = paruMatInfo->elementList;
             Element *curEl = elementList[e];
             Int mEl = curEl->nrows;
@@ -216,13 +221,18 @@ void paru_assemble (
             Int *el_rowIndex = el_colIndex + nEl;   // pointers to row indices
 
             Int curColIndex;
-            for (curColIndex = 0; curColIndex < nEl ; curColIndex++)
+            for (curColIndex = 0; curColIndex < nEl ; curColIndex++) 
+                // finding the corresponding column in the element
                 if (el_colIndex[curColIndex] == c)  break;
+            FLIP(el_colIndex[curColIndex]); //Nullifying the column
+            curEl->ncolsleft--;
             PRLEVEL (1, ("curColIndex =%ld\n", curColIndex));
+
             ASSERT (curColIndex < nEl);
             double *el_colrowNum = (double*)(el_colIndex + mEl + nEl); 
             PRLEVEL (1, ("element= %ld  mEl =%ld \n",e, mEl));
-            for (Int rEl = 0; rEl < mEl; rEl++){
+
+            for (Int rEl = 0; rEl < mEl; rEl++){   
                 Int curRow = el_rowIndex [rEl]; 
                 PRLEVEL (1, ("curRow =%ld\n", curRow));
                 ASSERT (curRow < m ) ;
@@ -238,7 +248,6 @@ void paru_assemble (
             }
         }
     }
-/*! TODO: Nullifying column     */
     
 #ifndef NDEBUG
     p = 0;
@@ -250,7 +259,7 @@ void paru_assemble (
     for (int r = 0; r < listP; r++){
         PRLEVEL (p, ("%ld\t", rowList [r]));
         for (Int c = col1; c < col2; c++){
-            PRLEVEL (p, (" %2.2lf\t", pF [(c-col1)*listP + r]));
+            PRLEVEL (p, (" %3.1lf\t", pF [(c-col1)*listP + r]));
         }
         PRLEVEL (p, ("\n"));
     }
