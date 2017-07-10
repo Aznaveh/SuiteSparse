@@ -94,8 +94,8 @@ void paru_assemble (
             Element *curEl = elementList[e];
             Int mEl = curEl->nrows;
             Int nEl = curEl->ncols;
-            Int *el_colrowIndex = (Int*)(curEl+1);     // pointers to element index 
-            Int *el_rowIndex = el_colrowIndex + nEl;   // pointers to row indices
+            Int *el_colrowIndex = (Int*)(curEl+1);  // pointers to element index 
+            Int *el_rowIndex = el_colrowIndex + nEl;// pointers to row indices
             PRLEVEL (1, ("element= %ld  mEl =%ld \n",e, mEl));
             for (Int rEl = 0; rEl < mEl; rEl++){
                 Int curRow = el_rowIndex [rEl]; 
@@ -176,7 +176,7 @@ void paru_assemble (
 
 
 
-    double *pF = (double*) paru_calloc (listP*fp, sizeof (double), cc);
+    double *pivotalFront = (double*) paru_calloc (listP*fp, sizeof (double), cc);
     /* assembling the pivotal part of the front */
     /* 
      *                  
@@ -217,8 +217,8 @@ void paru_assemble (
             Element *curEl = elementList[e];
             Int mEl = curEl->nrows;
             Int nEl = curEl->ncols;
-            Int *el_colIndex = (Int*)(curEl+1);     // pointers to element index 
-            Int *el_rowIndex = el_colIndex + nEl;   // pointers to row indices
+            Int *el_colIndex = (Int*)(curEl+1);    // pointers to element index
+            Int *el_rowIndex = el_colIndex + nEl;  // pointers to row indices
 
             Int curColIndex;
             for (curColIndex = 0; curColIndex < nEl ; curColIndex++) 
@@ -244,7 +244,8 @@ void paru_assemble (
                             colIndexF*listP + rowIndexF));
                 ASSERT ( colIndexF*listP + rowIndexF < listP * fp);
                 ASSERT ( curColIndex*mEl + rEl < mEl*nEl);
-                pF [colIndexF*listP + rowIndexF] += el_colrowNum [ curColIndex*mEl + rEl];
+                pivotalFront [colIndexF*listP + rowIndexF] += 
+                    el_colrowNum [ curColIndex*mEl + rEl];
             }
         }
     }
@@ -259,7 +260,7 @@ void paru_assemble (
     for (int r = 0; r < listP; r++){
         PRLEVEL (p, ("%ld\t", rowList [r]));
         for (Int c = col1; c < col2; c++){
-            PRLEVEL (p, (" %3.1lf\t", pF [(c-col1)*listP + r]));
+            PRLEVEL (p, (" %3.1lf\t", pivotalFront [(c-col1)*listP + r]));
         }
         PRLEVEL (p, ("\n"));
     }
@@ -281,7 +282,7 @@ void paru_assemble (
 #endif
 
 
-    paru_free (listP*fp, sizeof (Int), pF, cc);
+    paru_free (listP*fp, sizeof (Int), pivotalFront, cc);
 
 #if 0
     paru_free (setSize, sizeof (Int), rowSet, cc);
