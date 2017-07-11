@@ -46,7 +46,7 @@ void paru_assemble (
     Int fp = col2 - col1;   /* first fp columns are pivotal */ 
     Int fn = p2 - p1;          /* Upper bound number of columns of F */ 
 
-    PRLEVEL (0, ("fp=%ld pivotal columns:clo1=%ld...col2=%ld\n", 
+    PRLEVEL (1, ("fp=%ld pivotal columns:clo1=%ld...col2=%ld\n", 
                 fp, col1, col2-1));
     PRLEVEL (1, ("Upper bound number of columns: Rj[%ld]=%ld ... Rj[%ld]=%ld\n", 
                 p1, Rj [p1], p2, Rj [p2-1]));
@@ -55,7 +55,6 @@ void paru_assemble (
 
     /* computing number of rows, set union */
     tupleList *ColList = paruMatInfo->ColList;
-
 #if 0
     Int rowsP = 0;
     Int setSize = fn;  // it can be initialized with fm
@@ -64,15 +63,16 @@ void paru_assemble (
 
     Int listP= 0;
     work_struct *Work =  paruMatInfo->Work;
-    Int *isInSet = Work->all_Zero; /*  I can reduce the size with bitwise 
+    Int *isRowInFront = Work->all_Zero; /*  I can reduce the size with bitwise 
                                        operation. it might cause race in GPU */
+//    Int *
     Int *rowList = Work->scratch;
-    PRLEVEL (1, ("rowList(scratch)=%p isInSet(all_Zero)=%p\n", 
-                rowList, isInSet));
+    PRLEVEL (1, ("rowList(scratch)=%p isRowInFront(all_Zero)=%p\n", 
+                rowList, isRowInFront));
 
 #ifndef NDEBUG /* chekcing first part of Work to be zero */
     Int s = 0;
-    for (Int i = 0; i < m; i++) s += isInSet [i];
+    for (Int i = 0; i < m; i++) s += isRowInFront [i];
     ASSERT (s == 0);
 #endif 
 
@@ -86,7 +86,7 @@ void paru_assemble (
         Int numTuple = cur->numTuple;
         ASSERT (numTuple >= 0);
         Tuple *l = cur->list;
-        PRLEVEL (1, ("c =%ld numTuple = %ld\n", c, numTuple));
+        PRLEVEL (1, ("c =%l  numTuple = %ld\n", c, numTuple));
         for (Int i = 0; i < numTuple; i++){
             Tuple curTpl = l [i];
             Int e = curTpl.e;
@@ -104,19 +104,20 @@ void paru_assemble (
 #ifndef NDEBUG
                 stl_rowSet.insert (curRow );
 #endif
-                PRLEVEL (1, ("%p ---> isInSet [%ld]=%ld\n", 
-                            isInSet+curRow, curRow, isInSet[curRow]));
+                PRLEVEL (1, ("%p ---> isRowInFront [%ld]=%ld\n", 
+                            isRowInFront+curRow, curRow, isRowInFront[curRow]));
 
-                if (!isInSet[curRow]){
+                if (!isRowInFront[curRow]){
                     PRLEVEL (1, ("curRow =%ld listP=%ld\n", curRow, listP));
                     rowList [listP] = curRow;
                      PRLEVEL (1, ("listP=%ld FLIP(listP)=%ld\n", 
                                 listP, FLIP (listP) ));
-                    isInSet [curRow] = FLIP (listP++); /* set to some nonzero
-                                                        I want to use listP to
-                                                        know reverse perumtation
-                                                        too and listP can also 
-                                                        be zero */
+                    isRowInFront [curRow] = FLIP (listP++); 
+                    /* set to some nonzero
+                        I want to use isRowInFront to
+                        know reverse perumtation
+                        too and lisRowInFront can also 
+                        be zero */
                 }
                 ASSERT (listP <= m); 
 
@@ -195,7 +196,7 @@ void paru_assemble (
      *                                  ______________
      *                          0   23 | X  Y  .  .  . 
      *               listP      1    2 | X  Y  .  .  .
-     *                          2    4 | *  *  .  .  .  isInSet[4] == FLIP(2)
+     *                          2    4 | *  *  .  .  .  isRowInFront[4] == FLIP(2)
      *                          3   17 | X  Y  .  .  . 
      * */
 
@@ -210,6 +211,7 @@ void paru_assemble (
 
             Tuple curTpl = l [i];
             Int e = curTpl.e;
+            PRLEVEL (1, ("col=%ld, (%ld,%ld)\n", c, e, f));
             FLIP (curTpl.e); //Nullifying tuple
             curTupleList->numTuple--;
             
@@ -220,10 +222,7 @@ void paru_assemble (
             Int *el_colIndex = (Int*)(curEl+1);    // pointers to element index
             Int *el_rowIndex = el_colIndex + nEl;  // pointers to row indices
 
-            Int curColIndex;
-            for (curColIndex = 0; curColIndex < nEl ; curColIndex++) 
-                // finding the corresponding column in the element
-                if (el_colIndex[curColIndex] == c)  break;
+            Int curColIndex = curTpl.f;
             FLIP(el_colIndex[curColIndex]); //Nullifying the column
             curEl->ncolsleft--;
             PRLEVEL (1, ("curColIndex =%ld\n", curColIndex));
@@ -236,8 +235,8 @@ void paru_assemble (
                 Int curRow = el_rowIndex [rEl]; 
                 PRLEVEL (1, ("curRow =%ld\n", curRow));
                 ASSERT (curRow < m ) ;
-                ASSERT (isInSet [curRow] != 0);
-                Int rowIndexF = UNFLIP (isInSet [curRow]);
+                ASSERT (isRowInFront [curRow] != 0);
+                Int rowIndexF = UNFLIP (isRowInFront [curRow]);
                 Int colIndexF = c - col1;
                 PRLEVEL (1, ("rowIndexF = %ld\n", rowIndexF));
                 PRLEVEL (1, (" colIndexF*listP + rowIndexF=%ld\n",
@@ -251,10 +250,10 @@ void paru_assemble (
     }
     
 #ifndef NDEBUG
-    p = 0;
+    p = 1;
     PRLEVEL (p, ("x\t"));
     for (Int c = col1; c < col2; c++) {
-        PRLEVEL (0, ("%ld\t", c));
+        PRLEVEL (p, ("%ld\t", c));
     }
     PRLEVEL (p, ("\n"));
     for (int r = 0; r < listP; r++){
@@ -271,13 +270,13 @@ void paru_assemble (
     for (Int i = 0; i < listP; i++){
         Int curRow = rowList [i];
         ASSERT (curRow < m );
-        ASSERT (isInSet [curRow] != 0);
-        isInSet  [curRow] = 0;
+        ASSERT (isRowInFront [curRow] != 0);
+        isRowInFront  [curRow] = 0;
     }
 
-#ifndef NDEBUG /* chekcing isInSet to be zero */
+#ifndef NDEBUG /* chekcing isRowInFront to be zero */
     s = 0;
-    for (Int i = 0; i < m; i++) s+=isInSet [i];
+    for (Int i = 0; i < m; i++) s+=isRowInFront [i];
     ASSERT (s == 0);
 #endif
 
