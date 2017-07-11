@@ -45,8 +45,10 @@ Int paru_add_rowTuple (
 Int paru_add_colTuple (tupleList *ColList, Int col, 
         Tuple T, cholmod_common *cc)  /*! TODO: Sort for parallel case	 */
 {
-    DEBUGLEVEL(1);
+    DEBUGLEVEL(0);
+    PRLEVEL (1, ("col=%ld, (%ld,%ld)\n", col, T.e, T.f));
     tupleList *cur = &ColList [col];
+    PRLEVEL (1, ("cur->numTuple =%ld\n", cur->numTuple));
     if (cur->len > cur->numTuple)
         cur->list [cur->numTuple++] = T;
     else{

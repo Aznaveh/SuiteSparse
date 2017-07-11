@@ -108,11 +108,6 @@ int main (int argc, char **argv)
     m = paruMatInfo-> m;
     n = paruMatInfo-> n;
     nf = paruMatInfo->LUsym->nf;
- 
-   for (Int i = 0; i < nf; i++) {
-    paru_assemble (paruMatInfo, i, cc);
-   }
-
 #ifdef TESTAZNY_H
     Int el_num = LUsym->super2atree[25];
     paru_print_element (paruMatInfo, 91);
@@ -127,18 +122,24 @@ int main (int argc, char **argv)
         tupleList *ColList = paruMatInfo -> ColList;  
 
         printf ("RowList:\n");
-        for (int i = 0; i < m; ++i){ 
+        for (Int i = 0; i < m; ++i){ 
             printf("row %ld :",i);
             paru_print_tupleList (RowList , i);
         }
 
+        PRLEVEL (1, ("ColList =%p\n", ColList));
         printf ("ColList:\n");
-        for (int i = 0; i < n; ++i) {
+        for (Int i = 0; i < n; ++i) {
             printf("col %ld :",i);
             paru_print_tupleList (ColList , i);
         }
 
     }
+ 
+   for (Int i = 0; i < nf; i++) {
+    paru_assemble (paruMatInfo, i, cc);
+   }
+
 
 
     cholmod_l_free_sparse (&A, cc);

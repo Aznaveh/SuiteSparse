@@ -63,6 +63,16 @@ paru_matrix *paru_init_rowFronts (
     }
     PRLEVEL (1, ("scratch=%p\n",scratch));
 
+    Int *colSize= (Int*) paru_alloc (n, sizeof (Int), cc);
+    if (scratch == NULL){   //out of memory
+        printf ("Out of memory: Work\n");
+        return NULL;
+    }
+    memset (colSize, -1, n*sizeof(Int));
+    PRLEVEL (1, ("colSize=%p\n",colSize));
+
+
+
     work_struct *Work= (work_struct*) paru_alloc (1, sizeof (work_struct), cc);
     if (scratch == NULL){   //out of memory
         printf ("Out of memory: Work\n");
@@ -72,6 +82,7 @@ paru_matrix *paru_init_rowFronts (
 
     Work->all_Zero = all_Zero;
     Work->scratch = scratch;
+    Work->colSize = colSize;
 
     PRLEVEL (1, ("Work =%p\n ", Work));
     paruMatInfo->Work = Work;
@@ -209,7 +220,7 @@ paru_matrix *paru_init_rowFronts (
 
         Tuple rowTuple;
         rowTuple.e = e;
-        rowTuple.f = 1;
+        rowTuple.f = 0;
         if (paru_add_rowTuple (RowList, row, rowTuple, cc) ){
             paru_freemat (&paruMatInfo, cc);
             printf("Out of memory: add_rowTuple \n");
@@ -227,16 +238,17 @@ paru_matrix *paru_init_rowFronts (
         double *el_colrowNum = (double*)(el_colrowIndex+nrows+ncols); //and values
         PRLEVEL (1, ("el_colrowIndex =%p, el_colrowNum = %p \n", 
                     el_colrowIndex, el_colrowNum));
-        Int j = 0;  //Index inside an element
 
+        Int j = 0;  //Index inside an element
         for ( Int p = Sp [row]; p < Sp [row+1]; p++){
-            el_colrowIndex[j] = Sj[p];
-            el_colrowNum[j++] =   Sx[p];
-            PRLEVEL (1, ("Sj[%ld] =%ld Sx[%ld]=%lf\n", p, Sj[p], p, Sx[p] ));
             // adding column tuple
             Tuple colTuple;
             colTuple.e = e;
             colTuple.f = j;
+
+            el_colrowIndex[j] = Sj[p];
+            el_colrowNum[j++] =   Sx[p];
+            PRLEVEL (1, ("Sj[%ld] =%ld Sx[%ld]=%lf\n", p, Sj[p], p, Sx[p] ));
             if (paru_add_colTuple (ColList, Sj [p], colTuple, cc) ){
                 paru_freemat (&paruMatInfo, cc);
                 printf("Out of memory: add_colTuple \n");

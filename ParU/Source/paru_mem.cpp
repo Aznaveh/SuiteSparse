@@ -143,6 +143,8 @@ void paru_freemat (paru_matrix **paruMatInfo_handle,
     work_struct *Work = paruMatInfo->Work;
     cholmod_l_free (m, sizeof(Int), Work->all_Zero, cc);
     cholmod_l_free (m, sizeof(Int), Work->scratch, cc);
+    cholmod_l_free (n, sizeof(Int), Work->colSize, cc);
+
     
     cholmod_l_free (1, sizeof(work_struct), paruMatInfo->Work, cc);
     cholmod_l_free (1, sizeof(paru_matrix), paruMatInfo, cc);

@@ -176,8 +176,9 @@ typedef struct  /*List of tuples */
 
 typedef struct  /*work_struct*/
 {
-   Int *all_Zero;            
-   Int *scratch;        
+   Int *all_Zero;      // size of rows        
+   Int *scratch;       // size of rows          
+   Int *colSize;       // size of columns
 
 }   work_struct;
 
