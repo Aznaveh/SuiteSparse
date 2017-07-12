@@ -65,6 +65,10 @@ void paru_assemble (
     work_struct *Work =  paruMatInfo->Work;
     Int *isRowInFront = Work->all_initialized; 
     Int mark = Work->mark;
+    if (mark < 0) {  // in rare case of overflow
+        memset (isRowInFront, -1, m*sizeof(Int));
+        mark = Work->mark = 0;
+    }
 
     Int *rowList = Work->scratch;
     PRLEVEL (1, ("rowList(scratch)=%p isRowInFront(all_initialized)=%p\n", 
@@ -109,13 +113,13 @@ void paru_assemble (
                 if (isRowInFront[curRow] < mark ){
                     PRLEVEL (1, ("curRow =%ld listP=%ld\n", curRow, listP));
                     rowList [listP] = curRow;
-                     PRLEVEL (1, ("listP=%ld FLIP(listP)=%ld\n", 
+                    PRLEVEL (1, ("listP=%ld FLIP(listP)=%ld\n", 
                                 listP, FLIP (listP) ));
                     isRowInFront [curRow] = mark + listP++; 
                     /* set to some nonzero
-                        I want to use isRowInFront to
-                        know reverse perumtation
-                        too and lisRowInFront can also 
+                       I want to use isRowInFront to
+                       know reverse perumtation
+                       too and lisRowInFront can also 
                         be zero */
                 }
                 ASSERT (listP <= m); 
@@ -154,7 +158,7 @@ void paru_assemble (
 #endif    
 
 #ifndef NDEBUG /* Checking if pivotal rows are correct */
-    Int p = 0;
+    Int p = 1;
     PRLEVEL (p, ("There are %ld rows in this front: \n", listP));
     for (Int i = 0; i < listP; i++)
         PRLEVEL (p, (" %ld", rowList [i]));
@@ -222,6 +226,7 @@ void paru_assemble (
             Int *el_rowIndex = el_colIndex + nEl;  // pointers to row indices
 
             Int curColIndex = curTpl.f;
+            ASSERT (el_colIndex[curColIndex] == c);
             FLIP(el_colIndex[curColIndex]); //Nullifying the column
             curEl->ncolsleft--;
             PRLEVEL (1, ("curColIndex =%ld\n", curColIndex));
@@ -249,7 +254,7 @@ void paru_assemble (
     }
     
 #ifndef NDEBUG  // Printing the pivotal front
-    p = 0;
+    p = 1;
     PRLEVEL (p, ("x\t"));
     for (Int c = col1; c < col2; c++) {
         PRLEVEL (p, ("%ld\t", c));
@@ -266,18 +271,19 @@ void paru_assemble (
 
 
 #ifdef NotUsingMark
-   /* setting W for next iteration */
-   for (Int i = 0; i < listP; i++){
-       Int curRow = rowList [i];
-       ASSERT (curRow < m );
-       ASSERT (isRowInFront [curRow] != -1);
-       isRowInFront  [curRow] = -1;
-   }
+    /*Not used now, I am using mark to avoid this*/
+    /* setting W for next iteration */
+    for (Int i = 0; i < listP; i++){
+        Int curRow = rowList [i];
+        ASSERT (curRow < m );
+        ASSERT (isRowInFront [curRow] != -1);
+        isRowInFront  [curRow] = -1;
+    }
 #endif
 
     Work->mark += listP;
     mark = Work->mark;
-    
+
 
 #ifndef NDEBUG /* chekcing isRowInFront to be zero */
     for (Int i = 0; i < m; i++)
