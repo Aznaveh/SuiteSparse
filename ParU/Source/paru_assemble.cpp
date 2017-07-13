@@ -116,12 +116,7 @@ void paru_assemble (
                     PRLEVEL (1, ("listP=%ld FLIP(listP)=%ld\n", 
                                 listP, FLIP (listP) ));
                     isRowInFront [curRow] = mark + listP++; 
-                    /* set to some nonzero
-                       I want to use isRowInFront to
-                       know reverse perumtation
-                       too and lisRowInFront can also 
-                        be zero */
-                }
+               }
                 ASSERT (listP <= m); 
 
 #if 0
@@ -175,6 +170,7 @@ void paru_assemble (
         PRLEVEL (1, ("\n"));
     }
     ASSERT (listP == stl_size );
+ //   ASSERT (listP >= fp ); // otherwise it is a singular matrix
 
 #endif 
 
@@ -269,16 +265,17 @@ void paru_assemble (
     }
 #endif
 
+    paru_factorize (pivotalFront, listP, fp );
 
 #ifdef NotUsingMark
     /*Not used now, I am using mark to avoid this*/
-    /* setting W for next iteration */
+    /* setting W for next iteration
     for (Int i = 0; i < listP; i++){
         Int curRow = rowList [i];
         ASSERT (curRow < m );
         ASSERT (isRowInFront [curRow] != -1);
         isRowInFront  [curRow] = -1;
-    }
+    } */
 #endif
 
     Work->mark += listP;

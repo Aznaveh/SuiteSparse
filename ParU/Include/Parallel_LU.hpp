@@ -7,10 +7,12 @@
 // -----------------------------------------------------------------------------
 // debugging and printing macros
 // -----------------------------------------------------------------------------
+
 #ifndef NPR
     #define NPR
 #endif
-//for printing information uncomment this
+//for printing information uncomment this; to activate assertions uncomment 
+//NDEBUG in ./SPQR/Include/spqr.hpp line 42
 #undef NPR
 
 
@@ -176,7 +178,8 @@ typedef struct  /*List of tuples */
 
 typedef struct  /*work_struct*/
 {
-   Int *all_Zero;      // size of rows        
+   Int *all_initialized;      // size of rows        
+   Int mark;        // all_initialized[x] < mark
    Int *scratch;       // size of rows          
    Int *colSize;       // size of columns
 
@@ -216,3 +219,6 @@ Int paru_add_rowTuple (tupleList *RowList, Int row, Tuple T,
 Int paru_add_colTuple (tupleList *ColList, Int col, 
         Tuple T, cholmod_common *cc);
 void paru_assemble(paru_matrix *paruMatInfo, Int f, cholmod_common *cc);
+
+
+Int paru_factorize (double *F, Int m, Int n);

@@ -38,7 +38,8 @@ OBJ = \
     paru_sym_analyse.o \
 	paru_init_rowFronts.o\
 	paru_add_tuples.o\
-	paru_assemble.o
+	paru_assemble.o\
+	paru_factorize.o
 
 $(OBJ): $(INC)
 
@@ -68,6 +69,9 @@ paru_add_tuples.o: ../Source/paru_add_tuples.cpp
 	$(C) -c $<
 
 paru_assemble.o: ../Source/paru_assemble.cpp
+	$(C) -c $<
+
+paru_factorize.o: ../Source/paru_factorize.cpp
 	$(C) -c $<
 
 

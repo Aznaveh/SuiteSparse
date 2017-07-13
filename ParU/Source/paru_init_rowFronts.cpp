@@ -49,12 +49,13 @@ paru_matrix *paru_init_rowFronts (
     m = paruMatInfo->m = LUsym->m;   
     n = paruMatInfo->n = LUsym->n; 
 
-    Int *all_Zero= (Int*) paru_calloc (m, sizeof (Int), cc);
-    if (all_Zero == NULL){   //out of memory
+    Int *all_initialized= (Int*) paru_alloc (m, sizeof (Int), cc);
+    if (all_initialized == NULL){   //out of memory
         printf ("Out of memory: Work\n");
         return NULL;
     }
-    PRLEVEL (1, ("all_Zero =%p\n", all_Zero));
+    memset (all_initialized, -1, m*sizeof(Int));
+    PRLEVEL (1, ("all_initialized =%p\n", all_initialized));
 
     Int *scratch= (Int*) paru_alloc (m, sizeof (Int), cc);
     if (scratch == NULL){   //out of memory
@@ -80,7 +81,8 @@ paru_matrix *paru_init_rowFronts (
     }
 
 
-    Work->all_Zero = all_Zero;
+    Work->all_initialized = all_initialized;
+    Work->mark = 0;
     Work->scratch = scratch;
     Work->colSize = colSize;
 
