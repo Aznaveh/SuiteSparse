@@ -180,7 +180,7 @@ typedef struct  /*work_struct*/
 {
    Int *all_initialized;      // size of rows        
    Int mark;        // all_initialized[x] < mark
-   Int *scratch;       // size of rows          
+   Int *scratch;       // 2*size of rows          
    Int *colSize;       // size of columns
 
 }   work_struct;
@@ -221,4 +221,4 @@ Int paru_add_colTuple (tupleList *ColList, Int col,
 void paru_assemble(paru_matrix *paruMatInfo, Int f, cholmod_common *cc);
 
 
-Int paru_factorize (double *F, Int m, Int n);
+Int paru_factorize (double *F, Int m, Int n, Int *ipiv);

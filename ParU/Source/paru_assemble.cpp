@@ -1,3 +1,7 @@
+/** =========================================================================  /
+ * =======================  paru_assemble   =================================  /
+ * ========================================================================== */
+
 #include "Parallel_LU.hpp"
 
 #ifndef NDEBUG  // using STL for debugging
@@ -6,9 +10,6 @@
 #include <set>
 #endif
 
-/** =========================================================================  /
- * =======================  paru_assemble   =================================  /
- * ==========================================================================  /
 /*! \brief assembling a front and updating correspoing elelment
  *
  *
@@ -265,7 +266,12 @@ void paru_assemble (
     }
 #endif
 
-    paru_factorize (pivotalFront, listP, fp );
+    /*     factorizing the fully summed part of the matrix                    /
+     *     a set of pivot is found in this part that is crucial to            /
+     *       assemble the rest of the matrix and doing TRSM and GEMM         */
+
+    Int *ipiv = Work->scratch+m; // using the rest of scratch for permutation
+    paru_factorize (pivotalFront, listP, fp, ipiv );
 
 #ifdef NotUsingMark
     /*Not used now, I am using mark to avoid this*/
