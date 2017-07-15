@@ -1,12 +1,13 @@
 #include "Parallel_LU.hpp"
 
 extern "C" void dgetrf_(Int* dim1, Int* dim2, double* a, Int* lda,
-        Int* ipiv, Int* info);
+        int* ipiv, Int* info);
 
 
-Int paru_factorize (double *F, Int m, Int n, Int *ipiv)
+Int paru_factorize (double *F, Int m, Int n, int *ipiv)
 {
-    DEBUGLEVEL(1);
+    DEBUGLEVEL(0);
+    PRLEVEL (1, (" %ld x %ld\n", m, n));
 #ifndef NDEBUG  // Printing the pivotal front
     Int p = 0;
     for (Int r = 0; r < m; r++){
@@ -24,7 +25,7 @@ Int paru_factorize (double *F, Int m, Int n, Int *ipiv)
     
     
 #ifndef NDEBUG  // Initializing permutation for debug
-    for (Int i = 0; i < lda ; i++){
+    for (int i = 0; i < lda ; i++){
         ipiv [i] = -1;
     }
 #endif
@@ -32,15 +33,16 @@ Int paru_factorize (double *F, Int m, Int n, Int *ipiv)
 
     dgetrf_(&m, &n, F, &lda, ipiv, &info);
 
-    for (Int i = 0; i < lda ; i++){
-        PRLEVEL (1, ("ipiv[%ld] =%d\n",i, ipiv[i]));
+#ifndef NDEBUG  // Printing the permutation
+    p = 0;
+    // ATTENTION: ipiv is 1 based
+    for (int i = 0; i < n; i++){
+        PRLEVEL (p, ("ipiv[%d] =%d\n",i, ipiv[i]));
     }
-    PRLEVEL (1, ("\n"));
+    PRLEVEL (p, ("\n"));
 
-    PRLEVEL (1, ("info =%ld\n", info));
-
-#ifndef NDEBUG  // Printing the LU decomposition
-    p = 1;
+    // Printing the LU decomposition
+    p = 0;
     for (Int r = 0; r < m; r++){
         for (Int c = 0; c < n; c++){
             PRLEVEL (p, (" %3.1lf\t", F[c*m+ r]));
@@ -48,6 +50,11 @@ Int paru_factorize (double *F, Int m, Int n, Int *ipiv)
         PRLEVEL (p, ("\n"));
     }
 #endif
- 
+
+    PRLEVEL (1, ("info = %ld\n", info));
+    if (info !=0 ){
+        printf("Some problem in factorization\n");
+        return info;
+    }
     return 0;
 }

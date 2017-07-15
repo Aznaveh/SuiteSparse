@@ -270,7 +270,8 @@ void paru_assemble (
      *     a set of pivot is found in this part that is crucial to            /
      *       assemble the rest of the matrix and doing TRSM and GEMM         */
 
-    Int *ipiv = Work->scratch+m; // using the rest of scratch for permutation
+    int *ipiv =(int *) Work->scratch+listP; /* using the rest of scratch for 
+                                               permutation */
     paru_factorize (pivotalFront, listP, fp, ipiv );
 
 #ifdef NotUsingMark
