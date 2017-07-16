@@ -272,7 +272,7 @@ void paru_assemble (
 
     int *ipiv =(int *) Work->scratch+listP; /* using the rest of scratch for 
                                                permutation */
-    paru_factorize (pivotalFront, listP, fp, ipiv );
+    paru_factorize (pivotalFront, listP, fp, ipiv, cc );
 
 #ifdef NotUsingMark
     /*Not used now, I am using mark to avoid this*/

@@ -136,10 +136,11 @@ int main (int argc, char **argv)
 
     }
  
-   for (Int i = 0; i < nf; i++) {
-    paru_assemble (paruMatInfo, i, cc);
-   }
+//   for (Int i = 0; i < nf; i++) {
+//    paru_assemble (paruMatInfo, i, cc);
+//   }
 
+    paru_assemble (paruMatInfo, 0, cc);
 
 
     cholmod_l_free_sparse (&A, cc);

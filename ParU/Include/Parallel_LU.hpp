@@ -221,4 +221,5 @@ Int paru_add_colTuple (tupleList *ColList, Int col,
 void paru_assemble(paru_matrix *paruMatInfo, Int f, cholmod_common *cc);
 
 
-Int paru_factorize (double *F, Int m, Int n, int *ipiv);
+Int paru_factorize (double *F, Int m, Int n, 
+        int *ipiv, cholmod_common *cc);
