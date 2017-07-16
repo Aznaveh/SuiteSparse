@@ -1,3 +1,8 @@
+/** =========================================================================  /
+ * =======================  paru_factorize  =================================  /
+ * ========================================================================== */
+
+
 #include "Parallel_LU.hpp"
 
 extern "C" void dgetrf_(Int* dim1, Int* dim2, double* a, Int* lda,
@@ -10,7 +15,7 @@ Int paru_factorize (double *F, Int m, Int n,
     DEBUGLEVEL(0);
     PRLEVEL (0, (" %ld x %ld\n", m, n));
 #ifndef NDEBUG  // Printing the pivotal front before computation
-    Int p = 0;
+    Int p = 1;
     PRLEVEL (1, ("Befor factorization:\n"));
     for (Int r = 0; r < m; r++){
         for (Int c = 0; c < n; c++){
@@ -35,11 +40,15 @@ Int paru_factorize (double *F, Int m, Int n,
 
     dgetrf_(&m, &n, F, &lda, ipiv, &info);
 
-    ASSERT (m >= n);
+//    ASSERT (m >= n);
+    if (m < n) {
+        ipiv [0] = -1;
+        return info;
+    }
     /* changing swap permutation to a real permutation */
     int* tmpPinv = (int*) paru_alloc (m, sizeof (int), cc);
 #ifndef NDEBUG  // Printing the swap permutation
-    p = 0;
+    p = 1;
     // ATTENTION: ipiv is 1 based
     PRLEVEL (p, ("swap permutation:\n"));
     for (int i = 0; i < m; i++){
@@ -55,7 +64,7 @@ Int paru_factorize (double *F, Int m, Int n,
         // swap (tmpPinv [ipiv [i]], tmpPinv[i] ) and it is off by one
         ASSERT (ipiv [i] <= m);
         tmp = tmpPinv [ipiv [i]-1];
-        PRLEVEL (0, ("tmp =%d\n", tmp));
+        PRLEVEL (1, ("tmp =%d\n", tmp));
         ASSERT (tmp < m);
         tmpPinv [ipiv [i]-1] = tmpPinv [i];
         tmpPinv [i] = tmp;
@@ -69,15 +78,16 @@ Int paru_factorize (double *F, Int m, Int n,
 
 
 #ifndef NDEBUG  // Printing the permutation
-    p = 0;
+    p = 1;
     // ATTENTION: ipiv is 1 based
+    PRLEVEL (p, ("Real permutation:\n"));
     for (int i = 0; i < n; i++){
         PRLEVEL (p, ("ipiv[%d] =%d\n",i, ipiv[i]));
     }
     PRLEVEL (p, ("\n"));
 
     // Printing the LU decomposition
-    p = 0;
+    p = 1;
     PRLEVEL (p, ("After factorization:\n"));
     for (Int r = 0; r < m; r++){
         for (Int c = 0; c < n; c++){

@@ -267,22 +267,42 @@ void paru_assemble (
 #endif
 
     /*     factorizing the fully summed part of the matrix                    /
-     *     a set of pivot is found in this part that is crucial to            /
-     *       assemble the rest of the matrix and doing TRSM and GEMM         */
-
+     *     a set of pivot is found in this part that is crucial to assemble  */
     int *ipiv =(int *) Work->scratch+listP; /* using the rest of scratch for 
                                                permutation */
     paru_factorize (pivotalFront, listP, fp, ipiv, cc );
 
+    /* To this point fully summed part of the front is computed and L and U    /  
+     *  The next part is to find columns of nonfully summed then rows
+     *  the rest of the matrix and doing TRSM and GEMM,                       */
+#ifndef NDEBUG  // Printing the permutation
+    p = 1;
+    PRLEVEL (p, ("permutation:\n"));
+    for (int i = 0; i < fp; i++){
+        PRLEVEL (p, ("ipiv[%d] =%d\n",i, ipiv[i]));
+    }
+    PRLEVEL (p, ("\n"));
+#endif
+    /*! TODO: for each CBrow in ipiv 0:fp add all columns to the set     */
+    for (Int i = 0; i < fp; i++){
+        Int curFsRow =(Int) ipiv [i]; //current fully summed row
+        PRLEVEL (1, ("curFsRow = %ld\n", curFsRow));
+        ASSERT (curFsRow > 0);
+        
+    }
+
+
+
+
 #ifdef NotUsingMark
     /*Not used now, I am using mark to avoid this*/
     /* setting W for next iteration
-    for (Int i = 0; i < listP; i++){
-        Int curRow = rowList [i];
-        ASSERT (curRow < m );
-        ASSERT (isRowInFront [curRow] != -1);
-        isRowInFront  [curRow] = -1;
-    } */
+       for (Int i = 0; i < listP; i++){
+       Int curRow = rowList [i];
+       ASSERT (curRow < m );
+       ASSERT (isRowInFront [curRow] != -1);
+       isRowInFront  [curRow] = -1;
+       } */
 #endif
 
     Work->mark += listP;
