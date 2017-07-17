@@ -49,15 +49,15 @@ paru_matrix *paru_init_rowFronts (
     m = paruMatInfo->m = LUsym->m;   
     n = paruMatInfo->n = LUsym->n; 
 
-    Int *all_initialized= (Int*) paru_alloc (m, sizeof (Int), cc);
-    if (all_initialized == NULL){   //out of memory
+    Int *rowSize= (Int*) paru_alloc (m, sizeof (Int), cc);
+    if (rowSize == NULL){   //out of memory
         printf ("Out of memory: Work\n");
         return NULL;
     }
-    memset (all_initialized, -1, m*sizeof(Int));
-    PRLEVEL (1, ("all_initialized =%p\n", all_initialized));
+    memset (rowSize, -1, m*sizeof(Int));
+    PRLEVEL (1, ("rowSize =%p\n", rowSize));
 
-    Int *scratch= (Int*) paru_alloc (m+n, sizeof (Int), cc);
+    Int *scratch= (Int*) paru_alloc (3*m+n, sizeof (Int), cc);
     if (scratch == NULL){   //out of memory
         printf ("Out of memory: Work\n");
         return NULL;
@@ -65,7 +65,7 @@ paru_matrix *paru_init_rowFronts (
     PRLEVEL (1, ("scratch=%p\n",scratch));
 
     Int *colSize= (Int*) paru_alloc (n, sizeof (Int), cc);
-    if (scratch == NULL){   //out of memory
+    if (colSize == NULL){   //out of memory
         printf ("Out of memory: Work\n");
         return NULL;
     }
@@ -75,16 +75,17 @@ paru_matrix *paru_init_rowFronts (
 
 
     work_struct *Work= (work_struct*) paru_alloc (1, sizeof (work_struct), cc);
-    if (scratch == NULL){   //out of memory
+    if (Work == NULL){   //out of memory
         printf ("Out of memory: Work\n");
         return NULL;
     }
 
 
-    Work->all_initialized = all_initialized;
-    Work->mark = 0;
+    Work->rowSize = rowSize;
+    Work->rowMark = 0;
     Work->scratch = scratch;
     Work->colSize = colSize;
+    Work->colMark = 0;
 
     PRLEVEL (1, ("Work =%p\n ", Work));
     paruMatInfo->Work = Work;

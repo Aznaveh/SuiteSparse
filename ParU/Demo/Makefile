@@ -54,17 +54,17 @@ run:
 	./testazny < ../Matrix/Ragusa16_pattern.mtx
 	./testazny < ../Matrix/GD98_a.mtx #Structuraly rank defecient
 	./testazny < ../Matrix/a04.mtx
-#
-#
-#	./testazny < ../Matrix/a0.mtx #all zeros
-#	./testazny < ../Matrix/GD06_theory.mtx
-#	./testazny < ../Matrix/c2.mtx #2x2 4nz
-#	./testazny < ../Matrix/lpi_galenet.mtx
-#	./testazny < ../Matrix/n3c4-b4.mtx
-#	./testazny < ../Matrix/r2.mtx
-#	./testazny < ../Matrix/problem.mtx
-#
-#	./testazny < ../Matrix/arrow.mtx   #Huge
+
+
+	./testazny < ../Matrix/a0.mtx #all zeros
+	./testazny < ../Matrix/GD06_theory.mtx
+	./testazny < ../Matrix/c2.mtx #2x2 4nz
+	./testazny < ../Matrix/lpi_galenet.mtx
+	./testazny < ../Matrix/n3c4-b4.mtx
+	./testazny < ../Matrix/r2.mtx
+	./testazny < ../Matrix/problem.mtx
+
+	./testazny < ../Matrix/arrow.mtx   #Huge
 
 VGFLAGS = --tool=memcheck --leak-check=full --show-reachable=yes -v\
 		  --num-callers=20 --track-fds=yes --log-file="valgrindlogfile.log"

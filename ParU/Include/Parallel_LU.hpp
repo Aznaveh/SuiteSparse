@@ -178,10 +178,11 @@ typedef struct  /*List of tuples */
 
 typedef struct  /*work_struct*/
 {
-   Int *all_initialized;      // size of rows        
-   Int mark;        // all_initialized[x] < mark
-   Int *scratch;       // size of rows + sizeof cols
+   Int *rowSize;      // size of rows        
+   Int rowMark;        // rowSize[x] < rowMark
+   Int *scratch;       // size of 3*rows + sizeof cols
    Int *colSize;       // size of columns
+   Int colMark;        // colSize[x] < colMark
 
 }   work_struct;
 

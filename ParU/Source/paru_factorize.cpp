@@ -42,11 +42,13 @@ Int paru_factorize (double *F, Int m, Int n,
 
 //    ASSERT (m >= n);
     if (m < n) {
-        ipiv [0] = -1;
+        ipiv [0] *= -1;
         return info;
     }
     /* changing swap permutation to a real permutation */
-    int* tmpPinv = (int*) paru_alloc (m, sizeof (int), cc);
+    
+//    int* tmpPinv = (int*) paru_alloc (m, sizeof (int), cc);
+    int* tmpPinv = ipiv + n +1; // using the rest of scratch memory
 #ifndef NDEBUG  // Printing the swap permutation
     p = 1;
     // ATTENTION: ipiv is 1 based
@@ -73,7 +75,7 @@ Int paru_factorize (double *F, Int m, Int n,
     for (int i = 0; i < n; i++) 
         ipiv [i] = tmpPinv[i]; //copying back the important chunck
 
-    paru_free (m, sizeof (int), tmpPinv, cc);
+//    paru_free (m, sizeof (int), tmpPinv, cc);
 
 
 
@@ -99,7 +101,7 @@ Int paru_factorize (double *F, Int m, Int n,
 
 
     PRLEVEL (1, ("info = %ld\n", info));
-    if (info !=0 ){
+    if (info != 0 ){
         printf("Some problem in factorization\n");
         return info;
     }
