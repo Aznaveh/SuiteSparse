@@ -86,13 +86,13 @@ void paru_assemble (
     std::set<Int>::iterator it;
 #endif 
     for (Int c = col1; c < col2; c++){
-        tupleList *cur = &ColList[c];
-        Int numTuple = cur->numTuple;
+        tupleList *curColTupleList = &ColList[c];
+        Int numTuple = curColTupleList->numTuple;
         ASSERT (numTuple >= 0);
-        Tuple *l = cur->list;
-        PRLEVEL (1, ("c =%l  numTuple = %ld\n", c, numTuple));
+        Tuple *listColTuples = curColTupleList->list;
+        PRLEVEL (1, ("c =%ld  numTuple = %ld\n", c, numTuple));
         for (Int i = 0; i < numTuple; i++){
-            Tuple curTpl = l [i];
+            Tuple curTpl = listColTuples [i];
             Int e = curTpl.e;
             Element **elementList = paruMatInfo->elementList;
             Element *curEl = elementList[e];
@@ -101,12 +101,13 @@ void paru_assemble (
             Int *el_colrowIndex = (Int*)(curEl+1);  // pointers to element index 
             Int *el_rowIndex = el_colrowIndex + nEl;// pointers to row indices
             PRLEVEL (1, ("element= %ld  mEl =%ld \n",e, mEl));
+            /*! TODO: check if any row/col nulified     */
             for (Int rEl = 0; rEl < mEl; rEl++){
                 Int curRow = el_rowIndex [rEl]; 
                 PRLEVEL (1, ("curRow =%ld\n", curRow));
                 ASSERT (curRow < m ) ;
 #ifndef NDEBUG
-                stl_rowSet.insert (curRow );
+                stl_rowSet.insert (curRow);
 #endif
                 PRLEVEL (1, ("%p ---> isRowInFront [%ld]=%ld\n", 
                             isRowInFront+curRow, curRow, isRowInFront[curRow]));
@@ -271,7 +272,7 @@ void paru_assemble (
      *     a set of pivot is found in this part that is crucial to assemble   */
     PRLEVEL (1, ("listP =%ld\n", listP));
     int *ipiv =(int *) (Work->scratch+listP+1); /* using the rest of scratch for 
-                                               permutation; Not sure about 1 */
+                                               permutation; Not sure about 1  */
     paru_factorize (pivotalFront, listP, fp, ipiv, cc );
 
     /* To this point fully summed part of the front is computed and L and U    /  
@@ -289,24 +290,51 @@ void paru_assemble (
     }
     PRLEVEL (p, ("\n"));
 #endif
-    /*! TODO: for each CBrow in ipiv 0:fp add all columns to the set     */
     /* Set union for pivotal columns */
-    for (Int i = 0; i < listP; i++){
-        PRLEVEL (0, ("fsRowList[%ld]=%ld\n",i, fsRowList [i]));
+    Int *CBcolSet = Work -> colSize;
+    Int colMark = Work -> colMark;
+    if (colMark < 0) {  // in rare case of overflow
+        memset (isRowInFront, -1, n*sizeof(Int));
+        colMark = Work-> colMark = 0;
     }
 
-    Int *CBcolSet = Work -> colSize;
 #ifndef NDEBUG
     std::set<Int> stl_colSet;
 #endif 
     
+    tupleList *RowList = paruMatInfo->RowList;
     for (Int i = 0; i < fp; i++){
         Int curFsRowIndex =(Int) ipiv [i]; //current fully summed row index
         PRLEVEL (0, ("curFsRowIndex = %ld\n", curFsRowIndex));
         ASSERT (curFsRowIndex < m);
         Int curFsRow = fsRowList [curFsRowIndex];
         PRLEVEL (0, ("curFsRow =%ld\n", curFsRow));
-        
+        tupleList *curRowTupleList = &RowList [curFsRowIndex];
+        Int numTuple = curRowTupleList->numTuple;
+        ASSERT (numTuple >= 0);
+        Tuple *listRowTuples = curRowTupleList->list;
+        PRLEVEL (1, ("numTuple = %ld\n", numTuple));
+        for (Int i = 0; i < numTuple; i++){
+            Tuple curTpl = listColTuples [i];
+            Int e = curTpl.e;
+            Element **elementList = paruMatInfo->elementList;
+            Element *curEl = elementList[e];
+            Int mEl = curEl->nrows;
+            Int nEl = curEl->ncols;
+            Int *el_colIndex = (Int*)(curEl+1);  // pointers to element index 
+            Int *el_rowIndex = el_colrowIndex + nEl;// pointers to row indices
+            PRLEVEL (1, ("element= %ld  mEl =%ld \n",e, mEl));
+            for (Int cEl = 0; cEl < nEl; cEl++){
+                Int curCol = el_colIndex [cEl]; 
+                PRLEVEL (1, ("curRow =%ld\n", curRow));
+    /*! TODO: for each CBrow in ipiv 0:fp add all columns to the set     */
+#ifndef NDEBUG
+                stl_colSet.insert (curCol);
+#endif
+ 
+            }
+        }
+
 
     }
 
