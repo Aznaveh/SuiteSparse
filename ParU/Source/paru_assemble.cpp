@@ -62,6 +62,7 @@ void paru_assemble (
     Int *rowSet = (Int*) paru_alloc (setSize, sizeof (Int), cc);
 #endif
 
+    /* 1st Pass: Searching for rows*/
     Int rowCount= 0;
     work_struct *Work =  paruMatInfo->Work;
     Int *isRowInFront = Work->rowSize; 
@@ -200,6 +201,7 @@ void paru_assemble (
      *                          3   17 | X  Y  .  .  . 
      * */
 
+    /* 2nd Pass: pivot assembly*/
     for (Int c = col1; c < col2; c++){
         tupleList *curTupleList = &ColList[c];
         Int numTuple = curTupleList->numTuple;
@@ -288,6 +290,9 @@ void paru_assemble (
     }
     PRLEVEL (p, ("\n"));
 #endif
+
+
+    /* 3rd Pass: Searching for columns */
     /* Set union for pivotal columns */
     Int *isColInCBcolSet = Work -> colSize;
     Int colMark = Work -> colMark;
@@ -336,7 +341,6 @@ void paru_assemble (
                       isColInCBcolSet+curCol, curCol, isColInCBcolSet[curCol]));
                 if (isColInCBcolSet [curCol] < colMark ){
                     PRLEVEL (1, ("curCol = %ld rowCount=%ld\n", curCol, rowCount));
-
                     
                     fsRowList [colCount] = curCol;
                     
@@ -345,12 +349,8 @@ void paru_assemble (
                     isColInCBcolSet [curCol] = colMark + colCount++; 
                 }
                 ASSERT (colCount <= n);
-
-
             }
         }
-
-
     }
 
 
