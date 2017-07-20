@@ -307,18 +307,19 @@ void paru_assemble (
     std::set<Int> stl_colSet;
 #endif 
     
+    /*! TODO: for each CBrow in ipiv 0:fp add all columns to the set     */
     tupleList *RowList = paruMatInfo->RowList;
     for (Int i = 0; i < fp; i++){
         Int curFsRowIndex =(Int) ipiv [i]; //current fully summed row index
-        PRLEVEL (0, ("curFsRowIndex = %ld\n", curFsRowIndex));
+        PRLEVEL (1, ("curFsRowIndex = %ld\n", curFsRowIndex));
         ASSERT (curFsRowIndex < m);
         Int curFsRow = fsRowList [curFsRowIndex];
-        PRLEVEL (0, ("curFsRow =%ld\n", curFsRow));
+        PRLEVEL (1, ("curFsRow =%ld\n", curFsRow));
         tupleList *curRowTupleList = &RowList [curFsRowIndex];
         Int numTuple = curRowTupleList->numTuple;
         ASSERT (numTuple >= 0);
         Tuple *listRowTuples = curRowTupleList->list;
-        PRLEVEL (1, ("numTuple = %ld\n", numTuple));
+        PRLEVEL (0, ("numTuple = %ld\n", numTuple));
         for (Int i = 0; i < numTuple; i++){
             Tuple curTpl = listRowTuples [i];
             Int e = curTpl.e;
@@ -328,11 +329,10 @@ void paru_assemble (
             Int nEl = curEl->ncols;
             Int *el_colIndex = (Int*)(curEl+1);  // pointers to element index 
             Int *el_rowIndex = el_colIndex + nEl;// pointers to row indices
-            PRLEVEL (1, ("element= %ld  mEl =%ld \n",e, mEl));
-    /*! TODO: for each CBrow in ipiv 0:fp add all columns to the set     */
+            PRLEVEL (0, ("element= %ld  nEl =%ld \n",e, nEl));
             for (Int cEl = 0; cEl < nEl; cEl++){
                 Int curCol = el_colIndex [cEl]; 
-                PRLEVEL (1, ("curCol =%ld\n", curCol));
+                PRLEVEL (0, ("curCol =%ld\n", curCol));
                 ASSERT (curCol < n);
 #ifndef NDEBUG
                 stl_colSet.insert (curCol);
