@@ -47,7 +47,7 @@ void paru_assemble (
     Int fp = col2 - col1;   /* first fp columns are pivotal */ 
     Int fn = p2 - p1;          /* Upper bound number of columns of F */ 
 
-    PRLEVEL (1, ("fp=%ld pivotal columns:clo1=%ld...col2=%ld\n", 
+    PRLEVEL (0, ("fp=%ld pivotal columns:clo1=%ld...col2=%ld\n", 
                 fp, col1, col2-1));
     PRLEVEL (1, ("Upper bound number of columns: Rj[%ld]=%ld ... Rj[%ld]=%ld\n", 
                 p1, Rj [p1], p2, Rj [p2-1]));
@@ -159,18 +159,18 @@ void paru_assemble (
     for (Int i = 0; i < rowCount; i++)
         PRLEVEL (p, (" %ld", fsRowList [i]));
     PRLEVEL (p, ("\n"));
-    Int stl_size = stl_rowSet.size();
-    if (rowCount != stl_size){
-        PRLEVEL (1, ("#######################\n"));
-        PRLEVEL (1, ("STL %ld:\n",stl_size));
+    Int stl_rowSize = stl_rowSet.size();
+    if (rowCount != stl_rowSize){
+        PRLEVEL (p, ("#######################\n"));
+        PRLEVEL (p, ("STL %ld:\n",stl_rowSize));
         for (it = stl_rowSet.begin(); it != stl_rowSet.end(); it++)
-            PRLEVEL (1, (" %ld", *it));
-        PRLEVEL (1, ("\nMy Set %ld:\n",rowCount));
+            PRLEVEL (p, (" %ld", *it));
+        PRLEVEL (p, ("\nMy Set %ld:\n",rowCount));
         for (Int i = 0; i < rowCount; i++)
-            PRLEVEL (1, (" %ld", fsRowList [i]));
-        PRLEVEL (1, ("\n"));
+            PRLEVEL (p, (" %ld", fsRowList [i]));
+        PRLEVEL (p, ("\n"));
     }
-    ASSERT (rowCount == stl_size );
+    ASSERT (rowCount == stl_rowSize );
  //   ASSERT (rowCount >= fp ); // otherwise it is a singular matrix
 
 #endif 
@@ -340,12 +340,10 @@ void paru_assemble (
                 PRLEVEL (1, ("%p ---> isColInCBcolSet[%ld]=%ld\n", 
                       isColInCBcolSet+curCol, curCol, isColInCBcolSet[curCol]));
                 if (isColInCBcolSet [curCol] < colMark ){
-                    PRLEVEL (1, ("curCol = %ld rowCount=%ld\n", curCol, rowCount));
+                    PRLEVEL (1, ("curCol = %ld colCount=%ld\n", curCol, colCount));
                     
-                    fsRowList [colCount] = curCol;
+                    CBColList [colCount] = curCol;
                     
-                    PRLEVEL (1, ("rowCount=%ld FLIP(rowCount)=%ld\n", 
-                                rowCount, FLIP (rowCount) ));
                     isColInCBcolSet [curCol] = colMark + colCount++; 
                 }
                 ASSERT (colCount <= n);
@@ -353,7 +351,27 @@ void paru_assemble (
         }
     }
 
+#ifndef NDEBUG /* Checking if columns are correct */
 
+    p = 0;
+    PRLEVEL (p, ("There are %ld columns in this front: \n", colCount));
+    for (Int i = 0; i < colCount; i++)
+        PRLEVEL (p, (" %ld", CBColList [i]));
+    PRLEVEL (p, ("\n"));
+    Int stl_colSize = stl_colSet.size();
+    if (colCount != stl_colSize){
+        PRLEVEL (p, ("#######################\n"));
+        PRLEVEL (p, ("STL %ld:\n",stl_colSize));
+        for (it = stl_rowSet.begin(); it != stl_colSet.end(); it++)
+            PRLEVEL (p, (" %ld", *it));
+        PRLEVEL (p, ("\nMy Set %ld:\n",colCount));
+        for (Int i = 0; i < colCount; i++)
+            PRLEVEL (p, (" %ld", CBColList [i]));
+        PRLEVEL (p, ("\n"));
+    }
+    ASSERT (colCount == stl_colSize );
+
+#endif 
 
 
 #ifdef NotUsingMark
