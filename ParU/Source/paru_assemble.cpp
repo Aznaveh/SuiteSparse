@@ -102,7 +102,6 @@ void paru_assemble (
             Int *el_colrowIndex = (Int*)(curEl+1);  // pointers to element index 
             Int *el_rowIndex = el_colrowIndex + nEl;// pointers to row indices
             PRLEVEL (1, ("element= %ld  mEl =%ld \n",e, mEl));
-            /*! TODO: check if any row/col nulified     */
             for (Int rEl = 0; rEl < mEl; rEl++){
                 Int curRow = el_rowIndex [rEl]; 
                 PRLEVEL (1, ("curRow =%ld\n", curRow));
@@ -202,6 +201,7 @@ void paru_assemble (
      * */
 
     /* 2nd Pass: pivot assembly*/
+            /*! TODO: check if any row/col nulified     */
     for (Int c = col1; c < col2; c++){
         tupleList *curTupleList = &ColList[c];
         Int numTuple = curTupleList->numTuple;
@@ -307,7 +307,6 @@ void paru_assemble (
     std::set<Int> stl_colSet;
 #endif 
     
-    /*! TODO: for each CBrow in ipiv 0:fp add all columns to the set     */
     tupleList *RowList = paruMatInfo->RowList;
     for (Int i = 0; i < fp; i++){
         Int curFsRowIndex =(Int) ipiv [i]; //current fully summed row index
@@ -334,12 +333,16 @@ void paru_assemble (
                 Int curCol = el_colIndex [cEl]; 
                 PRLEVEL (0, ("curCol =%ld\n", curCol));
                 ASSERT (curCol < n);
+                /*! TODO: implement this part better     */
+                if (curCol >= col1 && curCol < col2) //if in pivotal front
+                    continue;
 #ifndef NDEBUG
                 stl_colSet.insert (curCol);
 #endif
                 PRLEVEL (1, ("%p ---> isColInCBcolSet[%ld]=%ld\n", 
                       isColInCBcolSet+curCol, curCol, isColInCBcolSet[curCol]));
-                if (isColInCBcolSet [curCol] < colMark ){
+/*! TODO: Check for elements too in Pass 1 and 3  */
+                if (isColInCBcolSet [curCol] < colMark  ){
                     PRLEVEL (1, ("curCol = %ld colCount=%ld\n", curCol, colCount));
                     
                     CBColList [colCount] = curCol;
@@ -354,7 +357,8 @@ void paru_assemble (
 #ifndef NDEBUG /* Checking if columns are correct */
 
     p = 0;
-    PRLEVEL (p, ("There are %ld columns in this front: \n", colCount));
+    PRLEVEL (p, ("There are %ld columns in this contribution block: \n",
+                colCount));
     for (Int i = 0; i < colCount; i++)
         PRLEVEL (p, (" %ld", CBColList [i]));
     PRLEVEL (p, ("\n"));
@@ -386,7 +390,10 @@ void paru_assemble (
 #endif
 
     Work->rowMark += rowCount;
-    rowMark = Work->rowMark;
+    rowMark = Work -> rowMark;
+
+    Work->colMark += colCount;
+    colMark = Work -> colMark;
 
 
 #ifndef NDEBUG /* chekcing isRowInFront to be zero */
