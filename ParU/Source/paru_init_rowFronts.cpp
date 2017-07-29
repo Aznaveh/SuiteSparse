@@ -43,11 +43,12 @@ paru_matrix *paru_init_rowFronts (
 
 
 
-    Int m,n;  
+    Int m,n,nf;  
 
     paruMatInfo->LUsym = LUsym;
     m = paruMatInfo->m = LUsym->m;   
     n = paruMatInfo->n = LUsym->n; 
+    nf =  LUsym->nf; 
 
     Int *rowSize= (Int*) paru_alloc (m, sizeof (Int), cc);
     if (rowSize == NULL){   //out of memory
@@ -72,6 +73,22 @@ paru_matrix *paru_init_rowFronts (
     memset (colSize, -1, n*sizeof(Int));
     PRLEVEL (1, ("colSize=%p\n",colSize));
 
+    Int *elRow = (Int*) paru_alloc (m+nf, sizeof (Int), cc);
+    if (elRow == NULL){   //out of memory
+        printf ("Out of memory: Work\n");
+        return NULL;
+    }
+    memset (elRow, -1, (m+nf)*sizeof(Int));
+    PRLEVEL (1, ("elRow=%p\n",elRow));
+
+    Int *elCol = (Int*) paru_alloc (m+nf, sizeof (Int), cc);
+    if (elCol == NULL){   //out of memory
+        printf ("Out of memory: Work\n");
+        return NULL;
+    }
+    memset (elCol, -1, (m+nf)*sizeof(Int));
+    PRLEVEL (1, ("elCol=%p\n",elCol));
+
 
 
     work_struct *Work= (work_struct*) paru_alloc (1, sizeof (work_struct), cc);
@@ -87,6 +104,10 @@ paru_matrix *paru_init_rowFronts (
     Work->colSize = colSize;
     Work->colMark = 0;
 
+    Work->elRow= elRow;
+    Work->elRMark= 0;
+    Work->elCol= elCol;
+    Work->elCMark= 0;
     PRLEVEL (1, ("Work =%p\n ", Work));
     paruMatInfo->Work = Work;
 
@@ -123,7 +144,6 @@ paru_matrix *paru_init_rowFronts (
     PRLEVEL (1, ("$ColList =%p\n", ColList));
 
     Element **elementList; 
-    Int nf = LUsym->nf;
     elementList = paruMatInfo->elementList = // Initialize with NULL
         (Element**) paru_calloc (1, (m+nf+1)*sizeof(Element), cc);
     if (elementList == NULL){   //out of memory

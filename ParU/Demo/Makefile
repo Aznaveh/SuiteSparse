@@ -64,10 +64,11 @@ run:
 	./testazny < ../Matrix/r2.mtx
 	./testazny < ../Matrix/problem.mtx
 
-	./testazny < ../Matrix/arrow.mtx   #Huge
+#	./testazny < ../Matrix/arrow.mtx   #Huge
 
 VGFLAGS = --tool=memcheck --leak-check=full --show-reachable=yes -v\
-		  --num-callers=20 --track-fds=yes --log-file="valgrindlogfile.log"
+		 --track-origins=yes --num-callers=20 \
+		 --track-fds=yes --log-file="valgrindlogfile.log"
 
 val:
 	valgrind	$(VGFLAGS)	./testazny < ../Matrix/lp_share1b.mtx 

@@ -178,6 +178,7 @@ void paru_assemble (
 
     double *pivotalFront = 
         (double*) paru_calloc (rowCount*fp, sizeof (double), cc);
+
     /* assembling the pivotal part of the front */
     /* 
      *                  
@@ -293,7 +294,6 @@ void paru_assemble (
 
 
     /* 3rd Pass: Searching for columns */
-    /* Set union for pivotal columns */
     Int *isColInCBcolSet = Work -> colSize;
     Int colMark = Work -> colMark;
     if (colMark < 0) {  // in rare case of overflow
