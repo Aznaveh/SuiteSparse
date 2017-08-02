@@ -62,7 +62,7 @@ void paru_assemble (
     Int *rowSet = (Int*) paru_alloc (setSize, sizeof (Int), cc);
 #endif
 
-    /* 1st Pass: Searching for rows*/
+    /* Searching for rows*/
     Int rowCount= 0;
     work_struct *Work =  paruMatInfo->Work;
     Int *isRowInFront = Work->rowSize; 
@@ -201,7 +201,7 @@ void paru_assemble (
      *                          3   17 | X  Y  .  .  . 
      * */
 
-    /* 2nd Pass: pivot assembly*/
+    /*  pivot assembly */
             /*! TODO: check if any row/col nulified     */
     for (Int c = col1; c < col2; c++){
         tupleList *curTupleList = &ColList[c];
@@ -293,7 +293,7 @@ void paru_assemble (
 #endif
 
 
-    /* 3rd Pass: Searching for columns */
+    /*  Searching for columns */
     Int *isColInCBcolSet = Work -> colSize;
     Int colMark = Work -> colMark;
     if (colMark < 0) {  // in rare case of overflow
@@ -388,6 +388,9 @@ void paru_assemble (
        isRowInFront  [curRow] = -1;
        } */
 #endif
+
+    if(colCount !=0 && rowCount != 0)
+        paru_fourPath (paruMatInfo, rowCount, colCount);
 
     Work->rowMark += rowCount;
     rowMark = Work -> rowMark;

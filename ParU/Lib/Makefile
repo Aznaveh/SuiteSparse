@@ -39,7 +39,8 @@ OBJ = \
 	paru_init_rowFronts.o\
 	paru_add_tuples.o\
 	paru_assemble.o\
-	paru_factorize.o
+	paru_factorize.o\
+	paru_fourPath.o
 
 $(OBJ): $(INC)
 
@@ -73,6 +74,10 @@ paru_assemble.o: ../Source/paru_assemble.cpp
 
 paru_factorize.o: ../Source/paru_factorize.cpp
 	$(C) -c $<
+
+paru_fourPath.o: ../Source/paru_fourPath.cpp
+	$(C) -c $<
+
 
 
 #-------------------------------------------------------------------------------

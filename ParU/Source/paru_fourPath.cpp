@@ -26,6 +26,19 @@ void paru_fourPath (paru_matrix *paruMatInfo,
     Int elCMark = Work -> elCMark;
 
 
+    Element **elementList = paruMatInfo->elementList;
+
+    /*! TODO: 1st path: over non pivotal columns to count rows  */
+
+    tupleList *ColList = paruMatInfo->ColList;
+    for (Int c = 0; c < colCount; c++){
+        tupleList *curColTupleList = &ColList[c];
+    }
+    /*! TODO: 2st path: over rows to count columns */
+    /*! TODO: 3st path: assemble columns   */
+    /*! TODO: 4st path: assemble rows */
+
+
 
     PRLEVEL (0, ("Hi\n"));
 }

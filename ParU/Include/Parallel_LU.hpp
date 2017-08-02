@@ -230,3 +230,6 @@ void paru_assemble(paru_matrix *paruMatInfo, Int f, cholmod_common *cc);
 
 Int paru_factorize (double *F, Int m, Int n, 
         int *ipiv, cholmod_common *cc);
+void paru_fourPath (paru_matrix *paruMatInfo, Int rowCount, Int colCount);
+
+
