@@ -33,6 +33,28 @@ void paru_fourPath (paru_matrix *paruMatInfo,
     tupleList *ColList = paruMatInfo->ColList;
     for (Int c = 0; c < colCount; c++){
         tupleList *curColTupleList = &ColList[c];
+        Int numTuple = curColTupleList->numTuple;
+        ASSERT (numTuple >= 0);
+        Tuple *listColTuples = curColTupleList->list;
+        PRLEVEL (1, ("c =%ld  numTuple = %ld\n", c, numTuple));
+        for (Int i = 0; i < numTuple; i++){
+            Tuple curTpl = listColTuples [i];
+            Int e = curTpl.e;
+            Element *curEl = elementList[e];
+            Int mEl = curEl->nrows;
+            Int nEl = curEl->ncols;
+            Int *el_colIndex = (Int*)(curEl+1);  // pointers to element index 
+            Int *el_rowIndex = el_colIndex + nEl;// pointers to row indices
+            PRLEVEL (1, ("element= %ld  mEl =%ld \n",e, mEl));
+            for (Int rEl = 0; rEl < mEl; rEl++){
+                Int curRow = el_rowIndex [rEl]; 
+                PRLEVEL (1, ("curRow =%ld\n", curRow));
+                if (elRow [curRow] < elRMark) // an element never seen before
+                    elRow [curRow] = elRMark + 1;
+                else 
+                    elRow [curRow]++; 
+            }
+        }
     }
     /*! TODO: 2st path: over rows to count columns */
     /*! TODO: 3st path: assemble columns   */

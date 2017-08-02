@@ -46,6 +46,7 @@ void paru_assemble (
     Int p2 = Rp [f+1];
     Int fp = col2 - col1;   /* first fp columns are pivotal */ 
     Int fn = p2 - p1;          /* Upper bound number of columns of F */ 
+    Element **elementList = paruMatInfo->elementList;
 
     PRLEVEL (0, ("fp=%ld pivotal columns:clo1=%ld...col2=%ld\n", 
                 fp, col1, col2-1));
@@ -95,7 +96,6 @@ void paru_assemble (
         for (Int i = 0; i < numTuple; i++){
             Tuple curTpl = listColTuples [i];
             Int e = curTpl.e;
-            Element **elementList = paruMatInfo->elementList;
             Element *curEl = elementList[e];
             Int mEl = curEl->nrows;
             Int nEl = curEl->ncols;
@@ -218,7 +218,6 @@ void paru_assemble (
             FLIP (curTpl.e); //Nullifying tuple
             curTupleList->numTuple--;
             
-            Element **elementList = paruMatInfo->elementList;
             Element *curEl = elementList[e];
             Int mEl = curEl->nrows;
             Int nEl = curEl->ncols;
@@ -322,7 +321,6 @@ void paru_assemble (
         for (Int i = 0; i < numTuple; i++){
             Tuple curTpl = listRowTuples [i];
             Int e = curTpl.e;
-            Element **elementList = paruMatInfo->elementList;
             Element *curEl = elementList[e];
             Int mEl = curEl->nrows;
             Int nEl = curEl->ncols;
