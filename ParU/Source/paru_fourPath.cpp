@@ -28,7 +28,7 @@ void paru_fourPath (paru_matrix *paruMatInfo,
 
     Element **elementList = paruMatInfo->elementList;
 
-    /*! TODO: 1st path: over non pivotal columns to count rows  */
+    /*!  1st path: over non pivotal columns to count rows  */
 
     tupleList *ColList = paruMatInfo->ColList;
     for (Int c = 0; c < colCount; c++){
@@ -56,7 +56,34 @@ void paru_fourPath (paru_matrix *paruMatInfo,
             }
         }
     }
+
     /*! TODO: 2st path: over rows to count columns */
+    tupleList *RowList = paruMatInfo->RowList;
+    for (Int r = 0; r < rowCount; r++){
+        tupleList *curColTupleList = &RowList[r];
+        Int numTuple = curColTupleList->numTuple;
+        ASSERT (numTuple >= 0);
+        Tuple *listColTuples = curColTupleList->list;
+        PRLEVEL (1, ("r =%ld  numTuple = %ld\n", r, numTuple));
+        for (Int i = 0; i < numTuple; i++){
+            Tuple curTpl = listColTuples [i];
+            Int e = curTpl.e;
+            Element *curEl = elementList[e];
+            Int mEl = curEl->nrows;
+            Int nEl = curEl->ncols;
+            Int *el_colIndex = (Int*)(curEl+1);  // pointers to element index 
+            Int *el_rowIndex = el_colIndex + nEl;// pointers to row indices
+            PRLEVEL (1, ("element= %ld  mEl =%ld \n",e, mEl));
+            for (Int cEl = 0; cEl < mEl; cEl++){
+                Int curCol = el_colIndex [cEl]; 
+                PRLEVEL (1, ("curCol =%ld\n", curCol));
+                if (elCol [curCol] < elCMark) // an element never seen before
+                    elCol [curCol] = elCMark + 1;
+                else 
+                    elCol [curCol]++; 
+            }
+        }
+    }
     /*! TODO: 3st path: assemble columns   */
     /*! TODO: 4st path: assemble rows */
 
