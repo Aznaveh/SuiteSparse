@@ -78,8 +78,6 @@ paru_factorize.o: ../Source/paru_factorize.cpp
 paru_fourPath.o: ../Source/paru_fourPath.cpp
 	$(C) -c $<
 
-
-
 #-------------------------------------------------------------------------------
 
 # install PARU

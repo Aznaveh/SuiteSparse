@@ -98,9 +98,8 @@ void paru_assemble (
             Int e = curTpl.e;
             Element *curEl = elementList[e];
             Int mEl = curEl->nrows;
-            Int nEl = curEl->ncols;
-            Int *el_colrowIndex = (Int*)(curEl+1);  // pointers to element index 
-            Int *el_rowIndex = el_colrowIndex + nEl;// pointers to row indices
+           //Int *el_colrowIndex = (Int*)(curEl+1);  // pointers to element index 
+            Int *el_rowIndex = rowIndex_pointer (curEl);//pointers to row index
             PRLEVEL (1, ("element= %ld  mEl =%ld \n",e, mEl));
             for (Int rEl = 0; rEl < mEl; rEl++){
                 Int curRow = el_rowIndex [rEl]; 

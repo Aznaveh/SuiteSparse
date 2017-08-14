@@ -165,6 +165,12 @@ typedef struct	/* Element */
 
 } Element ; // contribution block
 
+inline Int *colIndex_pointer (Element *curEl)
+{    return (Int*)(curEl+1);}
+
+inline Int *rowIndex_pointer (Element *curEl)
+{    return (Int*)(curEl+1) + curEl->ncols;}
+
 
 typedef struct  /*List of tuples */
 {
@@ -231,5 +237,4 @@ void paru_assemble(paru_matrix *paruMatInfo, Int f, cholmod_common *cc);
 Int paru_factorize (double *F, Int m, Int n, 
         int *ipiv, cholmod_common *cc);
 void paru_fourPath (paru_matrix *paruMatInfo, Int rowCount, Int colCount);
-
 
