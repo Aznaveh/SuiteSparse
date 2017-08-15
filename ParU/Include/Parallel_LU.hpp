@@ -171,6 +171,11 @@ inline Int *colIndex_pointer (Element *curEl)
 inline Int *rowIndex_pointer (Element *curEl)
 {    return (Int*)(curEl+1) + curEl->ncols;}
 
+inline double *numeric_pointer (Element *curEl)
+    // sizeof Int and double are same, but I keep it like this for clarity
+{    return (double*)((Int*)(curEl+1) + curEl->ncols + curEl->nrows);}
+
+
 
 typedef struct  /*List of tuples */
 {

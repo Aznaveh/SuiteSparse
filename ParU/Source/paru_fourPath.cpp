@@ -43,8 +43,8 @@ void paru_fourPath (paru_matrix *paruMatInfo,
             Element *curEl = elementList[e];
             Int mEl = curEl->nrows;
             Int nEl = curEl->ncols;
-            Int *el_colIndex = (Int*)(curEl+1);  // pointers to element index 
-            Int *el_rowIndex = el_colIndex + nEl;// pointers to row indices
+            Int *el_colIndex = colIndex_pointer (curEl);
+            Int *el_rowIndex = rowIndex_pointer (curEl);
             PRLEVEL (1, ("element= %ld  mEl =%ld \n",e, mEl));
             for (Int rEl = 0; rEl < mEl; rEl++){
                 Int curRow = el_rowIndex [rEl]; 
@@ -71,8 +71,8 @@ void paru_fourPath (paru_matrix *paruMatInfo,
             Element *curEl = elementList[e];
             Int mEl = curEl->nrows;
             Int nEl = curEl->ncols;
-            Int *el_colIndex = (Int*)(curEl+1);  // pointers to element index 
-            Int *el_rowIndex = el_colIndex + nEl;// pointers to row indices
+            Int *el_colIndex = colIndex_pointer (curEl);
+            Int *el_rowIndex = rowIndex_pointer (curEl);
             PRLEVEL (1, ("element= %ld  mEl =%ld \n",e, mEl));
             for (Int cEl = 0; cEl < mEl; cEl++){
                 Int curCol = el_colIndex [cEl]; 

@@ -98,7 +98,6 @@ void paru_assemble (
             Int e = curTpl.e;
             Element *curEl = elementList[e];
             Int mEl = curEl->nrows;
-           //Int *el_colrowIndex = (Int*)(curEl+1);  // pointers to element index 
             Int *el_rowIndex = rowIndex_pointer (curEl);//pointers to row index
             PRLEVEL (1, ("element= %ld  mEl =%ld \n",e, mEl));
             for (Int rEl = 0; rEl < mEl; rEl++){
@@ -220,8 +219,8 @@ void paru_assemble (
             Element *curEl = elementList[e];
             Int mEl = curEl->nrows;
             Int nEl = curEl->ncols;
-            Int *el_colIndex = (Int*)(curEl+1);    // pointers to element index
-            Int *el_rowIndex = el_colIndex + nEl;  // pointers to row indices
+            Int *el_colIndex = colIndex_pointer (curEl);
+            Int *el_rowIndex = rowIndex_pointer (curEl);
 
             Int curColIndex = curTpl.f;
             ASSERT (el_colIndex[curColIndex] == c);
@@ -230,7 +229,7 @@ void paru_assemble (
             PRLEVEL (1, ("curColIndex =%ld\n", curColIndex));
 
             ASSERT (curColIndex < nEl);
-            double *el_colrowNum = (double*)(el_colIndex + mEl + nEl); 
+            double *el_Num = numeric_pointer (curEl);
             PRLEVEL (1, ("element= %ld  mEl =%ld \n",e, mEl));
 
             for (Int rEl = 0; rEl < mEl; rEl++){   
@@ -246,7 +245,7 @@ void paru_assemble (
                 ASSERT ( colIndexF*rowCount + rowIndexF < rowCount * fp);
                 ASSERT ( curColIndex*mEl + rEl < mEl*nEl);
                 pivotalFront [colIndexF*rowCount + rowIndexF] += 
-                    el_colrowNum [ curColIndex*mEl + rEl];
+                    el_Num [ curColIndex*mEl + rEl];
             }
         }
     }
@@ -323,8 +322,8 @@ void paru_assemble (
             Element *curEl = elementList[e];
             Int mEl = curEl->nrows;
             Int nEl = curEl->ncols;
-            Int *el_colIndex = (Int*)(curEl+1);  // pointers to element index 
-            Int *el_rowIndex = el_colIndex + nEl;// pointers to row indices
+            Int *el_colIndex = colIndex_pointer (curEl);
+            Int *el_rowIndex = rowIndex_pointer (curEl);
             PRLEVEL (0, ("element= %ld  nEl =%ld \n",e, nEl));
             for (Int cEl = 0; cEl < nEl; cEl++){
                 Int curCol = el_colIndex [cEl]; 
