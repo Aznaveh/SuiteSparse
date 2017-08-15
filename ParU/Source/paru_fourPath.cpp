@@ -57,7 +57,8 @@ void paru_fourPath (paru_matrix *paruMatInfo,
         }
     }
 
-    /*! TODO: 2st path: over rows to count columns */
+    /*! 2st path: over rows to count columns */
+
     tupleList *RowList = paruMatInfo->RowList;
     for (Int r = 0; r < rowCount; r++){
         tupleList *curColTupleList = &RowList[r];
