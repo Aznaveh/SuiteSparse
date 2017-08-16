@@ -19,7 +19,7 @@ void paru_fourPath (paru_matrix *paruMatInfo,
     Int *isColInCBcolSet = Work -> colSize;
     Int colMark = Work -> colMark;
 
-
+    // Couning how many rows/cols of an element is seen
     Int *elRow = Work -> elRow; 
     Int elRMark = Work -> elRMark;
     Int *elCol = Work -> elCol;
@@ -49,10 +49,11 @@ void paru_fourPath (paru_matrix *paruMatInfo,
             for (Int rEl = 0; rEl < mEl; rEl++){
                 Int curRow = el_rowIndex [rEl]; 
                 PRLEVEL (1, ("curRow =%ld\n", curRow));
-                if (elRow [curRow] < elRMark) // an element never seen before
-                    elRow [curRow] = elRMark + 1;
+                /*! TODO: curRow --map--> augmented tree*/
+                if (elRow [e] < elRMark) // an element never seen before
+                    elRow [e] = elRMark + 1;
                 else 
-                    elRow [curRow]++; 
+                    elRow [e]++; 
             }
         }
     }
@@ -78,10 +79,10 @@ void paru_fourPath (paru_matrix *paruMatInfo,
             for (Int cEl = 0; cEl < mEl; cEl++){
                 Int curCol = el_colIndex [cEl]; 
                 PRLEVEL (1, ("curCol =%ld\n", curCol));
-                if (elCol [curCol] < elCMark) // an element never seen before
-                    elCol [curCol] = elCMark + 1;
+                if (elCol [e] < elCMark) // an element never seen before
+                    elCol [e] = elCMark + 1;
                 else 
-                    elCol [curCol]++; 
+                    elCol [e]++; 
             }
         }
     }
