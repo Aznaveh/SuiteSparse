@@ -49,7 +49,6 @@ void paru_fourPath (paru_matrix *paruMatInfo,
             for (Int rEl = 0; rEl < mEl; rEl++){
                 Int curRow = el_rowIndex [rEl]; 
                 PRLEVEL (1, ("curRow =%ld\n", curRow));
-                /*! TODO: curRow --map--> augmented tree*/
                 if (elRow [e] < elRMark) // an element never seen before
                     elRow [e] = elRMark + 1;
                 else 

@@ -48,6 +48,13 @@ void paru_assemble (
     Int fn = p2 - p1;          /* Upper bound number of columns of F */ 
     Element **elementList = paruMatInfo->elementList;
 
+    // Couning how many rows/cols of an element is seen
+    /*! TODO: grasping a prior CB sooner     */
+    Int *elRow = Work -> elRow; 
+    Int elRMark = Work -> elRMark;
+    Int *elCol = Work -> elCol;
+    Int elCMark = Work -> elCMark;
+
     PRLEVEL (0, ("fp=%ld pivotal columns:clo1=%ld...col2=%ld\n", 
                 fp, col1, col2-1));
     PRLEVEL (1, ("Upper bound number of columns: Rj[%ld]=%ld ... Rj[%ld]=%ld\n", 
