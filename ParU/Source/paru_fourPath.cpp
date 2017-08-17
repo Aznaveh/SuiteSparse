@@ -40,20 +40,10 @@ void paru_fourPath (paru_matrix *paruMatInfo,
         for (Int i = 0; i < numTuple; i++){
             Tuple curTpl = listColTuples [i];
             Int e = curTpl.e;
-            Element *curEl = elementList[e];
-            Int mEl = curEl->nrows;
-            Int nEl = curEl->ncols;
-            Int *el_colIndex = colIndex_pointer (curEl);
-            Int *el_rowIndex = rowIndex_pointer (curEl);
-            PRLEVEL (1, ("element= %ld  mEl =%ld \n",e, mEl));
-            for (Int rEl = 0; rEl < mEl; rEl++){
-                Int curRow = el_rowIndex [rEl]; 
-                PRLEVEL (1, ("curRow =%ld\n", curRow));
-                if (elRow [e] < elRMark) // an element never seen before
-                    elRow [e] = elRMark + 1;
-                else 
-                    elRow [e]++; 
-            }
+           if (elRow [e] < elRMark) // an element never seen before
+                elRow [e] = elRMark + 1;
+            else 
+                elRow [e]++; 
         }
     }
 
@@ -69,20 +59,10 @@ void paru_fourPath (paru_matrix *paruMatInfo,
         for (Int i = 0; i < numTuple; i++){
             Tuple curTpl = listColTuples [i];
             Int e = curTpl.e;
-            Element *curEl = elementList[e];
-            Int mEl = curEl->nrows;
-            Int nEl = curEl->ncols;
-            Int *el_colIndex = colIndex_pointer (curEl);
-            Int *el_rowIndex = rowIndex_pointer (curEl);
-            PRLEVEL (1, ("element= %ld  mEl =%ld \n",e, mEl));
-            for (Int cEl = 0; cEl < mEl; cEl++){
-                Int curCol = el_colIndex [cEl]; 
-                PRLEVEL (1, ("curCol =%ld\n", curCol));
-                if (elCol [e] < elCMark) // an element never seen before
-                    elCol [e] = elCMark + 1;
-                else 
-                    elCol [e]++; 
-            }
+            if (elCol [e] < elCMark) // an element never seen before
+                elCol [e] = elCMark + 1;
+            else 
+                elCol [e]++; 
         }
     }
     /*! TODO: 3st path: assemble columns   */
