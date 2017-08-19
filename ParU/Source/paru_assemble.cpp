@@ -47,6 +47,7 @@ void paru_assemble (
     Int fp = col2 - col1;   /* first fp columns are pivotal */ 
     Int fn = p2 - p1;          /* Upper bound number of columns of F */ 
     Element **elementList = paruMatInfo->elementList;
+    work_struct *Work =  paruMatInfo->Work;
 
     // Couning how many rows/cols of an element is seen
     /*! TODO: grasping a prior CB sooner     */
@@ -70,9 +71,7 @@ void paru_assemble (
     Int *rowSet = (Int*) paru_alloc (setSize, sizeof (Int), cc);
 #endif
 
-    /* Searching for rows*/
     Int rowCount= 0;
-    work_struct *Work =  paruMatInfo->Work;
     Int *isRowInFront = Work->rowSize; 
     Int rowMark = Work->rowMark;
     if (rowMark < 0) {  // in rare case of overflow
@@ -94,6 +93,8 @@ void paru_assemble (
     std::set<Int> stl_rowSet;
     std::set<Int>::iterator it;
 #endif 
+
+    /*************** finding set of rows in current front *********************/
     for (Int c = col1; c < col2; c++){
         tupleList *curColTupleList = &ColList[c];
         Int numTuple = curColTupleList->numTuple;
@@ -103,6 +104,16 @@ void paru_assemble (
         for (Int i = 0; i < numTuple; i++){
             Tuple curTpl = listColTuples [i];
             Int e = curTpl.e;
+            /*! TODO: Is it possible to have columns already ate f<0 */
+            Int f = curTpl.f;
+
+            //counting element's row
+            /*! TODO:Update Mark somewhere     */
+            if (elRow [e] < elRMark) // an element never seen before
+                elRow [e] = elRMark + 1;
+            else 
+                elRow [e]++; 
+
             Element *curEl = elementList[e];
             Int mEl = curEl->nrows;
             Int *el_rowIndex = rowIndex_pointer (curEl);//pointers to row index
@@ -118,7 +129,8 @@ void paru_assemble (
                             isRowInFront+curRow, curRow, isRowInFront[curRow]));
 
                 if (isRowInFront[curRow] < rowMark ){
-                    PRLEVEL (1, ("curRow =%ld rowCount=%ld\n", curRow, rowCount));
+                    PRLEVEL (1, ("curRow =%ld rowCount=%ld\n", 
+                                curRow, rowCount));
                     fsRowList [rowCount] = curRow;
                     isRowInFront [curRow] = rowMark + rowCount++; 
                 }
@@ -175,7 +187,7 @@ void paru_assemble (
         PRLEVEL (p, ("\n"));
     }
     ASSERT (rowCount == stl_rowSize );
- //   ASSERT (rowCount >= fp ); // otherwise it is a singular matrix
+    //   ASSERT (rowCount >= fp ); // otherwise it is a singular matrix
 
 #endif 
 
@@ -207,7 +219,7 @@ void paru_assemble (
      * */
 
     /*  pivot assembly */
-            /*! TODO: check if any row/col nulified     */
+    /*! TODO: check if any row/col nulified     */
     for (Int c = col1; c < col2; c++){
         tupleList *curTupleList = &ColList[c];
         Int numTuple = curTupleList->numTuple;
@@ -222,7 +234,7 @@ void paru_assemble (
             PRLEVEL (1, ("col=%ld, (%ld,%ld)\n", c, e, f));
             FLIP (curTpl.e); //Nullifying tuple
             curTupleList->numTuple--;
-            
+
             Element *curEl = elementList[e];
             Int mEl = curEl->nrows;
             Int nEl = curEl->ncols;
@@ -256,7 +268,7 @@ void paru_assemble (
             }
         }
     }
-    
+
 #ifndef NDEBUG  // Printing the pivotal front
     p = 0;
     PRLEVEL (p, ("x\t"));
@@ -276,8 +288,8 @@ void paru_assemble (
     /*     factorizing the fully summed part of the matrix                     /
      *     a set of pivot is found in this part that is crucial to assemble   */
     PRLEVEL (1, ("rowCount =%ld\n", rowCount));
-    int *ipiv =(int *) (Work->scratch+rowCount+1); /* using the rest of scratch for 
-                                               permutation; Not sure about 1  */
+    /* using the rest of scratch for permutation; Not sure about 1  */
+    int *ipiv =(int *) (Work->scratch+rowCount+1);
     paru_factorize (pivotalFront, rowCount, fp, ipiv, cc );
 
     /* To this point fully summed part of the front is computed and L and U    /  
@@ -310,7 +322,7 @@ void paru_assemble (
 #ifndef NDEBUG
     std::set<Int> stl_colSet;
 #endif 
-    
+    /*************** finding set of non pivotal cols in current front *********/
     tupleList *RowList = paruMatInfo->RowList;
     for (Int i = 0; i < fp; i++){
         Int curFsRowIndex =(Int) ipiv [i]; //current fully summed row index
@@ -343,13 +355,13 @@ void paru_assemble (
                 stl_colSet.insert (curCol);
 #endif
                 PRLEVEL (1, ("%p ---> isColInCBcolSet[%ld]=%ld\n", 
-                      isColInCBcolSet+curCol, curCol, isColInCBcolSet[curCol]));
-/*! TODO: Check for elements too in Pass 1 and 3  */
+                            isColInCBcolSet+curCol, curCol, isColInCBcolSet[curCol]));
+                /*! TODO: Check for elements too in Pass 1 and 3  */
                 if (isColInCBcolSet [curCol] < colMark  ){
                     PRLEVEL (1, ("curCol = %ld colCount=%ld\n", curCol, colCount));
-                    
+
                     CBColList [colCount] = curCol;
-                    
+
                     isColInCBcolSet [curCol] = colMark + colCount++; 
                 }
                 ASSERT (colCount <= n);
