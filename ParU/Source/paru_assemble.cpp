@@ -338,6 +338,13 @@ void paru_assemble (
         for (Int i = 0; i < numTuple; i++){
             Tuple curTpl = listRowTuples [i];
             Int e = curTpl.e;
+
+            //Counting columns of priors CBs
+            if (elCol [e] < elCMark) // an element never seen before
+                elCol [e] = elCMark + 1;
+            else 
+                elCol [e]++; 
+
             Element *curEl = elementList[e];
             Int mEl = curEl->nrows;
             Int nEl = curEl->ncols;
