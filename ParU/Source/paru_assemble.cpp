@@ -106,6 +106,7 @@ void paru_assemble (
             Int e = curTpl.e;
             /*! TODO: Is it possible to have columns already ate f<0 */
             Int f = curTpl.f;
+            //if (f<0) continue;
 
             //counting element's row
             /*! TODO:Update Mark somewhere     */
