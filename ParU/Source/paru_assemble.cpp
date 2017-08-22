@@ -112,8 +112,10 @@ void paru_assemble (
             /*! TODO:Update Mark somewhere     */
             if (elRow [e] < elRMark) // an element never seen before
                 elRow [e] = elRMark + 1;
-            else 
-                elRow [e]++; 
+            else { 
+                elRow [e]++;    //already added its rows
+                continue;
+            }
 
             Element *curEl = elementList[e];
             Int mEl = curEl->nrows;
