@@ -158,9 +158,14 @@ typedef struct	/* Element */
        Int
        col [0..ncols-1],	column indices of this element
        row [0..nrows-1] ;	row indices of this element
-       Entry			(suitably aligned, see macro below)
-       C [0...nrows-1, 0...ncols-1] ;
-       size of C is nrows*ncols Entry's
+
+       Int cVald; last valid active front for relative indices in rows
+       relColInd [0..ncols-1];	relative indices of this element for current front
+       Int rVald;  last valid active front for relative indices in cols
+       relRowInd [0..nrows-1],	relative indices of this element for current front
+
+       double ncols*nrows; numeri values
+
        */
 
 } Element ; // contribution block
@@ -171,9 +176,22 @@ inline Int *colIndex_pointer (Element *curEl)
 inline Int *rowIndex_pointer (Element *curEl)
 {    return (Int*)(curEl+1) + curEl->ncols;}
 
+inline Int *colRelIndVal(Element *curEl)
+{    return (Int*)(curEl+1) + curEl->ncols + curEl->nrows;}
+
+inline Int *relColInd (Element *curEl)
+{    return (Int*)(curEl+1) + curEl->ncols + curEl->nrows + 1;}
+
+inline Int *rowRelIndVal(Element *curEl)
+{    return (Int*)(curEl+1) + 2*curEl->ncols + curEl->nrows + 1;}
+
+inline Int *relRowInd (Element *curEl)
+{    return (Int*)(curEl+1) + 2*curEl->ncols + curEl->nrows + 2;}
+
+
 inline double *numeric_pointer (Element *curEl)
     // sizeof Int and double are same, but I keep it like this for clarity
-{    return (double*)((Int*)(curEl+1) + curEl->ncols + curEl->nrows);}
+{    return (double*)((Int*)(curEl+1) + 2*curEl->ncols + 2*curEl->nrows + 2);}
 
 
 

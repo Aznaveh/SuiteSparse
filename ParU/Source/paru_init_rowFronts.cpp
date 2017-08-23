@@ -220,7 +220,8 @@ paru_matrix *paru_init_rowFronts (
 
         PRLEVEL (1, ("element %ld= %ld x %ld\n", e, nrows, ncols));
         Element *curEl = elementList[e] =
-            (Element*) paru_alloc(1, sizeof(Element)+sizeof(Int)*(nrows+ncols)+
+            (Element*) paru_alloc(1, sizeof(Element)+
+                    sizeof(Int)*(2*(nrows+ncols)+2)+
                     sizeof(double)*nrows*ncols, cc);
         if (curEl == NULL){   //out of memory
             paru_freemat (&paruMatInfo, cc);

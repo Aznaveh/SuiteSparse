@@ -134,7 +134,7 @@ void paru_freemat (paru_matrix **paruMatInfo_handle,
             ncols = curEl->ncols;
         PRLEVEL (1, ("nrows =%ld ", nrows));
         PRLEVEL (1, ("ncols =%ld\n", ncols));
-        cholmod_l_free (1, sizeof(Element)+sizeof(Int)*(nrows+ncols)+
+        cholmod_l_free (1, sizeof(Element)+sizeof(Int)*(2*(nrows+ncols)+2)+
                 sizeof(double)*nrows*ncols, curEl, cc);
     }
 
