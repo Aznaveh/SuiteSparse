@@ -248,11 +248,12 @@ void paru_assemble (
             Int *el_rowIndex = rowIndex_pointer (curEl);
 
             Int *rowRelIndValid = rowRelIndVal (curEl);
-            Int *rowRelIndex= rowRelInd (curEl);
+            Int *rowRelIndex = relRowInd (curEl);
             
             if (elRow [e] > 1 ){ // it can be good to store row relative indices 
                 for (Int rEl = 0; rEl < mEl; rEl++)   
-                    Int curRow = el_rowIndex [rEl]; 
+                    rowRelIndex [rEl] = el_rowIndex [rEl]; 
+                *rowRelIndValid = f ;//current front
 
             }
 
