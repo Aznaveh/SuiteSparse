@@ -230,12 +230,15 @@ void paru_assemble (
         Tuple *l = curTupleList->list;
         PRLEVEL (1, ("c =%ld numTuple = %ld\n", c, numTuple));
 
+        Int colIndexF = c - col1;  // relative column index
+
         for (Int i = 0; i < numTuple; i++){
 
             Tuple curTpl = l [i];
             Int e = curTpl.e;
+
             PRLEVEL (1, ("col=%ld, (%ld,%ld)\n", c, e, f));
-            FLIP (curTpl.e); //Nullifying tuple
+            FLIP (curTpl.e); //Nullifying tuple  /*! TODO: Deleting tuple     */
             curTupleList->numTuple--;
 
             Element *curEl = elementList[e];
@@ -243,6 +246,16 @@ void paru_assemble (
             Int nEl = curEl->ncols;
             Int *el_colIndex = colIndex_pointer (curEl);
             Int *el_rowIndex = rowIndex_pointer (curEl);
+
+            Int *rowRelIndValid = rowRelIndVal (curEl);
+            Int *rowRelIndex= rowRelInd (curEl);
+            
+            if (elRow [e] > 1 ){ // it can be good to store row relative indices 
+                for (Int rEl = 0; rEl < mEl; rEl++)   
+                    Int curRow = el_rowIndex [rEl]; 
+
+            }
+
 
             Int curColIndex = curTpl.f;
             ASSERT (el_colIndex[curColIndex] == c);
@@ -259,8 +272,8 @@ void paru_assemble (
                 PRLEVEL (1, ("curRow =%ld\n", curRow));
                 ASSERT (curRow < m ) ;
                 ASSERT (isRowInFront [curRow] != -1);
+                // relative row index
                 Int rowIndexF = isRowInFront [curRow] - rowMark;
-                Int colIndexF = c - col1;
                 PRLEVEL (1, ("rowIndexF = %ld\n", rowIndexF));
                 PRLEVEL (1, (" colIndexF*rowCount + rowIndexF=%ld\n",
                             colIndexF*rowCount + rowIndexF));
@@ -285,7 +298,7 @@ void paru_assemble (
             PRLEVEL (p, (" %3.1lf\t", pivotalFront [(c-col1)*rowCount + r]));
         }
         PRLEVEL (p, ("\n"));
-    }
+        }
 #endif
 
     /*     factorizing the fully summed part of the matrix                     /

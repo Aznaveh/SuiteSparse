@@ -160,9 +160,11 @@ typedef struct	/* Element */
        row [0..nrows-1] ;	row indices of this element
 
        Int cVald; last valid active front for relative indices in rows
-       relColInd [0..ncols-1];	relative indices of this element for current front
+       relColInd [0..ncols-1];	relative indices of this element for
+                                                            current front
        Int rVald;  last valid active front for relative indices in cols
-       relRowInd [0..nrows-1],	relative indices of this element for current front
+       relRowInd [0..nrows-1],	relative indices of this element for 
+                                                            current front
 
        double ncols*nrows; numeri values
 
