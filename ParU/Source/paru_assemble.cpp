@@ -36,6 +36,7 @@ void paru_assemble (
     /* get the front F  */
     /* ---------------------------------------------------------------------- */
 
+    
     PRLEVEL (0, ("Assemble Front %ld\n", f));
     /* pivotal columns Super [f] ... Super [f+1]-1 */
     Int col1 = Super [f];       /* fornt F has columns col1:col2-1 */
@@ -105,11 +106,10 @@ void paru_assemble (
             Tuple curTpl = listColTuples [i];
             Int e = curTpl.e;
             /*! TODO: Is it possible to have columns already ate f<0 */
-            Int f = curTpl.f;
-            //if (f<0) continue;
+            //if (curTpl.f<0) continue;
 
             //counting element's row
-            /*! TODO:Update Mark somewhere     */
+            /*! TODO:Update Mark somewhere    !!! Here is an issue !!! */
             if (elRow [e] < elRMark) // an element never seen before
                 elRow [e] = elRMark + 1;
             else { 
@@ -250,14 +250,15 @@ void paru_assemble (
             Int *rowRelIndValid = rowRelIndVal (curEl);
             Int *rowRelIndex = relRowInd (curEl);
             
-            if (elRow [e] > 1 ){ // it can be good to store row relative indices 
-                for (Int rEl = 0; rEl < mEl; rEl++)   
-                    rowRelIndex [rEl] = isRowInFront [el_rowIndex [rEl]] 
-                        - rowMark;
-                *rowRelIndValid = f ;//current front
-            }
-            else 
-                *rowRelIndValid = -1 ;//to test
+       //     if (elRow [e] > 1 ){ // it can be good to store row relative indices 
+       //         PRLEVEL (0, ("elRow[%ld]=%ld", e, elRow [e]));  
+       //         for (Int rEl = 0; rEl < mEl; rEl++)   
+       //             rowRelIndex [rEl] = isRowInFront [el_rowIndex [rEl]] 
+       //                 - rowMark;
+       //         *rowRelIndValid = f ;//current front
+       //     }
+       //     else 
+       //         *rowRelIndValid = -1 ;//to test
 
 
             Int curColIndex = curTpl.f;
@@ -276,12 +277,16 @@ void paru_assemble (
                 PRLEVEL (1, ("curRow =%ld\n", curRow));
                 ASSERT (curRow < m ) ;
                 ASSERT (isRowInFront [curRow] != -1);
-                // relative row index
-                Int rowIndexF = (*rowRelIndValid == f) ? rowRelIndex [rEl] :
-                    isRowInFront [curRow] - rowMark;
-                PRLEVEL (0, ("rowIndexF = %ld\n", rowIndexF));
+       //         PRLEVEL (0, ("rowRelIndValid = %ld, f=%ld,\
+       //                     rowRelIndex[%ld]= %ld,##%ld\n ", 
+       //                     *rowRelIndValid, f, rEl, rowRelIndex [rEl], 
+       //                     isRowInFront [curRow] - rowMark));
+       //         // relative row index
+       //         Int rowIndexF = (*rowRelIndValid == f) ? rowRelIndex [rEl] :
+       //             isRowInFront [curRow] - rowMark;
+                Int rowIndexF = isRowInFront [curRow] - rowMark;
+                PRLEVEL (1, ("rowIndexF = %ld\n", rowIndexF));
                 /*! TODO: Need to initialize valid ints somehow     */
-                ASSERT (rowIndexF ==  (isRowInFront [curRow] - rowMark) );
                 PRLEVEL (1, (" colIndexF*rowCount + rowIndexF=%ld\n",
                             colIndexF*rowCount + rowIndexF));
                 ASSERT ( colIndexF*rowCount + rowIndexF < rowCount * fp);
