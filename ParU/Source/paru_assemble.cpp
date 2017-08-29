@@ -255,8 +255,9 @@ void paru_assemble (
                     rowRelIndex [rEl] = isRowInFront [el_rowIndex [rEl]] 
                         - rowMark;
                 *rowRelIndValid = f ;//current front
-
             }
+            else 
+                *rowRelIndValid = -1 ;//to test
 
 
             Int curColIndex = curTpl.f;
