@@ -237,7 +237,7 @@ void paru_assemble (
             Tuple curTpl = l [i];
             Int e = curTpl.e;
 
-            PRLEVEL (1, ("col=%ld, (%ld,%ld)\n", c, e, f));
+            PRLEVEL (0, ("col=%ld, (%ld,%ld)\n", c, e, f));
             FLIP (curTpl.e); //Nullifying tuple  /*! TODO: Deleting tuple     */
             curTupleList->numTuple--;
 
@@ -252,7 +252,8 @@ void paru_assemble (
             
             if (elRow [e] > 1 ){ // it can be good to store row relative indices 
                 for (Int rEl = 0; rEl < mEl; rEl++)   
-                    rowRelIndex [rEl] = el_rowIndex [rEl]; 
+                    rowRelIndex [rEl] = isRowInFront [el_rowIndex [rEl]] 
+                        - rowMark;
                 *rowRelIndValid = f ;//current front
 
             }
@@ -270,12 +271,16 @@ void paru_assemble (
 
             for (Int rEl = 0; rEl < mEl; rEl++){   
                 Int curRow = el_rowIndex [rEl]; 
+
                 PRLEVEL (1, ("curRow =%ld\n", curRow));
                 ASSERT (curRow < m ) ;
                 ASSERT (isRowInFront [curRow] != -1);
                 // relative row index
-                Int rowIndexF = isRowInFront [curRow] - rowMark;
-                PRLEVEL (1, ("rowIndexF = %ld\n", rowIndexF));
+                Int rowIndexF = (*rowRelIndValid == f) ? rowRelIndex [rEl] :
+                    isRowInFront [curRow] - rowMark;
+                PRLEVEL (0, ("rowIndexF = %ld\n", rowIndexF));
+                /*! TODO: Need to initialize valid ints somehow     */
+                ASSERT (rowIndexF ==  (isRowInFront [curRow] - rowMark) );
                 PRLEVEL (1, (" colIndexF*rowCount + rowIndexF=%ld\n",
                             colIndexF*rowCount + rowIndexF));
                 ASSERT ( colIndexF*rowCount + rowIndexF < rowCount * fp);
