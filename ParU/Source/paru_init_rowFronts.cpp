@@ -218,7 +218,7 @@ paru_matrix *paru_init_rowFronts (
         Int nrows = 1, 
             ncols = Sp[row+1]-Sp[row]; //nrows and ncols of current front/row
 
-        PRLEVEL (1, ("element %ld= %ld x %ld\n", e, nrows, ncols));
+        PRLEVEL (0, ("element %ld = %ld x %ld\n", e, nrows, ncols));
         Element *curEl = elementList[e] =
             (Element*) paru_alloc(1, sizeof(Element)+
                     sizeof(Int)*(2*(nrows+ncols)+2)+
@@ -230,6 +230,25 @@ paru_matrix *paru_init_rowFronts (
         }
         curEl->nrowsleft = curEl->nrows = nrows;
         curEl->ncolsleft = curEl->ncols = ncols;
+
+
+        Int *rowRelIndValid = rowRelIndVal (curEl);
+        Int *colRelIndValid = colRelIndVal (curEl);
+#ifndef NDEBUG  // Printing the pointers info
+        Int p=1;
+        PRLEVEL (p, ("curEl = %p ", curEl));
+        PRLEVEL (p, ("rowRelIndValid = %p, %d", rowRelIndValid, 
+                    rowRelIndValid - (Int*)curEl));
+        PRLEVEL (p, (" colRelIndValid = %p, %d", colRelIndValid,
+                    colRelIndValid - (Int*)curEl));
+        Int limit = sizeof(Element)+
+            sizeof(Int)*(2*(nrows+ncols)+2)+
+            sizeof(double)*nrows*ncols;
+        PRLEVEL (p, ("limit= %p", curEl+limit));
+        PRLEVEL (p, ("\n"));
+#endif
+        *rowRelIndValid = -1 ;
+        *colRelIndValid = -1 ;
 
 
         // Allocating Rowlist and updating its tuples
