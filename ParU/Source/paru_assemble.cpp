@@ -110,10 +110,10 @@ void paru_assemble (
 
             //counting element's row
             /*! TODO:Update Mark somewhere    !!! Here is an issue !!! */
-            if (elRow [e] < elRMark) // an element never seen before
-                elRow [e] = elRMark + 1;
+            if (elCol [e] < elCMark) // an element never seen before
+                elCol [e] = elCMark + 1;
             else { 
-                elRow [e]++;    //already added its rows
+                elCol [e]++;    //already added its rows
                 continue;
             }
 
@@ -237,7 +237,7 @@ void paru_assemble (
             Tuple curTpl = l [i];
             Int e = curTpl.e;
 
-            PRLEVEL (0, ("col=%ld, (%ld,%ld)\n", c, e, f));
+            PRLEVEL (1, ("col=%ld, (%ld,%ld)\n", c, e, f));
             FLIP (curTpl.e); //Nullifying tuple  /*! TODO: Deleting tuple     */
             curTupleList->numTuple--;
 
@@ -250,15 +250,16 @@ void paru_assemble (
             Int *rowRelIndValid = rowRelIndVal (curEl);
             Int *rowRelIndex = relRowInd (curEl);
             
-       //     if (elRow [e] > 1 ){ // it can be good to store row relative indices 
-       //         PRLEVEL (0, ("elRow[%ld]=%ld", e, elRow [e]));  
-       //         for (Int rEl = 0; rEl < mEl; rEl++)   
-       //             rowRelIndex [rEl] = isRowInFront [el_rowIndex [rEl]] 
-       //                 - rowMark;
-       //         *rowRelIndValid = f ;//current front
-       //     }
-       //     else 
-       //         *rowRelIndValid = -1 ;//to test
+        //    if (elRow [e] > 1 ){ // it can be good to store row relative indices 
+        //        //!!! Some logical problem
+        //        PRLEVEL (1, ("elRow[%ld]=%ld", e, elRow [e]));  
+        //        for (Int rEl = 0; rEl < mEl; rEl++)   
+        //            rowRelIndex [rEl] = isRowInFront [el_rowIndex [rEl]] 
+        //                - rowMark;
+        //        *rowRelIndValid = f ;//current front
+        //    }
+        //    else 
+        //        *rowRelIndValid = -1 ;//to test
 
 
             Int curColIndex = curTpl.f;
@@ -281,10 +282,10 @@ void paru_assemble (
        //                     rowRelIndex[%ld]= %ld,##%ld\n ", 
        //                     *rowRelIndValid, f, rEl, rowRelIndex [rEl], 
        //                     isRowInFront [curRow] - rowMark));
-       //         // relative row index
-       //         Int rowIndexF = (*rowRelIndValid == f) ? rowRelIndex [rEl] :
-       //             isRowInFront [curRow] - rowMark;
-                Int rowIndexF = isRowInFront [curRow] - rowMark;
+                // relative row index
+                Int rowIndexF = (*rowRelIndValid == f) ? rowRelIndex [rEl] :
+                    isRowInFront [curRow] - rowMark;
+       //         Int rowIndexF = isRowInFront [curRow] - rowMark;
                 PRLEVEL (1, ("rowIndexF = %ld\n", rowIndexF));
                 /*! TODO: Need to initialize valid ints somehow     */
                 PRLEVEL (1, (" colIndexF*rowCount + rowIndexF=%ld\n",
@@ -298,7 +299,7 @@ void paru_assemble (
     }
 
 #ifndef NDEBUG  // Printing the pivotal front
-    p = 0;
+    p = 1;
     PRLEVEL (p, ("x\t"));
     for (Int c = col1; c < col2; c++) {
         PRLEVEL (p, ("%ld\t", c));
