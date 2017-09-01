@@ -218,7 +218,7 @@ paru_matrix *paru_init_rowFronts (
         Int nrows = 1, 
             ncols = Sp[row+1]-Sp[row]; //nrows and ncols of current front/row
 
-        PRLEVEL (0, ("element %ld = %ld x %ld\n", e, nrows, ncols));
+        PRLEVEL (1, ("element %ld = %ld x %ld\n", e, nrows, ncols));
         Element *curEl = elementList[e] =
             (Element*) paru_alloc(1, sizeof(Element)+
                     sizeof(Int)*(2*(nrows+ncols)+2)+
@@ -228,12 +228,14 @@ paru_matrix *paru_init_rowFronts (
             printf("Out of memory: curEl\n");
             return NULL;
         }
+        // Initializing current element
         curEl->nrowsleft = curEl->nrows = nrows;
         curEl->ncolsleft = curEl->ncols = ncols;
-
-
         Int *rowRelIndValid = rowRelIndVal (curEl);
         Int *colRelIndValid = colRelIndVal (curEl);
+        *rowRelIndValid = -1 ;
+        *colRelIndValid = -1 ;
+       
 #ifndef NDEBUG  // Printing the pointers info
         Int p=1;
         PRLEVEL (p, ("curEl = %p ", curEl));
@@ -247,9 +249,6 @@ paru_matrix *paru_init_rowFronts (
         PRLEVEL (p, ("limit= %p", curEl+limit));
         PRLEVEL (p, ("\n"));
 #endif
-        *rowRelIndValid = -1 ;
-        *colRelIndValid = -1 ;
-
 
         // Allocating Rowlist and updating its tuples
         RowList[row].list =
