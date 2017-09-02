@@ -174,7 +174,7 @@ typedef struct	/* Element */
 
 inline Int *colIndex_pointer (Element *curEl)
 {    return (Int*)(curEl+1);}
-
+// Never ever use these functions prior to initializing ncols and nrows
 inline Int *rowIndex_pointer (Element *curEl)
 {    return (Int*)(curEl+1) + curEl->ncols;}
 
