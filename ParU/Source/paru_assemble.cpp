@@ -108,7 +108,7 @@ void paru_assemble (
             /*! TODO: Is it possible to have columns already ate e<0 or f<0 */
             //if (curTpl.f<0) continue;
 
-            //counting element's row
+            //counting prior element's columns
             /*! TODO:Update Mark somewhere    !!! Here is an issue !!! */
             if (elCol [e] < elCMark) // an element never seen before
                 elCol [e] = elCMark + 1;
@@ -217,19 +217,22 @@ void paru_assemble (
             Int *el_colIndex = colIndex_pointer (curEl);
             Int *el_rowIndex = rowIndex_pointer (curEl);
 
-            Int *rowRelIndValid = rowRelIndVal (curEl);
-            Int *rowRelIndex = relRowInd (curEl);
-            
-        //    if (elRow [e] > 1 ){ // it can be good to store row relative indices 
-        //        //!!! Some logical problem
-        //        PRLEVEL (1, ("elRow[%ld]=%ld", e, elRow [e]));  
-        //        for (Int rEl = 0; rEl < mEl; rEl++)   
-        //            rowRelIndex [rEl] = isRowInFront [el_rowIndex [rEl]] 
-        //                - rowMark;
-        //        *rowRelIndValid = f ;//current front
-        //    }
-        //    else 
-        //        *rowRelIndValid = -1 ;//to test
+            // Row relative indices can be useful, howeve I still don't have 
+            // number of rows is consuming in each prior CB
+
+            //    Int *rowRelIndValid = rowRelIndVal (curEl);
+            //    Int *rowRelIndex = relRowInd (curEl);
+            //    if (elRow [e] > 1 ){ 
+            //    // it can be good to store row relative indices 
+            //        //!!! Some logical problem
+            //        PRLEVEL (1, ("elRow[%ld]=%ld", e, elRow [e]));  
+            //        for (Int rEl = 0; rEl < mEl; rEl++)   
+            //            rowRelIndex [rEl] = isRowInFront [el_rowIndex [rEl]] 
+            //                - rowMark;
+            //        *rowRelIndValid = f ;//current front
+            //    }
+            //    else 
+            //        *rowRelIndValid = -1 ;//to test
 
 
             Int curColIndex = curTpl.f;
@@ -248,14 +251,14 @@ void paru_assemble (
                 PRLEVEL (1, ("curRow =%ld\n", curRow));
                 ASSERT (curRow < m ) ;
                 ASSERT (isRowInFront [curRow] != -1);
-       //         PRLEVEL (0, ("rowRelIndValid = %ld, f=%ld,\
-       //                     rowRelIndex[%ld]= %ld,##%ld\n ", 
-       //                     *rowRelIndValid, f, rEl, rowRelIndex [rEl], 
-       //                     isRowInFront [curRow] - rowMark));
+                //         PRLEVEL (0, ("rowRelIndValid = %ld, f=%ld,\
+                //                     rowRelIndex[%ld]= %ld,##%ld\n ", 
+                //                     *rowRelIndValid, f, rEl, rowRelIndex [rEl], 
+                //                     isRowInFront [curRow] - rowMark));
                 // relative row index
-                Int rowIndexF = (*rowRelIndValid == f) ? rowRelIndex [rEl] :
-                    isRowInFront [curRow] - rowMark;
-       //         Int rowIndexF = isRowInFront [curRow] - rowMark;
+                //Int rowIndexF = (*rowRelIndValid == f) ? rowRelIndex [rEl] :
+                //    isRowInFront [curRow] - rowMark;
+                Int rowIndexF = isRowInFront [curRow] - rowMark;
                 PRLEVEL (1, ("rowIndexF = %ld\n", rowIndexF));
                 /*! TODO: Need to initialize valid ints somehow     */
                 PRLEVEL (1, (" colIndexF*rowCount + rowIndexF=%ld\n",
@@ -338,11 +341,13 @@ void paru_assemble (
             Tuple curTpl = listRowTuples [i];
             Int e = curTpl.e;
 
-            //Counting columns of priors CBs
-            if (elCol [e] < elCMark) // an element never seen before
-                elCol [e] = elCMark + 1;
-            else 
-                elCol [e]++; 
+            //counting prior element's rows
+            if (elRow [e] < elRMark) // an element never seen before
+                elRow [e] = elRMark + 1;
+            else { // must not happen anyway; it depends on changing strategy
+                elRow [e]++; 
+                continue;
+            }
 
             Element *curEl = elementList[e];
             Int mEl = curEl->nrows;
