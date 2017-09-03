@@ -105,7 +105,7 @@ void paru_assemble (
         for (Int i = 0; i < numTuple; i++){
             Tuple curTpl = listColTuples [i];
             Int e = curTpl.e;
-            /*! TODO: Is it possible to have columns already ate f<0 */
+            /*! TODO: Is it possible to have columns already ate e<0 or f<0 */
             //if (curTpl.f<0) continue;
 
             //counting element's row
@@ -119,7 +119,7 @@ void paru_assemble (
 
             Element *curEl = elementList[e];
             Int mEl = curEl->nrows;
-            Int *el_rowIndex = rowIndex_pointer (curEl);//pointers to row index
+            Int *el_rowIndex = rowIndex_pointer (curEl); //pointers to row index
             PRLEVEL (1, ("element= %ld  mEl =%ld \n",e, mEl));
             for (Int rEl = 0; rEl < mEl; rEl++){
                 Int curRow = el_rowIndex [rEl]; 
@@ -139,38 +139,9 @@ void paru_assemble (
                 }
                 ASSERT (rowCount <= m); 
 
-#if 0
-                Int rS;
-                for (rS = 0; rS < rowsP; rS++){
-                    PRLEVEL (1, ("rS =%ld rEl=%ld\n", rS, rEl));
-                    if (curRow == rowSet [rS])
-                        break; 
-                }
-                if ( rS == rowsP){ // count the new row
-                    if (rowsP >= setSize){
-                        PRLEVEL (1, ("rowsP =%ld setSize=%ld\n", 
-                                    rowsP, setSize));
-                        PRLEVEL (1, ("setSize*2 =%ld\n", setSize*2));
-                        Int *newSet= (Int*) paru_realloc (setSize*2, 
-                                sizeof (Int), rowSet, &setSize, cc);
-
-                        if(newSet== NULL){
-                            printf("Error in allocating memory for rows\n");
-                            return;
-                        }
-                        rowSet = newSet;
-                    }
-                    rowSet [rowsP++] = curRow;
-                }
-#endif                
-            }
+           }
         }
     }
-
-#if 0    
-    //shrinking allocated space
-    rowSet= (Int*) paru_realloc (rowsP, sizeof (Int), rowSet, &setSize, cc);
-#endif    
 
 #ifndef NDEBUG /* Checking if pivotal rows are correct */
     Int p = 1;
@@ -180,7 +151,6 @@ void paru_assemble (
     PRLEVEL (p, ("\n"));
     Int stl_rowSize = stl_rowSet.size();
     if (rowCount != stl_rowSize){
-        PRLEVEL (p, ("#######################\n"));
         PRLEVEL (p, ("STL %ld:\n",stl_rowSize));
         for (it = stl_rowSet.begin(); it != stl_rowSet.end(); it++)
             PRLEVEL (p, (" %ld", *it));
