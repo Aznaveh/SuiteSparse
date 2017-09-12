@@ -105,6 +105,14 @@ void paru_assemble (
         for (Int i = 0; i < numTuple; i++){
             Tuple curTpl = listColTuples [i];
             Int e = curTpl.e;
+
+            Element *curEl = elementList[e];
+            Int mEl = curEl->nrows;
+            Int *el_rowIndex = rowIndex_pointer (curEl); //pointers to row index
+            Int *rowRelIndValid = rowRelIndVal (curEl);
+            Int *rowRelIndex = relRowInd (curEl);
+
+
             /*! TODO: Is it possible to have columns already ate e<0 or f<0 */
             //if (curTpl.f<0) continue;
 
@@ -113,13 +121,21 @@ void paru_assemble (
             if (elCol [e] < elCMark) // an element never seen before
                 elCol [e] = elCMark + 1;
             else { 
+                if (elCol [e] == elCMark+1){ //second time to see this col
+                    // Row relative indices need two memory accesses each time
+                    // that can be lessen by saving them inside CB
+
+                    // it can be good to store row relative indices 
+                    PRLEVEL (1, ("elRow[%ld]=%ld", e, elRow [e]));  
+                    for (Int rEl = 0; rEl < mEl; rEl++)   
+                        rowRelIndex [rEl] = isRowInFront [el_rowIndex [rEl]] 
+                            - rowMark;
+                    *rowRelIndValid = f ;//current front
+                }
                 elCol [e]++;    //already added its rows
                 continue;
             }
 
-            Element *curEl = elementList[e];
-            Int mEl = curEl->nrows;
-            Int *el_rowIndex = rowIndex_pointer (curEl); //pointers to row index
             PRLEVEL (1, ("element= %ld  mEl =%ld \n",e, mEl));
             for (Int rEl = 0; rEl < mEl; rEl++){
                 Int curRow = el_rowIndex [rEl]; 
@@ -217,6 +233,8 @@ void paru_assemble (
 
             Int *el_colIndex = colIndex_pointer (curEl);
             Int *el_rowIndex = rowIndex_pointer (curEl);
+            Int *rowRelIndex = relRowInd (curEl);
+            Int *rowRelIndValid = rowRelIndVal (curEl);
 
             Int curColIndex = curTpl.f;
             //ASSERT (el_colIndex[curColIndex] == c);
@@ -239,9 +257,12 @@ void paru_assemble (
                 //                     *rowRelIndValid, f, rEl, rowRelIndex [rEl], 
                 //                     isRowInFront [curRow] - rowMark));
                 // relative row index
-                //Int rowIndexF = (*rowRelIndValid == f) ? rowRelIndex [rEl] :
-                //    isRowInFront [curRow] - rowMark;
-                Int rowIndexF = isRowInFront [curRow] - rowMark;
+                Int rowIndexF = (*rowRelIndValid == f) ? rowRelIndex [rEl] :
+                    isRowInFront [curRow] - rowMark;
+                // ASSERT (*rowRelIndValid == f);
+                // Int rowIndexF = isRowInFront [curRow] - rowMark;
+                //         ASSERT (rowIndexF == rowRelIndex [rEl]);
+
                 PRLEVEL (1, ("rowIndexF = %ld\n", rowIndexF));
                 PRLEVEL (1, (" colIndexF*rowCount + rowIndexF=%ld\n",
                             colIndexF*rowCount + rowIndexF));
@@ -331,20 +352,7 @@ void paru_assemble (
             //counting prior element's rows
             if (elRow [e] < elRMark) {// an element never seen before
                 elRow [e] = elRMark + 1;
-
-                // Row relative indices need two memory accesses each time
-                // that can be lessen by saving them inside CB
-
-                Int *rowRelIndValid = rowRelIndVal (curEl);
-                Int *rowRelIndex = relRowInd (curEl);
-                // it can be good to store row relative indices 
-                PRLEVEL (1, ("elRow[%ld]=%ld", e, elRow [e]));  
-                for (Int rEl = 0; rEl < mEl; rEl++)   
-                    rowRelIndex [rEl] = isRowInFront [el_rowIndex [rEl]] 
-                        - rowMark;
-                *rowRelIndValid = f ;//current front
             }
-
             else { // must not happen anyway; it depends on changing strategy
                 elRow [e]++; 
                 continue;
