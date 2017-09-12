@@ -36,7 +36,7 @@ void paru_assemble (
     /* get the front F  */
     /* ---------------------------------------------------------------------- */
 
-    
+
     PRLEVEL (0, ("Assemble Front %ld\n", f));
     /* pivotal columns Super [f] ... Super [f+1]-1 */
     Int col1 = Super [f];       /* fornt F has columns col1:col2-1 */
@@ -139,7 +139,7 @@ void paru_assemble (
                 }
                 ASSERT (rowCount <= m); 
 
-           }
+            }
         }
     }
 
@@ -173,7 +173,7 @@ void paru_assemble (
     /* 
      *                  
      *  curEl           nEl           
-     *              6, 7, 3, 10
+     *              6, 7, 3, 12
      *             ____________
      *          23 | X  Y  .  .     stored in memory like this:
      *      mEl 17 | X  Y  .  .     ...6, 7, 3, 10, 23, 17, 2, X, X, X, Y, Y, Y,
@@ -214,29 +214,12 @@ void paru_assemble (
             Element *curEl = elementList[e];
             Int mEl = curEl->nrows;
             Int nEl = curEl->ncols;
+
             Int *el_colIndex = colIndex_pointer (curEl);
             Int *el_rowIndex = rowIndex_pointer (curEl);
 
-            // Row relative indices can be useful, howeve I still don't have 
-            // number of rows is consuming in each prior CB
-
-            //    Int *rowRelIndValid = rowRelIndVal (curEl);
-            //    Int *rowRelIndex = relRowInd (curEl);
-            //    if (elRow [e] > 1 ){ 
-            //    // it can be good to store row relative indices 
-            //        //!!! Some logical problem
-            //        PRLEVEL (1, ("elRow[%ld]=%ld", e, elRow [e]));  
-            //        for (Int rEl = 0; rEl < mEl; rEl++)   
-            //            rowRelIndex [rEl] = isRowInFront [el_rowIndex [rEl]] 
-            //                - rowMark;
-            //        *rowRelIndValid = f ;//current front
-            //    }
-            //    else 
-            //        *rowRelIndValid = -1 ;//to test
-
-
             Int curColIndex = curTpl.f;
-            ASSERT (el_colIndex[curColIndex] == c);
+            //ASSERT (el_colIndex[curColIndex] == c);
             FLIP(el_colIndex[curColIndex]); //Nullifying the column
             curEl->ncolsleft--;
             PRLEVEL (1, ("curColIndex =%ld\n", curColIndex));
@@ -260,7 +243,6 @@ void paru_assemble (
                 //    isRowInFront [curRow] - rowMark;
                 Int rowIndexF = isRowInFront [curRow] - rowMark;
                 PRLEVEL (1, ("rowIndexF = %ld\n", rowIndexF));
-                /*! TODO: Need to initialize valid ints somehow     */
                 PRLEVEL (1, (" colIndexF*rowCount + rowIndexF=%ld\n",
                             colIndexF*rowCount + rowIndexF));
                 ASSERT ( colIndexF*rowCount + rowIndexF < rowCount * fp);
@@ -284,7 +266,7 @@ void paru_assemble (
             PRLEVEL (p, (" %3.1lf\t", pivotalFront [(c-col1)*rowCount + r]));
         }
         PRLEVEL (p, ("\n"));
-        }
+    }
 #endif
 
     /*     factorizing the fully summed part of the matrix                     /
@@ -340,20 +322,34 @@ void paru_assemble (
         for (Int i = 0; i < numTuple; i++){
             Tuple curTpl = listRowTuples [i];
             Int e = curTpl.e;
+            Element *curEl = elementList[e];
+            Int mEl = curEl->nrows;
+            Int nEl = curEl->ncols;
+            Int *el_rowIndex = rowIndex_pointer (curEl);
+            Int *el_colIndex = colIndex_pointer (curEl);
 
             //counting prior element's rows
-            if (elRow [e] < elRMark) // an element never seen before
+            if (elRow [e] < elRMark) {// an element never seen before
                 elRow [e] = elRMark + 1;
+
+                // Row relative indices need two memory accesses each time
+                // that can be lessen by saving them inside CB
+
+                Int *rowRelIndValid = rowRelIndVal (curEl);
+                Int *rowRelIndex = relRowInd (curEl);
+                // it can be good to store row relative indices 
+                PRLEVEL (1, ("elRow[%ld]=%ld", e, elRow [e]));  
+                for (Int rEl = 0; rEl < mEl; rEl++)   
+                    rowRelIndex [rEl] = isRowInFront [el_rowIndex [rEl]] 
+                        - rowMark;
+                *rowRelIndValid = f ;//current front
+            }
+
             else { // must not happen anyway; it depends on changing strategy
                 elRow [e]++; 
                 continue;
             }
 
-            Element *curEl = elementList[e];
-            Int mEl = curEl->nrows;
-            Int nEl = curEl->ncols;
-            Int *el_colIndex = colIndex_pointer (curEl);
-            Int *el_rowIndex = rowIndex_pointer (curEl);
             PRLEVEL (0, ("element= %ld  nEl =%ld \n",e, nEl));
             for (Int cEl = 0; cEl < nEl; cEl++){
                 Int curCol = el_colIndex [cEl]; 
@@ -366,13 +362,13 @@ void paru_assemble (
                 stl_colSet.insert (curCol);
 #endif
                 PRLEVEL (1, ("%p ---> isColInCBcolSet[%ld]=%ld\n", 
-                            isColInCBcolSet+curCol, curCol, isColInCBcolSet[curCol]));
+                            isColInCBcolSet+curCol, curCol,
+                            isColInCBcolSet[curCol]));
                 /*! TODO: Check for elements too in Pass 1 and 3  */
                 if (isColInCBcolSet [curCol] < colMark  ){
-                    PRLEVEL (1, ("curCol = %ld colCount=%ld\n", curCol, colCount));
-
+                    PRLEVEL (1, ("curCol = %ld colCount=%ld\n", 
+                                curCol, colCount));
                     CBColList [colCount] = curCol;
-
                     isColInCBcolSet [curCol] = colMark + colCount++; 
                 }
                 ASSERT (colCount <= n);
