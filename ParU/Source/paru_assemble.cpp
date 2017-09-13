@@ -132,8 +132,8 @@ void paru_assemble (
                             - rowMark;
                     *rowRelIndValid = f ;//current front
                 }
-                elCol [e]++;    //already added its rows
-                continue;
+                elCol [e]++;    //keep track of number of cols
+                continue;       // already have the set of rows
             }
 
             PRLEVEL (1, ("element= %ld  mEl =%ld \n",e, mEl));
@@ -252,16 +252,15 @@ void paru_assemble (
                 PRLEVEL (1, ("curRow =%ld\n", curRow));
                 ASSERT (curRow < m ) ;
                 ASSERT (isRowInFront [curRow] != -1);
-                //         PRLEVEL (0, ("rowRelIndValid = %ld, f=%ld,\
-                //                     rowRelIndex[%ld]= %ld,##%ld\n ", 
-                //                     *rowRelIndValid, f, rEl, rowRelIndex [rEl], 
-                //                     isRowInFront [curRow] - rowMark));
+
+                PRLEVEL (1, ("rowRelIndValid = %ld, f=%ld,\
+                            rowRelIndex[%ld]= %ld,##%ld\n ", 
+                            *rowRelIndValid, f, rEl, rowRelIndex [rEl], 
+                            isRowInFront [curRow] - rowMark));
                 // relative row index
                 Int rowIndexF = (*rowRelIndValid == f) ? rowRelIndex [rEl] :
                     isRowInFront [curRow] - rowMark;
-                // ASSERT (*rowRelIndValid == f);
-                // Int rowIndexF = isRowInFront [curRow] - rowMark;
-                //         ASSERT (rowIndexF == rowRelIndex [rEl]);
+                ASSERT (rowIndexF == isRowInFront [curRow] - rowMark);
 
                 PRLEVEL (1, ("rowIndexF = %ld\n", rowIndexF));
                 PRLEVEL (1, (" colIndexF*rowCount + rowIndexF=%ld\n",
@@ -421,6 +420,10 @@ void paru_assemble (
 
     if(colCount !=0 && rowCount != 0)
         paru_fourPath (paruMatInfo, rowCount, colCount);
+    /*! TODO: assemble front
+     *        Do numeric computation*/
+    /*! TODO: allocating an element for further use*/
+//    what about writing a function to allocate the element?
 
     Work->rowMark += rowCount;
     rowMark = Work -> rowMark;
