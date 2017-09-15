@@ -185,6 +185,11 @@ void paru_assemble (
     double *pivotalFront = 
         (double*) paru_calloc (rowCount*fp, sizeof (double), cc);
 
+    if (pivotalFront == NULL ){
+        printf ("Out of memory when tried to allocate for pivotal part %ld",f);
+        return;
+    }
+
     /* assembling the pivotal part of the front */
     /* 
      *                  
@@ -428,8 +433,11 @@ void paru_assemble (
     Int eli = snM [f]; // Element index of the one that is going to be assembled
     Element *el = elementList[eli] = paru_create_element (rowCount,
             colCount, 0 ,cc);
+    if ( el == NULL ){
+        printf ("Out of memory when tried to allocate current CB %ld",eli);
+        return;
+    }
 
-    /*! TODO: handle memory problem     */
     /*! TODO: assemble the data     */
     /*! TODO: TRSM*/
     /*! TODO: DGEMM     */
