@@ -422,8 +422,21 @@ void paru_assemble (
         paru_fourPath (paruMatInfo, rowCount, colCount);
     /*! TODO: assemble front
      *        Do numeric computation*/
-    /*! TODO: allocating an element for further use*/
-//    what about writing a function to allocate the element?
+
+
+    Int *snM = LUsym->super2atree;
+    Int eli = snM [f]; // Element index of the one that is going to be assembled
+    Element *el = elementList[eli] = paru_create_element (rowCount,
+            colCount, 0 ,cc);
+
+    /*! TODO: handle memory problem     */
+    /*! TODO: assemble the data     */
+    /*! TODO: TRSM*/
+    /*! TODO: DGEMM     */
+    /*! TODO: Store the result somewhere     */
+
+
+
 
     Work->rowMark += rowCount;
     rowMark = Work -> rowMark;
@@ -438,6 +451,7 @@ void paru_assemble (
 #endif
 
 
+    /*! TODO: This should be stored somewhere     */
     paru_free (rowCount*fp, sizeof (Int), pivotalFront, cc);
 
 #if 0
