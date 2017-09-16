@@ -439,10 +439,23 @@ void paru_assemble (
     }
 
     /*! TODO: assemble the data     */
-    /*! TODO: TRSM*/
+    /*! Marking pivotal rows by FLIPING*/
+    for (int i = 0; i < fp; i++){
+        FLIP (fsRowList [ipiv[i]]);
+    }
+ 
+    /*! TODO: TRSM: it also contains data assembly*/
+    double *uPart = 
+        (double*) paru_calloc (fp*colCount, sizeof (double), cc);
+
+    if ( uPart == NULL ){
+        printf ("Out of memory when tried to allocate for U part %ld",f);
+        return;
+    }
+
+
     /*! TODO: DGEMM     */
     /*! TODO: Store the result somewhere     */
-
 
 
 
@@ -460,7 +473,8 @@ void paru_assemble (
 
 
     /*! TODO: This should be stored somewhere     */
-    paru_free (rowCount*fp, sizeof (Int), pivotalFront, cc);
+    paru_free (rowCount*fp, sizeof (double), pivotalFront, cc);
+    paru_free (fp*colCount,  sizeof (double), uPart, cc);
 
 #if 0
     paru_free (setSize, sizeof (Int), rowSet, cc);
