@@ -309,7 +309,7 @@ void paru_assemble (
         return;
     }
 #ifndef NDEBUG  // Printing the permutation
-    p = 1;
+    p = 0;
     PRLEVEL (p, ("permutation:\n"));
     for (int i = 0; i < fp; i++){
         PRLEVEL (p, ("ipiv[%d] =%d\n",i, ipiv[i]));
@@ -356,6 +356,12 @@ void paru_assemble (
             //counting prior element's rows
             if (elRow [e] < elRMark) {// an element never seen before
                 elRow [e] = elRMark + 1;
+#ifndef NDEBUG
+                if ( elCol [e] >= elCMark )
+                    /*! TODO: Write a phase to assemble them     */
+                    PRLEVEL (0, ("element %ld must be eaten wholly\n",e));
+                   //And the rest of e is in U part 
+#endif
             }
             else { // must not happen anyway; it depends on changing strategy
                 elRow [e]++; 
@@ -365,7 +371,7 @@ void paru_assemble (
             PRLEVEL (0, ("element= %ld  nEl =%ld \n",e, nEl));
             for (Int cEl = 0; cEl < nEl; cEl++){
                 Int curCol = el_colIndex [cEl]; 
-                PRLEVEL (0, ("curCol =%ld\n", curCol));
+                PRLEVEL (1, ("curCol =%ld\n", curCol));
                 ASSERT (curCol < n);
                 /*! TODO: implement this part better     */
                 if (curCol >= col1 && curCol < col2) //if in pivotal front
@@ -428,14 +434,20 @@ void paru_assemble (
     /*! TODO: assemble front
      *        Do numeric computation*/
 
+    /*! TODO: TRSM: it also contains data assembly*/
+    double *uPart = 
+        (double*) paru_calloc (fp*colCount, sizeof (double), cc);
+
 
     Int *snM = LUsym->super2atree;
     Int eli = snM [f]; // Element index of the one that is going to be assembled
-    Element *el = elementList[eli] = paru_create_element (rowCount,
-            colCount, 0 ,cc);
-    if ( el == NULL ){
-        printf ("Out of memory when tried to allocate current CB %ld",eli);
-        return;
+    if (fp < rowCount ){ // otherwise nothing will remain of this front
+        Element *el = elementList[eli] = paru_create_element (rowCount-fp,
+                colCount, 0 ,cc);
+        if ( el == NULL ){
+            printf ("Out of memory when tried to allocate current CB %ld",eli);
+            return;
+        }
     }
 
     /*! TODO: assemble the data     */
@@ -443,10 +455,6 @@ void paru_assemble (
     for (int i = 0; i < fp; i++){
         FLIP (fsRowList [ipiv[i]]);
     }
- 
-    /*! TODO: TRSM: it also contains data assembly*/
-    double *uPart = 
-        (double*) paru_calloc (fp*colCount, sizeof (double), cc);
 
     if ( uPart == NULL ){
         printf ("Out of memory when tried to allocate for U part %ld",f);
