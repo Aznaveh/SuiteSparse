@@ -95,7 +95,7 @@ void paru_assemble (
     std::set<Int>::iterator it;
 #endif 
 
-    /*************** finding set of rows in current front *********************/
+    /**** 1 ******** finding set of rows in current front *********************/
     for (Int c = col1; c < col2; c++){
         tupleList *curColTupleList = &ColList[c];
         Int numTuple = curColTupleList->numTuple;
@@ -190,7 +190,7 @@ void paru_assemble (
         return;
     }
 
-    /* assembling the pivotal part of the front */
+    /**** 2 ********  assembling the pivotal part of the front ****************/
     /* 
      *                  
      *  curEl           nEl           
@@ -293,9 +293,8 @@ void paru_assemble (
         PRLEVEL (p, ("\n"));
     }
 #endif
-
-    /*     factorizing the fully summed part of the matrix                     /
-     *     a set of pivot is found in this part that is crucial to assemble   */
+    /**** 3 ********  factorizing the fully summed part of the matrix    
+    *****  a set of pivot is found in this part that is crucial to assemble  **/
     PRLEVEL (1, ("rowCount =%ld\n", rowCount));
     /* using the rest of scratch for permutation; Not sure about 1  */
     int *ipiv =(int *) (Work->scratch+rowCount+1);
@@ -330,8 +329,9 @@ void paru_assemble (
 
 #ifndef NDEBUG
     std::set<Int> stl_colSet;
-#endif 
-    /*************** finding set of non pivotal cols in current front *********/
+#endif  
+ 
+    /**** 4 ******** finding set of non pivotal cols in current front *********/
     tupleList *RowList = paruMatInfo->RowList;
     for (Int i = 0; i < fp; i++){
         Int curFsRowIndex =(Int) ipiv [i]; //current fully summed row index
@@ -431,13 +431,13 @@ void paru_assemble (
 
     if(colCount !=0 && rowCount != 0)
         paru_fourPath (paruMatInfo, rowCount, colCount);
-    /*! TODO: assemble front
-     *        Do numeric computation*/
-
     /*! TODO: TRSM: it also contains data assembly*/
     double *uPart = 
         (double*) paru_calloc (fp*colCount, sizeof (double), cc);
-
+    if ( uPart == NULL ){
+        printf ("Out of memory when tried to allocate for U part %ld",f);
+        return;
+    }
 
     Int *snM = LUsym->super2atree;
     Int eli = snM [f]; // Element index of the one that is going to be assembled
@@ -450,20 +450,16 @@ void paru_assemble (
         }
     }
 
-    /*! TODO: assemble the data     */
-    /*! Marking pivotal rows by FLIPING*/
-    for (int i = 0; i < fp; i++){
-        FLIP (fsRowList [ipiv[i]]);
-    }
 
-    if ( uPart == NULL ){
-        printf ("Out of memory when tried to allocate for U part %ld",f);
-        return;
-    }
+     /*! TODO:*/
+    /**** 4 ** assemble fronts which have rows and columns in pivotal part ****/ 
+    /*
+     * They must split into two part U part and CB                          ***/
+
+
 
 
     /*! TODO: DGEMM     */
-    /*! TODO: Store the result somewhere     */
 
 
 
