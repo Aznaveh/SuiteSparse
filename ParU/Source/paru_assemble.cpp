@@ -224,6 +224,7 @@ void paru_assemble (
             Tuple curTpl = l [i];
             Int e = curTpl.e;
 
+            // Assembly of column f of e in colIndexF
             PRLEVEL (1, ("col=%ld, (%ld,%ld)\n", c, e, f));
             FLIP (curTpl.e); //Nullifying tuple  /*! TODO: Deleting tuple     */
             curTupleList->numTuple--;
@@ -238,7 +239,7 @@ void paru_assemble (
             Int *rowRelIndValid = rowRelIndVal (curEl);
 
             Int curColIndex = curTpl.f;
-            //ASSERT (el_colIndex[curColIndex] == c);
+            ASSERT (el_colIndex[curColIndex] == c);
             FLIP(el_colIndex[curColIndex]); //Nullifying the column
             curEl->ncolsleft--;
             PRLEVEL (1, ("curColIndex =%ld\n", curColIndex));
