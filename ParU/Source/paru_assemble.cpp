@@ -121,17 +121,6 @@ void paru_assemble (
             if (elCol [e] < elCMark) // an element never seen before
                 elCol [e] = elCMark + 1;
             else { 
-                if (elCol [e] == elCMark+1){ //second time to see this col
-                    // Row relative indices need two memory accesses each time
-                    // that can be lessen by saving them inside CB
-
-                    // it can be good to store row relative indices 
-                    PRLEVEL (1, ("elRow[%ld]=%ld", e, elRow [e]));  
-                    for (Int rEl = 0; rEl < mEl; rEl++)   
-                        rowRelIndex [rEl] = isRowInFront [el_rowIndex [rEl]] 
-                            - rowMark;
-                    *rowRelIndValid = f ;//current front
-                }
                 elCol [e]++;    //keep track of number of cols
                 continue;       // already have the set of rows
             }
@@ -154,6 +143,13 @@ void paru_assemble (
                     isRowInFront [curRow] = rowMark + rowCount++; 
                 }
                 ASSERT (rowCount <= m); 
+
+                // Updating row relative indices 
+                PRLEVEL (1, ("elRow[%ld]=%ld", e, elRow [e]));  
+                for (Int rEl = 0; rEl < mEl; rEl++)   
+                    rowRelIndex [rEl] = isRowInFront [el_rowIndex [rEl]] 
+                        - rowMark;
+                *rowRelIndValid = f ;//current front
 
             }
         }
@@ -251,6 +247,8 @@ void paru_assemble (
             double *el_Num = numeric_pointer (curEl);
             PRLEVEL (1, ("element= %ld  mEl =%ld \n",e, mEl));
 
+            /*! TODO: implement a function for column assembly     */
+
             for (Int rEl = 0; rEl < mEl; rEl++){   
                 Int curRow = el_rowIndex [rEl]; 
 
@@ -263,8 +261,7 @@ void paru_assemble (
                             *rowRelIndValid, f, rEl, rowRelIndex [rEl], 
                             isRowInFront [curRow] - rowMark));
                 // relative row index
-                Int rowIndexF = (*rowRelIndValid == f) ? rowRelIndex [rEl] :
-                    isRowInFront [curRow] - rowMark;
+                Int rowIndexF = rowRelIndex [rEl];
                 ASSERT (rowIndexF == isRowInFront [curRow] - rowMark);
 
                 PRLEVEL (1, ("rowIndexF = %ld\n", rowIndexF));
@@ -294,7 +291,7 @@ void paru_assemble (
     }
 #endif
     /**** 3 ********  factorizing the fully summed part of the matrix    
-    *****  a set of pivot is found in this part that is crucial to assemble  **/
+     *****  a set of pivot is found in this part that is crucial to assemble  **/
     PRLEVEL (1, ("rowCount =%ld\n", rowCount));
     /* using the rest of scratch for permutation; Not sure about 1  */
     int *ipiv =(int *) (Work->scratch+rowCount+1);
@@ -330,7 +327,7 @@ void paru_assemble (
 #ifndef NDEBUG
     std::set<Int> stl_colSet;
 #endif  
- 
+
     /**** 4 ******** finding set of non pivotal cols in current front *********/
     tupleList *RowList = paruMatInfo->RowList;
     for (Int i = 0; i < fp; i++){
@@ -360,7 +357,7 @@ void paru_assemble (
                 if ( elCol [e] >= elCMark )
                     /*! TODO: Write a phase to assemble them     */
                     PRLEVEL (0, ("element %ld must be eaten wholly\n",e));
-                   //And the rest of e is in U part 
+                //And the rest of e is in U part 
 #endif
             }
             else { // must not happen anyway; it depends on changing strategy
@@ -451,10 +448,15 @@ void paru_assemble (
     }
 
 
-     /*! TODO:*/
-    /**** 4 ** assemble fronts which have rows and columns in pivotal part ****/ 
+    /*! TODO:*/
+    /**** 5 ** assemble fronts which have rows and columns in pivotal part ****/ 
     /*
      * They must split into two part U part and CB                          ***/
+
+    /*! TODO:TRSM and DGEMM can be here*/
+    /**** 6,7 ** Count number of rows and columsn of prior CBs to asslemble ***/ 
+    /*
+     * I need to either assemble rows or Columns                            ***/
 
 
 
