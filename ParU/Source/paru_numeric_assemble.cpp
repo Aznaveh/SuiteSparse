@@ -1,7 +1,8 @@
 /** =========================================================================  /
  * =======================  paru_numeric_assemble ===========================  /
  * ========================================================================== */
-/*  assemble numbers in columns, rows or fully                                */
+/*  assemble numbers in columns, rows or fully  
+ *  it is a gather scatter operation                                          */
 
 #include "Parallel_LU.hpp"
 

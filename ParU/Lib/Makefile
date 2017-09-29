@@ -40,6 +40,8 @@ OBJ = \
 	paru_add_tuples.o\
 	paru_assemble.o\
 	paru_factorize.o\
+	paru_create_element.o\
+	paru_numeric_assemble.o\
 	paru_fourPath.o
 
 $(OBJ): $(INC)
@@ -73,6 +75,12 @@ paru_assemble.o: ../Source/paru_assemble.cpp
 	$(C) -c $<
 
 paru_factorize.o: ../Source/paru_factorize.cpp
+	$(C) -c $<
+
+paru_create_element.o: ../Source/paru_create_element.cpp
+	$(C) -c $<
+
+paru_numeric_assemble.o: ../Source/paru_numeric_assemble.cpp
 	$(C) -c $<
 
 paru_fourPath.o: ../Source/paru_fourPath.cpp
