@@ -243,7 +243,6 @@ void paru_assemble (
             ASSERT (el_colIndex[curColIndex] == c);
 
             FLIP(el_colIndex[curColIndex]); //Marking column as assembled
-           // el_colIndex[curColIndex] = -1; //Marking column as assembled
 
             curEl->ncolsleft--;
             PRLEVEL (1, ("curColIndex =%ld\n", curColIndex));
@@ -255,7 +254,7 @@ void paru_assemble (
             /*! TODO: implement a function for column assembly     */
 
 
-            assemble_cols (pivotalFront+colIndexF*rowCount, 
+            assemble_col (pivotalFront+colIndexF*rowCount, 
                     el_Num +curColIndex*mEl, mEl, rowRelIndex);
 
       //      for (Int rEl = 0; rEl < mEl; rEl++){   
