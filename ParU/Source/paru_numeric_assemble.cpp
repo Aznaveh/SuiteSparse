@@ -17,12 +17,13 @@ void assemble_col (double *sC, double *dC,   //source col and destination col
     }
 }
 
+/*! TODO: design a different algorithm     */
 void assemble_row (double *sR, double *dR,   //source Row and destination row
-                    Int m, Int *relRowInd)
+                    Int m, Int n, Int *relColInd)
 {
     for (Int i = 0; i < m; i++) {
-        if ( relRowInd[i] > 0 )  // If still valid
-            dR [relRowInd[i] ] += sR[i];
+        if ( relColInd[i] > 0 )  // If still valid
+            dR [relColInd[i] ] += sR[i];
 
     }
 }
