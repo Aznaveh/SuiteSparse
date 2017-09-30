@@ -362,6 +362,8 @@ void paru_assemble (
             Int nEl = curEl->ncols;
             Int *el_rowIndex = rowIndex_pointer (curEl);
             Int *el_colIndex = colIndex_pointer (curEl);
+            Int *colRelIndValid = colRelIndVal (curEl);
+            Int *colRelIndex = relColInd (curEl);
 
             //counting prior element's rows
             if (elRow [e] < elRMark) {// an element never seen before
@@ -400,6 +402,9 @@ void paru_assemble (
                     isColInCBcolSet [curCol] = colMark + colCount++; 
                 }
                 ASSERT (colCount <= n);
+
+                colRelIndex [cEl] = isColInCBcolSet [el_colIndex [cEl]] 
+                    - colMark;
             }
         }
     }
