@@ -144,14 +144,18 @@ void paru_assemble (
                 }
                 ASSERT (rowCount <= m); 
 
-                // Updating row relative indices 
-                PRLEVEL (1, ("elRow[%ld]=%ld", e, elRow [e]));  
-                for (Int rEl = 0; rEl < mEl; rEl++)   
-                    rowRelIndex [rEl] = isRowInFront [el_rowIndex [rEl]] 
-                        - rowMark;
-                *rowRelIndValid = f ;//current front
+                rowRelIndex [rEl] = isRowInFront [el_rowIndex [rEl]] 
+                    - rowMark;
 
             }
+            //            // Updating row relative indices 
+            //            PRLEVEL (1, ("elRow[%ld]=%ld", e, elRow [e]));  
+            //            for (Int rEl = 0; rEl < mEl; rEl++)   
+            //                rowRelIndex [rEl] = isRowInFront [el_rowIndex [rEl]] 
+            //                    - rowMark;
+            *rowRelIndValid = f ;//current front
+
+
         }
     }
 
@@ -251,35 +255,36 @@ void paru_assemble (
             double *el_Num = numeric_pointer (curEl);
             PRLEVEL (1, ("element= %ld  mEl =%ld \n",e, mEl));
 
-            /*! TODO: implement a function for column assembly     */
-
-
             assemble_col (pivotalFront+colIndexF*rowCount, 
                     el_Num +curColIndex*mEl, mEl, rowRelIndex);
+            colRelIndex [curColIndex] = -1;
 
-      //      for (Int rEl = 0; rEl < mEl; rEl++){   
-      //          Int curRow = el_rowIndex [rEl]; 
+#if 0
+            //This part has been moved to assemble_col function
+                  for (Int rEl = 0; rEl < mEl; rEl++){   
+                      Int curRow = el_rowIndex [rEl]; 
 
-      //          PRLEVEL (1, ("curRow =%ld\n", curRow));
-      //          ASSERT (curRow < m ) ;
-      //          ASSERT (isRowInFront [curRow] != -1);
+                      PRLEVEL (1, ("curRow =%ld\n", curRow));
+                      ASSERT (curRow < m ) ;
+                      ASSERT (isRowInFront [curRow] != -1);
 
-      //          PRLEVEL (1, ("rowRelIndValid = %ld, f=%ld,\
-      //                      rowRelIndex[%ld]= %ld,##%ld\n ", 
-      //                      *rowRelIndValid, f, rEl, rowRelIndex [rEl], 
-      //                      isRowInFront [curRow] - rowMark));
-      //          // relative row index
-      //          Int rowIndexF = rowRelIndex [rEl];
-      //          ASSERT (rowIndexF == isRowInFront [curRow] - rowMark);
+                      PRLEVEL (1, ("rowRelIndValid = %ld, f=%ld,\
+                                  rowRelIndex[%ld]= %ld,##%ld\n ", 
+                                  *rowRelIndValid, f, rEl, rowRelIndex [rEl], 
+                                  isRowInFront [curRow] - rowMark));
+                      // relative row index
+                      Int rowIndexF = rowRelIndex [rEl];
+                      ASSERT (rowIndexF == isRowInFront [curRow] - rowMark);
 
-      //          PRLEVEL (1, ("rowIndexF = %ld\n", rowIndexF));
-      //          PRLEVEL (1, (" colIndexF*rowCount + rowIndexF=%ld\n",
-      //                      colIndexF*rowCount + rowIndexF));
-      //          ASSERT ( colIndexF*rowCount + rowIndexF < rowCount * fp);
-      //          ASSERT ( curColIndex*mEl + rEl < mEl*nEl);
-      //          pivotalFront [colIndexF*rowCount + rowIndexF] += 
-      //              el_Num [ curColIndex*mEl + rEl];
-      //      }
+                      PRLEVEL (1, ("rowIndexF = %ld\n", rowIndexF));
+                      PRLEVEL (1, (" colIndexF*rowCount + rowIndexF=%ld\n",
+                                  colIndexF*rowCount + rowIndexF));
+                      ASSERT ( colIndexF*rowCount + rowIndexF < rowCount * fp);
+                      ASSERT ( curColIndex*mEl + rEl < mEl*nEl);
+                      pivotalFront [colIndexF*rowCount + rowIndexF] += 
+                          el_Num [ curColIndex*mEl + rEl];
+                  }
+#endif
         }
     }
 
