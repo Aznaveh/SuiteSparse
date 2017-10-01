@@ -17,13 +17,17 @@ void assemble_col (double *sC, double *dC,   //source col and destination col
     }
 }
 
-/*! TODO: design a different algorithm     */
-void assemble_row (double *sR, double *dR,   //source Row and destination row
-                    Int m, Int n, Int *relColInd)
+void assemble_row (double *sM, double *dM,//source Matrix and destination matrix 
+                    Int sm, Int sn,    // dimension of source matrix
+                    Int dm,     // dimension of destination matrix
+                    Int sR, Int dR     //source row and destination row
+                    Int *relColInd)
+//Source and destination are stored column based
 {
-    for (Int i = 0; i < m; i++) {
+    for (Int i = 0; i < sn; i++) {
         if ( relColInd[i] > 0 )  // If still valid
-            dR [relColInd[i] ] += sR[i];
+            dM [relColInd [i]*dm + dR] += sM [sm*i + sR];
+            
 
     }
 }
