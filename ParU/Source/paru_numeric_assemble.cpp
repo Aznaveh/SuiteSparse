@@ -20,7 +20,7 @@ void assemble_col (double *sC, double *dC,   //source col and destination col
 void assemble_row (double *sM, double *dM,//source Matrix and destination matrix 
                     Int sm, Int sn,    // dimension of source matrix
                     Int dm,     // dimension of destination matrix
-                    Int sR, Int dR     //source row and destination row
+                    Int sR, Int dR,     //source row and destination row
                     Int *relColInd)
 //Source and destination are stored column based
 {
