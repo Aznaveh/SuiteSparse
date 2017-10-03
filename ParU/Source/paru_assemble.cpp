@@ -446,14 +446,76 @@ void paru_assemble (
 
     if(colCount !=0 && rowCount != 0)
         paru_fourPath (paruMatInfo, rowCount, colCount);
-    /*! TODO: TRSM: it also contains data assembly*/
+
     double *uPart = 
         (double*) paru_calloc (fp*colCount, sizeof (double), cc);
     if ( uPart == NULL ){
         printf ("Out of memory when tried to allocate for U part %ld",f);
         return;
     }
+    /*! TODO:*/
+    /**** 5 ** assemble U part         Row by Row                          ****/ 
+    for (Int i = 0; i < fp; i++){
+        Int curFsRowIndex =(Int) ipiv [i]; //current fully summed row index
+        PRLEVEL (1, ("curFsRowIndex = %ld\n", curFsRowIndex));
+        ASSERT (curFsRowIndex < m);
+        Int curFsRow = fsRowList [curFsRowIndex];
+        PRLEVEL (1, ("curFsRow =%ld\n", curFsRow));
+        tupleList *curRowTupleList = &RowList [curFsRowIndex];
+        Int numTuple = curRowTupleList->numTuple;
+        ASSERT (numTuple >= 0);
+        Tuple *listRowTuples = curRowTupleList->list;
+        PRLEVEL (0, ("numTuple = %ld\n", numTuple));
+        for (Int i = 0; i < numTuple; i++){
+            Tuple curTpl = listRowTuples [i];
+            Int e = curTpl.e;
+            Element *curEl = elementList[e];
+            Int mEl = curEl->nrows;
+            Int nEl = curEl->ncols;
+            Int *el_rowIndex = rowIndex_pointer (curEl);
+            Int *el_colIndex = colIndex_pointer (curEl);
+            Int *colRelIndValid = colRelIndVal (curEl);
+            Int *colRelIndex = relColInd (curEl);
 
+            /// Grab the row and add them to the u part row by row
+//            //counting prior element's rows
+//            if (elRow [e] < elRMark) {// an element never seen before
+//                elRow [e] = elRMark + 1;
+//           }
+//            else { // must not happen anyway; it depends on changing strategy
+//                elRow [e]++; 
+//                continue;
+//            }
+//
+//            PRLEVEL (0, ("element= %ld  nEl =%ld \n",e, nEl));
+//            for (Int cEl = 0; cEl < nEl; cEl++){
+//                Int curCol = el_colIndex [cEl]; 
+//                PRLEVEL (1, ("curCol =%ld\n", curCol));
+//                ASSERT (curCol < n);
+//                /*! TODO: implement this part better     */
+//                if (curCol >= col1 && curCol < col2) //if in pivotal front
+//                    continue;
+//               PRLEVEL (1, ("%p ---> isColInCBcolSet[%ld]=%ld\n", 
+//                            isColInCBcolSet+curCol, curCol,
+//                            isColInCBcolSet[curCol]));
+//                /*! TODO: Check for elements too in Pass 1 and 3  */
+//                if (isColInCBcolSet [curCol] < colMark  ){
+//                    PRLEVEL (1, ("curCol = %ld colCount=%ld\n", 
+//                                curCol, colCount));
+//                    CBColList [colCount] = curCol;
+//                    isColInCBcolSet [curCol] = colMark + colCount++; 
+//                }
+//                ASSERT (colCount <= n);
+//
+//                colRelIndex [cEl] = isColInCBcolSet [el_colIndex [cEl]] 
+//                    - colMark;
+//            }
+        }
+    }
+
+
+
+///////////////////////////////////////////////////////////////////////////////
     Int *snM = LUsym->super2atree;
     Int eli = snM [f]; // Element index of the one that is going to be assembled
     if (fp < rowCount ){ // otherwise nothing will remain of this front
@@ -466,20 +528,12 @@ void paru_assemble (
     }
 
 
-    /*! TODO:*/
-    /**** 5 ** assemble fronts which have rows and columns in pivotal part ****/ 
-    /*
-     * They must split into two part U part and CB                          ***/
-
     /*! TODO:TRSM and DGEMM can be here*/
     /**** 6,7 ** Count number of rows and columsn of prior CBs to asslemble ***/ 
     /*
      * I need to either assemble rows or Columns                            ***/
 
 
-
-
-    /*! TODO: DGEMM     */
 
 
 
