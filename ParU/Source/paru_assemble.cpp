@@ -230,8 +230,9 @@ void paru_assemble (
 
             // Assembly of column f of e in colIndexF
             PRLEVEL (1, ("col=%ld, (%ld,%ld)\n", c, e, f));
-            FLIP (curTpl.e); //Nullifying tuple  /*! TODO: Deleting tuple     */
-            curTupleList->numTuple--;
+            //!! WRONG do not delete tuples here
+       //     FLIP (curTpl.e); //Nullifying tuple  /*! TODO: Deleting tuple     */
+       //     curTupleList->numTuple--;
 
             Element *curEl = elementList[e];
             Int mEl = curEl->nrows;
@@ -248,7 +249,8 @@ void paru_assemble (
 
             FLIP(el_colIndex[curColIndex]); //Marking column as assembled
 
-            curEl->ncolsleft--;
+            /*! TODO: I can change number of left cols/rows in the end       */
+            //            curEl->ncolsleft--;
             PRLEVEL (1, ("curColIndex =%ld\n", curColIndex));
 
             ASSERT (curColIndex < nEl);
@@ -307,7 +309,7 @@ void paru_assemble (
      *****  a set of pivot is found in this part that is crucial to assemble  **/
     PRLEVEL (1, ("rowCount =%ld\n", rowCount));
     /* using the rest of scratch for permutation; Not sure about 1  */
-    int *ipiv =(int *) (Work->scratch+rowCount+1);
+    int *ipiv =(int *) (Work->scratch+rowCount);
     paru_factorize (pivotalFront, rowCount, fp, ipiv, cc );
 
     /* To this point fully summed part of the front is computed and L and U    /  
@@ -334,7 +336,7 @@ void paru_assemble (
         memset (isRowInFront, -1, n*sizeof(Int));
         colMark = Work-> colMark = 0;
     }
-    Int *CBColList = Work -> scratch + 2*rowCount; //scratch=[fsRowList..ipiv..]
+    Int *CBColList = Work -> scratch + 2*rowCount;//scratch=[fsRowList..ipiv..]
     Int colCount = 0;
 
 #ifndef NDEBUG
@@ -345,7 +347,7 @@ void paru_assemble (
     tupleList *RowList = paruMatInfo->RowList;
     for (Int i = 0; i < fp; i++){
         Int curFsRowIndex =(Int) ipiv [i]; //current fully summed row index
-        PRLEVEL (1, ("curFsRowIndex = %ld\n", curFsRowIndex));
+        PRLEVEL (1, ("4: curFsRowIndex = %ld\n", curFsRowIndex));
         ASSERT (curFsRowIndex < m);
         Int curFsRow = fsRowList [curFsRowIndex];
         PRLEVEL (1, ("curFsRow =%ld\n", curFsRow));
@@ -353,7 +355,7 @@ void paru_assemble (
         Int numTuple = curRowTupleList->numTuple;
         ASSERT (numTuple >= 0);
         Tuple *listRowTuples = curRowTupleList->list;
-        PRLEVEL (0, ("numTuple = %ld\n", numTuple));
+        PRLEVEL (1, ("numTuple = %ld\n", numTuple));
         for (Int i = 0; i < numTuple; i++){
             Tuple curTpl = listRowTuples [i];
             Int e = curTpl.e;
@@ -380,7 +382,7 @@ void paru_assemble (
                 continue;
             }
 
-            PRLEVEL (0, ("element= %ld  nEl =%ld \n",e, nEl));
+            PRLEVEL (1, ("element= %ld  nEl =%ld \n",e, nEl));
             for (Int cEl = 0; cEl < nEl; cEl++){
                 Int curCol = el_colIndex [cEl]; 
                 PRLEVEL (1, ("curCol =%ld\n", curCol));
@@ -411,7 +413,7 @@ void paru_assemble (
 
 #ifndef NDEBUG /* Checking if columns are correct */
 
-    p = 0;
+    p = 1;
     PRLEVEL (p, ("There are %ld columns in this contribution block: \n",
                 colCount));
     for (Int i = 0; i < colCount; i++)
@@ -453,19 +455,30 @@ void paru_assemble (
         printf ("Out of memory when tried to allocate for U part %ld",f);
         return;
     }
-    /*! TODO:*/
+    /*! TODO: Bug found ipiv changes!! Decument Work data structure*/
+#ifndef NDEBUG  // Printing the permutation
+    p = 1;
+    PRLEVEL (p, ("permutation:\n"));
+    for (int i = 0; i < fp; i++){
+        PRLEVEL (p, ("ipiv[%d] =%d\n",i, ipiv[i]));
+    }
+    PRLEVEL (p, ("\n"));
+#endif
+
+
     /**** 5 ** assemble U part         Row by Row                          ****/ 
     for (Int i = 0; i < fp; i++){
         Int curFsRowIndex =(Int) ipiv [i]; //current fully summed row index
-        PRLEVEL (1, ("curFsRowIndex = %ld\n", curFsRowIndex));
+        PRLEVEL (1, ("5(i=%ld): curFsRowIndex = %ld\n",i, curFsRowIndex));
         ASSERT (curFsRowIndex < m);
         Int curFsRow = fsRowList [curFsRowIndex];
         PRLEVEL (1, ("curFsRow =%ld\n", curFsRow));
         tupleList *curRowTupleList = &RowList [curFsRowIndex];
         Int numTuple = curRowTupleList->numTuple;
         ASSERT (numTuple >= 0);
-        Tuple *listRowTuples = curRowTupleList->list;
-        PRLEVEL (0, ("numTuple = %ld\n", numTuple));
+        ASSERT (numTuple <= m);
+       Tuple *listRowTuples = curRowTupleList->list;
+       PRLEVEL (0, ("numTuple = %ld\n", numTuple));
         for (Int i = 0; i < numTuple; i++){
             Tuple curTpl = listRowTuples [i];
             Int e = curTpl.e;
@@ -478,38 +491,39 @@ void paru_assemble (
             Int *colRelIndex = relColInd (curEl);
 
             /// Grab the row and add them to the u part row by row
-//            //counting prior element's rows
-//            if (elRow [e] < elRMark) {// an element never seen before
-//                elRow [e] = elRMark + 1;
-//           }
-//            else { // must not happen anyway; it depends on changing strategy
-//                elRow [e]++; 
-//                continue;
-//            }
-//
-//            PRLEVEL (0, ("element= %ld  nEl =%ld \n",e, nEl));
-//            for (Int cEl = 0; cEl < nEl; cEl++){
-//                Int curCol = el_colIndex [cEl]; 
-//                PRLEVEL (1, ("curCol =%ld\n", curCol));
-//                ASSERT (curCol < n);
-//                /*! TODO: implement this part better     */
-//                if (curCol >= col1 && curCol < col2) //if in pivotal front
-//                    continue;
-//               PRLEVEL (1, ("%p ---> isColInCBcolSet[%ld]=%ld\n", 
-//                            isColInCBcolSet+curCol, curCol,
-//                            isColInCBcolSet[curCol]));
-//                /*! TODO: Check for elements too in Pass 1 and 3  */
-//                if (isColInCBcolSet [curCol] < colMark  ){
-//                    PRLEVEL (1, ("curCol = %ld colCount=%ld\n", 
-//                                curCol, colCount));
-//                    CBColList [colCount] = curCol;
-//                    isColInCBcolSet [curCol] = colMark + colCount++; 
-//                }
-//                ASSERT (colCount <= n);
-//
-//                colRelIndex [cEl] = isColInCBcolSet [el_colIndex [cEl]] 
-//                    - colMark;
-//            }
+//*            //counting prior element's rows
+//*            if (elRow [e] < elRMark) {// an element never seen before
+//*                elRow [e] = elRMark + 1;
+//*           }
+//*            else { // must not happen anyway; it depends on changing strategy
+//*                elRow [e]++; 
+//*                continue;
+//*            }
+//*
+//*            PRLEVEL (0, ("element= %ld  nEl =%ld \n",e, nEl));
+//*            for (Int cEl = 0; cEl < nEl; cEl++){
+//*                Int curCol = el_colIndex [cEl]; 
+//*                PRLEVEL (1, ("curCol =%ld\n", curCol));
+//*                ASSERT (curCol < n);
+//*                /*! TODO: implement this part better     */
+//*                if (curCol >= col1 && curCol < col2) //if in pivotal front
+//*                    continue;
+//*               PRLEVEL (1, ("%p ---> isColInCBcolSet[%ld]=%ld\n", 
+//*                            isColInCBcolSet+curCol, curCol,
+//*                            isColInCBcolSet[curCol]));
+//*                /*! TODO: Check for elements too in Pass 1 and 3  */
+//*                if (isColInCBcolSet [curCol] < colMark  ){
+//*                    PRLEVEL (1, ("curCol = %ld colCount=%ld\n", 
+//*                                curCol, colCount));
+//*                    CBColList [colCount] = curCol;
+//*                    isColInCBcolSet [curCol] = colMark + colCount++; 
+//*                }
+//*                ASSERT (colCount <= n);
+//*
+//*                colRelIndex [cEl] = isColInCBcolSet [el_colIndex [cEl]] 
+//*                    - colMark;
+//*            }
+
         }
     }
 
