@@ -247,7 +247,6 @@ void paru_assemble (
             Int curColIndex = curTpl.f;
             ASSERT (el_colIndex[curColIndex] == c);
 
-            FLIP(el_colIndex[curColIndex]); //Marking column as assembled
 
             /*! TODO: I can change number of left cols/rows in the end       */
             //            curEl->ncolsleft--;
@@ -259,6 +258,8 @@ void paru_assemble (
 
             assemble_col (pivotalFront+colIndexF*rowCount, 
                     el_Num +curColIndex*mEl, mEl, rowRelIndex);
+
+            FLIP(el_colIndex[curColIndex]); //Marking column as assembled
             colRelIndex [curColIndex] = -1;
 
 #if 0
@@ -489,6 +490,16 @@ void paru_assemble (
             Int *el_colIndex = colIndex_pointer (curEl);
             Int *colRelIndValid = colRelIndVal (curEl);
             Int *colRelIndex = relColInd (curEl);
+
+            Int curRowIndex = curTpl.f;
+            ASSERT (el_rowIndex[curRowIndex] == curFsRowIndex);
+            ASSERT (curRowIndex < mEl)
+            PRLEVEL (1, ("curColIndex =%ld\n", curRowIndex));
+
+            double *el_Num = numeric_pointer (curEl);
+            PRLEVEL (1, ("element= %ld  mEl =%ld \n",e, mEl));
+
+
 
             /// Grab the row and add them to the u part row by row
 //*            //counting prior element's rows

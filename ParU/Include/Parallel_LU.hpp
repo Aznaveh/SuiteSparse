@@ -211,6 +211,7 @@ typedef struct  /*work_struct*/
 {
    Int *rowSize;     // Initalized data structure, size of rows        
    Int rowMark;      // rowSize[x] < rowMark
+   
    Int *scratch;     // size of 2*rows + sizeof cols
                      // Used for 3 things in paru_assemble so far
                      //     1) fsRowList: List of fully summed rows < |m|
