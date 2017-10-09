@@ -270,7 +270,8 @@ Int paru_factorize (double *F, Int m, Int n,
 Element *paru_create_element (Int nrows, Int ncols, 
         Int init, cholmod_common *cc);
 void assemble_col (double *sR, double *dR, Int m, Int *relRowInd);
-
+void assemble_row (double *sM, double *dM, Int sm, Int sn, Int dm, Int sR, 
+                    Int dR, Int *relColInd);
 
 void paru_fourPath (paru_matrix *paruMatInfo, Int rowCount, Int colCount);
 
