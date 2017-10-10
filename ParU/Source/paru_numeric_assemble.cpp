@@ -31,3 +31,22 @@ void assemble_row (double *sM, double *dM,//source Matrix and destination matrix
         }
     }
 }
+
+
+void assemble_all (double *s, double *d,   //source and destination
+                    Int sm, Int sn,    // dimension of source matrix
+                    Int dm,    // dimension of destination matrix
+                    Int *relRowInd, Int *relColInd)
+    
+//Source and destination are stored column based
+{
+    for (Int i = 0; i < sn; i++) {
+        if ( relColInd[i] > 0 ){  // If column is valid
+            for (Int j = 0; j < sm; j++) {
+                if ( relRowInd[j] > 0 )  // If row is valid
+                    d [relColInd[i]*dm + relRowInd[j] ] += s[sm*i + j];
+
+            }
+        }
+    }
+}
