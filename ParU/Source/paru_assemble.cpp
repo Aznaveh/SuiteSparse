@@ -446,17 +446,10 @@ void paru_assemble (
        isRowInFront  [curRow] = -1;
        } */
 #endif
+//
+//    if(colCount !=0 && rowCount != 0)
+//        paru_fourPath (paruMatInfo, rowCount, colCount);
 
-    if(colCount !=0 && rowCount != 0)
-        paru_fourPath (paruMatInfo, rowCount, colCount);
-
-    double *uPart = 
-        (double*) paru_calloc (fp*colCount, sizeof (double), cc);
-    if ( uPart == NULL ){
-        printf ("Out of memory when tried to allocate for U part %ld",f);
-        return;
-    }
-    /*! TODO: Bug found ipiv changes!! Decument Work data structure*/
 #ifndef NDEBUG  // Printing the permutation
     p = 1;
     PRLEVEL (p, ("permutation:\n"));
@@ -466,8 +459,15 @@ void paru_assemble (
     PRLEVEL (p, ("\n"));
 #endif
 
-
     /**** 5 ** assemble U part         Row by Row                          ****/ 
+
+    double *uPart = 
+        (double*) paru_calloc (fp*colCount, sizeof (double), cc);
+    if ( uPart == NULL ){
+        printf ("Out of memory when tried to allocate for U part %ld",f);
+        return;
+    }
+ 
     for (Int i = 0; i < fp; i++){
         Int curFsRowIndex =(Int) ipiv [i]; //current fully summed row index
         PRLEVEL (1, ("5(i=%ld): curFsRowIndex = %ld\n",i, curFsRowIndex));
@@ -506,44 +506,25 @@ void paru_assemble (
             FLIP(el_rowIndex[curRowIndex]); //marking column as assembled
             rowRelIndex [curRowIndex] = -1;
 
-
-            /// Grab the row and add them to the u part row by row
-//*            //counting prior element's rows
-//*            if (elRow [e] < elRMark) {// an element never seen before
-//*                elRow [e] = elRMark + 1;
-//*           }
-//*            else { // must not happen anyway; it depends on changing strategy
-//*                elRow [e]++; 
-//*                continue;
-//*            }
-//*
-//*            PRLEVEL (0, ("element= %ld  nEl =%ld \n",e, nEl));
-//*            for (Int cEl = 0; cEl < nEl; cEl++){
-//*                Int curCol = el_colIndex [cEl]; 
-//*                PRLEVEL (1, ("curCol =%ld\n", curCol));
-//*                ASSERT (curCol < n);
-//*                /*! TODO: implement this part better     */
-//*                if (curCol >= col1 && curCol < col2) //if in pivotal front
-//*                    continue;
-//*               PRLEVEL (1, ("%p ---> isColInCBcolSet[%ld]=%ld\n", 
-//*                            isColInCBcolSet+curCol, curCol,
-//*                            isColInCBcolSet[curCol]));
-//*                /*! TODO: Check for elements too in Pass 1 and 3  */
-//*                if (isColInCBcolSet [curCol] < colMark  ){
-//*                    PRLEVEL (1, ("curCol = %ld colCount=%ld\n", 
-//*                                curCol, colCount));
-//*                    CBColList [colCount] = curCol;
-//*                    isColInCBcolSet [curCol] = colMark + colCount++; 
-//*                }
-//*                ASSERT (colCount <= n);
-//*
-//*                colRelIndex [cEl] = isColInCBcolSet [el_colIndex [cEl]] 
-//*                    - colMark;
-//*            }
-
         }
     }
 
+#ifndef NDEBUG  // Printing the  U part
+    p = 0;
+    PRLEVEL (p, ("U\t"));
+    for (Int i = 0; i < colCount; i++){
+        PRLEVEL (p, ("%ld\t", CBColList[i]));
+    }
+    PRLEVEL (p, ("\n"));
+    for (Int i = 0; i < fp; i++){
+        PRLEVEL (p, ("%ld\t",  ipiv[i]));
+        for (Int j = 0; j < colCount; j++){
+            PRLEVEL (p, (" %3.1lf\t", uPart[j*fp+i]));
+        }
+        PRLEVEL (p, ("\n"));
+    }
+#endif
+ 
 
 
 ///////////////////////////////////////////////////////////////////////////////
