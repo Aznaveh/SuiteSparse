@@ -37,7 +37,6 @@ void assemble_all (double *s, double *d,   //source and destination
                     Int sm, Int sn,    // dimension of source matrix
                     Int dm,    // dimension of destination matrix
                     Int *relRowInd, Int *relColInd)
-    
 //Source and destination are stored column based
 {
     for (Int i = 0; i < sn; i++) {
