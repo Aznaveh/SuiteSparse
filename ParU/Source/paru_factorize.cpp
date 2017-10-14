@@ -5,8 +5,8 @@
 
 #include "Parallel_LU.hpp"
 
-extern "C" void dgetrf_(Int* dim1, Int* dim2, double* a, Int* lda,
-        int* ipiv, Int* info);
+extern "C" void dgetrf_(Int *dim1, Int *dim2, double *a, Int *lda,
+        int *ipiv, Int *info);
 
 
 Int paru_factorize (double *F, Int m, Int n,
