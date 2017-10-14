@@ -265,8 +265,9 @@ Int paru_add_colTuple (tupleList *ColList, Int col,
 void paru_assemble(paru_matrix *paruMatInfo, Int f, cholmod_common *cc);
 
 
-Int paru_factorize (double *F, Int m, Int n, 
-        int *ipiv, cholmod_common *cc);
+Int paru_factorize (double *F, BLAS_INT m, BLAS_INT n,
+        BLAS_INT *ipiv, cholmod_common *cc);
+
 Element *paru_create_element (Int nrows, Int ncols, 
         Int init, cholmod_common *cc);
 void assemble_col (double *sR, double *dR, Int m, Int *relRowInd);

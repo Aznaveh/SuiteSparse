@@ -5,12 +5,12 @@
 
 #include "Parallel_LU.hpp"
 
-extern "C" void dgetrf_(Int *dim1, Int *dim2, double *a, Int *lda,
-        int *ipiv, Int *info);
+extern "C" void dgetrf_( BLAS_INT *dim1, BLAS_INT *dim2, double *a, 
+        BLAS_INT *lda, BLAS_INT *ipiv, BLAS_INT *info);
 
 
-Int paru_factorize (double *F, Int m, Int n,
-        int *ipiv, cholmod_common *cc)
+Int paru_factorize (double *F, BLAS_INT m, BLAS_INT n,
+        BLAS_INT *ipiv, cholmod_common *cc)
 {
     DEBUGLEVEL(0);
     PRLEVEL (0, (" %ld x %ld\n", m, n));
@@ -24,8 +24,8 @@ Int paru_factorize (double *F, Int m, Int n,
         PRLEVEL (p, ("\n"));
     }
 #endif
-    Int info;
-    Int lda = m;
+    BLAS_INT info;
+    BLAS_INT lda = m;
 
     PRLEVEL (1, ("ipiv =%p\n", ipiv));
     PRLEVEL (1, ("F=%p\n", F));
