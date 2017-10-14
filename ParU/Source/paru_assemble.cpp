@@ -524,10 +524,16 @@ void paru_assemble (
         PRLEVEL (p, ("\n"));
     }
 #endif
- 
+
+    /*! TODO:TRSM and DGEMM can be here*/
+    /**** 6,7 ** Count number of rows and columsn of prior CBs to asslemble ***/ 
+    /*
+     * I need to either assemble rows or Columns                            ***/
+
+    paru_trsm(pivotalFront , uPart, fp, rowCount, colCount);
 
 
-///////////////////////////////////////////////////////////////////////////////
+
     Int *snM = LUsym->super2atree;
     Int eli = snM [f]; // Element index of the one that is going to be assembled
     if (fp < rowCount ){ // otherwise nothing will remain of this front
@@ -539,12 +545,7 @@ void paru_assemble (
         }
     }
 
-
-    /*! TODO:TRSM and DGEMM can be here*/
-    /**** 6,7 ** Count number of rows and columsn of prior CBs to asslemble ***/ 
-    /*
-     * I need to either assemble rows or Columns                            ***/
-
+///////////////////////////////////////////////////////////////////////////////
 
 
 

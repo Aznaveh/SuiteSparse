@@ -38,5 +38,6 @@ Int paru_trsm(double *pF, double *uPart, Int fp, Int rowCount, Int colCount){
 
     BLAS_DTRSM ("L" ,"L" ,"N" ,"U", &mB, &nB, &alpha, pF, &lda, 
             uPart, &ldb);
+    return 0;
 
 }
