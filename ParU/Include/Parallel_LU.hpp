@@ -274,6 +274,9 @@ void assemble_col (double *sR, double *dR, Int m, Int *relRowInd);
 void assemble_row (double *sM, double *dM, Int sm, Int sn, Int dm, Int sR, 
                     Int dR, Int *relColInd);
 Int paru_trsm(double *pF, double *uPart, Int fp, Int rowCount, Int colCount);
+Int paru_dgemm(double *pF, double *uPart, double *el, Int fp, 
+        Int rowCount, Int colCount);
+
 
 void paru_fourPath (paru_matrix *paruMatInfo, Int rowCount, Int colCount);
 

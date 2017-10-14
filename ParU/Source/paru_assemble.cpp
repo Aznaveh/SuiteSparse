@@ -527,23 +527,23 @@ void paru_assemble (
 
     /*! TODO:TRSM and DGEMM can be here*/
     /**** 6,7 ** Count number of rows and columsn of prior CBs to asslemble ***/ 
-    /*
-     * I need to either assemble rows or Columns                            ***/
 
-    paru_trsm(pivotalFront , uPart, fp, rowCount, colCount);
+   paru_trsm(pivotalFront , uPart, fp, rowCount, colCount);
 
-
-
-    Int *snM = LUsym->super2atree;
-    Int eli = snM [f]; // Element index of the one that is going to be assembled
+   Int *snM = LUsym->super2atree;
+   Int eli = snM [f]; // Element index of the one that is going to be assembled
+   Element *el;
     if (fp < rowCount ){ // otherwise nothing will remain of this front
-        Element *el = elementList[eli] = paru_create_element (rowCount-fp,
+        el = elementList[eli] = paru_create_element (rowCount-fp,
                 colCount, 0 ,cc);
         if ( el == NULL ){
             printf ("Out of memory when tried to allocate current CB %ld",eli);
             return;
         }
     }
+   //double *el_numbers = numeric_pointer (el);
+  //  paru_dgemm(pivotalFront, uPart, el_numbers, fp, rowCount, colCount);
+
 
 ///////////////////////////////////////////////////////////////////////////////
 

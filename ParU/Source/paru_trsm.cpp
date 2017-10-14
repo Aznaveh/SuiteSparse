@@ -30,11 +30,11 @@
 Int paru_trsm(double *pF, double *uPart, Int fp, Int rowCount, Int colCount){
     
     /*! TODO: Long int to int conversion     */
-    int mB = fp;
-    int nB = colCount;
+    BLAS_INT mB = fp;
+    BLAS_INT nB = colCount;
     double alpha = 1;
-    int lda = rowCount;
-    int ldb = colCount;
+    BLAS_INT lda = rowCount;
+    BLAS_INT ldb = colCount;
 
     BLAS_DTRSM ("L" ,"L" ,"N" ,"U", &mB, &nB, &alpha, pF, &lda, 
             uPart, &ldb);
