@@ -216,7 +216,10 @@ typedef struct  /*work_struct*/
                      // Used for 3 things in paru_assemble so far
                      //     1) fsRowList: List of fully summed rows < |m|
                      //     2) ipiv: permutation of fsRowList  < |m|
-                     //     3) CBColList: list of nonpivotal columns < |n|
+                     //     3) tmpInv: helper for correcting pinv < |m|
+                     //             I don't need it if the permutation is
+                     //             correct per se
+                     //     4) CBColList: list of nonpivotal columns < |n|
 
    Int *colSize;     // Initalized data structure, size of columns
    Int colMark;      // colSize[x] < colMark
@@ -265,7 +268,7 @@ Int paru_add_colTuple (tupleList *ColList, Int col,
 void paru_assemble(paru_matrix *paruMatInfo, Int f, cholmod_common *cc);
 
 
-Int paru_factorize (double *F, BLAS_INT m, BLAS_INT n,
+Int paru_factorize (double *F, Int m, Int n,
         BLAS_INT *ipiv, cholmod_common *cc);
 
 Element *paru_create_element (Int nrows, Int ncols, 
