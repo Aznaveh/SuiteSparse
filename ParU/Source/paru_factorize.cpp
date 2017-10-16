@@ -9,11 +9,16 @@ extern "C" void dgetrf_( BLAS_INT *dim1, BLAS_INT *dim2, double *a,
         BLAS_INT *lda, BLAS_INT *ipiv, BLAS_INT *info);
 
 
-Int paru_factorize (double *F, BLAS_INT m, BLAS_INT n,
+Int paru_factorize (double *F, Int lm, Int ln,
         BLAS_INT *ipiv, cholmod_common *cc)
 {
-    DEBUGLEVEL(0);
-    PRLEVEL (0, (" %ld x %ld\n", m, n));
+    DEBUGLEVEL(1);
+
+    BLAS_INT m = lm;
+    BLAS_INT n = ln;
+
+
+    PRLEVEL (0, (" %d x %d\n", m, n));
 #ifndef NDEBUG  // Printing the pivotal front before computation
     Int p = 1;
     PRLEVEL (1, ("Befor factorization:\n"));
@@ -40,17 +45,20 @@ Int paru_factorize (double *F, BLAS_INT m, BLAS_INT n,
 
     dgetrf_(&m, &n, F, &lda, ipiv, &info);
 
-//    ASSERT (m >= n);
-    if (m < n) {
-        ipiv [0] *= -1;
-        return info;
-    }
+
+
+    // ASSERT (m >= n);
+
+    //    if (m < n) {
+    //        ipiv [0] *= -1;
+    //        return info;
+    //    }
     /* changing swap permutation to a real permutation */
-    
+
 //    int* tmpPinv = (int*) paru_alloc (m, sizeof (int), cc);
-    int* tmpPinv = ipiv + n +1; // using the rest of scratch memory
+    BLAS_INT *tmpPinv = ipiv + n; // using the rest of scratch memory
 #ifndef NDEBUG  // Printing the swap permutation
-    p = 1;
+    p = 0;
     // ATTENTION: ipiv is 1 based
     PRLEVEL (p, ("swap permutation:\n"));
     for (int i = 0; i < m; i++){
@@ -61,9 +69,11 @@ Int paru_factorize (double *F, BLAS_INT m, BLAS_INT n,
 
     PRLEVEL (1, ("\n"));
     for (int i = 0; i < m; i++) tmpPinv[i] = i;
-    for (int i = 0; i < n; i++){
+    PRLEVEL (0, (" m=%d n=%d\n", m, n));
+    for (int i = 0; i < m; i++){
         int tmp;
         // swap (tmpPinv [ipiv [i]], tmpPinv[i] ) and it is off by one
+        PRLEVEL (0, ("ipiv[%d] =%d\n",i, ipiv[i]));
         ASSERT (ipiv [i] <= m);
         tmp = tmpPinv [ipiv [i]-1];
         PRLEVEL (1, ("tmp =%d\n", tmp));
@@ -72,7 +82,7 @@ Int paru_factorize (double *F, BLAS_INT m, BLAS_INT n,
         tmpPinv [i] = tmp;
     }
 
-    for (int i = 0; i < n; i++) 
+    for (int i = 0; i < m; i++) 
         ipiv [i] = tmpPinv[i]; //copying back the important chunck
 
 //    paru_free (m, sizeof (int), tmpPinv, cc);
@@ -83,7 +93,7 @@ Int paru_factorize (double *F, BLAS_INT m, BLAS_INT n,
     p = 1;
     // ATTENTION: ipiv is 1 based
     PRLEVEL (p, ("Real permutation:\n"));
-    for (int i = 0; i < n; i++){
+    for (int i = 0; i < m; i++){
         PRLEVEL (p, ("ipiv[%d] =%d\n",i, ipiv[i]));
     }
     PRLEVEL (p, ("\n"));

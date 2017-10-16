@@ -111,7 +111,12 @@ void paru_assemble (
             Int *el_rowIndex = rowIndex_pointer (curEl); //pointers to row index
             Int *rowRelIndValid = rowRelIndVal (curEl);
             Int *rowRelIndex = relRowInd (curEl);
+            Int *colRelIndex    = relColInd (curEl);
 
+            //########### WORK ON HERE #######################\\
+//            colRelIndex [curTpl.f] = c - col1; //Initialzing relative index
+//                                               // neede for row assembly
+//                                               // function
 
             /*! TODO: Is it possible to have columns already ate e<0 or f<0 */
             //if (curTpl.f<0) continue;
@@ -345,6 +350,7 @@ void paru_assemble (
 #endif  
 
     /**** 4 ******** finding set of non pivotal cols in current front *********/
+    /*! TODO: What if in current front m<n: here would be some problem     */
     tupleList *RowList = paruMatInfo->RowList;
     for (Int i = 0; i < fp; i++){
         Int curFsRowIndex =(Int) ipiv [i]; //current fully summed row index
@@ -533,15 +539,18 @@ void paru_assemble (
    Int *snM = LUsym->super2atree;
    Int eli = snM [f]; // Element index of the one that is going to be assembled
    Element *el;
-    if (fp < rowCount ){ // otherwise nothing will remain of this front
+   PRLEVEL (0, ("rowCount=%ld, colCount=%ld, fp=%ld\n",rowCount, colCount, fp));
+   PRLEVEL (0, ("el is %ld by %ld\n",rowCount-fp,colCount));
+    if (fp <= rowCount ){ // otherwise nothing will remain of this front
         el = elementList[eli] = paru_create_element (rowCount-fp,
                 colCount, 0 ,cc);
         if ( el == NULL ){
             printf ("Out of memory when tried to allocate current CB %ld",eli);
             return;
         }
+        PRLEVEL (0, ("el =%p\n", el));
     }
-   //double *el_numbers = numeric_pointer (el);
+   double *el_numbers = numeric_pointer (el);
   //  paru_dgemm(pivotalFront, uPart, el_numbers, fp, rowCount, colCount);
 
 
