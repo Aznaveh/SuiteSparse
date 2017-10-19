@@ -47,7 +47,7 @@ Int paru_factorize (double *F, Int lm, Int ln,
 
 
 
-    // ASSERT (m >= n);
+     ASSERT (m >= n);
 
     //    if (m < n) {
     //        ipiv [0] *= -1;

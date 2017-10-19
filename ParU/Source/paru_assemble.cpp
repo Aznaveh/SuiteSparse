@@ -461,9 +461,6 @@ void paru_assemble (
        isRowInFront  [curRow] = -1;
        } */
 #endif
-//
-//    if(colCount !=0 && rowCount != 0)
-//        paru_fourPath (paruMatInfo, rowCount, colCount);
 
 #ifndef NDEBUG  // Printing the permutation
     p = 1;
@@ -539,9 +536,8 @@ void paru_assemble (
     }
 #endif
 
-    /*! TODO:TRSM and DGEMM can be here*/
-    /**** 6,7 ** Count number of rows and columsn of prior CBs to asslemble ***/ 
 
+    /**** 6 ****                     TRSM and DGEMM                         ***/ 
    paru_trsm(pivotalFront , uPart, fp, rowCount, colCount);
 
    Int *snM = LUsym->super2atree;
@@ -559,7 +555,13 @@ void paru_assemble (
         PRLEVEL (0, ("el =%p\n", el));
     }
    double *el_numbers = numeric_pointer (el);
-  //  paru_dgemm(pivotalFront, uPart, el_numbers, fp, rowCount, colCount);
+   paru_dgemm(pivotalFront, uPart, el_numbers, fp, rowCount, colCount);
+
+
+    /**** 7 **** Count number of rows and columsn of prior CBs to asslemble ***/ 
+
+    if(colCount !=0 && rowCount != 0)
+        paru_fourPath (paruMatInfo, rowCount, colCount);
 
 
 ///////////////////////////////////////////////////////////////////////////////

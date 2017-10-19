@@ -48,6 +48,7 @@ void paru_fourPath (paru_matrix *paruMatInfo,
     }
 
     /*! 2st path: over rows to count columns */
+    /*! TODO: this part is not correct	 */
 
     tupleList *RowList = paruMatInfo->RowList;
     for (Int r = 0; r < rowCount; r++){
@@ -67,6 +68,10 @@ void paru_fourPath (paru_matrix *paruMatInfo,
     }
     /*! TODO: 3st path: assemble columns  
      * it contains adding and deleting tuples*/
+
+
+
+
     /*! TODO: 4st path: assemble rows */
 
 }

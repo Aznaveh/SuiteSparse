@@ -16,8 +16,11 @@ C = $(CXX) $(CF) $(SPQR_CONFIG) $(CONFIG_PARTITION) $(CONFIG_GPU) $(I) \
 
 LIBS = $(CLIB) $(FLIB) $(TBB) $(GPULIB)
 
+FLAG = -Wno-write-strings
+
 all:
-	$(C) testazny.cpp -o testazny $(LIBS)
+	$(C) $(FLAG) testazny.cpp -o testazny $(LIBS)
+	
 
 run:
 	./testazny < ../Matrix/cage5.mtx
@@ -63,51 +66,51 @@ run:
 	./testazny < ../Matrix/n3c4-b4.mtx
 	./testazny < ../Matrix/r2.mtx
 	./testazny < ../Matrix/problem.mtx
-
+#
 #	./testazny < ../Matrix/arrow.mtx   #Huge
 
 VGFLAGS = --tool=memcheck --leak-check=full --show-reachable=yes -v\
-		 --track-origins=yes --num-callers=20 \
-		 --track-fds=yes --log-file="valgrindlogfile.log"
+		  --track-origins=yes --num-callers=20 \
+		  --track-fds=yes --log-file="valgrindlogfile.log"
 
 val:
 	valgrind	$(VGFLAGS)	./testazny < ../Matrix/lp_share1b.mtx 
-	valgrind	$(VGFLAGS)	./testazny < ../Matrix/GD01_b.mtx
-	valgrind	$(VGFLAGS)	./testazny < ../Matrix/LFAT5.mtx
-	valgrind	$(VGFLAGS)	./testazny < ../Matrix/a2.mtx 
-	valgrind	$(VGFLAGS)	./testazny < ../Matrix/b1_ss.mtx
-	valgrind	$(VGFLAGS)	./testazny < ../Matrix/bcspwr01.mtx
-	valgrind	$(VGFLAGS)	./testazny < ../Matrix/bfwa62.mtx
-	valgrind	$(VGFLAGS)	./testazny < ../Matrix/GD06_theory.mtx
-	valgrind	$(VGFLAGS)	./testazny < ../Matrix/lfat5b.mtx
-	valgrind	$(VGFLAGS)	./testazny < ../Matrix/pwr01b.mtx
-	valgrind	$(VGFLAGS)	./testazny < ../Matrix/west0067.mtx 
-	valgrind	$(VGFLAGS)	./testazny < ../Matrix/cage5.mtx
-	valgrind	$(VGFLAGS)	./testazny < ../Matrix/az23.mtx
-
-
-	valgrind	$(VGFLAGS)	./testazny <  ../Matrix/Tina_AskCal.mtx
-	valgrind	$(VGFLAGS)	./testazny < ../Matrix/problem.mtx
-	valgrind	$(VGFLAGS)	./testazny < ../Matrix/problem.mtx
-	valgrind	$(VGFLAGS)	./testazny < ../Matrix/Ragusa16.mtx 
-	valgrind	$(VGFLAGS)	./testazny < ../Matrix/n3c4-b4.mtx
-	valgrind	$(VGFLAGS)	./testazny < ../Matrix/r2.mtx
-	valgrind	$(VGFLAGS)	./testazny < ../Matrix/lpi_itest6.mtx
-	valgrind	$(VGFLAGS)	./testazny < ../Matrix/lpi_itest6.mtx
-	valgrind	$(VGFLAGS)	./testazny < ../Matrix/lpi_galenet.mtx
-	valgrind	$(VGFLAGS)	./testazny < ../Matrix/a1.mtx
-	valgrind	$(VGFLAGS)	./testazny < ../Matrix/c2.mtx #2x2 4nz
-	valgrind	$(VGFLAGS)	./testazny < ../Matrix/a4.mtx
-	valgrind	$(VGFLAGS)	./testazny < ../Matrix/Ragusa16_pattern.mtx
-	valgrind	$(VGFLAGS)	./testazny < ../Matrix/GD98_a.mtx
-
-	valgrind	$(VGFLAGS)	./testazny < ../Matrix/s32.mtx
-
-	valgrind	$(VGFLAGS)	./testazny < ../Matrix/c32.mtx 
-	valgrind	$(VGFLAGS)	./testazny < ../Matrix/Groebner_id2003_aug.mtx  
-
-	valgrind	$(VGFLAGS)	./testazny < ../Matrix/a04.mtx
-	valgrind	$(VGFLAGS)	./testazny < ../Matrix/lp_e226.mtx
+	#	valgrind	$(VGFLAGS)	./testazny < ../Matrix/GD01_b.mtx
+	#	valgrind	$(VGFLAGS)	./testazny < ../Matrix/LFAT5.mtx
+#	valgrind	$(VGFLAGS)	./testazny < ../Matrix/a2.mtx 
+#	valgrind	$(VGFLAGS)	./testazny < ../Matrix/b1_ss.mtx
+#	valgrind	$(VGFLAGS)	./testazny < ../Matrix/bcspwr01.mtx
+#	valgrind	$(VGFLAGS)	./testazny < ../Matrix/bfwa62.mtx
+#	valgrind	$(VGFLAGS)	./testazny < ../Matrix/GD06_theory.mtx
+#	valgrind	$(VGFLAGS)	./testazny < ../Matrix/lfat5b.mtx
+#	valgrind	$(VGFLAGS)	./testazny < ../Matrix/pwr01b.mtx
+#	valgrind	$(VGFLAGS)	./testazny < ../Matrix/west0067.mtx 
+#	valgrind	$(VGFLAGS)	./testazny < ../Matrix/cage5.mtx
+#	valgrind	$(VGFLAGS)	./testazny < ../Matrix/az23.mtx
+#
+#
+#	valgrind	$(VGFLAGS)	./testazny <  ../Matrix/Tina_AskCal.mtx
+#	valgrind	$(VGFLAGS)	./testazny < ../Matrix/problem.mtx
+#	valgrind	$(VGFLAGS)	./testazny < ../Matrix/problem.mtx
+#	valgrind	$(VGFLAGS)	./testazny < ../Matrix/Ragusa16.mtx 
+#	valgrind	$(VGFLAGS)	./testazny < ../Matrix/n3c4-b4.mtx
+#	valgrind	$(VGFLAGS)	./testazny < ../Matrix/r2.mtx
+#	valgrind	$(VGFLAGS)	./testazny < ../Matrix/lpi_itest6.mtx
+#	valgrind	$(VGFLAGS)	./testazny < ../Matrix/lpi_itest6.mtx
+#	valgrind	$(VGFLAGS)	./testazny < ../Matrix/lpi_galenet.mtx
+#	valgrind	$(VGFLAGS)	./testazny < ../Matrix/a1.mtx
+#	valgrind	$(VGFLAGS)	./testazny < ../Matrix/c2.mtx #2x2 4nz
+#	valgrind	$(VGFLAGS)	./testazny < ../Matrix/a4.mtx
+#	valgrind	$(VGFLAGS)	./testazny < ../Matrix/Ragusa16_pattern.mtx
+#	valgrind	$(VGFLAGS)	./testazny < ../Matrix/GD98_a.mtx
+#
+#	valgrind	$(VGFLAGS)	./testazny < ../Matrix/s32.mtx
+#
+#	valgrind	$(VGFLAGS)	./testazny < ../Matrix/c32.mtx 
+#	valgrind	$(VGFLAGS)	./testazny < ../Matrix/Groebner_id2003_aug.mtx  
+#
+#	valgrind	$(VGFLAGS)	./testazny < ../Matrix/a04.mtx
+#	valgrind	$(VGFLAGS)	./testazny < ../Matrix/lp_e226.mtx
 
 debug:
 	g++ -g   -O3 -fexceptions -fPIC -fopenmp   -I../../include   aztest.cpp -o \
