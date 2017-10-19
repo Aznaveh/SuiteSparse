@@ -65,10 +65,8 @@ void paru_fourPath (paru_matrix *paruMatInfo,
                 elCol [e]++; 
         }
     }
-    /*! TODO: 3st path: assemble columns   */
+    /*! TODO: 3st path: assemble columns  
+     * it contains adding and deleting tuples*/
     /*! TODO: 4st path: assemble rows */
 
-
-
-    PRLEVEL (0, ("Hi\n"));
 }
