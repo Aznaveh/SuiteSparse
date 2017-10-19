@@ -334,6 +334,16 @@ void paru_assemble (
     PRLEVEL (p, ("\n"));
 #endif
 
+    /*! TODO: Rearranging fsRowList based on the permutation	 */
+    Int *tmp = (Work->scratch+2*rowCount);   //temp space for saving fsRowList
+    for (Int i = 0; i < rowCount; ++i) { //saving fsRowList 
+        tmp [i] = fsRowList [i];
+    }
+    for (Int i = 0; i < rowCount; ++i) { //reordering fsRowList
+        fsRowList [i] = tmp [ipiv [i]];
+        ASSERT (fsRowList [i] < m );
+    }
+
 
     /*  Searching for columns */
     Int *isColInCBcolSet = Work -> colSize;
@@ -353,10 +363,9 @@ void paru_assemble (
     /*! TODO: What if in current front m<n: here would be some problem     */
     tupleList *RowList = paruMatInfo->RowList;
     for (Int i = 0; i < fp; i++){
-        Int curFsRowIndex =(Int) ipiv [i]; //current fully summed row index
+        Int curFsRowIndex =(Int) i; //current fully summed row index
         PRLEVEL (1, ("4: curFsRowIndex = %ld\n", curFsRowIndex));
-        ASSERT (curFsRowIndex < m);
-        Int curFsRow = fsRowList [curFsRowIndex];
+        Int curFsRow = fsRowList [i];
         PRLEVEL (1, ("curFsRow =%ld\n", curFsRow));
         tupleList *curRowTupleList = &RowList [curFsRowIndex];
         Int numTuple = curRowTupleList->numTuple;
@@ -475,8 +484,7 @@ void paru_assemble (
     }
  
     for (Int i = 0; i < fp; i++){
-        Int curFsRowIndex =(Int) ipiv [i]; //current fully summed row index
-        PRLEVEL (1, ("5(i=%ld): curFsRowIndex = %ld\n",i, curFsRowIndex));
+        Int curFsRowIndex =(Int) i; //current fully summed row index
         ASSERT (curFsRowIndex < m);
         Int curFsRow = fsRowList [curFsRowIndex];
         PRLEVEL (1, ("curFsRow =%ld\n", curFsRow));
