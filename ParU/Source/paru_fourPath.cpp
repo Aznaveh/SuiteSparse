@@ -31,7 +31,8 @@ void paru_fourPath (paru_matrix *paruMatInfo,
     /*!  1st path: over non pivotal columns to count rows  */
 
     tupleList *ColList = paruMatInfo->ColList;
-    for (Int c = 0; c < colCount; c++){
+    for (Int k = 0; k < colCount; k++){
+        Int c = CBColList [k];   //non pivotal column list
         tupleList *curColTupleList = &ColList[c];
         Int numTuple = curColTupleList->numTuple;
         ASSERT (numTuple >= 0);
@@ -40,14 +41,14 @@ void paru_fourPath (paru_matrix *paruMatInfo,
         for (Int i = 0; i < numTuple; i++){
             Tuple curTpl = listColTuples [i];
             Int e = curTpl.e;
-           if (elRow [e] < elRMark) // an element never seen before
-                elRow [e] = elRMark + 1;
+           if (elCol [e] < elCMark) // an element never seen before
+                elCol [e] = elCMark + 1;
             else 
-                elRow [e]++; 
+                elCol [e]++; 
         }
     }
 
-    /*! 2st path: over rows to count columns */
+    /*! 2nd path: over rows to count columns */
     /*! TODO: this part is not correct	 */
 
     tupleList *RowList = paruMatInfo->RowList;
