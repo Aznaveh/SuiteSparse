@@ -105,6 +105,8 @@ void paru_assemble (
         for (Int i = 0; i < numTuple; i++){
             Tuple curTpl = listColTuples [i];
             Int e = curTpl.e;
+            if(e < 0 ) continue;//already deleted /*! TODO: DELETE TUPLE HERE */
+
 
             Element *curEl = elementList[e];
             Int mEl = curEl->nrows;
@@ -113,16 +115,11 @@ void paru_assemble (
             Int *rowRelIndex = relRowInd (curEl);
             Int *colRelIndex    = relColInd (curEl);
 
-            //########### WORK ON HERE #######################\\
-//            colRelIndex [curTpl.f] = c - col1; //Initialzing relative index
-//                                               // neede for row assembly
-//                                               // function
-
-            /*! TODO: Is it possible to have columns already ate e<0 or f<0 */
-            //if (curTpl.f<0) continue;
+            colRelIndex [curTpl.f] = c - col1; //Initialzing relative index
+                                               // neede for row assembly
+                                               // function
 
             //counting prior element's columns
-            /*! TODO:Update Mark somewhere    !!! Here is an issue !!! */
             if (elCol [e] < elCMark) // an element never seen before
                 elCol [e] = elCMark + 1;
             else { 
@@ -232,6 +229,7 @@ void paru_assemble (
 
             Tuple curTpl = l [i];
             Int e = curTpl.e;
+            if(e < 0 ) continue;//already deleted /*! TODO: it deponds!!! */
 
             // Assembly of column f of e in colIndexF
             PRLEVEL (1, ("col=%ld, (%ld,%ld)\n", c, e, f));
@@ -335,7 +333,7 @@ void paru_assemble (
 #endif
 
     /*! TODO: Rearranging fsRowList based on the permutation	 */
-    Int *tmp = (Work->scratch+2*rowCount);   //temp space for saving fsRowList
+    Int *tmp = (Work->scratch + 2*rowCount);   //temp space for saving fsRowList
     for (Int i = 0; i < rowCount; ++i) { //saving fsRowList 
         tmp [i] = fsRowList [i];
     }
@@ -360,7 +358,7 @@ void paru_assemble (
 #endif  
 
     /**** 4 ******** finding set of non pivotal cols in current front *********/
-    /*! TODO: What if in current front m<n: here would be some problem     */
+    /*! TODO: What if m<n: Do not handle them for the moment*/
     tupleList *RowList = paruMatInfo->RowList;
     for (Int i = 0; i < fp; i++){
         Int curFsRowIndex =(Int) i; //current fully summed row index
@@ -375,6 +373,8 @@ void paru_assemble (
         for (Int i = 0; i < numTuple; i++){
             Tuple curTpl = listRowTuples [i];
             Int e = curTpl.e;
+            if(e < 0 ) continue;//already deleted /*! TODO: DELETE TUPLE HERE */
+            
             Element *curEl = elementList[e];
             Int mEl = curEl->nrows;
             Int nEl = curEl->ncols;
@@ -382,6 +382,9 @@ void paru_assemble (
             Int *el_colIndex = colIndex_pointer (curEl);
             Int *colRelIndValid = colRelIndVal (curEl);
             Int *colRelIndex = relColInd (curEl);
+            Int *rowRelIndex = relRowInd (curEl);
+
+            rowRelIndex [curTpl.f] = curFsRow;
 
             //counting prior element's rows
             if (elRow [e] < elRMark) {// an element never seen before
@@ -479,7 +482,7 @@ void paru_assemble (
         printf ("Out of memory when tried to allocate for U part %ld",f);
         return;
     }
- 
+
     for (Int i = 0; i < fp; i++){
         Int curFsRowIndex =(Int) i; //current fully summed row index
         ASSERT (curFsRowIndex < m);
@@ -489,11 +492,13 @@ void paru_assemble (
         Int numTuple = curRowTupleList->numTuple;
         ASSERT (numTuple >= 0);
         ASSERT (numTuple <= m);
-       Tuple *listRowTuples = curRowTupleList->list;
-       PRLEVEL (0, ("numTuple = %ld\n", numTuple));
+        Tuple *listRowTuples = curRowTupleList->list;
+        PRLEVEL (0, ("numTuple = %ld\n", numTuple));
         for (Int i = 0; i < numTuple; i++){
             Tuple curTpl = listRowTuples [i];
             Int e = curTpl.e;
+            if(e < 0 ) continue;//already deleted /*! TODO: it deponds!!! */
+
             Element *curEl = elementList[e];
             Int mEl = curEl->nrows;
             Int nEl = curEl->ncols;
