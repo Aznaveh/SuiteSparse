@@ -281,5 +281,6 @@ Int paru_dgemm(double *pF, double *uPart, double *el, Int fp,
         Int rowCount, Int colCount);
 
 
-void paru_fourPath (paru_matrix *paruMatInfo, Int rowCount, Int colCount);
+void paru_fourPath (paru_matrix *paruMatInfo, Int fp,
+        Int rowCount, Int colCount);
 

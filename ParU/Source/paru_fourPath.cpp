@@ -5,13 +5,13 @@
 #include "Parallel_LU.hpp"
 
 void paru_fourPath (paru_matrix *paruMatInfo,
+        Int fp,
         Int rowCount,
         Int colCount){
 
     DEBUGLEVEL(0);
     work_struct *Work =  paruMatInfo->Work;
 
-    Int *fsRowList = Work->scratch; // fully summed row list
     Int *isRowInFront = Work->rowSize; 
     Int rowMark = Work->rowMark;
 
@@ -28,7 +28,7 @@ void paru_fourPath (paru_matrix *paruMatInfo,
 
     Element **elementList = paruMatInfo->elementList;
 
-    /*!  1st path: over non pivotal columns to count rows  */
+    /*****  1st path: over non pivotal columns to count rows             ******/
 
     tupleList *ColList = paruMatInfo->ColList;
     for (Int k = 0; k < colCount; k++){
@@ -47,12 +47,14 @@ void paru_fourPath (paru_matrix *paruMatInfo,
                 elCol [e]++; 
         }
     }
+    /**************************************************************************/
 
-    /*! 2nd path: over rows to count columns */
+    /*****  2nd path: over rows to count columns                         ******/
     /*! TODO: this part is not correct	 */
-
+    Int *fsRowList = Work->scratch; // fully summed row list
     tupleList *RowList = paruMatInfo->RowList;
-    for (Int r = 0; r < rowCount; r++){
+    for (Int k = fp; k < rowCount; k++){
+        Int r = fsRowList [k];
         tupleList *curColTupleList = &RowList[r];
         Int numTuple = curColTupleList->numTuple;
         ASSERT (numTuple >= 0);
@@ -61,10 +63,10 @@ void paru_fourPath (paru_matrix *paruMatInfo,
         for (Int i = 0; i < numTuple; i++){
             Tuple curTpl = listColTuples [i];
             Int e = curTpl.e;
-            if (elCol [e] < elCMark) // an element never seen before
-                elCol [e] = elCMark + 1;
+            if (elRow [e] < elRMark) // an element never seen before
+                elRow [e] = elRMark + 1;
             else 
-                elCol [e]++; 
+                elRow [e]++; 
         }
     }
     /*! TODO: 3st path: assemble columns  
