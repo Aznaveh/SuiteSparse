@@ -43,7 +43,11 @@ void paru_fourPath (paru_matrix *paruMatInfo,
             Int e = curTpl.e;
             Int curColIndex = curTpl.f;
             /*! TODO: DELETE TUPLE HERE */
-            if(e < 0 || curColIndex < 0 ) continue;  
+            if(e < 0 || curColIndex < 0 ){ 
+                paru_remove_colTuple (ColList, c, i);
+                i--; numTuple--;
+                continue;  
+            }
 
             if (elCol [e] < elCMark) // an element never seen before
                 elCol [e] = elCMark + 1;
