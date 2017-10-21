@@ -37,7 +37,7 @@ OBJ = \
     paru_mem.o \
     paru_sym_analyse.o \
 	paru_init_rowFronts.o\
-	paru_add_tuples.o\
+	paru_tuples.o\
 	paru_assemble.o\
 	paru_factorize.o\
 	paru_create_element.o\
@@ -70,7 +70,7 @@ paru_sym_analyse.o: ../Source/paru_sym_analyse.cpp
 paru_init_rowFronts.o: ../Source/paru_init_rowFronts.cpp
 	$(C) -c $<
 
-paru_add_tuples.o: ../Source/paru_add_tuples.cpp
+paru_tuples.o: ../Source/paru_tuples.cpp
 	$(C) -c $<
 
 paru_assemble.o: ../Source/paru_assemble.cpp
