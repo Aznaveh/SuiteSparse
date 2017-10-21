@@ -50,8 +50,6 @@ void paru_assemble (
     Element **elementList = paruMatInfo->elementList;
     work_struct *Work =  paruMatInfo->Work;
 
-    // Couning how many rows/cols of an element is seen
-    /*! TODO: grasping a prior CB sooner     */
     Int *elRow = Work -> elRow; 
     Int elRMark = Work -> elRMark;
     Int *elCol = Work -> elCol;
@@ -105,8 +103,9 @@ void paru_assemble (
         for (Int i = 0; i < numTuple; i++){
             Tuple curTpl = listColTuples [i];
             Int e = curTpl.e;
-            if(e < 0 ) continue;//already deleted /*! TODO: DELETE TUPLE HERE */
-
+            Int curColIndex = curTpl.f;
+            /*! TODO: DELETE TUPLE HERE */
+            if(e < 0 || curColIndex < 0 ) continue;  //already deleted
 
             Element *curEl = elementList[e];
             Int mEl = curEl->nrows;
@@ -215,7 +214,6 @@ void paru_assemble (
      * */
 
     /*  pivot assembly */
-    /*! TODO: check if any row/col nulified     */
     for (Int c = col1; c < col2; c++){
         tupleList *curTupleList = &ColList[c];
         Int numTuple = curTupleList->numTuple;
@@ -229,7 +227,9 @@ void paru_assemble (
 
             Tuple curTpl = l [i];
             Int e = curTpl.e;
-            if(e < 0 ) continue;//already deleted /*! TODO: it deponds!!! */
+            Int f = curTpl.f;
+            Int curColIndex = curTpl.f;
+            if(e < 0 || curColIndex<0) continue; /*! TODO: it deponds!!! */
 
             // Assembly of column f of e in colIndexF
             PRLEVEL (1, ("col=%ld, (%ld,%ld)\n", c, e, f));
@@ -247,7 +247,6 @@ void paru_assemble (
             Int *rowRelIndValid = rowRelIndVal (curEl);
             Int *colRelIndex    = relColInd (curEl);
 
-            Int curColIndex = curTpl.f;
             ASSERT (el_colIndex[curColIndex] == c);
 
 
@@ -309,8 +308,8 @@ void paru_assemble (
         PRLEVEL (p, ("\n"));
     }
 #endif
-    /**** 3 ********  factorizing the fully summed part of the matrix    
-     *****  a set of pivot is found in this part that is crucial to assemble  **/
+    /**** 3 ********  factorizing the fully summed part of the matrix        ***
+     *****  a set of pivot is found in this part that is crucial to assemble **/
     PRLEVEL (1, ("rowCount =%ld\n", rowCount));
     /* using the rest of scratch for permutation; Not sure about 1  */
     int *ipiv =(int *) (Work->scratch+rowCount);
@@ -332,7 +331,7 @@ void paru_assemble (
     PRLEVEL (p, ("\n"));
 #endif
 
-    /*! TODO: Rearranging fsRowList based on the permutation	 */
+    /***     Rearranging fsRowList based on the permutation	                ***/
     Int *tmp = (Work->scratch + 2*rowCount);   //temp space for saving fsRowList
     for (Int i = 0; i < rowCount; ++i) { //saving fsRowList 
         tmp [i] = fsRowList [i];
@@ -373,7 +372,8 @@ void paru_assemble (
         for (Int i = 0; i < numTuple; i++){
             Tuple curTpl = listRowTuples [i];
             Int e = curTpl.e;
-            if(e < 0 ) continue;//already deleted /*! TODO: DELETE TUPLE HERE */
+            Int curRowIndex = curTpl.f;
+            if(e < 0 || curRowIndex < 0) continue;/*! TODO: DELETE TUPLE HERE */
             
             Element *curEl = elementList[e];
             Int mEl = curEl->nrows;
@@ -391,7 +391,6 @@ void paru_assemble (
                 elRow [e] = elRMark + 1;
 #ifndef NDEBUG
                 if ( elCol [e] >= elCMark )
-                    /*! TODO: Write a phase to assemble them     */
                     PRLEVEL (0, ("element %ld must be eaten wholly\n",e));
                 //And the rest of e is in U part 
 #endif
@@ -440,7 +439,6 @@ void paru_assemble (
     PRLEVEL (p, ("\n"));
     Int stl_colSize = stl_colSet.size();
     if (colCount != stl_colSize){
-        PRLEVEL (p, ("#######################\n"));
         PRLEVEL (p, ("STL %ld:\n",stl_colSize));
         for (it = stl_rowSet.begin(); it != stl_colSet.end(); it++)
             PRLEVEL (p, (" %ld", *it));
@@ -497,7 +495,8 @@ void paru_assemble (
         for (Int i = 0; i < numTuple; i++){
             Tuple curTpl = listRowTuples [i];
             Int e = curTpl.e;
-            if(e < 0 ) continue;//already deleted /*! TODO: it deponds!!! */
+            Int curRowIndex = curTpl.f;
+            if(e < 0 || curRowIndex < 0 ) continue; /*! TODO: it deponds!!! */
 
             Element *curEl = elementList[e];
             Int mEl = curEl->nrows;
@@ -508,7 +507,6 @@ void paru_assemble (
             Int *colRelIndex = relColInd (curEl);
             Int *colRelIndValid = colRelIndVal (curEl);
 
-            Int curRowIndex = curTpl.f;
             ASSERT (el_rowIndex[curRowIndex] == curFsRowIndex);
             ASSERT (curRowIndex < mEl);
             PRLEVEL (1, ("curColIndex =%ld\n", curRowIndex));
