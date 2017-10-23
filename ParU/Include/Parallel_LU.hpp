@@ -266,6 +266,7 @@ Int paru_add_rowTuple (tupleList *RowList, Int row, Tuple T,
 Int paru_add_colTuple (tupleList *ColList, Int col, 
         Tuple T, cholmod_common *cc);
 Int paru_remove_colTuple(tupleList *ColList, Int col, Int t);
+Int paru_remove_rowTuple(tupleList *RowList, Int row, Int t);
 
 void paru_assemble(paru_matrix *paruMatInfo, Int f, cholmod_common *cc);
 
@@ -282,6 +283,6 @@ Int paru_trsm(double *pF, double *uPart, Int fp, Int rowCount, Int colCount);
 Int paru_dgemm(double *pF, double *uPart, double *el, Int fp, 
         Int rowCount, Int colCount);
 
-void paru_fourPath (paru_matrix *paruMatInfo, Int fp,
-        Int rowCount, Int colCount);
+void paru_fourPath (paru_matrix *paruMatInfo, double *el_numbers,
+        Int fp, Int rowCount, Int colCount);
 

@@ -564,7 +564,7 @@ void paru_assemble (
     /**** 7 **** Count number of rows and columsn of prior CBs to asslemble ***/ 
 
     if(colCount !=0 && rowCount != 0)
-        paru_fourPath (paruMatInfo, fp, rowCount, colCount);
+        paru_fourPath (paruMatInfo, el_numbers, fp, rowCount, colCount);
 
 
 ///////////////////////////////////////////////////////////////////////////////
