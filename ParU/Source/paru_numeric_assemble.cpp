@@ -27,7 +27,7 @@ void assemble_row (double *sM, double *dM,//source Matrix and destination matrix
     for (Int i = 0; i < sn; i++) {
         if ( relColInd[i] > 0 ){  // If still valid
             dM [relColInd [i]*dm + dR] += sM [sm*i + sR];
-            PRLEVEL (0, ("adding %lf\n", sM [sm*i + sR]));
+            PRLEVEL (1, ("adding %lf\n", sM [sm*i + sR]));
         }
     }
 }
