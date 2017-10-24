@@ -283,6 +283,6 @@ Int paru_trsm(double *pF, double *uPart, Int fp, Int rowCount, Int colCount);
 Int paru_dgemm(double *pF, double *uPart, double *el, Int fp, 
         Int rowCount, Int colCount);
 
-void paru_fourPath (paru_matrix *paruMatInfo, double *el_numbers,
-        Int fp, Int rowCount, Int colCount);
+void paru_fourPath (paru_matrix *paruMatInfo,  Int el_ind, Int fp, 
+        cholmod_common *cc);
 

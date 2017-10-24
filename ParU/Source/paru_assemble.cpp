@@ -55,7 +55,7 @@ void paru_assemble (
     Int *elCol = Work -> elCol;
     Int elCMark = Work -> elCMark;
 
-    PRLEVEL (0, ("fp=%ld pivotal columns:clo1=%ld...col2=%ld\n", 
+    PRLEVEL (1, ("fp=%ld pivotal columns:clo1=%ld...col2=%ld\n", 
                 fp, col1, col2-1));
     PRLEVEL (1, ("Upper bound number of columns: Rj[%ld]=%ld ... Rj[%ld]=%ld\n", 
                 p1, Rj [p1], p2, Rj [p2-1]));
@@ -323,7 +323,7 @@ void paru_assemble (
         return;
     }
 #ifndef NDEBUG  // Printing the permutation
-    p = 0;
+    p = 1;
     PRLEVEL (p, ("permutation:\n"));
     for (int i = 0; i < fp; i++){
         PRLEVEL (p, ("ipiv[%d] =%d\n",i, ipiv[i]));
@@ -391,7 +391,7 @@ void paru_assemble (
                 elRow [e] = elRMark + 1;
 #ifndef NDEBUG
                 if ( elCol [e] >= elCMark )
-                    PRLEVEL (0, ("element %ld must be eaten wholly\n",e));
+                    PRLEVEL (1, ("element %ld must be eaten wholly\n",e));
                 //And the rest of e is in U part 
 #endif
             }
@@ -491,7 +491,7 @@ void paru_assemble (
         ASSERT (numTuple >= 0);
         ASSERT (numTuple <= m);
         Tuple *listRowTuples = curRowTupleList->list;
-        PRLEVEL (0, ("numTuple = %ld\n", numTuple));
+        PRLEVEL (1, ("numTuple = %ld\n", numTuple));
         for (Int i = 0; i < numTuple; i++){
             Tuple curTpl = listRowTuples [i];
             Int e = curTpl.e;
@@ -524,7 +524,7 @@ void paru_assemble (
     }
 
 #ifndef NDEBUG  // Printing the  U part
-    p = 0;
+    p = 1;
     PRLEVEL (p, ("U\t"));
     for (Int i = 0; i < colCount; i++){
         PRLEVEL (p, ("%ld\t", CBColList[i]));
@@ -546,8 +546,8 @@ void paru_assemble (
    Int *snM = LUsym->super2atree;
    Int eli = snM [f]; // Element index of the one that is going to be assembled
    Element *el;
-   PRLEVEL (0, ("rowCount=%ld, colCount=%ld, fp=%ld\n",rowCount, colCount, fp));
-   PRLEVEL (0, ("el is %ld by %ld\n",rowCount-fp,colCount));
+   PRLEVEL (1, ("rowCount=%ld, colCount=%ld, fp=%ld\n",rowCount, colCount, fp));
+   PRLEVEL (1, ("el is %ld by %ld\n",rowCount-fp,colCount));
     if (fp <= rowCount ){ // otherwise nothing will remain of this front
         el = elementList[eli] = paru_create_element (rowCount-fp,
                 colCount, 0 ,cc);
@@ -555,19 +555,29 @@ void paru_assemble (
             printf ("Out of memory when tried to allocate current CB %ld",eli);
             return;
         }
-        PRLEVEL (0, ("el =%p\n", el));
+        PRLEVEL (1, ("el =%p\n", el));
     }
-   double *el_numbers = numeric_pointer (el);
-   paru_dgemm(pivotalFront, uPart, el_numbers, fp, rowCount, colCount);
+    // Initializing el global indices
+    Int *el_colIndex = colIndex_pointer (el);
+    for (Int i = 0; i < colCount; ++ i) {
+        el_colIndex [i] = CBColList[i];
+    }
+    Int *el_rowIndex = rowIndex_pointer (el);
+    for (Int i = 0; i < colCount; ++ i) {
+        el_rowIndex [i] = fsRowList[i];
+    }
+
+    double *el_numbers = numeric_pointer (el);
+    paru_dgemm(pivotalFront, uPart, el_numbers, fp, rowCount, colCount);
 
 
     /**** 7 **** Count number of rows and columsn of prior CBs to asslemble ***/ 
 
     if(colCount !=0 && rowCount != 0)
-        paru_fourPath (paruMatInfo, el_numbers, fp, rowCount, colCount);
+        paru_fourPath (paruMatInfo, eli, fp, cc);
 
 
-///////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////
 
 
 
