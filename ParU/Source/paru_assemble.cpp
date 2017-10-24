@@ -563,7 +563,7 @@ void paru_assemble (
         el_colIndex [i] = CBColList[i];
     }
     Int *el_rowIndex = rowIndex_pointer (el);
-    for (Int i = 0; i < colCount; ++ i) {
+    for (Int i = fp; i < rowCount; ++ i) {
         el_rowIndex [i] = fsRowList[i];
     }
 
