@@ -1,14 +1,16 @@
 /** =========================================================================  /
  * =======================  paru_fourPath ===================================  /
  * ========================================================================== */
+/*! This function is the same level as paru_assemble 
+ *      basically doing the rest of the work for non pivotal rows and columns
+ */
 
 #include "Parallel_LU.hpp"
 
 void paru_fourPath (paru_matrix *paruMatInfo,
-        double *dest_el_numbers, //current CB that want to be assembled
+        Int el_ind,         // Index of current CB
         Int fp,             //fp of current front
-        Int rowCount,
-        Int colCount)
+        cholmod_common *cc)
 {
 
     DEBUGLEVEL(0);
@@ -17,18 +19,24 @@ void paru_fourPath (paru_matrix *paruMatInfo,
     Int *isRowInFront = Work->rowSize; 
     Int rowMark = Work->rowMark;
 
-    Int *CBColList = Work -> scratch + 2*rowCount; //scratch=[fsRowList..ipiv..]
-    Int *isColInCBcolSet = Work -> colSize;
-    Int colMark = Work -> colMark;
-
     // Couning how many rows/cols of an element is seen
     Int *elRow = Work -> elRow; 
     Int elRMark = Work -> elRMark;
     Int *elCol = Work -> elCol;
     Int elCMark = Work -> elCMark;
 
-
     Element **elementList = paruMatInfo->elementList;
+
+
+    Element *curCB = elementList[el_ind]; 
+    Int rowCount= curCB->nrows + fp;
+    Int colCount = curCB->ncols;
+
+    Int *CBColList = Work -> scratch + 2*rowCount; //scratch=[fsRowList..ipiv..]
+    Int *isColInCBcolSet = Work -> colSize;
+    Int colMark = Work -> colMark;
+
+
 
     /*****  1st path: over non pivotal columns to count rows             ******/
 
@@ -39,12 +47,13 @@ void paru_fourPath (paru_matrix *paruMatInfo,
         Int numTuple = curColTupleList->numTuple;
         ASSERT (numTuple >= 0);
         Tuple *listColTuples = curColTupleList->list;
-        PRLEVEL (1, ("c =%ld  numTuple = %ld\n", c, numTuple));
+        PRLEVEL (0, ("1st: c =%ld  numTuple = %ld\n", c, numTuple));
         for (Int i = 0; i < numTuple; i++){
             Tuple curTpl = listColTuples [i];
             Int e = curTpl.e;
             Int curColIndex = curTpl.f;
             if(e < 0 || curColIndex < 0 ){ 
+                PRLEVEL (0, ("removing e =%ld\n", e));
                 paru_remove_colTuple (ColList, c, i);
                 i--; numTuple--;
                 continue;  
@@ -85,21 +94,31 @@ void paru_fourPath (paru_matrix *paruMatInfo,
                 elRow [e]++; 
         }
     }
-    /*! TODO: 3st path: assemble columns  
-     * it contains adding and deleting tuples*/
+    /**************************************************************************/
+
+    Int *cb_colIndex = colIndex_pointer (curCB);
+    Int *cb_rowIndex = rowIndex_pointer (curCB);
+    Int *cb_rowRelIndex = relRowInd (curCB);
+    Int *cb_rowRelIndValid = rowRelIndVal (curCB);
+    Int *cb_colRelIndex    = relColInd (curCB);
+    double *cb_numbers = numeric_pointer (curCB);
+
+
+    /*****                 3rd path: assemble columns                    ******/
+     /* it contains adding and deleting tuples*/
     for (Int k = 0; k < colCount; k++){
         Int c = CBColList [k];   //non pivotal column list
         tupleList *curColTupleList = &ColList[c];
         Int numTuple = curColTupleList->numTuple;
         ASSERT (numTuple >= 0);
         Tuple *listColTuples = curColTupleList->list;
-        PRLEVEL (1, ("c =%ld  numTuple = %ld\n", c, numTuple));
+        PRLEVEL (0, ("3rd: c =%ld  numTuple = %ld\n", c, numTuple));
         for (Int i = 0; i < numTuple; i++){
             Tuple curTpl = listColTuples [i];
             Int e = curTpl.e;
             Int curColIndex = curTpl.f;
-            ASSERT (e > 0);
-            ASSERT (curColIndex > 0);
+            ASSERT (e >= 0);
+            ASSERT (curColIndex >= 0);
 
             Element *curEl = elementList[e];
             Int mEl = curEl->nrows;
@@ -116,11 +135,26 @@ void paru_fourPath (paru_matrix *paruMatInfo,
             double *el_Num = numeric_pointer (curEl);
             PRLEVEL (1, ("element= %ld  mEl =%ld \n",e, mEl));
 
-            if (elRow [e] - elRMark == curEl->nrowsleft);// if I can take the
-                                                       //  whole column
-                        assemble_col (dest_el_numbers+c*colCount,
-                                el_Num+curColIndex*mEl,mEl, rowRelIndex);
+            if (elRow [e] - elRMark == curEl->nrowsleft){// if I can take the
+                //  whole column
+ //               assemble_col (cb_numbers+c*colCount,
+ //                       el_Num+curColIndex*mEl,mEl, rowRelIndex);
+                PRLEVEL (0, ("I am here\n"));
+                curEl->ncolsleft --;
+                colRelIndex [curColIndex] = -1;
+                el_colIndex [curColIndex] = -1;
+
+                /*! TODO: delete tuples, add tuples update CBs	 */
+                paru_remove_colTuple (ColList, c, i);
+                i--; numTuple--;
+
+            }
         }
+        //adding tuple for CB
+        Tuple T; T.e = el_ind; T.f= k;
+        paru_add_colTuple (ColList, c, T, cc);
+
+
     }
 
 
