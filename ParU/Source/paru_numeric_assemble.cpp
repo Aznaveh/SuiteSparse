@@ -6,7 +6,7 @@
 
 #include "Parallel_LU.hpp"
 
-
+/*! TODO: index validity must be checked somehow	 */
 void assemble_col (double *sC, double *dC,   //source col and destination col
                     Int m, Int *relRowInd)
 {

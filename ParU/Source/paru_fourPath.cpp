@@ -39,6 +39,7 @@ void paru_fourPath (paru_matrix *paruMatInfo,
 
 
     /*****  1st path: over non pivotal columns to count rows             ******/
+    /*! TODO: Update rowRelIndex	 */
 
     tupleList *ColList = paruMatInfo->ColList;
     for (Int k = 0; k < colCount; k++){
@@ -61,8 +62,24 @@ void paru_fourPath (paru_matrix *paruMatInfo,
 
             if (elCol [e] < elCMark) // an element never seen before
                 elCol [e] = elCMark + 1;
-            else 
+            else{ 
                 elCol [e]++; 
+                continue;
+            }
+
+            Element *curEl = elementList[e];
+            Int mEl = curEl->nrows;
+            Int *el_rowIndex = rowIndex_pointer (curEl); //pointers to row index
+            Int *rowRelIndValid = rowRelIndVal (curEl);
+            Int *rowRelIndex = relRowInd (curEl);
+            Int *colRelIndex    = relColInd (curEl);
+            // Updating row relative indices 
+            PRLEVEL (1, ("elRow[%ld]=%ld", e, elRow [e]));  
+            for (Int rEl = 0; rEl < mEl; rEl++)   
+                rowRelIndex [rEl] = isRowInFront [el_rowIndex [rEl]] 
+                    - rowMark;
+//            *rowRelIndValid = f ;//current front
+
         }
     }
     /**************************************************************************/
@@ -105,7 +122,7 @@ void paru_fourPath (paru_matrix *paruMatInfo,
 
 
     /*****                 3rd path: assemble columns                    ******/
-     /* it contains adding and deleting tuples*/
+    /* it contains adding and deleting tuples*/
     for (Int k = 0; k < colCount; k++){
         Int c = CBColList [k];   //non pivotal column list
         tupleList *curColTupleList = &ColList[c];
@@ -113,8 +130,9 @@ void paru_fourPath (paru_matrix *paruMatInfo,
         ASSERT (numTuple >= 0);
         Tuple *listColTuples = curColTupleList->list;
         PRLEVEL (0, ("3rd: c =%ld  numTuple = %ld\n", c, numTuple));
-        for (Int i = 0; i < numTuple; i++){
-            Tuple curTpl = listColTuples [i];
+        Int pdst = 0,psrc;
+        for (Int psrc = 0; psrc < numTuple; psrc ++){
+            Tuple curTpl = listColTuples [psrc];
             Int e = curTpl.e;
             Int curColIndex = curTpl.f;
             ASSERT (e >= 0);
@@ -133,27 +151,35 @@ void paru_fourPath (paru_matrix *paruMatInfo,
             ASSERT (el_colIndex[curColIndex] == c);
             ASSERT (curColIndex < nEl);
             double *el_Num = numeric_pointer (curEl);
+            PRLEVEL (1, ("  numTuple =%ld\n",   numTuple));
             PRLEVEL (1, ("element= %ld  mEl =%ld \n",e, mEl));
-
-            if (elRow [e] - elRMark == curEl->nrowsleft){// if I can take the
-                //  whole column
- //               assemble_col (cb_numbers+c*colCount,
- //                       el_Num+curColIndex*mEl,mEl, rowRelIndex);
-                PRLEVEL (0, ("I am here\n"));
-                curEl->ncolsleft --;
+            PRLEVEL (1, ("f =%ld\n", curColIndex));
+            PRLEVEL (1, ("CB: %ld x %ld\n", rowCount, colCount));
+            if (elRow [e] - elRMark == curEl->nrowsleft){
+                PRLEVEL (0, ("psrc=%ld", psrc));
+             //   assemble_col (cb_numbers+k*colCount,
+             //          el_Num+curColIndex*mEl,mEl, rowRelIndex);
                 colRelIndex [curColIndex] = -1;
                 el_colIndex [curColIndex] = -1;
+                curEl->ncolsleft --;
 
-                /*! TODO: delete tuples, add tuples update CBs	 */
-                paru_remove_colTuple (ColList, c, i);
-                i--; numTuple--;
+                //                paru_remove_colTuple (ColList, c, i);
+                //                i--; numTuple--;
+            } 
+            else 
+                listColTuples [pdst++] = curTpl; //keeping the tuple
 
-            }
         }
+
+        curColTupleList->numTuple = pdst;
+        PRLEVEL (0, ("pdst=%ld\n", pdst));
+
+
         //adding tuple for CB
         Tuple T; T.e = el_ind; T.f= k;
-        paru_add_colTuple (ColList, c, T, cc);
-
+        if( paru_add_colTuple (ColList, c, T, cc)){
+            printf("Out of memory: add_colTuple for CB \n");
+        }
 
     }
 
