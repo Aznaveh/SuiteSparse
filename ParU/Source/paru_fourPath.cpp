@@ -157,14 +157,14 @@ void paru_fourPath (paru_matrix *paruMatInfo,
             PRLEVEL (1, ("CB: %ld x %ld\n", rowCount, colCount));
             if (elRow [e] - elRMark == curEl->nrowsleft){
                 PRLEVEL (0, ("psrc=%ld", psrc));
-             //   assemble_col (cb_numbers+k*colCount,
-             //          el_Num+curColIndex*mEl,mEl, rowRelIndex);
+                assemble_col (el_Num+curColIndex*mEl,cb_numbers+k*colCount,
+                        mEl, rowRelIndex);
                 colRelIndex [curColIndex] = -1;
                 el_colIndex [curColIndex] = -1;
                 curEl->ncolsleft --;
 
-                //                paru_remove_colTuple (ColList, c, i);
-                //                i--; numTuple--;
+                //  paru_remove_colTuple (ColList, c, i);
+                //  i--; numTuple--;
             } 
             else 
                 listColTuples [pdst++] = curTpl; //keeping the tuple
