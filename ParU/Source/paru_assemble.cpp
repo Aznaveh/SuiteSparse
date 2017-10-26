@@ -115,8 +115,8 @@ void paru_assemble (
             Int *colRelIndex    = relColInd (curEl);
 
             colRelIndex [curTpl.f] = c - col1; //Initialzing relative index
-                                               // neede for row assembly
-                                               // function
+            // neede for row assembly
+            // function
 
             //counting prior element's columns
             if (elCol [e] < elCMark) // an element never seen before
@@ -234,8 +234,8 @@ void paru_assemble (
             // Assembly of column f of e in colIndexF
             PRLEVEL (1, ("col=%ld, (%ld,%ld)\n", c, e, f));
             //!! WRONG do not delete tuples here
-       //     FLIP (curTpl.e); //Nullifying tuple  /*! TODO: Deleting tuple     */
-       //     curTupleList->numTuple--;
+            //     FLIP (curTpl.e); //Nullifying tuple  /*! TODO: Deleting tuple   */
+            //     curTupleList->numTuple--;
 
             Element *curEl = elementList[e];
             Int mEl = curEl->nrows;
@@ -266,29 +266,29 @@ void paru_assemble (
 
 #if 0
             //This part has been moved to assemble_col function
-                  for (Int rEl = 0; rEl < mEl; rEl++){   
-                      Int curRow = el_rowIndex [rEl]; 
+            for (Int rEl = 0; rEl < mEl; rEl++){   
+                Int curRow = el_rowIndex [rEl]; 
 
-                      PRLEVEL (1, ("curRow =%ld\n", curRow));
-                      ASSERT (curRow < m ) ;
-                      ASSERT (isRowInFront [curRow] != -1);
+                PRLEVEL (1, ("curRow =%ld\n", curRow));
+                ASSERT (curRow < m ) ;
+                ASSERT (isRowInFront [curRow] != -1);
 
-                      PRLEVEL (1, ("rowRelIndValid = %ld, f=%ld,\
-                                  rowRelIndex[%ld]= %ld,##%ld\n ", 
-                                  *rowRelIndValid, f, rEl, rowRelIndex [rEl], 
-                                  isRowInFront [curRow] - rowMark));
-                      // relative row index
-                      Int rowIndexF = rowRelIndex [rEl];
-                      ASSERT (rowIndexF == isRowInFront [curRow] - rowMark);
+                PRLEVEL (1, ("rowRelIndValid = %ld, f=%ld,\
+                            rowRelIndex[%ld]= %ld,##%ld\n ", 
+                            *rowRelIndValid, f, rEl, rowRelIndex [rEl], 
+                            isRowInFront [curRow] - rowMark));
+                // relative row index
+                Int rowIndexF = rowRelIndex [rEl];
+                ASSERT (rowIndexF == isRowInFront [curRow] - rowMark);
 
-                      PRLEVEL (1, ("rowIndexF = %ld\n", rowIndexF));
-                      PRLEVEL (1, (" colIndexF*rowCount + rowIndexF=%ld\n",
-                                  colIndexF*rowCount + rowIndexF));
-                      ASSERT ( colIndexF*rowCount + rowIndexF < rowCount * fp);
-                      ASSERT ( curColIndex*mEl + rEl < mEl*nEl);
-                      pivotalFront [colIndexF*rowCount + rowIndexF] += 
-                          el_Num [ curColIndex*mEl + rEl];
-                  }
+                PRLEVEL (1, ("rowIndexF = %ld\n", rowIndexF));
+                PRLEVEL (1, (" colIndexF*rowCount + rowIndexF=%ld\n",
+                            colIndexF*rowCount + rowIndexF));
+                ASSERT ( colIndexF*rowCount + rowIndexF < rowCount * fp);
+                ASSERT ( curColIndex*mEl + rEl < mEl*nEl);
+                pivotalFront [colIndexF*rowCount + rowIndexF] += 
+                    el_Num [ curColIndex*mEl + rEl];
+            }
 #endif
         }
     }
@@ -374,7 +374,7 @@ void paru_assemble (
             Int e = curTpl.e;
             Int curRowIndex = curTpl.f;
             if(e < 0 || curRowIndex < 0) continue;/*! TODO: DELETE TUPLE HERE */
-            
+
             Element *curEl = elementList[e];
             Int mEl = curEl->nrows;
             Int nEl = curEl->ncols;
@@ -541,13 +541,13 @@ void paru_assemble (
 
 
     /**** 6 ****                     TRSM and DGEMM                         ***/ 
-   paru_trsm(pivotalFront , uPart, fp, rowCount, colCount);
+    paru_trsm(pivotalFront , uPart, fp, rowCount, colCount);
 
-   Int *snM = LUsym->super2atree;
-   Int eli = snM [f]; // Element index of the one that is going to be assembled
-   Element *el;
-   PRLEVEL (1, ("rowCount=%ld, colCount=%ld, fp=%ld\n",rowCount, colCount, fp));
-   PRLEVEL (1, ("el is %ld by %ld\n",rowCount-fp,colCount));
+    Int *snM = LUsym->super2atree;
+    Int eli = snM [f]; // Element index of the one that is going to be assembled
+    Element *el;
+    PRLEVEL (1, ("rowCount=%ld, colCount=%ld, fp=%ld\n",rowCount, colCount, fp));
+    PRLEVEL (1, ("el is %ld by %ld\n",rowCount-fp,colCount));
     if (fp <= rowCount ){ // otherwise nothing will remain of this front
         el = elementList[eli] = paru_create_element (rowCount-fp,
                 colCount, 0 ,cc);
@@ -577,7 +577,7 @@ void paru_assemble (
         paru_fourPath (paruMatInfo, eli, fp, cc);
 
 
-    ///////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////
 
 
 

@@ -39,7 +39,6 @@ void paru_fourPath (paru_matrix *paruMatInfo,
 
 
     /*****  1st path: over non pivotal columns to count rows             ******/
-    /*! TODO: Update rowRelIndex	 */
 
     tupleList *ColList = paruMatInfo->ColList;
     for (Int k = 0; k < colCount; k++){
@@ -67,6 +66,7 @@ void paru_fourPath (paru_matrix *paruMatInfo,
                 continue;
             }
 
+            /*  Update rowRelIndex	 */
             Element *curEl = elementList[e];
             Int mEl = curEl->nrows;
             Int *el_rowIndex = rowIndex_pointer (curEl); //pointers to row index
@@ -107,8 +107,25 @@ void paru_fourPath (paru_matrix *paruMatInfo,
 
             if (elRow [e] < elRMark) // an element never seen before
                 elRow [e] = elRMark + 1;
-            else 
+            else{ 
                 elRow [e]++; 
+                continue;
+            }
+            /* Update colRelIndex	 */
+             Element *curEl = elementList[e];
+            Int nEl = curEl->ncols;
+            Int *el_colIndex = colIndex_pointer (curEl); //pointers to row index
+            Int *colRelIndValid = rowRelIndVal (curEl);
+            Int *colRelIndex    = relColInd (curEl);
+            // Updating row relative indices 
+            PRLEVEL (1, ("elCol[%ld]=%ld", e, elCol [e]));  
+
+            for (Int cEl = 0; cEl < nEl; cEl++)   
+                colRelIndex [cEl] = isColInCBcolSet [el_colIndex [cEl]] 
+                    - colMark;
+//            *colRelIndValid = f ;//current front
+
+
         }
     }
     /**************************************************************************/
@@ -187,6 +204,6 @@ void paru_fourPath (paru_matrix *paruMatInfo,
 
     /**************************************************************************/
 
-    /*! TODO: 4st path: assemble rows */
+    /*! TODO: 4th path: assemble rows */
 
 }
