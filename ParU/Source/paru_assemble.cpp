@@ -342,6 +342,22 @@ void paru_assemble (
     }
 
 
+    /*! TODO: The problem is that permutation of row list is not correct	 */
+#ifndef NDEBUG  // Printing the permutation
+    p = 0;
+    PRLEVEL (p, ("pivotal rows:\n"));
+    for (int i = 0; i < fp; i++){
+        PRLEVEL (p, ("fsRowList[%d] =%d\n",i, fsRowList[i]));
+    }
+    PRLEVEL (p, ("=======\n"));
+    for (int i = fp; i < rowCount; i++){
+        PRLEVEL (p, ("fsRowList[%d] =%d\n",i, fsRowList[i]));
+    }
+    PRLEVEL (p, ("\n"));
+#endif
+
+
+
     /*  Searching for columns */
     Int *isColInCBcolSet = Work -> colSize;
     Int colMark = Work -> colMark;
