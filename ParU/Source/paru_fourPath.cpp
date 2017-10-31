@@ -198,14 +198,14 @@ void paru_fourPath (paru_matrix *paruMatInfo,
 
     /**************************************************************************/
 
-    /*! TODO: 4th path: assemble rows */
+    /****                   4th path: assemble rows                        ****/
     for (Int k = fp; k < rowCount; k++){
         Int r = fsRowList [k];
         tupleList *curRowTupleList = &RowList[r];
         Int numTuple = curRowTupleList->numTuple;
         ASSERT (numTuple >= 0);
         Tuple *listRowTuples = curRowTupleList->list;
-        PRLEVEL (1, ("r =%ld  numTuple = %ld\n", r, numTuple));
+        PRLEVEL (0, (" 4th: r =%ld  numTuple = %ld\n", r, numTuple));
         Int pdst = 0,psrc;
         for (Int psrc = 0; psrc < numTuple; psrc ++){
             Tuple curTpl = listRowTuples [psrc];
@@ -224,14 +224,21 @@ void paru_fourPath (paru_matrix *paruMatInfo,
             Int *rowRelIndValid = rowRelIndVal (curEl);
             Int *colRelIndex    = relColInd (curEl);
             
+            PRLEVEL (0, ("curRowIndex = %ld\n", curRowIndex));
+            PRLEVEL (0, ("r =%ld\n", r));
+            PRLEVEL (0, ("el_rowIndex [curRowIndex] =%ld\n", 
+                        el_rowIndex [curRowIndex]));
             ASSERT (el_rowIndex[curRowIndex] == r);
             ASSERT (curRowIndex < mEl);
 
             double *el_Num = numeric_pointer (curEl);
 
             if (elCol [e] - elCMark == curEl->ncolsleft){
-                //all the column is in CB
-                PRLEVEL (1, ("psrc=%ld", psrc));
+                //all the row is in CB
+                assemble_row (el_Num, cb_numbers, mEl, nEl, 
+                       colCount-fp, curRowIndex , k-fp, colRelIndex );
+
+                PRLEVEL (0, ("psrc=%ld", psrc));
                 rowRelIndex [curRowIndex] = -1;
                 el_rowIndex [curRowIndex] = -1;
                 curEl->nrowsleft --;
@@ -239,6 +246,16 @@ void paru_fourPath (paru_matrix *paruMatInfo,
             else 
                 listRowTuples [pdst++] = curTpl; //keeping the tuple
         }
+
+        curRowTupleList->numTuple = pdst;
+
+        //adding tuple for CB
+        Tuple T; T.e = el_ind; T.f= k-fp;
+        if( paru_add_rowTuple (RowList, r, T, cc)){
+            printf("Out of memory: add_rowTuple for CB \n");
+        }
+
+
 
     }
 }
