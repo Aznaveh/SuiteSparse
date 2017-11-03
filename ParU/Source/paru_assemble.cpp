@@ -64,11 +64,6 @@ void paru_assemble (
 
     /* computing number of rows, set union */
     tupleList *ColList = paruMatInfo->ColList;
-#if 0
-    Int rowsP = 0;
-    Int setSize = fn;  // it can be initialized with fm
-    Int *rowSet = (Int*) paru_alloc (setSize, sizeof (Int), cc);
-#endif
 
     Int rowCount= 0;
     Int *isRowInFront = Work->rowSize; 
@@ -227,15 +222,10 @@ void paru_assemble (
 
             Tuple curTpl = l [i];
             Int e = curTpl.e;
-            Int f = curTpl.f;
             Int curColIndex = curTpl.f;
             if(e < 0 || curColIndex<0) continue; /*! TODO: it deponds!!! */
 
-            // Assembly of column f of e in colIndexF
-            PRLEVEL (1, ("col=%ld, (%ld,%ld)\n", c, e, f));
-            //!! WRONG do not delete tuples here
-            //     FLIP (curTpl.e); //Nullifying tuple  /*! TODO: Deleting tuple   */
-            //     curTupleList->numTuple--;
+            // Assembly of column curColIndex of e in colIndexF
 
             Element *curEl = elementList[e];
             Int mEl = curEl->nrows;
@@ -256,10 +246,23 @@ void paru_assemble (
 
             ASSERT (curColIndex < nEl);
             double *el_Num = numeric_pointer (curEl);
-            PRLEVEL (1, ("element= %ld  mEl =%ld \n",e, mEl));
+            PRLEVEL (1, ("col=%ld, (%ld,%ld)\n", c, e, curColIndex));
+            PRLEVEL (1, ("ASSEMBL element= %ld  mEl =%ld ",e, mEl));
+            PRLEVEL (1, (" into column %ld of current front\n",colIndexF ));
+#ifndef NDEBUG // print the element which is going to be assembled from
+            p = 1;
+            PRLEVEL (p, ("Element %ld is %ld x %ld \n", e, mEl, nEl));
+            for (int i = 0; i < mEl; i++){
+                for (int j = 0; j < nEl; j++){
+                     PRLEVEL (p, ( "%lf ",el_Num [i*mEl+j] )); 
+                }
+                PRLEVEL (p, ("\n"));
+            }
+#endif
 
-            assemble_col (pivotalFront+colIndexF*rowCount, 
-                    el_Num +curColIndex*mEl, mEl, rowRelIndex);
+            assemble_col (el_Num +curColIndex*mEl,
+                    pivotalFront+colIndexF*rowCount,
+                    mEl, rowRelIndex);
 
             FLIP(el_colIndex[curColIndex]); //marking column as assembled
             colRelIndex [curColIndex] = -1;
@@ -294,7 +297,7 @@ void paru_assemble (
     }
 
 #ifndef NDEBUG  // Printing the pivotal front
-    p = 1;
+    p = 0;
     PRLEVEL (p, ("x\t"));
     for (Int c = col1; c < col2; c++) {
         PRLEVEL (p, ("%ld\t", c));
@@ -313,7 +316,7 @@ void paru_assemble (
     PRLEVEL (1, ("rowCount =%ld\n", rowCount));
     /* using the rest of scratch for permutation; Not sure about 1  */
     int *ipiv =(int *) (Work->scratch+rowCount);
-    paru_factorize (pivotalFront, rowCount, fp, ipiv, cc );
+    paru_factorize (pivotalFront, rowCount, fp, ipiv);
 
     /* To this point fully summed part of the front is computed and L and U    /  
      *  The next part is to find columns of nonfully summed then rows
@@ -324,8 +327,7 @@ void paru_assemble (
     }
 #ifndef NDEBUG  // Printing the permutation
     p = 1;
-    PRLEVEL (p, ("permutation:\n"));
-    for (int i = 0; i < fp; i++){
+    for (int i = 0; i < rowCount; i++){
         PRLEVEL (p, ("ipiv[%d] =%d\n",i, ipiv[i]));
     }
     PRLEVEL (p, ("\n"));
@@ -344,7 +346,7 @@ void paru_assemble (
 
     /*! TODO: The problem is that permutation of row list is not correct	 */
 #ifndef NDEBUG  // Printing the permutation
-    p = 0;
+    p = 1;
     PRLEVEL (p, ("pivotal rows:\n"));
     for (int i = 0; i < fp; i++){
         PRLEVEL (p, ("fsRowList[%d] =%d\n",i, fsRowList[i]));
@@ -615,7 +617,5 @@ void paru_assemble (
     paru_free (rowCount*fp, sizeof (double), pivotalFront, cc);
     paru_free (fp*colCount,  sizeof (double), uPart, cc);
 
-#if 0
-    paru_free (setSize, sizeof (Int), rowSet, cc);
-#endif
+
 }

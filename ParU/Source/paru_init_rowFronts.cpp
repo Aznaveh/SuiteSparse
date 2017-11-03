@@ -13,6 +13,7 @@
  *  */
 #include "Parallel_LU.hpp"
 
+
 paru_matrix *paru_init_rowFronts (
         // inputs, not modified
         cholmod_sparse *A,
@@ -275,14 +276,9 @@ paru_matrix *paru_init_rowFronts (
         }
 
         //Allocating elements, and updating column tuple list
+        Int *el_colrowIndex = colIndex_pointer (curEl); 
+        double *el_colrowNum = numeric_pointer (curEl);
 
-        Int *el_colrowIndex = (Int*)(curEl+1);     // pointers to element index 
-
-        /* Use these indeces if you need in your code:
-         * Int *colIndex = el_colrowIndex;
-         * Int *rowIndex = colIndex + ncols;
-         * */
-        double *el_colrowNum = (double*)(el_colrowIndex+nrows+ncols); //and values
         PRLEVEL (1, ("el_colrowIndex =%p, el_colrowNum = %p \n", 
                     el_colrowIndex, el_colrowNum));
 

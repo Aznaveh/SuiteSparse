@@ -10,7 +10,7 @@ extern "C" void dgetrf_( BLAS_INT *dim1, BLAS_INT *dim2, double *a,
 
 
 Int paru_factorize (double *F, Int lm, Int ln,
-        BLAS_INT *ipiv, cholmod_common *cc)
+        BLAS_INT *ipiv)
 {
     DEBUGLEVEL(1);
 
@@ -18,13 +18,13 @@ Int paru_factorize (double *F, Int lm, Int ln,
     BLAS_INT n = ln;
 
 
-    PRLEVEL (0, (" %d x %d\n", m, n));
+    PRLEVEL (1, (" %d x %d\n", m, n));
 #ifndef NDEBUG  // Printing the pivotal front before computation
     Int p = 1;
     PRLEVEL (1, ("Befor factorization:\n"));
     for (Int r = 0; r < m; r++){
         for (Int c = 0; c < n; c++){
-            PRLEVEL (p, (" %3.1lf\t", F[c*m+ r]));
+            PRLEVEL (p, (" %3.4lf\t", F[c*m+ r]));
         }
         PRLEVEL (p, ("\n"));
     }
@@ -49,16 +49,11 @@ Int paru_factorize (double *F, Int lm, Int ln,
 
      ASSERT (m >= n);
 
-    //    if (m < n) {
-    //        ipiv [0] *= -1;
-    //        return info;
-    //    }
-    /* changing swap permutation to a real permutation */
+     /* changing swap permutation to a real permutation */
 
-//    int* tmpPinv = (int*) paru_alloc (m, sizeof (int), cc);
     BLAS_INT *tmpPinv = ipiv + n; // using the rest of scratch memory
 #ifndef NDEBUG  // Printing the swap permutation
-    p = 0;
+    p = 1;
     // ATTENTION: ipiv is 1 based
     PRLEVEL (p, ("swap permutation:\n"));
     for (int i = 0; i < m; i++){
@@ -69,11 +64,11 @@ Int paru_factorize (double *F, Int lm, Int ln,
 
     PRLEVEL (1, ("\n"));
     for (int i = 0; i < m; i++) tmpPinv[i] = i;
-    PRLEVEL (0, (" m=%d n=%d\n", m, n));
+    PRLEVEL (1, (" m=%d n=%d\n", m, n));
     for (int i = 0; i < m; i++){
         int tmp;
         // swap (tmpPinv [ipiv [i]], tmpPinv[i] ) and it is off by one
-        PRLEVEL (0, ("ipiv[%d] =%d\n",i, ipiv[i]));
+        PRLEVEL (1, ("ipiv[%d] =%d\n",i, ipiv[i]));
         ASSERT (ipiv [i] <= m);
         tmp = tmpPinv [ipiv [i]-1];
         PRLEVEL (1, ("tmp =%d\n", tmp));
@@ -84,8 +79,6 @@ Int paru_factorize (double *F, Int lm, Int ln,
 
     for (int i = 0; i < m; i++) 
         ipiv [i] = tmpPinv[i]; //copying back the important chunck
-
-//    paru_free (m, sizeof (int), tmpPinv, cc);
 
 
 

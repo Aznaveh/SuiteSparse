@@ -27,8 +27,8 @@ void paru_print_element (paru_matrix *paruMatInfo, Int e){
     m = curEl->nrows;
     n = curEl->ncols;
    
-    Int *el_colrowIndex = (Int*)(curEl+1);     // pointers to element index 
-    double *el_colrowNum = (double*)(el_colrowIndex + m + n); //and values
+    Int *el_colrowIndex = colIndex_pointer (curEl);
+    double *el_colrowNum = numeric_pointer (curEl);
 
     PRLEVEL (1, ("el_colrowIndex =%p, el_colrowNum = %p \n", 
                 el_colrowIndex, el_colrowNum));
