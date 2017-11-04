@@ -271,8 +271,7 @@ Int paru_remove_rowTuple(tupleList *RowList, Int row, Int t);
 void paru_assemble(paru_matrix *paruMatInfo, Int f, cholmod_common *cc);
 
 
-Int paru_factorize (double *F, Int m, Int n,
-        BLAS_INT *ipiv, cholmod_common *cc);
+Int paru_factorize (double *F, Int m, Int n, BLAS_INT *ipiv);
 
 Element *paru_create_element (Int nrows, Int ncols, 
         Int init, cholmod_common *cc);
@@ -286,3 +285,5 @@ Int paru_dgemm(double *pF, double *uPart, double *el, Int fp,
 void paru_fourPath (paru_matrix *paruMatInfo,  Int el_ind, Int fp, 
         cholmod_common *cc);
 
+void paru_print_element (paru_matrix *paruMatInfo, Int e);
+void paru_print_tupleList (tupleList *listSet, Int index);

@@ -44,6 +44,7 @@ OBJ = \
 	paru_numeric_assemble.o\
 	paru_trsm.o\
 	paru_dgemm.o\
+	paru_print.o\
 	paru_fourPath.o
 
 $(OBJ): $(INC)
@@ -93,6 +94,10 @@ paru_dgemm.o: ../Source/paru_dgemm.cpp
 
 paru_fourPath.o: ../Source/paru_fourPath.cpp
 	$(C) -c $<
+
+paru_print.o: ../Source/paru_print.cpp
+	$(C) -c $<
+
 
 #-------------------------------------------------------------------------------
 
