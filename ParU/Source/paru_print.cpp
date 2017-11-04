@@ -27,11 +27,10 @@ void paru_print_element (paru_matrix *paruMatInfo, Int e){
     m = curEl->nrows;
     n = curEl->ncols;
    
-    Int *el_colrowIndex = colIndex_pointer (curEl);
+    Int *el_colIndex = colIndex_pointer (curEl);
+    Int *el_rowIndex = rowIndex_pointer (curEl);
+    
     double *el_colrowNum = numeric_pointer (curEl);
-
-    PRLEVEL (1, ("el_colrowIndex =%p, el_colrowNum = %p \n", 
-                el_colrowIndex, el_colrowNum));
 
     printf("\n"); 
     printf("Element %ld is %ld x %ld:\n", e, m, n);
@@ -39,10 +38,10 @@ void paru_print_element (paru_matrix *paruMatInfo, Int e){
 
     printf("\t"); 
     for (int j = 0; j < n; j++) 
-        printf("%ld\t", el_colrowIndex [j] );
+        printf("%ld\t", el_colIndex [j] );
     printf("\n"); 
     for (int i = 0; i < m; i++) {
-        printf("%ld\t",el_colrowIndex [n+i] );
+        printf("%ld\t",el_rowIndex [i] );
         for (int j = 0; j < n; j++) {
             double value =  el_colrowNum [i*m + j];
             printf("%2.4lf\t",value );

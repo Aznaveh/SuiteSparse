@@ -101,17 +101,6 @@ void paru_freemat (paru_matrix **paruMatInfo_handle,
     for (Int col = 0; col < n; col++) {
         Int len = ColList [col].len;
         ASSERT (len < m);
-#ifndef NDEBUG
-       Int p = 0; 
-       Tuple *list = ColList [col].list;
-       PRLEVEL (p, ("col=%ld length= %ld\n", col));
-       for (int t = 0; t < len ; t++){
-           Tuple T = list [t];
-           PRLEVEL (p, ("(%ld,%ld) ", T.e,T.f));
-       }
-       PRLEVEL (p, (" \n" )); 
-#endif
-
        cholmod_l_free (len , sizeof (Tuple), ColList[col].list, cc);
     }
     cholmod_l_free (1, n*sizeof(tupleList), ColList, cc);

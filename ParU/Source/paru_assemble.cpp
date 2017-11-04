@@ -379,14 +379,14 @@ void paru_assemble (
     tupleList *RowList = paruMatInfo->RowList;
     for (Int i = 0; i < fp; i++){
         Int curFsRowIndex =(Int) i; //current fully summed row index
-        PRLEVEL (0, ("4: curFsRowIndex = %ld\n", curFsRowIndex));
+        PRLEVEL (1, ("4: curFsRowIndex = %ld\n", curFsRowIndex));
         Int curFsRow = fsRowList [i];
-        PRLEVEL (0, ("curFsRow =%ld\n", curFsRow));
+        PRLEVEL (1, ("curFsRow =%ld\n", curFsRow));
         tupleList *curRowTupleList = &RowList [curFsRowIndex];
         Int numTuple = curRowTupleList->numTuple;
         ASSERT (numTuple >= 0);
         Tuple *listRowTuples = curRowTupleList->list;
-        PRLEVEL (0, ("4: numTuple = %ld\n", numTuple));
+        PRLEVEL (1, ("4: numTuple = %ld\n", numTuple));
         for (Int i = 0; i < numTuple; i++){
             Tuple curTpl = listRowTuples [i];
             Int e = curTpl.e;
@@ -409,7 +409,7 @@ void paru_assemble (
                 elRow [e] = elRMark + 1;
 #ifndef NDEBUG
                 if ( elCol [e] >= elCMark )
-                    PRLEVEL (0, ("element %ld must be eaten wholly\n",e));
+                    PRLEVEL (1, ("element %ld must be eaten wholly\n",e));
                 //And the rest of e is in U part 
 #endif
             }
@@ -449,8 +449,7 @@ void paru_assemble (
 
 
 #ifndef NDEBUG /* Checking if columns are correct */
-
-    p = 0;
+    p = 1;
     PRLEVEL (p, ("There are %ld columns in this contribution block: \n",
                 colCount));
     for (Int i = 0; i < colCount; i++)
@@ -467,7 +466,6 @@ void paru_assemble (
         PRLEVEL (p, ("\n"));
     }
     ASSERT (colCount == stl_colSize );
-
 #endif 
 
 
@@ -552,7 +550,7 @@ void paru_assemble (
     for (Int i = 0; i < fp; i++){
         PRLEVEL (p, ("%ld\t",  ipiv[i]));
         for (Int j = 0; j < colCount; j++){
-            PRLEVEL (p, (" %3.1lf\t", uPart[j*fp+i]));
+            PRLEVEL (p, (" %2.4lf\t", uPart[j*fp+i]));
         }
         PRLEVEL (p, ("\n"));
     }
