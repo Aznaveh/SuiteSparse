@@ -32,7 +32,7 @@ Int paru_add_rowTuple (
             (Tuple*) paru_alloc (newLen, sizeof(Tuple), cc);
         if (newList == NULL)    // Error in allocating memory
             return 1;
-        for (Int i = 0; i < cur->len; ++i) //copy old to new
+        for (Int i = 0; i < cur->numTuple; ++i) //copy old to new
             newList [i] = cur->list [i];
         paru_free (cur->len, sizeof(Tuple), cur->list, cc); 
         cur->len = newLen;
@@ -58,7 +58,7 @@ Int paru_add_colTuple (tupleList *ColList, Int col,
             (Tuple*) paru_alloc (newLen, sizeof(Tuple), cc);
         if (newList == NULL)    // Error in allocating memory
             return 1;
-        for (Int i = 0; i < cur->len; ++i) //copy old to new
+        for (Int i = 0; i < cur->numTuple; ++i) //copy old to new
             newList [i] = cur->list [i];
         paru_free (cur->len, sizeof(Tuple), cur->list, cc); 
         cur->len = newLen;
