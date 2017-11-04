@@ -93,21 +93,33 @@ void paru_freemat (paru_matrix **paruMatInfo_handle,
     n = paruMatInfo->n; 
 
     tupleList *RowList = paruMatInfo->RowList;
-    PRLEVEL (2, ("RowList =%p\n", RowList));
+    PRLEVEL (1, ("RowList =%p\n", RowList));
     tupleList *ColList = paruMatInfo->ColList;
-    PRLEVEL (2, ("ColList =%p\n", ColList));
+    PRLEVEL (1, ("ColList =%p\n", ColList));
 
     // free tuple lists 
     for (Int col = 0; col < n; col++) {
         Int len = ColList [col].len;
-        cholmod_l_free (len , sizeof (Tuple), ColList[col].list, cc);
+        ASSERT (len < m);
+#ifndef NDEBUG
+       Int p = 0; 
+       Tuple *list = ColList [col].list;
+       PRLEVEL (p, ("col=%ld length= %ld\n", col));
+       for (int t = 0; t < len ; t++){
+           Tuple T = list [t];
+           PRLEVEL (p, ("(%ld,%ld) ", T.e,T.f));
+       }
+       PRLEVEL (p, (" \n" )); 
+#endif
+
+       cholmod_l_free (len , sizeof (Tuple), ColList[col].list, cc);
     }
     cholmod_l_free (1, n*sizeof(tupleList), ColList, cc);
 
-    for (Int row = 0; row < m; row++) {
-        Int len = RowList [row].len;
-        cholmod_l_free (len , sizeof (Tuple), RowList[row].list, cc);
-    }
+       for (Int row = 0; row < m; row++) {
+           Int len = RowList [row].len;
+           cholmod_l_free (len , sizeof (Tuple), RowList[row].list, cc);
+       }
     cholmod_l_free (1, m*sizeof(tupleList), RowList, cc);
 
 
@@ -115,17 +127,15 @@ void paru_freemat (paru_matrix **paruMatInfo_handle,
     Element **elementList; 
     elementList = paruMatInfo->elementList;
 
-    /*! TODO: This code just work for row initialized elements	
-     * this code must be more general
-     *
-     * I should free other elements later 
-     * */
+   Int nf = LUsym->nf;
+
+    PRLEVEL (1, ("LUsym = %p\n",LUsym));
+    PRLEVEL (1, ("freeing initialized elements:\n"));
     for(Int i = 0; i < m ; i++){        // freeing all row elements
         if(LUsym == NULL){
             printf ("Probably LUsym has been freed before! Wrong usage\n");
             return;
         }
-        PRLEVEL (1, ("LUsym = %p\n",LUsym));
         Int e = LUsym->row2atree[i];    //element number in augmented tree
         PRLEVEL (1, ("e =%ld\t", e));
         Element *curEl = elementList[e];
@@ -138,7 +148,22 @@ void paru_freemat (paru_matrix **paruMatInfo_handle,
                 sizeof(double)*nrows*ncols, curEl, cc);
     }
 
-    Int nf = LUsym->nf;
+
+    PRLEVEL (1, ("freeing CB elements:\n"));
+    for(Int i = 0; i < nf ; i++){        // freeing all other elements
+       Int e = LUsym->super2atree[i];    //element number in augmented tree
+        PRLEVEL (1, ("e =%ld\t", e));
+        Element *curEl = elementList[e];
+        if (curEl == NULL) continue; /* CB not used */
+        Int nrows = curEl->nrows,
+            ncols = curEl->ncols;
+        PRLEVEL (1, ("nrows =%ld ", nrows));
+        PRLEVEL (1, ("ncols =%ld\n", ncols));
+        cholmod_l_free (1, sizeof(Element)+sizeof(Int)*(2*(nrows+ncols)+2)+
+                sizeof(double)*nrows*ncols, curEl, cc);
+    }
+
+
     cholmod_l_free (1, (m+nf+1)*sizeof(Element), elementList, cc);
     work_struct *Work = paruMatInfo->Work;
     cholmod_l_free (m, sizeof(Int), Work->rowSize, cc);
@@ -147,7 +172,7 @@ void paru_freemat (paru_matrix **paruMatInfo_handle,
     cholmod_l_free (m+nf, sizeof(Int), Work->elRow, cc);
     cholmod_l_free (m+nf, sizeof(Int), Work->elCol, cc);
 
-    
+
     cholmod_l_free (1, sizeof(work_struct), paruMatInfo->Work, cc);
     cholmod_l_free (1, sizeof(paru_matrix), paruMatInfo, cc);
     *paruMatInfo_handle = NULL;
