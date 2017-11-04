@@ -12,7 +12,7 @@ extern "C" void dgetrf_( BLAS_INT *dim1, BLAS_INT *dim2, double *a,
 Int paru_factorize (double *F, Int lm, Int ln,
         BLAS_INT *ipiv)
 {
-    DEBUGLEVEL(1);
+    DEBUGLEVEL(0);
 
     BLAS_INT m = lm;
     BLAS_INT n = ln;

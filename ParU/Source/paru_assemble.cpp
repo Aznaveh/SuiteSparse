@@ -346,7 +346,7 @@ void paru_assemble (
 
     /*! TODO: The problem is that permutation of row list is not correct	 */
 #ifndef NDEBUG  // Printing the permutation
-    p = 1;
+    p = 0;
     PRLEVEL (p, ("pivotal rows:\n"));
     for (int i = 0; i < fp; i++){
         PRLEVEL (p, ("fsRowList[%d] =%d\n",i, fsRowList[i]));
@@ -379,14 +379,14 @@ void paru_assemble (
     tupleList *RowList = paruMatInfo->RowList;
     for (Int i = 0; i < fp; i++){
         Int curFsRowIndex =(Int) i; //current fully summed row index
-        PRLEVEL (1, ("4: curFsRowIndex = %ld\n", curFsRowIndex));
+        PRLEVEL (0, ("4: curFsRowIndex = %ld\n", curFsRowIndex));
         Int curFsRow = fsRowList [i];
-        PRLEVEL (1, ("curFsRow =%ld\n", curFsRow));
+        PRLEVEL (0, ("curFsRow =%ld\n", curFsRow));
         tupleList *curRowTupleList = &RowList [curFsRowIndex];
         Int numTuple = curRowTupleList->numTuple;
         ASSERT (numTuple >= 0);
         Tuple *listRowTuples = curRowTupleList->list;
-        PRLEVEL (1, ("numTuple = %ld\n", numTuple));
+        PRLEVEL (0, ("4: numTuple = %ld\n", numTuple));
         for (Int i = 0; i < numTuple; i++){
             Tuple curTpl = listRowTuples [i];
             Int e = curTpl.e;
@@ -409,7 +409,7 @@ void paru_assemble (
                 elRow [e] = elRMark + 1;
 #ifndef NDEBUG
                 if ( elCol [e] >= elCMark )
-                    PRLEVEL (1, ("element %ld must be eaten wholly\n",e));
+                    PRLEVEL (0, ("element %ld must be eaten wholly\n",e));
                 //And the rest of e is in U part 
 #endif
             }
@@ -447,9 +447,10 @@ void paru_assemble (
         }
     }
 
+
 #ifndef NDEBUG /* Checking if columns are correct */
 
-    p = 1;
+    p = 0;
     PRLEVEL (p, ("There are %ld columns in this contribution block: \n",
                 colCount));
     for (Int i = 0; i < colCount; i++)
@@ -542,7 +543,7 @@ void paru_assemble (
     }
 
 #ifndef NDEBUG  // Printing the  U part
-    p = 1;
+    p = 0;
     PRLEVEL (p, ("U\t"));
     for (Int i = 0; i < colCount; i++){
         PRLEVEL (p, ("%ld\t", CBColList[i]));
@@ -582,7 +583,8 @@ void paru_assemble (
     }
     Int *el_rowIndex = rowIndex_pointer (el);
     for (Int i = fp; i < rowCount; ++ i) {
-        el_rowIndex [i] = fsRowList[i];
+        el_rowIndex [i-fp] = fsRowList[i];
+        PRLEVEL (0, ("el_rowIndex [%ld] =%ld\n",i-fp, el_rowIndex [i-fp]));
     }
 
     double *el_numbers = numeric_pointer (el);
@@ -596,6 +598,10 @@ void paru_assemble (
 
 
     ////////////////////////////////////////////////////////////////////////////
+    
+#ifndef NDEBUG
+    paru_print_element (paruMatInfo, eli);
+#endif
 
 
 
