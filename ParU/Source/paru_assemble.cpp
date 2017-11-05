@@ -298,6 +298,7 @@ void paru_assemble (
 
 #ifndef NDEBUG  // Printing the pivotal front
     p = 0;
+    PRLEVEL (p, ("Before pivoting\n"));
     PRLEVEL (p, ("x\t"));
     for (Int c = col1; c < col2; c++) {
         PRLEVEL (p, ("%ld\t", c));
@@ -344,7 +345,6 @@ void paru_assemble (
     }
 
 
-    /*! TODO: The problem is that permutation of row list is not correct	 */
 #ifndef NDEBUG  // Printing the permutation
     p = 0;
     PRLEVEL (p, ("pivotal rows:\n"));
@@ -358,7 +358,24 @@ void paru_assemble (
     PRLEVEL (p, ("\n"));
 #endif
 
+#ifndef NDEBUG  // Printing the pivotal front
+    p = 0;
+    PRLEVEL (p, ("L part:\n"));
+    PRLEVEL (p, ("x\t"));
+    for (Int c = col1; c < col2; c++) {
+        PRLEVEL (p, ("%ld\t", c));
+    }
+    PRLEVEL (p, ("\n"));
+    for (Int r = 0; r < rowCount; r++){
+        PRLEVEL (p, ("%ld\t", fsRowList [r]));
+        for (Int c = col1; c < col2; c++){
+            PRLEVEL (p, (" %3.1lf\t", pivotalFront [(c-col1)*rowCount + r]));
+        }
+        PRLEVEL (p, ("\n\n"));
+    }
+#endif
 
+/******************************************************************************/
 
     /*  Searching for columns */
     Int *isColInCBcolSet = Work -> colSize;
@@ -447,6 +464,8 @@ void paru_assemble (
         }
     }
 
+    if (colCount == 0) return; // there is no CB, Nothing to be done
+        
 
 #ifndef NDEBUG /* Checking if columns are correct */
     p = 1;
@@ -488,6 +507,8 @@ void paru_assemble (
     }
     PRLEVEL (p, ("\n"));
 #endif
+
+    
 
     /**** 5 ** assemble U part         Row by Row                          ****/ 
 
@@ -542,6 +563,7 @@ void paru_assemble (
 
 #ifndef NDEBUG  // Printing the  U part
     p = 0;
+    PRLEVEL (0, ("fp=%ld x colCount =%ld\n", fp, colCount));
     PRLEVEL (p, ("U\t"));
     for (Int i = 0; i < colCount; i++){
         PRLEVEL (p, ("%ld\t", CBColList[i]));
