@@ -62,10 +62,9 @@ Int paru_factorize (double *F, Int lm, Int ln,
     PRLEVEL (p, ("\n"));
 #endif
 
-    PRLEVEL (1, ("\n"));
     for (int i = 0; i < m; i++) tmpPinv[i] = i;
     PRLEVEL (1, (" m=%d n=%d\n", m, n));
-    for (int i = 0; i < m; i++){
+    for (int i = 0; i < n; i++){
         int tmp;
         // swap (tmpPinv [ipiv [i]], tmpPinv[i] ) and it is off by one
         PRLEVEL (1, ("ipiv[%d] =%d\n",i, ipiv[i]));
