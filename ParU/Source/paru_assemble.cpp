@@ -68,6 +68,7 @@ void paru_assemble (
     Int rowCount= 0;
     Int *isRowInFront = Work->rowSize; 
     Int rowMark = Work->rowMark;
+    PRLEVEL (0, ("rowMark=%ld\n", rowMark));
     if (rowMark < 0) {  // in rare case of overflow
         memset (isRowInFront, -1, m*sizeof(Int));
         rowMark = Work->rowMark = 0;
@@ -78,8 +79,12 @@ void paru_assemble (
                 fsRowList, isRowInFront));
 
 #ifndef NDEBUG /* chekcing first part of Work to be zero */
-    for (Int i = 0; i < m; i++)  
+    for (Int i = 0; i < m; i++){  
+        if ( isRowInFront [i] >= rowMark)
+            PRLEVEL (0, ("rowMark = %ld, isRowInFront[%ld] = %ld\n", rowMark ,i,
+                        isRowInFront [i]));
         ASSERT ( isRowInFront [i] < rowMark);
+    }
 #endif 
 
 
@@ -464,8 +469,10 @@ void paru_assemble (
         }
     }
 
-    if (colCount == 0) return; // there is no CB, Nothing to be done
-        
+    if (colCount == 0){  // there is no CB, Nothing to be done
+        Work->rowMark +=  rowCount;
+        return;
+    }
 
 #ifndef NDEBUG /* Checking if columns are correct */
     p = 1;
@@ -620,13 +627,14 @@ void paru_assemble (
     ////////////////////////////////////////////////////////////////////////////
     
 #ifndef NDEBUG
-    paru_print_element (paruMatInfo, eli);
+    p = 1;
+    if (p == 0)
+        paru_print_element (paruMatInfo, eli);
 #endif
 
 
 
-
-    Work->rowMark += rowCount;
+    Work->rowMark +=  rowCount;
     rowMark = Work -> rowMark;
 
     Work->colMark += colCount;
