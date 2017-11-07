@@ -97,11 +97,17 @@ void paru_freemat (paru_matrix **paruMatInfo_handle,
     tupleList *ColList = paruMatInfo->ColList;
     PRLEVEL (1, ("ColList =%p\n", ColList));
 
+
+    paru_symbolic *LUsym = paruMatInfo-> LUsym;
+    Int nf = LUsym->nf;
+
     // free tuple lists 
     for (Int col = 0; col < n; col++) {
         Int len = ColList [col].len;
         // ASSERT (len < m);  // it is a wrong assertion but there is a good
                                 //  point
+        if (len > m+nf )                        
+            printf ("too much space used for %ld\n",col);
         cholmod_l_free (len , sizeof (Tuple), ColList[col].list, cc);
     }
     cholmod_l_free (1, n*sizeof(tupleList), ColList, cc);
@@ -113,11 +119,9 @@ void paru_freemat (paru_matrix **paruMatInfo_handle,
     cholmod_l_free (1, m*sizeof(tupleList), RowList, cc);
 
 
-    paru_symbolic *LUsym = paruMatInfo-> LUsym;
     Element **elementList; 
     elementList = paruMatInfo->elementList;
 
-    Int nf = LUsym->nf;
 
     PRLEVEL (1, ("LUsym = %p\n",LUsym));
     PRLEVEL (1, ("freeing initialized elements:\n"));
