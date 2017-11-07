@@ -68,7 +68,7 @@ void paru_assemble (
     Int rowCount= 0;
     Int *isRowInFront = Work->rowSize; 
     Int rowMark = Work->rowMark;
-    PRLEVEL (0, ("rowMark=%ld\n", rowMark));
+    PRLEVEL (1, ("rowMark=%ld\n", rowMark));
     if (rowMark < 0) {  // in rare case of overflow
         memset (isRowInFront, -1, m*sizeof(Int));
         rowMark = Work->rowMark = 0;
@@ -256,13 +256,9 @@ void paru_assemble (
             PRLEVEL (1, (" into column %ld of current front\n",colIndexF ));
 #ifndef NDEBUG // print the element which is going to be assembled from
             p = 1;
-            PRLEVEL (p, ("Element %ld is %ld x %ld \n", e, mEl, nEl));
-            for (int i = 0; i < mEl; i++){
-                for (int j = 0; j < nEl; j++){
-                     PRLEVEL (p, ( "%lf ",el_Num [i*mEl+j] )); 
-                }
-                PRLEVEL (p, ("\n"));
-            }
+            PRLEVEL (p, ("assembling from col %ld", curColIndex ));
+            if (p == 0)
+                paru_print_element (paruMatInfo, e);
 #endif
 
             assemble_col (el_Num +curColIndex*mEl,
@@ -306,13 +302,13 @@ void paru_assemble (
     PRLEVEL (p, ("Before pivoting\n"));
     PRLEVEL (p, ("x\t"));
     for (Int c = col1; c < col2; c++) {
-        PRLEVEL (p, ("%ld\t", c));
+        PRLEVEL (p, ("%ld\t\t", c));
     }
     PRLEVEL (p, ("\n"));
     for (Int r = 0; r < rowCount; r++){
         PRLEVEL (p, ("%ld\t", fsRowList [r]));
         for (Int c = col1; c < col2; c++){
-            PRLEVEL (p, (" %3.1lf\t", pivotalFront [(c-col1)*rowCount + r]));
+            PRLEVEL (p, (" %2.5lf\t", pivotalFront [(c-col1)*rowCount + r]));
         }
         PRLEVEL (p, ("\n"));
     }
@@ -368,16 +364,17 @@ void paru_assemble (
     PRLEVEL (p, ("L part:\n"));
     PRLEVEL (p, ("x\t"));
     for (Int c = col1; c < col2; c++) {
-        PRLEVEL (p, ("%ld\t", c));
+        PRLEVEL (p, ("%ld\t\t", c));
     }
     PRLEVEL (p, ("\n"));
     for (Int r = 0; r < rowCount; r++){
         PRLEVEL (p, ("%ld\t", fsRowList [r]));
         for (Int c = col1; c < col2; c++){
-            PRLEVEL (p, (" %3.1lf\t", pivotalFront [(c-col1)*rowCount + r]));
+            PRLEVEL (p, (" %2.5lf\t", pivotalFront [(c-col1)*rowCount + r]));
         }
-        PRLEVEL (p, ("\n\n"));
+        PRLEVEL (p, ("\n"));
     }
+    PRLEVEL (p, ("\n"));
 #endif
 
 /******************************************************************************/
@@ -570,16 +567,16 @@ void paru_assemble (
 
 #ifndef NDEBUG  // Printing the  U part
     p = 0;
-    PRLEVEL (0, ("fp=%ld x colCount =%ld\n", fp, colCount));
+    PRLEVEL (p, ("U part: %ld x %ld\n", fp, colCount));
     PRLEVEL (p, ("U\t"));
     for (Int i = 0; i < colCount; i++){
-        PRLEVEL (p, ("%ld\t", CBColList[i]));
+        PRLEVEL (p, ("%ld\t\t", CBColList[i]));
     }
     PRLEVEL (p, ("\n"));
     for (Int i = 0; i < fp; i++){
         PRLEVEL (p, ("%ld\t",  ipiv[i]));
         for (Int j = 0; j < colCount; j++){
-            PRLEVEL (p, (" %2.4lf\t", uPart[j*fp+i]));
+            PRLEVEL (p, (" %2.5lf\t", uPart[j*fp+i]));
         }
         PRLEVEL (p, ("\n"));
     }
@@ -611,7 +608,7 @@ void paru_assemble (
     Int *el_rowIndex = rowIndex_pointer (el);
     for (Int i = fp; i < rowCount; ++ i) {
         el_rowIndex [i-fp] = fsRowList[i];
-        PRLEVEL (0, ("el_rowIndex [%ld] =%ld\n",i-fp, el_rowIndex [i-fp]));
+        PRLEVEL (1, ("el_rowIndex [%ld] =%ld\n",i-fp, el_rowIndex [i-fp]));
     }
 
     double *el_numbers = numeric_pointer (el);
@@ -627,7 +624,7 @@ void paru_assemble (
     ////////////////////////////////////////////////////////////////////////////
     
 #ifndef NDEBUG
-    p = 1;
+    p = 0;
     if (p == 0)
         paru_print_element (paruMatInfo, eli);
 #endif
