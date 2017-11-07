@@ -255,7 +255,7 @@ void paru_assemble (
             PRLEVEL (1, ("ASSEMBL element= %ld  mEl =%ld ",e, mEl));
             PRLEVEL (1, (" into column %ld of current front\n",colIndexF ));
 #ifndef NDEBUG // print the element which is going to be assembled from
-            p = 1;
+            p = 0;
             PRLEVEL (p, ("assembling from col %ld", curColIndex ));
             if (p == 0)
                 paru_print_element (paruMatInfo, e);
@@ -265,7 +265,8 @@ void paru_assemble (
                     pivotalFront+colIndexF*rowCount,
                     mEl, rowRelIndex);
 
-            FLIP(el_colIndex[curColIndex]); //marking column as assembled
+            //FLIP(el_colIndex[curColIndex]); //marking column as assembled
+            el_colIndex[curColIndex] = -1;
             colRelIndex [curColIndex] = -1;
 
 #if 0
@@ -298,7 +299,7 @@ void paru_assemble (
     }
 
 #ifndef NDEBUG  // Printing the pivotal front
-    p = 0;
+    p = 1;
     PRLEVEL (p, ("Before pivoting\n"));
     PRLEVEL (p, ("x\t"));
     for (Int c = col1; c < col2; c++) {
@@ -347,7 +348,7 @@ void paru_assemble (
 
 
 #ifndef NDEBUG  // Printing the permutation
-    p = 0;
+    p = 1;
     PRLEVEL (p, ("pivotal rows:\n"));
     for (int i = 0; i < fp; i++){
         PRLEVEL (p, ("fsRowList[%d] =%d\n",i, fsRowList[i]));
@@ -443,7 +444,8 @@ void paru_assemble (
                 PRLEVEL (1, ("curCol =%ld\n", curCol));
                 ASSERT (curCol < n);
                 /*! TODO: implement this part better     */
-                if (curCol >= col1 && curCol < col2) //if in pivotal front
+//                if (curCol >= col1 && curCol < col2) //if in pivotal front
+                if (curCol < 0)
                     continue;
 #ifndef NDEBUG
                 stl_colSet.insert (curCol);
@@ -471,8 +473,9 @@ void paru_assemble (
         return;
     }
 
+    PRLEVEL (0, ("I am here\n"));
 #ifndef NDEBUG /* Checking if columns are correct */
-    p = 1;
+    p = 0;
     PRLEVEL (p, ("There are %ld columns in this contribution block: \n",
                 colCount));
     for (Int i = 0; i < colCount; i++)
@@ -481,7 +484,7 @@ void paru_assemble (
     Int stl_colSize = stl_colSet.size();
     if (colCount != stl_colSize){
         PRLEVEL (p, ("STL %ld:\n",stl_colSize));
-        for (it = stl_rowSet.begin(); it != stl_colSet.end(); it++)
+        for (it = stl_colSet.begin(); it != stl_colSet.end(); it++)
             PRLEVEL (p, (" %ld", *it));
         PRLEVEL (p, ("\nMy Set %ld:\n",colCount));
         for (Int i = 0; i < colCount; i++)
@@ -559,7 +562,8 @@ void paru_assemble (
             assemble_row (el_Num, uPart, mEl, nEl, fp, 
                     curRowIndex, curFsRowIndex, colRelIndex);
 
-            FLIP(el_rowIndex[curRowIndex]); //marking column as assembled
+            //FLIP(el_rowIndex[curRowIndex]); //marking column as assembled
+            el_rowIndex[curRowIndex] = -1;
             rowRelIndex [curRowIndex] = -1;
 
         }
