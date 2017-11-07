@@ -10,7 +10,11 @@
  * \param  a list of tuples and the the tuple we want to add
  * \return 0 on sucess 
  */
-/*! TODO: I have to take into account deleted tuples	 */
+/*! TODO: Cap number of tuples to maximum number of elements; 
+ *      How to do this? 
+ *      The maximum number is a constant based on the input
+ *      matrix. should I send it as an argument to the function or there is a
+ *      better way of doing this*/
 Int paru_add_rowTuple (
         tupleList *RowList, 
         Int row, 
