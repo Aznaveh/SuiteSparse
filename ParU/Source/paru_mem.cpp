@@ -100,15 +100,16 @@ void paru_freemat (paru_matrix **paruMatInfo_handle,
     // free tuple lists 
     for (Int col = 0; col < n; col++) {
         Int len = ColList [col].len;
-        ASSERT (len < m);
-       cholmod_l_free (len , sizeof (Tuple), ColList[col].list, cc);
+        // ASSERT (len < m);  // it is a wrong assertion but there is a good
+                                //  point
+        cholmod_l_free (len , sizeof (Tuple), ColList[col].list, cc);
     }
     cholmod_l_free (1, n*sizeof(tupleList), ColList, cc);
 
-       for (Int row = 0; row < m; row++) {
-           Int len = RowList [row].len;
-           cholmod_l_free (len , sizeof (Tuple), RowList[row].list, cc);
-       }
+    for (Int row = 0; row < m; row++) {
+        Int len = RowList [row].len;
+        cholmod_l_free (len , sizeof (Tuple), RowList[row].list, cc);
+    }
     cholmod_l_free (1, m*sizeof(tupleList), RowList, cc);
 
 
@@ -116,7 +117,7 @@ void paru_freemat (paru_matrix **paruMatInfo_handle,
     Element **elementList; 
     elementList = paruMatInfo->elementList;
 
-   Int nf = LUsym->nf;
+    Int nf = LUsym->nf;
 
     PRLEVEL (1, ("LUsym = %p\n",LUsym));
     PRLEVEL (1, ("freeing initialized elements:\n"));
@@ -140,7 +141,7 @@ void paru_freemat (paru_matrix **paruMatInfo_handle,
 
     PRLEVEL (1, ("freeing CB elements:\n"));
     for(Int i = 0; i < nf ; i++){        // freeing all other elements
-       Int e = LUsym->super2atree[i];    //element number in augmented tree
+        Int e = LUsym->super2atree[i];    //element number in augmented tree
         PRLEVEL (1, ("e =%ld\t", e));
         Element *curEl = elementList[e];
         if (curEl == NULL) continue; /* CB not used */
