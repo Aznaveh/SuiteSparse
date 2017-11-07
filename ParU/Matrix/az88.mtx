@@ -1,6 +1,6 @@
 %%MatrixMarket matrix coordinate real general
 %---Aznaveh Test: changed s32---------------------------------------------------
-% 2-by-2 matrix with no nonzeros:
+% 8-by-8 matrix with 8 nonzeros:
 %
 %   4   1    
 %  -1   4  
