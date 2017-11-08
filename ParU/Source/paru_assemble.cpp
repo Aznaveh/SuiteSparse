@@ -228,7 +228,6 @@ void paru_assemble (
             Tuple curTpl = l [i];
             Int e = curTpl.e;
             Int curColIndex = curTpl.f;
-            if(e < 0 || curColIndex<0) continue; /*! TODO: it deponds!!! */
 
             // Assembly of column curColIndex of e in colIndexF
 
@@ -241,12 +240,11 @@ void paru_assemble (
             Int *rowRelIndex = relRowInd (curEl);
             Int *rowRelIndValid = rowRelIndVal (curEl);
             Int *colRelIndex    = relColInd (curEl);
+            if (el_colIndex [curColIndex]< 0 ) continue; /*! TODO: Delete Tuple*/
 
             ASSERT (el_colIndex[curColIndex] == c);
 
 
-            /*! TODO: I can change number of left cols/rows in the end       */
-            //            curEl->ncolsleft--;
             PRLEVEL (1, ("curColIndex =%ld\n", curColIndex));
 
             ASSERT (curColIndex < nEl);
@@ -473,7 +471,6 @@ void paru_assemble (
         return;
     }
 
-    PRLEVEL (0, ("I am here\n"));
 #ifndef NDEBUG /* Checking if columns are correct */
     p = 0;
     PRLEVEL (p, ("There are %ld columns in this contribution block: \n",
@@ -541,7 +538,6 @@ void paru_assemble (
             Tuple curTpl = listRowTuples [i];
             Int e = curTpl.e;
             Int curRowIndex = curTpl.f;
-            if(e < 0 || curRowIndex < 0 ) continue; /*! TODO: it deponds!!! */
 
             Element *curEl = elementList[e];
             Int mEl = curEl->nrows;
@@ -552,6 +548,9 @@ void paru_assemble (
             Int *colRelIndex = relColInd (curEl);
             Int *colRelIndValid = colRelIndVal (curEl);
 
+            if(el_rowIndex[curRowIndex] < 0 ) continue; /*! TODO: Delete Tuple*/
+
+            PRLEVEL (1, ("curFsRowIndex =%ld\n", curFsRowIndex));
             ASSERT (el_rowIndex[curRowIndex] == curFsRowIndex);
             ASSERT (curRowIndex < mEl);
             PRLEVEL (1, ("curColIndex =%ld\n", curRowIndex));
