@@ -45,7 +45,7 @@ OBJ = \
 	paru_trsm.o\
 	paru_dgemm.o\
 	paru_print.o\
-	paru_fourPath.o
+	paru_fourPass.o
 
 $(OBJ): $(INC)
 
@@ -92,7 +92,7 @@ paru_trsm.o: ../Source/paru_trsm.cpp
 paru_dgemm.o: ../Source/paru_dgemm.cpp
 	$(C) -c $<
 
-paru_fourPath.o: ../Source/paru_fourPath.cpp
+paru_fourPass.o: ../Source/paru_fourPass.cpp
 	$(C) -c $<
 
 paru_print.o: ../Source/paru_print.cpp
