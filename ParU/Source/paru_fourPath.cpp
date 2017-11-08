@@ -47,12 +47,21 @@ void paru_fourPath (paru_matrix *paruMatInfo,
         Int numTuple = curColTupleList->numTuple;
         ASSERT (numTuple >= 0);
         Tuple *listColTuples = curColTupleList->list;
-        PRLEVEL (1, ("1st: c =%ld  numTuple = %ld\n", c, numTuple));
+#ifndef NDEBUG        
+        Int p = 0;
+        PRLEVEL (p, ("1st: c =%ld  numTuple = %ld\n", c, numTuple));
+        if (p == 0)
+            paru_print_tupleList (ColList, c);
+#endif
         for (Int i = 0; i < numTuple; i++){
             Tuple curTpl = listColTuples [i];
             Int e = curTpl.e;
+            ASSERT (e >= 0);
             Int curColIndex = curTpl.f;
-            if(e < 0 || curColIndex < 0 ){ 
+            Element *curEl = elementList[e];
+            Int *el_colIndex = colIndex_pointer (curEl);
+
+            if (el_colIndex [curColIndex] < 0 ){ /*! TODO: Dead Delete it	 */
                 continue;  
             }
 
@@ -64,18 +73,16 @@ void paru_fourPath (paru_matrix *paruMatInfo,
             }
 
             /*  Update rowRelIndex	 */
-            Element *curEl = elementList[e];
             Int mEl = curEl->nrows;
             Int *el_rowIndex = rowIndex_pointer (curEl); //pointers to row index
             Int *rowRelIndValid = rowRelIndVal (curEl);
             Int *rowRelIndex = relRowInd (curEl);
-            Int *colRelIndex    = relColInd (curEl);
             // Updating row relative indices 
             PRLEVEL (1, ("elRow[%ld]=%ld", e, elRow [e]));  
             for (Int rEl = 0; rEl < mEl; rEl++)   
                 rowRelIndex [rEl] = isRowInFront [el_rowIndex [rEl]] 
                     - rowMark;
-//            *rowRelIndValid = f ;//current front
+            //            *rowRelIndValid = f ;//current front
 
         }
     }
@@ -91,11 +98,15 @@ void paru_fourPath (paru_matrix *paruMatInfo,
         ASSERT (numTuple >= 0);
         Tuple *listColTuples = curColTupleList->list;
         PRLEVEL (1, ("r =%ld  numTuple = %ld\n", r, numTuple));
+
         for (Int i = 0; i < numTuple; i++){
             Tuple curTpl = listColTuples [i];
             Int e = curTpl.e;
             Int curRowIndex = curTpl.f;
-            if(e < 0 || curRowIndex < 0){ 
+            Element *curEl = elementList[e];
+            Int *el_rowIndex = rowIndex_pointer (curEl);
+
+            if (el_rowIndex [curRowIndex] < 0 ){  /*! TODO: Dead Delete it	 */
                 continue;  
             }
 
@@ -107,7 +118,6 @@ void paru_fourPath (paru_matrix *paruMatInfo,
                 continue;
             }
             /* Update colRelIndex	 */
-             Element *curEl = elementList[e];
             Int nEl = curEl->ncols;
             Int *el_colIndex = colIndex_pointer (curEl); //pointers to row index
             Int *colRelIndValid = rowRelIndVal (curEl);
@@ -118,7 +128,7 @@ void paru_fourPath (paru_matrix *paruMatInfo,
             for (Int cEl = 0; cEl < nEl; cEl++)   
                 colRelIndex [cEl] = isColInCBcolSet [el_colIndex [cEl]] 
                     - colMark;
-//            *colRelIndValid = f ;//current front
+            //            *colRelIndValid = f ;//current front
 
         }
     }
@@ -140,12 +150,19 @@ void paru_fourPath (paru_matrix *paruMatInfo,
         Int numTuple = curColTupleList->numTuple;
         ASSERT (numTuple >= 0);
         Tuple *listColTuples = curColTupleList->list;
-        PRLEVEL (1, ("3rd: c =%ld  numTuple = %ld\n", c, numTuple));
+#ifndef NDEBUG            
+        Int p = 0;
+        PRLEVEL (p, ("3rd: c =%ld  numTuple = %ld\n", c, numTuple));
+        if (p == 0 )
+            paru_print_tupleList (ColList, c);
+#endif
         Int pdst = 0,psrc;
         for (Int psrc = 0; psrc < numTuple; psrc ++){
             Tuple curTpl = listColTuples [psrc];
             Int e = curTpl.e;
             Int curColIndex = curTpl.f;
+            PRLEVEL (0, ("element= %ld  f =%ld \n",e, curColIndex));
+
             ASSERT (e >= 0);
             ASSERT (curColIndex >= 0);
 
@@ -158,6 +175,10 @@ void paru_fourPath (paru_matrix *paruMatInfo,
             Int *rowRelIndex = relRowInd (curEl);
             Int *rowRelIndValid = rowRelIndVal (curEl);
             Int *colRelIndex    = relColInd (curEl);
+
+            if (el_colIndex [curColIndex] < 0 ){ //it will be deleted here
+                continue;  
+            }
 
             ASSERT (el_colIndex[curColIndex] == c);
             ASSERT (curColIndex < nEl);
@@ -223,10 +244,17 @@ void paru_fourPath (paru_matrix *paruMatInfo,
             Int *rowRelIndex = relRowInd (curEl);
             Int *rowRelIndValid = rowRelIndVal (curEl);
             Int *colRelIndex    = relColInd (curEl);
-            
-            PRLEVEL (1, ("curRowIndex = %ld\n", curRowIndex));
-            PRLEVEL (1, ("r =%ld\n", r));
-            PRLEVEL (1, ("el_rowIndex [curRowIndex] =%ld\n", 
+
+            if (el_rowIndex [curRowIndex] < 0 ){ // it will be deleted here
+                continue;  
+            }
+
+
+            /*! TODO: for Columns too	 */
+            if (el_rowIndex[curRowIndex] < 0)     continue; //not valid
+            PRLEVEL (0, ("curRowIndex = %ld\n", curRowIndex));
+            PRLEVEL (0, ("r =%ld\n", r));
+            PRLEVEL (0, ("el_rowIndex [curRowIndex] =%ld\n", 
                         el_rowIndex [curRowIndex]));
             ASSERT (el_rowIndex[curRowIndex] == r);
             ASSERT (curRowIndex < mEl);
@@ -236,7 +264,7 @@ void paru_fourPath (paru_matrix *paruMatInfo,
             if (elCol [e] - elCMark == curEl->ncolsleft){
                 //all the row is in CB
                 assemble_row (el_Num, cb_numbers, mEl, nEl, 
-                       colCount-fp, curRowIndex , k-fp, colRelIndex );
+                        colCount-fp, curRowIndex , k-fp, colRelIndex );
 
                 PRLEVEL (1, ("psrc=%ld", psrc));
                 rowRelIndex [curRowIndex] = -1;
