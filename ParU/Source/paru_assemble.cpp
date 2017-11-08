@@ -141,12 +141,14 @@ void paru_assemble (
                     PRLEVEL (1, ("curRow =%ld rowCount=%ld\n", 
                                 curRow, rowCount));
                     fsRowList [rowCount] = curRow;
+                    rowRelIndex [rEl] = rowCount ;
                     isRowInFront [curRow] = rowMark + rowCount++; 
                 }
+                else
+                {
+                    rowRelIndex [rEl] = isRowInFront [curRow] - rowMark;
+                }
                 ASSERT (rowCount <= m); 
-
-                rowRelIndex [rEl] = isRowInFront [el_rowIndex [rEl]] 
-                    - rowMark;
 
             }
             //            // Updating row relative indices 
@@ -298,12 +300,12 @@ void paru_assemble (
 
 #ifndef NDEBUG  // Printing the pivotal front
     p = 1;
-    PRLEVEL (p, ("Before pivoting\n"));
-    PRLEVEL (p, ("x\t"));
+    PRLEVEL (p, ("%% Before pivoting\n"));
+    PRLEVEL (p, ("x = [ \t"));
     for (Int c = col1; c < col2; c++) {
         PRLEVEL (p, ("%ld\t\t", c));
     }
-    PRLEVEL (p, ("\n"));
+    PRLEVEL (p, ("] ;\n"));
     for (Int r = 0; r < rowCount; r++){
         PRLEVEL (p, ("%ld\t", fsRowList [r]));
         for (Int c = col1; c < col2; c++){
@@ -456,10 +458,16 @@ void paru_assemble (
                     PRLEVEL (1, ("curCol = %ld colCount=%ld\n", 
                                 curCol, colCount));
                     CBColList [colCount] = curCol;
+                    // same trick here ...
                     isColInCBcolSet [curCol] = colMark + colCount++; 
+                }
+                else
+                {
+                    // ...
                 }
                 ASSERT (colCount <= n);
 
+                // move this into if/else above:
                 colRelIndex [cEl] = isColInCBcolSet [el_colIndex [cEl]] 
                     - colMark;
             }

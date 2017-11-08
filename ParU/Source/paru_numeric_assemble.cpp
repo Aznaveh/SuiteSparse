@@ -7,15 +7,16 @@
 #include "Parallel_LU.hpp"
 
 /*! TODO: index validity must be checked somehow	 */
-void assemble_col (double *sC, double *dC,   //source col and destination col
-                    Int m, Int *relRowInd)
+void assemble_col (const double *sC, double *dC,   //source col and destination col
+                    Int m, const Int *relRowInd)
 {
     DEBUGLEVEL (1);
     for (Int i = 0; i < m; i++) {
         PRLEVEL (1, ("relRowInd [%ld] =%ld\n",i ,relRowInd [i] ));
-        if ( relRowInd[i] >= 0 ) { // If still valid
+        Int ri = relRowInd[i] ;
+        if ( ri >= 0 ) { // If still valid
             PRLEVEL (1, ("sC [%ld] =%2.5lf\n", i, sC [i]));
-            dC [relRowInd[i] ] += sC[i];
+            dC [ri ] += sC[i];
         }
     }
     PRLEVEL (1, ("\n"));
@@ -29,10 +30,11 @@ void assemble_row (double *sM, double *dM,//source Matrix and destination matrix
 //Source and destination are stored column based
 {
     DEBUGLEVEL (0);
-    for (Int i = 0; i < sn; i++) {
-        if ( relColInd[i] >= 0 ){  // If still valid
-            dM [relColInd [i]*dm + dR] += sM [sm*i + sR];
-            PRLEVEL (1, ("adding %lf\n", sM [sm*i + sR]));
+    for (Int j = 0; j < sn; j++) {
+        Int rj =relColInd[j] ;
+        if ( rj >= 0 ){  // If still valid
+            dM [rj*dm + dR] += sM [sm*j + sR];
+            PRLEVEL (1, ("adding %lf\n", sM [sm*j + sR]));
         }
     }
 }
@@ -45,11 +47,13 @@ void assemble_all (double *s, double *d,   //source and destination
 //Source and destination are stored column based
 {
     DEBUGLEVEL (0);
-    for (Int i = 0; i < sn; i++) {
-        if ( relColInd[i] >= 0 ){  // If column is valid
-            for (Int j = 0; j < sm; j++) {
-                if ( relRowInd[j] >= 0 )  // If row is valid
-                    d [relColInd[i]*dm + relRowInd[j] ] += s[sm*i + j];
+    for (Int j = 0; j < sn; j++) {
+        Int rj =relColInd[j] ;
+        if (rj  >= 0 ){  // If column is valid
+            for (Int i = 0; i < sm; i++) {
+                Int ri =relRowInd[i] ;
+                if (ri >= 0 )  // If row is valid
+                    d [rj*dm + ri ] += s[sm*j + i];
 
             }
         }
