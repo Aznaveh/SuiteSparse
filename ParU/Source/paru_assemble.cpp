@@ -137,28 +137,20 @@ void paru_assemble (
                 PRLEVEL (1, ("%p ---> isRowInFront [%ld]=%ld\n", 
                             isRowInFront+curRow, curRow, isRowInFront[curRow]));
 
-                if (isRowInFront[curRow] < rowMark ){
+                if (isRowInFront[curRow] < rowMark ){  
+                    // Adding curRow to the set
                     PRLEVEL (1, ("curRow =%ld rowCount=%ld\n", 
                                 curRow, rowCount));
                     fsRowList [rowCount] = curRow;
                     rowRelIndex [rEl] = rowCount ;
                     isRowInFront [curRow] = rowMark + rowCount++; 
                 }
-                else
-                {
+                else{
                     rowRelIndex [rEl] = isRowInFront [curRow] - rowMark;
                 }
                 ASSERT (rowCount <= m); 
-
             }
-            //            // Updating row relative indices 
-            //            PRLEVEL (1, ("elRow[%ld]=%ld", e, elRow [e]));  
-            //            for (Int rEl = 0; rEl < mEl; rEl++)   
-            //                rowRelIndex [rEl] = isRowInFront [el_rowIndex [rEl]] 
-            //                    - rowMark;
             *rowRelIndValid = f ;//current front
-
-
         }
     }
 
@@ -378,7 +370,7 @@ void paru_assemble (
     PRLEVEL (p, ("\n"));
 #endif
 
-/******************************************************************************/
+    /******************************************************************************/
 
     /*  Searching for columns */
     Int *isColInCBcolSet = Work -> colSize;
@@ -444,7 +436,7 @@ void paru_assemble (
                 PRLEVEL (1, ("curCol =%ld\n", curCol));
                 ASSERT (curCol < n);
                 /*! TODO: implement this part better     */
-//                if (curCol >= col1 && curCol < col2) //if in pivotal front
+                //                if (curCol >= col1 && curCol < col2) //if in pivotal front
                 if (curCol < 0)
                     continue;
 #ifndef NDEBUG
@@ -458,18 +450,13 @@ void paru_assemble (
                     PRLEVEL (1, ("curCol = %ld colCount=%ld\n", 
                                 curCol, colCount));
                     CBColList [colCount] = curCol;
-                    // same trick here ...
+                    colRelIndex [cEl] = colCount;
                     isColInCBcolSet [curCol] = colMark + colCount++; 
                 }
-                else
-                {
-                    // ...
+                else{
+                    colRelIndex [cEl] = isColInCBcolSet [curCol]- colMark;
                 }
                 ASSERT (colCount <= n);
-
-                // move this into if/else above:
-                colRelIndex [cEl] = isColInCBcolSet [el_colIndex [cEl]] 
-                    - colMark;
             }
         }
     }
@@ -520,7 +507,7 @@ void paru_assemble (
     PRLEVEL (p, ("\n"));
 #endif
 
-    
+
 
     /**** 5 ** assemble U part         Row by Row                          ****/ 
 
@@ -633,7 +620,7 @@ void paru_assemble (
 
 
     ////////////////////////////////////////////////////////////////////////////
-    
+
 #ifndef NDEBUG
     p = 0;
     if (p == 0)
