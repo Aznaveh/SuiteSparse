@@ -22,11 +22,11 @@ void assemble_col (const double *sC, double *dC,   //source col and destination 
     PRLEVEL (1, ("\n"));
 }
 
-void assemble_row (double *sM, double *dM,//source Matrix and destination matrix 
+void assemble_row (const double *sM, double *dM,//source and destination matrix 
                     Int sm, Int sn,    // dimension of source matrix
                     Int dm,     // dimension of destination matrix
                     Int sR, Int dR,     //source row and destination row
-                    Int *relColInd)
+                    const Int *relColInd)
 //Source and destination are stored column based
 {
     DEBUGLEVEL (0);
