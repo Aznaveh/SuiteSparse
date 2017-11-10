@@ -104,7 +104,7 @@ void paru_assemble (
             Tuple curTpl = listColTuples [i];
             Int e = curTpl.e;
             Int curColIndex = curTpl.f;
-            /*! TODO: DELETE TUPLE HERE */
+
             if(e < 0 || curColIndex < 0 ) continue;  //already deleted
 
             Element *curEl = elementList[e];
@@ -113,6 +113,11 @@ void paru_assemble (
             Int *rowRelIndValid = rowRelIndVal (curEl);
             Int *rowRelIndex = relRowInd (curEl);
             Int *colRelIndex    = relColInd (curEl);
+            Int *el_colIndex = colIndex_pointer (curEl);
+
+            if (el_colIndex [curColIndex]< 0 ) continue; // already assembled
+            ASSERT (el_colIndex[curColIndex] == c);
+
 
             colRelIndex [curTpl.f] = c - col1; //Initialzing relative index
             // neede for row assembly
@@ -129,6 +134,7 @@ void paru_assemble (
             PRLEVEL (1, ("element= %ld  mEl =%ld \n",e, mEl));
             for (Int rEl = 0; rEl < mEl; rEl++){
                 Int curRow = el_rowIndex [rEl]; 
+                if (curRow < 0 ) continue; // that row has already deleted
                 PRLEVEL (1, ("curRow =%ld\n", curRow));
                 ASSERT (curRow < m ) ;
 #ifndef NDEBUG
@@ -234,8 +240,7 @@ void paru_assemble (
             Int *rowRelIndex = relRowInd (curEl);
             Int *rowRelIndValid = rowRelIndVal (curEl);
             Int *colRelIndex    = relColInd (curEl);
-            if (el_colIndex [curColIndex]< 0 ) continue; /*! TODO: Delete Tuple*/
-
+            if (el_colIndex [curColIndex]< 0 ) continue;
             ASSERT (el_colIndex[curColIndex] == c);
 
 
@@ -414,6 +419,9 @@ void paru_assemble (
             Int *colRelIndex = relColInd (curEl);
             Int *rowRelIndex = relRowInd (curEl);
 
+            if (el_rowIndex [curRowIndex] < 0 ) continue;
+            ASSERT (el_rowIndex[curRowIndex] == curFsRowIndex);
+
             rowRelIndex [curTpl.f] = curFsRow;
 
             //counting prior element's rows
@@ -435,8 +443,6 @@ void paru_assemble (
                 Int curCol = el_colIndex [cEl]; 
                 PRLEVEL (1, ("curCol =%ld\n", curCol));
                 ASSERT (curCol < n);
-                /*! TODO: implement this part better     */
-                //                if (curCol >= col1 && curCol < col2) //if in pivotal front
                 if (curCol < 0)
                     continue;
 #ifndef NDEBUG
@@ -543,7 +549,7 @@ void paru_assemble (
             Int *colRelIndex = relColInd (curEl);
             Int *colRelIndValid = colRelIndVal (curEl);
 
-            if(el_rowIndex[curRowIndex] < 0 ) continue; /*! TODO: Delete Tuple*/
+            if(el_rowIndex[curRowIndex] < 0 ) continue; 
 
             PRLEVEL (1, ("curFsRowIndex =%ld\n", curFsRowIndex));
             ASSERT (el_rowIndex[curRowIndex] == curFsRowIndex);
