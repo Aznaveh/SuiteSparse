@@ -9,7 +9,7 @@ extern "C" void dgetrf_( BLAS_INT *dim1, BLAS_INT *dim2, double *a,
         BLAS_INT *lda, BLAS_INT *ipiv, BLAS_INT *info);
 
 
-Int paru_factorize (double *F, Int lm, Int ln,
+Int paru_factorize (double *F, Int *fsRowList, Int lm, Int ln,
         BLAS_INT *ipiv)
 {
     DEBUGLEVEL(0);
@@ -51,6 +51,7 @@ Int paru_factorize (double *F, Int lm, Int ln,
 
      /* changing swap permutation to a real permutation */
 
+/*! TODO: tmpPinv must be deleted	 */
     BLAS_INT *tmpPinv = ipiv + n; // using the rest of scratch memory
 #ifndef NDEBUG  // Printing the swap permutation
     p = 1;

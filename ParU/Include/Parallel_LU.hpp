@@ -271,7 +271,7 @@ Int paru_remove_rowTuple(tupleList *RowList, Int row, Int t);
 void paru_assemble(paru_matrix *paruMatInfo, Int f, cholmod_common *cc);
 
 
-Int paru_factorize (double *F, Int m, Int n, BLAS_INT *ipiv);
+Int paru_factorize (double *F, Int *rowList, Int m, Int n, BLAS_INT *ipiv);
 
 Element *paru_create_element (Int nrows, Int ncols, 
         Int init, cholmod_common *cc);

@@ -316,7 +316,7 @@ void paru_assemble (
     PRLEVEL (1, ("rowCount =%ld\n", rowCount));
     /* using the rest of scratch for permutation; Not sure about 1  */
     int *ipiv =(int *) (Work->scratch+rowCount);
-    paru_factorize (pivotalFront, rowCount, fp, ipiv);
+    paru_factorize (pivotalFront, fsRowList, rowCount, fp, ipiv);
 
     /* To this point fully summed part of the front is computed and L and U    /  
      *  The next part is to find columns of nonfully summed then rows
