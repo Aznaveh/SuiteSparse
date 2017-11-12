@@ -333,6 +333,7 @@ void paru_assemble (
     PRLEVEL (p, ("\n"));
 #endif
 
+    /*! TODO: Send fsRowList to factorize*/
     /***     Rearranging fsRowList based on the permutation	                ***/
     Int *tmp = (Work->scratch + 2*rowCount);   //temp space for saving fsRowList
     for (Int i = 0; i < rowCount; ++i) { //saving fsRowList 
