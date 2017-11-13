@@ -65,16 +65,24 @@ Int paru_factorize (double *F, Int *fsRowList, Int lm, Int ln,
 
     for (int i = 0; i < m; i++) tmpPinv[i] = i;
     PRLEVEL (1, (" m=%d n=%d\n", m, n));
+
+    
     for (int i = 0; i < n; i++){
-        int tmp;
+        int tmpP;
+        Int tmpV;
         // swap (tmpPinv [ipiv [i]], tmpPinv[i] ) and it is off by one
         PRLEVEL (1, ("ipiv[%d] =%d\n",i, ipiv[i]));
         ASSERT (ipiv [i] <= m);
-        tmp = tmpPinv [ipiv [i]-1];
-        PRLEVEL (1, ("tmp =%d\n", tmp));
-        ASSERT (tmp < m);
+        tmpP = tmpPinv [ipiv [i]-1];
+        tmpV = fsRowList[ipiv [i]-1];
+
+        PRLEVEL (1, ("tmp =%d\n", tmpP));
+        ASSERT (tmpP < m);
         tmpPinv [ipiv [i]-1] = tmpPinv [i];
-        tmpPinv [i] = tmp;
+        tmpPinv [i] = tmpP;
+
+        fsRowList[ipiv [i]-1] = fsRowList [i];
+        fsRowList [i] = tmpV;
     }
 
     for (int i = 0; i < m; i++) 
