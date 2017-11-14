@@ -24,7 +24,7 @@ all:
 
 run:
 #	./testazny < ../Matrix/a2.mtx 
-#	./testazny < ../Matrix/cage5.mtx
+	./testazny < ../Matrix/cage5.mtx
 #	./testazny < ../Matrix/pwr01b.mtx
 #
 #
@@ -45,7 +45,6 @@ run:
 #	./testazny < ../Matrix/c32.mtx
 #	./testazny < ../Matrix/Groebner_id2003_aug.mtx
 #	./testazny < ../Matrix/a1.mtx
-#	./testazny < ../Matrix/a4.mtx
 #
 #	./testazny < ../Matrix/Ragusa16_pattern.mtx
 #	./testazny < ../Matrix/GD98_a.mtx #Structuraly rank defecient
@@ -54,6 +53,7 @@ run:
 #
 #	./testazny < ../Matrix/a0.mtx #all zeros
 #	./testazny < ../Matrix/c2.mtx #2x2 4nz
+#	./testazny < ../Matrix/a4.mtx
 
 	./testazny < ../Matrix/GD06_theory.mtx # e>= 0 failure
 

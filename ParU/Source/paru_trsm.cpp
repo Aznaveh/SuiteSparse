@@ -26,18 +26,46 @@
 //extern "C"  int dtrsm_(char *side, char *uplo, char *transa, char *diag, 
 //                           int *m, int *n, double *alpha, double *a, int *lda, 
 //                                                         double *b, int *ldb);
- 
+
 Int paru_trsm(double *pF, double *uPart, Int fp, Int rowCount, Int colCount){
-    
+
     /*! TODO: Long int to int conversion     */
-    BLAS_INT mB = fp;
-    BLAS_INT nB = colCount;
-    double alpha = 1;
-    BLAS_INT lda = rowCount;
-    BLAS_INT ldb = colCount;
+    DEBUGLEVEL (1);
+    BLAS_INT mB = (BLAS_INT) fp;
+    BLAS_INT nB = (BLAS_INT) colCount;
+    double alpha = 1.0;
+    BLAS_INT lda = (BLAS_INT) rowCount;
+    BLAS_INT ldb = (BLAS_INT) colCount;
+
+    PRLEVEL (1, ("mB=%d nB = %d alpha = %f \n", mB, nB, alpha));
+    PRLEVEL (1, ("lda =%d ldb =%d\n", lda, ldb));
+
+#ifndef NDEBUG  // Printing the  U part
+    Int p = 1;
+    PRLEVEL (p, ("U Before Trsm: %ld x %ld\n", fp, colCount));
+    for (Int i = 0; i < fp; i++){
+        for (Int j = 0; j < colCount; j++){
+            PRLEVEL (p, (" %2.5lf\t", uPart[j*fp+i]));
+        }
+        PRLEVEL (p, ("\n"));
+    }
+#endif
+
 
     BLAS_DTRSM ("L" ,"L" ,"N" ,"U", &mB, &nB, &alpha, pF, &lda, 
             uPart, &ldb);
+
+#ifndef NDEBUG  // Printing the  U part
+    PRLEVEL (p, ("U After Trsm: %ld x %ld\n", fp, colCount));
+    for (Int i = 0; i < fp; i++){
+        for (Int j = 0; j < colCount; j++){
+            PRLEVEL (p, (" %2.5lf\t", uPart[j*fp+i]));
+        }
+        PRLEVEL (p, ("\n"));
+    }
+#endif
+
+
     return 0;
 
 }

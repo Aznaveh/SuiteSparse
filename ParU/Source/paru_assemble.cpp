@@ -560,8 +560,8 @@ void paru_assemble (
     }
 
 #ifndef NDEBUG  // Printing the  U part
-    p = 1;
-    PRLEVEL (p, ("U part: %ld x %ld\n", fp, colCount));
+    p = 0;
+    PRLEVEL (p, ("U part Before TRSM: %ld x %ld\n", fp, colCount));
     PRLEVEL (p, ("U\t"));
     for (Int i = 0; i < colCount; i++){
         PRLEVEL (p, ("%ld\t\t", CBColList[i]));
@@ -584,6 +584,8 @@ void paru_assemble (
     PRLEVEL (p, ("TEST: ~~~~~~~~~~~~~~~~~\n"));
     if (p == 0)
         paru_print_tupleList (ColList, 58);
+    PRLEVEL (p, ("fp =%ld\n rowCount=%ld colCount=%ld\n", 
+                fp, rowCount, colCount));
 #endif
     paru_trsm(pivotalFront , uPart, fp, rowCount, colCount);
 #ifndef NDEBUG
@@ -591,7 +593,25 @@ void paru_assemble (
         paru_print_tupleList (ColList, 58);
     PRLEVEL (p, ("~~~~~~~~~~~~~~~~~\n"));
 #endif
- 
+
+ #ifndef NDEBUG  // Printing the  U part
+    p = 0;
+    PRLEVEL (p, ("U part After TRSM: %ld x %ld\n", fp, colCount));
+    PRLEVEL (p, ("U\t"));
+    for (Int i = 0; i < colCount; i++){
+        PRLEVEL (p, ("%ld\t\t", CBColList[i]));
+    }
+    PRLEVEL (p, ("\n"));
+    for (Int i = 0; i < fp; i++){
+        PRLEVEL (p, ("%ld\t",  ipiv[i]));
+        for (Int j = 0; j < colCount; j++){
+            PRLEVEL (p, (" %2.5lf\t", uPart[j*fp+i]));
+        }
+        PRLEVEL (p, ("\n"));
+    }
+#endif
+
+
     Int *snM = LUsym->super2atree;
     Int eli = snM [f]; // Element index of the one that is going to be assembled
     Element *el;
