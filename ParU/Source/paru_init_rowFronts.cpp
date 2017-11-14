@@ -59,7 +59,7 @@ paru_matrix *paru_init_rowFronts (
     memset (rowSize, -1, m*sizeof(Int));
     PRLEVEL (1, ("rowSize =%p\n", rowSize));
 
-    Int *scratch= (Int*) paru_alloc (3*m+n, sizeof (Int), cc);
+    Int *scratch= (Int*) paru_alloc (2*m+n, sizeof (Int), cc);
     if (scratch == NULL){   //out of memory
         printf ("Out of memory: Work\n");
         return NULL;

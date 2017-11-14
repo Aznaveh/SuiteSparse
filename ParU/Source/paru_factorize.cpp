@@ -51,8 +51,7 @@ Int paru_factorize (double *F, Int *fsRowList, Int lm, Int ln,
 
      /* changing swap permutation to a real permutation */
 
-/*! TODO: tmpPinv must be deleted	 */
-    BLAS_INT *tmpPinv = ipiv + n; // using the rest of scratch memory
+
 #ifndef NDEBUG  // Printing the swap permutation
     p = 1;
     // ATTENTION: ipiv is 1 based
@@ -61,33 +60,19 @@ Int paru_factorize (double *F, Int *fsRowList, Int lm, Int ln,
         PRLEVEL (p, ("ipiv[%d] =%d\n",i, ipiv[i]));
     }
     PRLEVEL (p, ("\n"));
-#endif
+#endif 
 
-    for (int i = 0; i < m; i++) tmpPinv[i] = i;
     PRLEVEL (1, (" m=%d n=%d\n", m, n));
 
     
     for (int i = 0; i < n; i++){
-        int tmpP;
         Int tmpV;
-        // swap (tmpPinv [ipiv [i]], tmpPinv[i] ) and it is off by one
+        // swap (fsRowList[ipiv [i]], fsRowList[i] ) and it is off by one
         PRLEVEL (1, ("ipiv[%d] =%d\n",i, ipiv[i]));
         ASSERT (ipiv [i] <= m);
-        tmpP = tmpPinv [ipiv [i]-1];
-        tmpV = fsRowList[ipiv [i]-1];
-
-        PRLEVEL (1, ("tmp =%d\n", tmpP));
-        ASSERT (tmpP < m);
-        tmpPinv [ipiv [i]-1] = tmpPinv [i];
-        tmpPinv [i] = tmpP;
-
         fsRowList[ipiv [i]-1] = fsRowList [i];
         fsRowList [i] = tmpV;
     }
-
-    for (int i = 0; i < m; i++) 
-        ipiv [i] = tmpPinv[i]; //copying back the important chunck
-
 
 
 #ifndef NDEBUG  // Printing the permutation
