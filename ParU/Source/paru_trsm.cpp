@@ -35,7 +35,7 @@ Int paru_trsm(double *pF, double *uPart, Int fp, Int rowCount, Int colCount){
     BLAS_INT nB = (BLAS_INT) colCount;
     double alpha = 1.0;
     BLAS_INT lda = (BLAS_INT) rowCount;
-    BLAS_INT ldb = (BLAS_INT) colCount;
+    BLAS_INT ldb = (BLAS_INT) fp;
 
     PRLEVEL (1, ("mB=%d nB = %d alpha = %f \n", mB, nB, alpha));
     PRLEVEL (1, ("lda =%d ldb =%d\n", lda, ldb));
