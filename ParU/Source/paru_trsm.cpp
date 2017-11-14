@@ -30,7 +30,7 @@
 Int paru_trsm(double *pF, double *uPart, Int fp, Int rowCount, Int colCount){
 
     /*! TODO: Long int to int conversion     */
-    DEBUGLEVEL (1);
+    DEBUGLEVEL (0);
     BLAS_INT mB = (BLAS_INT) fp;
     BLAS_INT nB = (BLAS_INT) colCount;
     double alpha = 1.0;

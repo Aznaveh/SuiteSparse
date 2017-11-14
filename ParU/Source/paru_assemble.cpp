@@ -560,7 +560,7 @@ void paru_assemble (
     }
 
 #ifndef NDEBUG  // Printing the  U part
-    p = 0;
+    p = 1;
     PRLEVEL (p, ("U part Before TRSM: %ld x %ld\n", fp, colCount));
     PRLEVEL (p, ("U\t"));
     for (Int i = 0; i < colCount; i++){
@@ -580,7 +580,7 @@ void paru_assemble (
     /**** 6 ****                     TRSM and DGEMM                         ***/ 
     /*! TODO: TRSM change elements that it shouldn't	 */
 #ifndef NDEBUG
-    p = 0;
+    p = 1;
     PRLEVEL (p, ("TEST: ~~~~~~~~~~~~~~~~~\n"));
     if (p == 0)
         paru_print_tupleList (ColList, 58);
