@@ -578,8 +578,20 @@ void paru_assemble (
 
 
     /**** 6 ****                     TRSM and DGEMM                         ***/ 
+    /*! TODO: TRSM change elements that it shouldn't	 */
+#ifndef NDEBUG
+    p = 0;
+    PRLEVEL (p, ("TEST: ~~~~~~~~~~~~~~~~~\n"));
+    if (p == 0)
+        paru_print_tupleList (ColList, 58);
+#endif
     paru_trsm(pivotalFront , uPart, fp, rowCount, colCount);
-
+#ifndef NDEBUG
+    if (p == 0)
+        paru_print_tupleList (ColList, 58);
+    PRLEVEL (p, ("~~~~~~~~~~~~~~~~~\n"));
+#endif
+ 
     Int *snM = LUsym->super2atree;
     Int eli = snM [f]; // Element index of the one that is going to be assembled
     Element *el;
