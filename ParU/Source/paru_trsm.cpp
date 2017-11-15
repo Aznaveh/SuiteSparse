@@ -17,6 +17,7 @@
  *  TRANSA = 'N' or 'n'   op( A ) = A.
  *  DIAG = 'U' or 'u'   A is assumed to be unit triangular.
  *  LDA  leading dimension of A. 
+ *  LDB  leading dimension of B.  it must be fp
  */
 
 
