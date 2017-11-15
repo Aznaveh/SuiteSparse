@@ -35,6 +35,8 @@ Int paru_dgemm(double *pF, double *uPart,
     BLAS_INT ldb = colCount;
     BLAS_INT ldc = rowCount-fp;
 
+    // NOTE: beta can be zero, since C has just been calloc'd.
+    // Also, C can be malloc'd not calloc'd.
     double beta= 1;
     
     BLAS_DGEMM ("N" ,"N" , &mA, &nB, &nA, &alpha, pF, &lda, uPart, &ldb, &beta,
