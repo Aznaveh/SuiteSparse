@@ -54,7 +54,7 @@ void paru_assemble (
     Int *elCol = Work -> elCol;
     Int elCMark = Work -> elCMark;
 
-    PRLEVEL (1, ("fp=%ld pivotal columns:clo1=%ld...col2=%ld\n", 
+    PRLEVEL (0, ("fp=%ld pivotal columns:clo1=%ld...col2=%ld\n", 
                 fp, col1, col2-1));
     PRLEVEL (1, ("Upper bound number of columns: Rj[%ld]=%ld ... Rj[%ld]=%ld\n", 
                 p1, Rj [p1], p2, Rj [p2-1]));
@@ -160,7 +160,7 @@ void paru_assemble (
     }
 
 #ifndef NDEBUG /* Checking if pivotal rows are correct */
-    Int p = 1;
+    Int p = 0;
     PRLEVEL (p, ("There are %ld rows in this front: \n", rowCount));
     for (Int i = 0; i < rowCount; i++)
         PRLEVEL (p, (" %ld", fsRowList [i]));
@@ -295,7 +295,7 @@ void paru_assemble (
     }
 
 #ifndef NDEBUG  // Printing the pivotal front
-    p = 1;
+    p = 0;
     PRLEVEL (p, ("%% Before pivoting\n"));
     PRLEVEL (p, ("x =  \t"));
     for (Int c = col1; c < col2; c++) {
@@ -313,6 +313,18 @@ void paru_assemble (
     /**** 3 ********  factorizing the fully summed part of the matrix        ***
      *****  a set of pivot is found in this part that is crucial to assemble **/
     PRLEVEL (1, ("rowCount =%ld\n", rowCount));
+
+#ifndef NDEBUG  // Printing the list of rows
+    p = 1;
+    PRLEVEL (p, ("Befor factorization (inside assemble): \n"));
+    for (int i = 0; i < rowCount; i++){
+        PRLEVEL (p, ("fsRowList [%d] =%d\n",i, fsRowList [i]));
+    }
+    PRLEVEL (p, ("\n"));
+#endif
+
+
+
     /* using the rest of scratch for permutation; Not sure about 1  */
     BLAS_INT *ipiv = (BLAS_INT*) (Work->scratch+rowCount);
     paru_factorize (pivotalFront, fsRowList, rowCount, fp, ipiv);
@@ -324,17 +336,18 @@ void paru_assemble (
         printf ("Singular Matrix\n");
         return;
     }
-#ifndef NDEBUG  // Printing the permutation
+#ifndef NDEBUG  // Printing the list of rows
     p = 1;
+    PRLEVEL (p, ("After factorization (inside assemble): \n"));
     for (int i = 0; i < rowCount; i++){
-        PRLEVEL (p, ("ipiv[%d] =%d\n",i, ipiv[i]));
+        PRLEVEL (p, ("fsRowList [%d] =%d\n",i, fsRowList [i]));
     }
     PRLEVEL (p, ("\n"));
 #endif
 
 
 #ifndef NDEBUG  // Printing the permutation
-    p = 1;
+    p = 0;
     PRLEVEL (p, ("pivotal rows:\n"));
     for (int i = 0; i < fp; i++){
         PRLEVEL (p, ("fsRowList[%d] =%d\n",i, fsRowList[i]));
@@ -511,8 +524,7 @@ void paru_assemble (
     }
 
     for (Int i = 0; i < fp; i++){
-        Int curFsRowIndex =(Int) i; //current fully summed row index
-        ASSERT (curFsRowIndex < m);
+        Int curFsRowIndex = i; //current fully summed row index
         Int curFsRow = fsRowList [curFsRowIndex];
         PRLEVEL (1, ("curFsRow =%ld\n", curFsRow));
         tupleList *curRowTupleList = &RowList [curFsRowIndex];
@@ -653,7 +665,10 @@ void paru_assemble (
 
 
     /*! TODO: This should be stored somewhere     */
-    paru_free (rowCount*fp, sizeof (double), pivotalFront, cc);
-    paru_free (fp*colCount,  sizeof (double), uPart, cc);
+    PRLEVEL (0, ("rowCount =%ld\n", rowCount));
+    PRLEVEL (0, ("colCount =%ld\n", colCount));
+    PRLEVEL (0, ("fp =%ld\n", fp));
+//    paru_free (rowCount*fp, sizeof (double), pivotalFront, cc);
+//    paru_free (fp*colCount,  sizeof (double), uPart, cc);
 
 }

@@ -42,6 +42,16 @@ Int paru_factorize (double *F, Int *fsRowList, Int lm, Int ln,
     }
 #endif
 
+#ifndef NDEBUG  // Printing the list of rows
+    p = 0;
+    PRLEVEL (p, ("Befor factorization (inside factorize): \n"));
+    for (int i = 0; i < lm ; i++){
+        PRLEVEL (p, ("fsRowList [%d] =%d\n",i, fsRowList [i]));
+    }
+    PRLEVEL (p, ("\n"));
+#endif
+
+
 
     dgetrf_(&m, &n, F, &lda, ipiv, &info);
 
@@ -65,10 +75,12 @@ Int paru_factorize (double *F, Int *fsRowList, Int lm, Int ln,
     PRLEVEL (1, (" m=%d n=%d\n", m, n));
 
     
+    // swap (fsRowList[ipiv [i]], fsRowList[i] ) and it is off by one
     for (int i = 0; i < n; i++){
-        Int tmp;
-        // swap (fsRowList[ipiv [i]], fsRowList[i] ) and it is off by one
-        PRLEVEL (1, ("ipiv[%d] =%d\n",i, ipiv[i]));
+        Int tmp =  fsRowList[ipiv [i]-1];
+        ASSERT (tmp <= m);
+        ASSERT (tmp > 0);
+
         ASSERT (ipiv [i] <= m);
         ASSERT (ipiv [i] > 0);
         fsRowList[ipiv [i]-1] = fsRowList [i];
@@ -76,16 +88,7 @@ Int paru_factorize (double *F, Int *fsRowList, Int lm, Int ln,
     }
 
 
-#ifndef NDEBUG  // Printing the permutation
-    p = 1;
-    // ATTENTION: ipiv is 1 based
-    PRLEVEL (p, ("Real permutation:\n"));
-    for (int i = 0; i < m; i++){
-        PRLEVEL (p, ("ipiv[%d] =%d\n",i, ipiv[i]));
-    }
-    PRLEVEL (p, ("\n"));
-
-    // Printing the LU decomposition
+#ifndef NDEBUG   // Printing the LU decomposition
     p = 1;
     PRLEVEL (p, ("After factorization:\n"));
     for (Int r = 0; r < m; r++){
@@ -95,7 +98,6 @@ Int paru_factorize (double *F, Int *fsRowList, Int lm, Int ln,
         PRLEVEL (p, ("\n"));
     }
 #endif
-
 
     PRLEVEL (1, ("info = %ld\n", info));
     if (info != 0 ){
