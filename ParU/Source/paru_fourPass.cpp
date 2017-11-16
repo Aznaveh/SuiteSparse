@@ -250,7 +250,6 @@ void paru_fourPass (paru_matrix *paruMatInfo,
             }
 
 
-            /*! TODO: for Columns too	 */
             if (el_rowIndex[curRowIndex] < 0)     continue; //not valid
             PRLEVEL (1, ("r =%ld\n", r));
             PRLEVEL (1, ("el_rowIndex [%ld] =%ld\n", 
