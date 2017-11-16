@@ -14,8 +14,8 @@ Int paru_factorize (double *F, Int *fsRowList, Int lm, Int ln,
 {
     DEBUGLEVEL(0);
 
-    BLAS_INT m = lm;
-    BLAS_INT n = ln;
+    BLAS_INT m = (BLAS_INT) lm;
+    BLAS_INT n = (BLAS_INT) ln;
 
 
     PRLEVEL (1, (" %d x %d\n", m, n));
@@ -45,7 +45,7 @@ Int paru_factorize (double *F, Int *fsRowList, Int lm, Int ln,
 #ifndef NDEBUG  // Printing the list of rows
     p = 0;
     PRLEVEL (p, ("Befor factorization (inside factorize): \n"));
-    for (int i = 0; i < lm ; i++){
+    for (int i = 0; i < m ; i++){
         PRLEVEL (p, ("fsRowList [%d] =%d\n",i, fsRowList [i]));
     }
     PRLEVEL (p, ("\n"));
@@ -63,7 +63,7 @@ Int paru_factorize (double *F, Int *fsRowList, Int lm, Int ln,
 
 
 #ifndef NDEBUG  // Printing the swap permutation
-    p = 1;
+    p = 0;
     // ATTENTION: ipiv is 1 based
     PRLEVEL (p, ("swap permutation:\n"));
     for (int i = 0; i < m; i++){
@@ -72,24 +72,24 @@ Int paru_factorize (double *F, Int *fsRowList, Int lm, Int ln,
     PRLEVEL (p, ("\n"));
 #endif 
 
-    PRLEVEL (1, (" m=%d n=%d\n", m, n));
+    PRLEVEL (0, (" m=%d n=%d\n", m, n));
 
     
     // swap (fsRowList[ipiv [i]], fsRowList[i] ) and it is off by one
-    for (int i = 0; i < n; i++){
-        Int tmp =  fsRowList[ipiv [i]-1];
-        ASSERT (tmp <= m);
-        ASSERT (tmp > 0);
-
-        ASSERT (ipiv [i] <= m);
+    for (Int i = 0; i < n; i++){
+        PRLEVEL (0, ("ipiv[%d] =%d\n", i, ipiv[i]));
         ASSERT (ipiv [i] > 0);
+        ASSERT (ipiv [i] <= m);
+        Int tmp =  fsRowList[ipiv [i]-1];
+        PRLEVEL (0, ("tmp =%ld\n", tmp));
+        ASSERT (tmp >= 0);
+
         fsRowList[ipiv [i]-1] = fsRowList [i];
         fsRowList [i] = tmp;
     }
 
-
 #ifndef NDEBUG   // Printing the LU decomposition
-    p = 1;
+    p = 0;
     PRLEVEL (p, ("After factorization:\n"));
     for (Int r = 0; r < m; r++){
         for (Int c = 0; c < n; c++){
