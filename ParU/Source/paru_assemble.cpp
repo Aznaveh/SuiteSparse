@@ -315,7 +315,7 @@ void paru_assemble (
      *****  a set of pivot is found in this part that is crucial to assemble **/
     PRLEVEL (1, ("rowCount =%ld\n", rowCount));
     /* using the rest of scratch for permutation; Not sure about 1  */
-    int *ipiv =(int *) (Work->scratch+rowCount);
+    BLAS_INT *ipiv = (BLAS_INT*) (Work->scratch+rowCount);
     paru_factorize (pivotalFront, fsRowList, rowCount, fp, ipiv);
 
     /* To this point fully summed part of the front is computed and L and U    /  
