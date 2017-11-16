@@ -252,10 +252,9 @@ void paru_fourPass (paru_matrix *paruMatInfo,
 
             /*! TODO: for Columns too	 */
             if (el_rowIndex[curRowIndex] < 0)     continue; //not valid
-            PRLEVEL (0, ("curRowIndex = %ld\n", curRowIndex));
-            PRLEVEL (0, ("r =%ld\n", r));
-            PRLEVEL (0, ("el_rowIndex [curRowIndex] =%ld\n", 
-                        el_rowIndex [curRowIndex]));
+            PRLEVEL (1, ("r =%ld\n", r));
+            PRLEVEL (1, ("el_rowIndex [%ld] =%ld\n", 
+                        curRowIndex, el_rowIndex [curRowIndex]));
             ASSERT (el_rowIndex[curRowIndex] == r);
             ASSERT (curRowIndex < mEl);
 
