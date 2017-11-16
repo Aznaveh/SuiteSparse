@@ -503,17 +503,6 @@ void paru_assemble (
        } */
 #endif
 
-#ifndef NDEBUG  // Printing the permutation
-    p = 1;
-    PRLEVEL (p, ("permutation:\n"));
-    for (int i = 0; i < fp; i++){
-        PRLEVEL (p, ("ipiv[%d] =%d\n",i, ipiv[i]));
-    }
-    PRLEVEL (p, ("\n"));
-#endif
-
-
-
     /**** 5 ** assemble U part         Row by Row                          ****/ 
 
     double *uPart = 
@@ -568,7 +557,7 @@ void paru_assemble (
     }
 
 #ifndef NDEBUG  // Printing the  U part
-    p = 1;
+    p = 0;
     PRLEVEL (p, ("U part Before TRSM: %ld x %ld\n", fp, colCount));
     PRLEVEL (p, ("U\t"));
     for (Int i = 0; i < colCount; i++){
@@ -576,7 +565,7 @@ void paru_assemble (
     }
     PRLEVEL (p, ("\n"));
     for (Int i = 0; i < fp; i++){
-        PRLEVEL (p, ("%ld\t",  ipiv[i]));
+        PRLEVEL (p, ("%ld\t",  fsRowList [i]));
         for (Int j = 0; j < colCount; j++){
             PRLEVEL (p, (" %2.5lf\t", uPart[j*fp+i]));
         }
@@ -598,7 +587,7 @@ void paru_assemble (
     }
     PRLEVEL (p, ("\n"));
     for (Int i = 0; i < fp; i++){
-        PRLEVEL (p, ("%ld\t",  ipiv[i]));
+        PRLEVEL (p, ("%ld\t",  fsRowList [i]));
         for (Int j = 0; j < colCount; j++){
             PRLEVEL (p, (" %2.5lf\t", uPart[j*fp+i]));
         }
