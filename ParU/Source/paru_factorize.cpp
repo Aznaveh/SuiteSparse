@@ -43,7 +43,7 @@ Int paru_factorize (double *F, Int *fsRowList, Int lm, Int ln,
 #endif
 
 #ifndef NDEBUG  // Printing the list of rows
-    p = 0;
+    p = 1;
     PRLEVEL (p, ("Befor factorization (inside factorize): \n"));
     for (int i = 0; i < m ; i++){
         PRLEVEL (p, ("fsRowList [%d] =%d\n",i, fsRowList [i]));
@@ -63,7 +63,7 @@ Int paru_factorize (double *F, Int *fsRowList, Int lm, Int ln,
 
 
 #ifndef NDEBUG  // Printing the swap permutation
-    p = 0;
+    p = 1;
     // ATTENTION: ipiv is 1 based
     PRLEVEL (p, ("swap permutation:\n"));
     for (int i = 0; i < m; i++){
@@ -89,7 +89,7 @@ Int paru_factorize (double *F, Int *fsRowList, Int lm, Int ln,
     }
 
 #ifndef NDEBUG   // Printing the LU decomposition
-    p = 0;
+    p = 1;
     PRLEVEL (p, ("After factorization:\n"));
     for (Int r = 0; r < m; r++){
         for (Int c = 0; c < n; c++){
