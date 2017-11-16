@@ -36,7 +36,7 @@ void paru_assemble (
     /* get the front F  */
     /* ---------------------------------------------------------------------- */
 
-    PRLEVEL (0, ("Assemble Front %ld\n", f));
+    PRLEVEL (0, ("~~~~~~~  Assemble Front %ld start ~~~~\n", f));
     /* pivotal columns Super [f] ... Super [f+1]-1 */
     Int col1 = Super [f];       /* fornt F has columns col1:col2-1 */
     Int col2 = Super [f+1];
@@ -627,7 +627,7 @@ void paru_assemble (
 
     /**** 7 **** Count number of rows and columsn of prior CBs to asslemble ***/ 
 
-    paru_fourPass (paruMatInfo, eli, fp, cc);
+    //paru_fourPass (paruMatInfo, eli, fp, cc);
 
 
     ////////////////////////////////////////////////////////////////////////////
@@ -657,7 +657,8 @@ void paru_assemble (
     PRLEVEL (0, ("rowCount =%ld\n", rowCount));
     PRLEVEL (0, ("colCount =%ld\n", colCount));
     PRLEVEL (0, ("fp =%ld\n", fp));
-//    paru_free (rowCount*fp, sizeof (double), pivotalFront, cc);
-//    paru_free (fp*colCount,  sizeof (double), uPart, cc);
+    paru_free (rowCount*fp, sizeof (double), pivotalFront, cc);
+    paru_free (fp*colCount,  sizeof (double), uPart, cc);
 
+    PRLEVEL (0, ("~~~~~~~Assemble Front %ld finished\n", f));
 }

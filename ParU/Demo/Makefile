@@ -23,40 +23,41 @@ all:
 	
 
 run:
-	./testazny < ../Matrix/a2.mtx 
-	./testazny < ../Matrix/cage5.mtx
-	./testazny < ../Matrix/pwr01b.mtx
-
-
-	./testazny < ../Matrix/LFAT5.mtx
-	./testazny < ../Matrix/b1_ss.mtx
-	./testazny < ../Matrix/bcspwr01.mtx
-	./testazny < ../Matrix/lfat5b.mtx
-
-	./testazny < ../Matrix/lp_e226.mtx
-	./testazny < ../Matrix/Franz6_id1959_aug.mtx 
-	./testazny < ../Matrix/ash219.mtx
-
-	./testazny < ../Matrix/Tina_AskCal.mtx
-	./testazny < ../Matrix/Tina_AskCal_perm.mtx
-
-	./testazny < ../Matrix/Ragusa16.mtx 
-	./testazny < ../Matrix/s32.mtx
-	./testazny < ../Matrix/c32.mtx
-	./testazny < ../Matrix/Groebner_id2003_aug.mtx
-	./testazny < ../Matrix/a1.mtx
-
-	./testazny < ../Matrix/Ragusa16_pattern.mtx
-	./testazny < ../Matrix/GD98_a.mtx #Structuraly rank defecient
-	./testazny < ../Matrix/a04.mtx
-
-
-	./testazny < ../Matrix/a0.mtx #all zeros
-	./testazny < ../Matrix/c2.mtx #2x2 4nz
-	./testazny < ../Matrix/a4.mtx
-
-	./testazny < ../Matrix/GD06_theory.mtx # e>= 0 failure
-
+#	./testazny < ../Matrix/a2.mtx 
+#	./testazny < ../Matrix/cage5.mtx
+#	./testazny < ../Matrix/pwr01b.mtx
+#
+#
+#	./testazny < ../Matrix/LFAT5.mtx
+#	./testazny < ../Matrix/b1_ss.mtx
+#	./testazny < ../Matrix/bcspwr01.mtx
+#	./testazny < ../Matrix/lfat5b.mtx
+#
+#	./testazny < ../Matrix/lp_e226.mtx
+#	./testazny < ../Matrix/Franz6_id1959_aug.mtx 
+#	./testazny < ../Matrix/ash219.mtx
+#
+#	./testazny < ../Matrix/Tina_AskCal.mtx
+#	./testazny < ../Matrix/Tina_AskCal_perm.mtx
+#
+#	./testazny < ../Matrix/Ragusa16.mtx 
+#	./testazny < ../Matrix/s32.mtx
+#	./testazny < ../Matrix/c32.mtx
+#	./testazny < ../Matrix/Groebner_id2003_aug.mtx
+#	./testazny < ../Matrix/a1.mtx
+#
+#	./testazny < ../Matrix/Ragusa16_pattern.mtx
+#	./testazny < ../Matrix/GD98_a.mtx #Structuraly rank defecient
+#	./testazny < ../Matrix/a04.mtx
+#
+#
+#	./testazny < ../Matrix/a0.mtx #all zeros
+#	./testazny < ../Matrix/c2.mtx #2x2 4nz
+#	./testazny < ../Matrix/a4.mtx
+#
+#	./testazny < ../Matrix/GD06_theory.mtx
+#	./testazny < ../Matrix/lp_e226_transposed.mtx 
+#
 #	./testazny < ../Matrix/problem.mtx     # m >=n assertion failure
 #	./testazny < ../Matrix/r2.mtx          # m >=n assertion failure
 #	./testazny < ../Matrix/n3c4-b4.mtx     # m >=n assertion failure
@@ -66,8 +67,7 @@ run:
 #	./testazny < ../Matrix/young1c.mtx     # m >=n assertion failure
 #	./testazny < ../Matrix/lp_share1b.mtx  # m >=n assertion failure
 #
-#	./testazny < ../Matrix/lp_e226_transposed.mtx #bad failiure: seg fault
-#	./testazny < ../Matrix/bfwa62.mtx   #bad failiure: seg fault
+	./testazny < ../Matrix/bfwa62.mtx   #bad failiure: seg fault
 #
 #	./testazny < ../Matrix/arrow.mtx   #Huge
 
