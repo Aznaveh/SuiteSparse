@@ -36,7 +36,6 @@ void paru_assemble (
     /* get the front F  */
     /* ---------------------------------------------------------------------- */
 
-
     PRLEVEL (0, ("Assemble Front %ld\n", f));
     /* pivotal columns Super [f] ... Super [f+1]-1 */
     Int col1 = Super [f];       /* fornt F has columns col1:col2-1 */
@@ -365,9 +364,8 @@ void paru_assemble (
     PRLEVEL (p, ("\n"));
 #endif
 
-    /******************************************************************************/
 
-    /*  Searching for columns */
+    /**** 4 ******** finding set of non pivotal cols in current front *********/
     Int *isColInCBcolSet = Work -> colSize;
     Int colMark = Work -> colMark;
     if (colMark < 0) {  // in rare case of overflow
@@ -381,8 +379,6 @@ void paru_assemble (
     std::set<Int> stl_colSet;
 #endif  
 
-    /**** 4 ******** finding set of non pivotal cols in current front *********/
-    /*! TODO: What if m<n: Do not handle them for the moment*/
     tupleList *RowList = paruMatInfo->RowList;
     for (Int i = 0; i < fp; i++){
         Int curFsRowIndex =(Int) i; //current fully summed row index
@@ -398,7 +394,7 @@ void paru_assemble (
             Tuple curTpl = listRowTuples [i];
             Int e = curTpl.e;
             Int curRowIndex = curTpl.f;
-            if(e < 0 || curRowIndex < 0) continue;/*! TODO: DELETE TUPLE HERE */
+            if(e < 0 || curRowIndex < 0) continue;
 
             Element *curEl = elementList[e];
             Int mEl = curEl->nrows;
@@ -441,7 +437,7 @@ void paru_assemble (
                 PRLEVEL (1, ("%p ---> isColInCBcolSet[%ld]=%ld\n", 
                             isColInCBcolSet+curCol, curCol,
                             isColInCBcolSet[curCol]));
-                /*! TODO: Check for elements too in Pass 1 and 3  */
+             
                 if (isColInCBcolSet [curCol] < colMark  ){
                     PRLEVEL (1, ("curCol = %ld colCount=%ld\n", 
                                 curCol, colCount));
@@ -578,23 +574,10 @@ void paru_assemble (
 
 
     /**** 6 ****                     TRSM and DGEMM                         ***/ 
-    /*! TODO: TRSM change elements that it shouldn't	 */
-#ifndef NDEBUG
-    p = 1;
-    PRLEVEL (p, ("TEST: ~~~~~~~~~~~~~~~~~\n"));
-    if (p == 0)
-        paru_print_tupleList (ColList, 58);
-    PRLEVEL (p, ("fp =%ld\n rowCount=%ld colCount=%ld\n", 
-                fp, rowCount, colCount));
-#endif
-    paru_trsm(pivotalFront , uPart, fp, rowCount, colCount);
-#ifndef NDEBUG
-    if (p == 0)
-        paru_print_tupleList (ColList, 58);
-    PRLEVEL (p, ("~~~~~~~~~~~~~~~~~\n"));
-#endif
 
- #ifndef NDEBUG  // Printing the  U part
+    paru_trsm(pivotalFront , uPart, fp, rowCount, colCount);
+
+#ifndef NDEBUG  // Printing the  U part
     p = 0;
     PRLEVEL (p, ("U part After TRSM: %ld x %ld\n", fp, colCount));
     PRLEVEL (p, ("U\t"));
@@ -643,8 +626,7 @@ void paru_assemble (
 
     /**** 7 **** Count number of rows and columsn of prior CBs to asslemble ***/ 
 
-    if(colCount !=0 && rowCount != 0)
-        paru_fourPass (paruMatInfo, eli, fp, cc);
+    paru_fourPass (paruMatInfo, eli, fp, cc);
 
 
     ////////////////////////////////////////////////////////////////////////////
@@ -673,6 +655,5 @@ void paru_assemble (
     /*! TODO: This should be stored somewhere     */
     paru_free (rowCount*fp, sizeof (double), pivotalFront, cc);
     paru_free (fp*colCount,  sizeof (double), uPart, cc);
-
 
 }
