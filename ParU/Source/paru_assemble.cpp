@@ -163,7 +163,7 @@ void paru_assemble (
     }
 
 #ifndef NDEBUG /* Checking if pivotal rows are correct */
-    Int p = 0;
+    Int p = 1;
     PRLEVEL (p, ("There are %ld rows in this front: \n", rowCount));
     for (Int i = 0; i < rowCount; i++)
         PRLEVEL (p, (" %ld", fsRowList [i]));
@@ -340,7 +340,7 @@ void paru_assemble (
         return;
     }
 #ifndef NDEBUG  // Printing the list of rows
-    p = 0;
+    p = 1;
     PRLEVEL (p, ("After factorization (inside assemble): \n"));
     for (int i = 0; i < rowCount; i++){
         PRLEVEL (p, ("fsRowList [%d] =%d\n",i, fsRowList [i]));
@@ -350,7 +350,7 @@ void paru_assemble (
 
 
 #ifndef NDEBUG  // Printing the permutation
-    p = 0;
+    p = 1;
     PRLEVEL (p, ("pivotal rows:\n"));
     for (int i = 0; i < fp; i++){
         PRLEVEL (p, ("fsRowList[%d] =%d\n",i, fsRowList[i]));
@@ -560,7 +560,7 @@ void paru_assemble (
     }
 
 #ifndef NDEBUG  // Printing the  U part
-    p = 0;
+    p = 1;
     PRLEVEL (p, ("U part Before TRSM: %ld x %ld\n", fp, colCount));
     PRLEVEL (p, ("U\t"));
     for (Int i = 0; i < colCount; i++){
@@ -656,10 +656,10 @@ void paru_assemble (
 #endif
 
 
+    PRLEVEL (1, ("rowCount =%ld\n", rowCount));
+    PRLEVEL (1, ("colCount =%ld\n", colCount));
+    PRLEVEL (1, ("fp =%ld\n", fp));
     /*! TODO: This should be stored somewhere     */
-    PRLEVEL (0, ("rowCount =%ld\n", rowCount));
-    PRLEVEL (0, ("colCount =%ld\n", colCount));
-    PRLEVEL (0, ("fp =%ld\n", fp));
     paru_free (rowCount*fp, sizeof (double), pivotalFront, cc);
     paru_free (fp*colCount,  sizeof (double), uPart, cc);
 

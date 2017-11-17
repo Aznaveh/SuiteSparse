@@ -24,11 +24,11 @@ all:
 
 run:
 #	./testazny < ../Matrix/a2.mtx 
-#	./testazny < ../Matrix/pwr01b.mtx
+	./testazny < ../Matrix/pwr01b.mtx
 #
 #
 #	./testazny < ../Matrix/LFAT5.mtx
-	./testazny < ../Matrix/b1_ss.mtx
+#	./testazny < ../Matrix/b1_ss.mtx
 #	./testazny < ../Matrix/bcspwr01.mtx
 #	./testazny < ../Matrix/lfat5b.mtx
 #
@@ -58,7 +58,7 @@ run:
 #	./testazny < ../Matrix/lp_e226_transposed.mtx 
 #
 #	./testazny < ../Matrix/problem.mtx    
-	./testazny < ../Matrix/cage5.mtx       # m >=n assertion failure
+#	./testazny < ../Matrix/cage5.mtx       # m >=n assertion failure
 #	./testazny < ../Matrix/r2.mtx          # m >=n assertion failure
 #	./testazny < ../Matrix/n3c4-b4.mtx     # m >=n assertion failure
 #	./testazny < ../Matrix/lpi_galenet.mtx # m >=n assertion failure
@@ -76,9 +76,9 @@ VGFLAGS = --tool=memcheck --leak-check=full --show-reachable=yes -v\
 		  --track-fds=yes --log-file="valgrindlogfile.log"
 
 val:
-	valgrind	$(VGFLAGS)	./testazny < ../Matrix/lp_share1b.mtx 
-	#	valgrind	$(VGFLAGS)	./testazny < ../Matrix/GD01_b.mtx
-	#	valgrind	$(VGFLAGS)	./testazny < ../Matrix/LFAT5.mtx
+	valgrind	$(VGFLAGS)	./testazny < ../Matrix/lp_share1b.mtx
+#	valgrind	$(VGFLAGS)	./testazny < ../Matrix/GD01_b.mtx
+#	valgrind	$(VGFLAGS)	./testazny < ../Matrix/LFAT5.mtx
 #	valgrind	$(VGFLAGS)	./testazny < ../Matrix/a2.mtx 
 #	valgrind	$(VGFLAGS)	./testazny < ../Matrix/b1_ss.mtx
 #	valgrind	$(VGFLAGS)	./testazny < ../Matrix/bcspwr01.mtx
