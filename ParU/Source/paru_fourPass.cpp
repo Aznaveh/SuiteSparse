@@ -66,9 +66,9 @@ void paru_fourPass (paru_matrix *paruMatInfo,
             }
 
             if (elCol [e] < elCMark) // an element never seen before
-                elCol [e] = elCMark + 1;
+                elCol [e] = curEl->ncolsleft - 1; //initiaze
             else{ 
-                elCol [e]++; 
+                elCol [e]--; 
                 continue;
             }
 
@@ -112,9 +112,9 @@ void paru_fourPass (paru_matrix *paruMatInfo,
 
 
             if (elRow [e] < elRMark) // an element never seen before
-                elRow [e] = elRMark + 1;
+                elRow [e] = curEl ->nrowsleft - 1; //initiaze
             else{ 
-                elRow [e]++; 
+                elRow [e]--;
                 continue;
             }
             /* Update colRelIndex	 */
@@ -188,7 +188,7 @@ void paru_fourPass (paru_matrix *paruMatInfo,
             PRLEVEL (1, ("element= %ld  mEl =%ld \n",e, mEl));
             PRLEVEL (1, ("f =%ld\n", curColIndex));
             PRLEVEL (1, ("CB: %ld x %ld\n", rowCount, colCount));
-            if (elRow [e] - elRMark == curEl->nrowsleft){
+            if (elRow [e] - elRMark == 0){
                 //all the column is in CB
                 PRLEVEL (1, ("psrc=%ld", psrc));
                 assemble_col (el_Num+curColIndex*mEl,cb_numbers+k*colCount,
@@ -259,7 +259,7 @@ void paru_fourPass (paru_matrix *paruMatInfo,
 
             double *el_Num = numeric_pointer (curEl);
 
-            if (elCol [e] - elCMark == curEl->ncolsleft){
+            if (elCol [e] - elCMark == 0){
                 //all the row is in CB
                 assemble_row (el_Num, cb_numbers, mEl, nEl, 
                         colCount-fp, curRowIndex , k-fp, colRelIndex );

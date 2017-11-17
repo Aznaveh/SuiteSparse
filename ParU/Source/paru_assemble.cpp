@@ -126,9 +126,10 @@ void paru_assemble (
 
             //counting prior element's columns
             if (elCol [e] < elCMark) // an element never seen before
-                elCol [e] = elCMark + 1;
+                elCol [e] = curEl->ncolsleft - 1; //initiaze 
+
             else { 
-                elCol [e]++;    //keep track of number of cols
+                elCol [e]--;    //keep track of number of cols
                 continue;       // already have the set of rows
             }
 
@@ -427,15 +428,15 @@ void paru_assemble (
 
             //counting prior element's rows
             if (elRow [e] < elRMark) {// an element never seen before
-                elRow [e] = elRMark + 1;
+                elRow [e] = curEl ->nrowsleft - 1; //initiaze
 #ifndef NDEBUG
                 if ( elCol [e] >= elCMark )
-                    PRLEVEL (1, ("element %ld must be eaten wholly\n",e));
+                    PRLEVEL (1, ("element %ld can be eaten wholly\n",e));
                 //And the rest of e is in U part 
 #endif
             }
             else { // must not happen anyway; it depends on changing strategy
-                elRow [e]++; 
+                elRow [e]--;
                 continue;
             }
 
