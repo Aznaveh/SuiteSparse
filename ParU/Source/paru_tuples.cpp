@@ -47,7 +47,7 @@ Int paru_add_rowTuple (
 }
 
 Int paru_add_colTuple (tupleList *ColList, Int col, 
-        Tuple T, cholmod_common *cc)  /*! TODO: Sort for parallel case	 */
+        Tuple T, cholmod_common *cc)  
 {
     DEBUGLEVEL(0);
     PRLEVEL (1, ("col=%ld, (%ld,%ld)\n", col, T.e, T.f));

@@ -104,6 +104,7 @@ void paru_assemble (
             Int e = curTpl.e;
             Int curColIndex = curTpl.f;
 
+            /*! TODO: Never negate e or f for now... keep it?	 */
             if(e < 0 || curColIndex < 0 ) continue;  //already deleted
 
             Element *curEl = elementList[e];
@@ -114,6 +115,7 @@ void paru_assemble (
             Int *colRelIndex    = relColInd (curEl);
             Int *el_colIndex = colIndex_pointer (curEl);
 
+            /*! TODO: Keep the tuple or delete it?	 */
             if (el_colIndex [curColIndex]< 0 ) continue; // already assembled
             ASSERT (el_colIndex[curColIndex] == c);
 
@@ -295,7 +297,7 @@ void paru_assemble (
     }
 
 #ifndef NDEBUG  // Printing the pivotal front
-    p = 0;
+    p = 1;
     PRLEVEL (p, ("%% Before pivoting\n"));
     PRLEVEL (p, ("x =  \t"));
     for (Int c = col1; c < col2; c++) {
@@ -337,7 +339,7 @@ void paru_assemble (
         return;
     }
 #ifndef NDEBUG  // Printing the list of rows
-    p = 1;
+    p = 0;
     PRLEVEL (p, ("After factorization (inside assemble): \n"));
     for (int i = 0; i < rowCount; i++){
         PRLEVEL (p, ("fsRowList [%d] =%d\n",i, fsRowList [i]));
@@ -360,7 +362,7 @@ void paru_assemble (
 #endif
 
 #ifndef NDEBUG  // Printing the pivotal front
-    p = 1;
+    p = 0;
     PRLEVEL (p, ("L part:\n"));
     PRLEVEL (p, ("x\t"));
     for (Int c = col1; c < col2; c++) {
