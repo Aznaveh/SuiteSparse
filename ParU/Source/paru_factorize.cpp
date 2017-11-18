@@ -73,7 +73,7 @@ Int paru_factorize (double *F, Int *fsRowList, Int lm, Int ln,
     PRLEVEL (p, ("\n"));
 #endif 
 
-    PRLEVEL (0, (" m=%d n=%d\n", m, n));
+    PRLEVEL (1, (" m=%d n=%d\n", m, n));
 
     
     // swap (fsRowList[ipiv [i]], fsRowList[i] ) and it is off by one

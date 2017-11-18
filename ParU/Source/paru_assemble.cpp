@@ -36,7 +36,7 @@ void paru_assemble (
     /* get the front F  */
     /* ---------------------------------------------------------------------- */
 
-    PRLEVEL (0, ("~~~~~~~  Assemble Front %ld start ~~~~\n", f));
+    PRLEVEL (0, ("%%~~~~~~~  Assemble Front %ld start ~~~~\n", f));
     /* pivotal columns Super [f] ... Super [f+1]-1 */
     Int col1 = Super [f];       /* fornt F has columns col1:col2-1 */
     Int col2 = Super [f+1];
@@ -54,7 +54,7 @@ void paru_assemble (
     Int *elCol = Work -> elCol;
     Int elCMark = Work -> elCMark;
 
-    PRLEVEL (0, ("fp=%ld pivotal columns:clo1=%ld...col2=%ld\n", 
+    PRLEVEL (0, ("%% fp=%ld pivotal columns:clo1=%ld...col2=%ld\n", 
                 fp, col1, col2-1));
     PRLEVEL (1, ("Upper bound number of columns: Rj[%ld]=%ld ... Rj[%ld]=%ld\n", 
                 p1, Rj [p1], p2, Rj [p2-1]));
@@ -364,20 +364,31 @@ void paru_assemble (
 
 #ifndef NDEBUG  // Printing the pivotal front
     p = 0;
-    PRLEVEL (p, ("L part:\n"));
-    PRLEVEL (p, ("x\t"));
+    PRLEVEL (p, ("%%L part:\n"));
+
+    //col permutatin
+    PRLEVEL (p, ("cols = ["));
     for (Int c = col1; c < col2; c++) {
-        PRLEVEL (p, ("%ld\t\t", c));
+        PRLEVEL (p, ("%ld ", c));
     }
-    PRLEVEL (p, ("\n"));
+    PRLEVEL (p, ("];\n"));
+
+    //row permutatin
+    PRLEVEL (p, ("rows = ["));
+    for (Int r = 0; r < rowCount; r++)
+        PRLEVEL (p, ("%ld ", fsRowList [r]));
+    PRLEVEL (p, ("];\n"));
+
+    PRLEVEL (p, ("L= ["));
     for (Int r = 0; r < rowCount; r++){
-        PRLEVEL (p, ("%ld\t", fsRowList [r]));
+    PRLEVEL (p, (" "));
         for (Int c = col1; c < col2; c++){
-            PRLEVEL (p, (" %2.5lf\t", pivotalFront [(c-col1)*rowCount + r]));
+            PRLEVEL (p, (" %2.5lf ", pivotalFront [(c-col1)*rowCount + r]));
         }
-        PRLEVEL (p, ("\n"));
+        PRLEVEL (p, (";\n"));
     }
-    PRLEVEL (p, ("\n"));
+    PRLEVEL (p, ("];\n"));
+    PRLEVEL (p, ("A(rows,cols)=L;\n"));
 #endif
 
 
@@ -663,5 +674,5 @@ void paru_assemble (
     paru_free (rowCount*fp, sizeof (double), pivotalFront, cc);
     paru_free (fp*colCount,  sizeof (double), uPart, cc);
 
-    PRLEVEL (0, ("~~~~~~~Assemble Front %ld finished\n", f));
+    PRLEVEL (0, ("%%~~~~~~~Assemble Front %ld finished\n", f));
 }

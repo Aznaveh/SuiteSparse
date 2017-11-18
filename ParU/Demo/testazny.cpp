@@ -4,7 +4,7 @@
 int main (int argc, char **argv)
 {
     DEBUGLEVEL(0); 
-    printf("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$\n");
+    printf("%%%%%%%%%%%%%%%%%% START %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% \n");
     cholmod_common Common, *cc;
     cholmod_sparse *A;
     int mtype;
@@ -79,7 +79,7 @@ int main (int argc, char **argv)
     //cc->malloc_count, cc->memory_inuse));
 
     cholmod_l_finish (cc);
-    printf("***************************************************************\n");
+    printf("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*\n");
     //   printf 
     //   ("malloc_count %ld inuse %ld\n", cc->malloc_count, cc->memory_inuse);
 }
