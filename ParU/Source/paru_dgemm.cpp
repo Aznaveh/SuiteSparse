@@ -7,7 +7,11 @@
                                                         
 /*!
  *
+ *      This does the outer product
  *        C := alpha*op( A )*op( B ) + beta*C,   
+ *        el:= -1*part(pF) * uPart + zero 
+ *        TRANSA = 'N'   op(A) = A
+ *        TRANSB = 'N'   op(B) = B
  * 
  */
 
@@ -24,22 +28,34 @@
 Int paru_dgemm(double *pF, double *uPart, 
         double *el, Int fp, Int rowCount, Int colCount){
 
-    BLAS_INT mA = rowCount-fp;
+    DEBUGLEVEL(1);
+    PRLEVEL (1, ("rowCount =%ld  ", rowCount));
+    PRLEVEL (1, ("colCount =%ld  ", colCount));
+    PRLEVEL (1, ("fp =%ld\n", fp));
 
-    BLAS_INT nB = colCount;
+    BLAS_INT mA = (BLAS_INT) (rowCount - fp); 
+    BLAS_INT nB = (BLAS_INT)colCount;
+    BLAS_INT nA = (BLAS_INT)fp;
 
-    BLAS_INT nA = fp;
+    PRLEVEL (1, ("mA =%d  ", mA));
+    PRLEVEL (1, ("nB =%d  ", nB));
+    PRLEVEL (1, ("nA =%d\n", nA));
 
     double alpha = -1;
-    BLAS_INT lda = rowCount;
-    BLAS_INT ldb = colCount;
-    BLAS_INT ldc = rowCount-fp;
+    BLAS_INT lda = (BLAS_INT) rowCount;
+    BLAS_INT ldb = (BLAS_INT) fp;
+    BLAS_INT ldc = (BLAS_INT) (rowCount - fp);
+    PRLEVEL (1, ("alpha =%lf  ", alpha));
+    PRLEVEL (1, ("lda =%ld  ", lda));
+    PRLEVEL (1, ("ldb =%ld  ", ldb));
+    PRLEVEL (1, ("ldc =%ld\n", ldc));
+
 
     // NOTE: beta can be zero, since C has just been calloc'd.
     // Also, C can be malloc'd not calloc'd.
     double beta= 1;
     
-    BLAS_DGEMM ("N" ,"N" , &mA, &nB, &nA, &alpha, pF, &lda, uPart, &ldb, &beta,
+    BLAS_DGEMM ("N" ,"N" , &mA, &nB, &nA, &alpha, pF+fp, &lda, uPart, &ldb, &beta,
             el, &ldc);
     return 0;
 
