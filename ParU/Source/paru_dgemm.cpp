@@ -28,7 +28,7 @@
 Int paru_dgemm(double *pF, double *uPart, 
         double *el, Int fp, Int rowCount, Int colCount){
 
-    DEBUGLEVEL(1);
+    DEBUGLEVEL(0);
     PRLEVEL (1, ("rowCount =%ld  ", rowCount));
     PRLEVEL (1, ("colCount =%ld  ", colCount));
     PRLEVEL (1, ("fp =%ld\n", fp));

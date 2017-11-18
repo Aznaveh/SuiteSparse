@@ -23,18 +23,16 @@ all:
 	
 
 run:
+#	./testazny < ../Matrix/lfat5b.mtx
 #	./testazny < ../Matrix/a2.mtx 
-	./testazny < ../Matrix/pwr01b.mtx
-#
-#
+
+#	./testazny < ../Matrix/pwr01b.mtx
 #	./testazny < ../Matrix/LFAT5.mtx
 #	./testazny < ../Matrix/b1_ss.mtx
 #	./testazny < ../Matrix/bcspwr01.mtx
-#	./testazny < ../Matrix/lfat5b.mtx
-#
 #	./testazny < ../Matrix/lp_e226.mtx
-#	./testazny < ../Matrix/Franz6_id1959_aug.mtx 
-#	./testazny < ../Matrix/ash219.mtx
+#	./testazny < ../Matrix/Franz6_id1959_aug.mtx #!!
+	./testazny < ../Matrix/ash219.mtx
 #
 #	./testazny < ../Matrix/Tina_AskCal.mtx
 #	./testazny < ../Matrix/Tina_AskCal_perm.mtx
