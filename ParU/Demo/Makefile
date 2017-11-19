@@ -23,6 +23,15 @@ all:
 	
 
 run:
+#	./testazny < ../Matrix/lp_e226_transposed.mtx   #!! 
+#	./testazny < ../Matrix/Franz6_id1959_aug.mtx #!!
+#	
+	./testazny < ../Matrix/ParUTst/az88_2.mtx
+#	./testazny < ../Matrix/ParUTst/bcsstm01.mtx
+#	./testazny < ../Matrix/ParUTst/bcsstm02.mtx
+#
+#
+#	
 #	./testazny < ../Matrix/lfat5b.mtx
 #	./testazny < ../Matrix/a2.mtx 
 
@@ -31,8 +40,7 @@ run:
 #	./testazny < ../Matrix/b1_ss.mtx
 #	./testazny < ../Matrix/bcspwr01.mtx
 #	./testazny < ../Matrix/lp_e226.mtx
-#	./testazny < ../Matrix/Franz6_id1959_aug.mtx #!!
-	./testazny < ../Matrix/ash219.mtx
+#	./testazny < ../Matrix/ash219.mtx
 #
 #	./testazny < ../Matrix/Tina_AskCal.mtx
 #	./testazny < ../Matrix/Tina_AskCal_perm.mtx
@@ -53,7 +61,6 @@ run:
 #	./testazny < ../Matrix/a4.mtx
 #
 #	./testazny < ../Matrix/GD06_theory.mtx
-#	./testazny < ../Matrix/lp_e226_transposed.mtx 
 #
 #	./testazny < ../Matrix/problem.mtx    
 #	./testazny < ../Matrix/cage5.mtx       # m >=n assertion failure
@@ -131,3 +138,4 @@ clean:
 az:
 	(cd ..; $(MAKE) )
 	(cd Demo; $(MAKE) run )
+
