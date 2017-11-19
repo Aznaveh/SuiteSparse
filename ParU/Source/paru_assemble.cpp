@@ -369,14 +369,14 @@ void paru_assemble (
     //col permutatin
     PRLEVEL (p, ("cols = ["));
     for (Int c = col1; c < col2; c++) {
-        PRLEVEL (p, ("%ld ", c));
+        PRLEVEL (p, ("%ld ", c+1));
     }
     PRLEVEL (p, ("];\n"));
 
     //row permutatin
     PRLEVEL (p, ("rows = ["));
     for (Int r = 0; r < rowCount; r++)
-        PRLEVEL (p, ("%ld ", fsRowList [r]));
+        PRLEVEL (p, ("%ld ", fsRowList [r]+1)); //Matlab is base 1
     PRLEVEL (p, ("];\n"));
 
     PRLEVEL (p, ("L= ["));
@@ -385,7 +385,7 @@ void paru_assemble (
         for (Int c = col1; c < col2; c++){
             PRLEVEL (p, (" %2.5lf ", pivotalFront [(c-col1)*rowCount + r]));
         }
-        PRLEVEL (p, (";\n"));
+        PRLEVEL (p, (";\n   "));
     }
     PRLEVEL (p, ("];\n"));
     PRLEVEL (p, ("A(rows,cols)=L;\n"));
