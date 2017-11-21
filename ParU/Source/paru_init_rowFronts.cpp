@@ -293,7 +293,7 @@ paru_matrix *paru_init_rowFronts (
             el_colrowNum[j++] =   Sx[p];
             PRLEVEL (1, ("Sj[%ld] =%ld Sx[%ld]=%lf\n", p, Sj[p], p, Sx[p] ));
             //for Matlab
-            PRLEVEL (0, ("S(%ld,%ld)= %lf;\n", p+1,Sj[p]+1, Sx[p]) );
+            PRLEVEL (0, ("S(%ld,%ld)= %lf;\n", row+1,Sj[p]+1, Sx[p]) );
             
    
             if (paru_add_colTuple (ColList, Sj [p], colTuple, cc) ){
