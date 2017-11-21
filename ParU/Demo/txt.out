@@ -1,0 +1,59 @@
+(cd ..; make )
+make[1]: Entering directory `/users/aznaveh/SuiteSparse/ParU'
+( cd Lib ; make )
+make[2]: Entering directory `/users/aznaveh/SuiteSparse/ParU/Lib'
+make install INSTALL=/users/aznaveh/SuiteSparse
+make[3]: Entering directory `/users/aznaveh/SuiteSparse/ParU/Lib'
+make[3]: Nothing to be done for `install'.
+make[3]: Leaving directory `/users/aznaveh/SuiteSparse/ParU/Lib'
+make[2]: Leaving directory `/users/aznaveh/SuiteSparse/ParU/Lib'
+( cd Demo ; make )
+make[2]: Entering directory `/users/aznaveh/SuiteSparse/ParU/Demo'
+g++    -g -fexceptions -fPIC -fopenmp    -I../../include  -I ../Include  -Wno-write-strings testazny.cpp -o testazny -L/users/aznaveh/SuiteSparse/lib -L../../lib -lparu -lspqr -lsuitesparseconfig -lcholmod -lamd -lcolamd -lccolamd -lcamd -lmetis  -lm -lrt -Wl,-rpath=/users/aznaveh/SuiteSparse/lib -llapack -lopenblas  
+make[2]: Leaving directory `/users/aznaveh/SuiteSparse/ParU/Demo'
+make[1]: Leaving directory `/users/aznaveh/SuiteSparse/ParU'
+(cd Demo; make run )
+make[1]: Entering directory `/users/aznaveh/SuiteSparse/ParU/Demo'
+./testazny < ../Matrix/LFAT5.mtx
+%%%%%%%%% START %%%%%%%%%%%%%%%%%%% 
+% A  is  14 x 14 
+ A = zeros(14,14) 
+% nf=3
+% anz = 46  rjsize=14
+%~~~~~~~  Assemble Front 0 start ~~~~
+% fp=8 pivotal columns:clo1=0...col2=7
+%L part:
+cols = [1 2 3 4 5 6 7 8 ];
+rows = [1 4 2 7 3 8 5 6 ];
+L= [  94.25280  15080.44800  0.00000  0.00000  0.00000  -7540.22400  -94.25280  0.00000 ;
+     0.00000  -7540.22400  94.25280  0.00000  -94.25280  15080.44800  0.00000  -7540.22400 ;
+     0.00833  0.01667  1.57088  0.00000  1.57088  -94.25280  1.57088  125.67040 ;
+     0.00000  -0.00000  0.00000  -94.25280  0.00000  -7540.22400  94.25280  15080.44800 ;
+     0.01667  0.02083  -0.75000  -0.00000  3.14176  -259.19520  2.74904  251.34080 ;
+     0.00000  -0.00000  0.00000  -0.00833  1.00000  102.10720  -1.17816  -125.67040 ;
+     0.00000  0.01250  -0.25000  -0.00000  0.75000  -0.17308  1.26879  9.66695 ;
+     0.00000  -0.00000  0.00000  -0.01667  0.25000  -0.59615  0.14286  17.95291 ;
+   ];
+A(rows,cols)=L;
+%~~~~~~~  Assemble Front 1 start ~~~~
+% fp=3 pivotal columns:clo1=8...col2=10
+%L part:
+cols = [9 10 11 ];
+rows = [9 10 11 ];
+L= [  12566400.00000  -6283200.00000  0.00000 ;
+     -0.50000  9424800.00000  -6283200.00000 ;
+     0.00000  -0.66667  8377600.00000 ;
+   ];
+A(rows,cols)=L;
+%~~~~~~~  Assemble Front 2 start ~~~~
+% fp=3 pivotal columns:clo1=11...col2=13
+%L part:
+cols = [12 13 14 ];
+rows = [12 13 14 ];
+L= [  0.60881  -0.30440  0.00000 ;
+     -0.50000  0.45660  -0.30440 ;
+     0.00000  -0.66667  0.40587 ;
+   ];
+A(rows,cols)=L;
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*
+make[1]: Leaving directory `/users/aznaveh/SuiteSparse/ParU/Demo'

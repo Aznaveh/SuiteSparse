@@ -107,7 +107,7 @@ void paru_freemat (paru_matrix **paruMatInfo_handle,
         // ASSERT (len < m);  // it is a wrong assertion but there is a good
                                 //  point
         if (len > m+nf )                        
-            printf ("too much space used for %ld\n",col);
+            printf ("%% too much space used for %ld\n",col);
         cholmod_l_free (len , sizeof (Tuple), ColList[col].list, cc);
     }
     cholmod_l_free (1, n*sizeof(tupleList), ColList, cc);

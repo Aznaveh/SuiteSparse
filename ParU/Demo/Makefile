@@ -25,8 +25,9 @@ all:
 run:
 #	./testazny < ../Matrix/lp_e226_transposed.mtx   #!! 
 #	./testazny < ../Matrix/Franz6_id1959_aug.mtx #!!
+#	./testazny < ../Matrix/az88.mtx			#check
 #	
-	./testazny < ../Matrix/ParUTst/az88_2.mtx
+#	./testazny < ../Matrix/ParUTst/az88_2.mtx  	
 #	./testazny < ../Matrix/ParUTst/bcsstm01.mtx
 #	./testazny < ../Matrix/ParUTst/bcsstm02.mtx
 #
@@ -60,14 +61,12 @@ run:
 #	./testazny < ../Matrix/c2.mtx #2x2 4nz
 #	./testazny < ../Matrix/a4.mtx
 #
-#	./testazny < ../Matrix/GD06_theory.mtx
-#
 #	./testazny < ../Matrix/problem.mtx    
 #	./testazny < ../Matrix/cage5.mtx       # m >=n assertion failure
 #	./testazny < ../Matrix/r2.mtx          # m >=n assertion failure
 #	./testazny < ../Matrix/n3c4-b4.mtx     # m >=n assertion failure
 #	./testazny < ../Matrix/lpi_galenet.mtx # m >=n assertion failure
-#	./testazny < ../Matrix/GD01_b.mtx      # m >=n assertion failure
+	./testazny < ../Matrix/GD01_b.mtx      # m >=n assertion failure
 #	./testazny < ../Matrix/lpi_itest6.mtx  # m >=n assertion failure
 #	./testazny < ../Matrix/young1c.mtx     # m >=n assertion failure
 #	./testazny < ../Matrix/lp_share1b.mtx  # m >=n assertion failure
@@ -87,10 +86,7 @@ val:
 #	valgrind	$(VGFLAGS)	./testazny < ../Matrix/a2.mtx 
 #	valgrind	$(VGFLAGS)	./testazny < ../Matrix/b1_ss.mtx
 #	valgrind	$(VGFLAGS)	./testazny < ../Matrix/bcspwr01.mtx
-#	valgrind	$(VGFLAGS)	./testazny < ../Matrix/bfwa62.mtx
-#	valgrind	$(VGFLAGS)	./testazny < ../Matrix/GD06_theory.mtx
 #	valgrind	$(VGFLAGS)	./testazny < ../Matrix/lfat5b.mtx
-#	valgrind	$(VGFLAGS)	./testazny < ../Matrix/pwr01b.mtx
 #	valgrind	$(VGFLAGS)	./testazny < ../Matrix/west0067.mtx 
 #	valgrind	$(VGFLAGS)	./testazny < ../Matrix/cage5.mtx
 #

@@ -5,6 +5,7 @@ int main (int argc, char **argv)
 {
     DEBUGLEVEL(0); 
     printf("%%%%%%%%%%%%%%%%%% START %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% \n");
+    PRLEVEL (0, ("clear all\n" ));
     cholmod_common Common, *cc;
     cholmod_sparse *A;
     int mtype;

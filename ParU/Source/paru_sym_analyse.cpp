@@ -49,7 +49,8 @@ paru_symbolic *paru_sym_analyse
 
 
     PRLEVEL (0, ("%% A  is  %ld x %ld \n",m, n ));
-    PRLEVEL (0, ("S= A = zeros(%ld,%ld) \n",m, n ));
+    PRLEVEL (0, ("A = zeros(%ld,%ld);\n",m, n ));
+    PRLEVEL (0, ("S = zeros(%ld,%ld);\n",m, n ));
     PRLEVEL (0, ("%% nf=%ld\n",nf ));
     PRLEVEL (0, ("%% anz = %ld  rjsize=%ld\n", anz, rjsize));
 
