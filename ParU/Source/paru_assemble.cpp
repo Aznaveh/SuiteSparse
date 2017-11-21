@@ -594,19 +594,30 @@ void paru_assemble (
 
 #ifndef NDEBUG  // Printing the  U part
     p = 0;
-    PRLEVEL (p, ("U part After TRSM: %ld x %ld\n", fp, colCount));
-    PRLEVEL (p, ("U\t"));
+    PRLEVEL (p, ("%% U part After TRSM: %ld x %ld\n", fp, colCount));
+
+    PRLEVEL (p, ("cols = ["));
     for (Int i = 0; i < colCount; i++){
-        PRLEVEL (p, ("%ld\t\t", CBColList[i]));
+        PRLEVEL (p, ("%ld ", CBColList[i]+1));
     }
-    PRLEVEL (p, ("\n"));
+    PRLEVEL (p, ("];\n"));
+
+
+    PRLEVEL (p, ("rows = ["));
+    for (Int i = 0; i < fp; i++)
+        PRLEVEL (p, ("%ld ",  fsRowList [i]));
+    PRLEVEL (p, ("];\n"));
+    
+    PRLEVEL (p, ("U = ["));
+
     for (Int i = 0; i < fp; i++){
-        PRLEVEL (p, ("%ld\t",  fsRowList [i]));
         for (Int j = 0; j < colCount; j++){
-            PRLEVEL (p, (" %2.5lf\t", uPart[j*fp+i]));
+            PRLEVEL (p, (" %2.5lf ", uPart[j*fp+i]));
         }
-        PRLEVEL (p, ("\n"));
+        PRLEVEL (p, (";\n    "));
     }
+    PRLEVEL (p, ("];\n"));
+    PRLEVEL (p, ("A(rows,cols)=U;\n"));
 #endif
 
 
