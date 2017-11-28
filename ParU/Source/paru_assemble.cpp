@@ -379,6 +379,9 @@ void paru_assemble (
         PRLEVEL (p, ("%ld ", fsRowList [r]+1)); //Matlab is base 1
     PRLEVEL (p, ("];\n"));
 
+    //inv row permutatin
+    PRLEVEL (p, ("for i=1:%ld\ninvRows(rows(i)) = i;\nend\n",rowCount));
+
     PRLEVEL (p, ("L= ["));
     for (Int r = 0; r < rowCount; r++){
     PRLEVEL (p, (" "));
@@ -388,7 +391,7 @@ void paru_assemble (
         PRLEVEL (p, (";\n   "));
     }
     PRLEVEL (p, ("];\n"));
-    PRLEVEL (p, ("A(rows,cols)=L;\n"));
+    PRLEVEL (p, ("A(invRows,cols)=L;\n"));
 #endif
 
 
@@ -608,6 +611,9 @@ void paru_assemble (
         PRLEVEL (p, ("%ld ",  fsRowList [i]));
     PRLEVEL (p, ("];\n"));
     
+    //inv row permutatin
+    PRLEVEL (p, ("for i=1:%ld\ninvRows(rows(i)) = i;\nend\n",rowCount));
+
     PRLEVEL (p, ("U = ["));
 
     for (Int i = 0; i < fp; i++){
@@ -617,7 +623,7 @@ void paru_assemble (
         PRLEVEL (p, (";\n    "));
     }
     PRLEVEL (p, ("];\n"));
-    PRLEVEL (p, ("A(rows,cols)=U;\n"));
+    PRLEVEL (p, ("A(invRows,cols)=L;\n"));
 #endif
 
 

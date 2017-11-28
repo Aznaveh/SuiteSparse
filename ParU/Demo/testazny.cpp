@@ -84,7 +84,7 @@ int main (int argc, char **argv)
     //Matlab
     PRLEVEL (0, ("U =triu(A);"));
     PRLEVEL (0, ("d =triu(tril(A));"));
-    PRLEVEL (0, ("L =tril(A)-d+eye(%ld);\n",m));
+    PRLEVEL (0, ("L =tril(A)-d+eye(%ld,%ld);\n",m,n));
     printf("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*\n");
     //   printf 
     //   ("malloc_count %ld inuse %ld\n", cc->malloc_count, cc->memory_inuse);
