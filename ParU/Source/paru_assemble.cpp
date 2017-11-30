@@ -367,20 +367,20 @@ void paru_assemble (
     PRLEVEL (p, ("%%L part:\n"));
 
     //col permutatin
-    PRLEVEL (p, ("cols = ["));
+    PRLEVEL (p, ("cols{%ld} = [",f+1));
     for (Int c = col1; c < col2; c++) {
         PRLEVEL (p, ("%ld ", c+1));
     }
     PRLEVEL (p, ("];\n"));
 
     //row permutatin
-    PRLEVEL (p, ("rows = ["));
+    PRLEVEL (p, ("rows{%ld} = [",f+1));
     for (Int r = 0; r < rowCount; r++)
         PRLEVEL (p, ("%ld ", fsRowList [r]+1)); //Matlab is base 1
     PRLEVEL (p, ("];\n"));
 
     //inv row permutatin
-    PRLEVEL (p, ("for i=1:%ld\ninvRows(rows(i)) = i;\nend\n",rowCount));
+    PRLEVEL (p, ("invRows (rows{%ld}) = 1:%ld\n",f+1,rowCount));
 
     PRLEVEL (p, ("L= ["));
     for (Int r = 0; r < rowCount; r++){
@@ -599,14 +599,14 @@ void paru_assemble (
     p = 0;
     PRLEVEL (p, ("%% U part After TRSM: %ld x %ld\n", fp, colCount));
 
-    PRLEVEL (p, ("cols = ["));
+    PRLEVEL (p, ("cols{%ld} = [",f+1));
     for (Int i = 0; i < colCount; i++){
         PRLEVEL (p, ("%ld ", CBColList[i]+1));
     }
     PRLEVEL (p, ("];\n"));
 
 
-    PRLEVEL (p, ("rows = ["));
+    PRLEVEL (p, ("rows{%ld} = [",f+1));
     for (Int i = 0; i < fp; i++)
         PRLEVEL (p, ("%ld ",  fsRowList [i]));
     PRLEVEL (p, ("];\n"));
