@@ -380,18 +380,17 @@ void paru_assemble (
     PRLEVEL (p, ("];\n"));
 
     //inv row permutatin
-    PRLEVEL (p, ("invRows (rows{%ld}) = 1:%ld\n",f+1,rowCount));
+    //PRLEVEL (p, ("invRows (rows{%ld}) = 1:%ld\n",f+1,rowCount));
 
-    PRLEVEL (p, ("L= ["));
+    PRLEVEL (p, ("L{%ld}= [",f+1));
     for (Int r = 0; r < rowCount; r++){
     PRLEVEL (p, (" "));
         for (Int c = col1; c < col2; c++){
-            PRLEVEL (p, (" %2.5lf ", pivotalFront [(c-col1)*rowCount + r]));
+            PRLEVEL (p, (" %.16lf ", pivotalFront [(c-col1)*rowCount + r]));
         }
         PRLEVEL (p, (";\n   "));
     }
     PRLEVEL (p, ("];\n"));
-    PRLEVEL (p, ("A(invRows,cols)=L;\n"));
 #endif
 
 
@@ -614,16 +613,15 @@ void paru_assemble (
     //inv row permutatin
     PRLEVEL (p, ("for i=1:%ld\ninvRows(rows(i)) = i;\nend\n",rowCount));
 
-    PRLEVEL (p, ("U = ["));
+    PRLEVEL (p, ("U{%ld} = [",f+1));
 
     for (Int i = 0; i < fp; i++){
         for (Int j = 0; j < colCount; j++){
-            PRLEVEL (p, (" %2.5lf ", uPart[j*fp+i]));
+            PRLEVEL (p, (" %.16lf ", uPart[j*fp+i]));
         }
         PRLEVEL (p, (";\n    "));
     }
     PRLEVEL (p, ("];\n"));
-    PRLEVEL (p, ("A(invRows,cols)=L;\n"));
 #endif
 
 
