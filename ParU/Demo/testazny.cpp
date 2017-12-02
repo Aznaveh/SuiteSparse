@@ -89,9 +89,11 @@ int main (int argc, char **argv)
     PRLEVEL (p, ("oldrows = rows{f};\n "));
     PRLEVEL (p, ("newrows= invp(oldrows);\n"));
     PRLEVEL (p, ("newcols = ncols+1: ncols+npivots(f); \n"));
+    PRLEVEL (p, ("\tLU(newrows,newcols)=Luf{f};\n"));
+    PRLEVEL (p, ("\tLU(newrows,ncols+1:ncols+npivots(f))=U{f};\nend\n"));
     PRLEVEL (p, (" ncols = ncols+npivots(f); \n"));
-    PRLEVEL (p, ("\tLU(newrows,newcols)=Luf{f};\nend\n"));
-    PRLEVEL (p, ("LU-lu(S(invp,:))\n" ));
+    PRLEVEL (p, ("if( norm(LU-lu(S(invp,:))) < eps )\n" ));
+    PRLEVEL (p, ("\tfprintf('Pass\\n')\nelse\nfprintf('Fail\\n')\nend\n" ));
     
 //    PRLEVEL (p, ("U =triu(A);"));
 //    PRLEVEL (p, ("d =triu(tril(A));"));

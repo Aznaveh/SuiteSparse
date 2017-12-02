@@ -380,7 +380,7 @@ void paru_assemble (
     PRLEVEL (p, ("];\n"));
 
     //global row permutatin
-    PRLEVEL (p, (" npivots(end+1)=%ld\n",fp ));
+    PRLEVEL (p, (" npivots(end+1)=%ld;\n",fp ));
     for (Int r = 0 ; r < fp ; r++) {
         PRLEVEL (p, ("p(end+1)= "));
         PRLEVEL (p, ("%ld; ", fsRowList [r]+1));
@@ -401,6 +401,8 @@ void paru_assemble (
         PRLEVEL (p, (";\n   "));
     }
     PRLEVEL (p, ("];\n"));
+    //just in cases that there is no U
+    PRLEVEL (p, ("U{%ld} =[];\n", f+1));
 #endif
 
 
