@@ -379,10 +379,20 @@ void paru_assemble (
         PRLEVEL (p, ("%ld ", fsRowList [r]+1)); //Matlab is base 1
     PRLEVEL (p, ("];\n"));
 
+    //global row permutatin
+    PRLEVEL (p, (" npivots(end+1)=%ld\n",fp ));
+    for (Int r = 0 ; r < fp ; r++) {
+        PRLEVEL (p, ("p(end+1)= "));
+        PRLEVEL (p, ("%ld; ", fsRowList [r]+1));
+    }
+    PRLEVEL (p, ("\n"));
+
+
+
     //inv row permutatin
     //PRLEVEL (p, ("invRows (rows{%ld}) = 1:%ld\n",f+1,rowCount));
 
-    PRLEVEL (p, ("L{%ld}= [",f+1));
+    PRLEVEL (p, ("Luf{%ld}= [",f+1));
     for (Int r = 0; r < rowCount; r++){
     PRLEVEL (p, (" "));
         for (Int c = col1; c < col2; c++){

@@ -82,9 +82,20 @@ int main (int argc, char **argv)
     cholmod_l_finish (cc);
 
     //Matlab
-    PRLEVEL (0, ("U =triu(A);"));
-    PRLEVEL (0, ("d =triu(tril(A));"));
-    PRLEVEL (0, ("L =tril(A)-d+eye(%ld,%ld);\n",m,n));
+    //
+    Int p=0;
+    PRLEVEL (p, ("ncols=0;\n invp(p)=1:%ld;\n",n));
+    PRLEVEL (p, ("for f=1:%ld\n",nf));
+    PRLEVEL (p, ("oldrows = rows{f};\n "));
+    PRLEVEL (p, ("newrows= invp(oldrows);\n"));
+    PRLEVEL (p, ("newcols = ncols+1: ncols+npivots(f); \n"));
+    PRLEVEL (p, (" ncols = ncols+npivots(f); \n"));
+    PRLEVEL (p, ("\tLU(newrows,newcols)=Luf{f};\nend\n"));
+    PRLEVEL (p, ("LU-lu(S(invp,:))\n" ));
+    
+//    PRLEVEL (p, ("U =triu(A);"));
+//    PRLEVEL (p, ("d =triu(tril(A));"));
+//    PRLEVEL (p, ("L =tril(A)-d+eye(%ld,%ld);\n",m,n));
     printf("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*\n");
     //   printf 
     //   ("malloc_count %ld inuse %ld\n", cc->malloc_count, cc->memory_inuse);
