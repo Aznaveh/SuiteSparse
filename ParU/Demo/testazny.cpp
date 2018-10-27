@@ -84,20 +84,26 @@ int main (int argc, char **argv)
     //Matlab
     //
     Int p=0;
-    PRLEVEL (p, ("ncols=0;\n invp(p)=1:%ld;\n",n));
+    PRLEVEL (p, ("ncols=0; err = 1e-12;\n"));
+    PRLEVEL (p, ("oldR=[]; c=[];\n"));
+    PRLEVEL (p, ("%%Finalizing the permutation\n"));
     PRLEVEL (p, ("for f=1:%ld\n",nf));
-    PRLEVEL (p, ("oldrows = rows{f};\n "));
-    PRLEVEL (p, ("newrows= invp(oldrows);\n"));
-    PRLEVEL (p, ("newcols = ncols+1: ncols+npivots(f); \n"));
-    PRLEVEL (p, ("\tLU(newrows,newcols)=Luf{f};\n"));
-    PRLEVEL (p, ("\tLU(newrows,ncols+1:ncols+npivots(f))=U{f};\nend\n"));
-    PRLEVEL (p, (" ncols = ncols+npivots(f); \n"));
-    PRLEVEL (p, ("if( norm(LU-lu(S(invp,:))) < eps )\n" ));
-    PRLEVEL (p, ("\tfprintf('Pass\\n')\nelse\nfprintf('Fail\\n')\nend\n" ));
+    PRLEVEL (p, ("\tnpivots(f) = length(cols{f});\n"));
+    PRLEVEL (p, ("\toldR=[oldR, rows{f}(1:npivots(f))]; c=[c, cols{f}];\nend\n"));
+    PRLEVEL (p, ("newR(oldR)=1:length(oldR);\n"));
+
+    PRLEVEL (p, ("for f=1:%ld\n",nf));
+//  PRLEVEL (p, ("\tLU(ncols+1:ncols+npivots(f),ncols+1:ncols+npivots(f))=Luf{f};\n"));
+    PRLEVEL (p, ("\tLU(newR(rows{f}),cols{f})=Luf{f};\n"));
+
+    PRLEVEL (p, ("\tLU(newR(Urows{f}),cols{f})=U{f};\n"));
+    PRLEVEL (p, ("\tncols = ncols+npivots(f); \nend\n"));
+
+    PRLEVEL (p, ("L=tril(LU,-1)+eye(size(LU));\n"));
+    PRLEVEL (p, ("U=triu(LU);\n"));
+    PRLEVEL (p, ("if( ( norm(S(oldR,c)-L*U)) < err )\n" ));
+    PRLEVEL (p, ("\tfprintf('Pass\\n')\nelse\n\tfprintf('Fail\\n')\nend\n" ));
     
-//    PRLEVEL (p, ("U =triu(A);"));
-//    PRLEVEL (p, ("d =triu(tril(A));"));
-//    PRLEVEL (p, ("L =tril(A)-d+eye(%ld,%ld);\n",m,n));
     printf("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*\n");
     //   printf 
     //   ("malloc_count %ld inuse %ld\n", cc->malloc_count, cc->memory_inuse);

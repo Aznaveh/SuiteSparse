@@ -379,16 +379,6 @@ void paru_assemble (
         PRLEVEL (p, ("%ld ", fsRowList [r]+1)); //Matlab is base 1
     PRLEVEL (p, ("];\n"));
 
-    //global row permutatin
-    PRLEVEL (p, (" npivots(end+1)=%ld;\n",fp ));
-    for (Int r = 0 ; r < fp ; r++) {
-        PRLEVEL (p, ("p(end+1)= "));
-        PRLEVEL (p, ("%ld; ", fsRowList [r]+1));
-    }
-    PRLEVEL (p, ("\n"));
-
-
-
     //inv row permutatin
     //PRLEVEL (p, ("invRows (rows{%ld}) = 1:%ld\n",f+1,rowCount));
 
@@ -403,6 +393,8 @@ void paru_assemble (
     PRLEVEL (p, ("];\n"));
     //just in cases that there is no U
     PRLEVEL (p, ("U{%ld} =[];\n", f+1));
+    PRLEVEL (p, ("Ucols{%ld}=[];\n",f+1));
+    PRLEVEL (p, ("Urows{%ld}=[];\n",f+1));
 #endif
 
 
@@ -610,16 +602,16 @@ void paru_assemble (
     p = 0;
     PRLEVEL (p, ("%% U part After TRSM: %ld x %ld\n", fp, colCount));
 
-    PRLEVEL (p, ("cols{%ld} = [",f+1));
+    PRLEVEL (p, ("Ucols{%ld} = [",f+1));
     for (Int i = 0; i < colCount; i++){
         PRLEVEL (p, ("%ld ", CBColList[i]+1));
     }
     PRLEVEL (p, ("];\n"));
 
 
-    PRLEVEL (p, ("rows{%ld} = [",f+1));
+    PRLEVEL (p, ("Urows{%ld} = [",f+1));
     for (Int i = 0; i < fp; i++)
-        PRLEVEL (p, ("%ld ",  fsRowList [i]));
+        PRLEVEL (p, ("%ld ",  fsRowList [i]+1));
     PRLEVEL (p, ("];\n"));
     
     //inv row permutatin
