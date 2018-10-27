@@ -102,7 +102,7 @@ Int paru_factorize (double *F, Int *fsRowList, Int lm, Int ln,
 
     PRLEVEL (1, ("info = %ld\n", info));
     if (info != 0 ){
-        printf("Some problem in factorization\n");
+        printf("%%Some problem in factorization\n");
         return info;
     }
     return 0;
