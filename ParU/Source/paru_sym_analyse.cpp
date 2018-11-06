@@ -50,7 +50,7 @@ paru_symbolic *paru_sym_analyse
 
     PRLEVEL (0, ("%% A  is  %ld x %ld \n",m, n ));
     PRLEVEL (0, ("LU = zeros(%ld,%ld);\n",m, n ));
-    PRLEVEL (0, (" npivots =[]; \n" ));
+    PRLEVEL (0, ("npivots =[]; \n" ));
     PRLEVEL (0, ("S = zeros(%ld,%ld);\n",m, n ));
     PRLEVEL (0, ("%% nf=%ld\n",nf ));
     PRLEVEL (0, ("%% anz = %ld  rjsize=%ld\n", anz, rjsize));
@@ -110,7 +110,7 @@ paru_symbolic *paru_sym_analyse
    for (Int row = 0; row < m; row++){
         PRLEVEL (1,("Sprow[%ld]=%ld\n", row, Sp[row]));
         if (Sp [row] == Sp[row+1] ){
-            printf("Empty Row\n");
+            printf("%%Empty Row\n");
             paru_freesym (&LUsym , cc);
             return NULL;
         }
@@ -118,7 +118,7 @@ paru_symbolic *paru_sym_analyse
     for (Int col = 0; col < n; col++){
         Int *Ap =(Int*) A->p;
         if (Ap [col] == Ap [col+1]){
-            printf("Empty Column\n");
+            printf("%%Empty Column\n");
             paru_freesym (&LUsym , cc);
             return NULL;
         }

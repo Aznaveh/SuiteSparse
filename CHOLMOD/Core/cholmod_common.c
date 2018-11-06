@@ -264,9 +264,16 @@ int CHOLMOD(defaults)
     Common->supernodal = CHOLMOD_AUTO ;
     Common->supernodal_switch = 40 ;
 
-    Common->nrelax [0] = 4 ;
-    Common->nrelax [1] = 16 ;
-    Common->nrelax [2] = 48 ;
+/* Azny:
+ * Common->nrelax [0] = 4 ;
+/*    Common->nrelax [1] = 16 ;
+/*    Common->nrelax [2] = 48 ;
+ */
+
+    Common->nrelax [0] = 0 ;
+    Common->nrelax [1] = 0 ;
+    Common->nrelax [2] = 0 ;
+ 
     Common->zrelax [0] = 0.8 ;
     Common->zrelax [1] = 0.1 ;
     Common->zrelax [2] = 0.05 ;

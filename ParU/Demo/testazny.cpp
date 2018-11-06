@@ -84,24 +84,29 @@ int main (int argc, char **argv)
     //Matlab
     //
     Int p=0;
-    PRLEVEL (p, ("ncols=0; err = 1e-12;\n"));
+    PRLEVEL (p, ("err = 1e-12; [m n] =size(S);\n"));
     PRLEVEL (p, ("oldR=[]; c=[];\n"));
     PRLEVEL (p, ("%%Finalizing the permutation\n"));
     PRLEVEL (p, ("for f=1:%ld\n",nf));
     PRLEVEL (p, ("\tnpivots(f) = length(cols{f});\n"));
     PRLEVEL (p, ("\toldR=[oldR, rows{f}(1:npivots(f))]; c=[c, cols{f}];\nend\n"));
+    PRLEVEL (p, ("oldR = [oldR setdiff(1:m,oldR)];\n"));
     PRLEVEL (p, ("newR(oldR)=1:length(oldR);\n"));
 
     PRLEVEL (p, ("for f=1:%ld\n",nf));
-//  PRLEVEL (p, ("\tLU(ncols+1:ncols+npivots(f),ncols+1:ncols+npivots(f))=Luf{f};\n"));
     PRLEVEL (p, ("\tLU(newR(rows{f}),cols{f})=Luf{f};\n"));
-
-    PRLEVEL (p, ("\tLU(newR(Urows{f}),cols{f})=U{f};\n"));
-    PRLEVEL (p, ("\tncols = ncols+npivots(f); \nend\n"));
+    PRLEVEL (p, ("\tLU(newR(Urows{f}),Ucols{f})=Us{f};\nend\n"));
 
     PRLEVEL (p, ("L=tril(LU,-1)+eye(size(LU));\n"));
-    PRLEVEL (p, ("U=triu(LU);\n"));
-    PRLEVEL (p, ("if( ( norm(S(oldR,c)-L*U)) < err )\n" ));
+    PRLEVEL (p, ("U=triu(LU); U=U(1:n,:);\n"));
+    PRLEVEL (p, ("spparms('spumoni',3);\n" ));
+    PRLEVEL (p, ("fprintf('Matlab\\n');\n" ));
+    PRLEVEL (p, ("[l,u,p]=lu(S);\n" ));
+    PRLEVEL (p, ("norm(p*S-l*u)\n" ));
+
+    PRLEVEL (p, ("fprintf('Paru\\n');\n"));
+    PRLEVEL (p, ("norm(S(oldR,c)-L*U)\n" ));
+    PRLEVEL (p, ("if( (norm(S(oldR,c)-L*U)) < err )\n" ));
     PRLEVEL (p, ("\tfprintf('Pass\\n')\nelse\n\tfprintf('Fail\\n')\nend\n" ));
     
     printf("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*\n");

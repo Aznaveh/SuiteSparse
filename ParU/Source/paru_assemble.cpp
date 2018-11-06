@@ -103,7 +103,8 @@ void paru_assemble (
             Tuple curTpl = listColTuples [i];
             Int e = curTpl.e;
             Int curColIndex = curTpl.f;
-
+            PRLEVEL (1, ("e =%ld  curColIndex = %ld\n", e, curColIndex));
+            
             /*! TODO: Never negate e or f for now... keep it?	 */
             if(e < 0 || curColIndex < 0 ) continue;  //already deleted
 
@@ -115,8 +116,10 @@ void paru_assemble (
             Int *colRelIndex    = relColInd (curEl);
             Int *el_colIndex = colIndex_pointer (curEl);
 
+            PRLEVEL (1, ("point to col = %ld\n", el_colIndex[curColIndex]));
             /*! TODO: Keep the tuple or delete it?	 */
             if (el_colIndex [curColIndex]< 0 ) continue; // already assembled
+            
             ASSERT (el_colIndex[curColIndex] == c);
 
 
@@ -380,7 +383,6 @@ void paru_assemble (
     PRLEVEL (p, ("];\n"));
 
     //inv row permutatin
-    //PRLEVEL (p, ("invRows (rows{%ld}) = 1:%ld\n",f+1,rowCount));
 
     PRLEVEL (p, ("Luf{%ld}= [",f+1));
     for (Int r = 0; r < rowCount; r++){
@@ -392,7 +394,7 @@ void paru_assemble (
     }
     PRLEVEL (p, ("];\n"));
     //just in cases that there is no U
-    PRLEVEL (p, ("U{%ld} =[];\n", f+1));
+    PRLEVEL (p, ("Us{%ld} =[];\n", f+1));
     PRLEVEL (p, ("Ucols{%ld}=[];\n",f+1));
     PRLEVEL (p, ("Urows{%ld}=[];\n",f+1));
 #endif
@@ -591,6 +593,7 @@ void paru_assemble (
         }
         PRLEVEL (p, ("\n"));
     }
+
 #endif
 
 
@@ -600,6 +603,7 @@ void paru_assemble (
 
 #ifndef NDEBUG  // Printing the  U part
     p = 0;
+    PRLEVEL (p, ("rowCount=%ld;\n",rowCount));
     PRLEVEL (p, ("%% U part After TRSM: %ld x %ld\n", fp, colCount));
 
     PRLEVEL (p, ("Ucols{%ld} = [",f+1));
@@ -614,10 +618,8 @@ void paru_assemble (
         PRLEVEL (p, ("%ld ",  fsRowList [i]+1));
     PRLEVEL (p, ("];\n"));
     
-    //inv row permutatin
-    PRLEVEL (p, ("for i=1:%ld\ninvRows(rows(i)) = i;\nend\n",rowCount));
 
-    PRLEVEL (p, ("U{%ld} = [",f+1));
+    PRLEVEL (p, ("Us{%ld} = [",f+1));
 
     for (Int i = 0; i < fp; i++){
         for (Int j = 0; j < colCount; j++){
@@ -647,11 +649,31 @@ void paru_assemble (
     Int *el_colIndex = colIndex_pointer (el);
     for (Int i = 0; i < colCount; ++ i) {
         el_colIndex [i] = CBColList[i];
+        /* TODO: add column tuple */
+        Tuple colTuple;
+        colTuple.e = eli;
+        colTuple.f = i;
+        if (paru_add_colTuple (ColList, CBColList[i], colTuple, cc) ){
+            paru_freemat (&paruMatInfo, cc);
+            printf("Out of memory: add_colTuple \n");
+            return; /* TODO: check RETURN MEM usage */
+        }
     }
     Int *el_rowIndex = rowIndex_pointer (el);
     for (Int i = fp; i < rowCount; ++ i) {
-        el_rowIndex [i-fp] = fsRowList[i];
-        PRLEVEL (1, ("el_rowIndex [%ld] =%ld\n",i-fp, el_rowIndex [i-fp]));
+       Int locIndx = i-fp; 
+        el_rowIndex [locIndx] = fsRowList[i];
+        PRLEVEL (1, ("el_rowIndex [%ld] =%ld\n",locIndx, el_rowIndex [locIndx]));
+        /* TODO: add row tuple */
+        Tuple rowTuple;
+        rowTuple.e = eli;
+        rowTuple.f = locIndx;
+        if (paru_add_rowTuple (RowList, fsRowList[i], rowTuple, cc) ){
+            paru_freemat (&paruMatInfo, cc);
+            printf("Out of memory: add_colTuple \n");
+            return; /* TODO: check RETURN MEM usage */
+        }
+
     }
 
     double *el_numbers = numeric_pointer (el);

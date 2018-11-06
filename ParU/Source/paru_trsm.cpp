@@ -7,17 +7,20 @@
                                                         
 /*!
  * l11*u12=a12 and u12 is unkonwn  so we need this:
- *          op( A ) * X = alpha*B --> SIDE = 'L' or 'l'
+ *          op( A ) * X = alpha*B 
  *         part(pF) * X = 1 * upart
- * UPLO = 'L' or 'l'; A is a lower triangular matrix.   
+ *         part(pF) * upart = 1 * upart
+ *  SIDE = 'L' or 'l'      
+ *  UPLO = 'L' or 'l'; A is a lower triangular matrix.   
  *  TRANSA = 'N' or 'n'   op( A ) = A.
  *  DIAG = 'U' or 'u'   A is assumed to be unit triangular.
- *  M     M specifies the number of rows of B.
- *  N     N specifies the number of columns of B.
- *  TRANSA = 'N' or 'n'   op( A ) = A.
- *  DIAG = 'U' or 'u'   A is assumed to be unit triangular.
- *  LDA  leading dimension of A. 
- *  LDB  leading dimension of B.  it must be fp
+ *  M     M specifies the number of rows of B.    (fp)
+ *  N     N specifies the number of columns of B. (colCount)
+ *  ALPHA, (alpha = 1.0)
+ *  A (pF)
+ *  LDA  leading dimension of A. (rowCount)
+ *  B (upart)
+ *  LDB  leading dimension of B.  (fp)
  */
 
 
@@ -42,7 +45,7 @@ Int paru_trsm(double *pF, double *uPart, Int fp, Int rowCount, Int colCount){
 
 #ifndef NDEBUG  // Printing the  U part
     Int p = 1;
-    PRLEVEL (p, ("U Before Trsm: %ld x %ld\n", fp, colCount));
+    PRLEVEL (p, ("(I)U Before Trsm: %ld x %ld\n", fp, colCount));
     for (Int i = 0; i < fp; i++){
         for (Int j = 0; j < colCount; j++){
             PRLEVEL (p, (" %2.5lf\t", uPart[j*fp+i]));
@@ -56,7 +59,7 @@ Int paru_trsm(double *pF, double *uPart, Int fp, Int rowCount, Int colCount){
             uPart, &ldb);
 
 #ifndef NDEBUG  // Printing the  U part
-    PRLEVEL (p, ("U After Trsm: %ld x %ld\n", fp, colCount));
+    PRLEVEL (p, ("(I)U After Trsm: %ld x %ld\n", fp, colCount));
     for (Int i = 0; i < fp; i++){
         for (Int j = 0; j < colCount; j++){
             PRLEVEL (p, (" %2.5lf\t", uPart[j*fp+i]));

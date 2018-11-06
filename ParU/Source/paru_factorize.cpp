@@ -41,7 +41,7 @@ Int paru_factorize (double *F, Int *fsRowList, Int lm, Int ln,
         ipiv [i] = -1;
     }
     if (m < n )
-        PRLEVEL (0, ("!!!!! FAIL m= %d  n= %d\n", m, n));
+        PRLEVEL (0, ("%%!!!!! FAIL m= %d  n= %d\n", m, n));
 #endif
 
 #ifndef NDEBUG  // Printing the list of rows

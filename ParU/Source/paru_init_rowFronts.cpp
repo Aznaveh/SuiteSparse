@@ -120,7 +120,7 @@ paru_matrix *paru_init_rowFronts (
     // RowList, ColList and elementList are place holders 
     // pointers to pointers that are allocated
     if (m == 0 || n == 0) {
-        printf("The dimension of matrix is zero: %ld x %ld \n",m,n);
+        printf("%%The dimension of matrix is zero: %ld x %ld \n",m,n);
         paru_free (1, sizeof(paru_matrix), paruMatInfo, cc);
         return NULL;
 

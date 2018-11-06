@@ -22,7 +22,7 @@ int main (int argc, char **argv)
 
     if (mtype != CHOLMOD_SPARSE)
     {
-        printf ("input matrix must be sparse\n") ;
+        printf ("%%input matrix must be sparse\n") ;
         exit (1) ;
     }
 
