@@ -9,12 +9,12 @@
 void assemble_col (const double *sC, double *dC,   //source col and destination col
                     Int m, const Int *relRowInd)
 {
-    DEBUGLEVEL (0);
+    DEBUGLEVEL (1);
     for (Int i = 0; i < m; i++) {
-        PRLEVEL (1, ("relRowInd [%ld] =%ld\n",i ,relRowInd [i] ));
+        PRLEVEL (1, ("%% relRowInd [%ld] =%ld\n",i ,relRowInd [i] ));
         Int ri = relRowInd[i] ;
         if ( ri >= 0 ) { // If still valid
-            PRLEVEL (1, ("sC [%ld] =%2.5lf\n", i, sC [i]));
+            PRLEVEL (1, ("%% sC [%ld] =%2.5lf \n", i, sC [i]));
             dC [ri ] += sC[i];
         }
     }

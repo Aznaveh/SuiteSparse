@@ -30,7 +30,7 @@ Int paru_add_rowTuple (
         cur->list[cur->numTuple++] = T;
 
     else{
-        PRLEVEL (0, ("Row Tuple reallocating space\n"));
+        PRLEVEL (0, ("%%Row Tuple reallocating space\n"));
         Int newLen = cur->len*2 + 1;
         Tuple *newList = 
             (Tuple*) paru_alloc (newLen, sizeof(Tuple), cc);

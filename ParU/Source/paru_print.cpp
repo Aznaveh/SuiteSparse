@@ -13,13 +13,13 @@ void paru_print_element (paru_matrix *paruMatInfo, Int e){
     Int nf = paruMatInfo->LUsym->nf;
 
     if ( e > morign + nf +1){
-        printf("Element %ld is out of range; just %ld elements \n", 
+        printf("%% Element %ld is out of range; just %ld elements \n", 
                 e,  morign + nf +1);
         return;
     }
 
     if (curEl == NULL){
-        printf("Element %ld is empty\n",e );
+        printf("%% Element %ld is empty\n",e );
         return;
     }
 
@@ -33,15 +33,15 @@ void paru_print_element (paru_matrix *paruMatInfo, Int e){
     double *el_colrowNum = numeric_pointer (curEl);
 
     printf("\n"); 
-    printf("Element %ld is %ld x %ld:\n", e, m, n);
+    printf("%% Element %ld is %ld x %ld:\n", e, m, n);
 
 
     printf("\t"); 
     for (int j = 0; j < n; j++) 
-        printf("%ld\t", el_colIndex [j] );
+        printf("%% %ld\t", el_colIndex [j] );
     printf("\n"); 
     for (int i = 0; i < m; i++) {
-        printf("%ld\t",el_rowIndex [i] );
+        printf("%% %ld\t",el_rowIndex [i] );
         for (int j = 0; j < n; j++) {
             double value =  el_colrowNum [i*m + j];
             printf("%2.4lf\t",value );

@@ -56,7 +56,7 @@ void paru_assemble (
 
     PRLEVEL (0, ("%% fp=%ld pivotal columns:clo1=%ld...col2=%ld\n", 
                 fp, col1, col2-1));
-    PRLEVEL (1, ("Upper bound number of columns: Rj[%ld]=%ld ... Rj[%ld]=%ld\n", 
+    PRLEVEL (1, ("%%Upper bound number of columns: Rj[%ld]=%ld ... Rj[%ld]=%ld\n", 
                 p1, Rj [p1], p2, Rj [p2-1]));
     ASSERT (fp > 0 );
     ASSERT (fp <= fn );
@@ -74,13 +74,14 @@ void paru_assemble (
     }
 
     Int *fsRowList = Work->scratch; // fully summed row list
-    PRLEVEL (1, ("fsRowList(scratch)=%p isRowInFront(all_initialized)=%p\n", 
+    PRLEVEL (1, ("%%fsRowList(scratch)=%p isRowInFront(all_initialized)=%p\n", 
                 fsRowList, isRowInFront));
 
 #ifndef NDEBUG /* chekcing first part of Work to be zero */
     for (Int i = 0; i < m; i++){  
         if ( isRowInFront [i] >= rowMark)
-            PRLEVEL (1, ("rowMark = %ld, isRowInFront[%ld] = %ld\n", rowMark ,i,
+            PRLEVEL (1, ("%%rowMark = %ld, isRowInFront[%ld] = %ld\n", 
+                        rowMark ,i,
                         isRowInFront [i]));
         ASSERT ( isRowInFront [i] < rowMark);
     }
@@ -98,12 +99,12 @@ void paru_assemble (
         Int numTuple = curColTupleList->numTuple;
         ASSERT (numTuple >= 0);
         Tuple *listColTuples = curColTupleList->list;
-        PRLEVEL (1, ("c =%ld  numTuple = %ld\n", c, numTuple));
+        PRLEVEL (1, ("%%c =%ld  numTuple = %ld\n", c, numTuple));
         for (Int i = 0; i < numTuple; i++){
             Tuple curTpl = listColTuples [i];
             Int e = curTpl.e;
             Int curColIndex = curTpl.f;
-            PRLEVEL (1, ("e =%ld  curColIndex = %ld\n", e, curColIndex));
+            PRLEVEL (1, ("%%e =%ld  curColIndex = %ld\n", e, curColIndex));
             
             /*! TODO: Never negate e or f for now... keep it?	 */
             if(e < 0 || curColIndex < 0 ) continue;  //already deleted
@@ -116,7 +117,7 @@ void paru_assemble (
             Int *colRelIndex    = relColInd (curEl);
             Int *el_colIndex = colIndex_pointer (curEl);
 
-            PRLEVEL (1, ("point to col = %ld\n", el_colIndex[curColIndex]));
+            PRLEVEL (1, ("%%point to col = %ld\n", el_colIndex[curColIndex]));
             /*! TODO: Keep the tuple or delete it?	 */
             if (el_colIndex [curColIndex]< 0 ) continue; // already assembled
             
@@ -127,37 +128,45 @@ void paru_assemble (
             // neede for row assembly
             // function
 
-            //counting prior element's columns
-            if (elCol [e] < elCMark) // an element never seen before
+            PRLEVEL (0, ("%%1:element= %ld elCol=%ld elCMark=%ld \n",
+                        e, elCol[e], elCMark));
+            //counting prior element's columns //TODO: LOOK INTO this part
+            if (elCol [e] <= elCMark) // an element never seen before
                 elCol [e] = curEl->ncolsleft - 1; //initiaze 
-
             else { 
                 elCol [e]--;    //keep track of number of cols
+                PRLEVEL (0, ("%%!:element= %ld \n",e));
+            //counting prior element's columns
                 continue;       // already have the set of rows
             }
 
-            PRLEVEL (1, ("element= %ld  mEl =%ld \n",e, mEl));
+            PRLEVEL (0, ("%%2:element= %ld  mEl =%ld \n",e, mEl));
+            //Set union of all the rows of the current element
             for (Int rEl = 0; rEl < mEl; rEl++){
                 Int curRow = el_rowIndex [rEl]; 
                 if (curRow < 0 ) continue; // that row has already deleted
-                PRLEVEL (1, ("curRow =%ld\n", curRow));
+                PRLEVEL (0, ("%%**curRow =%ld rEl=%ld\n", curRow, rEl));
                 ASSERT (curRow < m ) ;
 #ifndef NDEBUG
                 stl_rowSet.insert (curRow);
 #endif
-                PRLEVEL (1, ("%p ---> isRowInFront [%ld]=%ld\n", 
+                PRLEVEL (1, ("%% %p ---> isRowInFront [%ld]=%ld\n", 
                             isRowInFront+curRow, curRow, isRowInFront[curRow]));
 
                 if (isRowInFront[curRow] < rowMark ){  
                     // Adding curRow to the set
-                    PRLEVEL (1, ("curRow =%ld rowCount=%ld\n", 
+                    PRLEVEL (0, ("%%curRow =%ld rowCount=%ld\n", 
                                 curRow, rowCount));
                     fsRowList [rowCount] = curRow;
                     rowRelIndex [rEl] = rowCount ;
+                    PRLEVEL (0, ("%%1st: rowRelIndex[%ld] = %ld\n",
+                                rEl, rowCount ));
                     isRowInFront [curRow] = rowMark + rowCount++; 
                 }
                 else{
                     rowRelIndex [rEl] = isRowInFront [curRow] - rowMark;
+                    PRLEVEL (0, ("%%N1st: rowRelIndex[%ld] = %ld\n",
+                                rEl, rowCount ));
                 }
                 ASSERT (rowCount <= m); 
             }
@@ -167,18 +176,18 @@ void paru_assemble (
 
 #ifndef NDEBUG /* Checking if pivotal rows are correct */
     Int p = 1;
-    PRLEVEL (p, ("There are %ld rows in this front: \n", rowCount));
+    PRLEVEL (p, ("%%There are %ld rows in this front: \n", rowCount));
     for (Int i = 0; i < rowCount; i++)
-        PRLEVEL (p, (" %ld", fsRowList [i]));
+        PRLEVEL (p, ("%% %ld", fsRowList [i]));
     PRLEVEL (p, ("\n"));
     Int stl_rowSize = stl_rowSet.size();
     if (rowCount != stl_rowSize){
-        PRLEVEL (p, ("STL %ld:\n",stl_rowSize));
+        PRLEVEL (p, ("%% STL %ld:\n",stl_rowSize));
         for (it = stl_rowSet.begin(); it != stl_rowSet.end(); it++)
-            PRLEVEL (p, (" %ld", *it));
-        PRLEVEL (p, ("\nMy Set %ld:\n",rowCount));
+            PRLEVEL (p, ("%% %ld", *it));
+        PRLEVEL (p, ("\n%%My Set %ld:\n",rowCount));
         for (Int i = 0; i < rowCount; i++)
-            PRLEVEL (p, (" %ld", fsRowList [i]));
+            PRLEVEL (p, ("%% %ld", fsRowList [i]));
         PRLEVEL (p, ("\n"));
     }
     ASSERT (rowCount == stl_rowSize );
@@ -224,7 +233,7 @@ void paru_assemble (
         Int numTuple = curTupleList->numTuple;
         ASSERT (numTuple >= 0);
         Tuple *l = curTupleList->list;
-        PRLEVEL (1, ("c =%ld numTuple = %ld\n", c, numTuple));
+        PRLEVEL (1, ("%% c =%ld numTuple = %ld\n", c, numTuple));
 
         Int colIndexF = c - col1;  // relative column index
 
@@ -249,16 +258,17 @@ void paru_assemble (
             ASSERT (el_colIndex[curColIndex] == c);
 
 
-            PRLEVEL (1, ("curColIndex =%ld\n", curColIndex));
+            PRLEVEL (1, ("%% curColIndex =%ld\n", curColIndex));
 
             ASSERT (curColIndex < nEl);
             double *el_Num = numeric_pointer (curEl);
-            PRLEVEL (1, ("col=%ld, (%ld,%ld)\n", c, e, curColIndex));
-            PRLEVEL (1, ("ASSEMBL element= %ld  mEl =%ld ",e, mEl));
-            PRLEVEL (1, (" into column %ld of current front\n",colIndexF ));
 #ifndef NDEBUG // print the element which is going to be assembled from
-            p = 1;
-            PRLEVEL (p, ("assembling from col %ld", curColIndex ));
+            p = 0;
+            PRLEVEL (p, ("%% col=%ld, element=%ld,curColIndex=%ld\n", c, e,
+                        curColIndex));
+            PRLEVEL (p, ("%% ASSEMBL element= %ld  mEl =%ld ",e, mEl));
+            PRLEVEL (p, ("%% into column %ld of current front\n",colIndexF ));
+            PRLEVEL (p, ("%%assembling from col %ld", curColIndex ));
             if (p == 0)
                 paru_print_element (paruMatInfo, e);
 #endif
@@ -270,6 +280,23 @@ void paru_assemble (
             //FLIP(el_colIndex[curColIndex]); //marking column as assembled
             el_colIndex[curColIndex] = -1;
             colRelIndex [curColIndex] = -1;
+
+#ifndef NDEBUG  // Printing the pivotal front
+            p = 0;
+            PRLEVEL (p, ("%%Inside the assembly loop \n"));
+            PRLEVEL (p, ("%%x =  \t"));
+            for (Int c = col1; c < col2; c++) {
+                PRLEVEL (p, ("%% %ld\t\t", c));
+            }
+            PRLEVEL (p, (" ;\n"));
+            for (Int r = 0; r < rowCount; r++){
+                PRLEVEL (p, ("%% %ld\t", fsRowList [r]));
+                for (Int c = col1; c < col2; c++){
+                    PRLEVEL (p, (" %2.5lf\t", pivotalFront [(c-col1)*rowCount + r]));
+                }
+                PRLEVEL (p, ("\n"));
+            }
+#endif
 
 #if 0
             //This part has been moved to assemble_col function
@@ -301,15 +328,15 @@ void paru_assemble (
     }
 
 #ifndef NDEBUG  // Printing the pivotal front
-    p = 1;
+    p = 0;
     PRLEVEL (p, ("%% Before pivoting\n"));
-    PRLEVEL (p, ("x =  \t"));
+    PRLEVEL (p, ("%% x =  \t"));
     for (Int c = col1; c < col2; c++) {
         PRLEVEL (p, ("%ld\t\t", c));
     }
     PRLEVEL (p, (" ;\n"));
     for (Int r = 0; r < rowCount; r++){
-        PRLEVEL (p, ("%ld\t", fsRowList [r]));
+        PRLEVEL (p, ("%% %ld\t", fsRowList [r]));
         for (Int c = col1; c < col2; c++){
             PRLEVEL (p, (" %2.5lf\t", pivotalFront [(c-col1)*rowCount + r]));
         }
@@ -318,13 +345,13 @@ void paru_assemble (
 #endif
     /**** 3 ********  factorizing the fully summed part of the matrix        ***
      *****  a set of pivot is found in this part that is crucial to assemble **/
-    PRLEVEL (1, ("rowCount =%ld\n", rowCount));
+    PRLEVEL (1, ("%% rowCount =%ld\n", rowCount));
 
 #ifndef NDEBUG  // Printing the list of rows
     p = 1;
-    PRLEVEL (p, ("Befor factorization (inside assemble): \n"));
+    PRLEVEL (p, ("%% Befor factorization (inside assemble): \n"));
     for (int i = 0; i < rowCount; i++){
-        PRLEVEL (p, ("fsRowList [%d] =%d\n",i, fsRowList [i]));
+        PRLEVEL (p, ("%% fsRowList [%d] =%d\n",i, fsRowList [i]));
     }
     PRLEVEL (p, ("\n"));
 #endif
@@ -344,9 +371,9 @@ void paru_assemble (
     }
 #ifndef NDEBUG  // Printing the list of rows
     p = 1;
-    PRLEVEL (p, ("After factorization (inside assemble): \n"));
+    PRLEVEL (p, ("%% After factorization (inside assemble): \n"));
     for (int i = 0; i < rowCount; i++){
-        PRLEVEL (p, ("fsRowList [%d] =%d\n",i, fsRowList [i]));
+        PRLEVEL (p, ("%% fsRowList [%d] =%d\n",i, fsRowList [i]));
     }
     PRLEVEL (p, ("\n"));
 #endif
@@ -354,13 +381,13 @@ void paru_assemble (
 
 #ifndef NDEBUG  // Printing the permutation
     p = 1;
-    PRLEVEL (p, ("pivotal rows:\n"));
+    PRLEVEL (p, ("%% pivotal rows:\n"));
     for (int i = 0; i < fp; i++){
-        PRLEVEL (p, ("fsRowList[%d] =%d\n",i, fsRowList[i]));
+        PRLEVEL (p, ("%% fsRowList[%d] =%d\n",i, fsRowList[i]));
     }
-    PRLEVEL (p, ("=======\n"));
+    PRLEVEL (p, ("%% =======\n"));
     for (int i = fp; i < rowCount; i++){
-        PRLEVEL (p, ("fsRowList[%d] =%d\n",i, fsRowList[i]));
+        PRLEVEL (p, ("%% fsRowList[%d] =%d\n",i, fsRowList[i]));
     }
     PRLEVEL (p, ("\n"));
 #endif
@@ -386,7 +413,7 @@ void paru_assemble (
 
     PRLEVEL (p, ("Luf{%ld}= [",f+1));
     for (Int r = 0; r < rowCount; r++){
-    PRLEVEL (p, (" "));
+        PRLEVEL (p, (" "));
         for (Int c = col1; c < col2; c++){
             PRLEVEL (p, (" %.16lf ", pivotalFront [(c-col1)*rowCount + r]));
         }
@@ -419,12 +446,12 @@ void paru_assemble (
         Int curFsRowIndex =(Int) i; //current fully summed row index
         PRLEVEL (1, ("4: curFsRowIndex = %ld\n", curFsRowIndex));
         Int curFsRow = fsRowList [i];
-        PRLEVEL (1, ("curFsRow =%ld\n", curFsRow));
+        PRLEVEL (1, ("%% curFsRow =%ld\n", curFsRow));
         tupleList *curRowTupleList = &RowList [curFsRowIndex];
         Int numTuple = curRowTupleList->numTuple;
         ASSERT (numTuple >= 0);
         Tuple *listRowTuples = curRowTupleList->list;
-        PRLEVEL (1, ("4: numTuple = %ld\n", numTuple));
+        PRLEVEL (1, ("%% 4: numTuple = %ld\n", numTuple));
         for (Int i = 0; i < numTuple; i++){
             Tuple curTpl = listRowTuples [i];
             Int e = curTpl.e;
@@ -446,11 +473,11 @@ void paru_assemble (
             rowRelIndex [curTpl.f] = curFsRow;
 
             //counting prior element's rows
-            if (elRow [e] < elRMark) {// an element never seen before
+            if (elRow [e] <= elRMark) {// an element never seen before
                 elRow [e] = curEl ->nrowsleft - 1; //initiaze
 #ifndef NDEBUG
                 if ( elCol [e] >= elCMark )
-                    PRLEVEL (1, ("element %ld can be eaten wholly\n",e));
+                    PRLEVEL (1, ("%% element %ld can be eaten wholly\n",e));
                 //And the rest of e is in U part 
 #endif
             }
@@ -459,22 +486,22 @@ void paru_assemble (
                 continue;
             }
 
-            PRLEVEL (1, ("element= %ld  nEl =%ld \n",e, nEl));
+            PRLEVEL (1, ("%% element= %ld  nEl =%ld \n",e, nEl));
             for (Int cEl = 0; cEl < nEl; cEl++){
                 Int curCol = el_colIndex [cEl]; 
-                PRLEVEL (1, ("curCol =%ld\n", curCol));
+                PRLEVEL (1, ("%% curCol =%ld\n", curCol));
                 ASSERT (curCol < n);
                 if (curCol < 0)
                     continue;
 #ifndef NDEBUG
                 stl_colSet.insert (curCol);
 #endif
-                PRLEVEL (1, ("%p ---> isColInCBcolSet[%ld]=%ld\n", 
+                PRLEVEL (1, ("%% %p ---> isColInCBcolSet[%ld]=%ld\n", 
                             isColInCBcolSet+curCol, curCol,
                             isColInCBcolSet[curCol]));
-             
+
                 if (isColInCBcolSet [curCol] < colMark  ){
-                    PRLEVEL (1, ("curCol = %ld colCount=%ld\n", 
+                    PRLEVEL (1, ("%% curCol = %ld colCount=%ld\n", 
                                 curCol, colCount));
                     CBColList [colCount] = curCol;
                     colRelIndex [cEl] = colCount;
@@ -495,19 +522,19 @@ void paru_assemble (
 
 #ifndef NDEBUG /* Checking if columns are correct */
     p = 1;
-    PRLEVEL (p, ("There are %ld columns in this contribution block: \n",
+    PRLEVEL (p, ("%% There are %ld columns in this contribution block: \n",
                 colCount));
     for (Int i = 0; i < colCount; i++)
-        PRLEVEL (p, (" %ld", CBColList [i]));
+        PRLEVEL (p, ("%%  %ld", CBColList [i]));
     PRLEVEL (p, ("\n"));
     Int stl_colSize = stl_colSet.size();
     if (colCount != stl_colSize){
-        PRLEVEL (p, ("STL %ld:\n",stl_colSize));
+        PRLEVEL (p, ("%% STL %ld:\n",stl_colSize));
         for (it = stl_colSet.begin(); it != stl_colSet.end(); it++)
-            PRLEVEL (p, (" %ld", *it));
-        PRLEVEL (p, ("\nMy Set %ld:\n",colCount));
+            PRLEVEL (p, ("%%  %ld", *it));
+        PRLEVEL (p, ("\n%% My Set %ld:\n",colCount));
         for (Int i = 0; i < colCount; i++)
-            PRLEVEL (p, (" %ld", CBColList [i]));
+            PRLEVEL (p, ("%%  %ld", CBColList [i]));
         PRLEVEL (p, ("\n"));
     }
     ASSERT (colCount == stl_colSize );
@@ -537,13 +564,13 @@ void paru_assemble (
     for (Int i = 0; i < fp; i++){
         Int curFsRowIndex = i; //current fully summed row index
         Int curFsRow = fsRowList [curFsRowIndex];
-        PRLEVEL (1, ("curFsRow =%ld\n", curFsRow));
+        PRLEVEL (1, ("%% curFsRow =%ld\n", curFsRow));
         tupleList *curRowTupleList = &RowList [curFsRowIndex];
         Int numTuple = curRowTupleList->numTuple;
         ASSERT (numTuple >= 0);
         ASSERT (numTuple <= m);
         Tuple *listRowTuples = curRowTupleList->list;
-        PRLEVEL (1, ("numTuple = %ld\n", numTuple));
+        PRLEVEL (1, ("%% numTuple = %ld\n", numTuple));
         for (Int i = 0; i < numTuple; i++){
             Tuple curTpl = listRowTuples [i];
             Int e = curTpl.e;
@@ -560,13 +587,13 @@ void paru_assemble (
 
             if(el_rowIndex[curRowIndex] < 0 ) continue; 
 
-            PRLEVEL (1, ("curFsRowIndex =%ld\n", curFsRowIndex));
+            PRLEVEL (1, ("%% curFsRowIndex =%ld\n", curFsRowIndex));
             ASSERT (el_rowIndex[curRowIndex] == curFsRowIndex);
             ASSERT (curRowIndex < mEl);
-            PRLEVEL (1, ("curColIndex =%ld\n", curRowIndex));
+            PRLEVEL (1, ("%% curColIndex =%ld\n", curRowIndex));
 
             double *el_Num = numeric_pointer (curEl);
-            PRLEVEL (1, ("element= %ld  nEl =%ld \n",e, nEl));
+            PRLEVEL (1, ("%% element= %ld  nEl =%ld \n",e, nEl));
 
             assemble_row (el_Num, uPart, mEl, nEl, fp, 
                     curRowIndex, curFsRowIndex, colRelIndex);
@@ -580,14 +607,14 @@ void paru_assemble (
 
 #ifndef NDEBUG  // Printing the  U part
     p = 1;
-    PRLEVEL (p, ("U part Before TRSM: %ld x %ld\n", fp, colCount));
-    PRLEVEL (p, ("U\t"));
+    PRLEVEL (p, ("%% U part Before TRSM: %ld x %ld\n", fp, colCount));
+    PRLEVEL (p, ("%% U\t"));
     for (Int i = 0; i < colCount; i++){
         PRLEVEL (p, ("%ld\t\t", CBColList[i]));
     }
     PRLEVEL (p, ("\n"));
     for (Int i = 0; i < fp; i++){
-        PRLEVEL (p, ("%ld\t",  fsRowList [i]));
+        PRLEVEL (p, ("%% %ld\t",  fsRowList [i]));
         for (Int j = 0; j < colCount; j++){
             PRLEVEL (p, (" %2.5lf\t", uPart[j*fp+i]));
         }
@@ -603,7 +630,7 @@ void paru_assemble (
 
 #ifndef NDEBUG  // Printing the  U part
     p = 0;
-    PRLEVEL (p, ("rowCount=%ld;\n",rowCount));
+    PRLEVEL (p, ("%% rowCount=%ld;\n",rowCount));
     PRLEVEL (p, ("%% U part After TRSM: %ld x %ld\n", fp, colCount));
 
     PRLEVEL (p, ("Ucols{%ld} = [",f+1));
@@ -617,7 +644,7 @@ void paru_assemble (
     for (Int i = 0; i < fp; i++)
         PRLEVEL (p, ("%ld ",  fsRowList [i]+1));
     PRLEVEL (p, ("];\n"));
-    
+
 
     PRLEVEL (p, ("Us{%ld} = [",f+1));
 
@@ -634,8 +661,9 @@ void paru_assemble (
     Int *snM = LUsym->super2atree;
     Int eli = snM [f]; // Element index of the one that is going to be assembled
     Element *el;
-    PRLEVEL (1, ("rowCount=%ld, colCount=%ld, fp=%ld\n",rowCount, colCount, fp));
-    PRLEVEL (1, ("el is %ld by %ld\n",rowCount-fp,colCount));
+    PRLEVEL (1, ("%% rowCount=%ld, colCount=%ld, fp=%ld\n",
+                rowCount, colCount, fp));
+    PRLEVEL (1, ("%% el is %ld by %ld\n",rowCount-fp,colCount));
     if (fp <= rowCount ){ // otherwise nothing will remain of this front
         el = elementList[eli] = paru_create_element (rowCount-fp,
                 colCount, 0 ,cc);
@@ -643,7 +671,7 @@ void paru_assemble (
             printf ("Out of memory when tried to allocate current CB %ld",eli);
             return;
         }
-        PRLEVEL (1, ("el =%p\n", el));
+        PRLEVEL (1, ("%% el =%p\n", el));
     }
     // Initializing el global indices
     Int *el_colIndex = colIndex_pointer (el);
@@ -663,7 +691,8 @@ void paru_assemble (
     for (Int i = fp; i < rowCount; ++ i) {
        Int locIndx = i-fp; 
         el_rowIndex [locIndx] = fsRowList[i];
-        PRLEVEL (1, ("el_rowIndex [%ld] =%ld\n",locIndx, el_rowIndex [locIndx]));
+        PRLEVEL (1, ("%% el_rowIndex [%ld] =%ld\n",
+                    locIndx, el_rowIndex [locIndx]));
         /* TODO: add row tuple */
         Tuple rowTuple;
         rowTuple.e = eli;
@@ -688,6 +717,7 @@ void paru_assemble (
     ////////////////////////////////////////////////////////////////////////////
 
 #ifndef NDEBUG
+    //Printing the contribution block
     p = 1;
     if (p == 0)
         paru_print_element (paruMatInfo, eli);
@@ -700,6 +730,9 @@ void paru_assemble (
 
     Work->colMark += colCount;
     colMark = Work -> colMark;
+   /* Trying to DEBUG */ 
+    Work -> elCMark += colCount;
+    Work -> elRMark += colCount;
 
 
 #ifndef NDEBUG /* chekcing isRowInFront to be zero */
@@ -708,8 +741,8 @@ void paru_assemble (
 #endif
 
 
-    PRLEVEL (1, ("rowCount =%ld\n", rowCount));
-    PRLEVEL (1, ("colCount =%ld\n", colCount));
+    PRLEVEL (0, ("%%rowCount =%ld\n", rowCount));
+    PRLEVEL (0, ("%%colCount =%ld\n", colCount));
     PRLEVEL (1, ("fp =%ld\n", fp));
     /*! TODO: This should be stored somewhere     */
     paru_free (rowCount*fp, sizeof (double), pivotalFront, cc);
