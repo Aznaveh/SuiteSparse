@@ -444,10 +444,11 @@ void paru_assemble (
     tupleList *RowList = paruMatInfo->RowList;
     for (Int i = 0; i < fp; i++){
         Int curFsRowIndex =(Int) i; //current fully summed row index
-        PRLEVEL (1, ("4: curFsRowIndex = %ld\n", curFsRowIndex));
         Int curFsRow = fsRowList [i];
-        PRLEVEL (1, ("%% curFsRow =%ld\n", curFsRow));
-        tupleList *curRowTupleList = &RowList [curFsRowIndex];
+        PRLEVEL (0, ("%% 4: curFsRowIndex = %ld\n", curFsRowIndex));
+        PRLEVEL (0, ("%% curFsRow =%ld\n", curFsRow));
+        //tupleList *curRowTupleList = &RowList [curFsRowIndex]; //BUG DETECTED
+        tupleList *curRowTupleList = &RowList [curFsRow];
         Int numTuple = curRowTupleList->numTuple;
         ASSERT (numTuple >= 0);
         Tuple *listRowTuples = curRowTupleList->list;
@@ -468,7 +469,8 @@ void paru_assemble (
             Int *rowRelIndex = relRowInd (curEl);
 
             if (el_rowIndex [curRowIndex] < 0 ) continue;
-            ASSERT (el_rowIndex[curRowIndex] == curFsRowIndex);
+           // ASSERT (el_rowIndex[curRowIndex] == curFsRowIndex); //BUGGY
+            ASSERT (el_rowIndex[curRowIndex] == curFsRow);
 
             rowRelIndex [curTpl.f] = curFsRow;
 
@@ -489,7 +491,7 @@ void paru_assemble (
             PRLEVEL (1, ("%% element= %ld  nEl =%ld \n",e, nEl));
             for (Int cEl = 0; cEl < nEl; cEl++){
                 Int curCol = el_colIndex [cEl]; 
-                PRLEVEL (1, ("%% curCol =%ld\n", curCol));
+                PRLEVEL (0, ("%% curCol =%ld\n", curCol));
                 ASSERT (curCol < n);
                 if (curCol < 0)
                     continue;
@@ -565,7 +567,8 @@ void paru_assemble (
         Int curFsRowIndex = i; //current fully summed row index
         Int curFsRow = fsRowList [curFsRowIndex];
         PRLEVEL (1, ("%% curFsRow =%ld\n", curFsRow));
-        tupleList *curRowTupleList = &RowList [curFsRowIndex];
+        //tupleList *curRowTupleList = &RowList [curFsRowIndex]; //BUGGY
+        tupleList *curRowTupleList = &RowList [curFsRow];
         Int numTuple = curRowTupleList->numTuple;
         ASSERT (numTuple >= 0);
         ASSERT (numTuple <= m);
@@ -588,7 +591,8 @@ void paru_assemble (
             if(el_rowIndex[curRowIndex] < 0 ) continue; 
 
             PRLEVEL (1, ("%% curFsRowIndex =%ld\n", curFsRowIndex));
-            ASSERT (el_rowIndex[curRowIndex] == curFsRowIndex);
+            //ASSERT (el_rowIndex[curRowIndex] == curFsRowIndex); //BUGGY
+            ASSERT (el_rowIndex[curRowIndex] == curFsRow);
             ASSERT (curRowIndex < mEl);
             PRLEVEL (1, ("%% curColIndex =%ld\n", curRowIndex));
 
@@ -718,7 +722,7 @@ void paru_assemble (
 
 #ifndef NDEBUG
     //Printing the contribution block
-    p = 1;
+    p = 0;
     if (p == 0)
         paru_print_element (paruMatInfo, eli);
 #endif
@@ -741,12 +745,12 @@ void paru_assemble (
 #endif
 
 
-    PRLEVEL (0, ("%%rowCount =%ld\n", rowCount));
-    PRLEVEL (0, ("%%colCount =%ld\n", colCount));
+    PRLEVEL (1, ("%%rowCount =%ld\n", rowCount));
+    PRLEVEL (1, ("%%colCount =%ld\n", colCount));
     PRLEVEL (1, ("fp =%ld\n", fp));
     /*! TODO: This should be stored somewhere     */
     paru_free (rowCount*fp, sizeof (double), pivotalFront, cc);
     paru_free (fp*colCount,  sizeof (double), uPart, cc);
 
-    PRLEVEL (0, ("%%~~~~~~~Assemble Front %ld finished\n", f));
+    PRLEVEL (1, ("%%~~~~~~~Assemble Front %ld finished\n", f));
 }
