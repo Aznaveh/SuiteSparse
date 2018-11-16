@@ -130,13 +130,17 @@ void paru_assemble (
 
             PRLEVEL (0, ("%%1:element= %ld elCol=%ld elCMark=%ld \n",
                         e, elCol[e], elCMark));
-            //counting prior element's columns //TODO: LOOK INTO this part
-            if (elCol [e] <= elCMark) // an element never seen before
-                elCol [e] = curEl->ncolsleft - 1; //initiaze 
+
+
+            //counting prior element's columns //TODO: BUGGY 
+//         if (elCol [e] <= elCMark) // an element never seen before
+//               elCol [e] = curEl->ncolsleft - 1; //initiaze 
+            if(*rowRelIndValid !=  f)
+                *rowRelIndValid =  f;
             else { 
                 elCol [e]--;    //keep track of number of cols
                 PRLEVEL (0, ("%%!:element= %ld \n",e));
-            //counting prior element's columns
+                //counting prior element's columns
                 continue;       // already have the set of rows
             }
 
@@ -475,8 +479,11 @@ void paru_assemble (
             rowRelIndex [curTpl.f] = curFsRow;
 
             //counting prior element's rows
-            if (elRow [e] <= elRMark) {// an element never seen before
-                elRow [e] = curEl ->nrowsleft - 1; //initiaze
+            //BUGGY: just like line 136
+//            if (elRow [e] <= elRMark) {// an element never seen before
+//                elRow [e] = curEl ->nrowsleft - 1; //initiaze
+            if(*colRelIndValid !=  f){
+                *colRelIndValid =  f;
 #ifndef NDEBUG
                 if ( elCol [e] >= elCMark )
                     PRLEVEL (1, ("%% element %ld can be eaten wholly\n",e));
@@ -515,21 +522,21 @@ void paru_assemble (
                 ASSERT (colCount <= n);
             }
         }
-    }
+        }
 
-    if (colCount == 0){  // there is no CB, Nothing to be done
-        Work->rowMark +=  rowCount;
-        return;
-    }
+        if (colCount == 0){  // there is no CB, Nothing to be done
+            Work->rowMark +=  rowCount;
+            return;
+        }
 
 #ifndef NDEBUG /* Checking if columns are correct */
-    p = 1;
-    PRLEVEL (p, ("%% There are %ld columns in this contribution block: \n",
-                colCount));
-    for (Int i = 0; i < colCount; i++)
-        PRLEVEL (p, ("%%  %ld", CBColList [i]));
-    PRLEVEL (p, ("\n"));
-    Int stl_colSize = stl_colSet.size();
+        p = 1;
+        PRLEVEL (p, ("%% There are %ld columns in this contribution block: \n",
+                    colCount));
+        for (Int i = 0; i < colCount; i++)
+            PRLEVEL (p, ("%%  %ld", CBColList [i]));
+        PRLEVEL (p, ("\n"));
+        Int stl_colSize = stl_colSet.size();
     if (colCount != stl_colSize){
         PRLEVEL (p, ("%% STL %ld:\n",stl_colSize));
         for (it = stl_colSet.begin(); it != stl_colSet.end(); it++)
@@ -567,7 +574,6 @@ void paru_assemble (
         Int curFsRowIndex = i; //current fully summed row index
         Int curFsRow = fsRowList [curFsRowIndex];
         PRLEVEL (1, ("%% curFsRow =%ld\n", curFsRow));
-        //tupleList *curRowTupleList = &RowList [curFsRowIndex]; //BUGGY
         tupleList *curRowTupleList = &RowList [curFsRow];
         Int numTuple = curRowTupleList->numTuple;
         ASSERT (numTuple >= 0);
@@ -591,7 +597,6 @@ void paru_assemble (
             if(el_rowIndex[curRowIndex] < 0 ) continue; 
 
             PRLEVEL (1, ("%% curFsRowIndex =%ld\n", curFsRowIndex));
-            //ASSERT (el_rowIndex[curRowIndex] == curFsRowIndex); //BUGGY
             ASSERT (el_rowIndex[curRowIndex] == curFsRow);
             ASSERT (curRowIndex < mEl);
             PRLEVEL (1, ("%% curColIndex =%ld\n", curRowIndex));
