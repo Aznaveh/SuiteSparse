@@ -675,7 +675,7 @@ void paru_assemble (
     PRLEVEL (1, ("%% el is %ld by %ld\n",rowCount-fp,colCount));
     if (fp <= rowCount ){ // otherwise nothing will remain of this front
         el = elementList[eli] = paru_create_element (rowCount-fp,
-                colCount, 0 ,cc);
+                colCount, 1 ,cc);
         if ( el == NULL ){
             printf ("Out of memory when tried to allocate current CB %ld",eli);
             return;
@@ -713,6 +713,14 @@ void paru_assemble (
         }
 
     }
+#ifndef NDEBUG
+    //Printing the contribution block
+    p = 0;
+    PRLEVEL (p, ("\n%%Before DGEMM:"));
+    if (p == 0)
+        paru_print_element (paruMatInfo, eli);
+#endif
+
 
     double *el_numbers = numeric_pointer (el);
     paru_dgemm(pivotalFront, uPart, el_numbers, fp, rowCount, colCount);
@@ -728,6 +736,7 @@ void paru_assemble (
 #ifndef NDEBUG
     //Printing the contribution block
     p = 0;
+    PRLEVEL (p, ("\n%%After DGEMM:"));
     if (p == 0)
         paru_print_element (paruMatInfo, eli);
 #endif

@@ -85,6 +85,7 @@ int main (int argc, char **argv)
     //
     Int p=0;
     PRLEVEL (p, ("err = 1e-12; [m n] =size(S);\n"));
+    PRLEVEL (p, ("format long g\n"));
     PRLEVEL (p, ("oldR=[]; c=[];\n"));
     PRLEVEL (p, ("%%Finalizing the permutation\n"));
     PRLEVEL (p, ("for f=1:%ld\n",nf));
@@ -100,13 +101,14 @@ int main (int argc, char **argv)
     PRLEVEL (p, ("L=tril(LU,-1)+eye(size(LU));\n"));
     PRLEVEL (p, ("U=triu(LU); U=U(1:n,:);\n"));
     PRLEVEL (p, ("spparms('spumoni',3);\n" ));
-    PRLEVEL (p, ("fprintf('Matlab\\n');\n" ));
+//    PRLEVEL (p, ("fprintf('Matlab\\n');\n" ));
     PRLEVEL (p, ("[l,u,p]=lu(S);\n" ));
-    PRLEVEL (p, ("norm(p*S-l*u)\n" ));
+    PRLEVEL (p, ("matlabErr = norm(p*S-l*u)\n" ));
 
     PRLEVEL (p, ("fprintf('Paru\\n');\n"));
-    PRLEVEL (p, ("norm(S(oldR,c)-L*U)\n" ));
-    PRLEVEL (p, ("if( (norm(S(oldR,c)-L*U)) < err )\n" ));
+    PRLEVEL (p, ("myErr = norm(S(oldR,c)-L*U)\n" ));
+    //PRLEVEL (p, ("if( (norm(S(oldR,c)-L*U)) < err )\n" ));
+    PRLEVEL (p, ("if(myErr <= 100*matlabErr)\n" ));
     PRLEVEL (p, ("\tfprintf('Pass\\n')\nelse\n\tfprintf('Fail\\n')\nend\n" ));
     
     printf("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*\n");
