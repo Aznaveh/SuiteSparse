@@ -205,7 +205,7 @@ void paru_assemble (
         (double*) paru_calloc (rowCount*fp, sizeof (double), cc);
 
     if (pivotalFront == NULL ){
-        printf ("Out of memory when tried to allocate for pivotal part %ld",f);
+        printf ("%% Out of memory when tried to allocate for pivotal part %ld",f);
         return;
     }
 
@@ -364,13 +364,18 @@ void paru_assemble (
 
     /* using the rest of scratch for permutation; Not sure about 1  */
     BLAS_INT *ipiv = (BLAS_INT*) (Work->scratch+rowCount);
-    paru_factorize (pivotalFront, fsRowList, rowCount, fp, ipiv);
+    Int fac = paru_factorize (pivotalFront, fsRowList, rowCount, fp, ipiv);
 
     /* To this point fully summed part of the front is computed and L and U    /  
      *  The next part is to find columns of nonfully summed then rows
      *  the rest of the matrix and doing TRSM and GEMM,                       */
+    if (fac < 0){
+        printf ("%% m > n\n");
+        exit(0);
+        return;
+    }
     if (ipiv [0] < 0){
-        printf ("Singular Matrix\n");
+        printf ("%% Singular Matrix\n");
         return;
     }
 #ifndef NDEBUG  // Printing the list of rows
@@ -566,7 +571,7 @@ void paru_assemble (
     double *uPart = 
         (double*) paru_calloc (fp*colCount, sizeof (double), cc);
     if ( uPart == NULL ){
-        printf ("Out of memory when tried to allocate for U part %ld",f);
+        printf ("%% Out of memory when tried to allocate for U part %ld",f);
         return;
     }
 
@@ -674,10 +679,12 @@ void paru_assemble (
                 rowCount, colCount, fp));
     PRLEVEL (1, ("%% el is %ld by %ld\n",rowCount-fp,colCount));
     if (fp <= rowCount ){ // otherwise nothing will remain of this front
+
         el = elementList[eli] = paru_create_element (rowCount-fp,
-                colCount, 1 ,cc);
+                colCount, 0 ,cc); // allocating an un-initialized part of memory
+                                  // While insided the DGEMM BETA == 0
         if ( el == NULL ){
-            printf ("Out of memory when tried to allocate current CB %ld",eli);
+            printf ("%% Out of memory when tried to allocate current CB %ld",eli);
             return;
         }
         PRLEVEL (1, ("%% el =%p\n", el));
@@ -691,8 +698,8 @@ void paru_assemble (
         colTuple.e = eli;
         colTuple.f = i;
         if (paru_add_colTuple (ColList, CBColList[i], colTuple, cc) ){
-            paru_freemat (&paruMatInfo, cc);
-            printf("Out of memory: add_colTuple \n");
+           // paru_freemat (&paruMatInfo, cc);
+            printf("%% Out of memory: add_colTuple \n");
             return; /* TODO: check RETURN MEM usage */
         }
     }
@@ -707,15 +714,15 @@ void paru_assemble (
         rowTuple.e = eli;
         rowTuple.f = locIndx;
         if (paru_add_rowTuple (RowList, fsRowList[i], rowTuple, cc) ){
-            paru_freemat (&paruMatInfo, cc);
-            printf("Out of memory: add_colTuple \n");
+            //paru_freemat (&paruMatInfo, cc);
+            printf("%% Out of memory: add_colTuple \n");
             return; /* TODO: check RETURN MEM usage */
         }
 
     }
 #ifndef NDEBUG
     //Printing the contribution block
-    p = 0;
+    p = 1;
     PRLEVEL (p, ("\n%%Before DGEMM:"));
     if (p == 0)
         paru_print_element (paruMatInfo, eli);

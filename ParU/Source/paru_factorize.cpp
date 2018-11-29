@@ -40,8 +40,10 @@ Int paru_factorize (double *F, Int *fsRowList, Int lm, Int ln,
     for (int i = 0; i < lda ; i++){
         ipiv [i] = -1;
     }
-    if (m < n )
+    if (m < n ){
         PRLEVEL (0, ("%%!!!!! FAIL m= %d  n= %d\n", m, n));
+        return -1;
+    }
 #endif
 
 #ifndef NDEBUG  // Printing the list of rows

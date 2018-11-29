@@ -51,12 +51,10 @@ Int paru_dgemm(double *pF, double *uPart,
     PRLEVEL (1, ("ldc =%ld\n", ldc));
 
 
-    // NOTE: beta can be zero, since C has just been calloc'd.
-    // Also, C can be malloc'd not calloc'd.
-    double beta= 1;
+    double beta= 0; //U part is not initialized
     
-    BLAS_DGEMM ("N" ,"N" , &mA, &nB, &nA, &alpha, pF+fp, &lda, uPart, &ldb, &beta,
-            el, &ldc);
+    BLAS_DGEMM ("N" ,"N" , &mA, &nB, &nA, &alpha, pF+fp, &lda, uPart, &ldb, 
+            &beta, el, &ldc);
     return 0;
 
 }
