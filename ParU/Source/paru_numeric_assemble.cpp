@@ -9,7 +9,7 @@
 void assemble_col (const double *sC, double *dC,   //source col and destination col
                     Int m, const Int *relRowInd)
 {
-    DEBUGLEVEL (1);
+    DEBUGLEVEL (0);
     for (Int i = 0; i < m; i++) {
         PRLEVEL (1, ("%% relRowInd [%ld] =%ld\n",i ,relRowInd [i] ));
         Int ri = relRowInd[i] ;

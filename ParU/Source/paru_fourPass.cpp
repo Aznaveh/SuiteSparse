@@ -13,7 +13,7 @@ void paru_fourPass (paru_matrix *paruMatInfo,
         cholmod_common *cc)
 {
 
-    DEBUGLEVEL(0);
+    DEBUGLEVEL(1);
     work_struct *Work =  paruMatInfo->Work;
 
     Int *isRowInFront = Work->rowSize; 
@@ -49,7 +49,7 @@ void paru_fourPass (paru_matrix *paruMatInfo,
         Tuple *listColTuples = curColTupleList->list;
 #ifndef NDEBUG        
         Int p = 1;
-        PRLEVEL (p, ("1st: c =%ld  numTuple = %ld\n", c, numTuple));
+        PRLEVEL (p, ("%% 1st: c =%ld  numTuple = %ld\n", c, numTuple));
         if (p == 0)
             paru_print_tupleList (ColList, c);
 #endif
@@ -78,7 +78,7 @@ void paru_fourPass (paru_matrix *paruMatInfo,
             Int *rowRelIndValid = rowRelIndVal (curEl);
             Int *rowRelIndex = relRowInd (curEl);
             // Updating row relative indices 
-            PRLEVEL (1, ("elRow[%ld]=%ld", e, elRow [e]));  
+            PRLEVEL (1, ("%% elRow[%ld]=%ld", e, elRow [e]));  
             for (Int rEl = 0; rEl < mEl; rEl++)   
                 rowRelIndex [rEl] = isRowInFront [el_rowIndex [rEl]] 
                     - rowMark;
@@ -97,7 +97,7 @@ void paru_fourPass (paru_matrix *paruMatInfo,
         Int numTuple = curColTupleList->numTuple;
         ASSERT (numTuple >= 0);
         Tuple *listColTuples = curColTupleList->list;
-        PRLEVEL (1, ("r =%ld  numTuple = %ld\n", r, numTuple));
+        PRLEVEL (1, ("%% r =%ld  numTuple = %ld\n", r, numTuple));
 
         for (Int i = 0; i < numTuple; i++){
             Tuple curTpl = listColTuples [i];
@@ -123,7 +123,7 @@ void paru_fourPass (paru_matrix *paruMatInfo,
             Int *colRelIndValid = rowRelIndVal (curEl);
             Int *colRelIndex    = relColInd (curEl);
             // Updating row relative indices 
-            PRLEVEL (1, ("elCol[%ld]=%ld", e, elCol [e]));  
+            PRLEVEL (1, ("%% elCol[%ld]=%ld", e, elCol [e]));  
 
             for (Int cEl = 0; cEl < nEl; cEl++)   
                 colRelIndex [cEl] = isColInCBcolSet [el_colIndex [cEl]] 
@@ -152,7 +152,7 @@ void paru_fourPass (paru_matrix *paruMatInfo,
         Tuple *listColTuples = curColTupleList->list;
 #ifndef NDEBUG            
         Int p = 1;
-        PRLEVEL (p, ("3rd: c =%ld  numTuple = %ld\n", c, numTuple));
+        PRLEVEL (p, ("%% 3rd: c =%ld  numTuple = %ld\n", c, numTuple));
         if (p == 0 )
             paru_print_tupleList (ColList, c);
 #endif
@@ -161,7 +161,7 @@ void paru_fourPass (paru_matrix *paruMatInfo,
             Tuple curTpl = listColTuples [psrc];
             Int e = curTpl.e;
             Int curColIndex = curTpl.f;
-            PRLEVEL (1, ("element= %ld  f =%ld \n",e, curColIndex));
+            PRLEVEL (1, ("%% element= %ld  f =%ld \n",e, curColIndex));
 
             ASSERT (e >= 0);
             ASSERT (curColIndex >= 0);
@@ -184,13 +184,13 @@ void paru_fourPass (paru_matrix *paruMatInfo,
             ASSERT (curColIndex < nEl);
 
             double *el_Num = numeric_pointer (curEl);
-            PRLEVEL (1, ("  numTuple =%ld\n",   numTuple));
-            PRLEVEL (1, ("element= %ld  mEl =%ld \n",e, mEl));
-            PRLEVEL (1, ("f =%ld\n", curColIndex));
-            PRLEVEL (1, ("CB: %ld x %ld\n", rowCount, colCount));
+            PRLEVEL (1, ("%%   numTuple =%ld\n",   numTuple));
+            PRLEVEL (1, ("%% element= %ld  mEl =%ld \n",e, mEl));
+            PRLEVEL (1, ("%% f =%ld\n", curColIndex));
+            PRLEVEL (1, ("%% CB: %ld x %ld\n", rowCount, colCount));
             if (elRow [e] - elRMark == 0){
                 //all the column is in CB
-                PRLEVEL (1, ("psrc=%ld", psrc));
+                PRLEVEL (1, ("%% psrc=%ld", psrc));
                 assemble_col (el_Num+curColIndex*mEl,cb_numbers+k*colCount,
                         mEl, rowRelIndex);
                 colRelIndex [curColIndex] = -1;
@@ -204,7 +204,7 @@ void paru_fourPass (paru_matrix *paruMatInfo,
         }
 
         curColTupleList->numTuple = pdst;
-        PRLEVEL (1, ("pdst=%ld\n", pdst));
+        PRLEVEL (1, ("%% pdst=%ld\n", pdst));
 
 
         //adding tuple for CB
@@ -226,7 +226,7 @@ void paru_fourPass (paru_matrix *paruMatInfo,
         Int numTuple = curRowTupleList->numTuple;
         ASSERT (numTuple >= 0);
         Tuple *listRowTuples = curRowTupleList->list;
-        PRLEVEL (1, ("---------\n 4th: r =%ld  numTuple = %ld\n", r, numTuple));
+        PRLEVEL (1, ("%%-----\n%% 4th: r =%ld  numTuple = %ld\n", r, numTuple));
         Int pdst = 0,psrc;
         for (Int psrc = 0; psrc < numTuple; psrc ++){
             Tuple curTpl = listRowTuples [psrc];
@@ -251,8 +251,8 @@ void paru_fourPass (paru_matrix *paruMatInfo,
 
 
             if (el_rowIndex[curRowIndex] < 0)     continue; //not valid
-            PRLEVEL (1, ("r =%ld\n", r));
-            PRLEVEL (1, ("el_rowIndex [%ld] =%ld\n", 
+            PRLEVEL (1, ("%% r =%ld\n", r));
+            PRLEVEL (1, ("%% el_rowIndex [%ld] =%ld\n", 
                         curRowIndex, el_rowIndex [curRowIndex]));
             ASSERT (el_rowIndex[curRowIndex] == r);
             ASSERT (curRowIndex < mEl);
@@ -264,7 +264,7 @@ void paru_fourPass (paru_matrix *paruMatInfo,
                 assemble_row (el_Num, cb_numbers, mEl, nEl, 
                         colCount-fp, curRowIndex , k-fp, colRelIndex );
 
-                PRLEVEL (1, ("psrc=%ld", psrc));
+                PRLEVEL (1, ("%% psrc=%ld", psrc));
                 rowRelIndex [curRowIndex] = -1;
                 el_rowIndex [curRowIndex] = -1;
                 curEl->nrowsleft --;
@@ -273,7 +273,7 @@ void paru_fourPass (paru_matrix *paruMatInfo,
                 listRowTuples [pdst++] = curTpl; //keeping the tuple
         }
 
-        PRLEVEL (1, ("  pdst=%ld", pdst));
+        PRLEVEL (1, ("%%   pdst=%ld", pdst));
         curRowTupleList->numTuple = pdst;
 
         //adding tuple for CB

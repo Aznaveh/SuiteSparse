@@ -24,7 +24,12 @@ void paru_assemble (
         cholmod_common *cc)
 
 {
-    DEBUGLEVEL(0);
+    DEBUGLEVEL(-1);
+    /* -2 Nothing
+     * -1 Just Matlab
+     *  0 Detailed
+     *  > 0 Everything
+     */
     paru_symbolic *LUsym =  paruMatInfo->LUsym;
 
     Int m,n,nf;
@@ -35,6 +40,7 @@ void paru_assemble (
     /* ---------------------------------------------------------------------- */
     /* get the front F  */
     /* ---------------------------------------------------------------------- */
+
 
     PRLEVEL (0, ("%%~~~~~~~  Assemble Front %ld start ~~~~\n", f));
     /* pivotal columns Super [f] ... Super [f+1]-1 */
@@ -67,7 +73,7 @@ void paru_assemble (
     Int rowCount= 0;
     Int *isRowInFront = Work->rowSize; 
     Int rowMark = Work->rowMark;
-    PRLEVEL (1, ("rowMark=%ld\n", rowMark));
+    PRLEVEL (-1, ("rowMark=%ld\n", rowMark));
     if (rowMark < 0) {  // in rare case of overflow
         memset (isRowInFront, -1, m*sizeof(Int));
         rowMark = Work->rowMark = 0;
@@ -273,7 +279,7 @@ void paru_assemble (
             PRLEVEL (p, ("%% ASSEMBL element= %ld  mEl =%ld ",e, mEl));
             PRLEVEL (p, ("%% into column %ld of current front\n",colIndexF ));
             PRLEVEL (p, ("%%assembling from col %ld", curColIndex ));
-            if (p == 0)
+            if (p > 0)
                 paru_print_element (paruMatInfo, e);
 #endif
 
@@ -402,7 +408,7 @@ void paru_assemble (
 #endif
 
 #ifndef NDEBUG  // Printing the pivotal front
-    p = 0;
+    p = -1;
     PRLEVEL (p, ("%%L part:\n"));
 
     //col permutatin
@@ -620,7 +626,7 @@ void paru_assemble (
     }
 
 #ifndef NDEBUG  // Printing the  U part
-    p = 1;
+    p = -1;
     PRLEVEL (p, ("%% U part Before TRSM: %ld x %ld\n", fp, colCount));
     PRLEVEL (p, ("%% U\t"));
     for (Int i = 0; i < colCount; i++){
@@ -643,7 +649,7 @@ void paru_assemble (
     paru_trsm(pivotalFront , uPart, fp, rowCount, colCount);
 
 #ifndef NDEBUG  // Printing the  U part
-    p = 0;
+    p = -1;
     PRLEVEL (p, ("%% rowCount=%ld;\n",rowCount));
     PRLEVEL (p, ("%% U part After TRSM: %ld x %ld\n", fp, colCount));
 
@@ -724,7 +730,7 @@ void paru_assemble (
     //Printing the contribution block
     p = 1;
     PRLEVEL (p, ("\n%%Before DGEMM:"));
-    if (p == 0)
+    if (p > 0)
         paru_print_element (paruMatInfo, eli);
 #endif
 
@@ -735,7 +741,7 @@ void paru_assemble (
 
     /**** 7 **** Count number of rows and columsn of prior CBs to asslemble ***/ 
 
-    //paru_fourPass (paruMatInfo, eli, fp, cc);
+    // paru_fourPass (paruMatInfo, eli, fp, cc);
 
 
     ////////////////////////////////////////////////////////////////////////////
@@ -744,7 +750,7 @@ void paru_assemble (
     //Printing the contribution block
     p = 0;
     PRLEVEL (p, ("\n%%After DGEMM:"));
-    if (p == 0)
+    if (p > 0)
         paru_print_element (paruMatInfo, eli);
 #endif
 
@@ -768,7 +774,7 @@ void paru_assemble (
 
     PRLEVEL (1, ("%%rowCount =%ld\n", rowCount));
     PRLEVEL (1, ("%%colCount =%ld\n", colCount));
-    PRLEVEL (1, ("fp =%ld\n", fp));
+    PRLEVEL (-1, ("fp =%ld\n", fp));
     /*! TODO: This should be stored somewhere     */
     paru_free (rowCount*fp, sizeof (double), pivotalFront, cc);
     paru_free (fp*colCount,  sizeof (double), uPart, cc);
