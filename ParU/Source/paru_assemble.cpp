@@ -24,7 +24,7 @@ void paru_assemble (
         cholmod_common *cc)
 
 {
-    DEBUGLEVEL(-1);
+    DEBUGLEVEL(0);
     /* -2 Nothing
      * -1 Just Matlab
      *  0 Detailed
@@ -42,7 +42,7 @@ void paru_assemble (
     /* ---------------------------------------------------------------------- */
 
 
-    PRLEVEL (0, ("%%~~~~~~~  Assemble Front %ld start ~~~~\n", f));
+    PRLEVEL (-1, ("%%~~~~~~~  Assemble Front %ld start ~~~~\n", f));
     /* pivotal columns Super [f] ... Super [f+1]-1 */
     Int col1 = Super [f];       /* fornt F has columns col1:col2-1 */
     Int col2 = Super [f+1];
@@ -73,7 +73,7 @@ void paru_assemble (
     Int rowCount= 0;
     Int *isRowInFront = Work->rowSize; 
     Int rowMark = Work->rowMark;
-    PRLEVEL (-1, ("rowMark=%ld\n", rowMark));
+    PRLEVEL (-1, ("rowMark=%ld;\n", rowMark));
     if (rowMark < 0) {  // in rare case of overflow
         memset (isRowInFront, -1, m*sizeof(Int));
         rowMark = Work->rowMark = 0;
@@ -727,10 +727,10 @@ void paru_assemble (
 
     }
 #ifndef NDEBUG
-    //Printing the contribution block
+    //Printing the contribution block before dgemm
     p = 1;
     PRLEVEL (p, ("\n%%Before DGEMM:"));
-    if (p > 0)
+    if (p <= 0)
         paru_print_element (paruMatInfo, eli);
 #endif
 
@@ -738,19 +738,29 @@ void paru_assemble (
     double *el_numbers = numeric_pointer (el);
     paru_dgemm(pivotalFront, uPart, el_numbers, fp, rowCount, colCount);
 
+#ifndef NDEBUG
+    //Printing the contribution block after dgemm
+    p = 0;
+    PRLEVEL (p, ("\n%%After DGEMM:"));
+    if (p <= 0)
+        paru_print_element (paruMatInfo, eli);
+#endif
+
 
     /**** 7 **** Count number of rows and columsn of prior CBs to asslemble ***/ 
 
-    // paru_fourPass (paruMatInfo, eli, fp, cc);
+    PRLEVEL (-1, ("\n%%||||  Start FourPass %ld ||||\n", f));
+    paru_fourPass (paruMatInfo, eli, fp, cc);
+    PRLEVEL (-1, ("\n%%||||  Finish FourPass %ld ||||\n", f));
 
 
     ////////////////////////////////////////////////////////////////////////////
 
 #ifndef NDEBUG
-    //Printing the contribution block
-    p = 0;
-    PRLEVEL (p, ("\n%%After DGEMM:"));
-    if (p > 0)
+    //Printing the contribution block after prior blocks assembly
+    p = 1;
+    PRLEVEL (p, ("\n%%After prior blocks assembly:"));
+    if (p <= 0)
         paru_print_element (paruMatInfo, eli);
 #endif
 

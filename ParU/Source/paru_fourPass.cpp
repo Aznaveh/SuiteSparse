@@ -60,13 +60,20 @@ void paru_fourPass (paru_matrix *paruMatInfo,
             Int curColIndex = curTpl.f;
             Element *curEl = elementList[e];
             Int *el_colIndex = colIndex_pointer (curEl);
-
-            if (el_colIndex [curColIndex] < 0 ){ /*! TODO: Dead Delete it	 */
+            Int *el_rowIndex = rowIndex_pointer (curEl); //pointers to row index
+            Int *rowRelIndValid = rowRelIndVal (curEl);
+            Int *rowRelIndex = relRowInd (curEl);
+ 
+            if (el_colIndex [curColIndex] < 0 ){/*!TODO: Dead Delete the tuple*/
                 continue;  
             }
 
-            if (elCol [e] < elCMark) // an element never seen before
+            //TODO: potential buggy part
+            //if (elCol [e] < elCMark) // an element never seen before
+            if(*rowRelIndValid !=  c){
+                *rowRelIndValid =  c;
                 elCol [e] = curEl->ncolsleft - 1; //initiaze
+            }
             else{ 
                 elCol [e]--; 
                 continue;
@@ -74,10 +81,7 @@ void paru_fourPass (paru_matrix *paruMatInfo,
 
             /*  Update rowRelIndex	 */
             Int mEl = curEl->nrows;
-            Int *el_rowIndex = rowIndex_pointer (curEl); //pointers to row index
-            Int *rowRelIndValid = rowRelIndVal (curEl);
-            Int *rowRelIndex = relRowInd (curEl);
-            // Updating row relative indices 
+           // Updating row relative indices 
             PRLEVEL (1, ("%% elRow[%ld]=%ld", e, elRow [e]));  
             for (Int rEl = 0; rEl < mEl; rEl++)   
                 rowRelIndex [rEl] = isRowInFront [el_rowIndex [rEl]] 
@@ -104,6 +108,9 @@ void paru_fourPass (paru_matrix *paruMatInfo,
             Int e = curTpl.e;
             Int curRowIndex = curTpl.f;
             Element *curEl = elementList[e];
+             Int *el_colIndex = colIndex_pointer (curEl); //pointers to row index
+            Int *colRelIndValid = rowRelIndVal (curEl);
+            Int *colRelIndex    = relColInd (curEl);
             Int *el_rowIndex = rowIndex_pointer (curEl);
 
             if (el_rowIndex [curRowIndex] < 0 ){  /*! TODO: Dead Delete it	 */
@@ -111,18 +118,19 @@ void paru_fourPass (paru_matrix *paruMatInfo,
             }
 
 
-            if (elRow [e] < elRMark) // an element never seen before
+            //TODO: potential buggy part
+            //if (elRow [e] < elRMark) // an element never seen before
+            if(*colRelIndValid !=  r){
+                *colRelIndValid =  r;
                 elRow [e] = curEl ->nrowsleft - 1; //initiaze
+            }
             else{ 
                 elRow [e]--;
                 continue;
             }
             /* Update colRelIndex	 */
             Int nEl = curEl->ncols;
-            Int *el_colIndex = colIndex_pointer (curEl); //pointers to row index
-            Int *colRelIndValid = rowRelIndVal (curEl);
-            Int *colRelIndex    = relColInd (curEl);
-            // Updating row relative indices 
+           // Updating row relative indices 
             PRLEVEL (1, ("%% elCol[%ld]=%ld", e, elCol [e]));  
 
             for (Int cEl = 0; cEl < nEl; cEl++)   
@@ -281,10 +289,6 @@ void paru_fourPass (paru_matrix *paruMatInfo,
         if( paru_add_rowTuple (RowList, r, T, cc)){
             printf("Out of memory: add_rowTuple for CB \n");
         }
-
-
-
     }
-
 }
 
