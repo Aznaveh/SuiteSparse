@@ -50,7 +50,7 @@ void paru_fourPass (paru_matrix *paruMatInfo,
 #ifndef NDEBUG        
         Int p = 1;
         PRLEVEL (p, ("%% 1st: c =%ld  numTuple = %ld\n", c, numTuple));
-        if (p == 0)
+        if (p <= 0)
             paru_print_tupleList (ColList, c);
 #endif
         for (Int i = 0; i < numTuple; i++){
@@ -89,6 +89,8 @@ void paru_fourPass (paru_matrix *paruMatInfo,
             //            *rowRelIndValid = f ;//current front
 
         }
+        PRLEVEL (1, ("\n%% counting column finished\n"));
+
     }
     /**************************************************************************/
 
@@ -108,7 +110,7 @@ void paru_fourPass (paru_matrix *paruMatInfo,
             Int e = curTpl.e;
             Int curRowIndex = curTpl.f;
             Element *curEl = elementList[e];
-             Int *el_colIndex = colIndex_pointer (curEl); //pointers to row index
+            Int *el_colIndex = colIndex_pointer (curEl); //pointers to row index
             Int *colRelIndValid = rowRelIndVal (curEl);
             Int *colRelIndex    = relColInd (curEl);
             Int *el_rowIndex = rowIndex_pointer (curEl);
@@ -130,7 +132,7 @@ void paru_fourPass (paru_matrix *paruMatInfo,
             }
             /* Update colRelIndex	 */
             Int nEl = curEl->ncols;
-           // Updating row relative indices 
+            // Updating row relative indices 
             PRLEVEL (1, ("%% elCol[%ld]=%ld", e, elCol [e]));  
 
             for (Int cEl = 0; cEl < nEl; cEl++)   
@@ -161,7 +163,7 @@ void paru_fourPass (paru_matrix *paruMatInfo,
 #ifndef NDEBUG            
         Int p = 1;
         PRLEVEL (p, ("%% 3rd: c =%ld  numTuple = %ld\n", c, numTuple));
-        if (p == 0 )
+        if (p <= 0 )
             paru_print_tupleList (ColList, c);
 #endif
         Int pdst = 0,psrc;
