@@ -53,10 +53,10 @@ void paru_print_element (paru_matrix *paruMatInfo, Int e){
 
 void paru_print_tupleList (tupleList *listSet, Int index){
     DEBUGLEVEL(0);
-    PRLEVEL (1, ("listSet =%p\n", listSet));
+    PRLEVEL (1, ("%% listSet =%p\n", listSet));
 
     if (listSet == NULL) {
-       printf("Empty tuple\n"); 
+       printf("%% Empty tuple\n"); 
        return;
     }
 
@@ -64,7 +64,7 @@ void paru_print_tupleList (tupleList *listSet, Int index){
     Int numTuple = cur.numTuple;
     Tuple *l = cur.list;
 
-    printf(" There are %ld tuples in this list:\n", numTuple);
+    printf("%% There are %ld tuples in this list:\n %%", numTuple);
     for (Int i = 0; i < numTuple; i++) {
        Tuple curTpl = l [i];
         printf(" (%ld,%ld)", curTpl.e, curTpl.f);
