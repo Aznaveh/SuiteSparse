@@ -105,7 +105,11 @@ void paru_assemble (
         Int numTuple = curColTupleList->numTuple;
         ASSERT (numTuple >= 0);
         Tuple *listColTuples = curColTupleList->list;
-        PRLEVEL (1, ("%%c =%ld  numTuple = %ld\n", c, numTuple));
+
+#ifndef NDEBUG            
+        PRLEVEL (0, ("%%c =%ld  numTuple = %ld\n", c, numTuple));
+        paru_print_tupleList (ColList, c);
+#endif
         for (Int i = 0; i < numTuple; i++){
             Tuple curTpl = listColTuples [i];
             Int e = curTpl.e;
@@ -139,13 +143,13 @@ void paru_assemble (
 
 
             //counting prior element's columns //TODO: BUGGY 
-//         if (elCol [e] <= elCMark) // an element never seen before
+//         if (elCol [e] <= elCMark) 
 //               elCol [e] = curEl->ncolsleft - 1; //initiaze 
-            if(*rowRelIndValid !=  f)
+            if(*rowRelIndValid !=  f)  // an element never seen before
                 *rowRelIndValid =  f;
             else { 
                 elCol [e]--;    //keep track of number of cols
-                PRLEVEL (0, ("%%!:element= %ld \n",e));
+                PRLEVEL (1, ("%%  element= %ld \n",e));
                 //counting prior element's columns
                 continue;       // already have the set of rows
             }
@@ -154,13 +158,15 @@ void paru_assemble (
             //Set union of all the rows of the current element
             for (Int rEl = 0; rEl < mEl; rEl++){
                 Int curRow = el_rowIndex [rEl]; 
+                PRLEVEL (0, ("%%@@curRow =%ld rEl=%ld\n", curRow, rEl));
+                paru_print_element (paruMatInfo, e);
                 if (curRow < 0 ) continue; // that row has already deleted
                 PRLEVEL (0, ("%%**curRow =%ld rEl=%ld\n", curRow, rEl));
                 ASSERT (curRow < m ) ;
 #ifndef NDEBUG
                 stl_rowSet.insert (curRow);
 #endif
-                PRLEVEL (1, ("%% %p ---> isRowInFront [%ld]=%ld\n", 
+                PRLEVEL (0, ("%% %p ---> isRowInFront [%ld]=%ld\n", 
                             isRowInFront+curRow, curRow, isRowInFront[curRow]));
 
                 if (isRowInFront[curRow] < rowMark ){  
@@ -175,12 +181,11 @@ void paru_assemble (
                 }
                 else{
                     rowRelIndex [rEl] = isRowInFront [curRow] - rowMark;
-                    PRLEVEL (0, ("%%N1st: rowRelIndex[%ld] = %ld\n",
+                    PRLEVEL (1, ("%%N1st: rowRelIndex[%ld] = %ld\n",
                                 rEl, rowCount ));
                 }
                 ASSERT (rowCount <= m); 
             }
-            *rowRelIndValid = f ;//current front
         }
     }
 
@@ -290,6 +295,8 @@ void paru_assemble (
             //FLIP(el_colIndex[curColIndex]); //marking column as assembled
             el_colIndex[curColIndex] = -1;
             colRelIndex [curColIndex] = -1;
+            curEl->ncolsleft--;     // After each assembly Az: Added later
+
 
 #ifndef NDEBUG  // Printing the pivotal front
             p = 0;
@@ -491,9 +498,9 @@ void paru_assemble (
 
             //counting prior element's rows
             //BUGGY: just like line 136
-//            if (elRow [e] <= elRMark) {// an element never seen before
+//            if (elRow [e] <= elRMark) {
 //                elRow [e] = curEl ->nrowsleft - 1; //initiaze
-            if(*colRelIndValid !=  f){
+            if(*colRelIndValid !=  f){// an element never seen before
                 *colRelIndValid =  f;
 #ifndef NDEBUG
                 if ( elCol [e] >= elCMark )
@@ -621,6 +628,7 @@ void paru_assemble (
             //FLIP(el_rowIndex[curRowIndex]); //marking column as assembled
             el_rowIndex[curRowIndex] = -1;
             rowRelIndex [curRowIndex] = -1;
+            curEl->nrowsleft--;  // After each assembly Az: Added later
 
         }
     }
