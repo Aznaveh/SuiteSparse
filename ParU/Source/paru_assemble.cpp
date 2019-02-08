@@ -25,7 +25,7 @@ void paru_assemble (
 
 {
     DEBUGLEVEL(0);
-    /* -2 Nothing
+    /* -2 Print Nothing
      * -1 Just Matlab
      *  0 Detailed
      *  > 0 Everything
@@ -122,7 +122,8 @@ void paru_assemble (
             Element *curEl = elementList[e];
             Int mEl = curEl->nrows;
             Int *el_rowIndex = rowIndex_pointer (curEl); //pointers to row index
-            Int *rowRelIndValid = rowRelIndVal (curEl);
+            //Int *rowRelIndValid = rowRelIndVal (curEl);
+            Int rowRelIndValid = curEl->rValid;
             Int *rowRelIndex = relRowInd (curEl);
             Int *colRelIndex    = relColInd (curEl);
             Int *el_colIndex = colIndex_pointer (curEl);
@@ -145,8 +146,8 @@ void paru_assemble (
             //counting prior element's columns //TODO: BUGGY 
 //         if (elCol [e] <= elCMark) 
 //               elCol [e] = curEl->ncolsleft - 1; //initiaze 
-            if(*rowRelIndValid !=  f)  // an element never seen before
-                *rowRelIndValid =  f;
+            if(rowRelIndValid !=  f)  // an element never seen before
+                rowRelIndValid =  f;
             else { 
                 elCol [e]--;    //keep track of number of cols
                 PRLEVEL (1, ("%%  element= %ld \n",e));
@@ -267,7 +268,6 @@ void paru_assemble (
             Int *el_colIndex = colIndex_pointer (curEl);
             Int *el_rowIndex = rowIndex_pointer (curEl);
             Int *rowRelIndex = relRowInd (curEl);
-            Int *rowRelIndValid = rowRelIndVal (curEl);
             Int *colRelIndex    = relColInd (curEl);
             if (el_colIndex [curColIndex]< 0 ) continue;
             ASSERT (el_colIndex[curColIndex] == c);
@@ -315,32 +315,6 @@ void paru_assemble (
             }
 #endif
 
-#if 0
-            //This part has been moved to assemble_col function
-            for (Int rEl = 0; rEl < mEl; rEl++){   
-                Int curRow = el_rowIndex [rEl]; 
-
-                PRLEVEL (1, ("curRow =%ld\n", curRow));
-                ASSERT (curRow < m ) ;
-                ASSERT (isRowInFront [curRow] != -1);
-
-                PRLEVEL (1, ("rowRelIndValid = %ld, f=%ld,\
-                            rowRelIndex[%ld]= %ld,##%ld\n ", 
-                            *rowRelIndValid, f, rEl, rowRelIndex [rEl], 
-                            isRowInFront [curRow] - rowMark));
-                // relative row index
-                Int rowIndexF = rowRelIndex [rEl];
-                ASSERT (rowIndexF == isRowInFront [curRow] - rowMark);
-
-                PRLEVEL (1, ("rowIndexF = %ld\n", rowIndexF));
-                PRLEVEL (1, (" colIndexF*rowCount + rowIndexF=%ld\n",
-                            colIndexF*rowCount + rowIndexF));
-                ASSERT ( colIndexF*rowCount + rowIndexF < rowCount * fp);
-                ASSERT ( curColIndex*mEl + rEl < mEl*nEl);
-                pivotalFront [colIndexF*rowCount + rowIndexF] += 
-                    el_Num [ curColIndex*mEl + rEl];
-            }
-#endif
         }
     }
 
@@ -486,7 +460,8 @@ void paru_assemble (
             Int nEl = curEl->ncols;
             Int *el_rowIndex = rowIndex_pointer (curEl);
             Int *el_colIndex = colIndex_pointer (curEl);
-            Int *colRelIndValid = colRelIndVal (curEl);
+            //Int *colRelIndValid = colRelIndVal (curEl);
+            Int colRelIndValid = curEl->cValid;
             Int *colRelIndex = relColInd (curEl);
             Int *rowRelIndex = relRowInd (curEl);
 
@@ -500,8 +475,8 @@ void paru_assemble (
             //BUGGY: just like line 136
 //            if (elRow [e] <= elRMark) {
 //                elRow [e] = curEl ->nrowsleft - 1; //initiaze
-            if(*colRelIndValid !=  f){// an element never seen before
-                *colRelIndValid =  f;
+            if(colRelIndValid !=  f){// an element never seen before
+                colRelIndValid =  f;
 #ifndef NDEBUG
                 if ( elCol [e] >= elCMark )
                     PRLEVEL (1, ("%% element %ld can be eaten wholly\n",e));
@@ -610,7 +585,6 @@ void paru_assemble (
             Int *el_colIndex = colIndex_pointer (curEl);
             Int *rowRelIndex = relRowInd (curEl);
             Int *colRelIndex = relColInd (curEl);
-            Int *colRelIndValid = colRelIndVal (curEl);
 
             if(el_rowIndex[curRowIndex] < 0 ) continue; 
 
@@ -758,7 +732,7 @@ void paru_assemble (
     /**** 7 **** Count number of rows and columsn of prior CBs to asslemble ***/ 
 
     PRLEVEL (-1, ("\n%%||||  Start FourPass %ld ||||\n", f));
-    paru_fourPass (paruMatInfo, eli, fp, cc);
+   // paru_fourPass (paruMatInfo, eli, fp, cc);
     PRLEVEL (-1, ("\n%%||||  Finish FourPass %ld ||||\n", f));
 
 

@@ -21,7 +21,7 @@ Element *paru_create_element (Int nrows, Int ncols,
     Element *curEl;
     if (init)
         curEl = (Element*) paru_calloc(1, sizeof(Element)+
-                sizeof(Int)*(2*(nrows+ncols)+2)+
+                sizeof(Int)*(2*(nrows+ncols))+
                 sizeof(double)*nrows*ncols, cc);
     else
         curEl = (Element*) paru_alloc(1, sizeof(Element)+
@@ -31,10 +31,8 @@ Element *paru_create_element (Int nrows, Int ncols,
     // Initializing current element
     curEl->nrowsleft = curEl->nrows = nrows;
     curEl->ncolsleft = curEl->ncols = ncols;
-    Int *rowRelIndValid = rowRelIndVal (curEl);
-    Int *colRelIndValid = colRelIndVal (curEl);
-    *rowRelIndValid = -1 ;
-    *colRelIndValid = -1 ;
+    curEl->rValid = -1;
+    curEl->cValid = -1;
 
     return curEl;
 }

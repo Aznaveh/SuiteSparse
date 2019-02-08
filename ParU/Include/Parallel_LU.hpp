@@ -152,21 +152,21 @@ typedef struct	/* Element */
         nrowsleft,	/* number of rows remaining */
         ncolsleft,	/* number of columns remaining */
         nrows,		/* number of rows */
-        ncols;		/* number of columns */
+        ncols,		/* number of columns */
+        rValid,     /* validity of relative row index */
+        cValid;     /* validity of relative column index */
 
     /* followed in memory by:
        Int
        col [0..ncols-1],	column indices of this element
        row [0..nrows-1] ;	row indices of this element
 
-       Int cVald; last valid active front for relative indices in rows
        relColInd [0..ncols-1];	relative indices of this element for
                                                             current front
-       Int rVald;  last valid active front for relative indices in cols
        relRowInd [0..nrows-1],	relative indices of this element for 
                                                             current front
 
-       double ncols*nrows; numeri values
+       double ncols*nrows; numeric values
 
        */
 
@@ -178,14 +178,10 @@ inline Int *colIndex_pointer (Element *curEl)
 inline Int *rowIndex_pointer (Element *curEl)
 {    return (Int*)(curEl+1) + curEl->ncols;}
 
-inline Int *colRelIndVal(Element *curEl)
-{    return (Int*)(curEl+1) + curEl->ncols + curEl->nrows;}
 
 inline Int *relColInd (Element *curEl)
 {    return (Int*)(curEl+1) + curEl->ncols + curEl->nrows + 1;}
 
-inline Int *rowRelIndVal(Element *curEl)
-{    return (Int*)(curEl+1) + 2*curEl->ncols + curEl->nrows + 1;}
 
 inline Int *relRowInd (Element *curEl)
 {    return (Int*)(curEl+1) + 2*curEl->ncols + curEl->nrows + 2;}

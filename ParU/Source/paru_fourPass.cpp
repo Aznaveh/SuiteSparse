@@ -61,15 +61,17 @@ void paru_fourPass (paru_matrix *paruMatInfo,
             Element *curEl = elementList[e];
             Int *el_colIndex = colIndex_pointer (curEl);
             Int *el_rowIndex = rowIndex_pointer (curEl); //pointers to row index
-            Int *rowRelIndValid = rowRelIndVal (curEl);
+            //Int *rowRelIndValid = rowRelIndVal (curEl);
+            Int rowRelIndValid = curEl->rValid;
+
             Int *rowRelIndex = relRowInd (curEl);
  
             if (el_colIndex [curColIndex] < 0 ){/*!TODO: Dead Delete the tuple*/
                 continue;  
             }
 
-            if(*rowRelIndValid !=  el_ind){//BUGGY, What if I already have seen
-                *rowRelIndValid =  el_ind;
+            if(rowRelIndValid !=  el_ind){//BUGGY, What if I already have seen
+                rowRelIndValid =  el_ind;
                 elCol [e] = curEl->ncolsleft - 1; //initiaze
             }
             else{ 
@@ -101,7 +103,8 @@ void paru_fourPass (paru_matrix *paruMatInfo,
             Int curRowIndex = curTpl.f;
             Element *curEl = elementList[e];
             Int *el_colIndex = colIndex_pointer (curEl); //pointers to row index
-            Int *colRelIndValid = rowRelIndVal (curEl);
+            //Int *colRelIndValid = rowRelIndVal (curEl);
+            Int colRelIndValid = curEl->cValid;
             Int *colRelIndex    = relColInd (curEl);
             Int *el_rowIndex = rowIndex_pointer (curEl);
 
@@ -110,8 +113,8 @@ void paru_fourPass (paru_matrix *paruMatInfo,
             }
 
 
-            if(*colRelIndValid != el_ind ){
-                *colRelIndValid =  el_ind ;
+            if(colRelIndValid != el_ind ){
+                colRelIndValid =  el_ind ;
                 elRow [e] = curEl ->nrowsleft - 1; //initiaze
             }
             else{ 
@@ -126,8 +129,6 @@ void paru_fourPass (paru_matrix *paruMatInfo,
     Int *cb_colIndex = colIndex_pointer (curCB);
     Int *cb_rowIndex = rowIndex_pointer (curCB);
     Int *cb_rowRelIndex = relRowInd (curCB);
-    Int *cb_rowRelIndValid = rowRelIndVal (curCB);
-    Int *cb_colRelIndex    = relColInd (curCB);
     double *cb_numbers = numeric_pointer (curCB);
 
 
@@ -169,7 +170,6 @@ void paru_fourPass (paru_matrix *paruMatInfo,
             Int *el_colIndex = colIndex_pointer (curEl);
             Int *el_rowIndex = rowIndex_pointer (curEl);
             Int *rowRelIndex = relRowInd (curEl);
-            Int *rowRelIndValid = rowRelIndVal (curEl);
             Int *colRelIndex    = relColInd (curEl);
 
             if (el_colIndex [curColIndex] < 0 ){ //it will be deleted here
@@ -286,7 +286,6 @@ void paru_fourPass (paru_matrix *paruMatInfo,
             Int *el_colIndex = colIndex_pointer (curEl);
             Int *el_rowIndex = rowIndex_pointer (curEl);
             Int *rowRelIndex = relRowInd (curEl);
-            Int *rowRelIndValid = rowRelIndVal (curEl);
             Int *colRelIndex    = relColInd (curEl);
 
             if (el_rowIndex [curRowIndex] < 0 ){ // it will be deleted here
