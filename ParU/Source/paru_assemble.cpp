@@ -74,6 +74,7 @@ void paru_assemble (
     Int *isRowInFront = Work->rowSize; 
     Int rowMark = Work->rowMark;
     PRLEVEL (-1, ("rowMark=%ld;\n", rowMark));
+
     if (rowMark < 0) {  // in rare case of overflow
         memset (isRowInFront, -1, m*sizeof(Int));
         rowMark = Work->rowMark = 0;
@@ -99,6 +100,23 @@ void paru_assemble (
     std::set<Int>::iterator it;
 #endif 
 
+    // Initializing relative index validation flag of current front
+    Int *aChild = LUsym->aChild;
+    Int *aChildp = LUsym->aChildp;
+    Int maxrValid, maxcValid; // maximum of all the children
+    PRLEVEL (0, ("%% children of %ld  are:\n", f));
+    for(Int p = aChildp[f]; p < aChildp[f+1]; p++){
+        maxrValid = maxcValid = -1;
+        Element *childEl = elementList[aChild[p]];
+        maxrValid = maxrValid > childEl->rValid? maxrValid : childEl->rValid;
+        maxcValid = maxcValid > childEl->cValid? maxcValid : childEl->cValid;
+        PRLEVEL (0, ("%% aChild[%ld]= %ld  ",p,aChild[p] ));
+    }
+    maxrValid++; maxcValid++;
+    PRLEVEL (0, ("%% maxrValid= %ld  maxcValid=%ld\n", maxrValid, maxcValid));
+
+
+
     /**** 1 ******** finding set of rows in current front *********************/
     for (Int c = col1; c < col2; c++){
         tupleList *curColTupleList = &ColList[c];
@@ -115,14 +133,13 @@ void paru_assemble (
             Int e = curTpl.e;
             Int curColIndex = curTpl.f;
             PRLEVEL (1, ("%%e =%ld  curColIndex = %ld\n", e, curColIndex));
-            
+
             /*! TODO: Never negate e or f for now... keep it?	 */
             if(e < 0 || curColIndex < 0 ) continue;  //already deleted
 
             Element *curEl = elementList[e];
             Int mEl = curEl->nrows;
             Int *el_rowIndex = rowIndex_pointer (curEl); //pointers to row index
-            //Int *rowRelIndValid = rowRelIndVal (curEl);
             Int rowRelIndValid = curEl->rValid;
             Int *rowRelIndex = relRowInd (curEl);
             Int *colRelIndex    = relColInd (curEl);
@@ -131,7 +148,7 @@ void paru_assemble (
             PRLEVEL (1, ("%%point to col = %ld\n", el_colIndex[curColIndex]));
             /*! TODO: Keep the tuple or delete it?	 */
             if (el_colIndex [curColIndex]< 0 ) continue; // already assembled
-            
+
             ASSERT (el_colIndex[curColIndex] == c);
 
 
@@ -143,11 +160,9 @@ void paru_assemble (
                         e, elCol[e], elCMark));
 
 
-            //counting prior element's columns //TODO: BUGGY 
-//         if (elCol [e] <= elCMark) 
-//               elCol [e] = curEl->ncolsleft - 1; //initiaze 
-            if(rowRelIndValid !=  f)  // an element never seen before
-                rowRelIndValid =  f;
+            //if(rowRelIndValid !=  f)  // an element never seen before
+            if(rowRelIndValid !=  maxrValid)  // an element never seen before
+                rowRelIndValid =  maxrValid;
             else { 
                 elCol [e]--;    //keep track of number of cols
                 PRLEVEL (1, ("%%  element= %ld \n",e));
@@ -460,7 +475,6 @@ void paru_assemble (
             Int nEl = curEl->ncols;
             Int *el_rowIndex = rowIndex_pointer (curEl);
             Int *el_colIndex = colIndex_pointer (curEl);
-            //Int *colRelIndValid = colRelIndVal (curEl);
             Int colRelIndValid = curEl->cValid;
             Int *colRelIndex = relColInd (curEl);
             Int *rowRelIndex = relRowInd (curEl);
@@ -471,12 +485,9 @@ void paru_assemble (
 
             rowRelIndex [curTpl.f] = curFsRow;
 
-            //counting prior element's rows
-            //BUGGY: just like line 136
-//            if (elRow [e] <= elRMark) {
-//                elRow [e] = curEl ->nrowsleft - 1; //initiaze
-            if(colRelIndValid !=  f){// an element never seen before
-                colRelIndValid =  f;
+            //if(colRelIndValid !=  f){// an element never seen before
+            if(colRelIndValid !=  maxcValid){// an element never seen before
+                colRelIndValid =  maxcValid;
 #ifndef NDEBUG
                 if ( elCol [e] >= elCMark )
                     PRLEVEL (1, ("%% element %ld can be eaten wholly\n",e));
@@ -666,16 +677,20 @@ void paru_assemble (
     PRLEVEL (1, ("%% rowCount=%ld, colCount=%ld, fp=%ld\n",
                 rowCount, colCount, fp));
     PRLEVEL (1, ("%% el is %ld by %ld\n",rowCount-fp,colCount));
-    if (fp <= rowCount ){ // otherwise nothing will remain of this front
+    if (fp <= rowCount ){ 
 
         el = elementList[eli] = paru_create_element (rowCount-fp,
                 colCount, 0 ,cc); // allocating an un-initialized part of memory
                                   // While insided the DGEMM BETA == 0
         if ( el == NULL ){
-            printf ("%% Out of memory when tried to allocate current CB %ld",eli);
+            printf ("%% Out of memory when tried to allocate current CB %ld",
+                    eli);
             return;
         }
         PRLEVEL (1, ("%% el =%p\n", el));
+        el->rValid=maxrValid;
+        el->cValid=maxcValid;
+        
     }
     // Initializing el global indices
     Int *el_colIndex = colIndex_pointer (el);
