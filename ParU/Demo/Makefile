@@ -58,6 +58,15 @@ run:
 #	./testazny < ../Matrix/Tina_AskCal.mtx       #EMPTY col
 #	./testazny < ../Matrix/Tina_AskCal_perm.mtx  #EMPTY col
 #	./testazny < ../Matrix/west0067.mtx 	#67x67!
+#	./testazny < ../Matrix/ParUTst/west0132/west0132.mtx
+#	./testazny < ../Matrix/ParUTst/west0156/west0156.mtx
+#	./testazny < ../Matrix/ParUTst/west0167/west0167.mtx
+#	./testazny < ../Matrix/ParUTst/west0381/west0381.mtx
+#	./testazny < ../Matrix/ParUTst/west0479/west0479.mtx
+#	./testazny < ../Matrix/ParUTst/west0497/west0497.mtx
+	./testazny < ../Matrix/ParUTst/west0655/west0655.mtx
+#	./testazny < ../Matrix/ParUTst/west0989/west0989.mtx
+
 #	./testazny < ../Matrix/young1c.mtx     	#841x841
 #	./testazny < ../Matrix/ParUTst/az11_11.mtx   #14x14
 #	./testazny < ../Matrix/ParUTst/az88_2.mtx	 #4x4
@@ -84,18 +93,22 @@ run:
 
 
 
-VGFLAGS = --tool=memcheck --leak-check=full --show-reachable=yes -v\
-		  --track-origins=yes --num-callers=20 \
-		  --track-fds=yes --log-file="valgrindlogfile.log"
+#VGFLAGS = --tool=memcheck --leak-check=yes --show-reachable=yes -v\
+#		  --track-origins=yes --num-callers=20 \
+#		  --track-fds=yes --log-file="valgrindlogfile.log"
+VGFLAGS =  --leak-check=yes --log-file="valgrindlogfile.log"
+
+
+
 
 val:
-	valgrind	$(VGFLAGS)	./testazny < ../Matrix/lp_share1b.mtx
+#	valgrind	$(VGFLAGS)	./testazny < ../Matrix/lp_share1b.mtx
 #	valgrind	$(VGFLAGS)	./testazny < ../Matrix/LFAT5.mtx
 #	valgrind	$(VGFLAGS)	./testazny < ../Matrix/a2.mtx 
 #	valgrind	$(VGFLAGS)	./testazny < ../Matrix/b1_ss.mtx
 #	valgrind	$(VGFLAGS)	./testazny < ../Matrix/lfat5b.mtx
 #	valgrind	$(VGFLAGS)	./testazny < ../Matrix/west0067.mtx 
-#	valgrind	$(VGFLAGS)	./testazny < ../Matrix/cage5.mtx
+	valgrind	$(VGFLAGS)	./testazny < ../Matrix/cage5.mtx
 #
 #
 #	valgrind	$(VGFLAGS)	./testazny <  ../Matrix/Tina_AskCal.mtx
