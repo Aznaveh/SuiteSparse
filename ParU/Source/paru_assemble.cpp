@@ -101,21 +101,25 @@ void paru_assemble (
 #endif 
 
     // Initializing relative index validation flag of current front
+    Int maxrValid, maxcValid; // maximum of all the children
     Int *aChild = LUsym->aChild;
     Int *aChildp = LUsym->aChildp;
-    Int maxrValid, maxcValid; // maximum of all the children
     PRLEVEL (0, ("%% children of %ld  are:\n", f));
+    maxrValid = maxcValid = -1;
     for(Int p = aChildp[f]; p < aChildp[f+1]; p++){
-        maxrValid = maxcValid = -1;
         Element *childEl = elementList[aChild[p]];
-        maxrValid = maxrValid > childEl->rValid? maxrValid : childEl->rValid;
-        maxcValid = maxcValid > childEl->cValid? maxcValid : childEl->cValid;
+        Int rV = childEl->rValid;
+        Int cV = childEl->cValid;
         PRLEVEL (0, ("%% aChild[%ld]= %ld  ",p,aChild[p] ));
+        PRLEVEL (0, ("%% rV=%ld cV= %ld\n  ",rV,cV ));
+        maxrValid = maxrValid > rV? maxrValid : rV;
+        maxcValid = maxcValid > cV? maxcValid : cV;
     }
     maxrValid++; maxcValid++;
     PRLEVEL (0, ("%% maxrValid= %ld  maxcValid=%ld\n", maxrValid, maxcValid));
 
 
+//        maxrValid = maxcValid = f;
 
     /**** 1 ******** finding set of rows in current front *********************/
     for (Int c = col1; c < col2; c++){
@@ -158,15 +162,14 @@ void paru_assemble (
 
             PRLEVEL (0, ("%%1:element= %ld elCol=%ld elCMark=%ld \n",
                         e, elCol[e], elCMark));
+            PRLEVEL (0, ("%%  rowRelIndValid = %ld \n",rowRelIndValid));
 
 
-            //if(rowRelIndValid !=  f)  // an element never seen before
             if(rowRelIndValid !=  maxrValid)  // an element never seen before
                 rowRelIndValid =  maxrValid;
-              //  rowRelIndValid =  f;
             else { 
                 elCol [e]--;    //keep track of number of cols
-                PRLEVEL (1, ("%%  element= %ld \n",e));
+                PRLEVEL (1, ("%%  element= %ld is seen before \n",e));
                 //counting prior element's columns
                 continue;       // already have the set of rows
             }
@@ -481,15 +484,12 @@ void paru_assemble (
             Int *rowRelIndex = relRowInd (curEl);
 
             if (el_rowIndex [curRowIndex] < 0 ) continue;
-           // ASSERT (el_rowIndex[curRowIndex] == curFsRowIndex); //BUGGY
             ASSERT (el_rowIndex[curRowIndex] == curFsRow);
 
             rowRelIndex [curTpl.f] = curFsRow;
 
-            //if(colRelIndValid !=  f){// an element never seen before
             if(colRelIndValid !=  maxcValid){// an element never seen before
                 colRelIndValid =  maxcValid;
-                //colRelIndValid =  f;
 #ifndef NDEBUG
                 if ( elCol [e] >= elCMark )
                     PRLEVEL (1, ("%% element %ld can be eaten wholly\n",e));
@@ -504,7 +504,7 @@ void paru_assemble (
             PRLEVEL (1, ("%% element= %ld  nEl =%ld \n",e, nEl));
             for (Int cEl = 0; cEl < nEl; cEl++){
                 Int curCol = el_colIndex [cEl]; 
-                PRLEVEL (0, ("%% curCol =%ld\n", curCol));
+                PRLEVEL (1, ("%% curCol =%ld\n", curCol));
                 ASSERT (curCol < n);
                 if (curCol < 0)
                     continue;
@@ -690,9 +690,11 @@ void paru_assemble (
             return;
         }
         PRLEVEL (1, ("%% el =%p\n", el));
-        el->rValid=maxrValid;
-        el->cValid=maxcValid;
-        
+
+
+        //maxrValid+=f;  maxcValid+=f;
+       // el->rValid= maxrValid; el->cValid= maxcValid;   
+        el->rValid=++maxrValid;  el->cValid=++maxcValid;
     }
     // Initializing el global indices
     Int *el_colIndex = colIndex_pointer (el);
@@ -703,14 +705,14 @@ void paru_assemble (
         colTuple.e = eli;
         colTuple.f = i;
         if (paru_add_colTuple (ColList, CBColList[i], colTuple, cc) ){
-           // paru_freemat (&paruMatInfo, cc);
+            // paru_freemat (&paruMatInfo, cc);
             printf("%% Out of memory: add_colTuple \n");
             return; /* TODO: check RETURN MEM usage */
         }
     }
     Int *el_rowIndex = rowIndex_pointer (el);
     for (Int i = fp; i < rowCount; ++ i) {
-       Int locIndx = i-fp; 
+        Int locIndx = i-fp; 
         el_rowIndex [locIndx] = fsRowList[i];
         PRLEVEL (1, ("%% el_rowIndex [%ld] =%ld\n",
                     locIndx, el_rowIndex [locIndx]));

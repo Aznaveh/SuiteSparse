@@ -223,33 +223,16 @@ paru_matrix *paru_init_rowFronts (
 
         Element *curEl = elementList[e] = paru_create_element (nrows, ncols,
                 0 ,cc);
-        //     Element *curEl = elementList[e] =
-        //     curEl = elementList[e] =
-        //         (Element*) paru_alloc(1, sizeof(Element)+
-        //                 sizeof(Int)*(2*(nrows+ncols)+2)+
-        //                 sizeof(double)*nrows*ncols, cc);
-        if (curEl == NULL){   //out of memory
+       if (curEl == NULL){   //out of memory
             paru_freemat (&paruMatInfo, cc);
             printf("Out of memory: curEl\n");
             return NULL;
         }
-        // Initializing current element
-        //     curEl->nrowsleft = curEl->nrows = nrows;
-        //     curEl->ncolsleft = curEl->ncols = ncols;
-        Int *rowRelIndValid = rowRelIndVal (curEl);
-        Int *colRelIndValid = colRelIndVal (curEl);
-        //     *rowRelIndValid = -1 ;
-        //     *colRelIndValid = -1 ;
-
 #ifndef NDEBUG  // Printing the pointers info
         Int p=1;
         PRLEVEL (p, ("curEl = %p ", curEl));
-        PRLEVEL (p, ("rowRelIndValid = %p, %d", rowRelIndValid, 
-                    rowRelIndValid - (Int*)curEl));
-        PRLEVEL (p, (" colRelIndValid = %p, %d", colRelIndValid,
-                    colRelIndValid - (Int*)curEl));
-        Int limit = sizeof(Element)+
-            sizeof(Int)*(2*(nrows+ncols)+2)+
+       Int limit = sizeof(Element)+
+            sizeof(Int)*(2*(nrows+ncols))+
             sizeof(double)*nrows*ncols;
         PRLEVEL (p, ("limit= %p", curEl+limit));
         PRLEVEL (p, ("\n"));
