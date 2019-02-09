@@ -180,16 +180,19 @@ inline Int *rowIndex_pointer (Element *curEl)
 
 
 inline Int *relColInd (Element *curEl)
-{    return (Int*)(curEl+1) + curEl->ncols + curEl->nrows + 1;}
+//{    return (Int*)(curEl+1) + curEl->ncols + curEl->nrows + 1;}
+{    return (Int*)(curEl+1) + curEl->ncols + curEl->nrows  ;}
 
 
 inline Int *relRowInd (Element *curEl)
-{    return (Int*)(curEl+1) + 2*curEl->ncols + curEl->nrows + 2;}
+//{    return (Int*)(curEl+1) + 2*curEl->ncols + curEl->nrows + 2;}
+{    return (Int*)(curEl+1) + 2*curEl->ncols + curEl->nrows ;}
 
 
 inline double *numeric_pointer (Element *curEl)
     // sizeof Int and double are same, but I keep it like this for clarity
-{    return (double*)((Int*)(curEl+1) + 2*curEl->ncols + 2*curEl->nrows + 2);}
+//{    return (double*)((Int*)(curEl+1) + 2*curEl->ncols + 2*curEl->nrows + 2);}
+{    return (double*)((Int*)(curEl+1) + 2*curEl->ncols + 2*curEl->nrows );}
 
 
 

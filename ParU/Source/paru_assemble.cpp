@@ -163,6 +163,7 @@ void paru_assemble (
             //if(rowRelIndValid !=  f)  // an element never seen before
             if(rowRelIndValid !=  maxrValid)  // an element never seen before
                 rowRelIndValid =  maxrValid;
+              //  rowRelIndValid =  f;
             else { 
                 elCol [e]--;    //keep track of number of cols
                 PRLEVEL (1, ("%%  element= %ld \n",e));
@@ -488,6 +489,7 @@ void paru_assemble (
             //if(colRelIndValid !=  f){// an element never seen before
             if(colRelIndValid !=  maxcValid){// an element never seen before
                 colRelIndValid =  maxcValid;
+                //colRelIndValid =  f;
 #ifndef NDEBUG
                 if ( elCol [e] >= elCMark )
                     PRLEVEL (1, ("%% element %ld can be eaten wholly\n",e));
@@ -747,7 +749,7 @@ void paru_assemble (
     /**** 7 **** Count number of rows and columsn of prior CBs to asslemble ***/ 
 
     PRLEVEL (-1, ("\n%%||||  Start FourPass %ld ||||\n", f));
-   // paru_fourPass (paruMatInfo, eli, fp, cc);
+    //paru_fourPass (paruMatInfo, eli, fp, cc);
     PRLEVEL (-1, ("\n%%||||  Finish FourPass %ld ||||\n", f));
 
 
@@ -781,7 +783,7 @@ void paru_assemble (
 
     PRLEVEL (1, ("%%rowCount =%ld\n", rowCount));
     PRLEVEL (1, ("%%colCount =%ld\n", colCount));
-    PRLEVEL (-1, ("fp =%ld\n", fp));
+    PRLEVEL (-1, ("fp =%ld;\n", fp));
     /*! TODO: This should be stored somewhere     */
     paru_free (rowCount*fp, sizeof (double), pivotalFront, cc);
     paru_free (fp*colCount,  sizeof (double), uPart, cc);

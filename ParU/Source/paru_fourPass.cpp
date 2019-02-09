@@ -36,6 +36,9 @@ void paru_fourPass (paru_matrix *paruMatInfo,
     Int *isColInCBcolSet = Work -> colSize;
     Int colMark = Work -> colMark;
 
+    Int maxrValid = curCB->rValid++; // mark all relative index value as unvalid
+    Int maxcValid = curCB->cValid++;
+
 
 
     /*****  1st path: over non pivotal columns to count rows             ******/
@@ -61,7 +64,6 @@ void paru_fourPass (paru_matrix *paruMatInfo,
             Element *curEl = elementList[e];
             Int *el_colIndex = colIndex_pointer (curEl);
             Int *el_rowIndex = rowIndex_pointer (curEl); //pointers to row index
-            //Int *rowRelIndValid = rowRelIndVal (curEl);
             Int rowRelIndValid = curEl->rValid;
 
             Int *rowRelIndex = relRowInd (curEl);
@@ -70,8 +72,8 @@ void paru_fourPass (paru_matrix *paruMatInfo,
                 continue;  
             }
 
-            if(rowRelIndValid !=  el_ind){//BUGGY, What if I already have seen
-                rowRelIndValid =  el_ind;
+            if(rowRelIndValid !=  maxrValid){
+                rowRelIndValid =  maxrValid;
                 elCol [e] = curEl->ncolsleft - 1; //initiaze
             }
             else{ 
@@ -103,7 +105,6 @@ void paru_fourPass (paru_matrix *paruMatInfo,
             Int curRowIndex = curTpl.f;
             Element *curEl = elementList[e];
             Int *el_colIndex = colIndex_pointer (curEl); //pointers to row index
-            //Int *colRelIndValid = rowRelIndVal (curEl);
             Int colRelIndValid = curEl->cValid;
             Int *colRelIndex    = relColInd (curEl);
             Int *el_rowIndex = rowIndex_pointer (curEl);
@@ -113,8 +114,8 @@ void paru_fourPass (paru_matrix *paruMatInfo,
             }
 
 
-            if(colRelIndValid != el_ind ){
-                colRelIndValid =  el_ind ;
+            if(colRelIndValid != maxcValid){
+                colRelIndValid =  maxcValid;
                 elRow [e] = curEl ->nrowsleft - 1; //initiaze
             }
             else{ 
