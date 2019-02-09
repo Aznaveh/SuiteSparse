@@ -17,7 +17,7 @@ gmon.out
 *.gcda 
 *.gcno 
 *.aux 
-*.bbl 
+*.bbl
 *.blg 
 *.log 
 *.toc 
@@ -35,6 +35,7 @@ my_*.out
 .DS_Store
 .nfs*
 tags
+core.*
 
 # ignore these specific programs in the Package/Demo directories
 AMD/Demo/amd_demo
