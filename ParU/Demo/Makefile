@@ -23,62 +23,62 @@ all:
 	
 
 run:
-#	./testazny < ../Matrix/a0.mtx  		#OK #0x0
-#	./testazny < ../Matrix/a04.mtx 		#OK #0x4
-#	./testazny < ../Matrix/a1.mtx 		#OK #Empty row
+#	./testazny < ../Matrix/a0.mtx  		 #0x0 #OK
+#	./testazny < ../Matrix/a04.mtx 		 #0x4 #OK
+#	./testazny < ../Matrix/a1.mtx 		 #Empty row #OK
 #	./testazny < ../Matrix/a2.mtx 		#OK
-#	./testazny < ../Matrix/a4.mtx 		#OK #Empty row
+#	./testazny < ../Matrix/a4.mtx 		 #Empty row #OK
 #	./testazny < ../Matrix/arrow.mtx    #Huge
-#	./testazny < ../Matrix/ash219.mtx   #OK
-#	./testazny < ../Matrix/b1_ss.mtx  	#OK 
-#	./testazny < ../Matrix/bfwa62.mtx   #OK 
-#	./testazny < ../Matrix/c2.mtx		#OK #2x2 4nz
-#	./testazny < ../Matrix/c32.mtx		#OK #3x2 
+#	./testazny < ../Matrix/ash219.mtx   
+#	./testazny < ../Matrix/b1_ss.mtx  	#OK
+#	./testazny < ../Matrix/bfwa62.mtx  
+#	./testazny < ../Matrix/c2.mtx		#2x2 4nz #OK
+#	./testazny < ../Matrix/c32.mtx		#3x2 	 #OK
 #	./testazny < ../Matrix/cage3.mtx    #OK
-#	./testazny < ../Matrix/cage5.mtx    #OK   #Good sample
+#	./testazny < ../Matrix/cage5.mtx    #Good sample ! #37x37
 #	./testazny < ../Matrix/Franz6_id1959_aug.mtx #Huge
-#	./testazny < ../Matrix/GD98_a.mtx   #OK		 #Empty Row
+#	./testazny < ../Matrix/GD98_a.mtx   #Empty Row OK
 #	./testazny < ../Matrix/Groebner_id2003_aug.mtx #HUGE not good for MATLAB
-#	./testazny < ../Matrix/LFAT5.mtx	#OK
-#	./testazny < ../Matrix/lfat5b.mtx   #OK 
+#	./testazny < ../Matrix/LFAT5.mtx	#11x11
+#	./testazny < ../Matrix/lfat5b.mtx  #11x11
 #
 #	./testazny < ../Matrix/lp_e226_transposed.mtx   #SEG FAULT
 #
-#	./testazny < ../Matrix/lp_e226.mtx 		#OK  	# m >=n 
-#	./testazny < ../Matrix/lp_share1b.mtx 	#OK  	# m >=n 
-#	./testazny < ../Matrix/lpi_galenet.mtx 	#OK 	# m >=n 
-#	./testazny < ../Matrix/lpi_itest6.mtx  	#OK  	# m >=n 
-#	./testazny < ../Matrix/n3c4-b4.mtx    	#OK   	# m >=n 
+#	./testazny < ../Matrix/lp_e226.mtx 		# m >=n 
+#	./testazny < ../Matrix/lp_share1b.mtx 	# m >=n 
+#	./testazny < ../Matrix/lpi_galenet.mtx 	# m >=n 
+#	./testazny < ../Matrix/lpi_itest6.mtx  	# m >=n 
+#	./testazny < ../Matrix/n3c4-b4.mtx    	# m >=n 
 #	./testazny < ../Matrix/permuted_b1_ss.mtx  #OK
-#	./testazny < ../Matrix/problem.mtx    #OK  # m >=n
-#	./testazny < ../Matrix/pwr01b.mtx	  #OK  #Good sample
-#	./testazny < ../Matrix/r2.mtx         #OK  # m >=n failure
-#	./testazny < ../Matrix/Ragusa16.mtx   #OK #EMPTY row
-#	./testazny < ../Matrix/s32.mtx		  #OK
-#	./testazny < ../Matrix/Tina_AskCal.mtx       #OK #EMPTY col
-#	./testazny < ../Matrix/Tina_AskCal_perm.mtx  #OK #EMPTY col
-#	./testazny < ../Matrix/west0067.mtx 	#OK #Goood sample
-#	./testazny < ../Matrix/young1c.mtx     	#OK  
-#	./testazny < ../Matrix/ParUTst/az11_11.mtx   #OK
-#	./testazny < ../Matrix/ParUTst/az88_2.mtx	 #OK
-#	./testazny < ../Matrix/ParUTst/bcsstk01.mtx  #OK
-#	./testazny < ../Matrix/ParUTst/bcsstk03.mtx  #NO  #Memory problem
-#	./testazny < ../Matrix/ParUTst/bcsstk22.mtx  #OK
-#	./testazny < ../Matrix/ParUTst/bcsstm01.mtx	  		#OK
-#	./testazny < ../Matrix/ParUTst/bcsstm02.mtx	  		#OK
-#	./testazny < ../Matrix/ParUTst/bcsstm05.mtx	  		#OK  		
-#	./testazny < ../Matrix/ParUTst/bcsstm06.mtx	  		#OK  
-#	./testazny < ../Matrix/ParUTst/bcsstm19.mtx		 	#OK  
-#	./testazny < ../Matrix/ParUTst/bcsstm20.mtx		 	#OK  
-#	./testazny < ../Matrix/ParUTst/ex5.mtx  	#OK  #Good sample
-#	./testazny < ../Matrix/ParUTst/mesh1e1.mtx  #OK
-#	./testazny < ../Matrix/ParUTst/LF10/LF10.mtx #OK  #Good sample
-#	./testazny < ../Matrix/ParUTst/mesh1em1/mesh1em1.mtx #OK
+#	./testazny < ../Matrix/problem.mtx      # m >=n
+#	./testazny < ../Matrix/pwr01b.mtx	    #Good sample 37x37
+#	./testazny < ../Matrix/r2.mtx           # m >=n failure
+#	./testazny < ../Matrix/Ragusa16.mtx    #EMPTY row
+#	./testazny < ../Matrix/s32.mtx		  
+#	./testazny < ../Matrix/Tina_AskCal.mtx       #EMPTY col
+#	./testazny < ../Matrix/Tina_AskCal_perm.mtx  #EMPTY col
+	./testazny < ../Matrix/west0067.mtx 	#Goood sample 67x67
+#	./testazny < ../Matrix/young1c.mtx     	
+#	./testazny < ../Matrix/ParUTst/az11_11.mtx   #14x14
+#	./testazny < ../Matrix/ParUTst/az88_2.mtx	 #OK 
+#	./testazny < ../Matrix/ParUTst/bcsstk01.mtx #NO CBs 
+#	./testazny < ../Matrix/ParUTst/bcsstk03.mtx  
+#	./testazny < ../Matrix/ParUTst/bcsstk22.mtx 
+#	./testazny < ../Matrix/ParUTst/bcsstm01.mtx	
+#	./testazny < ../Matrix/ParUTst/bcsstm02.mtx	
+#	./testazny < ../Matrix/ParUTst/bcsstm05.mtx	  		
+#	./testazny < ../Matrix/ParUTst/bcsstm06.mtx	  
+#	./testazny < ../Matrix/ParUTst/bcsstm19.mtx	  
+#	./testazny < ../Matrix/ParUTst/bcsstm20.mtx	  
+#	./testazny < ../Matrix/ParUTst/ex5.mtx  	#Good sample 27x27
+#	./testazny < ../Matrix/ParUTst/mesh1e1.mtx  
+#	./testazny < ../Matrix/ParUTst/LF10/LF10.mtx #Good sample 18x18
+#	./testazny < ../Matrix/ParUTst/mesh1em1/mesh1em1.mtx 
 #	./testazny < ../Matrix/ParUTst/Trefethen_20/Trefethen_20.mtx
 #	./testazny < ../Matrix/ParUTst/Trefethen_20b/Trefethen_20b.mtx
 #	./testazny < ../Matrix/ParUTst/curtis54/curtis54.mtx
-	./testazny < ../Matrix/ParUTst/nos1/nos1.mtx #NO  #Memory problem
-#	./testazny < ../Matrix/ParUTst/nos4/nos4.mtx #OK
+#	./testazny < ../Matrix/ParUTst/nos1/nos1.mtx #Memory problem solved
+#	./testazny < ../Matrix/ParUTst/nos4/nos4.mtx 
 #	./testazny < ../Matrix/ParUTst/494_bus/494_bus.mtx
 #	./testazny < ../Matrix/ParUTst/mesh1em6/mesh1em6.mtx
 

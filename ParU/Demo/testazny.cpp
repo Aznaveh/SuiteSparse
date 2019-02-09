@@ -108,7 +108,7 @@ int main (int argc, char **argv)
     PRLEVEL (p, ("fprintf('Paru\\n');\n"));
     PRLEVEL (p, ("myErr = norm(S(oldR,c)-L*U)\n" ));
     //PRLEVEL (p, ("if( (norm(S(oldR,c)-L*U)) < err )\n" ));
-    PRLEVEL (p, ("if(myErr <= 100*matlabErr)\n" ));
+    PRLEVEL (p, ("if(myErr <= 100*matlabErr || myErr<err)\n" ));
     PRLEVEL (p, ("\tfprintf('Pass\\n')\nelse\n\tfprintf('Fail\\n')\nend\n" ));
     
     printf("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*\n");
