@@ -84,7 +84,7 @@ int main (int argc, char **argv)
     //Matlab
     //
     Int p=0;
-    PRLEVEL (p, ("err = 1e-12; [m n] =size(S);\n"));
+    PRLEVEL (p, ("err = 1e-9; [m n] =size(S);\n"));
     PRLEVEL (p, ("format long g\n"));
     PRLEVEL (p, ("oldR=[]; c=[];\n"));
     PRLEVEL (p, ("%%Finalizing the permutation\n"));
@@ -101,7 +101,7 @@ int main (int argc, char **argv)
     PRLEVEL (p, ("L=tril(LU,-1)+eye(size(LU));\n"));
     PRLEVEL (p, ("U=triu(LU); U=U(1:n,:);\n"));
     PRLEVEL (p, ("spparms('spumoni',3);\n" ));
-//    PRLEVEL (p, ("fprintf('Matlab\\n');\n" ));
+    //PRLEVEL (p, ("fprintf('Matlab\\n');\n" ));
     PRLEVEL (p, ("[l,u,p]=lu(S);\n" ));
     PRLEVEL (p, ("matlabErr = norm(p*S-l*u)\n" ));
 
