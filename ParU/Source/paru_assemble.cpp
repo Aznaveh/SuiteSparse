@@ -102,15 +102,45 @@ void paru_assemble (
 
     // Initializing relative index validation flag of current front
     Int maxrValid, maxcValid; // maximum of all the children
-    Int *aChild = LUsym->aChild;
-    Int *aChildp = LUsym->aChildp;
+//    Int *aChild = LUsym->aChild;
+//    Int *aChildp = LUsym->aChildp;
+//    PRLEVEL (0, ("%% children of %ld  are:\n", f));
+//    maxrValid = maxcValid = -1;
+//    for(Int p = aChildp[f]; p < aChildp[f+1]; p++){
+//        ASSERT(aChild[p] < m+nf);
+//        ASSERT(aChild[p] >= 0);
+//        Element *childEl = elementList[aChild[p]];
+//        if(childEl == NULL){
+//            PRLEVEL (0, ("%% AHA!! " ));
+//            continue;
+//        }
+//        //ASSERT(childEl!=NULL);
+//        Int rV = childEl->rValid;
+//        Int cV = childEl->cValid;
+//        PRLEVEL (0, ("%% aChild[%ld]= %ld  ",p,aChild[p] ));
+//        PRLEVEL (0, ("%% rV=%ld cV= %ld\n  ",rV,cV ));
+//        maxrValid = maxrValid > rV? maxrValid : rV;
+//        maxcValid = maxcValid > cV? maxcValid : cV;
+//    }
+//
+    Int *Child = LUsym->Child;
+    Int *Childp = LUsym->Childp;
+    Int *snM = LUsym->super2atree;
     PRLEVEL (0, ("%% children of %ld  are:\n", f));
     maxrValid = maxcValid = -1;
-    for(Int p = aChildp[f]; p < aChildp[f+1]; p++){
-        Element *childEl = elementList[aChild[p]];
+    for(Int p = Childp[f]; p <= Childp[f+1]-1; p++){
+        ASSERT(Child[p] < m);
+        ASSERT(Child[p] >= 0);
+        Element *childEl = elementList[snM[Child[p]]];
+        if(childEl == NULL){
+            PRLEVEL (0, ("%% Vaporized element=%ld  ",snM[Child[p]] ));
+            PRLEVEL (0, ("%% Child[%ld]= %ld  ",p,Child[p] ));
+            continue;
+        }
+        ASSERT(childEl!=NULL);
         Int rV = childEl->rValid;
         Int cV = childEl->cValid;
-        PRLEVEL (0, ("%% aChild[%ld]= %ld  ",p,aChild[p] ));
+        PRLEVEL (0, ("%% Child[%ld]= %ld  ",p,Child[p] ));
         PRLEVEL (0, ("%% rV=%ld cV= %ld\n  ",rV,cV ));
         maxrValid = maxrValid > rV? maxrValid : rV;
         maxcValid = maxcValid > cV? maxcValid : cV;
@@ -119,7 +149,6 @@ void paru_assemble (
     PRLEVEL (0, ("%% maxrValid= %ld  maxcValid=%ld\n", maxrValid, maxcValid));
 
 
-//        maxrValid = maxcValid = f;
 
     /**** 1 ******** finding set of rows in current front *********************/
     for (Int c = col1; c < col2; c++){
@@ -165,8 +194,14 @@ void paru_assemble (
             PRLEVEL (0, ("%%  rowRelIndValid = %ld \n",rowRelIndValid));
 
 
-            if(rowRelIndValid !=  maxrValid)  // an element never seen before
+            if(rowRelIndValid !=  maxrValid){  // an element never seen before
+                //ASSERT(rowRelIndValid <= maxrValid);
+#ifndef NDEBUG
+                if(rowRelIndValid > maxrValid) 
+                    PRLEVEL (0, ("%%??  XXrowRelI > maxrValid\n"));
+#endif
                 rowRelIndValid =  maxrValid;
+            }
             else { 
                 elCol [e]--;    //keep track of number of cols
                 PRLEVEL (1, ("%%  element= %ld is seen before \n",e));
@@ -489,6 +524,7 @@ void paru_assemble (
             rowRelIndex [curTpl.f] = curFsRow;
 
             if(colRelIndValid !=  maxcValid){// an element never seen before
+                //ASSERT(colRelIndValid <= maxcValid);
                 colRelIndValid =  maxcValid;
 #ifndef NDEBUG
                 if ( elCol [e] >= elCMark )
@@ -673,7 +709,6 @@ void paru_assemble (
 #endif
 
 
-    Int *snM = LUsym->super2atree;
     Int eli = snM [f]; // Element index of the one that is going to be assembled
     Element *el;
     PRLEVEL (1, ("%% rowCount=%ld, colCount=%ld, fp=%ld\n",
@@ -693,7 +728,7 @@ void paru_assemble (
 
 
         //maxrValid+=f;  maxcValid+=f;
-       // el->rValid= maxrValid; el->cValid= maxcValid;   
+        //el->rValid= maxrValid; el->cValid= maxcValid;   
         el->rValid=++maxrValid;  el->cValid=++maxcValid;
     }
     // Initializing el global indices
