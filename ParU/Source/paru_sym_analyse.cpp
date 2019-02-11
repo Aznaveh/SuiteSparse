@@ -133,7 +133,7 @@ paru_symbolic *paru_sym_analyse
         fn = LUsym->Rp[f+1]-LUsym->Rp[f];
         fp = Super[f+1]-Super[f];
         
-        Int p=0;
+        Int p=1;
         PRLEVEL (p,("%% Front=%ld Parent=%ld\n", f,  Parent[f]));
         PRLEVEL (p,("%% list of children: "));
         for (Int i = Childp[f]; i <= Childp[f+1]-1; i++) 

@@ -12,6 +12,7 @@ ccode: all
 
 include ../../SuiteSparse_config/SuiteSparse_config.mk
 
+
 # ParU depends on SPQR, CHOLMOD, AMD, COLAMD, LAPACK, the BLAS and SuiteSparse_config
 LDLIBS += -lspqr -lamd -lcolamd -lcholmod -lsuitesparseconfig $(LAPACK) $(BLAS)
 
@@ -45,7 +46,8 @@ OBJ = \
 	paru_trsm.o\
 	paru_dgemm.o\
 	paru_print.o\
-	paru_fourPass.o
+	paru_fourPass.o\
+	paru_max_rel_child.o
 
 $(OBJ): $(INC)
 
@@ -97,6 +99,10 @@ paru_fourPass.o: ../Source/paru_fourPass.cpp
 
 paru_print.o: ../Source/paru_print.cpp
 	$(C) -c $<
+
+paru_max_rel_child.o: ../Source/paru_max_rel_child.cpp
+	$(C) -c $<
+
 
 
 #-------------------------------------------------------------------------------
