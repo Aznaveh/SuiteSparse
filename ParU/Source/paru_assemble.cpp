@@ -10,11 +10,11 @@
 #include <set>
 #endif
 
-/*! \brief assembling a front and updating correspoing elelment
+/*! @brief assembling a front and updating correspoing elelment
  *
  *
- * \param  a list of tuples and the the tuple we want to add
- * \return 0 on sucess 
+ * @param  a list of tuples and the the tuple we want to add
+ * @return 0 on sucess 
  */
 void paru_assemble (
         paru_matrix *paruMatInfo,
@@ -102,7 +102,7 @@ void paru_assemble (
 
     Int maxrValid, maxcValid; // maximum of all the children
         // Initializing relative index validation flag of current front
-    paru_max_rel_child (LUsym, elementList, f, &maxrValid, &maxcValid);
+    paru_init_rel (LUsym, elementList, f, &maxrValid, &maxcValid);
 
     PRLEVEL (0, ("%% maxrValid= %ld  maxcValid=%ld\n", maxrValid, maxcValid));
 

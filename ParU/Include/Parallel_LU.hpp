@@ -283,5 +283,5 @@ void paru_fourPass (paru_matrix *paruMatInfo,  Int el_ind, Int fp,
 
 void paru_print_element (paru_matrix *paruMatInfo, Int e);
 void paru_print_tupleList (tupleList *listSet, Int index);
-void paru_max_rel_child (paru_symbolic *LUsym,  Element **elementList, Int f,
+void paru_init_rel (paru_symbolic *LUsym,  Element **elementList, Int f,
         Int *maxrValid, Int *maxcValid);

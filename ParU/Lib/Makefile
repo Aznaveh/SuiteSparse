@@ -47,7 +47,7 @@ OBJ = \
 	paru_dgemm.o\
 	paru_print.o\
 	paru_fourPass.o\
-	paru_max_rel_child.o
+	paru_init_rel.o
 
 $(OBJ): $(INC)
 
@@ -100,7 +100,7 @@ paru_fourPass.o: ../Source/paru_fourPass.cpp
 paru_print.o: ../Source/paru_print.cpp
 	$(C) -c $<
 
-paru_max_rel_child.o: ../Source/paru_max_rel_child.cpp
+paru_init_rel.o: ../Source/paru_init_rel.cpp
 	$(C) -c $<
 
 
