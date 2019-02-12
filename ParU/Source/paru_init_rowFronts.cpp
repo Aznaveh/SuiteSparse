@@ -186,13 +186,13 @@ paru_matrix *paru_init_rowFronts (
     Int *Wi = (Int *) cc->Iwork ;   // size m, aliased with the rest of Iwork
 
     // create numeric values of S = A(p,q) in row-form in Sx
-    double *Sx = (double*) cholmod_l_malloc (anz, sizeof (double), cc) ;
+    double *Sx = (double*) paru_alloc (anz, sizeof (double), cc) ;
     if (Sx == NULL){   //out of memory
         paru_freemat (&paruMatInfo, cc);
         printf("Out of memory: Sx\n");
         return NULL;
     }
-    Int *W = (Int*) cholmod_l_malloc (m, sizeof (Int), cc) ;
+    Int *W = (Int*) paru_alloc (m, sizeof (Int), cc) ;
     if (W == NULL){   //out of memory
         paru_freemat (&paruMatInfo, cc);
         printf("Out of memory: W\n");

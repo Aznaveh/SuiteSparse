@@ -200,7 +200,7 @@ void *CHOLMOD(free)	/* always returns NULL */
 
     if (p != NULL)
     {
-        ASSERT (Common->memory_inuse >= (n * size)) ;
+        //Aznaveh: ASSERT (Common->memory_inuse >= (n * size)) ;
 
 	/* only free the object if the pointer is not NULL */
 	/* call free, or its equivalent */
@@ -215,7 +215,7 @@ void *CHOLMOD(free)	/* always returns NULL */
 	/* This assertion will fail if the user calls cholmod_malloc and
 	 * cholmod_free with mismatched memory sizes.  It shouldn't fail
 	 * otherwise. */
-	ASSERT (IMPLIES (Common->malloc_count == 0, Common->memory_inuse == 0));
+	//Aznaveh: ASSERT (IMPLIES (Common->malloc_count == 0, Common->memory_inuse == 0));
     }
     /* return NULL, and the caller should assign this to p.  This avoids
      * freeing the same pointer twice. */
