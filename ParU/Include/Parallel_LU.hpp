@@ -228,6 +228,12 @@ typedef struct  /*work_struct*/
 
 }   work_struct;
 
+typedef struct  /*dense factorized part pointer*/
+{
+    Int m,n;   /* mxn dense matrix */
+    double *p; /* point to factorized parts */
+} paru_fac; 
+
 typedef struct  /*Matrix */
 {
     Int m, n;
@@ -236,6 +242,8 @@ typedef struct  /*Matrix */
     tupleList *ColList;     /* size m of dynamic list */
     Element **elementList;  /* pointers to all elements, size = m+nf+1 */
     work_struct *Work;             
+    paru_fac *partial_Us;           /* save the answer LU: righ part*/
+    paru_fac *partial_LUs;          /* left part */
 
 }   paru_matrix;
 

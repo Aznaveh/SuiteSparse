@@ -23,7 +23,10 @@ void *paru_realloc(
 
 
 void paru_free (Int n, Int size, void *p,  cholmod_common *cc){
-    cholmod_l_free (n,   size, p, cc);
+    if(p != NULL)
+        cholmod_l_free (n,   size, p, cc);
+    else
+        printf("freeing a NULL pointer\n");
 }
 
 void paru_freesym (paru_symbolic **LUsym_handle,
@@ -49,30 +52,30 @@ void paru_freesym (paru_symbolic **LUsym_handle,
     PRLEVEL (1, ("In free sym: m=%ld n=%ld\n nf=%ld\
                 anz=%ld rjsize=%ld\n", m, n, nf, anz, rjsize ));
 
-    cholmod_l_free (nf+1, sizeof (Int), LUsym->Parent, cc);
-    cholmod_l_free (nf+1, sizeof (Int), LUsym->Child, cc);
-    cholmod_l_free (nf+2, sizeof (Int), LUsym->Childp, cc);
-    cholmod_l_free (nf+1, sizeof (Int), LUsym->Super, cc);
-    cholmod_l_free (n, sizeof (Int), LUsym->Qfill , cc);
-    cholmod_l_free (m, sizeof (Int), LUsym->PLinv, cc);
-    cholmod_l_free (nf+1, sizeof (Int), LUsym->Fm, cc);
-    cholmod_l_free (nf+1, sizeof (Int), LUsym->Cm, cc);
+    paru_free (nf+1, sizeof (Int), LUsym->Parent, cc);
+    paru_free (nf+1, sizeof (Int), LUsym->Child, cc);
+    paru_free (nf+2, sizeof (Int), LUsym->Childp, cc);
+    paru_free (nf+1, sizeof (Int), LUsym->Super, cc);
+    paru_free (n, sizeof (Int), LUsym->Qfill , cc);
+    paru_free (m, sizeof (Int), LUsym->PLinv, cc);
+    paru_free (nf+1, sizeof (Int), LUsym->Fm, cc);
+    paru_free (nf+1, sizeof (Int), LUsym->Cm, cc);
 
-    cholmod_l_free (rjsize, sizeof (Int), LUsym->Rj, cc);
-    cholmod_l_free (nf+1,   sizeof (Int), LUsym->Rp, cc);
+    paru_free (rjsize, sizeof (Int), LUsym->Rj, cc);
+    paru_free (nf+1,   sizeof (Int), LUsym->Rp, cc);
 
-    cholmod_l_free (m+1, sizeof (Int), LUsym->Sp, cc);
-    cholmod_l_free (anz, sizeof (Int), LUsym->Sj, cc);
-    cholmod_l_free (n+2, sizeof (Int), LUsym->Sleft, cc);
+    paru_free (m+1, sizeof (Int), LUsym->Sp, cc);
+    paru_free (anz, sizeof (Int), LUsym->Sj, cc);
+    paru_free (n+2, sizeof (Int), LUsym->Sleft, cc);
+;
 
+    paru_free (m+nf, sizeof (Int), LUsym->aParent, cc);
+    paru_free (m+nf+1, sizeof (Int), LUsym->aChild, cc);
+    paru_free (m+nf+2, sizeof (Int), LUsym->aChildp, cc);
+    paru_free (m, sizeof (Int), LUsym->row2atree, cc);
+    paru_free (nf, sizeof (Int), LUsym->super2atree, cc);
 
-    cholmod_l_free (m+nf, sizeof (Int), LUsym->aParent, cc);
-    cholmod_l_free (m+nf+1, sizeof (Int), LUsym->aChild, cc);
-    cholmod_l_free (m+nf+2, sizeof (Int), LUsym->aChildp, cc);
-    cholmod_l_free (m, sizeof (Int), LUsym->row2atree, cc);
-    cholmod_l_free (nf, sizeof (Int), LUsym->super2atree, cc);
-
-    cholmod_l_free (1, sizeof (paru_symbolic), LUsym, cc);
+    paru_free (1, sizeof (paru_symbolic), LUsym, cc);
 
     *LUsym_handle = NULL;
 }
@@ -108,15 +111,15 @@ void paru_freemat (paru_matrix **paruMatInfo_handle,
                                 //  point
         if (len > m+nf )                        
             printf ("%% too much space used for %ld\n",col);
-        cholmod_l_free (len , sizeof (Tuple), ColList[col].list, cc);
+        paru_free (len , sizeof (Tuple), ColList[col].list, cc);
     }
-    cholmod_l_free (1, n*sizeof(tupleList), ColList, cc);
+    paru_free (1, n*sizeof(tupleList), ColList, cc);
 
     for (Int row = 0; row < m; row++) {
         Int len = RowList [row].len;
-        cholmod_l_free (len , sizeof (Tuple), RowList[row].list, cc);
+        paru_free (len , sizeof (Tuple), RowList[row].list, cc);
     }
-    cholmod_l_free (1, m*sizeof(tupleList), RowList, cc);
+    paru_free (1, m*sizeof(tupleList), RowList, cc);
 
 
     Element **elementList; 
@@ -138,10 +141,13 @@ void paru_freemat (paru_matrix **paruMatInfo_handle,
             ncols = curEl->ncols;
         PRLEVEL (1, ("nrows =%ld ", nrows));
         PRLEVEL (1, ("ncols =%ld\n", ncols));
-        cholmod_l_free (1, sizeof(Element)+sizeof(Int)*(2*(nrows+ncols)+2)+
+        paru_free (1, sizeof(Element)+sizeof(Int)*(2*(nrows+ncols)+2)+
                 sizeof(double)*nrows*ncols, curEl, cc);
     }
 
+
+    paru_fac *LUs =  paruMatInfo->partial_LUs;
+    paru_fac *Us =  paruMatInfo->partial_Us;
 
     PRLEVEL (1, ("freeing CB elements:\n"));
     for(Int i = 0; i < nf ; i++){        // freeing all other elements
@@ -153,21 +159,36 @@ void paru_freemat (paru_matrix **paruMatInfo_handle,
             ncols = curEl->ncols;
         PRLEVEL (1, ("nrows =%ld ", nrows));
         PRLEVEL (1, ("ncols =%ld\n", ncols));
-        cholmod_l_free (1, sizeof(Element)+sizeof(Int)*(2*(nrows+ncols))+
+        paru_free (1, sizeof(Element)+sizeof(Int)*(2*(nrows+ncols))+
                 sizeof(double)*nrows*ncols, curEl, cc);
+
+        //free the answer
+        if(Us[i].p != NULL){
+            Int m=Us[i].m; Int n=Us[i].n;
+            paru_free (m*n, sizeof (double), Us[i].p, cc);
+        }
+        if(LUs[i].p != NULL){
+            Int m=LUs[i].m; Int n=LUs[i].n;
+            paru_free (m*n, sizeof (double), LUs[i].p, cc);
+        }
+
     }
 
+    paru_free(1, nf*sizeof(paru_fac),LUs, cc);
+    paru_free(1, nf*sizeof(paru_fac),Us, cc);
 
-    cholmod_l_free (1, (m+nf+1)*sizeof(Element), elementList, cc);
+
+    paru_free (1, (m+nf+1)*sizeof(Element), elementList, cc);
     work_struct *Work = paruMatInfo->Work;
-    cholmod_l_free (m, sizeof(Int), Work->rowSize, cc);
-    cholmod_l_free (3*m+n, sizeof(Int), Work->scratch, cc);
-    cholmod_l_free (n, sizeof(Int), Work->colSize, cc);
-    cholmod_l_free (m+nf, sizeof(Int), Work->elRow, cc);
-    cholmod_l_free (m+nf, sizeof(Int), Work->elCol, cc);
+    paru_free (m, sizeof(Int), Work->rowSize, cc);
+    paru_free (3*m+n, sizeof(Int), Work->scratch, cc);
+    paru_free (n, sizeof(Int), Work->colSize, cc);
+    paru_free (m+nf, sizeof(Int), Work->elRow, cc);
+    paru_free (m+nf, sizeof(Int), Work->elCol, cc);
 
 
-    cholmod_l_free (1, sizeof(work_struct), paruMatInfo->Work, cc);
-    cholmod_l_free (1, sizeof(paru_matrix), paruMatInfo, cc);
+    paru_free (1, sizeof(work_struct), paruMatInfo->Work, cc);
+    paru_free (1, sizeof(paru_matrix), paruMatInfo, cc);
     *paruMatInfo_handle = NULL;
+
 } 

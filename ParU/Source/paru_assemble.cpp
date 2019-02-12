@@ -154,10 +154,6 @@ void paru_assemble (
 
             if(rowRelIndValid !=  maxrValid){  // an element never seen before
                 ASSERT(rowRelIndValid <= maxrValid);
-#ifndef NDEBUG
-                if(rowRelIndValid > maxrValid) 
-                    PRLEVEL (0, ("%%??  XXrowRelI > maxrValid\n"));
-#endif
                 rowRelIndValid =  maxrValid;
             }
             else { 
@@ -232,6 +228,12 @@ void paru_assemble (
         printf ("%% Out of memory when tried to allocate for pivotal part %ld",f);
         return;
     }
+
+    paru_fac *LUs =  paruMatInfo->partial_LUs;
+    LUs[f].m =rowCount;
+    LUs[f].n=fp;
+    ASSERT (LUs[f].p == NULL);
+    LUs[f].p = pivotalFront;
 
     /**** 2 ********  assembling the pivotal part of the front ****************/
     /* 
@@ -522,21 +524,23 @@ void paru_assemble (
                 ASSERT (colCount <= n);
             }
         }
-        }
+    }
 
-        if (colCount == 0){  // there is no CB, Nothing to be done
-            Work->rowMark +=  rowCount;
-            return;
-        }
+    if (colCount == 0){  // there is no CB, Nothing to be done
+        Work->rowMark +=  rowCount;
+        PRLEVEL (0, ("%% pivotalFront =%p\n",pivotalFront));
+        //paru_free (rowCount*fp, sizeof (double), pivotalFront, cc);
+        return;
+    }
 
 #ifndef NDEBUG /* Checking if columns are correct */
-        p = 1;
-        PRLEVEL (p, ("%% There are %ld columns in this contribution block: \n",
-                    colCount));
-        for (Int i = 0; i < colCount; i++)
-            PRLEVEL (p, ("%%  %ld", CBColList [i]));
-        PRLEVEL (p, ("\n"));
-        Int stl_colSize = stl_colSet.size();
+    p = 1;
+    PRLEVEL (p, ("%% There are %ld columns in this contribution block: \n",
+                colCount));
+    for (Int i = 0; i < colCount; i++)
+        PRLEVEL (p, ("%%  %ld", CBColList [i]));
+    PRLEVEL (p, ("\n"));
+    Int stl_colSize = stl_colSet.size();
     if (colCount != stl_colSize){
         PRLEVEL (p, ("%% STL %ld:\n",stl_colSize));
         for (it = stl_colSet.begin(); it != stl_colSet.end(); it++)
@@ -550,17 +554,6 @@ void paru_assemble (
 #endif 
 
 
-#ifdef NotUsingMark
-    /*Not used now, I am using rowMark to avoid this*/
-    /* setting W for next iteration
-       for (Int i = 0; i < rowCount; i++){
-       Int curRow = fsRowList [i];
-       ASSERT (curRow < m );
-       ASSERT (isRowInFront [curRow] != -1);
-       isRowInFront  [curRow] = -1;
-       } */
-#endif
-
     /**** 5 ** assemble U part         Row by Row                          ****/ 
 
     double *uPart = 
@@ -569,6 +562,13 @@ void paru_assemble (
         printf ("%% Out of memory when tried to allocate for U part %ld",f);
         return;
     }
+
+    paru_fac *Us =  paruMatInfo->partial_Us;
+    Us[f].m=fp;
+    Us[f].n =colCount;
+    ASSERT (Us[f].p == NULL);
+    Us[f].p = uPart;
+
 
     for (Int i = 0; i < fp; i++){
         Int curFsRowIndex = i; //current fully summed row index
@@ -677,7 +677,7 @@ void paru_assemble (
 
         el = elementList[eli] = paru_create_element (rowCount-fp,
                 colCount, 0 ,cc); // allocating an un-initialized part of memory
-                                  // While insided the DGEMM BETA == 0
+        // While insided the DGEMM BETA == 0
         if ( el == NULL ){
             printf ("%% Out of memory when tried to allocate current CB %ld",
                     eli);
@@ -766,7 +766,7 @@ void paru_assemble (
 
     Work->colMark += colCount;
     colMark = Work -> colMark;
-   /* Trying to DEBUG */ 
+    /* Trying to DEBUG */ 
     Work -> elCMark += colCount;
     Work -> elRMark += colCount;
 
@@ -781,8 +781,9 @@ void paru_assemble (
     PRLEVEL (1, ("%%colCount =%ld\n", colCount));
     PRLEVEL (-1, ("fp =%ld;\n", fp));
     /*! TODO: This should be stored somewhere     */
-    paru_free (rowCount*fp, sizeof (double), pivotalFront, cc);
-    paru_free (fp*colCount,  sizeof (double), uPart, cc);
+
+    //    paru_free (rowCount*fp, sizeof (double), pivotalFront, cc);
+    //    paru_free (fp*colCount,  sizeof (double), uPart, cc);
 
     PRLEVEL (1, ("%%~~~~~~~Assemble Front %ld finished\n", f));
 }

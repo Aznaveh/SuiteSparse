@@ -154,6 +154,27 @@ paru_matrix *paru_init_rowFronts (
         return NULL;
     }
 
+    paruMatInfo->partial_Us = //Initialize with NULL
+        (paru_fac*) paru_calloc (1, nf*sizeof(paru_fac), cc);
+    if (paruMatInfo->partial_Us== NULL){   //out of memory
+        paru_freemat (&paruMatInfo, cc);
+        printf("Out of memory: Us\n");
+        return NULL;
+    }
+
+
+
+    
+    paruMatInfo->partial_LUs= //Initialize with NULL
+        (paru_fac*) paru_calloc (1, nf*sizeof(paru_fac), cc);
+    if (paruMatInfo->partial_LUs== NULL){   //out of memory
+        paru_freemat (&paruMatInfo, cc);
+        printf("Out of memory: Us\n");
+        return NULL;
+    }
+
+
+
 
 
     /// ------------------------------------------------------------------------
@@ -183,8 +204,8 @@ paru_matrix *paru_init_rowFronts (
         // use Wi as workspace (Iwork (0:m-1)) [
         spqr_stranspose2 (A, Qfill, Sp, PLinv, Sx, Wi) ;
         // Wi no longer needed ]
-    }
-
+    }//
+     //
 
     Int *Sj= LUsym->Sj;
     Int *Ap = (Int*) A->p;
