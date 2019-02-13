@@ -25,11 +25,11 @@ void paru_init_rel  (
     Int *maxrValid, 
     Int *maxcValid)
 {
-    DEBUGLEVEL(1);
+    DEBUGLEVEL(0);
    Int *Child = LUsym->Child;
     Int *Childp = LUsym->Childp;
     Int *snM = LUsym->super2atree;
-    PRLEVEL (0, ("%% children of %ld  are:\n", f));
+    PRLEVEL (1, ("%% children of %ld  are:\n", f));
     Int maxrV, maxcV;
     maxrV= maxcV= -1;
     for(Int p = Childp[f]; p <= Childp[f+1]-1; p++){
@@ -37,8 +37,8 @@ void paru_init_rel  (
         ASSERT(Child[p] >= 0);
         Element *childEl = elementList[snM[Child[p]]];
         if(childEl == NULL){
-            PRLEVEL (0, ("%% Vaporized element=%ld  ",snM[Child[p]] ));
-            PRLEVEL (0, ("%% Child[%ld]= %ld  ",p,Child[p] ));
+            PRLEVEL (1, ("%% Vaporized element=%ld  ",snM[Child[p]] ));
+            PRLEVEL (1, ("%% Child[%ld]= %ld  ",p,Child[p] ));
             paru_init_rel (LUsym, elementList, Child[p], &rV, &cV);
         }
         else{

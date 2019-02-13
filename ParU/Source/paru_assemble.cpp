@@ -25,7 +25,8 @@ void paru_assemble (
 
 {
     DEBUGLEVEL(0);
-    /* -2 Print Nothing
+    /* 
+     * -2 Print Nothing
      * -1 Just Matlab
      *  0 Detailed
      *  > 0 Everything
@@ -116,8 +117,10 @@ void paru_assemble (
         Tuple *listColTuples = curColTupleList->list;
 
 #ifndef NDEBUG            
-        PRLEVEL (0, ("%%c =%ld  numTuple = %ld\n", c, numTuple));
-        paru_print_tupleList (ColList, c);
+        Int p = 1;
+        PRLEVEL (p, ("%%c =%ld  numTuple = %ld\n", c, numTuple));
+        if (p <= 0 )
+            paru_print_tupleList (ColList, c);
 #endif
         for (Int i = 0; i < numTuple; i++){
             Tuple curTpl = listColTuples [i];
@@ -147,9 +150,9 @@ void paru_assemble (
             // neede for row assembly
             // function
 
-            PRLEVEL (0, ("%%1:element= %ld elCol=%ld elCMark=%ld \n",
+            PRLEVEL (1, ("%%1:element= %ld elCol=%ld elCMark=%ld \n",
                         e, elCol[e], elCMark));
-            PRLEVEL (0, ("%%  rowRelIndValid = %ld \n",rowRelIndValid));
+            PRLEVEL (1, ("%%  rowRelIndValid = %ld \n",rowRelIndValid));
 
 
             if(rowRelIndValid !=  maxrValid){  // an element never seen before
@@ -163,28 +166,29 @@ void paru_assemble (
                 continue;       // already have the set of rows
             }
 
-            PRLEVEL (0, ("%%2:element= %ld  mEl =%ld \n",e, mEl));
+            PRLEVEL (1, ("%%2:element= %ld  mEl =%ld \n",e, mEl));
             //Set union of all the rows of the current element
             for (Int rEl = 0; rEl < mEl; rEl++){
                 Int curRow = el_rowIndex [rEl]; 
-                PRLEVEL (0, ("%%@@curRow =%ld rEl=%ld\n", curRow, rEl));
-                paru_print_element (paruMatInfo, e);
+                PRLEVEL (1, ("%%@@curRow =%ld rEl=%ld\n", curRow, rEl));
+                Int p=1;
+                if (p <= 0) paru_print_element (paruMatInfo, e);
                 if (curRow < 0 ) continue; // that row has already deleted
-                PRLEVEL (0, ("%%**curRow =%ld rEl=%ld\n", curRow, rEl));
+                PRLEVEL (1, ("%%**curRow =%ld rEl=%ld\n", curRow, rEl));
                 ASSERT (curRow < m ) ;
 #ifndef NDEBUG
                 stl_rowSet.insert (curRow);
 #endif
-                PRLEVEL (0, ("%% %p ---> isRowInFront [%ld]=%ld\n", 
+                PRLEVEL (1, ("%% %p ---> isRowInFront [%ld]=%ld\n", 
                             isRowInFront+curRow, curRow, isRowInFront[curRow]));
 
                 if (isRowInFront[curRow] < rowMark ){  
                     // Adding curRow to the set
-                    PRLEVEL (0, ("%%curRow =%ld rowCount=%ld\n", 
+                    PRLEVEL (1, ("%%curRow =%ld rowCount=%ld\n", 
                                 curRow, rowCount));
                     fsRowList [rowCount] = curRow;
                     rowRelIndex [rEl] = rowCount ;
-                    PRLEVEL (0, ("%%1st: rowRelIndex[%ld] = %ld\n",
+                    PRLEVEL (1, ("%%1st: rowRelIndex[%ld] = %ld\n",
                                 rEl, rowCount ));
                     isRowInFront [curRow] = rowMark + rowCount++; 
                 }
@@ -292,13 +296,13 @@ void paru_assemble (
             ASSERT (curColIndex < nEl);
             double *el_Num = numeric_pointer (curEl);
 #ifndef NDEBUG // print the element which is going to be assembled from
-            p = 0;
+            p = 1;
             PRLEVEL (p, ("%% col=%ld, element=%ld,curColIndex=%ld\n", c, e,
                         curColIndex));
             PRLEVEL (p, ("%% ASSEMBL element= %ld  mEl =%ld ",e, mEl));
             PRLEVEL (p, ("%% into column %ld of current front\n",colIndexF ));
             PRLEVEL (p, ("%%assembling from col %ld", curColIndex ));
-            if (p > 0)
+            if (p <= 0)
                 paru_print_element (paruMatInfo, e);
 #endif
 
@@ -313,7 +317,7 @@ void paru_assemble (
 
 
 #ifndef NDEBUG  // Printing the pivotal front
-            p = 0;
+            p = 1;
             PRLEVEL (p, ("%%Inside the assembly loop \n"));
             PRLEVEL (p, ("%%x =  \t"));
             for (Int c = col1; c < col2; c++) {
@@ -333,7 +337,7 @@ void paru_assemble (
     }
 
 #ifndef NDEBUG  // Printing the pivotal front
-    p = 0;
+    p = 1;
     PRLEVEL (p, ("%% Before pivoting\n"));
     PRLEVEL (p, ("%% x =  \t"));
     for (Int c = col1; c < col2; c++) {
@@ -735,7 +739,7 @@ void paru_assemble (
 
 #ifndef NDEBUG
     //Printing the contribution block after dgemm
-    p = 0;
+    p = 1;
     PRLEVEL (p, ("\n%%After DGEMM:"));
     if (p <= 0)
         paru_print_element (paruMatInfo, eli);

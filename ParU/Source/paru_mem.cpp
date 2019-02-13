@@ -10,7 +10,7 @@ void *paru_alloc (Int n, Int size, cholmod_common *cc){
     alloc_count += n*size ;
 #endif
     void *p = cholmod_l_malloc (n,size,cc);
-    PRLEVEL (0, ("%% allocated %ld in %p total= %ld\n", 
+    PRLEVEL (1, ("%% allocated %ld in %p total= %ld\n", 
                 n*size, p, alloc_count ));
     return p;
 }
@@ -22,7 +22,7 @@ void *paru_calloc(Int n, Int size, cholmod_common *cc){
     calloc_count += n*size ;
 #endif
     void *p= cholmod_l_calloc (n,size,cc);       
-    PRLEVEL (0, ("%% callocated %ld in %p total= %ld\n", 
+    PRLEVEL (1, ("%% callocated %ld in %p total= %ld\n", 
                 n*size, p, calloc_count ));
     return p;
 }
@@ -40,7 +40,7 @@ void *paru_realloc(
     realloc_count += newsize*size_Entry - *size;
 #endif
     void *p= cholmod_l_realloc (newsize, size_Entry, oldP, (size_t*)size, cc);
-    PRLEVEL (0, ("%% reallocated %ld in %p and freed %p total= %ld\n", 
+    PRLEVEL (1, ("%% reallocated %ld in %p and freed %p total= %ld\n", 
                 newsize*size_Entry, p, oldP, realloc_count ));
     return p;
 }
@@ -56,7 +56,7 @@ void paru_free (Int n, Int size, void *p,  cholmod_common *cc){
         cholmod_l_free (n,   size, p, cc);
     else
         printf("freeing a NULL pointer\n");
-    PRLEVEL (0, ("%% free %ld in %p total= %ld\n", 
+    PRLEVEL (1, ("%% free %ld in %p total= %ld\n", 
                 n*size, p, free_count));
 
 }
@@ -177,7 +177,7 @@ void paru_freemat (paru_matrix **paruMatInfo_handle,
     }
 
 
-    PRLEVEL (0, ("%% freeing CB elements:\n"));
+    PRLEVEL (1, ("%% freeing CB elements:\n"));
     for(Int i = 0; i < nf ; i++){        // freeing all other elements
         Int e = LUsym->super2atree[i];    //element number in augmented tree
         PRLEVEL (1, ("%% e =%ld\t", e));
@@ -195,12 +195,12 @@ void paru_freemat (paru_matrix **paruMatInfo_handle,
     paru_fac *LUs =  paruMatInfo->partial_LUs;
     paru_fac *Us =  paruMatInfo->partial_Us;
     for(Int i = 0; i < nf ; i++){  
-        PRLEVEL (0, ("%% Freeing Us=%p\n", Us[i].p));
+        PRLEVEL (1, ("%% Freeing Us=%p\n", Us[i].p));
         if(Us[i].p != NULL){
             Int m=Us[i].m; Int n=Us[i].n;
             paru_free (m*n, sizeof (double), Us[i].p, cc);
         }
-        PRLEVEL (0, ("%% Freeing LUs=%p\n", LUs[i].p));
+        PRLEVEL (1, ("%% Freeing LUs=%p\n", LUs[i].p));
         if(LUs[i].p != NULL){
             Int m=LUs[i].m; Int n=LUs[i].n;
             paru_free (m*n, sizeof (double), LUs[i].p, cc);
