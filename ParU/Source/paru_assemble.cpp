@@ -102,10 +102,11 @@ void paru_assemble (
 #endif 
 
     Int maxrValid, maxcValid; // maximum of all the children
-        // Initializing relative index validation flag of current front
-    paru_init_rel (LUsym, elementList, f, &maxrValid, &maxcValid);
+    // Initializing relative index validation flag of current front
+    paru_init_rel (paruMatInfo, f);
 
-    PRLEVEL (0, ("%% maxrValid= %ld  maxcValid=%ld\n", maxrValid, maxcValid));
+//    PRLEVEL (1, ("%% maxrValid= %ld  maxcValid=%ld\n", maxrValid, maxcValid));
+    Int time_f = paruMatInfo->time_stamp[f];
 
 
 
@@ -155,9 +156,9 @@ void paru_assemble (
             PRLEVEL (1, ("%%  rowRelIndValid = %ld \n",rowRelIndValid));
 
 
-            if(rowRelIndValid !=  maxrValid){  // an element never seen before
-                ASSERT(rowRelIndValid <= maxrValid);
-                rowRelIndValid =  maxrValid;
+            if(rowRelIndValid !=  time_f){  // an element never seen before
+                //ASSERT(rowRelIndValid <= time_f);
+                rowRelIndValid =  time_f;
             }
             else { 
                 elCol [e]--;    //keep track of number of cols
@@ -459,8 +460,8 @@ void paru_assemble (
     for (Int i = 0; i < fp; i++){
         Int curFsRowIndex =(Int) i; //current fully summed row index
         Int curFsRow = fsRowList [i];
-        PRLEVEL (0, ("%% 4: curFsRowIndex = %ld\n", curFsRowIndex));
-        PRLEVEL (0, ("%% curFsRow =%ld\n", curFsRow));
+        PRLEVEL (1, ("%% 4: curFsRowIndex = %ld\n", curFsRowIndex));
+        PRLEVEL (1, ("%% curFsRow =%ld\n", curFsRow));
         //tupleList *curRowTupleList = &RowList [curFsRowIndex]; //BUG DETECTED
         tupleList *curRowTupleList = &RowList [curFsRow];
         Int numTuple = curRowTupleList->numTuple;
@@ -487,9 +488,9 @@ void paru_assemble (
 
             rowRelIndex [curTpl.f] = curFsRow;
 
-            if(colRelIndValid !=  maxcValid){// an element never seen before
-                ASSERT(colRelIndValid <= maxcValid);
-                colRelIndValid =  maxcValid;
+            if(colRelIndValid !=  time_f){// an element never seen before
+//                ASSERT(colRelIndValid <= maxcValid);
+                colRelIndValid =  time_f;
 #ifndef NDEBUG
                 if ( elCol [e] >= elCMark )
                     PRLEVEL (1, ("%% element %ld can be eaten wholly\n",e));
@@ -692,7 +693,8 @@ void paru_assemble (
 
         //maxrValid+=f;  maxcValid+=f;
         //el->rValid= maxrValid; el->cValid= maxcValid;   
-        el->rValid=++maxrValid;  el->cValid=++maxcValid;
+        //el->rValid=++maxrValid;  el->cValid=++maxcValid;
+        paruMatInfo->time_stamp[f]++; //invalidating all the marks
     }
     // Initializing el global indices
     Int *el_colIndex = colIndex_pointer (el);
@@ -739,7 +741,7 @@ void paru_assemble (
 
 #ifndef NDEBUG
     //Printing the contribution block after dgemm
-    p = 1;
+    p = 0;
     PRLEVEL (p, ("\n%%After DGEMM:"));
     if (p <= 0)
         paru_print_element (paruMatInfo, eli);

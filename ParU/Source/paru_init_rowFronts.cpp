@@ -174,6 +174,14 @@ paru_matrix *paru_init_rowFronts (
     }
 
 
+    paruMatInfo->time_stamp= 
+        (Int*) paru_alloc (1, nf*sizeof(Int), cc);
+    if (paruMatInfo->time_stamp== NULL){   //out of memory
+        paru_freemat (&paruMatInfo, cc);
+        printf("Out of memory: time_stamp\n");
+        return NULL;
+    }
+
 
 
 
@@ -205,7 +213,7 @@ paru_matrix *paru_init_rowFronts (
         spqr_stranspose2 (A, Qfill, Sp, PLinv, Sx, Wi) ;
         // Wi no longer needed ]
     }//
-     //
+    //
 
     Int *Sj= LUsym->Sj;
     Int *Ap = (Int*) A->p;

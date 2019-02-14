@@ -209,6 +209,7 @@ void paru_freemat (paru_matrix **paruMatInfo_handle,
 
     paru_free(1, nf*sizeof(paru_fac),LUs, cc);
     paru_free(1, nf*sizeof(paru_fac),Us, cc);
+    paru_free(1, nf*sizeof(Int),paruMatInfo->time_stamp, cc);
 
 
     paru_free (1, (m+nf+1)*sizeof(Element), elementList, cc);

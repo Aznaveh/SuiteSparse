@@ -244,7 +244,8 @@ typedef struct  /*Matrix */
     work_struct *Work;             
     paru_fac *partial_Us;           /* save the answer LU: righ part*/
     paru_fac *partial_LUs;          /* left part */
-
+    Int *time_stamp;                /* for relative index update
+                                       not initialized */
 }   paru_matrix;
 
 
@@ -291,5 +292,4 @@ void paru_fourPass (paru_matrix *paruMatInfo,  Int el_ind, Int fp,
 
 void paru_print_element (paru_matrix *paruMatInfo, Int e);
 void paru_print_tupleList (tupleList *listSet, Int index);
-void paru_init_rel (paru_symbolic *LUsym,  Element **elementList, Int f,
-        Int *maxrValid, Int *maxcValid);
+void paru_init_rel (paru_matrix *paruMatInfo, Int f);

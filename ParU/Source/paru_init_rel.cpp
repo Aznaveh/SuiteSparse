@@ -3,55 +3,38 @@
  * ========================================================================== */
 
 #include "Parallel_LU.hpp"
-/*! @brief Initiazing element f's rowRelIndValid and colRelIndValid
- *          chekc all f's children and find the maximum relIndex and ensure that
- *          f's relative index is bigger than all its children
- *          if any chidlren is NULL it means that it has been vaporized along 
- *          the way and it's children must be checked. It is done recursively
+/*! @brief Initiazing element f's  time_stamp
+ *          chekc all f's children and find the maximum time_stamp
+ *          this time is checking for validation or invalidation of elements
+ *          
  *
- * @param LUsym: pointer to symboicl analysis
- *        elementList: list of element pointers that are intiailized by NULL 
- *        f: front that is going to be initialized; its element number is
- *        computed in augmented tree
- *        maxrValid, maxcValid: local varibales in paru_assemble that will be
- *        updated
+ * @param paruMatInfo: pointer to matrix info
+ *        f: front that is going to be initialized;
  *
  */
 
-void paru_init_rel  (
-    paru_symbolic *LUsym,
-    Element **elementList,
-    Int f,
-    Int *maxrValid, 
-    Int *maxcValid)
+void paru_init_rel  (paru_matrix *paruMatInfo, Int f)
 {
     DEBUGLEVEL(0);
-   Int *Child = LUsym->Child;
+    paru_symbolic *LUsym =  paruMatInfo->LUsym;
+    Int* time_stamp = paruMatInfo->time_stamp;
+
+    Int *Child = LUsym->Child;
     Int *Childp = LUsym->Childp;
     Int *snM = LUsym->super2atree;
+    Int max_time = 0;
+
+    PRLEVEL (1, ("%% begining=%ld end=%ld \n",Childp[f], Childp[f+1]));
     PRLEVEL (1, ("%% children of %ld  are:\n", f));
-    Int maxrV, maxcV;
-    maxrV= maxcV= -1;
     for(Int p = Childp[f]; p <= Childp[f+1]-1; p++){
-        Int rV, cV;
+       Int child_rel;
         ASSERT(Child[p] >= 0);
-        Element *childEl = elementList[snM[Child[p]]];
-        if(childEl == NULL){
-            PRLEVEL (1, ("%% Vaporized element=%ld  ",snM[Child[p]] ));
-            PRLEVEL (1, ("%% Child[%ld]= %ld  ",p,Child[p] ));
-            paru_init_rel (LUsym, elementList, Child[p], &rV, &cV);
-        }
-        else{
-            rV = childEl->rValid;
-            cV = childEl->cValid;
-        }
-        PRLEVEL (0, ("%% Child[%ld]= %ld  ",p,Child[p] ));
-        PRLEVEL (0, ("%% rV=%ld cV= %ld\n  ",rV,cV ));
-        maxrV = maxrV > rV? maxrV : rV;
-        maxcV = maxcV > cV? maxcV : cV;
+        child_rel = time_stamp [Child[p]]; 
+        PRLEVEL (1, ("%% Child[%ld]= %ld  ",p,Child[p] ));
+        max_time= max_time > child_rel ? max_time : child_rel;
     }
-    *maxrValid = ++maxrV; 
-    *maxcValid = ++maxcV; 
+    time_stamp [f] = max_time++;
+    PRLEVEL (1, ("%% max_time=%ld \n",max_time));
 }
 
 
