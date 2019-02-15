@@ -18,7 +18,7 @@
 Element *paru_create_element (Int nrows, Int ncols, 
         Int init, cholmod_common *cc)
 {
-    DEBUGLEVEL(1);
+    DEBUGLEVEL(0);
 
     PRLEVEL (1, ("%% creating %ldx%ld element ", nrows, ncols));
     Element *curEl;

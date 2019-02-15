@@ -4,7 +4,7 @@
 #include "Parallel_LU.hpp"
 
 void *paru_alloc (Int n, Int size, cholmod_common *cc){
-    DEBUGLEVEL(1);
+    DEBUGLEVEL(0);
 #ifndef NDEBUG
     static Int alloc_count =0;
     alloc_count += n*size ;
@@ -16,7 +16,7 @@ void *paru_alloc (Int n, Int size, cholmod_common *cc){
 }
 
 void *paru_calloc(Int n, Int size, cholmod_common *cc){
-    DEBUGLEVEL(1);
+    DEBUGLEVEL(0);
 #ifndef NDEBUG
     static Int calloc_count =0;
     calloc_count += n*size ;
@@ -34,7 +34,7 @@ void *paru_realloc(
         Int *size,  // a single number, input: old size, output: new size
         cholmod_common *cc){
 
-    DEBUGLEVEL(1);
+    DEBUGLEVEL(0);
 #ifndef NDEBUG
     static Int realloc_count =0;
     realloc_count += newsize*size_Entry - *size;
@@ -47,7 +47,7 @@ void *paru_realloc(
 
 
 void paru_free (Int n, Int size, void *p,  cholmod_common *cc){
-    DEBUGLEVEL(1);
+    DEBUGLEVEL(0);
 #ifndef NDEBUG
     static Int free_count =0;
     free_count+= n*size ;

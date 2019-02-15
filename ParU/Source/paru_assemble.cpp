@@ -714,11 +714,11 @@ void paru_assemble (
 
     }
 #ifndef NDEBUG
-    //Printing the contribution block before dgemm
-    p = 0;
-    PRLEVEL (p, ("\n%%Before DGEMM:"));
-    if (p <= 0)
-        paru_print_element (paruMatInfo, eli);
+//    //Printing the contribution block before dgemm
+//    p = 0;
+//    PRLEVEL (p, ("\n%%Before DGEMM:"));
+//    if (p <= 0)
+//        paru_print_element (paruMatInfo, eli);
 #endif
 
 
