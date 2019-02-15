@@ -23,7 +23,7 @@ paru_matrix *paru_init_rowFronts (
         cholmod_common *cc
         ){
 
-    DEBUGLEVEL(0);
+    DEBUGLEVEL(1);
     if (!A->packed){
         printf ("A is not packed; Wrong format \n");
         return NULL;
@@ -57,14 +57,14 @@ paru_matrix *paru_init_rowFronts (
         return NULL;
     }
     memset (rowSize, -1, m*sizeof(Int));
-    PRLEVEL (1, ("rowSize =%p\n", rowSize));
+    PRLEVEL (1, ("%% rowSize pointer=%p size=%ld \n", rowSize,m*sizeof(Int) ));
 
     Int *scratch= (Int*) paru_alloc (2*m+n, sizeof (Int), cc);
     if (scratch == NULL){   //out of memory
         printf ("Out of memory: Work\n");
         return NULL;
     }
-    PRLEVEL (1, ("scratch=%p\n",scratch));
+    PRLEVEL (1, ("%% scratch=%p\n",scratch));
 
     Int *colSize= (Int*) paru_alloc (n, sizeof (Int), cc);
     if (colSize == NULL){   //out of memory
@@ -72,7 +72,7 @@ paru_matrix *paru_init_rowFronts (
         return NULL;
     }
     memset (colSize, -1, n*sizeof(Int));
-    PRLEVEL (1, ("colSize=%p\n",colSize));
+    PRLEVEL (1, ("%% colSize=%p\n",colSize));
 
     Int *elRow = (Int*) paru_alloc (m+nf, sizeof (Int), cc);
     if (elRow == NULL){   //out of memory
@@ -80,7 +80,7 @@ paru_matrix *paru_init_rowFronts (
         return NULL;
     }
     memset (elRow, -1, (m+nf)*sizeof(Int));
-    PRLEVEL (1, ("elRow=%p\n",elRow));
+    PRLEVEL (1, ("%% elRow=%p\n",elRow));
 
     Int *elCol = (Int*) paru_alloc (m+nf, sizeof (Int), cc);
     if (elCol == NULL){   //out of memory
@@ -88,7 +88,7 @@ paru_matrix *paru_init_rowFronts (
         return NULL;
     }
     memset (elCol, -1, (m+nf)*sizeof(Int));
-    PRLEVEL (1, ("elCol=%p\n",elCol));
+    PRLEVEL (1, ("%% elCol=%p\n",elCol));
 
 
 
@@ -110,13 +110,13 @@ paru_matrix *paru_init_rowFronts (
     Work->elCol= elCol;
     Work->elCMark= 0;
 
-    PRLEVEL (1, ("Work =%p\n ", Work));
+    PRLEVEL (1, ("%% Work =%p\n ", Work));
     paruMatInfo->Work = Work;
 
     //memset (Work, 0, m*sizeof(Int) );
 
 
-    PRLEVEL (1, ("m=%ld, n=%ld\n",m,n));
+    PRLEVEL (1, ("%% m=%ld, n=%ld\n",m,n));
     // RowList, ColList and elementList are place holders 
     // pointers to pointers that are allocated
     if (m == 0 || n == 0) {
@@ -134,7 +134,7 @@ paru_matrix *paru_init_rowFronts (
         return NULL;
     }
 
-    PRLEVEL (1, ("$RowList =%p\n", RowList));
+    PRLEVEL (1, ("%% $RowList =%p\n", RowList));
 
     tupleList *ColList= paruMatInfo->ColList =
         (tupleList*) paru_alloc (1, n*sizeof(tupleList), cc);
@@ -143,7 +143,7 @@ paru_matrix *paru_init_rowFronts (
         printf("Out of memory: ColList\n");
         return NULL;
     }
-    PRLEVEL (1, ("$ColList =%p\n", ColList));
+    PRLEVEL (1, ("%% $ColList =%p\n", ColList));
 
     Element **elementList; 
     elementList = paruMatInfo->elementList = // Initialize with NULL
@@ -229,7 +229,7 @@ paru_matrix *paru_init_rowFronts (
         Int j = Qfill ? Qfill [col] : col ;  // col of S is column j of A
         Int ncols = Ap[j+1]-Ap[j];
 
-        PRLEVEL (2, ("ncols[%ld]=%ld\n",col,ncols));
+        PRLEVEL (2, ("%% ncols[%ld]=%ld\n",col,ncols));
 
         ColList[col].numTuple = 0;
         ColList[col].len = slackCol*ncols;
@@ -248,7 +248,7 @@ paru_matrix *paru_init_rowFronts (
         Int nrows = 1, 
             ncols = Sp[row+1]-Sp[row]; //nrows and ncols of current front/row
 
-        PRLEVEL (1, ("element %ld = %ld x %ld\n", e, nrows, ncols));
+        PRLEVEL (1, ("%% element %ld = %ld x %ld\n", e, nrows, ncols));
 
         Element *curEl = elementList[e] = paru_create_element (nrows, ncols,
                 0 ,cc);
@@ -259,11 +259,11 @@ paru_matrix *paru_init_rowFronts (
         }
 #ifndef NDEBUG  // Printing the pointers info
         Int p=1;
-        PRLEVEL (p, ("curEl = %p ", curEl));
-       Int limit = sizeof(Element)+
+        PRLEVEL (p, ("%% curEl = %p ", curEl));
+       Int size= sizeof(Element)+
             sizeof(Int)*(2*(nrows+ncols))+
             sizeof(double)*nrows*ncols;
-        PRLEVEL (p, ("limit= %p", curEl+limit));
+        PRLEVEL (p, ("size= %ld", size));
         PRLEVEL (p, ("\n"));
 #endif
 

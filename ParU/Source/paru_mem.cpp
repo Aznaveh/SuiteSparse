@@ -4,7 +4,7 @@
 #include "Parallel_LU.hpp"
 
 void *paru_alloc (Int n, Int size, cholmod_common *cc){
-    DEBUGLEVEL(0);
+    DEBUGLEVEL(1);
 #ifndef NDEBUG
     static Int alloc_count =0;
     alloc_count += n*size ;
@@ -16,7 +16,7 @@ void *paru_alloc (Int n, Int size, cholmod_common *cc){
 }
 
 void *paru_calloc(Int n, Int size, cholmod_common *cc){
-    DEBUGLEVEL(0);
+    DEBUGLEVEL(1);
 #ifndef NDEBUG
     static Int calloc_count =0;
     calloc_count += n*size ;
@@ -34,7 +34,7 @@ void *paru_realloc(
         Int *size,  // a single number, input: old size, output: new size
         cholmod_common *cc){
 
-    DEBUGLEVEL(0);
+    DEBUGLEVEL(1);
 #ifndef NDEBUG
     static Int realloc_count =0;
     realloc_count += newsize*size_Entry - *size;
@@ -47,7 +47,7 @@ void *paru_realloc(
 
 
 void paru_free (Int n, Int size, void *p,  cholmod_common *cc){
-    DEBUGLEVEL(0);
+    DEBUGLEVEL(1);
 #ifndef NDEBUG
     static Int free_count =0;
     free_count+= n*size ;
@@ -185,10 +185,11 @@ void paru_freemat (paru_matrix **paruMatInfo_handle,
         if (curEl == NULL) continue; /* CB not used */
         Int nrows = curEl->nrows,
             ncols = curEl->ncols;
-        PRLEVEL (1, ("%% nrows =%ld ", nrows));
-        PRLEVEL (1, ("%% ncols =%ld\n", ncols));
-        paru_free (1, sizeof(Element)+sizeof(Int)*(2*(nrows+ncols))+
-                sizeof(double)*nrows*ncols, curEl, cc);
+        Int tot_size = sizeof(Element)+sizeof(Int)*(2*(nrows+ncols))+
+            sizeof(double)*nrows*ncols;
+        PRLEVEL (0, ("%% nrows =%ld ", nrows));
+        PRLEVEL (0, ("%% ncols =%ld tot_size=%ld\n", ncols, tot_size));
+       paru_free (1, tot_size, curEl, cc);
     }
 
     //free the answer
@@ -215,7 +216,7 @@ void paru_freemat (paru_matrix **paruMatInfo_handle,
     paru_free (1, (m+nf+1)*sizeof(Element), elementList, cc);
     work_struct *Work = paruMatInfo->Work;
     paru_free (m, sizeof(Int), Work->rowSize, cc);
-    paru_free (3*m+n, sizeof(Int), Work->scratch, cc);
+    paru_free (2*m+n, sizeof(Int), Work->scratch, cc);
     paru_free (n, sizeof(Int), Work->colSize, cc);
     paru_free (m+nf, sizeof(Int), Work->elRow, cc);
     paru_free (m+nf, sizeof(Int), Work->elCol, cc);

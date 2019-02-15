@@ -100,15 +100,9 @@ void paru_assemble (
     std::set<Int> stl_rowSet;
     std::set<Int>::iterator it;
 #endif 
-
-    Int maxrValid, maxcValid; // maximum of all the children
     // Initializing relative index validation flag of current front
     paru_init_rel (paruMatInfo, f);
-
-//    PRLEVEL (1, ("%% maxrValid= %ld  maxcValid=%ld\n", maxrValid, maxcValid));
     Int time_f = paruMatInfo->time_stamp[f];
-
-
 
     /**** 1 ******** finding set of rows in current front *********************/
     for (Int c = col1; c < col2; c++){
@@ -533,8 +527,7 @@ void paru_assemble (
 
     if (colCount == 0){  // there is no CB, Nothing to be done
         Work->rowMark +=  rowCount;
-        PRLEVEL (0, ("%% pivotalFront =%p\n",pivotalFront));
-        //paru_free (rowCount*fp, sizeof (double), pivotalFront, cc);
+        PRLEVEL (1, ("%% pivotalFront =%p\n",pivotalFront));
         return;
     }
 
@@ -679,7 +672,6 @@ void paru_assemble (
                 rowCount, colCount, fp));
     PRLEVEL (1, ("%% el is %ld by %ld\n",rowCount-fp,colCount));
     if (fp <= rowCount ){ 
-
         el = elementList[eli] = paru_create_element (rowCount-fp,
                 colCount, 0 ,cc); // allocating an un-initialized part of memory
         // While insided the DGEMM BETA == 0
@@ -689,12 +681,6 @@ void paru_assemble (
             return;
         }
         PRLEVEL (1, ("%% el =%p\n", el));
-
-
-        //maxrValid+=f;  maxcValid+=f;
-        //el->rValid= maxrValid; el->cValid= maxcValid;   
-        //el->rValid=++maxrValid;  el->cValid=++maxcValid;
-        paruMatInfo->time_stamp[f]++; //invalidating all the marks
     }
     // Initializing el global indices
     Int *el_colIndex = colIndex_pointer (el);
@@ -729,7 +715,7 @@ void paru_assemble (
     }
 #ifndef NDEBUG
     //Printing the contribution block before dgemm
-    p = 1;
+    p = 0;
     PRLEVEL (p, ("\n%%Before DGEMM:"));
     if (p <= 0)
         paru_print_element (paruMatInfo, eli);
@@ -750,6 +736,7 @@ void paru_assemble (
 
     /**** 7 **** Count number of rows and columsn of prior CBs to asslemble ***/ 
 
+    paruMatInfo->time_stamp[f]++; //invalidating all the marks
     PRLEVEL (-1, ("\n%%||||  Start FourPass %ld ||||\n", f));
     //paru_fourPass (paruMatInfo, eli, fp, cc);
     PRLEVEL (-1, ("\n%%||||  Finish FourPass %ld ||||\n", f));
@@ -786,10 +773,5 @@ void paru_assemble (
     PRLEVEL (1, ("%%rowCount =%ld\n", rowCount));
     PRLEVEL (1, ("%%colCount =%ld\n", colCount));
     PRLEVEL (-1, ("fp =%ld;\n", fp));
-    /*! TODO: This should be stored somewhere     */
-
-    //    paru_free (rowCount*fp, sizeof (double), pivotalFront, cc);
-    //    paru_free (fp*colCount,  sizeof (double), uPart, cc);
-
     PRLEVEL (1, ("%%~~~~~~~Assemble Front %ld finished\n", f));
 }

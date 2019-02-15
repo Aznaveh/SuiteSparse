@@ -33,7 +33,7 @@ void paru_init_rel  (paru_matrix *paruMatInfo, Int f)
         PRLEVEL (1, ("%% Child[%ld]= %ld  ",p,Child[p] ));
         max_time= max_time > child_rel ? max_time : child_rel;
     }
-    time_stamp [f] = max_time++;
+    time_stamp [f] = ++max_time;
     PRLEVEL (1, ("%% max_time=%ld \n",max_time));
 }
 

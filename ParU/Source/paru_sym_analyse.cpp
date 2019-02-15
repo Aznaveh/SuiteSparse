@@ -38,7 +38,14 @@ paru_symbolic *paru_sym_analyse
     spqr_symbolic *QRsym;
     cc->SPQR_grain = 1;
     cc->useGPU = -1;
+    QRsym = NULL;
     QRsym = spqr_analyze (A, SPQR_ORDERING_CHOLMOD, FALSE,FALSE , FALSE, cc);
+    if (QRsym == NULL){
+        printf("some problem in QRsym\n");
+        return NULL;
+    }
+
+    PRLEVEL (0, ("%% After %p \n", QRsym ));
 
     Int m, n, anz,nf, rjsize ; 
     m = LUsym->m = QRsym->m;
@@ -49,9 +56,9 @@ paru_symbolic *paru_sym_analyse
 
 
     PRLEVEL (0, ("%% A  is  %ld x %ld \n",m, n ));
-    PRLEVEL (0, ("LU = zeros(%ld,%ld);\n",m, n ));
-    PRLEVEL (0, ("npivots =[]; \n" ));
-    PRLEVEL (0, ("S = zeros(%ld,%ld);\n",m, n ));
+    PRLEVEL (-1, ("LU = zeros(%ld,%ld);\n",m, n ));
+    PRLEVEL (-1, ("npivots =[]; \n" ));
+    PRLEVEL (-1, ("S = zeros(%ld,%ld);\n",m, n ));
     PRLEVEL (0, ("%% nf=%ld\n",nf ));
     PRLEVEL (0, ("%% anz = %ld  rjsize=%ld\n", anz, rjsize));
 

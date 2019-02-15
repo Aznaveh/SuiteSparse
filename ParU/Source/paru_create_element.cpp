@@ -18,16 +18,20 @@
 Element *paru_create_element (Int nrows, Int ncols, 
         Int init, cholmod_common *cc)
 {
+    DEBUGLEVEL(1);
+
+    PRLEVEL (1, ("%% creating %ldx%ld element ", nrows, ncols));
     Element *curEl;
+    Int tot_size = sizeof(Element)+ sizeof(Int)*(2*(nrows+ncols))+
+                sizeof(double)*nrows*ncols;
     if (init)
-        curEl = (Element*) paru_calloc(1, sizeof(Element)+
-                sizeof(Int)*(2*(nrows+ncols))+
-                sizeof(double)*nrows*ncols, cc);
+        curEl = (Element*) paru_calloc(1, tot_size , cc);
     else
-        curEl = (Element*) paru_alloc(1, sizeof(Element)+
-                sizeof(Int)*(2*(nrows+ncols)+2)+
-                sizeof(double)*nrows*ncols, cc);
+        curEl = (Element*) paru_alloc(1, tot_size , cc);
     if (curEl == NULL) return NULL; // do not do error checking
+
+    PRLEVEL (1, ("%% with size of %ld in %p\n", tot_size, curEl));
+    
     // Initializing current element
     curEl->nrowsleft = curEl->nrows = nrows;
     curEl->ncolsleft = curEl->ncols = ncols;
