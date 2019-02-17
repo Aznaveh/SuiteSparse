@@ -129,7 +129,6 @@ void paru_assemble (
             Element *curEl = elementList[e];
             Int mEl = curEl->nrows;
             Int *el_rowIndex = rowIndex_pointer (curEl); //pointers to row index
-            Int rowRelIndValid = curEl->rValid;
             Int *rowRelIndex = relRowInd (curEl);
             Int *colRelIndex    = relColInd (curEl);
             Int *el_colIndex = colIndex_pointer (curEl);
@@ -147,12 +146,11 @@ void paru_assemble (
 
             PRLEVEL (1, ("%%1:element= %ld elCol=%ld elCMark=%ld \n",
                         e, elCol[e], elCMark));
-            PRLEVEL (1, ("%%  rowRelIndValid = %ld \n",rowRelIndValid));
 
 
-            if(rowRelIndValid !=  time_f){  // an element never seen before
+            if(curEl->rValid !=  time_f){  // an element never seen before
                 //ASSERT(rowRelIndValid <= time_f);
-                rowRelIndValid =  time_f;
+                curEl->rValid = time_f;
             }
             else { 
                 elCol [e]--;    //keep track of number of cols
@@ -473,7 +471,6 @@ void paru_assemble (
             Int nEl = curEl->ncols;
             Int *el_rowIndex = rowIndex_pointer (curEl);
             Int *el_colIndex = colIndex_pointer (curEl);
-            Int colRelIndValid = curEl->cValid;
             Int *colRelIndex = relColInd (curEl);
             Int *rowRelIndex = relRowInd (curEl);
 
@@ -482,9 +479,8 @@ void paru_assemble (
 
             rowRelIndex [curTpl.f] = curFsRow;
 
-            if(colRelIndValid !=  time_f){// an element never seen before
-//                ASSERT(colRelIndValid <= maxcValid);
-                colRelIndValid =  time_f;
+            if(curEl->cValid !=  time_f){// an element never seen before
+                curEl->cValid = time_f;
 #ifndef NDEBUG
                 if ( elCol [e] >= elCMark )
                     PRLEVEL (1, ("%% element %ld can be eaten wholly\n",e));
@@ -613,7 +609,7 @@ void paru_assemble (
     }
 
 #ifndef NDEBUG  // Printing the  U part
-    p = -1;
+    p = 1;
     PRLEVEL (p, ("%% U part Before TRSM: %ld x %ld\n", fp, colCount));
     PRLEVEL (p, ("%% U\t"));
     for (Int i = 0; i < colCount; i++){
@@ -738,7 +734,7 @@ void paru_assemble (
 
     paruMatInfo->time_stamp[f]++; //invalidating all the marks
     PRLEVEL (-1, ("\n%%||||  Start FourPass %ld ||||\n", f));
-    //paru_fourPass (paruMatInfo, eli, fp, cc);
+   // paru_fourPass (paruMatInfo, f, fp, cc);
     PRLEVEL (-1, ("\n%%||||  Finish FourPass %ld ||||\n", f));
 
 
