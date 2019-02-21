@@ -187,8 +187,8 @@ void paru_freemat (paru_matrix **paruMatInfo_handle,
             ncols = curEl->ncols;
         Int tot_size = sizeof(Element)+sizeof(Int)*(2*(nrows+ncols))+
             sizeof(double)*nrows*ncols;
-        PRLEVEL (0, ("%% nrows =%ld ", nrows));
-        PRLEVEL (0, ("%% ncols =%ld tot_size=%ld\n", ncols, tot_size));
+        PRLEVEL (1, ("%% nrows =%ld ", nrows));
+        PRLEVEL (1, ("%% ncols =%ld tot_size=%ld\n", ncols, tot_size));
        paru_free (1, tot_size, curEl, cc);
     }
 

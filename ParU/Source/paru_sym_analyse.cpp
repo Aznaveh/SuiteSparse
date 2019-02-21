@@ -45,7 +45,7 @@ paru_symbolic *paru_sym_analyse
         return NULL;
     }
 
-    PRLEVEL (0, ("%% After %p \n", QRsym ));
+    PRLEVEL (1, ("%% After %p \n", QRsym ));
 
     Int m, n, anz,nf, rjsize ; 
     m = LUsym->m = QRsym->m;
