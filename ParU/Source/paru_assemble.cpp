@@ -149,8 +149,13 @@ void paru_assemble (
 
 
             if(curEl->rValid !=  time_f){  // an element never seen before
-                //ASSERT(rowRelIndValid <= time_f);
                 curEl->rValid = time_f;
+#ifndef NDEBUG            
+                if (curEl->rValid >  time_f )
+                    PRLEVEL (0, ("%%time_f =%ld  rVal= %ld\n",
+                                time_f , curEl->rValid));
+#endif               
+                ASSERT(curEl->rValid <= time_f);
             }
             else { 
                 elCol [e]--;    //keep track of number of cols
@@ -481,6 +486,12 @@ void paru_assemble (
 
             if(curEl->cValid !=  time_f){// an element never seen before
                 curEl->cValid = time_f;
+#ifndef NDEBUG            
+                if (curEl->cValid >  time_f )
+                    PRLEVEL (0, ("%%time_f =%ld  cVal= %ld\n", 
+                                time_f , curEl->cValid));
+#endif    
+                ASSERT(curEl->cValid <= time_f);
 #ifndef NDEBUG
                 if ( elCol [e] >= elCMark )
                     PRLEVEL (1, ("%% element %ld can be eaten wholly\n",e));
@@ -734,7 +745,7 @@ void paru_assemble (
 
     paruMatInfo->time_stamp[f]++; //invalidating all the marks
     PRLEVEL (-1, ("\n%%||||  Start FourPass %ld ||||\n", f));
-   // paru_fourPass (paruMatInfo, f, fp, cc);
+    paru_fourPass (paruMatInfo, f, fp, cc);
     PRLEVEL (-1, ("\n%%||||  Finish FourPass %ld ||||\n", f));
 
 
