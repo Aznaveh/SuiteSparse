@@ -72,6 +72,7 @@ Int paru_add_colTuple (tupleList *ColList, Int col,
     return 0;
 }
 
+/*TODO I am not using remove functions so maybe delete them */
 Int paru_remove_colTuple(tupleList *ColList, Int col, Int t){
     // pick the last tuple and insert into the one should be removed
     DEBUGLEVEL(0);
