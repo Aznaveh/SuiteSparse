@@ -13,7 +13,7 @@ void paru_fourPass (paru_matrix *paruMatInfo,
         cholmod_common *cc)
 {
 
-    DEBUGLEVEL(1);
+    DEBUGLEVEL(0);
     work_struct *Work =  paruMatInfo->Work;
 
     Int *isRowInFront = Work->rowSize; 
@@ -55,7 +55,7 @@ void paru_fourPass (paru_matrix *paruMatInfo,
         ASSERT (numTuple >= 0);
         Tuple *listColTuples = curColTupleList->list;
 #ifndef NDEBUG        
-        Int p = 0;
+        Int p = 1;
         PRLEVEL (p, ("\n %%--------> 1st: c =%ld  numTuple = %ld\n", 
                     c, numTuple));
         if (p <= 0)
@@ -107,7 +107,7 @@ void paru_fourPass (paru_matrix *paruMatInfo,
         ASSERT (numTuple >= 0);
         Tuple *listRowTuples = curRowTupleList->list;
 #ifndef NDEBUG        
-        Int p = 0;
+        Int p = 1;
         PRLEVEL (p, ("\n %%--------> 2nd r =%ld  numTuple = %ld\n"
                     , r, numTuple));
         if (p <= 0)
@@ -165,7 +165,7 @@ void paru_fourPass (paru_matrix *paruMatInfo,
         ASSERT (numTuple >= 0);
         Tuple *listColTuples = curColTupleList->list;
 #ifndef NDEBUG            
-        Int p = 0;
+        Int p = 1;
         PRLEVEL (p, ("\n %%-------->  3rd: c =%ld  numTuple = %ld\n",
                     c, numTuple));
         if (p <= 0 ){
@@ -219,7 +219,7 @@ void paru_fourPass (paru_matrix *paruMatInfo,
                     PRLEVEL (1, ("%% update row relative element%ld\n",e ));
 #ifndef NDEBUG
                     //Printing the contribution block prior index update 
-                    p = 0;
+                    p = 1;
                     if (p <= 0){
                         PRLEVEL (p, ("\n%%Before index update %ld:",e));
                         paru_print_element (paruMatInfo, e);
@@ -239,7 +239,7 @@ void paru_fourPass (paru_matrix *paruMatInfo,
                 }
 #ifndef NDEBUG
                 //Printing the contribution block after prior blocks assembly
-                p = 0;
+                p = 1;
                 if (p <= 0){
                     PRLEVEL (p, ("\n%%Before column assembly of %ld:",e));
                     paru_print_element (paruMatInfo, el_ind);
@@ -261,7 +261,7 @@ void paru_fourPass (paru_matrix *paruMatInfo,
                 curEl->ncolsleft --;
 #ifndef NDEBUG
                 //Printing the contribution block after prior blocks assembly
-                p = 0;
+                p = 1;
                 PRLEVEL (p, ("\n%%After column assembly of %ld:",e));
                 if (p <= 0){
                     paru_print_element (paruMatInfo, el_ind);
@@ -279,7 +279,10 @@ void paru_fourPass (paru_matrix *paruMatInfo,
 
         //        curColTupleList->numTuple = pdst;
         //        PRLEVEL (1, ("%% pdst=%ld\n", pdst));
-        paru_print_tupleList (ColList, c);
+#ifndef NDEBUG
+        if (p <= 0)
+            paru_print_tupleList (ColList, c);
+#endif
 
     }
 
@@ -294,7 +297,7 @@ void paru_fourPass (paru_matrix *paruMatInfo,
         ASSERT (numTuple >= 0);
         Tuple *listRowTuples = curRowTupleList->list;
 #ifndef NDEBUG            
-        Int p = 0;
+        Int p = 1;
         PRLEVEL (1, ("\n %%-------->  4th: r =%ld  numTuple = %ld\n",
                     r, numTuple));
         if (p <= 0 ){
@@ -348,7 +351,7 @@ void paru_fourPass (paru_matrix *paruMatInfo,
             if (elCol [e] == 0 && curEl->cValid == time_f -1){
 
 #ifndef NDEBUG            
-                Int p = 0;
+                Int p = 1;
                 PRLEVEL (1, ("%% Before row assembly: \n" ));
                 if (p <= 0 ){
                     paru_print_element (paruMatInfo, e);
@@ -449,7 +452,10 @@ void paru_fourPass (paru_matrix *paruMatInfo,
         }
         curColTupleList->numTuple = pdst;
         PRLEVEL (1, ("%% new number of tuple=%ld\n", pdst));
-        paru_print_tupleList (ColList, c);
+#ifndef NDEBUG
+        if (p <= 0)
+            paru_print_tupleList (ColList, c);
+#endif
 
     }
     /**************************************************************************/
@@ -503,9 +509,11 @@ void paru_fourPass (paru_matrix *paruMatInfo,
         }
         curRowTupleList->numTuple = pdst;
         PRLEVEL (1, ("%% new number of tuples=%ld\n", pdst));
-        paru_print_tupleList (RowList, r);
+#ifndef NDEBUG            
+        if (p <= 0 )
+            paru_print_tupleList (RowList, r);
+#endif
 
     }
-
 
 }

@@ -30,7 +30,7 @@ void assemble_row (const double *sM, double *dM,//source and destination matrix
                     const Int *relColInd)
 //Source and destination are stored column based
 {
-    DEBUGLEVEL (1);
+    DEBUGLEVEL (0);
     for (Int j = 0; j < sn; j++) {
         Int rj =relColInd[j] ;
         if ( rj >= 0 ){  // If still valid
