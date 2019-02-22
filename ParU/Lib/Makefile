@@ -47,7 +47,8 @@ OBJ = \
 	paru_dgemm.o\
 	paru_print.o\
 	paru_fourPass.o\
-	paru_init_rel.o
+	paru_init_rel.o\
+	paru_update_rel_ind.o
 
 $(OBJ): $(INC)
 
@@ -103,6 +104,10 @@ paru_print.o: ../Source/paru_print.cpp
 paru_init_rel.o: ../Source/paru_init_rel.cpp
 	$(C) -c $<
 
+paru_update_rel_ind.o: ../Source/paru_update_rel_ind.cpp
+	$(C) -c $<
+
+
 
 
 #-------------------------------------------------------------------------------
@@ -122,7 +127,8 @@ $(INSTALL_LIB)/$(SO_TARGET): $(OBJ)
 	$(CP) ../README.txt $(INSTALL_DOC)/PARU_README.txt
 	chmod 755 $(INSTALL_LIB)/$(SO_TARGET)
 	chmod 644 $(INSTALL_INCLUDE)/Parallel_LU.hpp
-	chmod 644 $(INSTALL_DOC)/paru_user_guide.pdf
+#	chmod 644 $(INSTALL_DOC)/paru_user_guide.pdf
+	chmod 744 $(INSTALL_DOC)/paru_user_guide.pdf
 	chmod 644 $(INSTALL_DOC)/PARU_README.txt
 
 # uninstall PARU
