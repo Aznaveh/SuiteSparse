@@ -298,14 +298,10 @@ void paru_fourPass (paru_matrix *paruMatInfo,
         }
 #endif
 
-        //       Int pdst = 0,psrc;
         for (Int i = 0; i < numTuple; i++){
-            //      for (Int psrc = 0; psrc < numTuple; psrc ++){}
-            //     Tuple curTpl = listRowTuples [psrc];
             Tuple curTpl = listRowTuples [i];
             Int e = curTpl.e;
             if (e == el_ind){ //current element
-                //  listRowTuples [pdst++] = curTpl; //keeping the tuple
                 continue;
             }
             Int curColIndex = curTpl.f;
@@ -501,5 +497,4 @@ void paru_fourPass (paru_matrix *paruMatInfo,
 #endif
 
     }
-
 }
