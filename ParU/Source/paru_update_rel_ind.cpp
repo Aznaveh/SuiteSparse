@@ -115,11 +115,12 @@ void paru_update_rel_ind (Element *el, Element *cb_el,
 
 
     if (len_cb*len_el < (len_cb+len_el)*log2(len_el) ){ //do a linear search
- //   if(1){
+        PRLEVEL (1, ("%% Linear search\n"));
         for (Int i=0; i < len_cb ; i++){
             Int global_ind = cb_el_Index[i];
             if (global_ind < 0) continue;
-            PRLEVEL (1, ("%% searching for: cb_index[%ld]=%ld\n", i,  global_ind));
+            PRLEVEL (1, ("%% searching for: cb_index[%ld]=%ld\n",
+                        i,  global_ind));
 #ifndef NDEBUG
             Int found = -1;
 #endif
@@ -143,9 +144,10 @@ void paru_update_rel_ind (Element *el, Element *cb_el,
     } 
     else{
 
+        PRLEVEL (1, ("%% Sort and Binary search\n"));
         Int *tmp_sp = (Int*) paru_alloc (2*len_el, sizeof(Int), cc);
-        Int *srt_lst = tmp_sp;            // list of relative indices; keys of sort
-        Int *ind_lst = tmp_sp + len_el;   //list of indices 
+        Int *srt_lst = tmp_sp;         // list of relative indices; keys of sort
+        Int *ind_lst = tmp_sp + len_el;//list of indices 
 
         for (Int i=0; i < len_el ; i++){  //initialize the lists
             srt_lst[i] = el_Index [i];
@@ -158,13 +160,13 @@ void paru_update_rel_ind (Element *el, Element *cb_el,
         for (Int i=0; i < len_cb ; i++){
             Int global_ind = cb_el_Index[i];
             if (global_ind < 0) continue;
-            PRLEVEL (1, ("%% searching for: cb_index[%ld]=%ld\n", i,  global_ind));
+            PRLEVEL (1, ("%% searching for: cb_index[%ld]=%ld\n",
+                        i,  global_ind));
             Int found = -1;
             found = bin_srch (srt_lst, ind_lst, 0, len_el-1, global_ind);
             RelIndex [i] = found;
             ASSERT (found != -1);
         }
-
         paru_free ( 2*len_el, sizeof(Int), tmp_sp, cc); 
     }
 }
