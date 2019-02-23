@@ -1,0 +1,21 @@
+version: 2
+jobs:
+  build:
+    working_directory: ../Lib/
+    docker:
+        - image: circleci/cpp
+    steps:
+      - checkout
+      - run: make  
+  test:
+    docker:
+      - image: circleci/cpp
+    steps:
+      - checkout
+      - run: make az
+workflows:
+  version: 2
+  build_and_test:
+    jobs:
+      - build
+      - test
