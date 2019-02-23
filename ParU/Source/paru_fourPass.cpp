@@ -31,9 +31,9 @@ void paru_fourPass (paru_matrix *paruMatInfo,
 
 
     Element **elementList = paruMatInfo->elementList;
-    Element *curCB = elementList[el_ind]; 
-    Int rowCount= curCB->nrows + fp;
-    Int colCount = curCB->ncols;
+    Element *curFr = elementList[el_ind]; 
+    Int rowCount= curFr->nrows + fp;
+    Int colCount = curFr->ncols;
 
     Int *CBColList = Work -> scratch + 2*rowCount; //scratch=[fsRowList..ipiv..]
     Int *isColInCBcolSet = Work -> colSize;
@@ -149,10 +149,7 @@ void paru_fourPass (paru_matrix *paruMatInfo,
     }
     /**************************************************************************/
 
-    Int *cb_colIndex = colIndex_pointer (curCB);
-    Int *cb_rowIndex = rowIndex_pointer (curCB);
-    Int *cb_rowRelIndex = relRowInd (curCB);
-    double *cb_numbers = numeric_pointer (curCB);
+    double *front_numeric = numeric_pointer (curFr);
 
     time_f = ++paruMatInfo->time_stamp[f]; //invalid all the markings
 
@@ -225,12 +222,12 @@ void paru_fourPass (paru_matrix *paruMatInfo,
                         paru_print_element (paruMatInfo, e);
                     }
 #endif
-                    paru_update_rel_ind (curCB, curEl, 'r',cc) ;
+                    paru_update_rel_ind (curFr, curEl, 'r',cc) ;
 #ifndef NDEBUG            
                     for(Int i=0; i < curEl->nrows; i++){
                         PRLEVEL (1, ("%% rowRelIndex[%ld] =%ld\t", i,
                                     rowRelIndex [i]));
-                        ASSERT(rowRelIndex [i] < curCB->nrows);
+                        ASSERT(rowRelIndex [i] < curFr->nrows);
                         PRLEVEL (1,("\n"));
                     }
 #endif
@@ -249,11 +246,11 @@ void paru_fourPass (paru_matrix *paruMatInfo,
 
 
                 PRLEVEL (1, ("%%colCount=%ld k=%ld", colCount, k));
-                PRLEVEL (1, ("%%curCB->nrows=%ld ", curCB->nrows));
-                PRLEVEL (1, ("%% cb_numbers=%2.4lf\n",
-                            *(cb_numbers+k*curCB->nrows)));
+                PRLEVEL (1, ("%%curFr->nrows=%ld ", curFr->nrows));
+                PRLEVEL (1, ("%% front_numeric=%2.4lf\n",
+                            *(front_numeric+k*curFr->nrows)));
 
-                assemble_col (el_Num+curColIndex*mEl,cb_numbers+k*curCB->nrows,
+                assemble_col (el_Num+curColIndex*mEl,front_numeric+k*curFr->nrows,
                         mEl, rowRelIndex);
                 colRelIndex [curColIndex] = -1;
                 el_colIndex [curColIndex] = -1;
@@ -351,19 +348,19 @@ void paru_fourPass (paru_matrix *paruMatInfo,
                     /* Update colRelIndex	 */
                     PRLEVEL (1, ("%% update column relative index %ld\n"
                                 ,e ));
-                    paru_update_rel_ind (curCB, curEl, 'c', cc) ;
+                    paru_update_rel_ind (curFr, curEl, 'c', cc) ;
 #ifndef NDEBUG            
                     for(Int i=0 ; i <curEl->ncols ; i++){
                         PRLEVEL (1, ("%% colRelIndex[%ld] =%ld\t", i,
                                     colRelIndex [i]));
-                        ASSERT(colRelIndex [i] < curCB->ncols);
+                        ASSERT(colRelIndex [i] < curFr->ncols);
                         PRLEVEL (1,("\n"));
                     }
 #endif
                     curEl->cValid =  time_f;
                 }
-                assemble_row (el_Num, cb_numbers, mEl, nEl, 
-                        curCB->nrows, curRowIndex , k-fp, colRelIndex );
+                assemble_row (el_Num, front_numeric, mEl, nEl, 
+                        curFr->nrows, curRowIndex , k-fp, colRelIndex );
 #ifndef NDEBUG            
                 PRLEVEL (0, ("%% after row assembly: \n" ));
                 if (p <= 0 ){
