@@ -293,4 +293,5 @@ void paru_fourPass (paru_matrix *paruMatInfo,  Int f, Int fp,
 void paru_print_element (paru_matrix *paruMatInfo, Int e);
 void paru_print_tupleList (tupleList *listSet, Int index);
 void paru_init_rel (paru_matrix *paruMatInfo, Int f);
-void paru_update_rel_ind (Element *el, Element *cb_el, char rc);
+void paru_update_rel_ind (Element *el, Element *cb_el, 
+        char rc, cholmod_common *cc );
