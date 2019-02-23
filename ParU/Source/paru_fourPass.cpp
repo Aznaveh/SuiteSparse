@@ -21,9 +21,7 @@ void paru_fourPass (paru_matrix *paruMatInfo,
 
     // Couning how many rows/cols of an element is seen
     Int *elRow = Work -> elRow; 
-    Int elRMark = Work -> elRMark;
     Int *elCol = Work -> elCol;
-    Int elCMark = Work -> elCMark;
 
     paru_symbolic *LUsym =  paruMatInfo->LUsym;
     Int *snM = LUsym->super2atree;
@@ -205,12 +203,12 @@ void paru_fourPass (paru_matrix *paruMatInfo,
             ASSERT (curColIndex < nEl);
 
             double *el_Num = numeric_pointer (curEl);
-            PRLEVEL (1, ("%% elRow[%ld]=%ld currVal= %ld elRMark=%ld\n", 
-                        e, elRow[e], curEl->rValid , elRMark));
+            PRLEVEL (1, ("%% elRow[%ld]=%ld currVal= %ld ", 
+                        e, elRow[e], curEl->rValid ));
             PRLEVEL (1, ("%% time_f =%ld \n", time_f));
 
-            //if (elRow [e] - elRMark == 0){}
-            if (elRow [e] == 0 && curEl->rValid == time_f -1 ){
+            //if (elRow [e] == 0 && curEl->rValid == time_f -1 ){
+            if (elRow [e] == 0 ){
                 //all the columns are in CB
                 if(curEl->rValid !=  time_f){ /*  Update rowRelIndex	 */
                     PRLEVEL (1, ("%% update row relative element%ld\n",e ));
@@ -329,11 +327,10 @@ void paru_fourPass (paru_matrix *paruMatInfo,
             ASSERT (curRowIndex < mEl);
 
             double *el_Num = numeric_pointer (curEl);
-            PRLEVEL (1, ("%% elCol[%ld]=%ld elCMark=%ld\n", 
-                        e, elCol[e], elCMark));
+            PRLEVEL (1, ("%% elCol[%ld]=%ld ",e, elCol[e]));
 
-            //if (elCol [e] - elCMark == 0){}
-            if (elCol [e] == 0 && curEl->cValid == time_f -1){
+            //if (elCol [e] == 0 && curEl->cValid == time_f -1){
+            if (elCol [e] == 0 ){
 
 #ifndef NDEBUG            
                 Int p = 0;
