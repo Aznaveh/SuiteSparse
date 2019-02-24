@@ -5,7 +5,12 @@
 #include "Parallel_LU.hpp"
 #include <math.h>
 /*! @brief updating element's relative indices in regard to another element 
- * @param 
+ * @param Element *el: current front which all the rleative indices are valid
+ *        Element *cb_el: contributing element that the relative indices need to
+ *           be updated. There might be invalid rows/cols in contribution block
+ *        char rc: it is either 'r' or 'c' row or column update
+ *        cholmod_common *cc: Memory allcoation is needed here so cc must be
+ *          informed about the amount of memory
  */
 
 
@@ -45,15 +50,16 @@ void paru_qsort (Int *srt_lst, Int *ind_lst, Int low, Int high){
 }
 
 void paru_sort (Int *srt_lst, Int *ind_lst, Int len){
-    DEBUGLEVEL(0);
+    DEBUGLEVEL(1);
 #ifndef NDEBUG
     PRLEVEL (1, ("%% Before sort\n")); 
-    for (Int i=0; i < len; i++){  //initialize the lists
+    for (Int i=0; i < len; i++){  
         PRLEVEL (1, ("%% srt_lst[%ld]= %ld ind_lst[%ld]=%ld \n",
                     i, srt_lst[i], i, ind_lst[i]));
     }
 #endif
-    if (len < -20 ){  // simple selection sort
+    if (len < 15 ){  // simple selection sort
+        PRLEVEL (1, ("%% Selection sort\n")); 
         for (Int i=0; i < len ; i++)
             for (Int j=i; j < len ; j++){
                 if (srt_lst[i] > srt_lst [j]){
@@ -61,13 +67,15 @@ void paru_sort (Int *srt_lst, Int *ind_lst, Int len){
                 }
             }
     }
-    else 
+    else{ 
+        PRLEVEL (1, ("%% Qsort\n")); 
         paru_qsort (srt_lst, ind_lst, 0, len-1);
+    }
 
 
 #ifndef NDEBUG
     PRLEVEL (1, ("%% After sort\n")); 
-    for (Int i=0; i < len; i++){  //initialize the lists
+    for (Int i=0; i < len; i++){ 
         PRLEVEL (1, ("%% srt_lst[%ld]= %ld ind_lst[%ld]=%ld \n",
                     i, srt_lst[i], i, ind_lst[i]));
     }
@@ -79,7 +87,7 @@ Int bin_srch  (Int *srt_lst, Int *ind_lst, Int l, Int r, Int num){
         Int mid = l + (r-l)/2;
         if (srt_lst[mid] == num)
             return ind_lst[mid];
-        
+
         if (srt_lst[mid] >  num)
             return bin_srch (srt_lst, ind_lst, l, mid-1, num);
         return bin_srch (srt_lst, ind_lst, mid+1, r,  num);
@@ -91,10 +99,10 @@ Int bin_srch  (Int *srt_lst, Int *ind_lst, Int l, Int r, Int num){
 void paru_update_rel_ind (Element *el, Element *cb_el, 
         char rc, cholmod_common *cc) 
 {
-    DEBUGLEVEL(0);
-    Int *el_Index, //row/col global index of destination
-        *cb_el_Index,  //row/col global index of source
-        *RelIndex,    //relative row/col index of source to be updated
+    DEBUGLEVEL(1);
+    Int *el_Index,      // row/col global index of destination
+        *cb_el_Index,   // row/col global index of source
+        *RelIndex,      // relative row/col index of source to be updated
         len_cb, len_el;       // number of rows/colum of el and cb_el
 
     if (rc == 'r'){ //row relative index update
@@ -155,15 +163,13 @@ void paru_update_rel_ind (Element *el, Element *cb_el,
         }
 
         paru_sort (srt_lst, ind_lst, len_el);
-        PRLEVEL (1, ("%% XXX here\n" ));
 
         for (Int i=0; i < len_cb ; i++){
             Int global_ind = cb_el_Index[i];
             if (global_ind < 0) continue;
             PRLEVEL (1, ("%% searching for: cb_index[%ld]=%ld\n",
                         i,  global_ind));
-            Int found = -1;
-            found = bin_srch (srt_lst, ind_lst, 0, len_el-1, global_ind);
+            Int found = bin_srch (srt_lst, ind_lst, 0, len_el-1, global_ind);
             RelIndex [i] = found;
             ASSERT (found != -1);
         }
