@@ -11,7 +11,8 @@
  *        char rc: it is either 'r' or 'c' row or column update
  *        cholmod_common *cc: Memory allcoation is needed here so cc must be
  *          informed about the amount of memory
- */
+ * @author Aznaveh
+ * */
 
 
 void inline swap_key(Int *srt_lst,Int *ind_lst, Int i, Int j ){

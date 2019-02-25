@@ -1,16 +1,16 @@
 /** =========================================================================  /
  * =======================  paru_init_rowFronts  ============================  /
  * ==========================================================================  /
- * Initializing row fronts; fronts will be assembled later.
- *      Initializing Row and column tuple lists: 
- *          allocating memory and updating lists and initializing matrix 
- *          structre
- *      Assemble each front:
- *          Adding numerical values, allocating data
- *          updating the list
+ * @brief  Initializing row fronts; fronts will be assembled later.
+ *         Initializing Row and column tuple lists: 
+ *            allocating memory and updating lists and initializing matrix 
+ *            structre
+ *        Assemble each front:
+ *            Adding numerical values, allocating data
+ *            updating the list
  *          
- *  be implemnted in different files and will be reused for other fronts     
- *  */
+ * @author Aznaveh
+ * */
 #include "Parallel_LU.hpp"
 
 

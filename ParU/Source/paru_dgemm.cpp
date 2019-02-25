@@ -7,12 +7,13 @@
                                                         
 /*!
  *
- *      This does the outer product
- *        C := alpha*op( A )*op( B ) + beta*C,   
- *        el:= -1*part(pF) * uPart + zero 
- *        TRANSA = 'N'   op(A) = A
- *        TRANSB = 'N'   op(B) = B
+ * @brief       This does the outer product
+ *              C := alpha*op( A )*op( B ) + beta*C,   
+ *              el:= -1*part(pF) * uPart + zero 
+ *              TRANSA = 'N'   op(A) = A
+ *              TRANSB = 'N'   op(B) = B
  * 
+ * @author Aznaveh
  */
 
 

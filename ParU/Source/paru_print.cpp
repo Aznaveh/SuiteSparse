@@ -1,7 +1,12 @@
 #include "Parallel_LU.hpp"
 /** =========================================================================  /
  * =======================  paru_print   ====================================  /
- * ========================================================================== */
+ * ========================================================================== 
+ * 
+ * @brief printing datas are implemented in this file
+ *
+ * @author Aznaveh
+ * */
 void paru_print_element (paru_matrix *paruMatInfo, Int e){
     // print out contribution blocks
     Element **elementList; 

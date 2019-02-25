@@ -1,7 +1,8 @@
 /* =========================================================================   /
  * ============================== paru_sym_analyse =========================   /
  * =========================================================================   /
- * Computing augmented tree and using QRsym data structure and add it to LUsym
+ * @brief Computing augmented tree and using QRsym data structure and add it 
+ *         to LUsym
  *
  * Example: ./Matrix/problem.mtx
  * original post ordered etree:          augmented tree: (Row elements)
@@ -16,6 +17,7 @@
  *                                               
  *      Note: the original etree use a dummy parent for all the tree(forest)
  *              the augmented tree does not
+ * @author Aznaveh
  * */
 #include "Parallel_LU.hpp"
 paru_symbolic *paru_sym_analyse
@@ -132,7 +134,7 @@ paru_symbolic *paru_sym_analyse
     }
 
 
-    //#ifndef NDEBUG
+#ifndef NDEBUG
     /* print fronts*/
     for (Int f = 0; f < nf; f++){
         Int fm, fn, fp;
@@ -147,7 +149,7 @@ paru_symbolic *paru_sym_analyse
             PRLEVEL (p,("%ld ",Child[i]));
         PRLEVEL (p,("\n"));
     }
-    //#endif /* end of NDEBUG */
+#endif /* end of NDEBUG */
 
     aParent = (Int*) paru_alloc (m+nf, sizeof(Int),cc);
     aChild =  (Int*) paru_alloc (m+nf+1, sizeof(Int),cc);
@@ -159,20 +161,18 @@ paru_symbolic *paru_sym_analyse
 
     if(aParent == NULL || aChild == NULL || aChildp == NULL ||
             rM == NULL  || snM == NULL ){
-        printf ("Out of memory");
+        printf ("Out of memory in symbolic phase");
         paru_freesym (&LUsym , cc);
         return NULL;
     }
 
     //initialization
-    /*! TODO: Not all of them need initialization this is for debug for now
-     * aParent needs initialization*/
-    /*! TODO: USE MEMSET     */
-    for (Int f = 0; f < nf; f++) snM[f] = -1;
-    for (Int i = 0; i < m; i++) rM[i] = -1;
-    for (Int i = 0; i < m+nf; i++) aParent[i] = -1;
-    for (Int i = 0; i < m+nf+1; i++) aChild[i] = -1;
-    for (Int i = 0; i < m+nf+2; i++) aChildp[i] = -1;
+    /*aParent needs initialization*/
+    //memset (snM, -1, nf*sizeof(Int));
+    //memset (rM, -1, m*sizeof(Int));
+    memset (aParent, -1, (m+nf)*sizeof(Int));
+    //memset (aChild, -1, (m+nf+1)*sizeof(Int));
+    memset (aChildp, -1, (m+nf+2)*sizeof(Int));
 
     aChildp[0] = 0;
     Int offset = 0; //number of rows visited in each iteration orig front+ rows
@@ -180,15 +180,15 @@ paru_symbolic *paru_sym_analyse
     Int childpointer = 0;
 
     for (Int f = 0; f < nf; f++) {
-        PRLEVEL (1,("Front %ld\n", f)) ;
-        PRLEVEL (1,("pivot columns [ %ld to %ld ] n: %ld \n",
+        PRLEVEL (1,("%% Front %ld\n", f)) ;
+        PRLEVEL (1,("%% pivot columns [ %ld to %ld ] n: %ld \n",
                     Super [f], Super [f+1]-1, n)) ;
         ASSERT(Super[f+1] <= n);
         Int numRow =Sleft[Super[f+1]]-Sleft[Super[f]] ;
 
         Int numoforiginalChild=0;
         if (lastChildFlag){  // the current node is the parent
-            PRLEVEL (1,("Childs of %ld: ",f)) ;
+            PRLEVEL (1,("%% Childs of %ld: ",f)) ;
             numoforiginalChild= Childp[f+1] - Childp[f];
 
             for (Int i = Childp[f]; i <= Childp[f+1]-1; i++) {
@@ -196,19 +196,19 @@ paru_symbolic *paru_sym_analyse
                 Int c= Child [i];
                 ASSERT(snM[c] < m+nf+1);
                 aParent[ snM[c]]=offset+numRow;
-                PRLEVEL (1, ("aParent[%ld] =%ld\n", 
+                PRLEVEL (1, ("%% aParent[%ld] =%ld\n", 
                             aParent[snM [c]], offset+numRow));
                 ASSERT(childpointer < m+nf+1);
                 aChild[childpointer++] = snM[c];
             }
         }
 
-        PRLEVEL (1,("numRow=%ld ",numRow));
+        PRLEVEL (1,("%% numRow=%ld ",numRow));
         PRLEVEL (1,("#offset=%ld\n",offset));
         for(Int i = offset ; i < offset+numRow ; i++){
             ASSERT (aChildp [i+1] == -1);
             aChildp[i+1] = aChildp[i];
-            PRLEVEL (1, ("@i=%ld aCp[%ld]=%ld aCp[%ld]=%ld",
+            PRLEVEL (1, ("%% @i=%ld aCp[%ld]=%ld aCp[%ld]=%ld",
                         i, i+1, aChildp[i+1], i, aChildp[i]));
         }
 
@@ -228,10 +228,11 @@ paru_symbolic *paru_sym_analyse
         ASSERT(offset < m+nf+1);
         ASSERT (aChildp [offset] == -1);
         aChildp[offset] = aChildp[offset-1]+numRow+numoforiginalChild;
-        PRLEVEL (1, ("\n f=%ld numoforiginalChild=%ld\n", f, numoforiginalChild));
+        PRLEVEL (1, ("\n %% f=%ld numoforiginalChild=%ld\n",
+                    f, numoforiginalChild));
 
         if( Parent[f] == f+1){  //last child due to staircase
-            PRLEVEL (1, ("last Child =%ld\n", f));
+            PRLEVEL (1, ("%% last Child =%ld\n", f));
             lastChildFlag = 1;  
         }else
             lastChildFlag = 0;  
@@ -244,37 +245,38 @@ paru_symbolic *paru_sym_analyse
     LUsym->super2atree = snM;
 
 #ifndef NDEBUG
-    PRLEVEL (1,("super node mapping (snM): ")); 
+    Int p = 1;
+    PRLEVEL (p,("%% super node mapping (snM): ")); 
     for (Int f = 0; f < nf; f++){
         ASSERT (snM [f] != -1);
-        PRLEVEL (1,("%ld ",snM[f]));     
+        PRLEVEL (p,("%ld ",snM[f]));     
     }
-    PRLEVEL (1,("\n"));
+    PRLEVEL (p,("\n"));
 
-    PRLEVEL (1,("row mapping (rM): "));  
+    PRLEVEL (p,("%% row mapping (rM): "));  
     for (Int i = 0; i < m; i++){
         ASSERT (rM [i] != -1);
-        PRLEVEL (1,("%ld ",rM[i]));        
+        PRLEVEL (p,("%ld ",rM[i]));        
     }
-    PRLEVEL (1,("\n"));
+    PRLEVEL (p,("\n"));
 
-    PRLEVEL (1,("aParent: ")); 
-    for (Int i = 0; i < m+nf; i++) PRLEVEL (1,("%ld ",aParent[i]));   
-    PRLEVEL (1,("\n"));
+    PRLEVEL (p,("%% aParent: ")); 
+    for (Int i = 0; i < m+nf; i++) PRLEVEL (p,("%ld ",aParent[i]));   
+    PRLEVEL (p,("%% \n"));
 
-    PRLEVEL (1,("aChildp: "));
-    for (Int i = 0; i < m+nf+2; i++) PRLEVEL (1,("%ld ",aChildp[i]));   
-    PRLEVEL (1,("\n"));
+    PRLEVEL (p,("%% aChildp: "));
+    for (Int i = 0; i < m+nf+2; i++) PRLEVEL (p,("%ld ",aChildp[i]));   
+    PRLEVEL (p,("\n"));
 
-    PRLEVEL (1,("aChild: ")); 
-    for (Int i = 0; i < m+nf+1; i++) PRLEVEL (1,("%ld ",aChild[i]));    
-    PRLEVEL (1,("\n"));
+    PRLEVEL (p,("%% aChild: ")); 
+    for (Int i = 0; i < m+nf+1; i++) PRLEVEL (p,("%ld ",aChild[i]));    
+    PRLEVEL (p,("\n"));
 
     for(Int i=0; i< m+nf; i++){
-        PRLEVEL (1,("anode:%ld",i));
+        PRLEVEL (p,("%% anode:%ld",i));
         for(Int c=aChildp[i]; c< aChildp[i+1]; c++)
-            PRLEVEL (1,(" %ld,",aChild[c]));  
-        PRLEVEL (1,("\n"));
+            PRLEVEL (p,(" %ld,",aChild[c]));  
+        PRLEVEL (p,("\n"));
     }
 #endif
     return (LUsym) ;

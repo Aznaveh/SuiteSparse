@@ -1,8 +1,10 @@
 /** =========================================================================  /
  * =======================  paru_fourPass ===================================  /
  * ========================================================================== */
-/*! This function is the same level as paru_assemble 
- *      basically doing the rest of the work for non pivotal rows and columns
+/*! @brief This function is the same level as basically doing the rest of the
+ *    work for non pivotal rows and columns; update the degree and assemble
+ *    prior fronts
+ * @author Aznaveh
  */
 
 #include "Parallel_LU.hpp"
@@ -38,9 +40,7 @@ void paru_fourPass (paru_matrix *paruMatInfo,
     Int colMark = Work -> colMark;
 
 
-    Int time_f = ++paruMatInfo->time_stamp[f]; //invalid all the markings
-
-
+    Int time_f = ++paruMatInfo->time_stamp[f]; //making all the markings invalid 
 
 
     /*****  1st path: over non pivotal columns to count rows             ******/
@@ -127,7 +127,7 @@ void paru_fourPass (paru_matrix *paruMatInfo,
             Int *el_colIndex = colIndex_pointer (curEl); //pointers to row index
             Int *el_rowIndex = rowIndex_pointer (curEl);
 
-            if (el_rowIndex [curRowIndex] < 0 ){  /*! TODO: Dead Delete it	 */
+            if (el_rowIndex [curRowIndex] < 0 ){
                 continue;  
             }
 
@@ -489,6 +489,5 @@ void paru_fourPass (paru_matrix *paruMatInfo,
         if (p <= 0 )
             paru_print_tupleList (RowList, r);
 #endif
-
     }
 }

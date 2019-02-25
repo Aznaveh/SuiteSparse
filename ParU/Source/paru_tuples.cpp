@@ -2,14 +2,16 @@
 /** =========================================================================  /
  * =======================  paru_tuples =====================================  /
  * ==========================================================================  /
-/*! \brief adding tuples to row and column list
+ *! @brief adding tuples to row and column list
  *
  * Row and column tuple list add is basically the same in sequential case
  * I have two functions for my parallel algorithm
  *
- * \param  a list of tuples and the the tuple we want to add
- * \return 0 on sucess 
- */
+ * @param  a list of tuples and the the tuple we want to add
+ * @return 0 on sucess 
+ *
+ * @author Aznaveh
+ * */
 /*! TODO: Cap number of tuples to maximum number of elements; 
  *      How to do this? 
  *      The maximum number is a constant based on the input

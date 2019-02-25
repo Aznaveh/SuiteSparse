@@ -11,6 +11,7 @@
 #endif
 
 /*! @brief assembling a front and updating correspoing elelment
+ *  @author Aznaveh
  *
  *
  * @param  a list of tuples and the the tuple we want to add
@@ -227,7 +228,8 @@ void paru_assemble (
         (double*) paru_calloc (rowCount*fp, sizeof (double), cc);
 
     if (pivotalFront == NULL ){
-        printf ("%% Out of memory when tried to allocate for pivotal part %ld",f);
+        printf ("%% Out of memory when tried to allocate for pivotal part %ld",
+                f);
         return;
     }
 
@@ -325,7 +327,8 @@ void paru_assemble (
             for (Int r = 0; r < rowCount; r++){
                 PRLEVEL (p, ("%% %ld\t", fsRowList [r]));
                 for (Int c = col1; c < col2; c++){
-                    PRLEVEL (p, (" %2.5lf\t", pivotalFront [(c-col1)*rowCount + r]));
+                    PRLEVEL (p, (" %2.5lf\t", 
+                                pivotalFront [(c-col1)*rowCount + r]));
                 }
                 PRLEVEL (p, ("\n"));
             }
@@ -722,6 +725,7 @@ void paru_assemble (
     }
 #ifndef NDEBUG
 //    //Printing the contribution block before dgemm
+//    // Valgrind complains if activated, but can be helpful sometimes
 //    p = 0;
 //    PRLEVEL (p, ("\n%%Before DGEMM:"));
 //    if (p <= 0)

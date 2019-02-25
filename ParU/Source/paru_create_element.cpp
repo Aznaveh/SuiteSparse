@@ -1,8 +1,8 @@
 /** =========================================================================  /
  * =======================  paru_create_element  ============================  /
  * ==========================================================================  /
- * Initializing an empty element
- * if (Init) use calloc .i.e x = 0;
+ * @brief Initializing an empty element
+ *    if (Init) use calloc .i.e x = 0;
  *                     
  *                    V RRRRRRRRRRRRRR
  *                      IIIIIIIIIIIIII            I = global index
@@ -13,6 +13,7 @@
  *                  R I  xxxxxxxxxxxxxx
  *                  R I  xxxxxxxxxxxxxx
  *
+ * @author Aznaveh
  *  */
 #include "Parallel_LU.hpp"
 Element *paru_create_element (Int nrows, Int ncols, 

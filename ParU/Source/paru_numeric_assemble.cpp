@@ -1,8 +1,10 @@
 /** =========================================================================  /
  * =======================  paru_numeric_assemble ===========================  /
  * ========================================================================== */
-/*  assemble numbers in columns, rows or fully  
- *  it is a gather scatter operation                                          */
+/* @brief  assemble numbers in columns, rows or fully  
+ *          it is a gather scatter operation
+ * @author Aznaveh
+ **/
 
 #include "Parallel_LU.hpp"
 
@@ -43,6 +45,7 @@ void assemble_row (const double *sM, double *dM,//source and destination matrix
 }
 
 
+/* TODO: I have not used this function so far; but it is not hard though   */
 void assemble_all (double *s, double *d,   //source and destination
         Int sm, Int sn,    // dimension of source matrix
         Int dm,    // dimension of destination matrix
