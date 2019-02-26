@@ -39,6 +39,8 @@ void paru_fourPass (paru_matrix *paruMatInfo,
     Int *isColInCBcolSet = Work -> colSize;
     Int colMark = Work -> colMark;
 
+    Int *first = LUsym->first;
+
 
     Int time_f = ++paruMatInfo->time_stamp[f]; //making all the markings invalid 
 
@@ -62,8 +64,8 @@ void paru_fourPass (paru_matrix *paruMatInfo,
         for (Int i = 0; i < numTuple; i++){
             Tuple curTpl = listColTuples [i];
             Int e = curTpl.e;
-            ASSERT (e >= 0);
-            if (e == el_ind){ //current element
+           // if (e == el_ind){ //current element
+            if ( e >= el_ind || e < first[el_ind]){ //Not any of descendents
                 continue;
             }
 #ifndef NDEBUG        
@@ -115,7 +117,8 @@ void paru_fourPass (paru_matrix *paruMatInfo,
             Tuple curTpl = listRowTuples [i];
             Int e = curTpl.e;
 
-            if (e == el_ind){ //current element
+        //    if (e == el_ind){ //current element
+            if ( e >= el_ind || e < first[el_ind]){ //Not any of descendents
                 continue;
             }
 #ifndef NDEBUG        
@@ -168,15 +171,14 @@ void paru_fourPass (paru_matrix *paruMatInfo,
             paru_print_element (paruMatInfo, el_ind);
         }
 #endif
-        //  Int pdst = 0,psrc;
 
         for (Int i = 0; i < numTuple; i++){
             //for (Int psrc = 0; psrc < numTuple; psrc ++){}
             //            Tuple curTpl = listColTuples [psrc];
             Tuple curTpl = listColTuples [i];
             Int e = curTpl.e;
-            if (e == el_ind){ //current element
-                //       listColTuples [pdst++] = curTpl; //keeping the tuple
+            //if (e == el_ind){ //current element
+            if ( e >= el_ind || e < first[el_ind]){ //Not any of descendents
                 continue;
             }
             Int curColIndex = curTpl.f;
@@ -195,7 +197,7 @@ void paru_fourPass (paru_matrix *paruMatInfo,
             Int *rowRelIndex = relRowInd (curEl);
             Int *colRelIndex    = relColInd (curEl);
 
-            if (el_colIndex [curColIndex] < 0 ){ //it will be deleted here
+            if (el_colIndex [curColIndex] < 0 ){
                 continue;  
             }
 
@@ -207,9 +209,9 @@ void paru_fourPass (paru_matrix *paruMatInfo,
                         e, elRow[e], curEl->rValid ));
             PRLEVEL (1, ("%% time_f =%ld \n", time_f));
 
-            //if (elRow [e] == 0 && curEl->rValid == time_f -1 ){
-            if (elRow [e] == 0 ){
-                //all the columns are in CB
+            if (elRow [e] == 0 ){         //all the columns are in CB
+                ASSERT ( e < el_ind && e >= first[el_ind]);
+                
                 if(curEl->rValid !=  time_f){ /*  Update rowRelIndex	 */
                     PRLEVEL (1, ("%% update row relative element%ld\n",e ));
 #ifndef NDEBUG
@@ -296,7 +298,8 @@ void paru_fourPass (paru_matrix *paruMatInfo,
         for (Int i = 0; i < numTuple; i++){
             Tuple curTpl = listRowTuples [i];
             Int e = curTpl.e;
-            if (e == el_ind){ //current element
+            //if (e == el_ind){ //current element
+            if ( e >= el_ind || e < first[el_ind]){ //Not any of descendents
                 continue;
             }
             Int curColIndex = curTpl.f;
@@ -329,8 +332,8 @@ void paru_fourPass (paru_matrix *paruMatInfo,
             double *el_Num = numeric_pointer (curEl);
             PRLEVEL (1, ("%% elCol[%ld]=%ld ",e, elCol[e]));
 
-            //if (elCol [e] == 0 && curEl->cValid == time_f -1){
-            if (elCol [e] == 0 ){
+            if (elCol [e] == 0 ){ //all the rows are in CB
+                ASSERT ( e < el_ind && e >= first[el_ind]);
 
 #ifndef NDEBUG            
                 Int p = 1;
@@ -340,7 +343,6 @@ void paru_fourPass (paru_matrix *paruMatInfo,
                     paru_print_element (paruMatInfo, el_ind);
                 }
 #endif
-                //all the row is in CB
                 if(curEl->cValid !=  time_f){
                     /* Update colRelIndex	 */
                     PRLEVEL (1, ("%% update column relative index %ld\n"
