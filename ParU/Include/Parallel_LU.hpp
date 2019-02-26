@@ -103,8 +103,11 @@ typedef struct /* paru_symbolic*/
     // truly a tree, with just one parent (node nf).
 
     Int *aParent; // size m+nf
-    Int *aChild; // size m+nf+1
+    Int *aChild;  // size m+nf+1
     Int *aChildp; // size m+nf+2
+    Int *first;   // size m+nf first successor of front in augmented postordered 
+                  //  tree; all successors are between first[eli]...eli-1
+
 
     // pivot column in the front F.  This refers to a column of S.  The
     // number of expected pivot columns in F is thus

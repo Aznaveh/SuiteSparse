@@ -105,6 +105,7 @@ void paru_freesym (paru_symbolic **LUsym_handle,
     paru_free (m+nf+2, sizeof (Int), LUsym->aChildp, cc);
     paru_free (m, sizeof (Int), LUsym->row2atree, cc);
     paru_free (nf, sizeof (Int), LUsym->super2atree, cc);
+    paru_free (m+nf, sizeof (Int), LUsym->first, cc);
 
     paru_free (1, sizeof (paru_symbolic), LUsym, cc);
 

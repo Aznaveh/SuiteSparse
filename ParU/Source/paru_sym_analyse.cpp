@@ -41,7 +41,7 @@ paru_symbolic *paru_sym_analyse
     cc->SPQR_grain = 1;
     cc->useGPU = -1;
     QRsym = NULL;
-    QRsym = spqr_analyze (A, SPQR_ORDERING_CHOLMOD, FALSE,FALSE , FALSE, cc);
+    QRsym = spqr_analyze (A, SPQR_ORDERING_CHOLMOD, FALSE, FALSE, FALSE, cc);
     if (QRsym == NULL){
         printf("some problem in QRsym\n");
         return NULL;
@@ -107,6 +107,7 @@ paru_symbolic *paru_sym_analyse
     Int *aChild;  // size m+nf+1
     Int *aChildp; // size m+nf+2
     Int *rM, *snM; // row map and supernode map
+    Int *first; //first in augmented tree augmented tree size m+nf
 
     //initializing with NULL to avoid freeing not allocated memory
     aParent = LUsym->aParent = NULL; 
@@ -114,6 +115,7 @@ paru_symbolic *paru_sym_analyse
     aChild = LUsym->aChild = NULL;
     rM = LUsym->row2atree = NULL;
     snM = LUsym->super2atree = NULL;
+    first= LUsym->first= NULL;
 
     /*! Check if there exist empty row or column in square part*/
    for (Int row = 0; row < m; row++){
@@ -154,13 +156,14 @@ paru_symbolic *paru_sym_analyse
     aParent = (Int*) paru_alloc (m+nf, sizeof(Int),cc);
     aChild =  (Int*) paru_alloc (m+nf+1, sizeof(Int),cc);
     aChildp = (Int*) paru_alloc (m+nf+2, sizeof(Int),cc);
+    first= (Int*) paru_alloc (m+nf, sizeof(Int),cc);
 
 
     rM =  (Int*) paru_alloc(m  ,sizeof(Int), cc);
     snM = (Int*) paru_alloc(nf ,sizeof(Int), cc);
 
     if(aParent == NULL || aChild == NULL || aChildp == NULL ||
-            rM == NULL  || snM == NULL ){
+            rM == NULL  || snM == NULL || free == NULL){
         printf ("Out of memory in symbolic phase");
         paru_freesym (&LUsym , cc);
         return NULL;
@@ -173,6 +176,7 @@ paru_symbolic *paru_sym_analyse
     memset (aParent, -1, (m+nf)*sizeof(Int));
     //memset (aChild, -1, (m+nf+1)*sizeof(Int));
     memset (aChildp, -1, (m+nf+2)*sizeof(Int));
+    memset (first, -1, (m+nf)*sizeof(Int));
 
     aChildp[0] = 0;
     Int offset = 0; //number of rows visited in each iteration orig front+ rows
@@ -244,6 +248,15 @@ paru_symbolic *paru_sym_analyse
     LUsym->row2atree = rM;
     LUsym->super2atree = snM;
 
+    //Initialize first descendent
+    for(Int i=0 ; i<m+nf; i++){
+        for (Int r = i; r!= -1 && first[r] == -1; r = aParent[r])
+            first[r] = i;
+    }
+
+
+    LUsym->first= first;
+
 #ifndef NDEBUG
     Int p = 1;
     PRLEVEL (p,("%% super node mapping (snM): ")); 
@@ -278,6 +291,12 @@ paru_symbolic *paru_sym_analyse
             PRLEVEL (p,(" %ld,",aChild[c]));  
         PRLEVEL (p,("\n"));
     }
+
+    PRLEVEL (p,("%% first: ")); 
+    for (Int i = 0; i < m+nf; i++) 
+        PRLEVEL (p,("first[%ld]=%ld ",i,first[i]));
+    PRLEVEL (p,("\n"));
+
 #endif
     return (LUsym) ;
 }
