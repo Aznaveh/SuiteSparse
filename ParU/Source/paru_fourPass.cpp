@@ -333,7 +333,7 @@ void paru_fourPass (paru_matrix *paruMatInfo,
             if (elCol [e] == 0 ){
 
 #ifndef NDEBUG            
-                Int p = 0;
+                Int p = 1;
                 PRLEVEL (1, ("%% Before row assembly: \n" ));
                 if (p <= 0 ){
                     paru_print_element (paruMatInfo, e);
@@ -359,7 +359,8 @@ void paru_fourPass (paru_matrix *paruMatInfo,
                 assemble_row (el_Num, front_numeric, mEl, nEl, 
                         curFr->nrows, curRowIndex , k-fp, colRelIndex );
 #ifndef NDEBUG            
-                PRLEVEL (0, ("%% after row assembly: \n" ));
+                p = 1;
+                PRLEVEL (1, ("%% after row assembly: \n" ));
                 if (p <= 0 ){
                     paru_print_element (paruMatInfo, e);
                     paru_print_element (paruMatInfo, el_ind);
