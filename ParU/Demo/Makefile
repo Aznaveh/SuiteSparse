@@ -82,26 +82,26 @@ run:
 	./testazny < ../Matrix/young1c.mtx     	#841x841
 	./testazny < ../Matrix/ParUTst/az11_11.mtx   #14x14
 	./testazny < ../Matrix/ParUTst/az88_2.mtx	 #4x4
-	./testazny < ../Matrix/ParUTst/bcsstk01.mtx #NO CBs 48x48 
-	./testazny < ../Matrix/ParUTst/bcsstk03.mtx  
-	./testazny < ../Matrix/ParUTst/bcsstk22.mtx 
-	./testazny < ../Matrix/ParUTst/bcsstm01.mtx	
-	./testazny < ../Matrix/ParUTst/bcsstm02.mtx	
-	./testazny < ../Matrix/ParUTst/bcsstm05.mtx	  		
-	./testazny < ../Matrix/ParUTst/bcsstm06.mtx	  
-	./testazny < ../Matrix/ParUTst/bcsstm19.mtx	  
-	./testazny < ../Matrix/ParUTst/bcsstm20.mtx	  
-	./testazny < ../Matrix/ParUTst/ex5.mtx  	#27x27
-	./testazny < ../Matrix/ParUTst/mesh1e1.mtx  #48x48
-	./testazny < ../Matrix/ParUTst/LF10/LF10.mtx #18x18
-	./testazny < ../Matrix/ParUTst/mesh1em1/mesh1em1.mtx #48x48
-	./testazny < ../Matrix/ParUTst/Trefethen_20/Trefethen_20.mtx #20x20
-	./testazny < ../Matrix/ParUTst/Trefethen_20b/Trefethen_20b.mtx #19x19
-	./testazny < ../Matrix/ParUTst/curtis54/curtis54.mtx #54x54
-	./testazny < ../Matrix/ParUTst/nos1/nos1.mtx #237x237
-	./testazny < ../Matrix/ParUTst/nos4/nos4.mtx  #100x100
-	./testazny < ../Matrix/ParUTst/494_bus/494_bus.mtx #494x494
-	./testazny < ../Matrix/ParUTst/mesh1em6/mesh1em6.mtx #48x48
+#	./testazny < ../Matrix/ParUTst/bcsstk01.mtx #NO CBs 48x48 
+#	./testazny < ../Matrix/ParUTst/bcsstk03.mtx  
+#	./testazny < ../Matrix/ParUTst/bcsstk22.mtx 
+#	./testazny < ../Matrix/ParUTst/bcsstm01.mtx	
+#	./testazny < ../Matrix/ParUTst/bcsstm02.mtx	
+#	./testazny < ../Matrix/ParUTst/bcsstm05.mtx	  		
+#	./testazny < ../Matrix/ParUTst/bcsstm06.mtx	  
+#	./testazny < ../Matrix/ParUTst/bcsstm19.mtx	  
+#	./testazny < ../Matrix/ParUTst/bcsstm20.mtx	  
+#	./testazny < ../Matrix/ParUTst/ex5.mtx  	#27x27
+#	./testazny < ../Matrix/ParUTst/mesh1e1.mtx  #48x48
+#	./testazny < ../Matrix/ParUTst/LF10/LF10.mtx #18x18
+#	./testazny < ../Matrix/ParUTst/mesh1em1/mesh1em1.mtx #48x48
+#	./testazny < ../Matrix/ParUTst/Trefethen_20/Trefethen_20.mtx #20x20
+#	./testazny < ../Matrix/ParUTst/Trefethen_20b/Trefethen_20b.mtx #19x19
+#	./testazny < ../Matrix/ParUTst/curtis54/curtis54.mtx #54x54
+#	./testazny < ../Matrix/ParUTst/nos1/nos1.mtx #237x237
+#	./testazny < ../Matrix/ParUTst/nos4/nos4.mtx  #100x100
+#	./testazny < ../Matrix/ParUTst/494_bus/494_bus.mtx #494x494
+#	./testazny < ../Matrix/ParUTst/mesh1em6/mesh1em6.mtx #48x48
 
 
 
