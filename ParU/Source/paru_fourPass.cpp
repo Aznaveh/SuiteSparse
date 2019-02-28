@@ -102,6 +102,9 @@ void paru_fourPass (paru_matrix *paruMatInfo,
     tupleList *RowList = paruMatInfo->RowList;
     for (Int k = fp; k < rowCount; k++){
         Int r = fsRowList [k];
+
+        new_row_degree_bound_for_r = curFr->nrows ;
+
         tupleList *curRowTupleList = &RowList[r];
         Int numTuple = curRowTupleList->numTuple;
         ASSERT (numTuple >= 0);
@@ -121,6 +124,8 @@ void paru_fourPass (paru_matrix *paruMatInfo,
             if ( e >= el_ind || e < first[el_ind]){ //Not any of descendents
                 continue;
             }
+
+
 #ifndef NDEBUG        
             if (p <= 0)
                 paru_print_element (paruMatInfo, e);
@@ -134,6 +139,13 @@ void paru_fourPass (paru_matrix *paruMatInfo,
                 continue;  
             }
 
+            if(curEl->cValid !=  time_f)
+            {
+                curEl->cValid =  time_f;
+                elCol [e] = curEl->ncolsleft ; //initiaze
+            }
+            new_row_degree_bound_for_r += elCol [e] ;
+
             if(curEl->rValid != time_f){
                 curEl->rValid =  time_f;
                 elRow [e] = curEl ->nrowsleft - 1; //initiaze
@@ -142,11 +154,25 @@ void paru_fourPass (paru_matrix *paruMatInfo,
             }
             else{ 
                 elRow [e]--;
+
+                if (elRow [e] == 0)
+                {
+                    if (elCol [e] == 0)
+                    {
+                        // do complete assembly of e into current front, now
+                        // delete e
+                    }
+                }
                 PRLEVEL (1, ("%%seen before: elRow[e]=%ld \n", elRow[e]));
                 continue;
             }
 
         }
+
+        old_bound_updated = row_degree_bound [r] + curFr->nrows - 1 ;
+        row_degree_bound [r] = min (old_bound_update, new_row_degree_bound_for_r ) ;
+
+
     }
     /**************************************************************************/
 
