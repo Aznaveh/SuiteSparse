@@ -112,6 +112,7 @@ ParU/Demo/testazny
 ParU/Demo/pfile
 ParU/Demo/tfile
 ParU/Demo/tmp
+ParU/Demo/*.m
 
 # ignore these specific programs in the Package/Tcov directories
 CHOLMOD/Tcov/cl
