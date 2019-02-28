@@ -696,15 +696,7 @@ void paru_assemble (
     Int *el_colIndex = colIndex_pointer (el);
     for (Int i = 0; i < colCount; ++ i) {
         el_colIndex [i] = CBColList[i];
-        /* TODO: add column tuple */
         Tuple colTuple;
-        colTuple.e = eli;
-        colTuple.f = i;
-        if (paru_add_colTuple (ColList, CBColList[i], colTuple, cc) ){
-            // paru_freemat (&paruMatInfo, cc);
-            printf("%% Out of memory: add_colTuple \n");
-            return; /* TODO: check RETURN MEM usage */
-        }
     }
     Int *el_rowIndex = rowIndex_pointer (el);
     for (Int i = fp; i < rowCount; ++ i) {
@@ -712,16 +704,6 @@ void paru_assemble (
         el_rowIndex [locIndx] = fsRowList[i];
         PRLEVEL (1, ("%% el_rowIndex [%ld] =%ld\n",
                     locIndx, el_rowIndex [locIndx]));
-        /* TODO: add row tuple */
-        Tuple rowTuple;
-        rowTuple.e = eli;
-        rowTuple.f = locIndx;
-        if (paru_add_rowTuple (RowList, fsRowList[i], rowTuple, cc) ){
-            //paru_freemat (&paruMatInfo, cc);
-            printf("%% Out of memory: add_colTuple \n");
-            return; /* TODO: check RETURN MEM usage */
-        }
-
     }
 #ifndef NDEBUG
 //    //Printing the contribution block before dgemm
@@ -754,6 +736,28 @@ void paru_assemble (
 
 
     ////////////////////////////////////////////////////////////////////////////
+
+    // adding tuples for current front
+    for (Int i = 0; i < colCount; ++ i) {
+        Tuple colTuple;
+        colTuple.e = eli;
+        colTuple.f = i;
+        if (paru_add_colTuple (ColList, CBColList[i], colTuple, cc) ){
+            printf("%% Out of memory: add_colTuple \n");
+            return;
+        }
+    }
+    for (Int i = fp; i < rowCount; ++ i) {
+        Int locIndx = i-fp; 
+       Tuple rowTuple;
+        rowTuple.e = eli;
+        rowTuple.f = locIndx;
+        if (paru_add_rowTuple (RowList, fsRowList[i], rowTuple, cc) ){
+            printf("%% Out of memory: add_colTuple \n");
+            return; 
+        }
+
+    }
 
 #ifndef NDEBUG
     //Printing the contribution block after prior blocks assembly

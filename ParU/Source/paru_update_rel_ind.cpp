@@ -40,7 +40,7 @@ Int partition (Int *srt_lst, Int *ind_lst, Int low, Int high){
     return (j+1);
 }
 
-void paru_qsort (Int *srt_lst, Int *ind_lst, Int low, Int high){
+void paru_qsort (Int *srt_lst, Int *ind_lst, Int low, Int high){ //recursive
     DEBUGLEVEL(0);
     PRLEVEL (1, ("%% low=%ld high=%ld  \n",low, high)); 
     if (low < high-15)
@@ -71,10 +71,7 @@ void paru_sort (Int *srt_lst, Int *ind_lst, Int len){
                     i, srt_lst[i], i, ind_lst[i]));
     }
 #endif
-
     paru_qsort (srt_lst, ind_lst, 0, len-1);
-
-
 #ifndef NDEBUG
     PRLEVEL (1, ("%% After sort\n")); 
     for (Int i=0; i < len; i++){ 
