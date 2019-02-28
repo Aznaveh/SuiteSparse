@@ -242,6 +242,7 @@ paru_matrix *paru_init_rowFronts (
         }
     }
 
+    PRLEVEL (0, ("InMatrix=[\n") ); //MATLAB matrix
     // allocating row tuples, elements and updating column tuples
     for(Int row = 0; row < m ; row++){  // row is number of row in A
         Int e = LUsym->row2atree[row]; //element number in augmented tree
@@ -305,7 +306,7 @@ paru_matrix *paru_init_rowFronts (
             el_colrowNum[j++] =   Sx[p];
             PRLEVEL (1, ("Sj[%ld] =%ld Sx[%ld]=%lf\n", p, Sj[p], p, Sx[p] ));
             //for Matlab
-            PRLEVEL (0, ("S(%ld,%ld)= %.16lf;\n", row+1,Sj[p]+1, Sx[p]) );
+            PRLEVEL (0, ("%ld,%ld, %.16lf;\n", row+1,Sj[p]+1, Sx[p]) );
             
    
             if (paru_add_colTuple (ColList, Sj [p], colTuple, cc) ){
@@ -317,6 +318,11 @@ paru_matrix *paru_init_rowFronts (
         el_colrowIndex[j++] = row;  //initializing element row index 
     }
 
+    PRLEVEL (0, ("];\n") );
+    PRLEVEL (0, ("I = InMatrix(:,1);\n") );
+    PRLEVEL (0, ("J = InMatrix(:,2);\n") );
+    PRLEVEL (0, ("X = InMatrix(:,3);\n") );
+    PRLEVEL (0, ("S=sparse(I,J,X);\n") );
 
     paru_free (anz, sizeof (double), Sx , cc) ;
     paru_free (m, sizeof (Int), W, cc) ;

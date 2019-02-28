@@ -100,14 +100,13 @@ int main (int argc, char **argv)
 
     PRLEVEL (p, ("L=tril(LU,-1)+eye(size(LU));\n"));
     PRLEVEL (p, ("U=triu(LU); U=U(1:n,:);\n"));
+    PRLEVEL (p, ("U=sparse(U); L=sparse(L);\n"));
     PRLEVEL (p, ("spparms('spumoni',3);\n" ));
-    //PRLEVEL (p, ("fprintf('Matlab\\n');\n" ));
-    PRLEVEL (p, ("[l,u,p]=lu(S);\n" ));
-    PRLEVEL (p, ("matlabErr = norm(p*S-l*u)\n" ));
+    PRLEVEL (p, ("[l,u,p]=lu(S, 'vector');\n" ));
+    PRLEVEL (p, ("matlabErr = norm(S(p,:)-l*u,'fro')\n" ));
     PRLEVEL (p, ("nnzMat= nnz(l+u) \n" ));
-
     PRLEVEL (p, ("fprintf('Paru\\n');\n"));
-    PRLEVEL (p, ("myErr = norm(S(oldR,c)-L*U)\n" ));
+    PRLEVEL (p, ("myErr = norm(S(oldR,c)-L*U,'fro')\n" ));
     PRLEVEL (p, ("mynnz= nnz(L+U) \n" ));
     //PRLEVEL (p, ("if( (norm(S(oldR,c)-L*U)) < err )\n" ));
     PRLEVEL (p, ("if(myErr <= 100*matlabErr || myErr<err)\n" ));
