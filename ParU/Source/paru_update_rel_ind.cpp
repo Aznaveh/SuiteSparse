@@ -41,12 +41,24 @@ Int partition (Int *srt_lst, Int *ind_lst, Int low, Int high){
 }
 
 void paru_qsort (Int *srt_lst, Int *ind_lst, Int low, Int high){
-    if (low < high)
+    DEBUGLEVEL(0);
+    PRLEVEL (1, ("%% low=%ld high=%ld  \n",low, high)); 
+    if (low < high-15)
     {
         Int piv = partition (srt_lst, ind_lst, low, high);
 
         paru_qsort(srt_lst, ind_lst, low, piv-1);
         paru_qsort(srt_lst, ind_lst,  piv+1, high);
+    }
+    else{
+        for (Int i=low; i <= high; i++)
+            for (Int j=i; j <= high; j++){
+                if (srt_lst[i] > srt_lst [j]){
+                    swap_key(srt_lst, ind_lst, i, j);
+                }
+            }
+
+
     }
 }
 
@@ -59,19 +71,8 @@ void paru_sort (Int *srt_lst, Int *ind_lst, Int len){
                     i, srt_lst[i], i, ind_lst[i]));
     }
 #endif
-    if (len < 15 ){  // simple selection sort
-        PRLEVEL (1, ("%% Selection sort\n")); 
-        for (Int i=0; i < len ; i++)
-            for (Int j=i; j < len ; j++){
-                if (srt_lst[i] > srt_lst [j]){
-                    swap_key(srt_lst, ind_lst, i, j);
-                }
-            }
-    }
-    else{ 
-        PRLEVEL (1, ("%% Qsort\n")); 
-        paru_qsort (srt_lst, ind_lst, 0, len-1);
-    }
+
+    paru_qsort (srt_lst, ind_lst, 0, len-1);
 
 
 #ifndef NDEBUG
