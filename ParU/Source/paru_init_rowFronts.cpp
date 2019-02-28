@@ -242,7 +242,9 @@ paru_matrix *paru_init_rowFronts (
         }
     }
 
-    PRLEVEL (0, ("InMatrix=[\n") ); //MATLAB matrix
+    PRLEVEL (0, ("InMatrix=[\n") ); //MATLAB matrix, 
+    //Activating after this parts comments will break the matlab input matrix
+
     // allocating row tuples, elements and updating column tuples
     for(Int row = 0; row < m ; row++){  // row is number of row in A
         Int e = LUsym->row2atree[row]; //element number in augmented tree
