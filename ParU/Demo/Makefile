@@ -14,9 +14,11 @@ I = -I../../include $(I_WITH_SPQRGPU) -I ../Include
 C = $(CXX) $(CF) $(SPQR_CONFIG) $(CONFIG_PARTITION) $(CONFIG_GPU) $(I) \
 	$(CHOLMOD_CONFIG)
 
-LIBS = $(CLIB) $(FLIB) $(TBB) $(GPULIB)
+LIBS = $(CLIB) $(FLIB) $(TBB) $(GPULIB) 
+#-lasan
 
-FLAG = -Wno-write-strings
+FLAG = -Wno-write-strings 
+#-O0 -fsanitize=address -g
 
 all:
 	$(C) $(FLAG) testazny.cpp -o testazny $(LIBS)
@@ -42,12 +44,20 @@ run:
 #	./testazny < ../Matrix/LFAT5.mtx	#14x14
 #	./testazny < ../Matrix/lfat5b.mtx   #14x14
 #
-#	./testazny < ../Matrix/lp_e226_transposed.mtx   #427x223 SEG FAULT
+#	./testazny < ../Matrix/ParUTst/tmp.mtx
 #
+#	./testazny < ../Matrix/lp_e226_transposed.mtx   #427x223
 #	./testazny < ../Matrix/lp_e226.mtx 		# m >=n 
 #	./testazny < ../Matrix/lp_share1b.mtx 	# m >=n 
 #	./testazny < ../Matrix/lpi_galenet.mtx 	# m >=n 
 #	./testazny < ../Matrix/lpi_itest6.mtx  	# m >=n 
+#
+#	./testazny < ../Matrix/ParUTst/lpi_galenet_transposed.mtx
+#	./testazny < ../Matrix/ParUTst/lpk_b2_transposed.mtx
+#	./testazny < ../Matrix/ParUTst/lp_kb2/lp_kb2.mtx
+#	./testazny < ../Matrix/ParUTst/lpi_woodinfe/lpi_woodinfe.mtx
+#	./testazny < ../Matrix/ParUTst/lpi_ex72a/lpi_ex72a.mtx
+#
 #	./testazny < ../Matrix/n3c4-b4.mtx    	# m >=n 
 #	./testazny < ../Matrix/permuted_b1_ss.mtx  #7x7
 #	./testazny < ../Matrix/problem.mtx      # m >=n
@@ -57,16 +67,18 @@ run:
 #	./testazny < ../Matrix/s32.mtx		   #3x2
 #	./testazny < ../Matrix/Tina_AskCal.mtx       #EMPTY col
 #	./testazny < ../Matrix/Tina_AskCal_perm.mtx  #EMPTY col
-#	./testazny < ../Matrix/west0067.mtx 	#67x67!
-#	./testazny < ../Matrix/ParUTst/west0132/west0132.mtx
-#	./testazny < ../Matrix/ParUTst/west0156/west0156.mtx
-#	./testazny < ../Matrix/ParUTst/west0167/west0167.mtx
-#	./testazny < ../Matrix/ParUTst/west0381/west0381.mtx
-#	./testazny < ../Matrix/ParUTst/west0479/west0479.mtx
-#	./testazny < ../Matrix/ParUTst/west0497/west0497.mtx
+#
+	./testazny < ../Matrix/west0067.mtx 	#67x67!
+	./testazny < ../Matrix/ParUTst/west0132/west0132.mtx
+	./testazny < ../Matrix/ParUTst/west0156/west0156.mtx
+	./testazny < ../Matrix/ParUTst/west0167/west0167.mtx
+	./testazny < ../Matrix/ParUTst/west0381/west0381.mtx
+	./testazny < ../Matrix/ParUTst/west0479/west0479.mtx
+	./testazny < ../Matrix/ParUTst/west0497/west0497.mtx
 	./testazny < ../Matrix/ParUTst/west0655/west0655.mtx
-#	./testazny < ../Matrix/ParUTst/west0989/west0989.mtx
-
+#	./testazny < ../Matrix/ParUTst/west0989/west0989.mtx #!
+#
+#
 #	./testazny < ../Matrix/young1c.mtx     	#841x841
 #	./testazny < ../Matrix/ParUTst/az11_11.mtx   #14x14
 #	./testazny < ../Matrix/ParUTst/az88_2.mtx	 #4x4
@@ -96,19 +108,31 @@ run:
 #VGFLAGS = --tool=memcheck --leak-check=yes --show-reachable=yes -v\
 #		  --track-origins=yes --num-callers=20 \
 #		  --track-fds=yes --log-file="valgrindlogfile.log"
-VGFLAGS =  --leak-check=yes --log-file="valgrindlogfile.log"
+VGFLAGS =  --leak-check=yes  --log-file="valgrindlogfile.log"
 
 
 
 
 val:
 #	valgrind	$(VGFLAGS)	./testazny < ../Matrix/lp_share1b.mtx
+#	valgrind	$(VGFLAGS)	./testazny < ../Matrix/c32.mtx
 #	valgrind	$(VGFLAGS)	./testazny < ../Matrix/LFAT5.mtx
 #	valgrind	$(VGFLAGS)	./testazny < ../Matrix/a2.mtx 
 #	valgrind	$(VGFLAGS)	./testazny < ../Matrix/b1_ss.mtx
+#	valgrind	$(VGFLAGS)	./testazny < ../Matrix/cage3.mtx
 #	valgrind	$(VGFLAGS)	./testazny < ../Matrix/lfat5b.mtx
 #	valgrind	$(VGFLAGS)	./testazny < ../Matrix/west0067.mtx 
-	valgrind	$(VGFLAGS)	./testazny < ../Matrix/cage5.mtx
+#	valgrind	$(VGFLAGS)  ./testazny < ../Matrix/ParUTst/west0132/west0132.mtx
+#	valgrind	$(VGFLAGS)	./testazny < ../Matrix/ParUTst/west0156/west0156.mtx
+#	valgrind	$(VGFLAGS)	./testazny < ../Matrix/ParUTst/west0167/west0167.mtx
+#	valgrind	$(VGFLAGS)	./testazny < ../Matrix/ParUTst/west0381/west0381.mtx 
+#	valgrind	$(VGFLAGS)	./testazny < ../Matrix/ParUTst/west0479/west0479.mtx
+#	valgrind	$(VGFLAGS)	./testazny < ../Matrix/ParUTst/west0497/west0497.mtx
+#	valgrind	$(VGFLAGS)	./testazny < ../Matrix/ParUTst/west0655/west0655.mtx
+#	valgrind	$(VGFLAGS)	./testazny < ../Matrix/ParUTst/west0989/west0989.mtx
+#
+#	valgrind	$(VGFLAGS)	./testazny < ../Matrix/cage5.mtx
+	valgrind	$(VGFLAGS)	./testazny < ../Matrix/lp_e226_transposed.mtx   #427x223
 #
 #
 #	valgrind	$(VGFLAGS)	./testazny <  ../Matrix/Tina_AskCal.mtx
@@ -127,7 +151,6 @@ val:
 #	valgrind	$(VGFLAGS)	./testazny < ../Matrix/GD98_a.mtx
 #
 #	valgrind	$(VGFLAGS)	./testazny < ../Matrix/s32.mtx
-#
 #	valgrind	$(VGFLAGS)	./testazny < ../Matrix/c32.mtx 
 #	valgrind	$(VGFLAGS)	./testazny < ../Matrix/Groebner_id2003_aug.mtx  
 #
@@ -135,11 +158,8 @@ val:
 #	valgrind	$(VGFLAGS)	./testazny < ../Matrix/lp_e226.mtx
 
 debug:
-	g++ -g   -O3 -fexceptions -fPIC -fopenmp   -I../../include   aztest.cpp -o \
-            dtest.out -L../../lib -lspqr -lsuitesparseconfig -lcholmod -lamd \
-            -lcolamd -lccolamd -lcamd -lmetis  -lm -lrt \
-            -Wl,-rpath=../../lib -llapack -lopenblas 
-
+	$(C) $(FLAG) -g testazny.cpp -o testazny $(LIBS)
+	gdb ./testazny < ../Matrix/c32.mtx		#3x2 	 #OK
 
 purge: distclean
 
