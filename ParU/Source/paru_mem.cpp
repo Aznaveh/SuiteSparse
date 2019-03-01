@@ -54,8 +54,10 @@ void paru_free (Int n, Int size, void *p,  cholmod_common *cc){
 #endif
     if(p != NULL)
         cholmod_l_free (n,   size, p, cc);
-    else
-        printf("freeing a NULL pointer\n");
+#ifndef NDEBUG
+    if(p == NULL)
+        PRLEVEL (1, ("%% freeing a NULL pointer = \n" ));
+#endif
     PRLEVEL (1, ("%% free %ld in %p total= %ld\n", 
                 n*size, p, free_count));
 

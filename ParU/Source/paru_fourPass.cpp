@@ -517,9 +517,16 @@ void paru_fourPass (paru_matrix *paruMatInfo,
         }
         curRowTupleList->numTuple = pdst;
         PRLEVEL (1, ("%% new number of tuples=%ld\n", pdst));
+
+
+        paru_free ( 2*curFr->nrows, sizeof(Int), curFr->rWork, cc); 
+        curFr->rWork = NULL;
+        paru_free ( 2*curFr->ncols, sizeof(Int), curFr->cWork, cc); 
+        curFr->cWork = NULL;
+
 #ifndef NDEBUG            
         if (p <= 0 )
             paru_print_tupleList (RowList, r);
 #endif
     }
-}
+    }

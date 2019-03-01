@@ -158,6 +158,8 @@ typedef struct	/* Element */
         ncols,		/* number of columns */
         rValid,     /* validity of relative row index */
         cValid;     /* validity of relative column index */
+    Int *cWork,     /* work space for current front; basically for sort */
+        *rWork;
 
     /* followed in memory by:
        Int
@@ -168,9 +170,7 @@ typedef struct	/* Element */
                                                             current front
        relRowInd [0..nrows-1],	relative indices of this element for 
                                                             current front
-
        double ncols*nrows; numeric values
-
        */
 
 } Element ; // contribution block

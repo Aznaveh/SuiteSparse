@@ -72,6 +72,7 @@ void paru_sort (Int *srt_lst, Int *ind_lst, Int len){
     }
 #endif
     paru_qsort (srt_lst, ind_lst, 0, len-1);
+    DEBUGLEVEL(0);
 #ifndef NDEBUG
     PRLEVEL (1, ("%% After sort\n")); 
     for (Int i=0; i < len; i++){ 
@@ -98,11 +99,13 @@ Int bin_srch  (Int *srt_lst, Int *ind_lst, Int l, Int r, Int num){
 void paru_update_rel_ind (Element *el, Element *cb_el, 
         char rc, cholmod_common *cc) 
 {
-    DEBUGLEVEL(0);
+    DEBUGLEVEL(1);
     Int *el_Index,      // row/col global index of destination
         *cb_el_Index,   // row/col global index of source
         *RelIndex,      // relative row/col index of source to be updated
-        len_cb, len_el;       // number of rows/colum of el and cb_el
+        len_cb, len_el,       // number of rows/colum of el and cb_el
+        *Work;            //Work space for sorting number or indices
+
 
     if (rc == 'r'){ //row relative index update
         el_Index = rowIndex_pointer (el);
@@ -110,6 +113,7 @@ void paru_update_rel_ind (Element *el, Element *cb_el,
         RelIndex = relRowInd (cb_el);
         len_cb = cb_el->nrows;
         len_el = el->nrows;
+        Work = el->rWork;
     }
     else{
         ASSERT (rc == 'c');
@@ -118,6 +122,7 @@ void paru_update_rel_ind (Element *el, Element *cb_el,
         RelIndex = relColInd (cb_el);
         len_cb = cb_el->ncols;
         len_el = el->ncols;
+        Work = el->cWork;
     }
 
 
@@ -151,17 +156,28 @@ void paru_update_rel_ind (Element *el, Element *cb_el,
     } 
     else{
 
-        PRLEVEL (1, ("%% Sort and Binary search\n"));
-        Int *tmp_sp = (Int*) paru_alloc (2*len_el, sizeof(Int), cc);
-        Int *srt_lst = tmp_sp;         // list of relative indices; keys of sort
-        Int *ind_lst = tmp_sp + len_el;//list of indices 
 
-        for (Int i=0; i < len_el ; i++){  //initialize the lists
-            srt_lst[i] = el_Index [i];
-            ind_lst[i] = i;
+        PRLEVEL (1, ("%% Sort and Binary search\n"));
+        if (Work == NULL ){  //Not sorted so far
+            Work= (Int*) paru_alloc (2*len_el, sizeof(Int), cc);
+            if (rc == 'r')
+                el->rWork = Work;
+            else
+                el->cWork = Work;
+
+            Int *srt_lst = Work;      // list of relative indices; keys of sort   
+            Int *ind_lst = Work + len_el; //list of indices 
+
+            for (Int i=0; i < len_el ; i++){  //initialize the lists
+                srt_lst[i] = el_Index [i];
+                ind_lst[i] = i;
+            }
+            paru_sort (srt_lst, ind_lst, len_el);
         }
 
-        paru_sort (srt_lst, ind_lst, len_el);
+        ASSERT (Work != NULL );
+        Int *srt_lst = Work;      // list of relative indices; keys of sort   
+        Int *ind_lst = Work + len_el; //list of indices 
 
         for (Int i=0; i < len_cb ; i++){
             Int global_ind = cb_el_Index[i];
@@ -172,6 +188,10 @@ void paru_update_rel_ind (Element *el, Element *cb_el,
             RelIndex [i] = found;
             ASSERT (found != -1);
         }
-        paru_free ( 2*len_el, sizeof(Int), tmp_sp, cc); 
+        //       paru_free ( 2*len_el, sizeof(Int), Work, cc); 
+        //       if (rc == 'r')
+        //           el->rWork = NULL;
+        //       else
+        //           el->cWork = NULL;
     }
 }
