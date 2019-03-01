@@ -126,7 +126,8 @@ void paru_update_rel_ind (Element *el, Element *cb_el,
     }
 
 
-    if (len_cb*len_el < (len_cb+len_el)*log2(len_el) ){ //do a linear search
+    if (len_cb*len_el < (len_cb+len_el)*log2(len_el) && Work == NULL ){
+        //do a linear search if not sorted already and it is worth it
         PRLEVEL (1, ("%% Linear search\n"));
         for (Int i=0; i < len_cb ; i++){
             Int global_ind = cb_el_Index[i];
