@@ -286,6 +286,9 @@ Element *paru_create_element (Int nrows, Int ncols,
 void assemble_col (const double *sR, double *dR, Int m, const Int *relRowInd);
 void assemble_row (const double *sM, double *dM, Int sm, Int sn, Int dm, Int sR, 
                     Int dR, const Int *relColInd);
+void assemble_all (double *s, double *d, Int sm, Int sn, Int dm,    
+        Int *relRowInd, Int *relColInd);
+ 
 Int paru_trsm(double *pF, double *uPart, Int fp, Int rowCount, Int colCount);
 Int paru_dgemm(double *pF, double *uPart, double *el, Int fp, 
         Int rowCount, Int colCount);
