@@ -127,12 +127,12 @@ void paru_assemble (
             /*! TODO: Never negate e or f for now... keep it?	 */
             if(e < 0 || curColIndex < 0 ) continue;  //already deleted
 
-            Element *curEl = elementList[e];
-            Int mEl = curEl->nrows;
-            Int *el_rowIndex = rowIndex_pointer (curEl); //pointers to row index
-            Int *rowRelIndex = relRowInd (curEl);
-            Int *colRelIndex    = relColInd (curEl);
-            Int *el_colIndex = colIndex_pointer (curEl);
+            Element *el = elementList[e];
+            Int mEl = el->nrows;
+            Int *el_rowIndex = rowIndex_pointer (el); //pointers to row index
+            Int *rowRelIndex = relRowInd (el);
+            Int *colRelIndex    = relColInd (el);
+            Int *el_colIndex = colIndex_pointer (el);
 
             PRLEVEL (1, ("%%point to col = %ld\n", el_colIndex[curColIndex]));
             /*! TODO: Keep the tuple or delete it?	 */
@@ -149,14 +149,14 @@ void paru_assemble (
                         e, elCol[e], elCMark));
 
 
-            if(curEl->rValid !=  time_f){  // an element never seen before
-                curEl->rValid = time_f;
+            if(el->rValid !=  time_f){  // an element never seen before
+                el->rValid = time_f;
 #ifndef NDEBUG            
-                if (curEl->rValid >  time_f )
+                if (el->rValid >  time_f )
                     PRLEVEL (0, ("%%time_f =%ld  rVal= %ld\n",
-                                time_f , curEl->rValid));
+                                time_f , el->rValid));
 #endif               
-                ASSERT(curEl->rValid <= time_f);
+                ASSERT(el->rValid <= time_f);
             }
             else { 
                 elCol [e]--;    //keep track of number of cols
@@ -242,7 +242,7 @@ void paru_assemble (
     /**** 2 ********  assembling the pivotal part of the front ****************/
     /* 
      *                  
-     *  curEl           nEl           
+     *  el           nEl           
      *              6, 7, 3, 12
      *             ____________
      *          23 | X  Y  .  .     stored in memory like this:
@@ -279,14 +279,14 @@ void paru_assemble (
 
             // Assembly of column curColIndex of e in colIndexF
 
-            Element *curEl = elementList[e];
-            Int mEl = curEl->nrows;
-            Int nEl = curEl->ncols;
+            Element *el = elementList[e];
+            Int mEl = el->nrows;
+            Int nEl = el->ncols;
 
-            Int *el_colIndex = colIndex_pointer (curEl);
-            Int *el_rowIndex = rowIndex_pointer (curEl);
-            Int *rowRelIndex = relRowInd (curEl);
-            Int *colRelIndex    = relColInd (curEl);
+            Int *el_colIndex = colIndex_pointer (el);
+            Int *el_rowIndex = rowIndex_pointer (el);
+            Int *rowRelIndex = relRowInd (el);
+            Int *colRelIndex    = relColInd (el);
             if (el_colIndex [curColIndex]< 0 ) continue;
             ASSERT (el_colIndex[curColIndex] == c);
 
@@ -294,7 +294,7 @@ void paru_assemble (
             PRLEVEL (1, ("%% curColIndex =%ld\n", curColIndex));
 
             ASSERT (curColIndex < nEl);
-            double *el_Num = numeric_pointer (curEl);
+            double *el_Num = numeric_pointer (el);
 #ifndef NDEBUG // print the element which is going to be assembled from
             p = 1;
             PRLEVEL (p, ("%% col=%ld, element=%ld,curColIndex=%ld\n", c, e,
@@ -313,7 +313,7 @@ void paru_assemble (
             //FLIP(el_colIndex[curColIndex]); //marking column as assembled
             el_colIndex[curColIndex] = -1;
             colRelIndex [curColIndex] = -1;
-            curEl->ncolsleft--;     // After each assembly Az: Added later
+            el->ncolsleft--;     // After each assembly Az: Added later
 
 
 #ifndef NDEBUG  // Printing the pivotal front
@@ -474,27 +474,27 @@ void paru_assemble (
             Int curRowIndex = curTpl.f;
             if(e < 0 || curRowIndex < 0) continue;
 
-            Element *curEl = elementList[e];
-            Int mEl = curEl->nrows;
-            Int nEl = curEl->ncols;
-            Int *el_rowIndex = rowIndex_pointer (curEl);
-            Int *el_colIndex = colIndex_pointer (curEl);
-            Int *colRelIndex = relColInd (curEl);
-            Int *rowRelIndex = relRowInd (curEl);
+            Element *el = elementList[e];
+            Int mEl = el->nrows;
+            Int nEl = el->ncols;
+            Int *el_rowIndex = rowIndex_pointer (el);
+            Int *el_colIndex = colIndex_pointer (el);
+            Int *colRelIndex = relColInd (el);
+            Int *rowRelIndex = relRowInd (el);
 
             if (el_rowIndex [curRowIndex] < 0 ) continue;
             ASSERT (el_rowIndex[curRowIndex] == curFsRow);
 
             rowRelIndex [curTpl.f] = curFsRow;
 
-            if(curEl->cValid !=  time_f){// an element never seen before
-                curEl->cValid = time_f;
+            if(el->cValid !=  time_f){// an element never seen before
+                el->cValid = time_f;
 #ifndef NDEBUG            
-                if (curEl->cValid >  time_f )
+                if (el->cValid >  time_f )
                     PRLEVEL (0, ("%%time_f =%ld  cVal= %ld\n", 
-                                time_f , curEl->cValid));
+                                time_f , el->cValid));
 #endif    
-                ASSERT(curEl->cValid <= time_f);
+                ASSERT(el->cValid <= time_f);
 #ifndef NDEBUG
                 if ( elCol [e] >= elCMark )
                     PRLEVEL (1, ("%% element %ld can be eaten wholly\n",e));
@@ -593,13 +593,13 @@ void paru_assemble (
             Int e = curTpl.e;
             Int curRowIndex = curTpl.f;
 
-            Element *curEl = elementList[e];
-            Int mEl = curEl->nrows;
-            Int nEl = curEl->ncols;
-            Int *el_rowIndex = rowIndex_pointer (curEl);
-            Int *el_colIndex = colIndex_pointer (curEl);
-            Int *rowRelIndex = relRowInd (curEl);
-            Int *colRelIndex = relColInd (curEl);
+            Element *el = elementList[e];
+            Int mEl = el->nrows;
+            Int nEl = el->ncols;
+            Int *el_rowIndex = rowIndex_pointer (el);
+            Int *el_colIndex = colIndex_pointer (el);
+            Int *rowRelIndex = relRowInd (el);
+            Int *colRelIndex = relColInd (el);
 
             if(el_rowIndex[curRowIndex] < 0 ) continue; 
 
@@ -608,7 +608,7 @@ void paru_assemble (
             ASSERT (curRowIndex < mEl);
             PRLEVEL (1, ("%% curColIndex =%ld\n", curRowIndex));
 
-            double *el_Num = numeric_pointer (curEl);
+            double *el_Num = numeric_pointer (el);
             PRLEVEL (1, ("%% element= %ld  nEl =%ld \n",e, nEl));
 
             assemble_row (el_Num, uPart, mEl, nEl, fp, 
@@ -617,7 +617,7 @@ void paru_assemble (
             //FLIP(el_rowIndex[curRowIndex]); //marking column as assembled
             el_rowIndex[curRowIndex] = -1;
             rowRelIndex [curRowIndex] = -1;
-            curEl->nrowsleft--;  // After each assembly Az: Added later
+            el->nrowsleft--;  // After each assembly Az: Added later
 
         }
     }
@@ -677,28 +677,28 @@ void paru_assemble (
 
     Int *snM = LUsym->super2atree;
     Int eli = snM [f]; // Element index of the one that is going to be assembled
-    Element *el;
+    Element *curEl;
     PRLEVEL (1, ("%% rowCount=%ld, colCount=%ld, fp=%ld\n",
                 rowCount, colCount, fp));
-    PRLEVEL (1, ("%% el is %ld by %ld\n",rowCount-fp,colCount));
+    PRLEVEL (1, ("%% curEl is %ld by %ld\n",rowCount-fp,colCount));
     if (fp <= rowCount ){ 
-        el = elementList[eli] = paru_create_element (rowCount-fp,
+        curEl = elementList[eli] = paru_create_element (rowCount-fp,
                 colCount, 0 ,cc); // allocating an un-initialized part of memory
         // While insided the DGEMM BETA == 0
-        if ( el == NULL ){
+        if ( curEl == NULL ){
             printf ("%% Out of memory when tried to allocate current CB %ld",
                     eli);
             return;
         }
-        PRLEVEL (1, ("%% el =%p\n", el));
+        PRLEVEL (1, ("%% curEl =%p\n", curEl));
     }
-    // Initializing el global indices
-    Int *el_colIndex = colIndex_pointer (el);
+    // Initializing curEl global indices
+    Int *el_colIndex = colIndex_pointer (curEl);
     for (Int i = 0; i < colCount; ++ i) {
         el_colIndex [i] = CBColList[i];
         Tuple colTuple;
     }
-    Int *el_rowIndex = rowIndex_pointer (el);
+    Int *el_rowIndex = rowIndex_pointer (curEl);
     for (Int i = fp; i < rowCount; ++ i) {
         Int locIndx = i-fp; 
         el_rowIndex [locIndx] = fsRowList[i];
@@ -715,7 +715,7 @@ void paru_assemble (
 #endif
 
 
-    double *el_numbers = numeric_pointer (el);
+    double *el_numbers = numeric_pointer (curEl);
     paru_dgemm(pivotalFront, uPart, el_numbers, fp, rowCount, colCount);
 
 #ifndef NDEBUG
