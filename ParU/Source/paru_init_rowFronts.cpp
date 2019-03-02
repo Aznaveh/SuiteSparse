@@ -264,6 +264,8 @@ paru_matrix *paru_init_rowFronts (
 
         PRLEVEL (1, ("%% element %ld = %ld x %ld\n", e, nrows, ncols));
 
+        row_degree_bound [row] = ncols; //Initialzing row degree
+
         Element *curEl = elementList[e] = paru_create_element (nrows, ncols,
                 0 ,cc);
        if (curEl == NULL){   //out of memory
