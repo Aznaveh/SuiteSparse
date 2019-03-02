@@ -225,6 +225,7 @@ void paru_freemat (paru_matrix **paruMatInfo_handle,
     paru_free (m+nf, sizeof(Int), Work->elCol, cc);
 
 
+    paru_free (m, sizeof(Int), paruMatInfo->row_degree_bound, cc);
     paru_free (1, sizeof(work_struct), paruMatInfo->Work, cc);
     paru_free (1, sizeof(paru_matrix), paruMatInfo, cc);
     *paruMatInfo_handle = NULL;

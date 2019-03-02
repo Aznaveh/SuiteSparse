@@ -249,6 +249,7 @@ typedef struct  /*Matrix */
     paru_fac *partial_LUs;          /* left part */
     Int *time_stamp;                /* for relative index update
                                        not initialized */
+    Int *row_degree_bound;          /* row degree size number of rows */
 }   paru_matrix;
 
 

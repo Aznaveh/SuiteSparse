@@ -97,6 +97,7 @@ void paru_fourPass (paru_matrix *paruMatInfo,
     }
     /**************************************************************************/
     double *cur_Numeric = numeric_pointer (curFr);
+    Int new_row_degree_bound_for_r ;
 
     /*****  2nd pass: over rows to count columns                    ***********/
     Int *fsRowList = Work->scratch; // fully summed row list
@@ -105,7 +106,7 @@ void paru_fourPass (paru_matrix *paruMatInfo,
         Int r = fsRowList [k];
 
         //TODO: Dr Davis changes
-        //        new_row_degree_bound_for_r = curFr->nrows ;
+        new_row_degree_bound_for_r = curFr->nrows ;
 
         tupleList *curRowTupleList = &RowList[r];
         Int numTuple = curRowTupleList->numTuple;
@@ -146,7 +147,7 @@ void paru_fourPass (paru_matrix *paruMatInfo,
                 elCol [e] = el->ncolsleft ; //initiaze
             }
             //TODO: Dr Davis changes
-            //            new_row_degree_bound_for_r += elCol [e] ;
+            new_row_degree_bound_for_r += elCol [e] ;
 
             if(el->rValid != time_f){
                 el->rValid =  time_f;
@@ -160,7 +161,6 @@ void paru_fourPass (paru_matrix *paruMatInfo,
 
                 if (elRow [e] == 0){ 
 
-                    //TODO: Dr Davis assembling all the prior fornt XXX
                     if (elCol [e] == 0){
                         // do complete assembly of e into current front, now
                         paru_update_rel_ind (curFr, el, 'r',cc) ;

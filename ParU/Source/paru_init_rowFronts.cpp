@@ -44,12 +44,23 @@ paru_matrix *paru_init_rowFronts (
 
 
 
+
     Int m,n,nf;  
 
     paruMatInfo->LUsym = LUsym;
     m = paruMatInfo->m = LUsym->m;   
     n = paruMatInfo->n = LUsym->n; 
     nf =  LUsym->nf; 
+
+    Int *row_degree_bound = (Int*) paru_alloc (m, sizeof (Int), cc);
+    if (row_degree_bound == NULL){   //out of memory
+
+        printf ("Out of memory: row_degree_bound\n");
+        return NULL;
+    }
+
+    paruMatInfo->row_degree_bound = row_degree_bound;
+ 
 
     Int *rowSize= (Int*) paru_alloc (m, sizeof (Int), cc);
     if (rowSize == NULL){   //out of memory
