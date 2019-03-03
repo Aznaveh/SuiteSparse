@@ -99,7 +99,7 @@ Int bin_srch  (Int *srt_lst, Int *ind_lst, Int l, Int r, Int num){
 void paru_update_rel_ind (Element *el, Element *cb_el, 
         char rc, cholmod_common *cc) 
 {
-    DEBUGLEVEL(1);
+    DEBUGLEVEL(0);
     Int *el_Index,      // row/col global index of destination
         *cb_el_Index,   // row/col global index of source
         *RelIndex,      // relative row/col index of source to be updated

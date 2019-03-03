@@ -40,6 +40,7 @@ void paru_fourPass (paru_matrix *paruMatInfo,
     Int colMark = Work -> colMark;
 
     Int *first = LUsym->first;
+    Int *row_degree_bound = paruMatInfo->row_degree_bound;
 
 
     Int time_f = ++paruMatInfo->time_stamp[f]; //making all the markings invalid 
@@ -98,14 +99,21 @@ void paru_fourPass (paru_matrix *paruMatInfo,
     /**************************************************************************/
     double *cur_Numeric = numeric_pointer (curFr);
     Int new_row_degree_bound_for_r ;
-
-    /*****  2nd pass: over rows to count columns                    ***********/
     Int *fsRowList = Work->scratch; // fully summed row list
+#ifndef NDEBUG            
+    Int p = 0;
+    PRLEVEL(p, ("%% Before row degree update:\n"));
+    for (Int k = fp; k < rowCount; k++){
+        Int r = fsRowList [k];
+        PRLEVEL(p, ("%% row_degree_bound[%ld]=%ld", r,row_degree_bound[r]));
+    }
+    PRLEVEL(p, ("%% \n"));
+#endif
+    /*****  2nd pass: over rows to count columns                    ***********/
     tupleList *RowList = paruMatInfo->RowList;
     for (Int k = fp; k < rowCount; k++){
         Int r = fsRowList [k];
 
-        //TODO: Dr Davis changes
         new_row_degree_bound_for_r = curFr->nrows ;
 
         tupleList *curRowTupleList = &RowList[r];
@@ -146,7 +154,6 @@ void paru_fourPass (paru_matrix *paruMatInfo,
                 el->cValid =  time_f;
                 elCol [e] = el->ncolsleft ; //initiaze
             }
-            //TODO: Dr Davis changes
             new_row_degree_bound_for_r += elCol [e] ;
 
             if(el->rValid != time_f){
@@ -194,15 +201,26 @@ void paru_fourPass (paru_matrix *paruMatInfo,
 
         }
 
-        //TODO: Dr Davis changes
-        //        old_bound_updated = row_degree_bound [r] + curFr->nrows - 1 ;
-        //        row_degree_bound [r] = min (old_bound_update, new_row_degree_bound_for_r ) ;
+        Int old_bound_updated = row_degree_bound [r] + curFr->nrows - 1 ;
+
+        row_degree_bound [r] =  // min
+            old_bound_updated < new_row_degree_bound_for_r ? 
+            old_bound_updated : new_row_degree_bound_for_r;
 
 
     }
     /**************************************************************************/
 
 
+#ifndef NDEBUG            
+    p = 0;
+    PRLEVEL(p, ("%% After row degree update:\n"));
+    for (Int k = fp; k < rowCount; k++){
+        Int r = fsRowList [k];
+        PRLEVEL(p, ("%% row_degree_bound[%ld]=%ld",r,row_degree_bound[r]));
+    }
+    PRLEVEL(p, ("%% \n"));
+#endif
     time_f = ++paruMatInfo->time_stamp[f]; //invalid all the markings
 
     /*****            3rd pass: assemble columns                 **************/
