@@ -102,12 +102,12 @@ void paru_fourPass (paru_matrix *paruMatInfo,
     Int *fsRowList = Work->scratch; // fully summed row list
 #ifndef NDEBUG            
     Int p = 0;
-    PRLEVEL(p, ("%% Before row degree update:\n"));
+    PRLEVEL(p, ("%% Before row degree update:\n%% "));
     for (Int k = fp; k < rowCount; k++){
         Int r = fsRowList [k];
-        PRLEVEL(p, ("%% row_degree_bound[%ld]=%ld", r,row_degree_bound[r]));
+        PRLEVEL(p, (" rowBound[%ld]=%ld", r,row_degree_bound[r]));
     }
-    PRLEVEL(p, ("%% \n"));
+    PRLEVEL(p, ("\n"));
 #endif
     /*****  2nd pass: over rows to count columns                    ***********/
     tupleList *RowList = paruMatInfo->RowList;
@@ -214,12 +214,12 @@ void paru_fourPass (paru_matrix *paruMatInfo,
 
 #ifndef NDEBUG            
     p = 0;
-    PRLEVEL(p, ("%% After row degree update:\n"));
+    PRLEVEL(p, ("%% After row degree update:\n%% "));
     for (Int k = fp; k < rowCount; k++){
         Int r = fsRowList [k];
-        PRLEVEL(p, ("%% row_degree_bound[%ld]=%ld",r,row_degree_bound[r]));
+        PRLEVEL(p, (" rowBound[%ld]=%ld",r,row_degree_bound[r]));
     }
-    PRLEVEL(p, ("%% \n"));
+    PRLEVEL(p, ("\n"));
 #endif
     time_f = ++paruMatInfo->time_stamp[f]; //invalid all the markings
 
