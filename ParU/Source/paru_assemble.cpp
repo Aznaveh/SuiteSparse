@@ -370,7 +370,9 @@ void paru_assemble (
 
     /* using the rest of scratch for permutation; Not sure about 1  */
     BLAS_INT *ipiv = (BLAS_INT*) (Work->scratch+rowCount);
-    Int fac = paru_factorize (pivotalFront, fsRowList, rowCount, fp, ipiv);
+    //Int fac = paru_dgetrf (pivotalFront, fsRowList, rowCount, fp, ipiv);
+    Int fac = paru_factorize(pivotalFront, fsRowList, rowCount, 
+            fp, paruMatInfo);
 
     /* To this point fully summed part of the front is computed and L and U    /  
      *  The next part is to find columns of nonfully summed then rows

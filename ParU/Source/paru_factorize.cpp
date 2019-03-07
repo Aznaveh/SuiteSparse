@@ -1,7 +1,7 @@
 /** =========================================================================  /
  * =======================  paru_factorize  =================================  /
  * ========================================================================== 
- * @brief Doint the BLAS factorization 
+ * @brief Doing the BLAS factorization 
  *         
  * @author Aznaveh
  **/
@@ -12,8 +12,7 @@
 extern "C" void dgetrf_( BLAS_INT *dim1, BLAS_INT *dim2, double *a, 
         BLAS_INT *lda, BLAS_INT *ipiv, BLAS_INT *info);
 
-
-Int paru_factorize (double *F, Int *fsRowList, Int lm, Int ln,
+Int paru_dgetrf (double *F, Int *fsRowList, Int lm, Int ln,
         BLAS_INT *ipiv)
 {
     DEBUGLEVEL(0);
@@ -113,3 +112,17 @@ Int paru_factorize (double *F, Int *fsRowList, Int lm, Int ln,
     }
     return 0;
 }
+
+Int paru_factorize(double *F, Int *fsRowList, Int rowCount, Int fp, 
+        paru_matrix *paruMatInfo)
+        
+{
+
+    work_struct *Work =  paruMatInfo->Work;
+    Int *row_degree_bound = paruMatInfo->row_degree_bound;
+    BLAS_INT *ipiv = (BLAS_INT*) (Work->scratch+rowCount);
+    return paru_dgetrf (F , fsRowList, rowCount, fp, ipiv);
+    return 0;
+}
+
+
