@@ -3,7 +3,6 @@
  * ========================================================================== */
 
 #include "Parallel_LU.hpp"
-#include <math.h>
 /*! @brief updating element's relative indices in regard to another element 
  * @param Element *el: current front which all the rleative indices are valid
  *        Element *cb_el: contributing element that the relative indices need to
