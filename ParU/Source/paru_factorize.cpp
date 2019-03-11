@@ -35,7 +35,7 @@ Int paru_panel_factorize (double *F, Int *fsRowList, Int m, Int n,
         paru_matrix *paruMatInfo) {
     // works like dgetf2f.f in netlib v3.0  here is a link:
     // https://github.com/xianyi/OpenBLAS/blob/develop/reference/dgetf2f.f
-    DEBUGLEVEL(0);
+    DEBUGLEVEL(1);
     PRLEVEL (1, ("%% Inside panel factorization \n"));
 
 
@@ -90,8 +90,12 @@ Int paru_panel_factorize (double *F, Int *fsRowList, Int m, Int n,
         }
         PRLEVEL (1, ("%% max value= %2.4lf\n", maxval));
         if (maxval == 0){
-            printf ("Singular submatrix\n");
-            return -1;
+            if ( j == col_end -1)
+                continue;
+            else{
+                printf ("Singular submatrix\n");
+                return -1;
+            }
         }
 
         //initialzing pivot as max numeric value
@@ -103,10 +107,10 @@ Int paru_panel_factorize (double *F, Int *fsRowList, Int m, Int n,
         //find sparsest between accepteble ones
         for (Int i = j; i < row_end; i++) 
             if ( fabs(TOLER*maxval) < fabs(F[j*m+i]) &&//numerically acceptalbe
-                row_degree_bound[i] < row_deg_sp){     // and sparser
-                    piv = F[j*m+i];
-                    row_deg_sp = row_degree_bound[i];
-                    row_sp = i;
+                    row_degree_bound[i] < row_deg_sp){     // and sparser
+                piv = F[j*m+i];
+                row_deg_sp = row_degree_bound[i];
+                row_sp = i;
             }
 
         PRLEVEL (1, ("%% piv value= %2.4lf\n", piv));
@@ -116,7 +120,9 @@ Int paru_panel_factorize (double *F, Int *fsRowList, Int m, Int n,
 
 #ifndef NDEBUG  // Printing the pivotal front
         p = 1;
-        PRLEVEL (p, ("%% After Swaping`\n"));
+        if (row_sp != row_max)
+            PRLEVEL (p, ("%% \n"));
+        PRLEVEL (p, ("%% After Swaping\n"));
         PRLEVEL (p, (" ;\n"));
         for (Int r = 0; r < row_end; r++){
             PRLEVEL (p, ("%% %ld\t", fsRowList [r]));
@@ -292,7 +298,7 @@ Int paru_factorize(double *F, Int *fsRowList, Int rowCount, Int fp,
     Int *row_degree_bound = paruMatInfo->row_degree_bound;
     BLAS_INT *ipiv = (BLAS_INT*) (Work->scratch+rowCount);
     return paru_panel_factorize ( F, fsRowList, rowCount, fp, 
-            fp, 0, rowCount, paruMatInfo);
-    //    return paru_dgetrf (F , fsRowList, rowCount, fp, ipiv);
+                fp, 0, rowCount, paruMatInfo);
+//    return paru_dgetrf (F , fsRowList, rowCount, fp, ipiv);
     return 0;
 }
