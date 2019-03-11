@@ -25,34 +25,73 @@ void swap_rows(double *F, Int *fsRowList, Int m, Int n, Int r1, Int r2){
     //This function also swap rows r1 and r2 wholly and indices 
     if(r1 == r2) return;
     swap(fsRowList[r1], fsRowList[r2]);
-    for (Int i=0; i < n; i++){
-        swap(F[r1*m+i],F[r2*m+i]);
+    for (Int j=0; j < n; j++){   //each column
+        swap(F[j*m+r1],F[j*m+r2]);
     }
 }
 
 Int paru_panel_factorize (double *F, Int *fsRowList, Int m, Int n, 
-        const Int panel_width, Int panel_num, Int num_rows, 
+        const Int panel_width, Int panel_num, Int row_end, 
         paru_matrix *paruMatInfo) {
     // works like dgetf2f.f in netlib v3.0  here is a link:
     // https://github.com/xianyi/OpenBLAS/blob/develop/reference/dgetf2f.f
+    DEBUGLEVEL(0);
+    PRLEVEL (1, ("%% Inside panel factorization \n"));
+
 
     Int *row_degree_bound = paruMatInfo->row_degree_bound;
-    Int panel_point = panel_num*panel_width;
+    Int col_st = panel_num*panel_width; // panel starting column
 
-    ASSERT (panel_point < m);
+    PRLEVEL (1, ("%% col_st= %ld\n", col_st));
+    PRLEVEL (1, ("%% row_end= %ld\n", row_end));
 
-    for (Int i=0; i < panel_width; i++){ //column ith of the panel
 
-        Int row_max = panel_point;
+    //  col_st <= panel columns < col_end
+    //     last panel might be smaller
+    Int col_end = (col_st + panel_width < n ) ? 
+        col_st + panel_width : n ;
+
+    Int num_col_panel=  col_end - col_st ;
+
+
+
+#ifndef NDEBUG  // Printing the pivotal front
+    Int p = 1;
+    PRLEVEL (p, ("%% Starting the factorization\n"));
+    PRLEVEL (p, (" ;\n"));
+    for (Int r = 0; r < row_end; r++){
+        PRLEVEL (p, ("%% %ld\t", fsRowList [r]));
+        for (Int c = 0; c < num_col_panel; c++){
+            PRLEVEL (p, (" %2.5lf\t", F[c*row_end+ r]));
+        }
+        PRLEVEL (p, ("\n"));
+    }
+#endif
+ 
+    //column ith of the panel
+    for (Int j = col_st; j < col_end ; j++){ 
+
+        PRLEVEL (1, ("%% j = %ld\n", j));
+
+        //Initializing maximum element in the column
+        Int row_max = j;
         Int row_deg_max = row_degree_bound[row_max];
-        double maxval = F[i*m+row_max];
+        double maxval = F[ j*m + row_max ];
+        PRLEVEL (1, ("%% before search max value= %2.4lf\n", maxval));
 
         //find max
-        for (Int j = panel_point+1 ; j < num_rows; j++){ 
-            if (maxval < F[i*m+j]){
-                row_max = j; row_deg_max = row_degree_bound[j];
-                maxval = F[i*m+j];
+        for (Int i = j+1 ; i < row_end; i++){ 
+            PRLEVEL (1, ("%%i=%ld value= %2.4lf\n", i, F[j*m+i]));
+            if (fabs (maxval) < fabs(F[j*m+i])){
+                row_max = i; 
+                row_deg_max = row_degree_bound[i];
+                maxval = F[j*m + i];
             }
+        }
+        PRLEVEL (1, ("%% max value= %2.4lf\n", maxval));
+        if (maxval == 0){
+            printf ("Singular submatrix\n");
+            return -1;
         }
 
         //initialzing pivot as max numeric value
@@ -62,39 +101,88 @@ Int paru_panel_factorize (double *F, Int *fsRowList, Int m, Int n,
 
 
         //find sparsest between accepteble ones
-        for (Int j = panel_point; j < num_rows; j++){ 
-            if ( TOLER*maxval < F[i*m+j] ) //numerically acceptalbe
-                if (row_degree_bound[j] < row_deg_sp){
-                    piv = F[i*m+j];
-                    row_deg_sp = row_degree_bound[j];
-                    row_sp = j;
+        for (Int i = j; i < row_end; i++) 
+            if ( fabs(TOLER*maxval) < fabs(F[j*m+i]) &&//numerically acceptalbe
+                row_degree_bound[i] < row_deg_sp){     // and sparser
+                    piv = F[j*m+i];
+                    row_deg_sp = row_degree_bound[i];
+                    row_sp = i;
             }
 
-        }
-
+        PRLEVEL (1, ("%% piv value= %2.4lf\n", piv));
         //swap rows
-        swap_rows (F, fsRowList, m , n, panel_point, row_sp);
+        PRLEVEL (1, ("%% Swaping rows j=%ld, spr=%ld\n", j, row_sp));
+        swap_rows (F, fsRowList, m , n, j, row_sp);
+
+#ifndef NDEBUG  // Printing the pivotal front
+        p = 1;
+        PRLEVEL (p, ("%% After Swaping`\n"));
+        PRLEVEL (p, (" ;\n"));
+        for (Int r = 0; r < row_end; r++){
+            PRLEVEL (p, ("%% %ld\t", fsRowList [r]));
+            for (Int c = 0; c < num_col_panel; c++){
+                PRLEVEL (p, (" %2.5lf\t", F[c*row_end+ r]));
+            }
+            PRLEVEL (p, ("\n"));
+        }
+#endif
+
 
         //dscal //TODO?: loop unroll is also possible
-        for (Int j = panel_point+1 ; j < num_rows; j++){ 
-            F[i*m+j]= F[i*m+j]/piv;
+
+        if ( j < row_end-1){
+
+            PRLEVEL (1, ("%% dscal\n"));
+            for (Int i = j +1 ; i < row_end; i++){ 
+                PRLEVEL (1, ("%%i=%ld before cal value= %2.4lf", i, F[j*m+i]));
+                F[j*m + i]= F[j*m + i]/piv;
+                PRLEVEL (1, (" after dscal value= %2.4lf\n", i, F[j*m+i]));
+            }
         }
 
-        //dger
-        BLAS_INT M = (BLAS_INT) num_rows-1;
-        BLAS_INT N = (BLAS_INT) n-panel_point;
-        double alpha = -1.0;
-        double *X = F+panel_point*panel_point+1;
-        BLAS_INT Incx = (BLAS_INT) 1;
-        double *Y = F+panel_point*panel_point+m;
-        BLAS_INT Incy = (BLAS_INT) m;
-        double *A =  F+panel_point*panel_point+m+1;
-        BLAS_INT lda = (BLAS_INT) m;
 
-        BLAS_DGER(&M, &N, &alpha, X ,  &Incx, Y, &Incy , A, &lda);
-        
+        //dger
+        if ( j < col_end - 1){
+            BLAS_INT M = (BLAS_INT) row_end - 1 - j ; 
+            BLAS_INT N = (BLAS_INT) col_end - 1 - j;
+            double alpha = -1.0;
+            double *X = F + j*m+j+ 1;
+            BLAS_INT Incx = (BLAS_INT) 1;
+            double *Y = F + j*m+j + m;
+            BLAS_INT Incy = (BLAS_INT) m;
+            double *A =  F + j*m+j+ m + 1;
+            BLAS_INT lda = (BLAS_INT) m;
+
+#ifndef NDEBUG  // Printing dger input
+            Int p = 1;
+            PRLEVEL (p, ("%% M =%d ",  M));
+            PRLEVEL (p, ("N =%d \n %% x= ",  N));
+            for (Int i=0; i<M; i++)
+                PRLEVEL (p, (" %lf ",  X[i] ));
+            PRLEVEL (p, ("\n %% y= ",  N));
+            for (Int j=0; j<N; j++)
+                PRLEVEL (p, (" %lf ",  Y[j*m] ));
+            PRLEVEL (p, ("\n"));
+
+#endif
+            BLAS_DGER(&M, &N, &alpha, X ,  &Incx, Y, &Incy , A, &lda);
+        }
+
+#ifndef NDEBUG  // Printing the pivotal front
+        Int p = 1;
+        PRLEVEL (p, ("%% After dger\n"));
+        PRLEVEL (p, (" ;\n"));
+        for (Int r = 0; r < row_end; r++){
+            PRLEVEL (p, ("%% %ld\t", fsRowList [r]));
+            for (Int c = 0; c < num_col_panel; c++){
+                PRLEVEL (p, (" %2.5lf\t", F[c*row_end+ r]));
+            }
+            PRLEVEL (p, ("\n"));
+        }
+#endif
 
     }
+    return 1;
 }
 
 Int paru_dgetrf (double *F, Int *fsRowList, Int lm, Int ln,
@@ -203,6 +291,8 @@ Int paru_factorize(double *F, Int *fsRowList, Int rowCount, Int fp,
     work_struct *Work =  paruMatInfo->Work;
     Int *row_degree_bound = paruMatInfo->row_degree_bound;
     BLAS_INT *ipiv = (BLAS_INT*) (Work->scratch+rowCount);
-    return paru_dgetrf (F , fsRowList, rowCount, fp, ipiv);
+    return paru_panel_factorize ( F, fsRowList, rowCount, fp, 
+            fp, 0, rowCount, paruMatInfo);
+    //    return paru_dgetrf (F , fsRowList, rowCount, fp, ipiv);
     return 0;
 }

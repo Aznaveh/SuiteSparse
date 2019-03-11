@@ -101,7 +101,7 @@ void paru_fourPass (paru_matrix *paruMatInfo,
     Int new_row_degree_bound_for_r ;
     Int *fsRowList = Work->scratch; // fully summed row list
 #ifndef NDEBUG            
-    Int p = 0;
+    Int p = 1;
     PRLEVEL(p, ("%% Before row degree update:\n%% "));
     for (Int k = fp; k < rowCount; k++){
         Int r = fsRowList [k];
@@ -213,7 +213,7 @@ void paru_fourPass (paru_matrix *paruMatInfo,
 
 
 #ifndef NDEBUG            
-    p = 0;
+    p = 1;
     PRLEVEL(p, ("%% After row degree update:\n%% "));
     for (Int k = fp; k < rowCount; k++){
         Int r = fsRowList [k];

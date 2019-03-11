@@ -338,7 +338,7 @@ void paru_assemble (
     }
 
 #ifndef NDEBUG  // Printing the pivotal front
-    p = 1;
+    p = 0;
     PRLEVEL (p, ("%% Before pivoting\n"));
     PRLEVEL (p, ("%% x =  \t"));
     for (Int c = col1; c < col2; c++) {
