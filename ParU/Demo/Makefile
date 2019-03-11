@@ -22,6 +22,12 @@ FLAG = -Wno-write-strings
 
 all:
 	$(C) $(FLAG) testazny.cpp -o testazny $(LIBS)
+
+panelF:
+	(cd ..; $(MAKE) )
+	$(C) $(FLAG) panel_factorization_test.cpp -o paneltest $(LIBS)
+	./paneltest< ../Matrix/cage3.mtx  		 #0x0 #OK
+
 	
 
 run:
@@ -68,24 +74,24 @@ run:
 #	./testazny < ../Matrix/Tina_AskCal.mtx       #EMPTY col
 #	./testazny < ../Matrix/Tina_AskCal_perm.mtx  #EMPTY col
 #
-	./testazny < ../Matrix/west0067.mtx 	#67x67!
-	./testazny < ../Matrix/ParUTst/west0132/west0132.mtx
-	./testazny < ../Matrix/ParUTst/west0156/west0156.mtx
-	./testazny < ../Matrix/ParUTst/west0167/west0167.mtx
-	./testazny < ../Matrix/ParUTst/west0381/west0381.mtx
-	./testazny < ../Matrix/ParUTst/west0479/west0479.mtx
-	./testazny < ../Matrix/ParUTst/west0497/west0497.mtx
-	./testazny < ../Matrix/ParUTst/west0655/west0655.mtx
-	./testazny < ../Matrix/ParUTst/west0989/west0989.mtx #!
-
-
-	./testazny < ../Matrix/young1c.mtx     	#841x841
-	./testazny < ../Matrix/ParUTst/az11_11.mtx   #14x14
-	./testazny < ../Matrix/ParUTst/az88_2.mtx	 #4x4
+#	./testazny < ../Matrix/west0067.mtx 	#67x67!
+#	./testazny < ../Matrix/ParUTst/west0132/west0132.mtx
+#	./testazny < ../Matrix/ParUTst/west0156/west0156.mtx
+#	./testazny < ../Matrix/ParUTst/west0167/west0167.mtx
+#	./testazny < ../Matrix/ParUTst/west0381/west0381.mtx
+#	./testazny < ../Matrix/ParUTst/west0479/west0479.mtx
+#	./testazny < ../Matrix/ParUTst/west0497/west0497.mtx
+#	./testazny < ../Matrix/ParUTst/west0655/west0655.mtx
+#	./testazny < ../Matrix/ParUTst/west0989/west0989.mtx #!
+#
+#
+#	./testazny < ../Matrix/young1c.mtx     	#841x841
+#	./testazny < ../Matrix/ParUTst/az11_11.mtx   #14x14
+#	./testazny < ../Matrix/ParUTst/az88_2.mtx	 #4x4
 #	./testazny < ../Matrix/ParUTst/bcsstk01.mtx #NO CBs 48x48 
 #	./testazny < ../Matrix/ParUTst/bcsstk03.mtx  
 #	./testazny < ../Matrix/ParUTst/bcsstk22.mtx 
-#	./testazny < ../Matrix/ParUTst/bcsstm01.mtx	
+	./testazny < ../Matrix/ParUTst/bcsstm01.mtx	
 #	./testazny < ../Matrix/ParUTst/bcsstm02.mtx	
 #	./testazny < ../Matrix/ParUTst/bcsstm05.mtx	  		
 #	./testazny < ../Matrix/ParUTst/bcsstm06.mtx	  
@@ -132,7 +138,7 @@ val:
 #	valgrind	$(VGFLAGS)	./testazny < ../Matrix/ParUTst/west0989/west0989.mtx
 #
 #	valgrind	$(VGFLAGS)	./testazny < ../Matrix/cage5.mtx
-	valgrind	$(VGFLAGS)	./testazny < ../Matrix/lp_e226_transposed.mtx   #427x223
+#	valgrind	$(VGFLAGS)	./testazny < ../Matrix/lp_e226_transposed.mtx   #427x223
 #
 #
 #	valgrind	$(VGFLAGS)	./testazny <  ../Matrix/Tina_AskCal.mtx
@@ -156,6 +162,7 @@ val:
 #
 #	valgrind	$(VGFLAGS)	./testazny < ../Matrix/a04.mtx
 #	valgrind	$(VGFLAGS)	./testazny < ../Matrix/lp_e226.mtx
+	valgrind	$(VGFLAGS)	./paneltest< ../Matrix/cage3.mtx
 
 debug:
 	$(C) $(FLAG) -g testazny.cpp -o testazny $(LIBS)
@@ -165,6 +172,7 @@ purge: distclean
 
 distclean: clean
 	- $(RM) testazny
+	- $(RM) paneltest
 	- $(RM) *.dot pfile tfile
 	- $(RM) -r $(PURGE)
 
