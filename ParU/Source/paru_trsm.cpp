@@ -44,11 +44,10 @@ Int paru_trsm(double *pF, double *uPart, Int fp, Int rowCount, Int colCount){
     BLAS_INT lda = (BLAS_INT) rowCount;
     BLAS_INT ldb = (BLAS_INT) fp;
 
-    PRLEVEL (1, ("mB=%d nB = %d alpha = %f \n", mB, nB, alpha));
-    PRLEVEL (1, ("lda =%d ldb =%d\n", lda, ldb));
-
 #ifndef NDEBUG  // Printing the  U part
     Int p = 1;
+    PRLEVEL (p, ("mB=%d nB = %d alpha = %f \n", mB, nB, alpha));
+    PRLEVEL (p, ("lda =%d ldb =%d\n", lda, ldb));
     PRLEVEL (p, ("(I)U Before Trsm: %ld x %ld\n", fp, colCount));
     for (Int i = 0; i < fp; i++){
         for (Int j = 0; j < colCount; j++){

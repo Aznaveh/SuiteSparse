@@ -79,6 +79,7 @@ Int paru_dgemm(double *pF, double *uPart,
     BLAS_INT lda = (BLAS_INT) rowCount;
     BLAS_INT ldb = (BLAS_INT) fp;
     BLAS_INT ldc = (BLAS_INT) (rowCount - fp);
+
     PRLEVEL (1, ("%% alpha =%lf  ", alpha));
     PRLEVEL (1, ("%% lda =%ld  ", lda));
     PRLEVEL (1, ("%% ldb =%ld  ", ldb));
