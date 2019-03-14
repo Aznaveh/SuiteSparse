@@ -40,18 +40,18 @@ Int paru_panel_factorize (double *F, Int *fsRowList, Int m, Int n,
 
 
     Int *row_degree_bound = paruMatInfo->row_degree_bound;
-    Int col_st = panel_num*panel_width; // panel starting column
+    Int j1 = panel_num*panel_width; // panel starting column
 
-    PRLEVEL (1, ("%% col_st= %ld\n", col_st));
+    PRLEVEL (1, ("%% j1= %ld\n", j1));
     PRLEVEL (1, ("%% row_end= %ld\n", row_end));
 
 
-    //  col_st <= panel columns < col_end
+    //  j1 <= panel columns < j2
     //     last panel might be smaller
-    Int col_end = (col_st + panel_width < n ) ? 
-        col_st + panel_width : n ;
+    Int j2 = (j1 + panel_width < n ) ? 
+        j1 + panel_width : n ;
 
-    Int num_col_panel=  col_end - col_st ;
+    Int num_col_panel=  j2 - j1 ;
 
 
 
@@ -69,7 +69,7 @@ Int paru_panel_factorize (double *F, Int *fsRowList, Int m, Int n,
 #endif
  
     //column ith of the panel
-    for (Int j = col_st; j < col_end ; j++){ 
+    for (Int j = j1; j < j2 ; j++){ 
 
         PRLEVEL (1, ("%% j = %ld\n", j));
 
@@ -90,7 +90,7 @@ Int paru_panel_factorize (double *F, Int *fsRowList, Int m, Int n,
         }
         PRLEVEL (1, ("%% max value= %2.4lf\n", maxval));
         if (maxval == 0){
-            if ( j == col_end -1)
+            if ( j == j2 -1)
                 continue;
             else{
                 printf ("Singular submatrix\n");
@@ -148,9 +148,40 @@ Int paru_panel_factorize (double *F, Int *fsRowList, Int m, Int n,
 
 
         //dger
-        if ( j < col_end - 1){
+        /*               dgemm   A := alpha *x*y**T + A
+         *
+         *
+         *                <----------fp------------------->
+         *                        j1 current j2    
+         *                         ^  panel  ^
+         *                         |         |
+         *                         |   j     |
+         *             F           |   ^     |
+         *              \  ____..._|___|_____|__________...___
+         * ^              |\      |         |                 |
+         * |              | \     |<--panel | rest of         |
+         * |              |  \    | width-> |  piv front      |
+         * |              |___\...|_______ _|_________ ... ___|
+         * |   ^    j1--> |       |\* *|    |                 |
+         * | panel        |       |**\*|    |                 |
+         * | width        |       |___|Pyyyy|                 |
+         * |   v          |____...|___|xAAAA__________...____ |
+         * |        j2--> |       |   |xAAAA|                 |
+         * rowCount       |       |   |xAAAA|                 |
+         * |              |       |   |xAAAA|                 |
+         * |              |       |   |xAAAA|                 |
+         * |              |       |row_end  |                 |
+         * |              .       .         .                 . 
+         * |              .       .         .                 . 
+         * |              .       .         .                 . 
+         * v              |___....____________________..._____|              
+         *                         
+         */
+
+
+        if ( j < j2 - 1){
             BLAS_INT M = (BLAS_INT) row_end - 1 - j ; 
-            BLAS_INT N = (BLAS_INT) col_end - 1 - j;
+            BLAS_INT N = (BLAS_INT) j2 - 1 - j;
             double alpha = -1.0;
             double *X = F + j*m+j+ 1;
             BLAS_INT Incx = (BLAS_INT) 1;
