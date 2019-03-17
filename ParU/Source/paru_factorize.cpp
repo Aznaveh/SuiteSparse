@@ -35,15 +35,12 @@ Int paru_panel_factorize (double *F, Int *fsRowList, Int m, Int n,
         paru_matrix *paruMatInfo) {
     // works like dgetf2f.f in netlib v3.0  here is a link:
     // https://github.com/xianyi/OpenBLAS/blob/develop/reference/dgetf2f.f
-    DEBUGLEVEL(0);
+    DEBUGLEVEL(1);
     PRLEVEL (1, ("%% Inside panel factorization \n"));
 
 
     Int *row_degree_bound = paruMatInfo->row_degree_bound;
     Int j1 = panel_num*panel_width; // panel starting column
-
-    PRLEVEL (1, ("%% j1= %ld\n", j1));
-    PRLEVEL (1, ("%% row_end= %ld\n", row_end));
 
 
     //  j1 <= panel columns < j2
@@ -52,8 +49,11 @@ Int paru_panel_factorize (double *F, Int *fsRowList, Int m, Int n,
         j1 + panel_width : n ;
 
     Int num_col_panel=  j2 - j1 ;
+    PRLEVEL (1, ("%% j1= %ld j2 =%ld \n", j1, j2));
+    PRLEVEL (1, ("%% row_end= %ld\n", row_end));
 
 
+    ASSERT ( row_end >= j2);
 
 #ifndef NDEBUG  // Printing the pivotal front
     Int p = 1;

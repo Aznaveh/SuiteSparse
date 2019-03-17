@@ -371,6 +371,10 @@ void paru_assemble (
     /* using the rest of scratch for permutation; Not sure about 1  */
     BLAS_INT *ipiv = (BLAS_INT*) (Work->scratch+rowCount);
     //Int fac = paru_dgetrf (pivotalFront, fsRowList, rowCount, fp, ipiv);
+    if (rowCount < fp){
+        printf ("structural problem\n");
+        exit(0);
+    }
     Int fac = paru_factorize(pivotalFront, fsRowList, rowCount, 
             fp, paruMatInfo);
 
