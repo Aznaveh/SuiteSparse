@@ -382,10 +382,11 @@ void paru_assemble (
         exit(0);
         return;
     }
-    if (ipiv [0] < 0){
-        printf ("%% Singular Matrix\n");
-        return;
-    }
+    // Not using ipiv anymore
+//    if (ipiv [0] < 0){
+//        printf ("%% Singular Matrix\n");
+//        return;
+//    }
 #ifndef NDEBUG  // Printing the list of rows
     p = 1;
     PRLEVEL (p, ("%% After factorization (inside assemble): \n"));
