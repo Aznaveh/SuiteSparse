@@ -49,15 +49,12 @@ run:
 #	./testazny < ../Matrix/Groebner_id2003_aug.mtx #HUGE not good for MATLAB
 #	./testazny < ../Matrix/LFAT5.mtx	#14x14
 #	./testazny < ../Matrix/lfat5b.mtx   #14x14
-#
 #	./testazny < ../Matrix/ParUTst/tmp.mtx
-#
 #	./testazny < ../Matrix/lp_e226_transposed.mtx   #427x223
 #	./testazny < ../Matrix/lp_e226.mtx 		# m >=n 
 #	./testazny < ../Matrix/lp_share1b.mtx 	# m >=n 
 #	./testazny < ../Matrix/lpi_galenet.mtx 	# m >=n 
 #	./testazny < ../Matrix/lpi_itest6.mtx  	# m >=n 
-#
 #	./testazny < ../Matrix/ParUTst/lpi_galenet_transposed.mtx
 #	./testazny < ../Matrix/ParUTst/lpk_b2_transposed.mtx
 #	./testazny < ../Matrix/ParUTst/lp_kb2/lp_kb2.mtx
@@ -91,7 +88,7 @@ run:
 #	./testazny < ../Matrix/ParUTst/bcsstk01.mtx #NO CBs 48x48 
 #	./testazny < ../Matrix/ParUTst/bcsstk03.mtx  
 #	./testazny < ../Matrix/ParUTst/bcsstk22.mtx 
-	./testazny < ../Matrix/ParUTst/bcsstm01.mtx	
+#	./testazny < ../Matrix/ParUTst/bcsstm01.mtx	
 #	./testazny < ../Matrix/ParUTst/bcsstm02.mtx	
 #	./testazny < ../Matrix/ParUTst/bcsstm05.mtx	  		
 #	./testazny < ../Matrix/ParUTst/bcsstm06.mtx	  
@@ -108,6 +105,36 @@ run:
 #	./testazny < ../Matrix/ParUTst/nos4/nos4.mtx  #100x100
 #	./testazny < ../Matrix/ParUTst/494_bus/494_bus.mtx #494x494
 #	./testazny < ../Matrix/ParUTst/mesh1em6/mesh1em6.mtx #48x48
+#	            UMFPACK Tests
+#	./testazny < ../../UMFPACK/Tcov/TestMat/matrix1
+#	./testazny < ../../UMFPACK/Tcov/TestMat/matrix2
+#	./testazny < ../../UMFPACK/Tcov/TestMat/matrix3
+#	./testazny < ../../UMFPACK/Tcov/TestMat/matrix4
+#	./testazny < ../../UMFPACK/Tcov/TestMat/matrix5
+#	./testazny < ../../UMFPACK/Tcov/TestMat/matrix6
+#	./testazny < ../../UMFPACK/Tcov/TestMat/matrix7
+#	./testazny < ../../UMFPACK/Tcov/TestMat/matrix8
+	./testazny < ../../UMFPACK/Tcov/TestMat/matrix10
+#	./testazny < ../../UMFPACK/Tcov/TestMat/matrix11
+#	./testazny < ../../UMFPACK/Tcov/TestMat/matrix12
+#	./testazny < ../../UMFPACK/Tcov/TestMat/matrix13
+#	./testazny < ../../UMFPACK/Tcov/TestMat/matrix14
+#	./testazny < ../../UMFPACK/Tcov/TestMat/matrix15
+#	./testazny < ../../UMFPACK/Tcov/TestMat/matrix16
+#	./testazny < ../../UMFPACK/Tcov/TestMat/matrix17
+#	./testazny < ../../UMFPACK/Tcov/TestMat/matrix18
+#	./testazny < ../../UMFPACK/Tcov/TestMat/matrix19
+#	./testazny < ../../UMFPACK/Tcov/TestMat/matrix20
+#	./testazny < ../../UMFPACK/Tcov/TestMat/matrix21
+#	./testazny < ../../UMFPACK/Tcov/TestMat/matrix22
+#	./testazny < ../../UMFPACK/Tcov/TestMat/matrix23
+#	./testazny < ../../UMFPACK/Tcov/TestMat/matrix24
+#	./testazny < ../../UMFPACK/Tcov/TestMat/matrix25
+#	./testazny < ../../UMFPACK/Tcov/TestMat/matrix26
+#	./testazny < ../../UMFPACK/Tcov/TestMat/matrix27
+#	./testazny < ../../UMFPACK/Tcov/TestMat/matrix28
+#	./testazny < ../../UMFPACK/Tcov/TestMat/matrix29
+#	./testazny < ../../UMFPACK/Tcov/TestMat/matrix30
 
 
 
