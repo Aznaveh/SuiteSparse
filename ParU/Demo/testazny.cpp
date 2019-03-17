@@ -17,9 +17,13 @@ int main (int argc, char **argv)
 
     // A = mread (stdin) ; read in the sparse matrix A
     A = (cholmod_sparse *) cholmod_l_read_matrix (stdin, 1, &mtype, cc);
+    if (A == NULL){
+        printf ("Paru: input matrix is invalid\n");
+        exit (1);
+    }
     if (mtype != CHOLMOD_SPARSE)
     {
-        printf ("input matrix must be sparse\n");
+        printf ("Paru: input matrix must be sparse\n");
         exit (1);
     }
 

@@ -105,36 +105,45 @@ run:
 #	./testazny < ../Matrix/ParUTst/nos4/nos4.mtx  #100x100
 #	./testazny < ../Matrix/ParUTst/494_bus/494_bus.mtx #494x494
 #	./testazny < ../Matrix/ParUTst/mesh1em6/mesh1em6.mtx #48x48
+#
 #	            UMFPACK Tests
-#	./testazny < ../../UMFPACK/Tcov/TestMat/matrix1
-#	./testazny < ../../UMFPACK/Tcov/TestMat/matrix2
-#	./testazny < ../../UMFPACK/Tcov/TestMat/matrix3
-#	./testazny < ../../UMFPACK/Tcov/TestMat/matrix4
-#	./testazny < ../../UMFPACK/Tcov/TestMat/matrix5
-#	./testazny < ../../UMFPACK/Tcov/TestMat/matrix6
-#	./testazny < ../../UMFPACK/Tcov/TestMat/matrix7
-#	./testazny < ../../UMFPACK/Tcov/TestMat/matrix8
-	./testazny < ../../UMFPACK/Tcov/TestMat/matrix10
-#	./testazny < ../../UMFPACK/Tcov/TestMat/matrix11
-#	./testazny < ../../UMFPACK/Tcov/TestMat/matrix12
-#	./testazny < ../../UMFPACK/Tcov/TestMat/matrix13
-#	./testazny < ../../UMFPACK/Tcov/TestMat/matrix14
-#	./testazny < ../../UMFPACK/Tcov/TestMat/matrix15
-#	./testazny < ../../UMFPACK/Tcov/TestMat/matrix16
-#	./testazny < ../../UMFPACK/Tcov/TestMat/matrix17
-#	./testazny < ../../UMFPACK/Tcov/TestMat/matrix18
-#	./testazny < ../../UMFPACK/Tcov/TestMat/matrix19
-#	./testazny < ../../UMFPACK/Tcov/TestMat/matrix20
-#	./testazny < ../../UMFPACK/Tcov/TestMat/matrix21
-#	./testazny < ../../UMFPACK/Tcov/TestMat/matrix22
-#	./testazny < ../../UMFPACK/Tcov/TestMat/matrix23
-#	./testazny < ../../UMFPACK/Tcov/TestMat/matrix24
-#	./testazny < ../../UMFPACK/Tcov/TestMat/matrix25
-#	./testazny < ../../UMFPACK/Tcov/TestMat/matrix26
-#	./testazny < ../../UMFPACK/Tcov/TestMat/matrix27
-#	./testazny < ../../UMFPACK/Tcov/TestMat/matrix28
-#	./testazny < ../../UMFPACK/Tcov/TestMat/matrix29
-#	./testazny < ../../UMFPACK/Tcov/TestMat/matrix30
+#	./testazny < ../../UMFPACK/Tcov/TestMat/matrix1  #10x10 
+#	./testazny < ../../UMFPACK/Tcov/TestMat/matrix2  #10x10 
+#	./testazny < ../../UMFPACK/Tcov/TestMat/matrix3  #10x10 
+#	./testazny < ../../UMFPACK/Tcov/TestMat/matrix4  #10x10 
+#	./testazny < ../../UMFPACK/Tcov/TestMat/matrix5  #10x10 
+#	./testazny < ../../UMFPACK/Tcov/TestMat/matrix6  #10x10 
+#	./testazny < ../../UMFPACK/Tcov/TestMat/matrix7  #10x10 
+#	./testazny < ../../UMFPACK/Tcov/TestMat/matrix8  #10x10 
+#	./testazny < ../../UMFPACK/Tcov/TestMat/matrix10  #40x40 
+#	./testazny < ../../UMFPACK/Tcov/TestMat/matrix11  #40x40 
+#!	./testazny < ../../UMFPACK/Tcov/TestMat/matrix12 #Empty Column
+#!	./testazny < ../../UMFPACK/Tcov/TestMat/matrix13 #Empty Column
+#	./testazny < ../../UMFPACK/Tcov/TestMat/matrix14  #1x1 
+#	./testazny < ../../UMFPACK/Tcov/TestMat/matrix15  #1x1 
+#	./testazny < ../../UMFPACK/Tcov/TestMat/matrix16  #1x1 
+#	./testazny < ../../UMFPACK/Tcov/TestMat/matrix17  #1x1 
+#	./testazny < ../../UMFPACK/Tcov/TestMat/matrix18  #1x1 
+#!	./testazny < ../../UMFPACK/Tcov/TestMat/matrix19 #Empty Row
+#!	./testazny < ../../UMFPACK/Tcov/TestMat/matrix20 #Empty Column
+#	./testazny < ../../UMFPACK/Tcov/TestMat/matrix21 #2x2
+#	./testazny < ../../UMFPACK/Tcov/TestMat/matrix22 #Empty Row
+#	./testazny < ../../UMFPACK/Tcov/TestMat/matrix23 #TRSM problem
+#	./testazny < ../../UMFPACK/Tcov/TestMat/matrix24 #Empty Row
+#	./testazny < ../../UMFPACK/Tcov/TestMat/matrix25 #3x3
+#	./testazny < ../../UMFPACK/Tcov/TestMat/matrix26 #3x3
+#	./testazny < ../../UMFPACK/Tcov/TestMat/matrix27 #3x3
+#	./testazny < ../../UMFPACK/Tcov/TestMat/matrix28 #4x4
+#	./testazny < ../../UMFPACK/Tcov/TestMat/matrix29 #2x2
+#	./testazny < ../../UMFPACK/Tcov/TestMat/matrix30 #2x2
+#	./testazny < ../../UMFPACK/Tcov/TestMat/adlittle #TRSM problem
+#	./testazny < ../../UMFPACK/Tcov/TestMat/arc130   #130x130
+#	./testazny < ../../UMFPACK/Tcov/TestMat/cage3    #5x5
+#	./testazny < ../../UMFPACK/Tcov/TestMat/d_dyn    #87x87
+#	./testazny < ../../UMFPACK/Tcov/TestMat/galenet  #8x14 TRSM problem
+#	./testazny < ../../UMFPACK/Tcov/TestMat/nug07    #invalid matrix
+#	./testazny < ../../UMFPACK/Tcov/TestMat/S_d2q06c #DGER problem
+	./testazny < ../../UMFPACK/Tcov/TestMat/shl0     #663x663
 
 
 
