@@ -249,6 +249,7 @@ typedef struct  /*Matrix */
     Int *time_stamp;                /* for relative index update
                                        not initialized */
     Int *row_degree_bound;          /* row degree size number of rows */
+    Int panel_width;                /* width of panel for dense factorizaiton*/
 }   paru_matrix;
 
 

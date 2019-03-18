@@ -73,6 +73,9 @@ void paru_assemble (
     tupleList *ColList = paruMatInfo->ColList;
 
     Int rowCount= 0;
+
+    Int panel_rows = 0; Int panel_width = paruMatInfo->panel_width;
+
     Int *isRowInFront = Work->rowSize; 
     Int rowMark = Work->rowMark;
     PRLEVEL (-1, ("rowMark=%ld;\n", rowMark));
@@ -107,6 +110,12 @@ void paru_assemble (
 
     /**** 1 ******** finding set of rows in current front *********************/
     for (Int c = col1; c < col2; c++){
+
+        if( (c-col1)%panel_width == 0){
+            PRLEVEL (0, ("%%### c =%ld  panel_rows= %ld\n", c, panel_rows));
+            panel_rows =0;
+        }
+        
         tupleList *curColTupleList = &ColList[c];
         Int numTuple = curColTupleList->numTuple;
         ASSERT (numTuple >= 0);
@@ -190,6 +199,7 @@ void paru_assemble (
                     PRLEVEL (1, ("%%1st: rowRelIndex[%ld] = %ld\n",
                                 rEl, rowCount ));
                     isRowInFront [curRow] = rowMark + rowCount++; 
+                    panel_rows++;
                 }
                 else{
                     rowRelIndex [rEl] = isRowInFront [curRow] - rowMark;
@@ -382,7 +392,7 @@ void paru_assemble (
      *  The next part is to find columns of nonfully summed then rows
      *  the rest of the matrix and doing TRSM and GEMM,                       */
     if (fac < 0){
-        printf ("%% m > n\n");
+        printf ("%% Some problem in factorization \n");
         exit(0);
         return;
     }
