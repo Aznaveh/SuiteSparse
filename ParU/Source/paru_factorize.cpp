@@ -323,7 +323,7 @@ Int paru_dgetrf (double *F, Int *fsRowList, Int lm, Int ln,
 }
 
 Int paru_factorize(double *F, Int *fsRowList, Int rowCount, Int fp, 
-        paru_matrix *paruMatInfo){
+        Int *panel_row, paru_matrix *paruMatInfo){
     DEBUGLEVEL (0);
 
     work_struct *Work =  paruMatInfo->Work;
@@ -334,8 +334,8 @@ Int paru_factorize(double *F, Int *fsRowList, Int rowCount, Int fp,
     //    return paru_dgetrf (F , fsRowList, rowCount, fp, ipiv);
 
     Int panel_width = paruMatInfo->panel_width;
-    Int row_end = rowCount;
     for(Int panel_num = 0; ; panel_num++){
+        Int row_end = panel_row [panel_num];
         Int j1 = panel_num*panel_width;
         Int j2 = (panel_num+1)*panel_width;
         // factorize current panel
@@ -426,18 +426,26 @@ Int paru_factorize(double *F, Int *fsRowList, Int rowCount, Int fp,
          * | panel        |       |  \      |****In***B****** |
          * | width        |       |    \    |**************** |
          * |   v          |____...|_______\___________...____ |
-         * |        j2--> |       |******** |                 |
-         * rowCount       |       |******** |                 |
-         * |              .       .******** .      C          . 
-         * |              .       .***In*** .    Out          . 
-         * |              .       .***A**** .                 . 
-         * v              |___...._********___________..._____|              
+         * |        j2--> |       |******** |ccccccccccccccccc|
+         * rowCount       |       |******** |ccccccccccccccccc|
+         * |              .       .******** .ccccccCcccccccccc. 
+         * |              .       .***In*** .ccccOutcccccccccc. 
+         * |              .       .***A**** .ccccccccccccccccc. 
+         * |              |       |******** |ccccccccccccccccc|              
+         * |              |       |******** |ccccccccccccccccc|              
+         * |              |       |row_end  |                 |              
+         * |              |       |         |                 |              
+         * |              |       |         |                 |              
+         * |              |       |         |                 |              
+         * v              |___....|_______ _|__________...____|              
          *                         
          */
 
 
         {
-            BLAS_INT M = (BLAS_INT) (rowCount - j2); 
+
+            BLAS_INT M = (BLAS_INT) (row_end - j2); 
+
             BLAS_INT N = (BLAS_INT) fp - j2;
             BLAS_INT K = (BLAS_INT) panel_width;
             double alpha = -1;

@@ -281,7 +281,7 @@ void paru_assemble(paru_matrix *paruMatInfo, Int f, cholmod_common *cc);
 
 
 Int paru_dgetrf (double *F, Int *rowList, Int m, Int n, BLAS_INT *ipiv);
-Int paru_factorize(double *F, Int *fsRowList, Int lm, Int ln, 
+Int paru_factorize(double *F, Int *fsRowList, Int lm, Int ln, Int *panel_row, 
         paru_matrix *paruMatInfo);
         
 

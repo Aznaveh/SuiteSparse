@@ -74,7 +74,10 @@ void paru_assemble (
 
     Int rowCount= 0;
 
-    Int panel_rows = 0; Int panel_width = paruMatInfo->panel_width;
+    Int panel_num = 0; Int panel_width = paruMatInfo->panel_width;
+    
+    Int *panel_row = (Int*) paru_alloc ( (Int) ceil( (double)fp/panel_width) , 
+            sizeof (Int), cc);
 
     Int *isRowInFront = Work->rowSize; 
     Int rowMark = Work->rowMark;
@@ -111,9 +114,9 @@ void paru_assemble (
     /**** 1 ******** finding set of rows in current front *********************/
     for (Int c = col1; c < col2; c++){
 
-        if( (c-col1)%panel_width == 0){
-            PRLEVEL (0, ("%%### c =%ld  panel_rows= %ld\n", c, panel_rows));
-            panel_rows =0;
+        //saving number of rows of last panel if it passed the last col
+        if( (c-col1) % panel_width == 0 && c != col1  ){ 
+            panel_row [panel_num++] = rowCount;
         }
         
         tupleList *curColTupleList = &ColList[c];
@@ -199,7 +202,6 @@ void paru_assemble (
                     PRLEVEL (1, ("%%1st: rowRelIndex[%ld] = %ld\n",
                                 rEl, rowCount ));
                     isRowInFront [curRow] = rowMark + rowCount++; 
-                    panel_rows++;
                 }
                 else{
                     rowRelIndex [rEl] = isRowInFront [curRow] - rowMark;
@@ -210,6 +212,12 @@ void paru_assemble (
             }
         }
     }
+
+
+    panel_row [panel_num++] = rowCount;
+    PRLEVEL (1, ("%%col1 =%ld col2 = %ld  panel_num= %ld\n", 
+                col1, col2, panel_num));
+    ASSERT (panel_num == (Int) ceil( (double)fp/panel_width) );
 
 #ifndef NDEBUG /* Checking if pivotal rows are correct */
     Int p = 1;
@@ -386,7 +394,7 @@ void paru_assemble (
         exit(0);
     }
     Int fac = paru_factorize(pivotalFront, fsRowList, rowCount, 
-            fp, paruMatInfo);
+            fp, panel_row, paruMatInfo);
 
     /* To this point fully summed part of the front is computed and L and U    /  
      *  The next part is to find columns of nonfully summed then rows
@@ -397,10 +405,10 @@ void paru_assemble (
         return;
     }
     // Not using ipiv anymore
-//    if (ipiv [0] < 0){
-//        printf ("%% Singular Matrix\n");
-//        return;
-//    }
+    //    if (ipiv [0] < 0){
+    //        printf ("%% Singular Matrix\n");
+    //        return;
+    //    }
 #ifndef NDEBUG  // Printing the list of rows
     p = 1;
     PRLEVEL (p, ("%% After factorization (inside assemble): \n"));
@@ -723,12 +731,12 @@ void paru_assemble (
                     locIndx, el_rowIndex [locIndx]));
     }
 #ifndef NDEBUG
-//    //Printing the contribution block before dgemm
-//    // Valgrind complains if activated, but can be helpful sometimes
-//    p = 0;
-//    PRLEVEL (p, ("\n%%Before DGEMM:"));
-//    if (p <= 0)
-//        paru_print_element (paruMatInfo, eli);
+    //    //Printing the contribution block before dgemm
+    //    // Valgrind complains if activated, but can be helpful sometimes
+    //    p = 0;
+    //    PRLEVEL (p, ("\n%%Before DGEMM:"));
+    //    if (p <= 0)
+    //        paru_print_element (paruMatInfo, eli);
 #endif
 
 
@@ -806,4 +814,8 @@ void paru_assemble (
     PRLEVEL (1, ("%%colCount =%ld\n", colCount));
     PRLEVEL (-1, ("fp =%ld;\n", fp));
     PRLEVEL (1, ("%%~~~~~~~Assemble Front %ld finished\n", f));
+     paru_free ( (Int) ceil( (double)fp/panel_width) , 
+            sizeof (Int), panel_row, cc);
+
+
 }
