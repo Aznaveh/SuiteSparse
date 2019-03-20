@@ -435,8 +435,6 @@ Int paru_factorize(double *F, Int *fsRowList, Int rowCount, Int fp,
          * |              |       |******** |ccccccccccccccccc|              
          * |              |       |row_end  |                 |              
          * |              |       |         |                 |              
-         * |              |       |         |                 |              
-         * |              |       |         |                 |              
          * v              |___....|_______ _|__________...____|              
          *                         
          */

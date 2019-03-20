@@ -28,6 +28,7 @@ panelF:
 	$(C) $(FLAG) panel_factorization_test.cpp -o paneltest $(LIBS)
 	./paneltest< ../Matrix/cage3.mtx  		 #0x0 #OK
 
+ssget_path = /users/aznaveh/ssget/mat/
 	
 
 run:
@@ -105,6 +106,10 @@ run:
 #	./testazny < ../Matrix/ParUTst/nos4/nos4.mtx  #100x100
 #	./testazny < ../Matrix/ParUTst/494_bus/494_bus.mtx #494x494
 #	./testazny < ../Matrix/ParUTst/mesh1em6/mesh1em6.mtx #48x48
+#	./testazny < ../Matrix/ParUTst/1138_bus/1138_bus.mtx
+#	./testazny < ../Matrix/ParUTst/Queen_4147.mtx
+#
+#	./testazny < ${ssget_path}/Rajat/rajat31.mat
 #
 #	            UMFPACK Tests
 #	./testazny < ../../UMFPACK/Tcov/TestMat/matrix1  #10x10 
@@ -117,33 +122,35 @@ run:
 #	./testazny < ../../UMFPACK/Tcov/TestMat/matrix8  #10x10 
 #	./testazny < ../../UMFPACK/Tcov/TestMat/matrix10  #40x40 
 #	./testazny < ../../UMFPACK/Tcov/TestMat/matrix11  #40x40 
-#!	./testazny < ../../UMFPACK/Tcov/TestMat/matrix12 #Empty Column
-#!	./testazny < ../../UMFPACK/Tcov/TestMat/matrix13 #Empty Column
 #	./testazny < ../../UMFPACK/Tcov/TestMat/matrix14  #1x1 
 #	./testazny < ../../UMFPACK/Tcov/TestMat/matrix15  #1x1 
 #	./testazny < ../../UMFPACK/Tcov/TestMat/matrix16  #1x1 
 #	./testazny < ../../UMFPACK/Tcov/TestMat/matrix17  #1x1 
 #	./testazny < ../../UMFPACK/Tcov/TestMat/matrix18  #1x1 
-#!	./testazny < ../../UMFPACK/Tcov/TestMat/matrix19 #Empty Row
-#!	./testazny < ../../UMFPACK/Tcov/TestMat/matrix20 #Empty Column
 #	./testazny < ../../UMFPACK/Tcov/TestMat/matrix21 #2x2
-#	./testazny < ../../UMFPACK/Tcov/TestMat/matrix22 #Empty Row
-#	./testazny < ../../UMFPACK/Tcov/TestMat/matrix23 #TRSM problem
-#	./testazny < ../../UMFPACK/Tcov/TestMat/matrix24 #Empty Row
 #	./testazny < ../../UMFPACK/Tcov/TestMat/matrix25 #3x3
 #	./testazny < ../../UMFPACK/Tcov/TestMat/matrix26 #3x3
 #	./testazny < ../../UMFPACK/Tcov/TestMat/matrix27 #3x3
 #	./testazny < ../../UMFPACK/Tcov/TestMat/matrix28 #4x4
 #	./testazny < ../../UMFPACK/Tcov/TestMat/matrix29 #2x2
 #	./testazny < ../../UMFPACK/Tcov/TestMat/matrix30 #2x2
-#	./testazny < ../../UMFPACK/Tcov/TestMat/adlittle #TRSM problem
 #	./testazny < ../../UMFPACK/Tcov/TestMat/arc130   #130x130
 #	./testazny < ../../UMFPACK/Tcov/TestMat/cage3    #5x5
 #	./testazny < ../../UMFPACK/Tcov/TestMat/d_dyn    #87x87
-#	./testazny < ../../UMFPACK/Tcov/TestMat/galenet  #8x14 TRSM problem
-#	./testazny < ../../UMFPACK/Tcov/TestMat/nug07    #invalid matrix
-#	./testazny < ../../UMFPACK/Tcov/TestMat/S_d2q06c #DGER problem
-	./testazny < ../../UMFPACK/Tcov/TestMat/shl0     #663x663
+#	./testazny < ../../UMFPACK/Tcov/TestMat/shl0     #663x663
+
+#	./testazny < ../../UMFPACK/Tcov/TestMat/matrix12 #Complex
+#	./testazny < ../../UMFPACK/Tcov/TestMat/matrix13 #Complex
+#	./testazny < ../../UMFPACK/Tcov/TestMat/matrix19 #Complex
+#	./testazny < ../../UMFPACK/Tcov/TestMat/matrix20 #Complex
+#	./testazny < ../../UMFPACK/Tcov/TestMat/matrix22 #Empty Row
+#!	./testazny < ../../UMFPACK/Tcov/TestMat/matrix23 #TRSM problem
+#!	./testazny < ../../UMFPACK/Tcov/TestMat/matrix24 #Empty Row
+#!	./testazny < ../../UMFPACK/Tcov/TestMat/adlittle #TRSM problem
+#!	./testazny < ../../UMFPACK/Tcov/TestMat/galenet  #8x14 TRSM problem
+#!	./testazny < ../../UMFPACK/Tcov/TestMat/nug07    #invalid matrix
+	./testazny < ../../UMFPACK/Tcov/TestMat/S_d2q06c #DGER problem
+
 
 
 

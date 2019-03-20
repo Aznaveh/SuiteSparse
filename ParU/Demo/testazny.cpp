@@ -21,11 +21,18 @@ int main (int argc, char **argv)
         printf ("Paru: input matrix is invalid\n");
         exit (1);
     }
-    if (mtype != CHOLMOD_SPARSE)
-    {
+
+    if (mtype != CHOLMOD_SPARSE){
         printf ("Paru: input matrix must be sparse\n");
         exit (1);
     }
+
+    if (A->xtype != CHOLMOD_REAL){
+        printf ("Paru: input matrix must be real\n");
+        exit (1);
+    }
+
+
 
     LUsym = paru_sym_analyse (A, cc);
     if (LUsym == NULL) {

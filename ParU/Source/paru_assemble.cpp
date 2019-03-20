@@ -390,6 +390,7 @@ void paru_assemble (
     BLAS_INT *ipiv = (BLAS_INT*) (Work->scratch+rowCount);
     //Int fac = paru_dgetrf (pivotalFront, fsRowList, rowCount, fp, ipiv);
     if (rowCount < fp){
+        PRLEVEL (0, ("%% %ldx%ld \n",rowCount, fp));
         printf ("structural problem\n");
         exit(0);
     }
