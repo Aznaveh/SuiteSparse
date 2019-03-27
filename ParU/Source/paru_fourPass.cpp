@@ -79,7 +79,7 @@ void paru_fourPass (paru_matrix *paruMatInfo,
 
             Int *rowRelIndex = relRowInd (el);
 
-            if (el_colIndex [curColIndex] < 0 ){/*!TODO: Dead Delete the tuple*/
+            if (el_colIndex [curColIndex] < 0 ){
                 continue;  
             }
 
@@ -109,7 +109,7 @@ void paru_fourPass (paru_matrix *paruMatInfo,
     }
     PRLEVEL(p, ("\n"));
 #endif
-    /*****  2nd pass: over rows to count columns                    ***********/
+    /****************2nd pass: over rows to count columns**********************/
     tupleList *RowList = paruMatInfo->RowList;
     for (Int k = fp; k < rowCount; k++){
         Int r = fsRowList [k];
@@ -223,7 +223,7 @@ void paru_fourPass (paru_matrix *paruMatInfo,
 #endif
     time_f = ++paruMatInfo->time_stamp[f]; //invalid all the markings
 
-    /*****            3rd pass: assemble columns                 **************/
+    /****************************3rd pass: assemble columns********************/
     for (Int k = 0; k < colCount; k++){
         Int c = CBColList [k];   //non pivotal column list
         tupleList *curColTupleList = &ColList[c];

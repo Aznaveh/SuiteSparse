@@ -1,7 +1,9 @@
 /** =========================================================================  /
  * =======================  paru_factorize  =================================  /
  * ========================================================================== 
- * @brief Doing the BLAS factorization 
+ * @brief Doing the BLAS factorization in different panels and call degree
+ * update it it is necessary
+ *   
  *         
  * @author Aznaveh
  **/
@@ -322,9 +324,15 @@ Int paru_dgetrf (double *F, Int *fsRowList, Int lm, Int ln,
     return 0;
 }
 
-Int paru_factorize(double *F, Int *fsRowList, Int rowCount, Int fp, 
+Int paru_factorize(double *F, Int *fsRowList, Int rowCount, Int f, 
         Int *panel_row, paru_matrix *paruMatInfo){
     DEBUGLEVEL (0);
+
+    Int *Super = paruMatInfo->LUsym->Super;
+    Int col1 = Super [f];       /* fornt F has columns col1:col2-1 */
+    Int col2 = Super [f+1];
+    Int fp = col2 - col1;   /* first fp columns are pivotal */ 
+
 
     work_struct *Work =  paruMatInfo->Work;
     Int *row_degree_bound = paruMatInfo->row_degree_bound;
@@ -461,6 +469,13 @@ Int paru_factorize(double *F, Int *fsRowList, Int rowCount, Int fp,
 
 
         }
+
+    // Int time_f  = paruMatInfo->time_stamp[f];
+    // time_f++;
+    // paru_update_rowDeg ( panel_num, time_f, CBColList, paruMatInfo);
+    // time_f+=2;
+
+
     }
 
 

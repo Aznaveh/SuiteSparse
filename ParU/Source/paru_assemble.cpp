@@ -10,8 +10,12 @@
 #include <set>
 #endif
 
-/*! @brief assembling a front and updating correspoing elelment
+/*! @brief Computing factorization of current front and doing the numerical
+ * assembly that ancestors will assemble. No degree update after each panel in
+ * this routine
  *  @author Aznaveh
+ *
+ *  
  *
  *
  * @param  a list of tuples and the the tuple we want to add
@@ -394,8 +398,8 @@ void paru_assemble (
         printf ("structural problem\n");
         exit(0);
     }
-    Int fac = paru_factorize(pivotalFront, fsRowList, rowCount, 
-            fp, panel_row, paruMatInfo);
+    Int fac = paru_factorize(pivotalFront, fsRowList, rowCount, f, 
+            panel_row, paruMatInfo);
 
     /* To this point fully summed part of the front is computed and L and U    /  
      *  The next part is to find columns of nonfully summed then rows
@@ -472,7 +476,8 @@ void paru_assemble (
     Int *isColInCBcolSet = Work -> colSize;
     Int colMark = Work -> colMark;
     if (colMark < 0) {  // in rare case of overflow
-        memset (isRowInFront, -1, n*sizeof(Int));
+        //memset (isRowInFront, -1, n*sizeof(Int)); //Bug detected
+        memset (isColInCBcolSet , -1, n*sizeof(Int));
         colMark = Work-> colMark = 0;
     }
     Int *CBColList = Work -> scratch + 2*rowCount;//scratch=[fsRowList..ipiv..]
@@ -488,7 +493,6 @@ void paru_assemble (
         Int curFsRow = fsRowList [i];
         PRLEVEL (1, ("%% 4: curFsRowIndex = %ld\n", curFsRowIndex));
         PRLEVEL (1, ("%% curFsRow =%ld\n", curFsRow));
-        //tupleList *curRowTupleList = &RowList [curFsRowIndex]; //BUG DETECTED
         tupleList *curRowTupleList = &RowList [curFsRow];
         Int numTuple = curRowTupleList->numTuple;
         ASSERT (numTuple >= 0);
