@@ -37,8 +37,8 @@ Int paru_panel_factorize (double *F, Int *fsRowList, Int m, Int n,
         paru_matrix *paruMatInfo) {
     // works like dgetf2f.f in netlib v3.0  here is a link:
     // https://github.com/xianyi/OpenBLAS/blob/develop/reference/dgetf2f.f
-    DEBUGLEVEL(0);
-    PRLEVEL (1, ("%% Inside panel factorization \n"));
+    DEBUGLEVEL(1);
+    PRLEVEL (1, ("%% Inside panel factorization %ld \n",panel_num));
 
 
     Int *row_degree_bound = paruMatInfo->row_degree_bound;
@@ -57,20 +57,20 @@ Int paru_panel_factorize (double *F, Int *fsRowList, Int m, Int n,
 
     ASSERT ( row_end >= j2);
 
-#ifndef NDEBUG  // Printing the pivotal front
+#ifndef NDEBUG  // Printing the panel
     Int p = 1;
     PRLEVEL (p, ("%% Starting the factorization\n"));
-    PRLEVEL (p, (" ;\n"));
-    for (Int r = 0; r < row_end; r++){
+    PRLEVEL (p, ("%% This Panel:\n"));
+    for (Int r = j1; r < row_end; r++){
         PRLEVEL (p, ("%% %ld\t", fsRowList [r]));
-        for (Int c = 0; c < num_col_panel; c++){
-            PRLEVEL (p, (" %2.5lf\t", F[c*row_end+ r]));
+        for (Int c = j1; c < j2; c++){
+            PRLEVEL (p, (" %2.5lf\t", F[c*m+ r]));
         }
         PRLEVEL (p, ("\n"));
     }
 #endif
  
-    //column ith of the panel
+    //column jth of the panel
     for (Int j = j1; j < j2 ; j++){ 
 
         PRLEVEL (1, ("%% j = %ld\n", j));
@@ -95,7 +95,7 @@ Int paru_panel_factorize (double *F, Int *fsRowList, Int m, Int n,
             if ( j == j2 -1)
                 continue;
             else{
-                printf ("Singular submatrix\n");
+                printf ("%% ATTENTION: Singular submatrix\n");
                 return -1;
             }
         }
@@ -129,7 +129,7 @@ Int paru_panel_factorize (double *F, Int *fsRowList, Int m, Int n,
         for (Int r = 0; r < row_end; r++){
             PRLEVEL (p, ("%% %ld\t", fsRowList [r]));
             for (Int c = 0; c < num_col_panel; c++){
-                PRLEVEL (p, (" %2.5lf\t", F[c*row_end+ r]));
+                PRLEVEL (p, (" %2.5lf\t", F[c*m+ r]));
             }
             PRLEVEL (p, ("\n"));
         }
@@ -143,7 +143,7 @@ Int paru_panel_factorize (double *F, Int *fsRowList, Int m, Int n,
             PRLEVEL (1, ("%% dscal\n"));
             for (Int i = j +1 ; i < row_end; i++){ 
                 PRLEVEL (1, ("%%i=%ld before cal value= %2.4lf", i, F[j*m+i]));
-                F[j*m + i]= F[j*m + i]/piv;
+                F[j*m + i] /= piv;
                 PRLEVEL (1, (" after dscal value= %2.4lf\n", i, F[j*m+i]));
             }
         }
@@ -208,13 +208,12 @@ Int paru_panel_factorize (double *F, Int *fsRowList, Int m, Int n,
         }
 
 #ifndef NDEBUG  // Printing the pivotal front
-        Int p = 1;
+        Int p = 2;
         PRLEVEL (p, ("%% After dger\n"));
-        PRLEVEL (p, (" ;\n"));
-        for (Int r = 0; r < row_end; r++){
+        for (Int r = j1; r < row_end; r++){
             PRLEVEL (p, ("%% %ld\t", fsRowList [r]));
-            for (Int c = 0; c < num_col_panel; c++){
-                PRLEVEL (p, (" %2.5lf\t", F[c*row_end+ r]));
+            for (Int c = j1; c < j2; c++){
+                PRLEVEL (p, (" %2.5lf\t", F[c*m+ r]));
             }
             PRLEVEL (p, ("\n"));
         }
@@ -326,7 +325,7 @@ Int paru_dgetrf (double *F, Int *fsRowList, Int lm, Int ln,
 
 Int paru_factorize(double *F, Int *fsRowList, Int rowCount, Int f, 
         Int *panel_row, paru_matrix *paruMatInfo){
-    DEBUGLEVEL (0);
+    DEBUGLEVEL (1);
 
     Int *Super = paruMatInfo->LUsym->Super;
     Int col1 = Super [f];       /* fornt F has columns col1:col2-1 */
@@ -339,10 +338,24 @@ Int paru_factorize(double *F, Int *fsRowList, Int rowCount, Int f,
     BLAS_INT *ipiv = (BLAS_INT*) (Work->scratch+rowCount);
     //    return paru_panel_factorize ( F, fsRowList, rowCount, fp, 
     //                fp, 0, rowCount, paruMatInfo);
-    //    return paru_dgetrf (F , fsRowList, rowCount, fp, ipiv);
+    //return paru_dgetrf (F , fsRowList, rowCount, fp, ipiv);
 
     Int panel_width = paruMatInfo->panel_width;
     for(Int panel_num = 0; ; panel_num++){
+
+#ifndef NDEBUG  // Printing the pivotal front
+    Int p = 1;
+    PRLEVEL (p, ("%%Pivotal Front Before %ld\n",panel_num));
+    
+    for (Int r = 0; r < rowCount; r++){
+        PRLEVEL (p, ("%% %ld\t", fsRowList [r]));
+        for (Int c = 0; c < fp; c++){
+            PRLEVEL (p, (" %2.5lf\t", F[c*rowCount+ r]));
+        }
+        PRLEVEL (p, ("\n"));
+    }
+#endif
+ 
         Int row_end = panel_row [panel_num];
         Int j1 = panel_num*panel_width;
         Int j2 = (panel_num+1)*panel_width;
@@ -390,27 +403,30 @@ Int paru_factorize(double *F, Int *fsRowList, Int rowCount, Int f,
             Int p = 1;
             PRLEVEL (p, ("%% M =%d N = %d alpha = %f \n", M, N, alpha));
             PRLEVEL (p, ("%% lda =%d ldb =%d\n", lda, ldb));
-            PRLEVEL (p, ("%% Panle Before Trsm: %ld x %ld\n", fp, rowCount));
-            PRLEVEL (p, ("\n %%"));
-            for (Int i = 0; i < fp; i++){
-                for (Int j = 0; j < rowCount; j++){
-                    PRLEVEL (p, (" %2.5lf\t", F[j*fp+i]));
+            PRLEVEL (p, ("%% Pivotal Front Before Trsm: %ld x %ld\n",
+                        fp, rowCount));
+            for (Int r = 0; r < rowCount; r++){
+                PRLEVEL (p, ("%% %ld\t", fsRowList [r]));
+                for (Int c = 0; c < fp; c++){
+                    PRLEVEL (p, (" %2.5lf\t", F[c*rowCount+ r]));
                 }
-                PRLEVEL (p, ("\n%% "));
+                PRLEVEL (p, ("\n"));
             }
+
 #endif
             BLAS_DTRSM ("L" ,"L" ,"N" ,"U", &M, &N, &alpha, A, &lda, 
                     B, &ldb);
 
 
 #ifndef NDEBUG  
-            PRLEVEL (p, ("%% Panel After Trsm: %ld x %ld\n %%", 
+            PRLEVEL (p, ("%% Pivotal Front After Trsm: %ld x %ld\n %%", 
                         fp, rowCount));
-            for (Int i = 0; i < fp; i++){
-                for (Int j = 0; j < rowCount; j++){
-                    PRLEVEL (p, (" %2.5lf\t", F[j*fp+i]));
+            for (Int r = 0; r < rowCount; r++){
+                PRLEVEL (p, ("%% %ld\t", fsRowList [r]));
+                for (Int c = 0; c < fp; c++){
+                    PRLEVEL (p, (" %2.5lf\t", F[c*rowCount+ r]));
                 }
-                PRLEVEL (p, ("\n %%"));
+                PRLEVEL (p, ("\n"));
             }
 #endif
         }
@@ -418,7 +434,7 @@ Int paru_factorize(double *F, Int *fsRowList, Int rowCount, Int f,
 
 
 
-        /*               dgemm   C := alpha *op (A) + beta*C
+        /*               dgemm   C := alpha*op(A)*op(B) + beta*C
          *
          *        F = fully summed part of the pivotal front
          *
@@ -462,6 +478,15 @@ Int paru_factorize(double *F, Int *fsRowList, Int rowCount, Int f,
             double beta = 1; //keep current values
             double *C = F+ j2*rowCount + j2;
             BLAS_INT ldc = (BLAS_INT) rowCount ;
+#ifndef NDEBUG  
+            Int p = 1;
+            PRLEVEL (p, ("%% DGEMM "));
+            PRLEVEL (p, ("%% M =%d K = %d N = %d alpha = %f \n",
+                        M, K, N,  alpha));
+            PRLEVEL (p, ("%% lda =%d ldb =%d\n", lda, ldb));
+            PRLEVEL (p, ("%% j2 =%ld j1=%ld\n", j2, j1));
+            PRLEVEL (p, ("\n %%"));
+#endif
 
 
             BLAS_DGEMM ("N", "N", &M, &N, &K, &alpha, A, &lda, B, &ldb, 
@@ -470,10 +495,24 @@ Int paru_factorize(double *F, Int *fsRowList, Int rowCount, Int f,
 
         }
 
-    // Int time_f  = paruMatInfo->time_stamp[f];
-    // time_f++;
-    // paru_update_rowDeg ( panel_num, time_f, CBColList, paruMatInfo);
-    // time_f+=2;
+#ifndef NDEBUG  
+        PRLEVEL (p, ("%% Pivotal Front After Dgemm: %ld x %ld\n %%", 
+                    fp, rowCount));
+        for (Int r = 0; r < rowCount; r++){
+            PRLEVEL (p, ("%% %ld\t", fsRowList [r]));
+            for (Int c = 0; c < fp; c++){
+                PRLEVEL (p, (" %2.5lf\t", F[c*rowCount+ r]));
+            }
+            PRLEVEL (p, ("\n"));
+        }
+
+#endif
+
+
+        paruMatInfo->time_stamp[f]++;
+        //        paru_update_rowDeg ( panel_num, row_end, colCount, f, 
+        //                CBColList, paruMatInfo);
+        paruMatInfo->time_stamp[f]+= 2;
 
 
     }
