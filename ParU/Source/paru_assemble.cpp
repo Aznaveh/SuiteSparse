@@ -465,7 +465,7 @@ void paru_assemble (
         PRLEVEL (p, (";\n   "));
     }
     PRLEVEL (p, ("];\n"));
-    //just in cases that there is no U
+    //just in cases that there is no U for MATLAB
     PRLEVEL (p, ("Us{%ld} =[];\n", f+1));
     PRLEVEL (p, ("Ucols{%ld}=[];\n",f+1));
     PRLEVEL (p, ("Urows{%ld}=[];\n",f+1));
@@ -565,8 +565,11 @@ void paru_assemble (
         }
     }
 
+    // FINISH HERE EARLY
     if (colCount == 0){  // there is no CB, Nothing to be done
         Work->rowMark +=  rowCount;
+        paru_free ( (Int) ceil( (double)fp/panel_width) , 
+            sizeof (Int), panel_row, cc);
         PRLEVEL (1, ("%% pivotalFront =%p\n",pivotalFront));
         return;
     }
