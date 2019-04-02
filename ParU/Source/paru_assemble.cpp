@@ -565,11 +565,12 @@ void paru_assemble (
         }
     }
 
-    // FINISH HERE EARLY
+    paru_free ( (Int) ceil( (double)fp/panel_width) ,  // Do not need this space
+            sizeof (Int), panel_row, cc);
+
+    // EXIT point HERE 
     if (colCount == 0){  // there is no CB, Nothing to be done
         Work->rowMark +=  rowCount;
-        paru_free ( (Int) ceil( (double)fp/panel_width) , 
-            sizeof (Int), panel_row, cc);
         PRLEVEL (1, ("%% pivotalFront =%p\n",pivotalFront));
         return;
     }
@@ -822,8 +823,4 @@ void paru_assemble (
     PRLEVEL (1, ("%%colCount =%ld\n", colCount));
     PRLEVEL (-1, ("fp =%ld;\n", fp));
     PRLEVEL (1, ("%%~~~~~~~Assemble Front %ld finished\n", f));
-     paru_free ( (Int) ceil( (double)fp/panel_width) , 
-            sizeof (Int), panel_row, cc);
-
-
 }

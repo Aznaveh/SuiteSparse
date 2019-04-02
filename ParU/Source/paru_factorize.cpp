@@ -37,7 +37,7 @@ Int paru_panel_factorize (double *F, Int *fsRowList, Int m, Int n,
         paru_matrix *paruMatInfo) {
     // works like dgetf2f.f in netlib v3.0  here is a link:
     // https://github.com/xianyi/OpenBLAS/blob/develop/reference/dgetf2f.f
-    DEBUGLEVEL(1);
+    DEBUGLEVEL(0);
     PRLEVEL (1, ("%% Inside panel factorization %ld \n",panel_num));
 
 
@@ -91,14 +91,6 @@ Int paru_panel_factorize (double *F, Int *fsRowList, Int m, Int n,
             }
         }
         PRLEVEL (1, ("%% max value= %2.4lf\n", maxval));
-        if (maxval == 0){
-            if ( j == j2 -1)
-                continue;
-            else{
-                printf ("%% ATTENTION: Singular submatrix\n");
-                return -1;
-            }
-        }
 
         //initialzing pivot as max numeric value
         Int row_sp = row_max;
@@ -138,7 +130,7 @@ Int paru_panel_factorize (double *F, Int *fsRowList, Int m, Int n,
 
         //dscal //TODO?: loop unroll is also possible
 
-        if ( j < row_end-1){
+        if ( j < row_end-1 && piv !=0 ){
 
             PRLEVEL (1, ("%% dscal\n"));
             for (Int i = j +1 ; i < row_end; i++){ 
@@ -181,7 +173,7 @@ Int paru_panel_factorize (double *F, Int *fsRowList, Int m, Int n,
          */
 
 
-        if ( j < j2 - 1){
+        if ( j < j2 - 1 && maxval != 0 ){
             BLAS_INT M = (BLAS_INT) row_end - 1 - j ; 
             BLAS_INT N = (BLAS_INT) j2 - 1 - j;
             double alpha = -1.0;
@@ -325,7 +317,7 @@ Int paru_dgetrf (double *F, Int *fsRowList, Int lm, Int ln,
 
 Int paru_factorize(double *F, Int *fsRowList, Int rowCount, Int f, 
         Int *panel_row, paru_matrix *paruMatInfo){
-    DEBUGLEVEL (1);
+    DEBUGLEVEL (0);
 
     Int *Super = paruMatInfo->LUsym->Super;
     Int col1 = Super [f];       /* fornt F has columns col1:col2-1 */
