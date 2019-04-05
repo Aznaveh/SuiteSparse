@@ -35,7 +35,9 @@ void paru_fourPass (paru_matrix *paruMatInfo,
     Int rowCount= curFr->nrows + fp;
     Int colCount = curFr->ncols;
 
-    Int *CBColList = Work -> scratch + 2*rowCount; //scratch=[fsRowList..ipiv..]
+//    Int *fcolList = Work -> scratch + 2*rowCount; //scratch=[frowList..ipiv..]
+     Int *fcolList = paruMatInfo->fcolList[f] ;
+
     Int *isColInCBcolSet = Work -> colSize;
     Int colMark = Work -> colMark;
 
@@ -50,7 +52,7 @@ void paru_fourPass (paru_matrix *paruMatInfo,
 
     tupleList *ColList = paruMatInfo->ColList;
     for (Int k = 0; k < colCount; k++){
-        Int c = CBColList [k];   //non pivotal column list
+        Int c = fcolList [k];   //non pivotal column list
         tupleList *curColTupleList = &ColList[c];
         Int numTuple = curColTupleList->numTuple;
         ASSERT (numTuple >= 0);
@@ -99,12 +101,13 @@ void paru_fourPass (paru_matrix *paruMatInfo,
     /**************************************************************************/
     double *cur_Numeric = numeric_pointer (curFr);
     Int new_row_degree_bound_for_r ;
-    Int *fsRowList = Work->scratch; // fully summed row list
+//    Int *frowList = Work->scratch; // fully summed row list
+     Int *frowList = paruMatInfo->frowList[f] ;
 #ifndef NDEBUG            
     Int p = 1;
     PRLEVEL(p, ("%% Before row degree update:\n%% "));
     for (Int k = fp; k < rowCount; k++){
-        Int r = fsRowList [k];
+        Int r = frowList [k];
         PRLEVEL(p, (" rowBound[%ld]=%ld", r,row_degree_bound[r]));
     }
     PRLEVEL(p, ("\n"));
@@ -112,7 +115,7 @@ void paru_fourPass (paru_matrix *paruMatInfo,
     /****************2nd pass: over rows to count columns**********************/
     tupleList *RowList = paruMatInfo->RowList;
     for (Int k = fp; k < rowCount; k++){
-        Int r = fsRowList [k];
+        Int r = frowList [k];
 
         new_row_degree_bound_for_r = curFr->nrows ;
 
@@ -216,7 +219,7 @@ void paru_fourPass (paru_matrix *paruMatInfo,
     p = 1;
     PRLEVEL(p, ("%% After row degree update:\n%% "));
     for (Int k = fp; k < rowCount; k++){
-        Int r = fsRowList [k];
+        Int r = frowList [k];
         PRLEVEL(p, (" rowBound[%ld]=%ld",r,row_degree_bound[r]));
     }
     PRLEVEL(p, ("\n"));
@@ -225,7 +228,7 @@ void paru_fourPass (paru_matrix *paruMatInfo,
 
     /****************************3rd pass: assemble columns********************/
     for (Int k = 0; k < colCount; k++){
-        Int c = CBColList [k];   //non pivotal column list
+        Int c = fcolList [k];   //non pivotal column list
         tupleList *curColTupleList = &ColList[c];
         Int numTuple = curColTupleList->numTuple;
         ASSERT (numTuple >= 0);
@@ -353,7 +356,7 @@ void paru_fourPass (paru_matrix *paruMatInfo,
 
     /*******************       4th pass: assemble rows            *************/
     for (Int k = fp; k < rowCount; k++){
-        Int r = fsRowList [k];
+        Int r = frowList [k];
         tupleList *curRowTupleList = &RowList[r];
         Int numTuple = curRowTupleList->numTuple;
         ASSERT (numTuple >= 0);
@@ -457,7 +460,7 @@ void paru_fourPass (paru_matrix *paruMatInfo,
 
     /********************* 5th path: clearing column tuples and unhceck *******/
     for (Int k = 0; k < colCount; k++){
-        Int c = CBColList [k];   //non pivotal column list
+        Int c = fcolList [k];   //non pivotal column list
         tupleList *curColTupleList = &ColList[c];
         Int numTuple = curColTupleList->numTuple;
         ASSERT (numTuple >= 0);
@@ -520,7 +523,7 @@ void paru_fourPass (paru_matrix *paruMatInfo,
 
     /********************* 6th path: clearing row tuples and unhceck **********/
     for (Int k = fp; k < rowCount; k++){
-        Int r = fsRowList [k];
+        Int r = frowList [k];
         tupleList *curRowTupleList = &RowList[r];
         Int numTuple = curRowTupleList->numTuple;
         ASSERT (numTuple >= 0);

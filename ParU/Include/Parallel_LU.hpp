@@ -215,9 +215,9 @@ typedef struct  /*work_struct*/
    
    Int *scratch;     // size of 2*rows + sizeof cols
                      // Used for 3 things in paru_assemble so far
-                     //     1) fsRowList: List of fully summed rows < |m|
-                     //     2) ipiv: permutation of fsRowList  < |m|
-                     //     4) CBColList: list of nonpivotal columns < |n|
+                     //     1) frowList: List of fully summed rows < |m|
+                     //     2) ipiv: permutation of frowList  < |m|
+                     //     4) fcolList: list of nonpivotal columns < |n|
 
    Int *colSize;     // Initalized data structure, size of columns
    Int colMark;      // colSize[x] < colMark
@@ -244,11 +244,21 @@ typedef struct  /*Matrix */
     tupleList *ColList;     /* size m of dynamic list */
     Element **elementList;  /* pointers to all elements, size = m+nf+1 */
     work_struct *Work;             
-    paru_fac *partial_Us;           /* save the answer LU: righ part*/
-    paru_fac *partial_LUs;          /* left part */
+
     Int *time_stamp;                /* for relative index update
                                        not initialized */
-    Int *row_degree_bound;          /* row degree size number of rows */
+ 
+    //Computed parts of each front
+    Int *frowCount;          /* size nf   size(CB) = rowCount[f]x         */
+    Int *fcolCount;          /* size nf                        colCount[f]*/
+    Int **frowList;          /* size nf   frowList[f] is rows of the matrix S */
+    Int **fcolList;          /* size nf   colList[f] is non pivotal cols of the
+                                                            matrix S */
+    paru_fac *partial_Us;   /* size nf   size(Us)= fp*colCount[f]    */
+    paru_fac *partial_LUs;  /* size nf   size(LUs)= rowCount[f]*fp   */
+
+    
+   Int *row_degree_bound;          /* row degree size number of rows */
     Int panel_width;                /* width of panel for dense factorizaiton*/
 }   paru_matrix;
 
@@ -280,8 +290,8 @@ Int paru_remove_rowTuple(tupleList *RowList, Int row, Int t);
 void paru_assemble(paru_matrix *paruMatInfo, Int f, cholmod_common *cc);
 
 
-Int paru_dgetrf (double *F, Int *rowList, Int m, Int n, BLAS_INT *ipiv);
-Int paru_factorize(double *F, Int *fsRowList, Int lm, Int ln, Int *panel_row, 
+Int paru_dgetrf (double *F, Int *frowList, Int m, Int n, BLAS_INT *ipiv);
+Int paru_factorize(double *F, Int *frowList, Int lm, Int ln, Int *panel_row, 
         paru_matrix *paruMatInfo);
         
 

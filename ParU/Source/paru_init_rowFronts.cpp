@@ -166,54 +166,80 @@ paru_matrix *paru_init_rowFronts (
         return NULL;
     }
 
-    paruMatInfo->partial_Us = //Initialize with NULL
-        (paru_fac*) paru_calloc (1, nf*sizeof(paru_fac), cc);
-    if (paruMatInfo->partial_Us== NULL){   //out of memory
+
+
+    paruMatInfo->frowCount = (Int*) paru_alloc (1, nf*sizeof(Int), cc);
+     if(paruMatInfo->frowCount == NULL){
         paru_freemat (&paruMatInfo, cc);
-        printf("Out of memory: Us\n");
+        printf("Out of memory frowCount\n");
         return NULL;
     }
-
-
-
-    
-    paruMatInfo->partial_LUs= //Initialize with NULL
-        (paru_fac*) paru_calloc (1, nf*sizeof(paru_fac), cc);
-    if (paruMatInfo->partial_LUs== NULL){   //out of memory
+    paruMatInfo->fcolCount = (Int*) paru_alloc (1, nf*sizeof(Int), cc);
+    if(paruMatInfo->fcolCount == NULL){
         paru_freemat (&paruMatInfo, cc);
-        printf("Out of memory: Us\n");
+        printf("Out of memory fcolCount\n");
         return NULL;
     }
-
-
-    paruMatInfo->time_stamp= 
-        (Int*) paru_alloc (1, nf*sizeof(Int), cc);
-    if (paruMatInfo->time_stamp== NULL){   //out of memory
+ 
+    paruMatInfo->frowList = (Int**) paru_alloc (1, nf*sizeof(Int*), cc);
+     if(paruMatInfo->frowList == NULL){
         paru_freemat (&paruMatInfo, cc);
-        printf("Out of memory: time_stamp\n");
+        printf("Out of memory frowList \n");
         return NULL;
-    }
+     }
+
+     paruMatInfo->fcolList = (Int**) paru_alloc (1, nf*sizeof(Int*), cc);
+     if(paruMatInfo->fcolList == NULL){
+         paru_freemat (&paruMatInfo, cc);
+         printf("Out of memory fcolList \n");
+         return NULL;
+     }
+
+
+     paruMatInfo->partial_Us = //Initialize with NULL
+         (paru_fac*) paru_calloc (1, nf*sizeof(paru_fac), cc);
+     if (paruMatInfo->partial_Us== NULL){   //out of memory
+         paru_freemat (&paruMatInfo, cc);
+         printf("Out of memory: Us\n");
+         return NULL;
+     }
+
+     paruMatInfo->partial_LUs= //Initialize with NULL
+         (paru_fac*) paru_calloc (1, nf*sizeof(paru_fac), cc);
+     if (paruMatInfo->partial_LUs== NULL){   //out of memory paru_freemat (&paruMatInfo, cc);
+         printf("Out of memory: Us\n");
+         return NULL;
+     }
+
+
+     paruMatInfo->time_stamp= 
+         (Int*) paru_alloc (1, nf*sizeof(Int), cc);
+     if (paruMatInfo->time_stamp== NULL){   //out of memory
+         paru_freemat (&paruMatInfo, cc);
+         printf("Out of memory: time_stamp\n");
+         return NULL;
+     }
 
 
 
 
-    /// ------------------------------------------------------------------------
-    // create S = A (p,q)', or S=A(p,q) if S is considered to be in row-form
-    // -------------------------------------------------------------------------
-    Int *Qfill = LUsym->Qfill;
-    Int *PLinv = LUsym->PLinv;
-    Int anz = LUsym->anz;
-    Int *Wi = (Int *) cc->Iwork ;   // size m, aliased with the rest of Iwork
+     /// ------------------------------------------------------------------------
+     // create S = A (p,q)', or S=A(p,q) if S is considered to be in row-form
+     // -------------------------------------------------------------------------
+     Int *Qfill = LUsym->Qfill;
+     Int *PLinv = LUsym->PLinv;
+     Int anz = LUsym->anz;
+     Int *Wi = (Int *) cc->Iwork ;   // size m, aliased with the rest of Iwork
 
-    // create numeric values of S = A(p,q) in row-form in Sx
-    double *Sx = (double*) paru_alloc (anz, sizeof (double), cc) ;
-    if (Sx == NULL){   //out of memory
-        paru_freemat (&paruMatInfo, cc);
-        printf("Out of memory: Sx\n");
-        return NULL;
-    }
-    Int *W = (Int*) paru_alloc (m, sizeof (Int), cc) ;
-    if (W == NULL){   //out of memory
+     // create numeric values of S = A(p,q) in row-form in Sx
+     double *Sx = (double*) paru_alloc (anz, sizeof (double), cc) ;
+     if (Sx == NULL){   //out of memory
+         paru_freemat (&paruMatInfo, cc);
+         printf("Out of memory: Sx\n");
+         return NULL;
+     }
+     Int *W = (Int*) paru_alloc (m, sizeof (Int), cc) ;
+     if (W == NULL){   //out of memory
         paru_freemat (&paruMatInfo, cc);
         printf("Out of memory: W\n");
         return NULL;

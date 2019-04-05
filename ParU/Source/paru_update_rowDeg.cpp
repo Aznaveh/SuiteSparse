@@ -1,5 +1,5 @@
 /** =========================================================================  /
- * =======================  paru_update_npColLst ============================  /
+ * =======================  paru_update_rowDeg   ============================  /
  * ========================================================================== */
 
 #include "Parallel_LU.hpp"
@@ -10,28 +10,49 @@
 #include <set>
 #endif
 
-/*! @brief  growing current front if necessary
+/*! @brief  growing current front if necessary and update the row degree of
+ *   current front for current panel. 
  * 
  *  @author Aznaveh
  *
- * @param  
- * @return 0 on sucess 
+ *  @param  
  */
 
-void paru_update_npColLst (paru_matrix *paruMatInfo, Int panel_num ){
+void paru_update_rowDeg ( Int panel_num,  Int row_end, 
+        Int *fcolList, Int &colCount, Int f, paru_matrix *paruMatInfo){
 
-    work_struct *Work =  paruMatInfo->Work;
+    Int panel_width = paruMatInfo->panel_width;
 
-    /**** 4 ******** finding set of non pivotal cols in current front *********/
+    paru_symbolic *LUsym =  paruMatInfo->LUsym;
+    Int *Super = LUsym->Super;
+    Int col1 = Super [f];       /* fornt F has columns col1:col2-1 */
+    Int col2 = Super [f+1];
+    Int fp = col2 - col1;   /* first fp columns are pivotal */ 
+
+    Int time_f = paruMatInfo->time_stamp[f];
+    Int npMark = time_f; //Mark for non pivotal rows
+    Int pMark = npMark; pMark++;    //Mark for non pivotal rows
+
+    Int past_col = colCount;   //saving how many colums are in this front so far
+
+    Int j1 = panel_num*panel_width; // panel starting column
+    Int j2 = (j1 + panel_width < fp ) ? 
+        j1 + panel_width : fp;
+
+
+
+    /*************** finding set of non pivotal cols in current front *********/
 
     /*               
-     *
+     *    Mark seen elements with pMark or time_f+1
+     *        if Marked already added to the list
+     *        else all columns are added to the current front
      *
      *                <----------fp--------->
-     *                        j1     j2
-     *                         ^     ^
-     *                         |     | CBColList  Update here
-     *                         |     |        \
+     *                        j1     j2              Update here
+     *                         ^     ^             past_col    colcount
+     *                         |     | fcolList      ^ . . .   ^
+     *                         |     |        \       |         |
      *             F           |     |         [QQQQQ|OOOOOOOOO|....
      *              \  ____..._|_  ____...__ _____________________________...
      * ^              |\      |     |       #  ^     |         | 
@@ -58,6 +79,7 @@ void paru_update_npColLst (paru_matrix *paruMatInfo, Int panel_num ){
 
 
 
+    work_struct *Work =  paruMatInfo->Work;
     Int *isColInCBcolSet = Work -> colSize;
     Int colMark = Work -> colMark;
     m = paruMatInfo-> m;
@@ -68,8 +90,10 @@ void paru_update_npColLst (paru_matrix *paruMatInfo, Int panel_num ){
         memset (isColInCBcolSet , -1, n*sizeof(Int));
         colMark = Work-> colMark = 0;
     }
-    Int *CBColList = Work -> scratch + 2*rowCount;//scratch=[fsRowList..ipiv..]
-    Int *fsRowList = Work->scratch; // fully summed row list
+//    Int *fcolList = Work -> scratch + 2*rowCount;//scratch=[frowList..ipiv..]
+//    Int *frowList = Work->scratch; // fully summed row list
+    Int *frowList = paruMatInfo->frowList[f];
+    Int *fcolList = paruMatInfo->fcolList[f];
     Int colCount = 0;
 
 #ifndef NDEBUG
@@ -77,9 +101,9 @@ void paru_update_npColLst (paru_matrix *paruMatInfo, Int panel_num ){
 #endif  
 
     tupleList *RowList = paruMatInfo->RowList;
-    for (Int i = 0; i < fp; i++){
+    for (Int i = j1; i < j2; i++){
         Int curFsRowIndex =(Int) i; //current fully summed row index
-        Int curFsRow = fsRowList [i];
+        Int curFsRow = frowList [i];
         PRLEVEL (1, ("%% 4: curFsRowIndex = %ld\n", curFsRowIndex));
         PRLEVEL (1, ("%% curFsRow =%ld\n", curFsRow));
         tupleList *curRowTupleList = &RowList [curFsRow];
@@ -106,22 +130,22 @@ void paru_update_npColLst (paru_matrix *paruMatInfo, Int panel_num ){
 
             rowRelIndex [curTpl.f] = curFsRow;
 
-            if(el->cValid !=  time_f){// an element never seen before
-                el->cValid = time_f;
+            if(el->cValid !=  pMark){// an element never seen before
+                el->cValid = pMark;
 #ifndef NDEBUG            
-                if (el->cValid >  time_f )
-                    PRLEVEL (0, ("%%time_f =%ld  cVal= %ld\n", 
-                                time_f , el->cValid));
+                if (el->cValid >  pMark)
+                    PRLEVEL (0, ("%%pMark=%ld  cVal= %ld\n", 
+                                pMark, el->cValid));
 #endif    
-                ASSERT(el->cValid <= time_f);
+                ASSERT(el->cValid <= pMark);
 #ifndef NDEBUG
                 if ( elCol [e] >= elCMark )
                     PRLEVEL (1, ("%% element %ld can be eaten wholly\n",e));
                 //And the rest of e is in U part 
 #endif
             }
-            else { // must not happen anyway; it depends on changing strategy
-                elRow [e]--;
+            else {  //already added to pivotal rows
+                //   elRow [e]--;
                 continue;
             }
 
@@ -130,7 +154,11 @@ void paru_update_npColLst (paru_matrix *paruMatInfo, Int panel_num ){
                 Int curCol = el_colIndex [cEl]; 
                 PRLEVEL (1, ("%% curCol =%ld\n", curCol));
                 ASSERT (curCol < n);
-                if (curCol < 0)
+
+                if (curCol < 0 )  //already deleted
+                    continue;
+                
+                if (curCol < col2 && curCol >= col1 )  /*is a pivotal col */ 
                     continue;
 #ifndef NDEBUG
                 stl_colSet.insert (curCol);
@@ -142,7 +170,7 @@ void paru_update_npColLst (paru_matrix *paruMatInfo, Int panel_num ){
                 if (isColInCBcolSet [curCol] < colMark  ){
                     PRLEVEL (1, ("%% curCol = %ld colCount=%ld\n", 
                                 curCol, colCount));
-                    CBColList [colCount] = curCol;
+                    fcolList [colCount] = curCol;
                     colRelIndex [cEl] = colCount;
                     isColInCBcolSet [curCol] = colMark + colCount++; 
                 }
@@ -165,7 +193,7 @@ void paru_update_npColLst (paru_matrix *paruMatInfo, Int panel_num ){
     PRLEVEL (p, ("%% There are %ld columns in this contribution block: \n",
                 colCount));
     for (Int i = 0; i < colCount; i++)
-        PRLEVEL (p, ("%%  %ld", CBColList [i]));
+        PRLEVEL (p, ("%%  %ld", fcolList [i]));
     PRLEVEL (p, ("\n"));
     Int stl_colSize = stl_colSet.size();
     if (colCount != stl_colSize){
@@ -174,19 +202,33 @@ void paru_update_npColLst (paru_matrix *paruMatInfo, Int panel_num ){
             PRLEVEL (p, ("%%  %ld", *it));
         PRLEVEL (p, ("\n%% My Set %ld:\n",colCount));
         for (Int i = 0; i < colCount; i++)
-            PRLEVEL (p, ("%%  %ld", CBColList [i]));
+            PRLEVEL (p, ("%%  %ld", fcolList [i]));
         PRLEVEL (p, ("\n"));
     }
     ASSERT (colCount == stl_colSize );
 #endif 
-    /************* travers over new non pivotal columns ***********************/
 
+    // if the front did not grow, there is nothing else to do
+    if (colCount == past_col ){
+        return; 
+    }
+
+
+
+    /************* After this step the Upart can be assembled partly **********/
+    /************* but I am not sure if it would have a good performance ******/
+
+
+
+
+    /************* travers over new non pivotal columns ***********************/
     /*               
-     *
-     *
+     *  Marking seen element with pMark or time_f; it would be fine with either
+     *  while there is no other column pass
+     *   
      *                <----------fp--------->
      *                                                  
-     *                                 CBColList      ^         ^         
+     *                                 fcolList      ^         ^         
      *                                        \       |   HERE  |
      *             F                           [QQQQQ|OOOOOOOOO|....
      *              \  ____..._________...__ _____________________________...
@@ -217,19 +259,66 @@ void paru_update_npColLst (paru_matrix *paruMatInfo, Int panel_num ){
      *                                         oooooooooooo    
      *                                             
      */
+    tupleList *ColList = paruMatInfo->ColList;
+    for (Int k = past_col; k < colCount; k++){
+        Int c = fcolList [k];   //non pivotal column list
+        tupleList *curColTupleList = &ColList[c];
+        Int numTuple = curColTupleList->numTuple;
+        ASSERT (numTuple >= 0);
+        Tuple *listColTuples = curColTupleList->list;
+#ifndef NDEBUG        
+        Int p = 1;
+        PRLEVEL (p, ("\n %%--------> 1st: c =%ld  numTuple = %ld\n", 
+                    c, numTuple));
+        if (p <= 0)
+            paru_print_tupleList (ColList, c);
+#endif
+        for (Int i = 0; i < numTuple; i++){
+            Tuple curTpl = listColTuples [i];
+            Int e = curTpl.e;
+            // if (e == el_ind){ //current element}
+            if ( e >= el_ind || e < first[el_ind]){ //Not any of descendents
+                continue;
+            }
+#ifndef NDEBUG        
+            if (p <= 0)
+                paru_print_element (paruMatInfo, e);
+#endif
+            Int curColIndex = curTpl.f;
+            Element *el = elementList[e];
+            Int *el_colIndex = colIndex_pointer (el);
 
+            Int *rowRelIndex = relRowInd (el);
+
+            if (el_colIndex [curColIndex] < 0 ){
+                continue;  
+            }
+
+            if(el->cValid !=  time_f){
+                el->cValid =  time_f;
+                elCol [e] = el->ncolsleft - 1; //initiaze
+                PRLEVEL (1, ("%%cValid=%ld \n",el->cValid));
+                PRLEVEL (1, ("%%first time seen elCol[e]=%ld \n", elCol[e]));
+            }
+            else{ 
+                elCol [e]--; 
+                PRLEVEL (1, ("%%seen before: elCol[e]=%ld \n", elCol[e]));
+                continue;
+            }
+        }
+    }
 
 
     /********* travers over new non pivotal rows of current panel *************/
-
-
-    /*               
-     *
+    /*           Marking seen elements by npMark or time_f
+     *           if marked with pMark just ignore
+     *           if marked with npMark decrease number of rows by 1 
+     *           else initialze number of rows seen
      *
      *                <----------fp--------->
      *                        j1     j2
      *                         ^     ^
-     *                         |     | CBColList  Update here
+     *                         |     | fcolList  Update here
      *                         |     |        \
      *             F           |     |         [QQQQQ|OOOOOOOOO|....
      *              \  ____..._|_  ____...__ _____________________________...
@@ -245,7 +334,7 @@ void paru_update_npColLst (paru_matrix *paruMatInfo, Int panel_num ){
      * |   v          |____...|________..._ #  |      vvvvvv   |
      * |        j2--> |       |     |       #  v    00000000   |           ...
      * rowCount   H   |=============================00 El 00=============
-     * |          E   |       |     |       |       00000000
+     * |          E   |       |     |       |       00000000   Update row degree
      * |              |       |     |       |          vvvvvvvvv
      * |          R   |       |     |       |          xxxxxxxxxxxxxxxxxxxx
      * |          E   |       |row_end      |          xxxxxx El xxxxxxxxxx
@@ -255,6 +344,77 @@ void paru_update_npColLst (paru_matrix *paruMatInfo, Int panel_num ){
      * v              |___....______________|              
      *                         
      */
+    tupleList *RowList = paruMatInfo->RowList;
+    for (Int k = j2; k < row_end; k++){
+        Int r = frowList [k];
+
+        new_row_degree_bound_for_r = curFr->nrows ;
+
+        tupleList *curRowTupleList = &RowList[r];
+        Int numTuple = curRowTupleList->numTuple;
+        ASSERT (numTuple >= 0);
+        Tuple *listRowTuples = curRowTupleList->list;
+#ifndef NDEBUG        
+        Int p = 1;
+        PRLEVEL (p, ("\n %%--------> 2nd r =%ld  numTuple = %ld\n"
+                    , r, numTuple));
+        if (p <= 0)
+            paru_print_tupleList (RowList, r);
+#endif
+        for (Int i = 0; i < numTuple; i++){
+            Tuple curTpl = listRowTuples [i];
+            Int e = curTpl.e;
+
+            //    if (e == el_ind){ //current element}
+            if ( e >= el_ind || e < first[el_ind]){ //Not any of descendents
+                continue;
+            }
+
+
+#ifndef NDEBUG        
+            if (p <= 0)
+                paru_print_element (paruMatInfo, e);
+#endif
+            Int curRowIndex = curTpl.f;
+            Element *el = elementList[e];
+            Int *el_colIndex = colIndex_pointer (el);//pointers to row index
+            Int *el_rowIndex = rowIndex_pointer (el);
+
+            if (el_rowIndex [curRowIndex] < 0 ){
+                continue;  
+            }
+
+            if(el->cValid !=  time_f){
+                el->cValid =  time_f;
+                elCol [e] = el->ncolsleft ; //initiaze
+            }
+            new_row_degree_bound_for_r += elCol [e] ;
+
+            if(el->rValid == pMark) continue;  //already a pivot
+
+            if(el->rValid != npMark){
+                el->rValid =  npMark;
+                elRow [e] = el ->nrowsleft - 1; //initiaze
+                PRLEVEL (1, ("%%rValid=%ld \n",el->rValid));
+                PRLEVEL (1, ("%%first time seen elRow[e]=%ld \n",
+                            elRow[e]));
+            }
+            else{ 
+                elRow [e]--;
+
+                PRLEVEL (1, ("%%seen before: elRow[e]=%ld \n", elRow[e]));
+            }
+
+        }
+
+        Int old_bound_updated = row_degree_bound [r] + curFr->nrows - 1 ;
+
+        row_degree_bound [r] =  // min
+            old_bound_updated < new_row_degree_bound_for_r ? 
+            old_bound_updated : new_row_degree_bound_for_r;
+
+
+    }
 
 
 }

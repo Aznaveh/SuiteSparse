@@ -23,16 +23,16 @@ template <class T> void inline swap (T &a,T &b){
     T c(a); a=b; b=c;
 }
 
-void swap_rows(double *F, Int *fsRowList, Int m, Int n, Int r1, Int r2){
+void swap_rows(double *F, Int *frowList, Int m, Int n, Int r1, Int r2){
     //This function also swap rows r1 and r2 wholly and indices 
     if(r1 == r2) return;
-    swap(fsRowList[r1], fsRowList[r2]);
+    swap(frowList[r1], frowList[r2]);
     for (Int j=0; j < n; j++){   //each column
         swap(F[j*m+r1],F[j*m+r2]);
     }
 }
 
-Int paru_panel_factorize (double *F, Int *fsRowList, Int m, Int n, 
+Int paru_panel_factorize (double *F, Int *frowList, Int m, Int n, 
         const Int panel_width, Int panel_num, Int row_end, 
         paru_matrix *paruMatInfo) {
     // works like dgetf2f.f in netlib v3.0  here is a link:
@@ -62,7 +62,7 @@ Int paru_panel_factorize (double *F, Int *fsRowList, Int m, Int n,
     PRLEVEL (p, ("%% Starting the factorization\n"));
     PRLEVEL (p, ("%% This Panel:\n"));
     for (Int r = j1; r < row_end; r++){
-        PRLEVEL (p, ("%% %ld\t", fsRowList [r]));
+        PRLEVEL (p, ("%% %ld\t", frowList [r]));
         for (Int c = j1; c < j2; c++){
             PRLEVEL (p, (" %2.5lf\t", F[c*m+ r]));
         }
@@ -91,7 +91,10 @@ Int paru_panel_factorize (double *F, Int *fsRowList, Int m, Int n,
             }
         }
         PRLEVEL (1, ("%% max value= %2.4lf\n", maxval));
-
+        
+        if (maxval == 0)  //no pivot found
+            continue;
+ 
         //initialzing pivot as max numeric value
         Int row_sp = row_max;
         Int row_deg_sp= row_degree_bound[row_max];
@@ -108,9 +111,10 @@ Int paru_panel_factorize (double *F, Int *fsRowList, Int m, Int n,
             }
 
         PRLEVEL (1, ("%% piv value= %2.4lf\n", piv));
-        //swap rows
+
+       //swap rows
         PRLEVEL (1, ("%% Swaping rows j=%ld, spr=%ld\n", j, row_sp));
-        swap_rows (F, fsRowList, m , n, j, row_sp);
+        swap_rows (F, frowList, m , n, j, row_sp);
 
 #ifndef NDEBUG  // Printing the pivotal front
         p = 1;
@@ -119,7 +123,7 @@ Int paru_panel_factorize (double *F, Int *fsRowList, Int m, Int n,
         PRLEVEL (p, ("%% After Swaping\n"));
         PRLEVEL (p, (" ;\n"));
         for (Int r = 0; r < row_end; r++){
-            PRLEVEL (p, ("%% %ld\t", fsRowList [r]));
+            PRLEVEL (p, ("%% %ld\t", frowList [r]));
             for (Int c = 0; c < num_col_panel; c++){
                 PRLEVEL (p, (" %2.5lf\t", F[c*m+ r]));
             }
@@ -130,7 +134,7 @@ Int paru_panel_factorize (double *F, Int *fsRowList, Int m, Int n,
 
         //dscal //TODO?: loop unroll is also possible
 
-        if ( j < row_end-1 && piv !=0 ){
+        if ( j < row_end-1 ){
 
             PRLEVEL (1, ("%% dscal\n"));
             for (Int i = j +1 ; i < row_end; i++){ 
@@ -173,7 +177,7 @@ Int paru_panel_factorize (double *F, Int *fsRowList, Int m, Int n,
          */
 
 
-        if ( j < j2 - 1 && maxval != 0 ){
+        if ( j < j2 - 1 ){
             BLAS_INT M = (BLAS_INT) row_end - 1 - j ; 
             BLAS_INT N = (BLAS_INT) j2 - 1 - j;
             double alpha = -1.0;
@@ -203,7 +207,7 @@ Int paru_panel_factorize (double *F, Int *fsRowList, Int m, Int n,
         Int p = 2;
         PRLEVEL (p, ("%% After dger\n"));
         for (Int r = j1; r < row_end; r++){
-            PRLEVEL (p, ("%% %ld\t", fsRowList [r]));
+            PRLEVEL (p, ("%% %ld\t", frowList [r]));
             for (Int c = j1; c < j2; c++){
                 PRLEVEL (p, (" %2.5lf\t", F[c*m+ r]));
             }
@@ -215,7 +219,7 @@ Int paru_panel_factorize (double *F, Int *fsRowList, Int m, Int n,
     return 1;
 }
 
-Int paru_dgetrf (double *F, Int *fsRowList, Int lm, Int ln,
+Int paru_dgetrf (double *F, Int *frowList, Int lm, Int ln,
         BLAS_INT *ipiv){
     DEBUGLEVEL(0);
 
@@ -255,7 +259,7 @@ Int paru_dgetrf (double *F, Int *fsRowList, Int lm, Int ln,
     p = 1;
     PRLEVEL (p, ("Befor factorization (inside factorize): \n"));
     for (int i = 0; i < m ; i++){
-        PRLEVEL (p, ("fsRowList [%d] =%d\n",i, fsRowList [i]));
+        PRLEVEL (p, ("frowList [%d] =%d\n",i, frowList [i]));
     }
     PRLEVEL (p, ("\n"));
 #endif
@@ -283,17 +287,17 @@ Int paru_dgetrf (double *F, Int *fsRowList, Int lm, Int ln,
     PRLEVEL (1, (" m=%d n=%d\n", m, n));
 
 
-    // swap (fsRowList[ipiv [i]], fsRowList[i] ) and it is off by one
+    // swap (frowList[ipiv [i]], frowList[i] ) and it is off by one
     for (Int i = 0; i < n; i++){
         PRLEVEL (1, ("ipiv[%d] =%d\n", i, ipiv[i]));
         ASSERT (ipiv [i] > 0);
         ASSERT (ipiv [i] <= m);
-        Int tmp =  fsRowList[ipiv [i]-1];
+        Int tmp =  frowList[ipiv [i]-1];
         PRLEVEL (1, ("tmp =%ld\n", tmp));
         ASSERT (tmp >= 0);
 
-        fsRowList[ipiv [i]-1] = fsRowList [i];
-        fsRowList [i] = tmp;
+        frowList[ipiv [i]-1] = frowList [i];
+        frowList [i] = tmp;
     }
 
 #ifndef NDEBUG   // Printing the LU decomposition
@@ -315,7 +319,7 @@ Int paru_dgetrf (double *F, Int *fsRowList, Int lm, Int ln,
     return 0;
 }
 
-Int paru_factorize(double *F, Int *fsRowList, Int rowCount, Int f, 
+Int paru_factorize(double *F, Int *frowList, Int rowCount, Int f, 
         Int *panel_row, paru_matrix *paruMatInfo){
     DEBUGLEVEL (0);
 
@@ -328,9 +332,9 @@ Int paru_factorize(double *F, Int *fsRowList, Int rowCount, Int f,
     work_struct *Work =  paruMatInfo->Work;
     Int *row_degree_bound = paruMatInfo->row_degree_bound;
     BLAS_INT *ipiv = (BLAS_INT*) (Work->scratch+rowCount);
-    //    return paru_panel_factorize ( F, fsRowList, rowCount, fp, 
+    //    return paru_panel_factorize ( F, frowList, rowCount, fp, 
     //                fp, 0, rowCount, paruMatInfo);
-    //return paru_dgetrf (F , fsRowList, rowCount, fp, ipiv);
+    //return paru_dgetrf (F , frowList, rowCount, fp, ipiv);
 
     Int panel_width = paruMatInfo->panel_width;
     for(Int panel_num = 0; ; panel_num++){
@@ -340,7 +344,7 @@ Int paru_factorize(double *F, Int *fsRowList, Int rowCount, Int f,
     PRLEVEL (p, ("%%Pivotal Front Before %ld\n",panel_num));
     
     for (Int r = 0; r < rowCount; r++){
-        PRLEVEL (p, ("%% %ld\t", fsRowList [r]));
+        PRLEVEL (p, ("%% %ld\t", frowList [r]));
         for (Int c = 0; c < fp; c++){
             PRLEVEL (p, (" %2.5lf\t", F[c*rowCount+ r]));
         }
@@ -352,7 +356,7 @@ Int paru_factorize(double *F, Int *fsRowList, Int rowCount, Int f,
         Int j1 = panel_num*panel_width;
         Int j2 = (panel_num+1)*panel_width;
         // factorize current panel
-        paru_panel_factorize ( F, fsRowList, rowCount, fp, 
+        paru_panel_factorize ( F, frowList, rowCount, fp, 
                 panel_width, panel_num, row_end, paruMatInfo);
         if ( j2 >= fp) //if it is not the last panel
             break;
@@ -398,7 +402,7 @@ Int paru_factorize(double *F, Int *fsRowList, Int rowCount, Int f,
             PRLEVEL (p, ("%% Pivotal Front Before Trsm: %ld x %ld\n",
                         fp, rowCount));
             for (Int r = 0; r < rowCount; r++){
-                PRLEVEL (p, ("%% %ld\t", fsRowList [r]));
+                PRLEVEL (p, ("%% %ld\t", frowList [r]));
                 for (Int c = 0; c < fp; c++){
                     PRLEVEL (p, (" %2.5lf\t", F[c*rowCount+ r]));
                 }
@@ -414,7 +418,7 @@ Int paru_factorize(double *F, Int *fsRowList, Int rowCount, Int f,
             PRLEVEL (p, ("%% Pivotal Front After Trsm: %ld x %ld\n %%", 
                         fp, rowCount));
             for (Int r = 0; r < rowCount; r++){
-                PRLEVEL (p, ("%% %ld\t", fsRowList [r]));
+                PRLEVEL (p, ("%% %ld\t", frowList [r]));
                 for (Int c = 0; c < fp; c++){
                     PRLEVEL (p, (" %2.5lf\t", F[c*rowCount+ r]));
                 }
@@ -491,7 +495,7 @@ Int paru_factorize(double *F, Int *fsRowList, Int rowCount, Int f,
         PRLEVEL (p, ("%% Pivotal Front After Dgemm: %ld x %ld\n %%", 
                     fp, rowCount));
         for (Int r = 0; r < rowCount; r++){
-            PRLEVEL (p, ("%% %ld\t", fsRowList [r]));
+            PRLEVEL (p, ("%% %ld\t", frowList [r]));
             for (Int c = 0; c < fp; c++){
                 PRLEVEL (p, (" %2.5lf\t", F[c*rowCount+ r]));
             }
@@ -503,7 +507,7 @@ Int paru_factorize(double *F, Int *fsRowList, Int rowCount, Int f,
 
         paruMatInfo->time_stamp[f]++;
         //        paru_update_rowDeg ( panel_num, row_end, colCount, f, 
-        //                CBColList, paruMatInfo);
+        //                fcolList, paruMatInfo);
         paruMatInfo->time_stamp[f]+= 2;
 
 

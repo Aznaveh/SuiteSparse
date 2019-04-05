@@ -5,10 +5,10 @@
 
 void *paru_alloc (Int n, Int size, cholmod_common *cc){
     DEBUGLEVEL(0);
-#ifndef NDEBUG
+//#ifndef NDEBUG
     static Int alloc_count =0;
     alloc_count += n*size ;
-#endif
+//#endif
     void *p = cholmod_l_malloc (n,size,cc);
     PRLEVEL (1, ("%% allocated %ld in %p total= %ld\n", 
                 n*size, p, alloc_count ));
@@ -17,10 +17,10 @@ void *paru_alloc (Int n, Int size, cholmod_common *cc){
 
 void *paru_calloc(Int n, Int size, cholmod_common *cc){
     DEBUGLEVEL(0);
-#ifndef NDEBUG
+//#ifndef NDEBUG
     static Int calloc_count =0;
     calloc_count += n*size ;
-#endif
+//#endif
     void *p= cholmod_l_calloc (n,size,cc);       
     PRLEVEL (1, ("%% callocated %ld in %p total= %ld\n", 
                 n*size, p, calloc_count ));
@@ -35,10 +35,10 @@ void *paru_realloc(
         cholmod_common *cc){
 
     DEBUGLEVEL(0);
-#ifndef NDEBUG
+//#ifndef NDEBUG
     static Int realloc_count =0;
     realloc_count += newsize*size_Entry - *size;
-#endif
+//#endif
     void *p= cholmod_l_realloc (newsize, size_Entry, oldP, (size_t*)size, cc);
     PRLEVEL (1, ("%% reallocated %ld in %p and freed %p total= %ld\n", 
                 newsize*size_Entry, p, oldP, realloc_count ));
@@ -48,10 +48,10 @@ void *paru_realloc(
 
 void paru_free (Int n, Int size, void *p,  cholmod_common *cc){
     DEBUGLEVEL(0);
-#ifndef NDEBUG
+//#ifndef NDEBUG
     static Int free_count =0;
     free_count+= n*size ;
-#endif
+//#endif
     if(p != NULL)
         cholmod_l_free (n,   size, p, cc);
 #ifndef NDEBUG
@@ -199,6 +199,14 @@ void paru_freemat (paru_matrix **paruMatInfo_handle,
     paru_fac *LUs =  paruMatInfo->partial_LUs;
     paru_fac *Us =  paruMatInfo->partial_Us;
     for(Int i = 0; i < nf ; i++){  
+        
+        paru_free (paruMatInfo->frowCount[i], 
+                sizeof(Int), paruMatInfo->frowList[i], cc);
+
+        paru_free (paruMatInfo->fcolCount[i], 
+                sizeof(Int), paruMatInfo->fcolList[i], cc);
+
+
         PRLEVEL (1, ("%% Freeing Us=%p\n", Us[i].p));
         if(Us[i].p != NULL){
             Int m=Us[i].m; Int n=Us[i].n;
@@ -210,6 +218,12 @@ void paru_freemat (paru_matrix **paruMatInfo_handle,
             paru_free (m*n, sizeof (double), LUs[i].p, cc);
         }
     }
+
+    paru_free(1, nf*sizeof(Int),paruMatInfo->frowCount, cc);
+    paru_free(1, nf*sizeof(Int),paruMatInfo->fcolCount, cc);
+
+    paru_free(1, nf*sizeof(Int*),paruMatInfo->frowList, cc);
+    paru_free(1, nf*sizeof(Int*),paruMatInfo->fcolList, cc);
 
     paru_free(1, nf*sizeof(paru_fac),LUs, cc);
     paru_free(1, nf*sizeof(paru_fac),Us, cc);

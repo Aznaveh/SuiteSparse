@@ -57,7 +57,9 @@ void paru_assemble (
     Int p1 = Rp [f];        /* Rj [p1:p2-1] = columns in F */
     Int p2 = Rp [f+1];
     Int fp = col2 - col1;   /* first fp columns are pivotal */ 
+
     Int fn = p2 - p1;          /* Upper bound number of columns of F */ 
+    Int fm = LUsym->Fm[f];     /* Upper bound number of rows of F */ 
     Element **elementList = paruMatInfo->elementList;
     work_struct *Work =  paruMatInfo->Work;
 
@@ -92,9 +94,17 @@ void paru_assemble (
         rowMark = Work->rowMark = 0;
     }
 
-    Int *fsRowList = Work->scratch; // fully summed row list
-    PRLEVEL (1, ("%%fsRowList(scratch)=%p isRowInFront(all_initialized)=%p\n", 
-                fsRowList, isRowInFront));
+ //   Int *frowList = Work->scratch; // fully summed row list
+
+    PRLEVEL (0, ("%% the size of fm is %ld\n",fm));
+    Int *frowList = (Int*) paru_alloc (fm, sizeof (Int), cc);
+    paruMatInfo->frowList[f] = frowList;
+    if (frowList == NULL ){
+        printf ("%% Out of memory when tried to allocate for frowList %ld",f);
+        return;
+    }
+    PRLEVEL (1, ("%%frowList(scratch)=%p isRowInFront(all_initialized)=%p\n", 
+                frowList, isRowInFront));
 
 #ifndef NDEBUG /* chekcing first part of Work to be zero */
     for (Int i = 0; i < m; i++){  
@@ -122,7 +132,7 @@ void paru_assemble (
         if( (c-col1) % panel_width == 0 && c != col1  ){ 
             panel_row [panel_num++] = rowCount;
         }
-        
+
         tupleList *curColTupleList = &ColList[c];
         Int numTuple = curColTupleList->numTuple;
         ASSERT (numTuple >= 0);
@@ -201,7 +211,7 @@ void paru_assemble (
                     // Adding curRow to the set
                     PRLEVEL (1, ("%%curRow =%ld rowCount=%ld\n", 
                                 curRow, rowCount));
-                    fsRowList [rowCount] = curRow;
+                    frowList [rowCount] = curRow;
                     rowRelIndex [rEl] = rowCount ;
                     PRLEVEL (1, ("%%1st: rowRelIndex[%ld] = %ld\n",
                                 rEl, rowCount ));
@@ -224,10 +234,10 @@ void paru_assemble (
     ASSERT (panel_num == (Int) ceil( (double)fp/panel_width) );
 
 #ifndef NDEBUG /* Checking if pivotal rows are correct */
-    Int p = 1;
+    Int p = 0;
     PRLEVEL (p, ("%%There are %ld rows in this front: \n", rowCount));
     for (Int i = 0; i < rowCount; i++)
-        PRLEVEL (p, ("%% %ld", fsRowList [i]));
+        PRLEVEL (p, ("%% %ld", frowList [i]));
     PRLEVEL (p, ("\n"));
     Int stl_rowSize = stl_rowSet.size();
     if (rowCount != stl_rowSize){
@@ -236,7 +246,7 @@ void paru_assemble (
             PRLEVEL (p, ("%% %ld", *it));
         PRLEVEL (p, ("\n%%My Set %ld:\n",rowCount));
         for (Int i = 0; i < rowCount; i++)
-            PRLEVEL (p, ("%% %ld", fsRowList [i]));
+            PRLEVEL (p, ("%% %ld", frowList [i]));
         PRLEVEL (p, ("\n"));
     }
     ASSERT (rowCount == stl_rowSize );
@@ -255,7 +265,18 @@ void paru_assemble (
         return;
     }
 
+    ASSERT ( fm >= rowCount );
+    //freeing extra space for rows
+    if (rowCount != fm){
+        Int sz = sizeof(Int)*fm; 
+        frowList =
+            (Int*) paru_realloc (rowCount, sizeof(Int), frowList, &sz, cc);
+        paruMatInfo ->frowList[f] = frowList;
+    }
+
     paru_fac *LUs =  paruMatInfo->partial_LUs;
+    paruMatInfo->frowCount[f] = rowCount;
+
     LUs[f].m =rowCount;
     LUs[f].n=fp;
     ASSERT (LUs[f].p == NULL);
@@ -347,7 +368,7 @@ void paru_assemble (
             }
             PRLEVEL (p, (" ;\n"));
             for (Int r = 0; r < rowCount; r++){
-                PRLEVEL (p, ("%% %ld\t", fsRowList [r]));
+                PRLEVEL (p, ("%% %ld\t", frowList [r]));
                 for (Int c = col1; c < col2; c++){
                     PRLEVEL (p, (" %2.5lf\t", 
                                 pivotalFront [(c-col1)*rowCount + r]));
@@ -368,7 +389,7 @@ void paru_assemble (
     }
     PRLEVEL (p, (" ;\n"));
     for (Int r = 0; r < rowCount; r++){
-        PRLEVEL (p, ("%% %ld\t", fsRowList [r]));
+        PRLEVEL (p, ("%% %ld\t", frowList [r]));
         for (Int c = col1; c < col2; c++){
             PRLEVEL (p, (" %2.5lf\t", pivotalFront [(c-col1)*rowCount + r]));
         }
@@ -383,7 +404,7 @@ void paru_assemble (
     p = 1;
     PRLEVEL (p, ("%% Befor factorization (inside assemble): \n"));
     for (int i = 0; i < rowCount; i++){
-        PRLEVEL (p, ("%% fsRowList [%d] =%d\n",i, fsRowList [i]));
+        PRLEVEL (p, ("%% frowList [%d] =%d\n",i, frowList [i]));
     }
     PRLEVEL (p, ("\n"));
 #endif
@@ -392,13 +413,13 @@ void paru_assemble (
 
     /* using the rest of scratch for permutation; Not sure about 1  */
     BLAS_INT *ipiv = (BLAS_INT*) (Work->scratch+rowCount);
-    //Int fac = paru_dgetrf (pivotalFront, fsRowList, rowCount, fp, ipiv);
+    //Int fac = paru_dgetrf (pivotalFront, frowList, rowCount, fp, ipiv);
     if (rowCount < fp){
         PRLEVEL (0, ("%% %ldx%ld \n",rowCount, fp));
         printf ("structural problem\n");
         exit(0);
     }
-    Int fac = paru_factorize(pivotalFront, fsRowList, rowCount, f, 
+    Int fac = paru_factorize(pivotalFront, frowList, rowCount, f, 
             panel_row, paruMatInfo);
 
     /* To this point fully summed part of the front is computed and L and U    /  
@@ -418,7 +439,7 @@ void paru_assemble (
     p = 1;
     PRLEVEL (p, ("%% After factorization (inside assemble): \n"));
     for (int i = 0; i < rowCount; i++){
-        PRLEVEL (p, ("%% fsRowList [%d] =%d\n",i, fsRowList [i]));
+        PRLEVEL (p, ("%% frowList [%d] =%d\n",i, frowList [i]));
     }
     PRLEVEL (p, ("\n"));
 #endif
@@ -428,11 +449,11 @@ void paru_assemble (
     p = 1;
     PRLEVEL (p, ("%% pivotal rows:\n"));
     for (int i = 0; i < fp; i++){
-        PRLEVEL (p, ("%% fsRowList[%d] =%d\n",i, fsRowList[i]));
+        PRLEVEL (p, ("%% frowList[%d] =%d\n",i, frowList[i]));
     }
     PRLEVEL (p, ("%% =======\n"));
     for (int i = fp; i < rowCount; i++){
-        PRLEVEL (p, ("%% fsRowList[%d] =%d\n",i, fsRowList[i]));
+        PRLEVEL (p, ("%% frowList[%d] =%d\n",i, frowList[i]));
     }
     PRLEVEL (p, ("\n"));
 #endif
@@ -451,7 +472,7 @@ void paru_assemble (
     //row permutatin
     PRLEVEL (p, ("rows{%ld} = [",f+1));
     for (Int r = 0; r < rowCount; r++)
-        PRLEVEL (p, ("%ld ", fsRowList [r]+1)); //Matlab is base 1
+        PRLEVEL (p, ("%ld ", frowList [r]+1)); //Matlab is base 1
     PRLEVEL (p, ("];\n"));
 
     //inv row permutatin
@@ -460,7 +481,7 @@ void paru_assemble (
     for (Int r = 0; r < rowCount; r++){
         PRLEVEL (p, (" "));
         for (Int c = col1; c < col2; c++){
-            PRLEVEL (p, (" %.16lf ", pivotalFront [(c-col1)*rowCount + r]));
+            PRLEVEL (p, (" %.16g ", pivotalFront [(c-col1)*rowCount + r]));
         }
         PRLEVEL (p, (";\n   "));
     }
@@ -480,7 +501,9 @@ void paru_assemble (
         memset (isColInCBcolSet , -1, n*sizeof(Int));
         colMark = Work-> colMark = 0;
     }
-    Int *CBColList = Work -> scratch + 2*rowCount;//scratch=[fsRowList..ipiv..]
+//    Int *fcolList = Work -> scratch + 2*rowCount;//scratch=[frowList..ipiv..]
+    Int *fcolList = (Int*) paru_alloc (fn, sizeof (Int), cc);
+    paruMatInfo->fcolList[f] = fcolList;
     Int colCount = 0;
 
 #ifndef NDEBUG
@@ -490,7 +513,7 @@ void paru_assemble (
     tupleList *RowList = paruMatInfo->RowList;
     for (Int i = 0; i < fp; i++){
         Int curFsRowIndex =(Int) i; //current fully summed row index
-        Int curFsRow = fsRowList [i];
+        Int curFsRow = frowList [i];
         PRLEVEL (1, ("%% 4: curFsRowIndex = %ld\n", curFsRowIndex));
         PRLEVEL (1, ("%% curFsRow =%ld\n", curFsRow));
         tupleList *curRowTupleList = &RowList [curFsRow];
@@ -553,7 +576,7 @@ void paru_assemble (
                 if (isColInCBcolSet [curCol] < colMark  ){
                     PRLEVEL (1, ("%% curCol = %ld colCount=%ld\n", 
                                 curCol, colCount));
-                    CBColList [colCount] = curCol;
+                    fcolList [colCount] = curCol;
                     colRelIndex [cEl] = colCount;
                     isColInCBcolSet [curCol] = colMark + colCount++; 
                 }
@@ -568,6 +591,16 @@ void paru_assemble (
     paru_free ( (Int) ceil( (double)fp/panel_width) ,  // Do not need this space
             sizeof (Int), panel_row, cc);
 
+    ASSERT ( fn >= colCount );
+    //freeing extra space for cols
+    if (colCount != fn){
+        Int sz = sizeof(Int)*fn; 
+        fcolList =
+            (Int*) paru_realloc (colCount, sizeof(Int), fcolList, &sz, cc);
+        paruMatInfo ->fcolList[f] = fcolList;
+    }
+
+
     // EXIT point HERE 
     if (colCount == 0){  // there is no CB, Nothing to be done
         Work->rowMark +=  rowCount;
@@ -580,7 +613,7 @@ void paru_assemble (
     PRLEVEL (p, ("%% There are %ld columns in this contribution block: \n",
                 colCount));
     for (Int i = 0; i < colCount; i++)
-        PRLEVEL (p, ("%%  %ld", CBColList [i]));
+        PRLEVEL (p, ("%%  %ld", fcolList [i]));
     PRLEVEL (p, ("\n"));
     Int stl_colSize = stl_colSet.size();
     if (colCount != stl_colSize){
@@ -589,7 +622,7 @@ void paru_assemble (
             PRLEVEL (p, ("%%  %ld", *it));
         PRLEVEL (p, ("\n%% My Set %ld:\n",colCount));
         for (Int i = 0; i < colCount; i++)
-            PRLEVEL (p, ("%%  %ld", CBColList [i]));
+            PRLEVEL (p, ("%%  %ld", fcolList [i]));
         PRLEVEL (p, ("\n"));
     }
     ASSERT (colCount == stl_colSize );
@@ -608,13 +641,14 @@ void paru_assemble (
     paru_fac *Us =  paruMatInfo->partial_Us;
     Us[f].m=fp;
     Us[f].n =colCount;
+    paruMatInfo->fcolCount[f] = colCount;
     ASSERT (Us[f].p == NULL);
     Us[f].p = uPart;
 
 
     for (Int i = 0; i < fp; i++){
         Int curFsRowIndex = i; //current fully summed row index
-        Int curFsRow = fsRowList [curFsRowIndex];
+        Int curFsRow = frowList [curFsRowIndex];
         PRLEVEL (1, ("%% curFsRow =%ld\n", curFsRow));
         tupleList *curRowTupleList = &RowList [curFsRow];
         Int numTuple = curRowTupleList->numTuple;
@@ -661,11 +695,11 @@ void paru_assemble (
     PRLEVEL (p, ("%% U part Before TRSM: %ld x %ld\n", fp, colCount));
     PRLEVEL (p, ("%% U\t"));
     for (Int i = 0; i < colCount; i++){
-        PRLEVEL (p, ("%ld\t\t", CBColList[i]));
+        PRLEVEL (p, ("%ld\t\t", fcolList[i]));
     }
     PRLEVEL (p, ("\n"));
     for (Int i = 0; i < fp; i++){
-        PRLEVEL (p, ("%% %ld\t",  fsRowList [i]));
+        PRLEVEL (p, ("%% %ld\t",  frowList [i]));
         for (Int j = 0; j < colCount; j++){
             PRLEVEL (p, (" %2.5lf\t", uPart[j*fp+i]));
         }
@@ -686,14 +720,14 @@ void paru_assemble (
 
     PRLEVEL (p, ("Ucols{%ld} = [",f+1));
     for (Int i = 0; i < colCount; i++){
-        PRLEVEL (p, ("%ld ", CBColList[i]+1));
+        PRLEVEL (p, ("%ld ", fcolList[i]+1));
     }
     PRLEVEL (p, ("];\n"));
 
 
     PRLEVEL (p, ("Urows{%ld} = [",f+1));
     for (Int i = 0; i < fp; i++)
-        PRLEVEL (p, ("%ld ",  fsRowList [i]+1));
+        PRLEVEL (p, ("%ld ",  frowList [i]+1));
     PRLEVEL (p, ("];\n"));
 
 
@@ -701,7 +735,7 @@ void paru_assemble (
 
     for (Int i = 0; i < fp; i++){
         for (Int j = 0; j < colCount; j++){
-            PRLEVEL (p, (" %.16lf ", uPart[j*fp+i]));
+            PRLEVEL (p, (" %.16g ", uPart[j*fp+i]));
         }
         PRLEVEL (p, (";\n    "));
     }
@@ -729,13 +763,13 @@ void paru_assemble (
     // Initializing curEl global indices
     Int *el_colIndex = colIndex_pointer (curEl);
     for (Int i = 0; i < colCount; ++ i) {
-        el_colIndex [i] = CBColList[i];
+        el_colIndex [i] = fcolList[i];
         Tuple colTuple;
     }
     Int *el_rowIndex = rowIndex_pointer (curEl);
     for (Int i = fp; i < rowCount; ++ i) {
         Int locIndx = i-fp; 
-        el_rowIndex [locIndx] = fsRowList[i];
+        el_rowIndex [locIndx] = frowList[i];
         PRLEVEL (1, ("%% el_rowIndex [%ld] =%ld\n",
                     locIndx, el_rowIndex [locIndx]));
     }
@@ -776,7 +810,7 @@ void paru_assemble (
         Tuple colTuple;
         colTuple.e = eli;
         colTuple.f = i;
-        if (paru_add_colTuple (ColList, CBColList[i], colTuple, cc) ){
+        if (paru_add_colTuple (ColList, fcolList[i], colTuple, cc) ){
             printf("%% Out of memory: add_colTuple \n");
             return;
         }
@@ -786,7 +820,7 @@ void paru_assemble (
        Tuple rowTuple;
         rowTuple.e = eli;
         rowTuple.f = locIndx;
-        if (paru_add_rowTuple (RowList, fsRowList[i], rowTuple, cc) ){
+        if (paru_add_rowTuple (RowList, frowList[i], rowTuple, cc) ){
             printf("%% Out of memory: add_colTuple \n");
             return; 
         }
