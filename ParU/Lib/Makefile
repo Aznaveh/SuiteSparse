@@ -48,7 +48,8 @@ OBJ = \
 	paru_print.o\
 	paru_fourPass.o\
 	paru_init_rel.o\
-	paru_update_rel_ind.o
+	paru_update_rel_ind.o\
+	paru_write.o
 
 $(OBJ): $(INC)
 
@@ -107,8 +108,8 @@ paru_init_rel.o: ../Source/paru_init_rel.cpp
 paru_update_rel_ind.o: ../Source/paru_update_rel_ind.cpp
 	$(C) -c $<
 
-
-
+paru_write.o: ../Source/paru_write.cpp
+	$(C) -c $<
 
 #-------------------------------------------------------------------------------
 

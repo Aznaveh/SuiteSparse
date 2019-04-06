@@ -34,18 +34,18 @@ int main (int argc, char **argv)
 
 
     double F[9]= {1, 2, 3, 1, 8, 3, 4, 5, 6};
-    Int fsRowList[3] = {5, 12, 7};
+    Int frowList[3] = {5, 12, 7};
     Int rowCount = 3; Int fp = 3;
 
 
 //    double F[4]= {1, 2, 3, 1};
-//    Int fsRowList[2] = {5, 12};
+//    Int frowList[2] = {5, 12};
 //    Int rowCount = 2; Int fp = 2;
  
-//    paru_panel_factorize ( F, fsRowList, rowCount, fp, 
+//    paru_panel_factorize ( F, frowList, rowCount, fp, 
 //            fp, 0, rowCount, paruMatInfo);
 
-    paru_factorize(F, fsRowList, rowCount, fp, paruMatInfo);
+    paru_factorize(F, frowList, rowCount, fp, paruMatInfo);
 
     printf("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*\n");
 
@@ -56,7 +56,7 @@ int main (int argc, char **argv)
     cholmod_l_finish (cc);
 
     for (Int j=0; j < fp; j++){
-        printf ("%ld\t", fsRowList[j]);
+        printf ("%ld\t", frowList[j]);
         for (Int i=0; i < rowCount; i++){
             printf ("%2.4lf\t", F[i*rowCount+j]);
         }

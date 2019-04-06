@@ -75,6 +75,7 @@ int main (int argc, char **argv)
     }
 
 
+    paru_write(paruMatInfo, cc);
 
     cholmod_l_free_sparse (&A, cc);
     paru_freemat (&paruMatInfo, cc);
