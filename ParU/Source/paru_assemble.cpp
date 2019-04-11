@@ -604,6 +604,7 @@ void paru_assemble (
     // EXIT point HERE 
     if (colCount == 0){  // there is no CB, Nothing to be done
         Work->rowMark +=  rowCount;
+        paruMatInfo->fcolCount[f] = 0;
         PRLEVEL (1, ("%% pivotalFront =%p\n",pivotalFront));
         return;
     }

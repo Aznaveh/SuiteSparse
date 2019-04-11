@@ -36,7 +36,7 @@ typedef std::complex<double> Complex ;
 #define NPRINT
 #endif
 
-//Aznaveh
+//Aznaveh For MATLAB OUTPUT UNCOMMENT HERE
 // uncomment the following line to turn on debugging (SPQR will be slow!)
 #undef NDEBUG
 

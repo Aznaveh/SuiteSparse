@@ -316,3 +316,5 @@ void paru_print_tupleList (tupleList *listSet, Int index);
 void paru_init_rel (paru_matrix *paruMatInfo, Int f);
 void paru_update_rel_ind (Element *el, Element *cb_el, 
         char rc, cholmod_common *cc );
+
+void paru_write( paru_matrix *paruMatInfo, cholmod_common *cc);
