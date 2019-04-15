@@ -24,7 +24,8 @@ void paru_write( paru_matrix *paruMatInfo, cholmod_common *cc){
 
     //-------------------- writing column permutation to a file
     FILE *colfptr;
-    colfptr = ( fopen("./col.txt","w"));
+//    colfptr = ( fopen("./col.txt","w"));
+    colfptr = ( fopen("/users/aznaveh/SuiteSparse/ParU/Demo/col.txt","w"));
     if (colfptr == NULL ){
         printf ("Error in opening a file");
         return;
@@ -41,7 +42,7 @@ void paru_write( paru_matrix *paruMatInfo, cholmod_common *cc){
     
     //-------------------- writing row permutation to a file
     FILE *rowfptr;
-    rowfptr = ( fopen("./row.txt","w"));
+    rowfptr = ( fopen("/users/aznaveh/SuiteSparse/ParU/Demo/row.txt","w"));
     if (rowfptr == NULL ){
         printf ("Error in opening a file");
         return;
@@ -79,7 +80,8 @@ void paru_write( paru_matrix *paruMatInfo, cholmod_common *cc){
     
 
     FILE *LUfptr;
-    LUfptr = ( fopen("./out.txt","w"));
+    //LUfptr = ( fopen("./out.txt","w"));
+    LUfptr = ( fopen("/users/aznaveh/SuiteSparse/ParU/Demo/out.txt","w"));
     if (LUfptr == NULL ){
         printf ("Error in opening a file");
         return;
