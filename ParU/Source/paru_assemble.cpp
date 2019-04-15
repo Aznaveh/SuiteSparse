@@ -29,7 +29,7 @@ void paru_assemble (
         cholmod_common *cc)
 
 {
-    DEBUGLEVEL(0);
+    DEBUGLEVEL(-2);
     /* 
      * -2 Print Nothing
      * -1 Just Matlab
@@ -94,7 +94,6 @@ void paru_assemble (
         rowMark = Work->rowMark = 0;
     }
 
- //   Int *frowList = Work->scratch; // fully summed row list
 
     PRLEVEL (0, ("%% the size of fm is %ld\n",fm));
     Int *frowList = (Int*) paru_alloc (fm, sizeof (Int), cc);
@@ -103,8 +102,6 @@ void paru_assemble (
         printf ("%% Out of memory when tried to allocate for frowList %ld",f);
         return;
     }
-    PRLEVEL (1, ("%%frowList(scratch)=%p isRowInFront(all_initialized)=%p\n", 
-                frowList, isRowInFront));
 
 #ifndef NDEBUG /* chekcing first part of Work to be zero */
     for (Int i = 0; i < m; i++){  
@@ -412,7 +409,7 @@ void paru_assemble (
 
 
     /* using the rest of scratch for permutation; Not sure about 1  */
-    BLAS_INT *ipiv = (BLAS_INT*) (Work->scratch+rowCount);
+    //BLAS_INT *ipiv = (BLAS_INT*) (Work->scratch+rowCount);
     //Int fac = paru_dgetrf (pivotalFront, frowList, rowCount, fp, ipiv);
     if (rowCount < fp){
         PRLEVEL (0, ("%% %ldx%ld \n",rowCount, fp));
@@ -501,7 +498,7 @@ void paru_assemble (
         memset (isColInCBcolSet , -1, n*sizeof(Int));
         colMark = Work-> colMark = 0;
     }
-//    Int *fcolList = Work -> scratch + 2*rowCount;//scratch=[frowList..ipiv..]
+
     Int *fcolList = (Int*) paru_alloc (fn, sizeof (Int), cc);
     paruMatInfo->fcolList[f] = fcolList;
     Int colCount = 0;

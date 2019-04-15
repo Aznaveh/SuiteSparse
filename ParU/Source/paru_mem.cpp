@@ -144,7 +144,7 @@ void paru_freemat (paru_matrix **paruMatInfo_handle,
         // ASSERT (len < m);  // it is a wrong assertion but there is a good
         //  point
         if (len > m+nf )                        
-            printf ("%% too much space used for %ld\n",col);
+            PRLEVEL (1, ("%% too much space used for %ld\n",col););
         paru_free (len , sizeof (Tuple), ColList[col].list, cc);
     }
     paru_free (1, n*sizeof(tupleList), ColList, cc);
@@ -233,7 +233,7 @@ void paru_freemat (paru_matrix **paruMatInfo_handle,
     paru_free (1, (m+nf+1)*sizeof(Element), elementList, cc);
     work_struct *Work = paruMatInfo->Work;
     paru_free (m, sizeof(Int), Work->rowSize, cc);
-    paru_free (2*m+n, sizeof(Int), Work->scratch, cc);
+    //    paru_free (2*m+n, sizeof(Int), Work->scratch, cc);
     paru_free (n, sizeof(Int), Work->colSize, cc);
     paru_free (m+nf, sizeof(Int), Work->elRow, cc);
     paru_free (m+nf, sizeof(Int), Work->elCol, cc);

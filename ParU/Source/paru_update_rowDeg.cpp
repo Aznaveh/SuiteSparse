@@ -90,8 +90,7 @@ void paru_update_rowDeg ( Int panel_num,  Int row_end,
         memset (isColInCBcolSet , -1, n*sizeof(Int));
         colMark = Work-> colMark = 0;
     }
-//    Int *fcolList = Work -> scratch + 2*rowCount;//scratch=[frowList..ipiv..]
-//    Int *frowList = Work->scratch; // fully summed row list
+
     Int *frowList = paruMatInfo->frowList[f];
     Int *fcolList = paruMatInfo->fcolList[f];
     Int colCount = 0;

@@ -35,7 +35,6 @@ void paru_fourPass (paru_matrix *paruMatInfo,
     Int rowCount= curFr->nrows + fp;
     Int colCount = curFr->ncols;
 
-//    Int *fcolList = Work -> scratch + 2*rowCount; //scratch=[frowList..ipiv..]
      Int *fcolList = paruMatInfo->fcolList[f] ;
 
     Int *isColInCBcolSet = Work -> colSize;
@@ -101,7 +100,6 @@ void paru_fourPass (paru_matrix *paruMatInfo,
     /**************************************************************************/
     double *cur_Numeric = numeric_pointer (curFr);
     Int new_row_degree_bound_for_r ;
-//    Int *frowList = Work->scratch; // fully summed row list
      Int *frowList = paruMatInfo->frowList[f] ;
 #ifndef NDEBUG            
     Int p = 1;

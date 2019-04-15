@@ -331,9 +331,10 @@ Int paru_factorize(double *F, Int *frowList, Int rowCount, Int f,
 
     work_struct *Work =  paruMatInfo->Work;
     Int *row_degree_bound = paruMatInfo->row_degree_bound;
-    BLAS_INT *ipiv = (BLAS_INT*) (Work->scratch+rowCount);
     //    return paru_panel_factorize ( F, frowList, rowCount, fp, 
     //                fp, 0, rowCount, paruMatInfo);
+
+    //BLAS_INT *ipiv = (BLAS_INT*) (Work->scratch+rowCount);
     //return paru_dgetrf (F , frowList, rowCount, fp, ipiv);
 
     Int panel_width = paruMatInfo->panel_width;
