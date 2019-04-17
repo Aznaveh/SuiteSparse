@@ -79,14 +79,14 @@ for k = 637:nmat
 
 
     umfStart= tic;
-    [l,u,p]=lu(A, 'vector');
+    [l,u,p,q,D]=lu(A, 'vector');
     umfElaps = toc(umfStart);
     
 
 	L=tril(LU,-1)+speye(size(LU));
 	U=triu(LU); 
     myErr = lu_normest(A(rowp,colp),L,U);
-    matlabErr = lu_normest(A(p,:),l,u);
+    matlabErr = lu_normest(D(:,p)\A(:,q),l,u);
 
     fprintf(ff,'%d\tmyErr=%g\tmatlabErr=%g\t\n',id,myErr, matlabErr);
     fprintf(ff,'%d\tmyElaps=%g\tmatlabElaps=%g\t',id,myElaps, umfElaps);
