@@ -1,0 +1,1307 @@
+449	myErr=1.38778e-17	matlabErr=8.32667e-17	
+449	myElaps=0.065683	matlabElaps=0.000358		Pass
+185	myErr=7.77156e-16	matlabErr=4.44089e-16	
+185	myElaps=0.162527	matlabElaps=0.000178		Pass
+186	myErr=1.05471e-15	matlabErr=7.77156e-16	
+186	myElaps=0.052078	matlabElaps=0.000206		Pass
+1199	myErr=5.72042e-14	matlabErr=8.32667e-17	
+1199	myElaps=0.044385	matlabElaps=0.00014		Pass
+13	myErr=3.10862e-15	matlabErr=2.77556e-16	
+13	myElaps=0.056114	matlabElaps=0.001403		Pass
+464	myErr=1.40025e-15	matlabErr=2.17654e-15	
+464	myElaps=0.041765	matlabElaps=0.000141		Pass
+97	myErr=3.88578e-16	matlabErr=5.27356e-16	
+97	myElaps=0.049379	matlabElaps=0.000211		Pass
+14	myErr=1.66533e-15	matlabErr=1.94289e-16	
+14	myElaps=0.04827	matlabElaps=0.000138		Pass
+1177	myErr=3.05311e-16	matlabErr=2.77556e-16	
+1177	myElaps=0.048492	matlabElaps=0.000113		Pass
+232	myErr=8.40055e-09	matlabErr=7.03039e-10	
+232	myElaps=0.044621	matlabElaps=9.8e-05		Pass
+103	myErr=2.33147e-15	matlabErr=3.05311e-16	
+103	myElaps=0.048346	matlabElaps=0.000185		Pass
+133	myErr=2.08167e-17	matlabErr=0	
+133	myElaps=0.044984	matlabElaps=0.000109		Pass
+462	myErr=1.02524e-17	matlabErr=2.60209e-18	
+462	myElaps=0.058007	matlabElaps=0.000229		Pass
+129	myErr=2.35922e-16	matlabErr=5.55112e-16	
+129	myElaps=0.051307	matlabElaps=0.000253		Pass
+274	myErr=0	matlabErr=0	
+274	myElaps=0.049751	matlabElaps=0.000138		Pass
+109	myErr=4.21885e-15	matlabErr=5.13478e-16	
+109	myElaps=0.052629	matlabElaps=0.000204		Pass
+262	myErr=4.56033e-14	matlabErr=3.82507e-16	
+262	myElaps=0.047116	matlabElaps=0.000249		Pass
+861	myErr=1.21431e-16	matlabErr=1.04083e-17	
+861	myElaps=0.054451	matlabElaps=0.00017		Pass
+172	myErr=5.34298e-15	matlabErr=1.26364e-15	
+172	myElaps=0.051345	matlabElaps=0.000177		Pass
+132	myErr=8.32667e-17	matlabErr=1.38778e-17	
+132	myElaps=0.050159	matlabElaps=0.000207		Pass
+296	myErr=9.61806e-19	matlabErr=4.06576e-20	
+296	myElaps=0.047818	matlabElaps=0.000227		Pass
+264	myErr=3.33414e-15	matlabErr=3.73521e-16	
+264	myElaps=0.06286	matlabElaps=0.000237		Pass
+106	myErr=7.11792e-14	matlabErr=1.9984e-15	
+106	myElaps=0.056741	matlabElaps=0.000298		Pass
+318	myErr=5.01821e-13	matlabErr=5.68434e-14	
+318	myElaps=0.04741	matlabElaps=0.00023		Pass
+173	myErr=5.55112e-16	matlabErr=2.81979e-15	
+173	myElaps=0.052084	matlabElaps=0.000319		Pass
+263	myErr=2.54725e-11	matlabErr=4.54747e-12	
+263	myElaps=0.056449	matlabElaps=0.000295		Pass
+293	myErr=1.61047e-13	matlabErr=1.25263e-15	
+293	myElaps=0.051403	matlabElaps=0.000471		Pass
+15	myErr=3.10862e-15	matlabErr=2.46331e-16	
+15	myElaps=0.052899	matlabElaps=0.000321		Pass
+334	myErr=3.71196e-14	matlabErr=1.89085e-16	
+334	myElaps=0.062291	matlabElaps=0.000383		Pass
+265	myErr=4.0018e-11	matlabErr=4.20641e-12	
+265	myElaps=0.063629	matlabElaps=0.000488		Pass
+11	myErr=6.92224e-14	matlabErr=1.36696e-15	
+11	myElaps=0.056161	matlabElaps=0.000517		Pass
+188	myErr=3.80111e-12	matlabErr=5.15564e-11	
+188	myElaps=0.058039	matlabElaps=0.000346		Pass
+136	myErr=7.04992e-14	matlabErr=2.47719e-15	
+136	myElaps=0.043088	matlabElaps=0.000502		Pass
+102	myErr=1.249e-15	matlabErr=2.09555e-15	
+102	myElaps=0.053428	matlabElaps=0.000547		Pass
+171	myErr=2.33147e-15	matlabErr=3.02471e-15	
+171	myElaps=0.050083	matlabElaps=0.000416		Pass
+2194	myErr=0	matlabErr=0	
+2194	myElaps=0.069368	matlabElaps=0.000186		Pass
+158	myErr=6.8695e-16	matlabErr=1.09981e-15	
+158	myElaps=0.04437	matlabElaps=0.000286		Pass
+273	myErr=1.06581e-14	matlabErr=1.83881e-15	
+273	myElaps=0.044395	matlabElaps=0.001644		Pass
+1326	myErr=7.28086e-12	matlabErr=3.9136e-13	
+1326	myElaps=0.07273	matlabElaps=0.000713		Pass
+108	myErr=2.35922e-16	matlabErr=4.16334e-17	
+108	myElaps=0.056526	matlabElaps=0.000412		Pass
+298	myErr=1.44773e-13	matlabErr=1.11466e-13	
+298	myElaps=0.04397	matlabElaps=0.001765		Pass
+1195	myErr=9.84014e-15	matlabErr=5.22665e-17	
+1195	myElaps=0.062157	matlabElaps=0.000762		Pass
+118	myErr=1.49852e-13	matlabErr=1.11022e-15	
+118	myElaps=0.044618	matlabElaps=0.000386		Pass
+2417	myErr=1.47451e-16	matlabErr=9.99201e-16	
+2417	myElaps=0.081197	matlabElaps=0.001063		Pass
+1325	myErr=3.43203e-14	matlabErr=4.19608e-16	
+1325	myElaps=0.06208	matlabElaps=0.000533		Pass
+2734	myErr=4.59221e-09	matlabErr=5.85717e-10	
+2734	myElaps=0.086027	matlabElaps=0.000656		Pass
+253	myErr=2.38419e-07	matlabErr=4.13002e-08	
+253	myElaps=0.044534	matlabElaps=0.000197		Pass
+313	myErr=9.56322e-16	matlabErr=2.17708e-16	
+313	myElaps=0.070406	matlabElaps=0.000521		Pass
+2416	myErr=0	matlabErr=2.77556e-16	
+2416	myElaps=0.063131	matlabElaps=0.000885		Pass
+306	myErr=3.6169e-16	matlabErr=4.85723e-16	
+306	myElaps=0.050652	matlabElaps=0.000409		Pass
+1943	myErr=6.07014e-14	matlabErr=1.65423e-14	
+1943	myElaps=0.048254	matlabElaps=0.000298		Pass
+323	myErr=4.56715e-13	matlabErr=1.70361e-15	
+323	myElaps=0.08124	matlabElaps=0.000608		Pass
+141	myErr=7.86971e-08	matlabErr=1.93179e-09	
+141	myElaps=0.138801	matlabElaps=0.002279		Pass
+1630	myErr=1.50413e-12	matlabErr=1.99701e-14	
+1630	myElaps=0.082348	matlabElaps=0.00062		Pass
+239	myErr=1.34111e-07	matlabErr=2.98023e-08	
+239	myElaps=0.075208	matlabElaps=0.000569		Pass
+113	myErr=0	matlabErr=0	
+113	myElaps=0.055791	matlabElaps=0.000662		Pass
+2338	myErr=2.9237e-12	matlabErr=8.85647e-14	
+2338	myElaps=0.082669	matlabElaps=0.000289		Pass
+316	myErr=8.98587e-16	matlabErr=9.94772e-17	
+316	myElaps=0.102674	matlabElaps=0.000455		Pass
+6	myErr=2.61423e-15	matlabErr=1.96631e-15	
+6	myElaps=0.18635	matlabElaps=0.001113		Pass
+93	myErr=8.67362e-16	matlabErr=2.20657e-15	
+93	myElaps=0.063941	matlabElaps=0.002076		Pass
+175	myErr=9.66935e-14	matlabErr=1.40487e-15	
+175	myElaps=0.078367	matlabElaps=0.000637		Pass
+174	myErr=7.49401e-16	matlabErr=2.67473e-15	
+174	myElaps=0.076191	matlabElaps=0.001356		Pass
+94	myErr=1.06859e-15	matlabErr=5.6205e-16	
+94	myElaps=0.083006	matlabElaps=0.000747		Pass
+1189	myErr=2.57794e-15	matlabErr=3.46952e-16	
+1189	myElaps=0.069675	matlabElaps=0.001952		Pass
+115	myErr=3.46945e-16	matlabErr=2.74086e-16	
+115	myElaps=0.049549	matlabElaps=0.000338		Pass
+119	myErr=8.97628e-14	matlabErr=1.41033e-15	
+119	myElaps=0.060529	matlabElaps=0.000878		Pass
+95	myErr=1.12133e-14	matlabErr=6.8695e-16	
+95	myElaps=0.075481	matlabElaps=0.00119		Pass
+215	myErr=1.8521e-10	matlabErr=4.12143e-13	
+215	myElaps=0.082179	matlabElaps=0.001194		Pass
+1198	myErr=5.79777e-10	matlabErr=5.12245e-11	
+1198	myElaps=0.284827	matlabElaps=0.006555		Pass
+2559	myErr=1.49811e-11	matlabErr=3.90833e-14	
+2559	myElaps=0.073986	matlabElaps=0.000714		Pass
+1112	myErr=1.28344e-09	matlabErr=1.16415e-10	
+1112	myElaps=0.072818	matlabElaps=0.001328		Pass
+16	myErr=5.36238e-14	matlabErr=2.47198e-15	
+16	myElaps=0.069817	matlabElaps=0.00279		Pass
+1169	myErr=1.28239e-09	matlabErr=5.40301e-12	
+1169	myElaps=0.065034	matlabElaps=0.001197		Pass
+17	myErr=5.02376e-14	matlabErr=2.7929e-15	
+17	myElaps=0.067243	matlabElaps=0.001734		Pass
+117	myErr=7.34968e-14	matlabErr=2.09208e-15	
+117	myElaps=0.081769	matlabElaps=0.002781		Pass
+247	myErr=2.89916e-16	matlabErr=0	
+247	myElaps=1.53094	matlabElaps=0.000315		Pass
+249	myErr=1.34441e-16	matlabErr=3.01408e-17	
+249	myElaps=1.54802	matlabElaps=0.000355		Pass
+248	myErr=3.66027e-16	matlabErr=6.13658e-17	
+248	myElaps=1.65624	matlabElaps=0.000348		Pass
+268	myErr=1.63725e-11	matlabErr=2.30216e-12	
+268	myElaps=0.102735	matlabElaps=0.001755		Pass
+116	myErr=2.38638e-13	matlabErr=5.46785e-15	
+116	myElaps=0.091062	matlabElaps=0.002989		Pass
+1641	myErr=3.65253e-12	matlabErr=2.16183e-12	
+1641	myElaps=0.121033	matlabElaps=0.000198		Pass
+202	myErr=4.72129e-13	matlabErr=1.44156e-15	
+202	myElaps=0.092322	matlabElaps=0.001956		Pass
+231	myErr=3.628e-14	matlabErr=1.11022e-16	
+231	myElaps=0.084376	matlabElaps=0.002446		Pass
+96	myErr=1.44329e-14	matlabErr=5.93275e-16	
+96	myElaps=0.087169	matlabElaps=0.001417		Pass
+2748	myErr=3.04426e-12	matlabErr=1.15817e-13	
+2748	myElaps=0.42664	matlabElaps=0.004613		Pass
+884	myErr=6.66654e-13	matlabErr=3.91354e-15	
+884	myElaps=0.10879	matlabElaps=0.001404		Pass
+335	myErr=2.19566e-13	matlabErr=4.46691e-16	
+335	myElaps=0.125623	matlabElaps=0.001575		Pass
+267	myErr=3.64997e-12	matlabErr=9.09495e-12	
+267	myElaps=0.108269	matlabElaps=0.002021		Pass
+321	myErr=6.40998e-12	matlabErr=2.38106e-14	
+321	myElaps=0.084942	matlabElaps=0.000462		Pass
+266	myErr=1.21473e-11	matlabErr=4.46016e-14	
+266	myElaps=0.149188	matlabElaps=0.004894		Pass
+1639	myErr=3.65253e-12	matlabErr=2.16183e-12	
+1639	myElaps=0.133997	matlabElaps=0.000263		Pass
+8	myErr=2.02505e-13	matlabErr=1.91513e-15	
+8	myElaps=0.077296	matlabElaps=0.00101		Pass
+1864	myErr=2.70298e-13	matlabErr=5.55112e-17	
+1864	myElaps=0.734664	matlabElaps=0.002475		Pass
+2421	myErr=2.633e-13	matlabErr=1.7408e-15	
+2421	myElaps=0.10409	matlabElaps=0.002176		Pass
+2015	myErr=3.49647e-13	matlabErr=1.35308e-15	
+2015	myElaps=1.31119	matlabElaps=0.011193		Pass
+926	myErr=2.18055e-12	matlabErr=8.36233e-16	
+926	myElaps=0.118231	matlabElaps=0.009918		Pass
+122	myErr=5.54001e-14	matlabErr=1.249e-15	
+122	myElaps=0.082156	matlabElaps=0.001294		Pass
+254	myErr=5.32907e-15	matlabErr=0	
+254	myElaps=0.081124	matlabElaps=0.000252		Pass
+310	myErr=2.32516e-13	matlabErr=5.3269e-15	
+310	myElaps=0.111945	matlabElaps=0.002046		Pass
+311	myErr=6.53161e-15	matlabErr=2.22045e-16	
+311	myElaps=0.12401	matlabElaps=0.001864		Pass
+121	myErr=6.00896e-14	matlabErr=5.35336e-15	
+121	myElaps=0.103753	matlabElaps=0.00164		Pass
+100	myErr=6.26714e-13	matlabErr=2.18818e-14	
+100	myElaps=0.164318	matlabElaps=0.007221		Pass
+1634	myErr=5.56095e-10	matlabErr=3.0741e-14	
+1634	myElaps=0.1589	matlabElaps=0.002108		Pass
+149	myErr=0.00781584	matlabErr=0.0312513	
+149	myElaps=0.084545	matlabElaps=0.017777		Pass
+212	myErr=4096	matlabErr=576	
+212	myElaps=0.137555	matlabElaps=0.000921		Pass
+2749	myErr=5.28983e-10	matlabErr=3.63946e-12	
+2749	myElaps=1.17471	matlabElaps=0.019553		Pass
+203	myErr=1.56777e-13	matlabErr=1.9984e-15	
+203	myElaps=0.120186	matlabElaps=0.00213		Pass
+929	myErr=1.87314e-12	matlabErr=2.90306e-15	
+929	myElaps=0.130778	matlabElaps=0.001296		Pass
+190	myErr=4.44746e-09	matlabErr=1.1432e-09	
+190	myElaps=0.186381	matlabElaps=0.008439		Pass
+269	myErr=3.64997e-12	matlabErr=9.09495e-12	
+269	myElaps=0.136842	matlabElaps=0.0042		Pass
+307	myErr=2.23357e-16	matlabErr=4.44089e-16	
+307	myElaps=0.073955	matlabElaps=0.003211		Pass
+2718	myErr=2.60555e-13	matlabErr=1.40014e-14	
+2718	myElaps=0.116035	matlabElaps=0.010157		Pass
+295	myErr=2.91013e-17	matlabErr=2.91028e-20	
+295	myElaps=0.124251	matlabElaps=0.011417		Pass
+98	myErr=1.93824e-13	matlabErr=2.67305e-14	
+98	myElaps=0.206868	matlabElaps=0.006995		Pass
+1627	myErr=1.18256e-06	matlabErr=9.84013e-06	
+1627	myElaps=0.085707	matlabElaps=0.00175		Pass
+124	myErr=4.50751e-14	matlabErr=9.83588e-16	
+124	myElaps=0.108567	matlabElaps=0.000768		Pass
+255	myErr=2.01754e-13	matlabErr=1.00614e-15	
+255	myElaps=0.091211	matlabElaps=0.000726		Pass
+99	myErr=5.11237e-13	matlabErr=1.40096e-14	
+99	myElaps=0.172025	matlabElaps=0.006611		Pass
+824	myErr=1.45664e-13	matlabErr=7.28977e-16	
+824	myElaps=0.129358	matlabElaps=0.002262		Pass
+126	myErr=1.13798e-14	matlabErr=8.54872e-15	
+126	myElaps=0.079824	matlabElaps=0.003444		Pass
+256	myErr=5.03757e-14	matlabErr=8.67362e-16	
+256	myElaps=0.091873	matlabElaps=0.00077		Pass
+2560	myErr=2.4016e-10	matlabErr=2.70069e-13	
+2560	myElaps=0.114877	matlabElaps=0.001956		Pass
+123	myErr=3.63721e-13	matlabErr=4.1217e-15	
+123	myElaps=0.167531	matlabElaps=0.002332		Pass
+82	myErr=6.8176e-17	matlabErr=0	
+82	myElaps=0.778067	matlabElaps=0.000419		Pass
+257	myErr=2.12387e-13	matlabErr=9.15934e-16	
+257	myElaps=0.119974	matlabElaps=0.000994		Pass
+328	myErr=3.77469e-07	matlabErr=5.49642e-06	
+328	myElaps=0.090949	matlabElaps=0.001652		Pass
+234	myErr=4.47277e-09	matlabErr=2.04353e-12	
+234	myElaps=0.122851	matlabElaps=0.007732		Pass
+2691	myErr=4.68635e-12	matlabErr=1.73172e-14	
+2691	myElaps=1.48197	matlabElaps=0.004494		Pass
+114	myErr=2.82413e-15	matlabErr=5.68989e-15	
+114	myElaps=0.132704	matlabElaps=0.002126		Pass
+128	myErr=5.85712e-14	matlabErr=2.11116e-15	
+128	myElaps=0.090662	matlabElaps=0.001238		Pass
+270	myErr=3.64264e-12	matlabErr=4.54737e-12	
+270	myElaps=0.096929	matlabElaps=0.002682		Pass
+1637	myErr=3.65253e-12	matlabErr=2.16183e-12	
+1637	myElaps=0.13204	matlabElaps=0.000442		Pass
+125	myErr=1.31796e-13	matlabErr=5.46395e-15	
+125	myElaps=0.105441	matlabElaps=0.016356		Pass
+2429	myErr=8.86093e-13	matlabErr=2.3319e-15	
+2429	myElaps=0.194274	matlabElaps=0.008526		Pass
+292	myErr=1.82183e-12	matlabErr=6.46644e-15	
+292	myElaps=0.131715	matlabElaps=0.021293		Pass
+240	myErr=1.00673e-14	matlabErr=4.00797e-15	
+240	myElaps=0.306785	matlabElaps=0.005168		Pass
+251	myErr=2.8732e-07	matlabErr=1.56891e-08	
+251	myElaps=0.193268	matlabElaps=0.00326		Pass
+245	myErr=3.43585e-14	matlabErr=3.98902e-14	
+245	myElaps=0.177911	matlabElaps=0.02953		Pass
+87	myErr=1.36248e-13	matlabErr=2.93099e-14	
+87	myElaps=0.939405	matlabElaps=0.001498		Pass
+101	myErr=1.23373e-12	matlabErr=4.79478e-15	
+101	myElaps=0.224638	matlabElaps=0.005206		Pass
+308	myErr=1.66533e-16	matlabErr=5.55112e-16	
+308	myElaps=0.081668	matlabElaps=0.007455		Pass
+204	myErr=9.85047e-13	matlabErr=3.27516e-15	
+204	myElaps=0.180888	matlabElaps=0.003929		Pass
+2750	myErr=1.58051e-07	matlabErr=2.32831e-10	
+2750	myElaps=2.68932	matlabElaps=0.027164		Pass
+280	myErr=1.62485e-09	matlabErr=2.27485e-13	
+280	myElaps=0.195133	matlabElaps=0.004097		Pass
+319	myErr=1.91003e-11	matlabErr=1.4309e-13	
+319	myElaps=0.097525	matlabElaps=0.0006		Pass
+88	myErr=1.43455e-13	matlabErr=3.19744e-14	
+88	myElaps=1.0742	matlabElaps=0.001608		Pass
+216	myErr=3.40048e-10	matlabErr=1.16068e-12	
+216	myElaps=0.20628	matlabElaps=0.00423		Pass
+89	myErr=6.23136e-13	matlabErr=2.95319e-14	
+89	myElaps=1.08426	matlabElaps=0.002724		Pass
+450	myErr=1.59599e-12	matlabErr=2.11219e-13	
+450	myElaps=0.116945	matlabElaps=0.001598		Pass
+451	myErr=1.50716e-17	matlabErr=2.11595e-17	
+451	myElaps=0.129519	matlabElaps=0.002115		Pass
+145	myErr=7.34036e-14	matlabErr=1.76706e-14	
+145	myElaps=0.133693	matlabElaps=0.026109		Pass
+406	myErr=6.11433e-15	matlabErr=3.36103e-17	
+406	myElaps=0.238301	matlabElaps=0.002308		Pass
+325	myErr=4.81775e-11	matlabErr=4.24921e-15	
+325	myElaps=0.253481	matlabElaps=0.004568		Pass
+90	myErr=9.86221e-13	matlabErr=2.94238e-14	
+90	myElaps=1.13569	matlabElaps=0.00334		Pass
+2751	myErr=0.0037547	matlabErr=7.62939e-06	
+2751	myElaps=3.45887	matlabElaps=0.034032		Fail
+2754	myErr=3.18553e-05	matlabErr=1.19209e-07	
+2754	myElaps=4.12601	matlabElaps=0.042991		Fail
+1636	myErr=8.36692e-11	matlabErr=1.93751e-14	
+1636	myElaps=0.278931	matlabElaps=0.009241		Pass
+83	myErr=2.82516e-12	matlabErr=2.96441e-14	
+83	myElaps=1.23616	matlabElaps=0.005509		Pass
+300	myErr=1.16874e-10	matlabErr=4.35763e-15	
+300	myElaps=0.238083	matlabElaps=0.004368		Pass
+2752	myErr=3.29926e-05	matlabErr=6.72669e-08	
+2752	myElaps=3.57395	matlabElaps=0.034987		Fail
+84	myErr=4.18469e-12	matlabErr=3.72449e-14	
+84	myElaps=1.25454	matlabElaps=0.004413		Pass
+2755	myErr=0.00278742	matlabErr=7.62939e-06	
+2755	myElaps=4.09842	matlabElaps=0.04109		Fail
+85	myErr=2.1013e-12	matlabErr=1.19837e-14	
+85	myElaps=1.27548	matlabElaps=0.004711		Pass
+2753	myErr=0.00861699	matlabErr=1.52588e-05	
+2753	myElaps=3.59892	matlabElaps=0.036047		Fail
+86	myErr=9.36841e-13	matlabErr=5.4845e-14	
+86	myElaps=1.10967	matlabElaps=0.003256		Pass
+2736	myErr=3.81223e-12	matlabErr=9.42024e-14	
+2736	myElaps=0.226471	matlabElaps=0.021143		Pass
+130	myErr=1.77636e-15	matlabErr=1.80411e-15	
+130	myElaps=0.106001	matlabElaps=0.006837		Pass
+131	myErr=4.93106e-13	matlabErr=1.46549e-14	
+131	myElaps=0.213553	matlabElaps=0.008856		Pass
+1638	myErr=3.65253e-12	matlabErr=2.16183e-12	
+1638	myElaps=0.176831	matlabElaps=0.00072		Pass
+2673	myErr=0.000129237	matlabErr=6.33536e-06	
+2673	myElaps=0.510394	matlabElaps=0.01304		Pass
+205	myErr=1.12183e-12	matlabErr=2.84148e-15	
+205	myElaps=0.221722	matlabElaps=0.006815		Pass
+18	myErr=6.96665e-14	matlabErr=1.25334e-15	
+18	myElaps=0.122159	matlabElaps=0.006587		Pass
+2665	myErr=2.26381e-11	matlabErr=1.10516e-13	
+2665	myElaps=0.936848	matlabElaps=0.037125		Pass
+1346	myErr=1.93387e-14	matlabErr=3.69111e-15	
+1346	myElaps=3.49743	matlabElaps=0.056464		Pass
+271	myErr=1.81921e-12	matlabErr=6.24384e-12	
+271	myElaps=0.167314	matlabElaps=0.004106		Pass
+333	myErr=4.61721e-11	matlabErr=3.1382e-14	
+333	myElaps=0.336458	matlabElaps=0.008493		Pass
+2735	myErr=8.73769e-12	matlabErr=1.42276e-13	
+2735	myElaps=1.09435	matlabElaps=0.011886		Pass
+19	myErr=2.29483e-13	matlabErr=1.38778e-15	
+19	myElaps=0.134185	matlabElaps=0.005709		Pass
+1059	myErr=3.12947e-15	matlabErr=3.85288e-15	
+1059	myElaps=0.21153	matlabElaps=0.006084		Pass
+1061	myErr=8.77084e-15	matlabErr=1.85632e-15	
+1061	myElaps=0.201552	matlabElaps=0.006316		Pass
+1060	myErr=3.99691e-15	matlabErr=1.80426e-15	
+1060	myElaps=0.190782	matlabElaps=0.006404		Pass
+1896	myErr=1.49547e-13	matlabErr=2.31645e-16	
+1896	myElaps=0.261134	matlabElaps=0.094559		Pass
+1058	myErr=3.5329e-14	matlabErr=2.6654e-15	
+1058	myElaps=0.182985	matlabElaps=0.012572		Pass
+1062	myErr=1.38823e-15	matlabErr=2.70987e-15	
+1062	myElaps=0.19048	matlabElaps=0.006837		Pass
+1055	myErr=5.16948e-16	matlabErr=5.03598e-17	
+1055	myElaps=0.189608	matlabElaps=0.016518		Pass
+226	myErr=1.13971e-08	matlabErr=2.61942e-10	
+226	myElaps=0.571248	matlabElaps=0.01612		Pass
+152	myErr=5.96085e-08	matlabErr=9.32829e-10	
+152	myElaps=0.239297	matlabElaps=0.291886		Pass
+297	myErr=5.65002e-18	matlabErr=1.99705e-20	
+297	myElaps=0.215025	matlabElaps=0.070752		Pass
+134	myErr=1.66533e-14	matlabErr=1.13538e-15	
+134	myElaps=0.122277	matlabElaps=0.005041		Pass
+127	myErr=1.10779e-13	matlabErr=6.09061e-15	
+127	myElaps=0.25678	matlabElaps=0.011835		Pass
+20	myErr=1.62537e-13	matlabErr=4.31599e-15	
+20	myElaps=0.13962	matlabElaps=0.009747		Pass
+2720	myErr=2.62042e-12	matlabErr=8.12336e-14	
+2720	myElaps=0.208208	matlabElaps=0.041469		Pass
+1626	myErr=2.06148e-06	matlabErr=0.00499623	
+1626	myElaps=0.172226	matlabElaps=0.002404		Pass
+176	myErr=5.92059e-12	matlabErr=9.15934e-15	
+176	myElaps=15.3629	matlabElaps=0.017568		Pass
+2561	myErr=1.00137e-08	matlabErr=1.56288e-12	
+2561	myElaps=1.04409	matlabElaps=0.004197		Pass
+21	myErr=1.71325e-13	matlabErr=3.05353e-15	
+21	myElaps=0.966853	matlabElaps=0.003884		Pass
+2719	myErr=8.53205e-12	matlabErr=5.04128e-14	
+2719	myElaps=1.14104	matlabElaps=0.062239		Pass
+105	myErr=1.54256e-12	matlabErr=1.96926e-14	
+105	myElaps=0.591362	matlabElaps=0.025219		Pass
+225	myErr=6.04078e-09	matlabErr=2.61942e-10	
+225	myElaps=1.31831	matlabElaps=0.020077		Pass
+177	myErr=7.99805e-12	matlabErr=9.49241e-15	
+177	myElaps=1.40676	matlabElaps=0.01136		Pass
+2730	myErr=2.78705e-13	matlabErr=2.1753e-13	
+2730	myElaps=6.61808	matlabElaps=0.017248		Pass
+2423	myErr=8.51069e-13	matlabErr=9.79251e-15	
+2423	myElaps=0.269211	matlabElaps=0.041065		Pass
+104	myErr=7.0071e-13	matlabErr=1.3424e-14	
+104	myElaps=0.564136	matlabElaps=0.026237		Pass
+135	myErr=1.68116e-13	matlabErr=1.13624e-15	
+135	myElaps=0.159594	matlabElaps=0.00454		Pass
+1628	myErr=1.0719e-09	matlabErr=1.03723e-13	
+1628	myElaps=0.520268	matlabElaps=0.012769		Pass
+2722	myErr=1.32912e-05	matlabErr=3.30041e-07	
+2722	myElaps=10.781	matlabElaps=0.025841		Pass
+380	myErr=5.81107e-11	matlabErr=9.42649e-15	
+380	myElaps=0.468603	matlabElaps=0.004204		Pass
+272	myErr=9.10094e-12	matlabErr=6.01951e-12	
+272	myElaps=0.184432	matlabElaps=0.007458		Pass
+178	myErr=3.15457e-12	matlabErr=5.37027e-15	
+178	myElaps=0.282962	matlabElaps=0.027421		Pass
+1106	myErr=1.3407e-14	matlabErr=1.08745e-15	
+1106	myElaps=0.295827	matlabElaps=0.03056		Pass
+138	myErr=6.07965e-13	matlabErr=5.64143e-15	
+138	myElaps=0.178802	matlabElaps=0.037582		Pass
+893	myErr=3.27058e-13	matlabErr=4.26603e-14	
+893	myElaps=0.124202	matlabElaps=0.020795		Pass
+137	myErr=3.48679e-16	matlabErr=1.76942e-16	
+137	myElaps=0.180352	matlabElaps=0.003289		Pass
+182	myErr=7.1549e-13	matlabErr=2.83844e-15	
+182	myElaps=0.220869	matlabElaps=0.012088		Pass
+183	myErr=2.2991e-12	matlabErr=3.44256e-15	
+183	myElaps=0.255383	matlabElaps=0.008493		Pass
+294	myErr=5.02205e-12	matlabErr=1.08224e-14	
+294	myElaps=0.230829	matlabElaps=0.132848		Pass
+208	myErr=2.19702e-12	matlabErr=4.10428e-15	
+208	myElaps=1.63255	matlabElaps=0.005342		Pass
+180	myErr=3.31707e-13	matlabErr=7.07767e-15	
+180	myElaps=0.225569	matlabElaps=0.008784		Pass
+287	myErr=3.82333e-15	matlabErr=2.72241e-16	
+287	myElaps=0.174325	matlabElaps=0.235567		Pass
+2721	myErr=1.72518e-11	matlabErr=5.03174e-14	
+2721	myElaps=0.238087	matlabElaps=0.090272		Pass
+299	myErr=2.07363e-11	matlabErr=3.09109e-11	
+299	myElaps=0.179122	matlabElaps=0.86664		Pass
+467	myErr=5.32907e-15	matlabErr=1.36965e-17	
+467	myElaps=0.250703	matlabElaps=0.001251		Pass
+2689	myErr=9.13692e-05	matlabErr=9.32443e-10	
+2689	myElaps=2.19183	matlabElaps=0.063778		Fail
+314	myErr=1.41058e-13	matlabErr=3.54376e-14	
+314	myElaps=0.150482	matlabElaps=0.00196		Pass
+111	myErr=5.65104e-14	matlabErr=5.42101e-16	
+111	myElaps=0.249348	matlabElaps=0.004409		Pass
+214	myErr=6.5001e-10	matlabErr=9.82991e-13	
+214	myElaps=0.481832	matlabElaps=0.014615		Pass
+110	myErr=1.45335e-12	matlabErr=6.83481e-15	
+110	myElaps=1.21694	matlabElaps=0.050266		Pass
+195	myErr=1.13032e-11	matlabErr=3.54231e-15	
+195	myElaps=0.368871	matlabElaps=0.016906		Pass
+2195	myErr=1.34835e-11	matlabErr=8.92376e-14	
+2195	myElaps=8.22779	matlabElaps=0.100124		Pass
+1640	myErr=3.65253e-12	matlabErr=2.11486e-12	
+1640	myElaps=0.310131	matlabElaps=0.001106		Pass
+1442	myErr=1.43146e-16	matlabErr=4.48001e-20	
+1442	myElaps=0.281617	matlabElaps=0.059154		Pass
+181	myErr=1.68032e-13	matlabErr=1.44676e-15	
+181	myElaps=0.216261	matlabElaps=0.006374		Pass
+1790	myErr=1.05618e-10	matlabErr=5.91094e-11	
+1790	myElaps=281.822	matlabElaps=1.69655		Pass
+2690	myErr=1.40168e-10	matlabErr=2.85778e-12	
+2690	myElaps=1.8072	matlabElaps=0.096622		Pass
+184	myErr=5.37226e-12	matlabErr=4.71845e-15	
+184	myElaps=0.331027	matlabElaps=0.027864		Pass
+179	myErr=1.83382e-12	matlabErr=1.26427e-14	
+179	myElaps=0.268269	matlabElaps=0.011081		Pass
+233	myErr=1.38531e-08	matlabErr=1.00992e-09	
+233	myElaps=0.540995	matlabElaps=0.091793		Pass
+1188	myErr=7.07929e-11	matlabErr=1.35612e-11	
+1188	myElaps=20.8458	matlabElaps=0.382303		Pass
+230	myErr=5.67563e-13	matlabErr=4.83496e-16	
+230	myElaps=0.389891	matlabElaps=0.108303		Pass
+107	myErr=3.70453e-12	matlabErr=5.1484e-14	
+107	myElaps=0.637303	matlabElaps=0.232779		Pass
+309	myErr=1.82752e-11	matlabErr=5.86622e-16	
+309	myElaps=0.572152	matlabElaps=0.022294		Pass
+112	myErr=9.31616e-14	matlabErr=1.13854e-14	
+112	myElaps=0.302402	matlabElaps=0.024374		Pass
+196	myErr=3.14649e-12	matlabErr=4.66597e-15	
+196	myElaps=0.499168	matlabElaps=0.028496		Pass
+1327	myErr=1.08567e-12	matlabErr=9.6282e-11	
+1327	myElaps=0.233535	matlabElaps=0.024259		Pass
+1430	myErr=2.47007e-15	matlabErr=1.08911e-19	
+1430	myElaps=0.465684	matlabElaps=0.014312		Pass
+988	myErr=6.21952e-15	matlabErr=3.2987e-15	
+988	myElaps=51.8972	matlabElaps=0.005643		Pass
+987	myErr=5.93561e-15	matlabErr=1.3183e-15	
+987	myElaps=62.4924	matlabElaps=0.00734		Pass
+986	myErr=4.16499e-15	matlabErr=1.46114e-15	
+986	myElaps=63.711	matlabElaps=0.012348		Pass
+984	myErr=5.51122e-15	matlabErr=3.38114e-18	
+984	myElaps=49.7503	matlabElaps=0.0159		Pass
+1186	myErr=7.28306e-14	matlabErr=1.75274e-12	
+1186	myElaps=34.0798	matlabElaps=1.78723		Pass
+989	myErr=6.22856e-15	matlabErr=9.04618e-16	
+989	myElaps=64.3783	matlabElaps=0.010044		Pass
+990	myErr=8.15994e-15	matlabErr=6.05762e-16	
+990	myElaps=64.3611	matlabElaps=0.004592		Pass
+993	myErr=1.033e-14	matlabErr=1.23842e-15	
+993	myElaps=52.7972	matlabElaps=0.004344		Pass
+992	myErr=4.82596e-14	matlabErr=1.03736e-14	
+992	myElaps=63.9215	matlabElaps=0.008356		Pass
+991	myErr=6.49782e-15	matlabErr=3.21851e-15	
+991	myElaps=59.1627	matlabElaps=0.003461		Pass
+994	myErr=4.71845e-15	matlabErr=3.50489e-16	
+994	myElaps=64.4844	matlabElaps=0.003446		Pass
+996	myErr=7.99884e-15	matlabErr=2.40212e-16	
+996	myElaps=64.6928	matlabElaps=0.00473		Pass
+985	myErr=4.44089e-15	matlabErr=7.49861e-16	
+985	myElaps=64.4429	matlabElaps=0.018604		Pass
+429	myErr=2.78868e-12	matlabErr=2.84425e-14	
+429	myElaps=0.358593	matlabElaps=0.006477		Pass
+258	myErr=1.27725e-18	matlabErr=8.19142e-22	
+258	myElaps=1.67732	matlabElaps=0.030622		Pass
+1535	myErr=1.7345e-12	matlabErr=9.02094e-15	
+1535	myElaps=0.292266	matlabElaps=0.003799		Pass
+836	myErr=1.19904e-12	matlabErr=8.41535e-15	
+836	myElaps=1.86851	matlabElaps=0.003877		Pass
+259	myErr=1.36942e-20	matlabErr=6.14965e-23	
+259	myElaps=1.58109	matlabElaps=0.027249		Pass
+2674	myErr=5.79939e-07	matlabErr=2.78624e-09	
+2674	myElaps=1.60955	matlabElaps=0.075664		Pass
+2334	myErr=2.68343e-08	matlabErr=7.16676e-10	
+2334	myElaps=0.163049	matlabElaps=0.001422		Pass
+331	myErr=2.36974e-09	matlabErr=2.98435e-14	
+331	myElaps=0.905162	matlabElaps=0.033047		Pass
+91	myErr=1.05293e-12	matlabErr=5.61079e-14	
+91	myElaps=0.817073	matlabElaps=0.258874		Pass
+2419	myErr=1.43469e-13	matlabErr=1.18352e-15	
+2419	myElaps=0.42396	matlabElaps=0.098667		Pass
+1613	myErr=2.28354e-09	matlabErr=2.06062e-12	
+1613	myElaps=0.756879	matlabElaps=0.081278		Pass
+92	myErr=2.97447e-12	matlabErr=6.21326e-14	
+92	myElaps=0.690643	matlabElaps=0.269741		Pass
+2562	myErr=9.50963e-09	matlabErr=7.78336e-12	
+2562	myElaps=0.310138	matlabElaps=0.009441		Pass
+2418	myErr=4.39926e-14	matlabErr=2.66454e-15	
+2418	myElaps=0.359559	matlabElaps=0.091071		Pass
+197	myErr=4.90134e-12	matlabErr=1.93942e-14	
+197	myElaps=0.641173	matlabElaps=0.037266		Pass
+2675	myErr=5.10855e-07	matlabErr=8.07684e-10	
+2675	myElaps=2.7218	matlabElaps=0.161182		Pass
+1196	myErr=2.15381e-12	matlabErr=1.14622e-13	
+1196	myElaps=166.564	matlabElaps=4.88117		Pass
+1170	myErr=1.81899e-12	matlabErr=1.11022e-15	
+1170	myElaps=0.675669	matlabElaps=0.002443		Pass
+838	myErr=3.70625e-14	matlabErr=1.03366e-15	
+838	myElaps=0.303676	matlabElaps=0.004855		Pass
+1942	myErr=9.07718e-13	matlabErr=2.2278e-13	
+1942	myElaps=0.609533	matlabElaps=0.015153		Pass
+2737	myErr=2.05106e-11	matlabErr=7.10614e-14	
+2737	myElaps=1.32273	matlabElaps=0.194766		Pass
+252	myErr=6.29337e-05	matlabErr=1.90735e-06	
+252	myElaps=0.610165	matlabElaps=0.003134		Pass
+227	myErr=1.62193e-07	matlabErr=2.45792e-12	
+227	myElaps=2.019	matlabElaps=0.618458		Pass
+1053	myErr=5.23468e-13	matlabErr=5.81783e-15	
+1053	myElaps=64.6389	matlabElaps=0.019998		Pass
+324	myErr=3.06844e-09	matlabErr=2.39286e-15	
+324	myElaps=0.84703	matlabElaps=0.032836		Pass
+2692	myErr=6.62943e-11	matlabErr=3.60694e-15	
+2692	myElaps=93.4577	matlabElaps=0.577934		Pass
+81	myErr=4.89801e-11	matlabErr=4.45477e-14	
+81	myElaps=1.03841	matlabElaps=0.099997		Pass
+1378	myErr=1.16462e-10	matlabErr=1.13687e-12	
+1378	myElaps=213.464	matlabElaps=0.002052		Pass
+1537	myErr=3.94538e-11	matlabErr=6.31149e-13	
+1537	myElaps=1.21735	matlabElaps=0.251812		Pass
+2738	myErr=1.8765e-11	matlabErr=1.84741e-13	
+2738	myElaps=1.72518	matlabElaps=0.227367		Pass
+198	myErr=2.68588e-11	matlabErr=9.49241e-15	
+198	myElaps=0.760136	matlabElaps=0.049417		Pass
+2666	myErr=1.0024e-10	matlabErr=1.24326e-14	
+2666	myElaps=17.4875	matlabElaps=0.445695		Pass
+2655	myErr=4.70417e-11	matlabErr=2.07526e-10	
+2655	myElaps=0.476529	matlabElaps=1.87402		Pass
+139	myErr=2.09208e-15	matlabErr=5.43315e-15	
+139	myElaps=0.393056	matlabElaps=0.184829		Pass
+329	myErr=2.9626e-10	matlabErr=4.26704e-12	
+329	myElaps=1.54082	matlabElaps=0.079783		Pass
+539	myErr=5.67137e-14	matlabErr=3.88579e-16	
+539	myElaps=1.51928	matlabElaps=5.07199		Pass
+2743	myErr=9.10194e-12	matlabErr=6.39767e-14	
+2743	myElaps=1.55533	matlabElaps=0.40221		Pass
+2739	myErr=6.88722e-11	matlabErr=1.06804e-13	
+2739	myElaps=2.28933	matlabElaps=0.291964		Pass
+1360	myErr=1.57178e-09	matlabErr=9.02612e-14	
+1360	myElaps=20.9633	matlabElaps=0.240901		Pass
+2723	myErr=6.1041e-08	matlabErr=2.98023e-08	
+2723	myElaps=101.355	matlabElaps=0.35548		Pass
+199	myErr=1.04322e-11	matlabErr=3.03872e-14	
+199	myElaps=1.04833	matlabElaps=0.068906		Pass
+2676	myErr=1.2095e-05	matlabErr=1.86266e-09	
+2676	myElaps=8.11054	matlabElaps=0.317361		Fail
+1446	myErr=1.70138e-13	matlabErr=3.41958e-13	
+1446	myElaps=0.420055	matlabElaps=0.012969		Pass
+2740	myErr=4.78026e-11	matlabErr=2.57634e-13	
+2740	myElaps=2.4801	matlabElaps=0.31118		Pass
+1865	myErr=2.70298e-13	matlabErr=5.55112e-17	
+1865	myElaps=205.004	matlabElaps=0.254065		Pass
+140	myErr=1.70068e-15	matlabErr=1.23124e-14	
+140	myElaps=0.579183	matlabElaps=0.013984		Pass
+734	myErr=1.3318e-11	matlabErr=5.77492e-15	
+734	myElaps=0.575898	matlabElaps=0.092005		Pass
+1633	myErr=4.20675e-09	matlabErr=8.02942e-14	
+1633	myElaps=1.58634	matlabElaps=0.071518		Pass
+2741	myErr=3.75305e-11	matlabErr=1.43444e-13	
+2741	myElaps=2.84848	matlabElaps=0.251223		Pass
+2744	myErr=4.43009e-11	matlabErr=1.99618e-13	
+2744	myElaps=1.63097	matlabElaps=0.502029		Pass
+830	myErr=1.68209e-10	matlabErr=2.67038e-15	
+830	myElaps=8.42814	matlabElaps=0.372957		Pass
+418	myErr=4.2716e-14	matlabErr=1.51938e-16	
+418	myElaps=1.42663	matlabElaps=0.015581		Pass
+545	myErr=8.57073e-09	matlabErr=1.16416e-09	
+545	myElaps=11.0215	matlabElaps=0.107378		Pass
+2742	myErr=3.90808e-11	matlabErr=7.92721e-14	
+2742	myElaps=3.28523	matlabElaps=0.334252		Pass
+2745	myErr=4.89541e-11	matlabErr=8.54874e-14	
+2745	myElaps=1.72234	matlabElaps=0.573354		Pass
+322	myErr=4.36557e-10	matlabErr=1.45519e-11	
+322	myElaps=0.325835	matlabElaps=0.002058		Pass
+244	myErr=9.31323e-10	matlabErr=9.31386e-10	
+244	myElaps=2.84684	matlabElaps=0.333547		Pass
+810	myErr=9.31763e-12	matlabErr=8.58213e-14	
+810	myElaps=1.07002	matlabElaps=0.018144		Pass
+336	myErr=2.14557e-10	matlabErr=2.08546e-16	
+336	myElaps=2.49972	matlabElaps=0.074619		Pass
+2696	myErr=1.86156e-06	matlabErr=2.23943e-08	
+2696	myElaps=27.1149	matlabElaps=0.774164		Pass
+246	myErr=9.3004e-13	matlabErr=2.5691e-13	
+246	myElaps=1.84521	matlabElaps=0.451508		Pass
+200	myErr=1.74083e-11	matlabErr=7.89798e-15	
+200	myElaps=1.20263	matlabElaps=0.096262		Pass
+828	myErr=1.18296e-14	matlabErr=1.45292e-17	
+828	myElaps=0.999491	matlabElaps=0.055984		Pass
+371	myErr=1.91528e-16	matlabErr=5.04138e-16	
+371	myElaps=115.696	matlabElaps=0.00373		Pass
+460	myErr=8.04512e-15	matlabErr=3.63907e-12	
+460	myElaps=0.534284	matlabElaps=0.007254		Pass
+823	myErr=5.87685e-12	matlabErr=1.88289e-15	
+823	myElaps=0.996387	matlabElaps=0.095434		Pass
+1538	myErr=1.97167e-09	matlabErr=9.27713e-14	
+1538	myElaps=18.5452	matlabElaps=0.688507		Pass
+22	myErr=8.77721e-12	matlabErr=9.34958e-15	
+22	myElaps=0.688807	matlabElaps=0.162555		Pass
+65	myErr=1.29487e-09	matlabErr=1.2932e-11	
+65	myElaps=0.367248	matlabElaps=0.004368		Pass
+1200	myErr=3.54526e-13	matlabErr=5.19767e-15	
+1200	myElaps=0.778535	matlabElaps=0.804436		Pass
+241	myErr=2.11168e-08	matlabErr=1.91002e-11	
+241	myElaps=3.70731	matlabElaps=0.296568		Pass
+1539	myErr=7.81563e-11	matlabErr=7.09707e-15	
+1539	myElaps=5.64491	matlabElaps=2.3921		Pass
+419	myErr=1.43814e-12	matlabErr=4.55452e-15	
+419	myElaps=0.562211	matlabElaps=0.011585		Pass
+250	myErr=6.25606e-14	matlabErr=6.54077e-15	
+250	myElaps=0.676233	matlabElaps=0.02446		Pass
+243	myErr=3.38996e-05	matlabErr=2.40824e-07	
+243	myElaps=6.01737	matlabElaps=0.117862		Fail
+755	myErr=1.39262e-12	matlabErr=1.06046e-15	
+755	myElaps=0.814849	matlabElaps=0.821076		Pass
+2412	myErr=6.08704e-11	matlabErr=6.19695e-15	
+2412	myElaps=1.74889	matlabElaps=0.092014		Pass
+2746	myErr=1.4518e-11	matlabErr=8.63771e-14	
+2746	myElaps=2.61993	matlabElaps=0.747834		Pass
+837	myErr=1.6689e-13	matlabErr=3.03471e-13	
+837	myElaps=0.718829	matlabElaps=0.013545		Pass
+426	myErr=4.97494e-16	matlabErr=7.02894e-17	
+426	myElaps=1.10372	matlabElaps=0.020434		Pass
+540	myErr=2.23776e-15	matlabErr=2.546e-18	
+540	myElaps=0.439773	matlabElaps=16.7535		Pass
+201	myErr=2.79022e-11	matlabErr=3.63945e-14	
+201	myElaps=1.3971	matlabElaps=0.134485		Pass
+2731	myErr=3.76455e-10	matlabErr=1.74652e-13	
+2731	myElaps=141.004	matlabElaps=1.00728		Pass
+344	myErr=1.85434e-12	matlabErr=1.5942e-14	
+344	myElaps=2.56142	matlabElaps=0.020108		Pass
+2747	myErr=7.63898e-11	matlabErr=3.19746e-13	
+2747	myElaps=3.19086	matlabElaps=0.891328		Pass
+213	myErr=97	matlabErr=12.25	
+213	myElaps=1.34389	matlabElaps=0.012608		Pass
+2411	myErr=4.85391e-11	matlabErr=1.53488e-14	
+2411	myElaps=1.30492	matlabElaps=0.078916		Pass
+2677	myErr=1.59333e-06	matlabErr=3.72531e-09	
+2677	myElaps=14.1589	matlabElaps=0.63003		Pass
+422	myErr=3.97702e-13	matlabErr=4.97357e-16	
+422	myElaps=1.45259	matlabElaps=0.022952		Pass
+120	myErr=2.23063e-12	matlabErr=2.20102e-14	
+120	myElaps=1.14572	matlabElaps=0.255573		Pass
+2230	myErr=3.54468e-11	matlabErr=1.36916e-12	
+2230	myElaps=232.457	matlabElaps=0.819375		Pass
+900	myErr=3.67486e-12	matlabErr=5.68438e-14	
+900	myElaps=412.197	matlabElaps=0.273193		Pass
+189	myErr=9.2752e-08	matlabErr=1.57289e-08	
+189	myElaps=2.18805	matlabElaps=3.19556		Pass
+2563	myErr=1.26435e-06	matlabErr=3.37035e-11	
+2563	myElaps=0.578307	matlabElaps=0.031711		Pass
+2706	myErr=2.46361e-11	matlabErr=3.19389e-14	
+2706	myElaps=43.2494	matlabElaps=2.59255		Pass
+754	myErr=6.88568e-12	matlabErr=2.59723e-15	
+754	myElaps=0.927318	matlabElaps=5.26628		Pass
+2410	myErr=3.29271e-11	matlabErr=5.16123e-15	
+2410	myElaps=2.23051	matlabElaps=0.245773		Pass
+416	myErr=2.36762e-05	matlabErr=4.3322e-07	
+416	myElaps=3.45099	matlabElaps=0.004789		Pass
+2678	myErr=3.79685e-07	matlabErr=1.64677e-09	
+2678	myElaps=20.1971	matlabElaps=0.559206		Pass
+2409	myErr=5.56431e-10	matlabErr=7.07377e-14	
+2409	myElaps=3.68509	matlabElaps=0.190181		Pass
+457	myErr=3.27441e-11	matlabErr=3.71011e-09	
+457	myElaps=2.12409	matlabElaps=0.045252		Pass
+456	myErr=9.31345e-08	matlabErr=0.000248806	
+456	myElaps=1.73493	matlabElaps=0.114143		Pass
+917	myErr=4.65661e-10	matlabErr=3.72862e-09	
+917	myElaps=3.05749	matlabElaps=1.94421		Pass
+1328	myErr=2.95612e-05	matlabErr=1.19175e-07	
+1328	myElaps=17.14	matlabElaps=0.029874		Fail
+2732	myErr=6.32058e-10	matlabErr=2.06578e-13	
+2732	myElaps=220.435	matlabElaps=1.51189		Pass
+1541	myErr=7.98404e-11	matlabErr=1.4213e-14	
+1541	myElaps=24.3552	matlabElaps=5.83278		Pass
+2827	myErr=1.02254e-09	matlabErr=7.38065e-12	
+2827	myElaps=1.35645	matlabElaps=7.97995		Pass
+332	myErr=3.55435e-08	matlabErr=1.5264e-13	
+332	myElaps=2.76886	matlabElaps=0.144696		Pass
+2656	myErr=1.01201e-10	matlabErr=7.87686e-10	
+2656	myElaps=0.527464	matlabElaps=32.683		Pass
+1547	myErr=4.19618e-11	matlabErr=6.12326e-15	
+1547	myElaps=4.32424	matlabElaps=0.702183		Pass
+2679	myErr=4.03725e-07	matlabErr=4.87793e-10	
+2679	myElaps=10.6384	matlabElaps=1.37998		Pass
+1542	myErr=8.18162e-11	matlabErr=3.88009e-14	
+1542	myElaps=34.0551	matlabElaps=7.50284		Pass
+1546	myErr=4.13778e-09	matlabErr=1.47058e-14	
+1546	myElaps=5.50751	matlabElaps=10.5243		Pass
+871	myErr=9.47183e-12	matlabErr=3.21138e-14	
+871	myElaps=1.58594	matlabElaps=0.757079		Pass
+2667	myErr=4.65671e-10	matlabErr=4.41325e-14	
+2667	myElaps=87.5147	matlabElaps=2.48263		Pass
+1540	myErr=1.07588e-09	matlabErr=6.80239e-13	
+1540	myElaps=32.8607	matlabElaps=5.69494		Pass
+2724	myErr=3.8147e-06	matlabErr=7.59408e-10	
+2724	myElaps=530.304	matlabElaps=1.50064		Pass
+2817	myErr=5.42779e-11	matlabErr=1.43262e-16	
+2817	myElaps=3.03498	matlabElaps=0.058154		Pass
+434	myErr=1.76149e-10	matlabErr=9.72448e-16	
+434	myElaps=3.82223	matlabElaps=0.042238		Pass
+1187	myErr=4.6807e-13	matlabErr=1.07536e-14	
+1187	myElaps=2.1724	matlabElaps=0.767832		Pass
+384	myErr=5.90779e-11	matlabErr=1.45276e-14	
+384	myElaps=2.56304	matlabElaps=0.048649		Pass
+468	myErr=4.64974e-14	matlabErr=9.66738e-16	
+468	myElaps=6.04487	matlabElaps=0.017741		Pass
+157	myErr=3.97099e-12	matlabErr=1.6854e-13	
+157	myElaps=0.678584	matlabElaps=11.3983		Pass
+156	myErr=6.28485e-12	matlabErr=1.18833e-13	
+156	myElaps=0.612972	matlabElaps=12.7207		Pass
+2725	myErr=5.96046e-08	matlabErr=3.97682e-14	
+2725	myElaps=682.157	matlabElaps=1.16821		Pass
+1545	myErr=4.19433e-11	matlabErr=2.61173e-14	
+1545	myElaps=15.8566	matlabElaps=9.05679		Pass
+2350	myErr=2.28955e-11	matlabErr=7.31106e-12	
+2350	myElaps=1.27914	matlabElaps=0.014964		Pass
+2680	myErr=2.50715e-06	matlabErr=1.49012e-08	
+2680	myElaps=40.9534	matlabElaps=1.53574		Pass
+1444	myErr=1.90489e-15	matlabErr=8.32424e-20	
+1444	myElaps=1.7051	matlabElaps=0.785552		Pass
+2726	myErr=8.60327e-09	matlabErr=1.10154e-11	
+2726	myElaps=889.633	matlabElaps=1.76532		Pass
+1543	myErr=3.95558e-10	matlabErr=1.25053e-12	
+1543	myElaps=12.4245	matlabElaps=8.68463		Pass
+370	myErr=2.1438e-13	matlabErr=1.2202e-16	
+370	myElaps=661.53	matlabElaps=0.033165		Pass
+2668	myErr=7.03415e-11	matlabErr=1.458e-13	
+2668	myElaps=91.8993	matlabElaps=3.83021		Pass
+2670	myErr=8.41228e-10	matlabErr=4.73402e-13	
+2670	myElaps=119.752	matlabElaps=3.54009		Pass
+2669	myErr=6.36474e-10	matlabErr=8.33191e-14	
+2669	myElaps=113.327	matlabElaps=3.18659		Pass
+1866	myErr=3.63806e-12	matlabErr=1.13748e-17	
+1866	myElaps=1682.13	matlabElaps=1.1442		Pass
+2728	myErr=2.38419e-07	matlabErr=2.98023e-08	
+2728	myElaps=800.605	matlabElaps=1.70254		Pass
+735	myErr=6.36505e-13	matlabErr=7.86179e-15	
+735	myElaps=1.05042	matlabElaps=0.186372		Pass
+2727	myErr=7.45527e-08	matlabErr=5.96046e-08	
+2727	myElaps=830.796	matlabElaps=1.62878		Pass
+1206	myErr=3.82808e-11	matlabErr=3.90799e-14	
+1206	myElaps=1.98931	matlabElaps=0.04066		Pass
+2671	myErr=7.88908e-10	matlabErr=2.89792e-14	
+2671	myElaps=115.553	matlabElaps=3.72461		Pass
+2278	myErr=3.58178e-13	matlabErr=3.58394e-16	
+2278	myElaps=10.7844	matlabElaps=0.024089		Pass
+2729	myErr=8.82474e-10	matlabErr=5.51714e-14	
+2729	myElaps=925.305	matlabElaps=2.20296		Pass
+2672	myErr=2.32836e-10	matlabErr=3.06673e-13	
+2672	myElaps=148.327	matlabElaps=3.9445		Pass
+568	myErr=1.74702e-10	matlabErr=6.03961e-13	
+568	myElaps=29.8755	matlabElaps=0.883447		Pass
+363	myErr=3.06726e-05	matlabErr=9.7917e-09	
+363	myElaps=4.01796	matlabElaps=0.120145		Fail
+2733	myErr=3.64247e-08	matlabErr=2.24856e-13	
+2733	myElaps=587.304	matlabElaps=3.7321		Pass
+2681	myErr=3.65138e-07	matlabErr=3.72567e-09	
+2681	myElaps=49.5406	matlabElaps=3.03084		Pass
+2683	myErr=1.06598e-06	matlabErr=3.27336e-10	
+2683	myElaps=72.0792	matlabElaps=3.02874		Pass
+2682	myErr=7.26141e-06	matlabErr=8.80003e-11	
+2682	myElaps=19.4299	matlabElaps=1.73589		Pass
+424	myErr=4.83349e-14	matlabErr=3.1537e-16	
+424	myElaps=32.0725	matlabElaps=0.025019		Pass
+866	myErr=1.58612e-11	matlabErr=2.42368e-14	
+866	myElaps=1.74271	matlabElaps=2.14323		Pass
+2351	myErr=2.28955e-11	matlabErr=7.30983e-12	
+2351	myElaps=1.01914	matlabElaps=0.007155		Pass
+312	myErr=5.74125e-09	matlabErr=2.9189e-13	
+312	myElaps=6.26127	matlabElaps=1.11957		Pass
+2684	myErr=4.78635e-06	matlabErr=7.4506e-09	
+2684	myElaps=69.9594	matlabElaps=5.04526		Pass
+825	myErr=1.89802e-11	matlabErr=2.80862e-15	
+825	myElaps=3.24566	matlabElaps=0.203856		Pass
+1404	myErr=0.000390589	matlabErr=4.87986e-05	
+1404	myElaps=1.33004	matlabElaps=0.207631		Pass
+923	myErr=4.96778e-10	matlabErr=1.9067e-13	
+923	myElaps=4.32783	matlabElaps=30.4554		Pass
+1185	myErr=3.40378e-11	matlabErr=9.56284e-12	
+1185	myElaps=74.9932	matlabElaps=37.9032		Pass
+2686	myErr=7.88138e-07	matlabErr=1.17428e-10	
+2686	myElaps=26.2627	matlabElaps=2.81633		Pass
+2687	myErr=4.13158e-07	matlabErr=1.60984e-08	
+2687	myElaps=71.386	matlabElaps=3.73587		Pass
+420	myErr=1.02788e-08	matlabErr=7.85308e-11	
+420	myElaps=2.49663	matlabElaps=0.057799		Pass
+1548	myErr=1.13173e-09	matlabErr=9.32363e-14	
+1548	myElaps=16.6137	matlabElaps=16.3556		Pass
+2685	myErr=8.42188e-06	matlabErr=5.17513e-09	
+2685	myElaps=60.5731	matlabElaps=2.48925		Pass
+2688	myErr=5.44038e-07	matlabErr=5.96049e-08	
+2688	myElaps=95.2161	matlabElaps=2.91223		Pass
+918	myErr=2.98023e-08	matlabErr=1.39336e-11	
+918	myElaps=4.94401	matlabElaps=7.57548		Pass
+2352	myErr=2.52361e-11	matlabErr=2.69857e-14	
+2352	myElaps=1.26815	matlabElaps=0.02742		Pass
+2697	myErr=1.90735e-06	matlabErr=3.04078e-08	
+2697	myElaps=100.413	matlabElaps=5.56141		Pass
+2348	myErr=2.383e-11	matlabErr=9.09606e-12	
+2348	myElaps=1.57635	matlabElaps=0.016023		Pass
+1427	myErr=2.37135e-16	matlabErr=1.35505e-16	
+1427	myElaps=1.12459	matlabElaps=0.005511		Pass
+547	myErr=5.86305e-07	matlabErr=8.88806e-11	
+547	myElaps=27.3547	matlabElaps=0.370375		Pass
+1891	myErr=4.79412e-06	matlabErr=4.88621e-09	
+1891	myElaps=29.3486	matlabElaps=9.46617		Pass
+865	myErr=8.34327e-11	matlabErr=2.27728e-14	
+865	myElaps=2.16853	matlabElaps=25.7498		Pass
+466	myErr=2.36469e-11	matlabErr=3.81334e-13	
+466	myElaps=52.4785	matlabElaps=0.235845		Pass
+1190	myErr=0	matlabErr=1.33063e-14	
+1190	myElaps=2.70452	matlabElaps=1.14931		Pass
+372	myErr=1.35754e-15	matlabErr=9.76768e-15	
+372	myElaps=426.709	matlabElaps=0.065579		Pass
+2340	myErr=2.43975e-11	matlabErr=5.24005e-12	
+2340	myElaps=1.94003	matlabElaps=0.01183		Pass
+421	myErr=7.97712e-11	matlabErr=3.36543e-14	
+421	myElaps=2.35537	matlabElaps=0.084082		Pass
+2346	myErr=1.76051e-11	matlabErr=2.78004e-13	
+2346	myElaps=1.92256	matlabElaps=0.01319		Pass
+2341	myErr=1.79644e-11	matlabErr=3.64064e-12	
+2341	myElaps=1.83372	matlabElaps=0.008423		Pass
+1197	myErr=1.52415e-09	matlabErr=2.53036e-12	
+1197	myElaps=7972.47	matlabElaps=272.833		Pass
+2353	myErr=1.46584e-11	matlabErr=2.23459e-14	
+2353	myElaps=2.16548	matlabElaps=0.137577		Pass
+1250	myErr=1.36559e-09	matlabErr=3.11552e-15	
+1250	myElaps=8.03852	matlabElaps=34.3182		Pass
+437	myErr=1.99908e-10	matlabErr=7.3011e-14	
+437	myElaps=3.12494	matlabElaps=0.101366		Pass
+1544	myErr=7.13049e-10	matlabErr=7.36928e-13	
+1544	myElaps=79.1552	matlabElaps=2.25745		Pass
+1612	myErr=7.876e-08	matlabErr=2.00117e-11	
+1612	myElaps=4.35533	matlabElaps=0.978678		Pass
+2564	myErr=3.3358e-06	matlabErr=1.6756e-10	
+2564	myElaps=1.14756	matlabElaps=0.054157		Pass
+2104	myErr=1.1167e-10	matlabErr=0	
+2104	myElaps=2683.78	matlabElaps=6.75224		Pass
+2698	myErr=0.00390625	matlabErr=0.0689421	
+2698	myElaps=148.607	matlabElaps=28.0821		Pass
+902	myErr=2.20208e-12	matlabErr=2.49184e-14	
+902	myElaps=3886.81	matlabElaps=0.582984		Pass
+432	myErr=3.00398e-10	matlabErr=8.61533e-14	
+432	myElaps=2.64297	matlabElaps=0.040586		Pass
+1243	myErr=4.57764e-05	matlabErr=1.01392e-14	
+1243	myElaps=5.90281	matlabElaps=119.16		Fail
+2245	myErr=2.87784e-13	matlabErr=1.02973e-14	
+2245	myElaps=1.52561	matlabElaps=0.170872		Pass
+1551	myErr=1.4612e-10	matlabErr=4.37819e-12	
+1551	myElaps=741.64	matlabElaps=27.8857		Pass
+438	myErr=0.0207381	matlabErr=4.42154e-07	
+438	myElaps=5.52466	matlabElaps=0.049735		Fail
+2818	myErr=1.08776e-09	matlabErr=4.45178e-16	
+2818	myElaps=5.94803	matlabElaps=0.122532		Pass
+1552	myErr=3.65664e-08	matlabErr=1.46288e-13	
+1552	myElaps=495.375	matlabElaps=24.1335		Pass
+77	myErr=9.52503e-10	matlabErr=1.67747e-12	
+77	myElaps=1.6518	matlabElaps=0.052762		Pass
+580	myErr=2.81086e-07	matlabErr=3.85234e-10	
+580	myElaps=47.0526	matlabElaps=0.537627		Pass
+454	myErr=4.38744e-13	matlabErr=9.55626e-12	
+454	myElaps=1.56962	matlabElaps=0.018725		Pass
+840	myErr=5.31241e-13	matlabErr=3.81695e-13	
+840	myElaps=1.30304	matlabElaps=0.024912		Pass
+2425	myErr=4.72886e-10	matlabErr=8.20129e-11	
+2425	myElaps=7.7198	matlabElaps=4.27981		Pass
+2424	myErr=1.46556e-10	matlabErr=7.32609e-14	
+2424	myElaps=5.00985	matlabElaps=4.24683		Pass
+465	myErr=1.10133e-08	matlabErr=2.70339e-09	
+465	myElaps=79.0419	matlabElaps=0.220537		Pass
+2415	myErr=3.49155e-11	matlabErr=4.98517e-14	
+2415	myElaps=7.12817	matlabElaps=28.7478		Pass
+2414	myErr=4.68687e-11	matlabErr=4.54723e-14	
+2414	myElaps=6.02498	matlabElaps=247.522		Pass
+1245	myErr=9.44741e-11	matlabErr=7.45272e-15	
+1245	myElaps=18.9795	matlabElaps=69.5324		Pass
+1868	myErr=9.75406e-12	matlabErr=3.16093e-14	
+1868	myElaps=22.1533	matlabElaps=21.2671		Pass
+756	myErr=3.95561e-11	matlabErr=2.01615e-14	
+756	myElaps=3.29977	matlabElaps=1.56949		Pass
+841	myErr=2.51361e-13	matlabErr=5.99262e-15	
+841	myElaps=1.7569	matlabElaps=0.038015		Pass
+2354	myErr=7.276e-11	matlabErr=4.99688e-14	
+2354	myElaps=2.22543	matlabElaps=0.019877		Pass
+1554	myErr=8.81573e-09	matlabErr=3.36517e-13	
+1554	myElaps=150.616	matlabElaps=10.6507		Pass
+2850	myErr=5.06966e-12	matlabErr=4.08009e-15	
+2850	myElaps=25.4333	matlabElaps=0.321154		Pass
+919	myErr=2.98284e-08	matlabErr=4.66028e-09	
+919	myElaps=10.3789	matlabElaps=29.9066		Pass
+453	myErr=4.20213e-15	matlabErr=4.33681e-19	
+453	myElaps=3.55901	matlabElaps=0.084978		Pass
+1191	myErr=0	matlabErr=1.4408e-14	
+1191	myElaps=4.28618	matlabElaps=1.99848		Pass
+1553	myErr=6.62977e-11	matlabErr=3.03115e-12	
+1553	myElaps=128.771	matlabElaps=54.3318		Pass
+1549	myErr=9.51894e-12	matlabErr=2.06701e-11	
+1549	myElaps=785.721	matlabElaps=11.9051		Pass
+1555	myErr=6.91221e-10	matlabErr=3.82376e-12	
+1555	myElaps=180.601	matlabElaps=41.1362		Pass
+377	myErr=9.90944e-15	matlabErr=5.80947e-16	
+377	myElaps=1.70061	matlabElaps=5.2206		Pass
+412	myErr=2.35855e-06	matlabErr=4.66271e-09	
+412	myElaps=13.5952	matlabElaps=0.102239		Pass
+1432	myErr=0.000299069	matlabErr=2.63078e-12	
+1432	myElaps=5.1397	matlabElaps=0.173663		Fail
+1212	myErr=4.48699e-11	matlabErr=3.89377e-12	
+1212	myElaps=2.42801	matlabElaps=0.012171		Pass
+433	myErr=5.73239e-14	matlabErr=6.3651e-14	
+433	myElaps=7.13622	matlabElaps=0.057181		Pass
+1622	myErr=1.62073e-12	matlabErr=3.99704e-13	
+1622	myElaps=0.855629	matlabElaps=0.012634		Pass
+417	myErr=6.46162e-12	matlabErr=5.05384e-16	
+417	myElaps=6.51833	matlabElaps=0.065783		Pass
+2430	myErr=2.04846e-12	matlabErr=1.69897e-14	
+2430	myElaps=4.66824	matlabElaps=0.543061		Pass
+2197	myErr=1.13915e-10	matlabErr=8.93296e-13	
+2197	myElaps=1216.54	matlabElaps=9.66345		Pass
+414	myErr=9.37718e-05	matlabErr=1.55389e-07	
+414	myElaps=3.52174	matlabElaps=0.10308		Fail
+2279	myErr=3.97686e-14	matlabErr=9.90858e-16	
+2279	myElaps=32.3878	matlabElaps=0.056312		Pass
+1242	myErr=0.0944951	matlabErr=0.000292252	
+1242	myElaps=239.919	matlabElaps=225.546		Fail
+1556	myErr=3.00623e-10	matlabErr=1.00012e-11	
+1556	myElaps=125.865	matlabElaps=46.9117		Pass
+2699	myErr=0.491654	matlabErr=0.0236013	
+2699	myElaps=3190.11	matlabElaps=62.6191		Pass
+389	myErr=2.06976e-10	matlabErr=2.23643e-14	
+389	myElaps=8.2718	matlabElaps=0.22968		Pass
+1557	myErr=3.25906e-10	matlabErr=2.49468e-12	
+1557	myElaps=87.5946	matlabElaps=67.1218		Pass
+425	myErr=3.41694e-10	matlabErr=4.21182e-14	
+425	myElaps=4.48454	matlabElaps=0.115469		Pass
+1550	myErr=1.38483e-09	matlabErr=6.18808e-12	
+1550	myElaps=75.2957	matlabElaps=12.9383		Pass
+410	myErr=3.55011e-10	matlabErr=9.69191e-14	
+410	myElaps=8.56376	matlabElaps=0.11517		Pass
+2707	myErr=4.80464e-11	matlabErr=4.08963e-14	
+2707	myElaps=1570.43	matlabElaps=53.4454		Pass
+2700	myErr=6.10352e-05	matlabErr=0.000779139	
+2700	myElaps=4663.78	matlabElaps=80.4229		Pass
+1559	myErr=2.4638e-09	matlabErr=2.64383e-11	
+1559	myElaps=1115	matlabElaps=168.548		Pass
+2701	myErr=1.90735e-06	matlabErr=0.000261752	
+2701	myElaps=4879.97	matlabElaps=78.4098		Pass
+736	myErr=6.18937e-13	matlabErr=3.37968e-15	
+736	myElaps=3.59515	matlabElaps=3.20227		Pass
+570	myErr=1.57231e-12	matlabErr=5.4026e-13	
+570	myElaps=127.095	matlabElaps=2.93326		Pass
+1192	myErr=1.6263e-19	matlabErr=1.67115e-14	
+1192	myElaps=6.95199	matlabElaps=3.14655		Pass
+826	myErr=1.39165e-10	matlabErr=5.10257e-15	
+826	myElaps=9.05886	matlabElaps=1.26498		Pass
+2702	myErr=1.19222e-07	matlabErr=7.61878e-06	
+2702	myElaps=5433.85	matlabElaps=93.2021		Pass
+1563	myErr=3.39757e-10	matlabErr=1.12656e-11	
+1563	myElaps=184.248	matlabElaps=48.633		Pass
+2702	myErr=1.19222e-07	matlabErr=7.61878e-06	
+2702	myElaps=4657.09	matlabElaps=107.019		Pass
+1563	myErr=3.39757e-10	matlabErr=1.12656e-11	
+1563	myElaps=160.28	matlabElaps=58.859		Pass
+2703	myErr=4.28196e-05	matlabErr=2.13993e-06	
+2703	myElaps=5389.45	matlabElaps=90.5319		Pass
+2704	myErr=5.72205e-06	matlabErr=0.000276974	
+2704	myElaps=5788.87	matlabElaps=125.677		Pass
+1916	myErr=7.57249e-08	matlabErr=5.52841e-15	
+1916	myElaps=6.96594	matlabElaps=0.401512		Pass
+1249	myErr=1.45429e-09	matlabErr=6.31046e-15	
+1249	myElaps=30.3032	matlabElaps=371.221		Pass
+444	myErr=9.99353e-11	matlabErr=1.58211e-13	
+444	myElaps=9.90352	matlabElaps=21.7601		Pass
+2413	myErr=1.12135e-09	matlabErr=1.07844e-13	
+2413	myElaps=13.3709	matlabElaps=1.48153		Pass
+224	myErr=2.53656e-12	matlabErr=2.88723e-13	
+224	myElaps=544.347	matlabElaps=0.19112		Pass
+2693	myErr=4.99059e-10	matlabErr=1.90023e-13	
+2693	myElaps=21242.4	matlabElaps=280.478		Pass
+1380	myErr=5.33174e-14	matlabErr=1.30972e-14	
+1380	myElaps=2.21061	matlabElaps=0.831004		Pass
+423	myErr=1.09267e-10	matlabErr=3.33694e-14	
+423	myElaps=37.658	matlabElaps=0.121876		Pass
+839	myErr=1.10555e-12	matlabErr=2.45574e-13	
+839	myElaps=2.41407	matlabElaps=0.056595		Pass
+461	myErr=1.77289e-14	matlabErr=1.3741e-16	
+461	myElaps=3.78683	matlabElaps=0.073924		Pass
+288	myErr=3.7e-11	matlabErr=2.81821e-16	
+288	myElaps=7.7257	matlabElaps=0.442821		Pass
+1303	myErr=2.72005e-15	matlabErr=2.33147e-15	
+1303	myElaps=1.2312	matlabElaps=0.007414		Pass
+864	myErr=7.68599e-07	matlabErr=1.78567e-15	
+864	myElaps=16.2944	matlabElaps=2.49677		Pass
+2819	myErr=6.93636e-09	matlabErr=1.93763e-16	
+2819	myElaps=8.23728	matlabElaps=0.280814		Pass
+1183	myErr=4.94257e-11	matlabErr=8.35102e-13	
+1183	myElaps=1751.68	matlabElaps=150.66		Pass
+1376	myErr=1.03352e-08	matlabErr=6.98494e-10	
+1376	myElaps=187.517	matlabElaps=24.7422		Pass
+1441	myErr=6.0072e-10	matlabErr=9.59233e-13	
+1441	myElaps=1.26604	matlabElaps=0.077914		Pass
+1262	myErr=6.66721e-11	matlabErr=1.38383e-13	
+1262	myElaps=8.53265	matlabElaps=14.3491		Pass
+1560	myErr=1.92127e-08	matlabErr=4.88075e-14	
+1560	myElaps=516.99	matlabElaps=128.623		Pass
+1624	myErr=1.60734e-12	matlabErr=4.56811e-13	
+1624	myElaps=1.35329	matlabElaps=0.124357		Pass
+2565	myErr=2.16373e-05	matlabErr=7.64388e-10	
+2565	myElaps=2.34176	matlabElaps=0.123986		Fail
+763	myErr=1.00365e-15	matlabErr=1.37668e-14	
+763	myElaps=4.12658	matlabElaps=0.544382		Pass
+365	myErr=1.93179e-14	matlabErr=6.03315e-15	
+365	myElaps=30.6498	matlabElaps=0.736203		Pass
+1193	myErr=0	matlabErr=1.98982e-14	
+1193	myElaps=7.57097	matlabElaps=5.85727		Pass
+439	myErr=0.00554772	matlabErr=2.25856e-08	
+439	myElaps=11.8792	matlabElaps=0.09347		Fail
+867	myErr=1.73722e-10	matlabErr=4.78774e-13	
+867	myElaps=7.0837	matlabElaps=3.20038		Pass
+1561	myErr=1.16574e-08	matlabErr=2.43267e-11	
+1561	myElaps=533.617	matlabElaps=179.37		Pass
+2569	myErr=0.538859	matlabErr=1.38066e-05	
+2569	myElaps=39.5592	matlabElaps=20.8046		Fail
+582	myErr=3.94679e-07	matlabErr=3.73869e-10	
+582	myElaps=129.951	matlabElaps=1.66717		Pass
+549	myErr=2.85276e-07	matlabErr=2.8662e-10	
+549	myElaps=194.067	matlabElaps=3.07185		Pass
+428	myErr=5.93866e-11	matlabErr=4.04986e-14	
+428	myElaps=5.56792	matlabElaps=0.121205		Pass
+1426	myErr=1.66597e-07	matlabErr=2.1287e-10	
+1426	myElaps=567.344	matlabElaps=1036.53		Pass
+1562	myErr=1.49651e-09	matlabErr=5.69395e-12	
+1562	myElaps=2195.33	matlabElaps=221.134		Pass
+543	myErr=2.64958e-14	matlabErr=7.65882e-16	
+543	myElaps=3124.95	matlabElaps=3188.22		Pass
+572	myErr=1.48444e-12	matlabErr=5.59619e-13	
+572	myElaps=151.788	matlabElaps=5.66334		Pass
+1218	myErr=5.96046e-08	matlabErr=1.17347e-16	
+1218	myElaps=73.8141	matlabElaps=2.8988		Pass
+1194	myErr=0	matlabErr=2.32003e-14	
+1194	myElaps=10.7514	matlabElaps=8.89625		Pass
+1565	myErr=1.35795e-09	matlabErr=2.49542e-11	
+1565	myElaps=6475.5	matlabElaps=317.895		Pass
+1558	myErr=6.53382e-10	matlabErr=4.41103e-14	
+1558	myElaps=887.109	matlabElaps=90.9833		Pass
+2828	myErr=4.62344e-09	matlabErr=1.42757e-09	
+2828	myElaps=5.28779	matlabElaps=911.603		Pass
+819	myErr=4.74208	matlabErr=0.0598694	
+819	myElaps=82.1321	matlabElaps=0.801566		Pass
+395	myErr=6.2935e-10	matlabErr=1.58109e-14	
+395	myElaps=20.3656	matlabElaps=0.719888		Pass
+1443	myErr=3.80158e-14	matlabErr=2.52018e-19	
+1443	myElaps=10.995	matlabElaps=20.1973		Pass
+1247	myErr=3.7312e-09	matlabErr=2.86311e-15	
+1247	myElaps=22.3632	matlabElaps=156.017		Pass
+901	myErr=1.13104e-11	matlabErr=2.27374e-13	
+901	myElaps=36343.7	matlabElaps=7.1457		Pass
+2214	myErr=2.38609e-09	matlabErr=4.10263e-13	
+2214	myElaps=237.524	matlabElaps=130.428		Pass
+2694	myErr=2.9093e-09	matlabErr=7.27606e-12	
+2694	myElaps=715.89	matlabElaps=1024.18		Pass
+1272	myErr=3.25806e-10	matlabErr=3.36433e-12	
+1272	myElaps=93.1681	matlabElaps=90.3329		Pass
+1295	myErr=5.87934e-12	matlabErr=3.63931e-12	
+1295	myElaps=800.552	matlabElaps=4797.95		Pass
+2695	myErr=6.66222e-09	matlabErr=4.36558e-11	
+2695	myElaps=821.108	matlabElaps=1236.88		Pass
+738	myErr=3.81935e-12	matlabErr=2.22891e-14	
+738	myElaps=4.64794	matlabElaps=17.0846		Pass
+1568	myErr=1.16348e-09	matlabErr=2.74913e-11	
+1568	myElaps=28.5757	matlabElaps=867.803		Pass
+551	myErr=1.93712e-08	matlabErr=1.13767e-13	
+551	myElaps=24.195	matlabElaps=8.95063		Pass
+2537	myErr=2.24171e-08	matlabErr=1.20275e-10	
+2537	myElaps=2.15619	matlabElaps=0.137614		Pass
+455	myErr=4.45853e-12	matlabErr=4.19927e-11	
+455	myElaps=4.1894	matlabElaps=0.071515		Pass
+1874	myErr=4.41326e-09	matlabErr=9.45273e-11	
+1874	myElaps=3.17889	matlabElaps=0.106268		Pass
+2708	myErr=2.74084e-10	matlabErr=7.65809e-14	
+2708	myElaps=158.146	matlabElaps=345.638		Pass
+1567	myErr=3.43299e-10	matlabErr=7.86793e-14	
+1567	myElaps=35.0516	matlabElaps=584.387		Pass
+834	myErr=4.11471e-11	matlabErr=8.12638e-16	
+834	myElaps=43.8536	matlabElaps=574.504		Pass
+818	myErr=0.0387179	matlabErr=7.47776e-10	
+818	myElaps=4.86964	matlabElaps=0.247786		Fail
+584	myErr=2.2867e-08	matlabErr=4.48631e-10	
+584	myElaps=37.5118	matlabElaps=1.80558		Pass
+574	myErr=1.29599e-09	matlabErr=5.70994e-13	
+574	myElaps=16.2905	matlabElaps=6.48731		Pass
+1365	myErr=3.40358e-08	matlabErr=8.59434e-14	
+1365	myElaps=54.6449	matlabElaps=24.0746		Pass
+1299	myErr=7.48021e-09	matlabErr=2.75369e-14	
+1299	myElaps=88.6686	matlabElaps=36.4062		Pass
+364	myErr=8.29909e-14	matlabErr=6.01862e-14	
+364	myElaps=3.06644	matlabElaps=0.442874		Pass
+1564	myErr=1.23173e-08	matlabErr=2.42466e-12	
+1564	myElaps=52.8014	matlabElaps=265.667		Pass
+289	myErr=2.24349e-09	matlabErr=3.0785e-16	
+289	myElaps=14.4668	matlabElaps=2.8196		Pass
+1204	myErr=4.75162e-10	matlabErr=1.3957e-13	
+1204	myElaps=9.94687	matlabElaps=0.603345		Pass
+832	myErr=6.84505e-10	matlabErr=9.21442e-16	
+832	myElaps=74.5265	matlabElaps=48.7692		Pass
+833	myErr=4.0235e-10	matlabErr=6.02884e-17	
+833	myElaps=65.8292	matlabElaps=47.2645		Pass
+1298	myErr=5.28554e-09	matlabErr=1.7561e-10	
+1298	myElaps=1318.45	matlabElaps=2010.86		Pass
+2820	myErr=6.59475e-10	matlabErr=2.31023e-16	
+2820	myElaps=9.39053	matlabElaps=1.21836		Pass
+1862	myErr=2.24627e-10	matlabErr=1.37397e-14	
+1862	myElaps=50.9373	matlabElaps=758.557		Pass
+1111	myErr=1.47328e-12	matlabErr=2.42491e-13	
+1111	myElaps=1307.68	matlabElaps=197.844		Pass
+1109	myErr=1.06189e-14	matlabErr=7.88836e-15	
+1109	myElaps=1271.49	matlabElaps=2.19257		Pass
+1569	myErr=1.90275e-09	matlabErr=4.24872e-14	
+1569	myElaps=54.4577	matlabElaps=1536.16		Pass
+1941	myErr=4.49846e-11	matlabErr=1.14214e-11	
+1941	myElaps=3.6964	matlabElaps=2.43558		Pass
+764	myErr=4.64787e-13	matlabErr=1.04943e-13	
+764	myElaps=4.19825	matlabElaps=1.94985		Pass
+1371	myErr=1.41277e-08	matlabErr=3.7835e-10	
+1371	myElaps=73.7655	matlabElaps=282.578		Pass
+2709	myErr=7.08617e-11	matlabErr=4.59193e-13	
+2709	myElaps=220.134	matlabElaps=537.65		Pass
+1366	myErr=1.16503e-07	matlabErr=1.08591e-13	
+1366	myElaps=66.7418	matlabElaps=30.1966		Pass
+1854	myErr=5.01993e-05	matlabErr=3.88426e-12	
+1854	myElaps=22.8687	matlabElaps=5.24919		Fail
+1571	myErr=1.90736e-06	matlabErr=3.98525e-11	
+1571	myElaps=23.5399	matlabElaps=313.558		Pass
+1570	myErr=2.22849e-09	matlabErr=3.70728e-11	
+1570	myElaps=51.1504	matlabElaps=1445.24		Pass
+552	myErr=8.66184e-11	matlabErr=2.23518e-08	
+552	myElaps=32.5974	matlabElaps=15.896		Pass
+2232	myErr=3.27844e-11	matlabErr=1.67015e-12	
+2232	myElaps=4.31534	matlabElaps=0.418733		Pass
+2566	myErr=0.0031798	matlabErr=5.14865e-09	
+2566	myElaps=4.42637	matlabElaps=0.305001		Fail
+1240	myErr=2.97482e-08	matlabErr=4.33261e-13	
+1240	myElaps=14.8991	matlabElaps=5142.7		Pass
+2710	myErr=2.76134e-10	matlabErr=4.98775e-13	
+2710	myElaps=254.776	matlabElaps=646.379		Pass
+1907	myErr=2.38476e-13	matlabErr=5.43923e-14	
+1907	myElaps=4.05977	matlabElaps=3.08938		Pass
+1255	myErr=1.37187e-09	matlabErr=1.37145e-13	
+1255	myElaps=47.4762	matlabElaps=51.5773		Pass
+1566	myErr=1.04025e-09	matlabErr=1.44002e-11	
+1566	myElaps=66.6808	matlabElaps=559.88		Pass
+2711	myErr=3.127e-10	matlabErr=1.14077e-12	
+2711	myElaps=256.475	matlabElaps=652.626		Pass
+576	myErr=2.90768e-12	matlabErr=5.70304e-13	
+576	myElaps=23.6049	matlabElaps=7.56759		Pass
+2712	myErr=6.38682e-10	matlabErr=9.62455e-13	
+2712	myElaps=263.603	matlabElaps=810.258		Pass
+2269	myErr=700.781	matlabErr=0.004182	
+2269	myElaps=15.8825	matlabElaps=1.54167		Fail
+2713	myErr=2.05892e-09	matlabErr=6.88759e-13	
+2713	myElaps=287.125	matlabElaps=762.861		Pass
+2714	myErr=6.58325e-10	matlabErr=9.30886e-13	
+2714	myElaps=286.146	matlabElaps=751.581		Pass
+2715	myErr=1.10458e-10	matlabErr=1.03727e-12	
+2715	myElaps=280.884	matlabElaps=767.204		Pass
+2716	myErr=1.26308e-10	matlabErr=1.06253e-12	
+2716	myElaps=281.633	matlabElaps=821.72		Pass
+2717	myErr=7.62168e-10	matlabErr=1.0422e-12	
+2717	myElaps=314.171	matlabElaps=889.465		Pass
+284	myErr=2.15067e-08	matlabErr=1.8614e-12	
+284	myElaps=10.0729	matlabElaps=4.27027		Pass
+586	myErr=1.79861e-07	matlabErr=1.25785e-10	
+586	myElaps=47.6664	matlabElaps=2.89991		Pass
+431	myErr=3.74635e-07	matlabErr=8.72893e-09	
+431	myElaps=8.42421	matlabElaps=0.249314		Pass
+1309	myErr=2.13111e-13	matlabErr=5.3193e-16	
+1309	myElaps=3.44738	matlabElaps=0.032073		Pass
+740	myErr=9.73249e-13	matlabErr=4.21924e-14	
+740	myElaps=4.93473	matlabElaps=45.1958		Pass
+2814	myErr=4.99139e-10	matlabErr=1.64488e-11	
+2814	myElaps=11.067	matlabElaps=49.8737		Pass
+742	myErr=8.52494e-12	matlabErr=9.60735e-15	
+742	myElaps=5.05135	matlabElaps=61.3742		Pass
+969	myErr=0.105591	matlabErr=0.00143436	
+969	myElaps=8.26529	matlabElaps=440.258		Pass
+808	myErr=4.3956e-11	matlabErr=9.3365e-13	
+808	myElaps=18.3448	matlabElaps=3.89723		Pass
+2829	myErr=5.46976e-09	matlabErr=8.37024e-11	
+2829	myElaps=14.7515	matlabElaps=3.83006		Pass
+1348	myErr=2.36114e-08	matlabErr=3.78208e-13	
+1348	myElaps=114.401	matlabElaps=72.9369		Pass
+1375	myErr=7.30926e-09	matlabErr=1.33878e-09	
+1375	myElaps=78.8365	matlabElaps=292.434		Pass
+2242	myErr=4.38252e-12	matlabErr=3.26558e-13	
+2242	myElaps=5.7129	matlabElaps=0.697544		Pass
+886	myErr=2.05684e-10	matlabErr=5.49716e-12	
+886	myElaps=34.0199	matlabElaps=1059.45		Pass
+1293	myErr=1.79433e-10	matlabErr=4.42408e-12	
+1293	myElaps=807.053	matlabElaps=3130.01		Pass
+1319	myErr=0.000337905	matlabErr=2.79743e-10	
+1319	myElaps=17.5006	matlabElaps=2.67202		Fail
+415	myErr=0.000139126	matlabErr=8.29361e-09	
+415	myElaps=6.40474	matlabElaps=0.141576		Fail
+578	myErr=1.4022e-12	matlabErr=5.7848e-13	
+578	myElaps=26.5156	matlabElaps=12.1308		Pass
+452	myErr=8.55817e-17	matlabErr=5.21875e-20	
+452	myElaps=12.9189	matlabElaps=0.214928		Pass
+1428	myErr=7.67459e-10	matlabErr=7.03937e-16	
+1428	myElaps=64.0716	matlabElaps=18.5294		Pass
+588	myErr=2.26322e-07	matlabErr=3.73869e-10	
+588	myElaps=67.7263	matlabElaps=4.105		Pass
+1908	myErr=4.29934e-14	matlabErr=2.54206e-13	
+1908	myElaps=5.37052	matlabElaps=0.500643		Pass
+554	myErr=1.95006e-07	matlabErr=1.21073e-08	
+554	myElaps=54.6767	matlabElaps=28.6424		Pass
+814	myErr=7.39416e-11	matlabErr=4.37324e-15	
+814	myElaps=15.3493	matlabElaps=1.1066		Pass
+920	myErr=1.97579e-07	matlabErr=5.28542e-08	
+920	myElaps=47.7595	matlabElaps=30.3614		Pass
+2199	myErr=3.87125e-10	matlabErr=5.93096e-12	
+2199	myElaps=156.189	matlabElaps=152.452		Pass
+1261	myErr=1.60969e-11	matlabErr=2.72492e-13	
+1261	myElaps=34.3858	matlabElaps=4496.23		Pass
+1576	myErr=3.98097e-09	matlabErr=5.95902e-11	
+1576	myElaps=91.3842	matlabElaps=6118.93		Pass
+====again
+1576	myErr=3.98097e-09	matlabErr=5.95902e-11	
+1576	myElaps=88.2146	matlabElaps=6059.75		Pass
+1302	myErr=1.50127e-08	matlabErr=3.12816e-11	
+1302	myElaps=9.09746	matlabElaps=49281		Pass
+2538	myErr=3.18429e-08	matlabErr=3.72909e-09	
+2538	myElaps=4.70944	matlabElaps=4.37221		Pass
+1358	myErr=9.48668e-09	matlabErr=1.31037e-13	
+1358	myElaps=75.4152	matlabElaps=32.1686		Pass
+373	myErr=4.67458e-12	matlabErr=8.52654e-14	
+373	myElaps=638.11	matlabElaps=0.086343		Pass
+744	myErr=7.34924e-12	matlabErr=1.36708e-14	
+744	myElaps=7.2426	matlabElaps=97.6755		Pass
+1577	myErr=5.56203e-09	matlabErr=6.19402e-11	
+1577	myElaps=90.0737	matlabElaps=7999.48		Pass
+2821	myErr=2.85636e-09	matlabErr=2.69671e-16	
+2821	myElaps=15.4515	matlabElaps=4.3798		Pass
+350	myErr=2.23577e-20	matlabErr=2.63776e-25	
+350	myElaps=12.756	matlabElaps=0.722976		Pass
+446	myErr=4.35534e-08	matlabErr=1.22037e-11	
+446	myElaps=11.3739	matlabElaps=1.2992		Pass
+762	myErr=1.93466e-11	matlabErr=2.9742e-13	
+762	myElaps=18.3232	matlabElaps=22.4202		Pass
+1384	myErr=4.40796e-10	matlabErr=9.15508e-11	
+1384	myElaps=171.636	matlabElaps=2841.51		Pass
+1436	myErr=2.10272e-12	matlabErr=8.51096e-16	
+1436	myElaps=10.0716	matlabElaps=1.11051		Pass
+809	myErr=1.53827e-10	matlabErr=2.13164e-14	
+809	myElaps=36.3294	matlabElaps=2.40235		Pass
