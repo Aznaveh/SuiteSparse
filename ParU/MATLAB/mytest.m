@@ -35,8 +35,15 @@ nmat = length (fnew) ;
 err = 1e-5;
 
 ff = fopen ('results.out', 'w') ;
-%for k = 1:nmat
-for k = 637:nmat
+
+% Headers
+fprintf(ff,'id\tmyErr\tumfErr\tratio' );
+fprintf(ff,'\tmyElaps\tumfElaps\tratio');
+fprintf(ff,'\tmynnz\tumfnnz\tratio');
+fprintf(ff,'\tmyflop\tumfflop\tratio\n');
+
+
+for k = 1:nmat
     id = fnew (k) ;
     group = index.Group {id} ;
     name = index.Name {id} ;
@@ -50,54 +57,63 @@ for k = 637:nmat
     str = strcat (str1,str2);
 
     myStart = tic;
-	system(str);
+    system(str);
     myElaps = toc(myStart);
 
 
     % Loading the results into Matlab
+    %path = '/export/scratch/multifrontal/aznaveh/myResults/';
     path = '../Demo/Res/';
 
     row_name = sprintf ('%d_row.txt',id);
     rowfullname = strcat(path, row_name);
-	rowp = load (rowfullname);
-	rowp = rowp+1;
-	
+    rowp = load (rowfullname);
+    rowp = rowp+1;
+
     col_name = sprintf ('%d_col.txt',id);
     colfullname = strcat(path, col_name);
     colp = load (colfullname);
-	colp = colp+1;
+    colp = colp+1;
 
     LU_name = sprintf ('%d_LU.txt',id);
     LUfullname = strcat(path, LU_name);
-	InMatrix = load (LUfullname);
 
-
-	I = InMatrix(:,1)+1;
-	J = InMatrix(:,2)+1;
-	X = InMatrix(:,3);
-	LU = sparse(I,J,X);
+    [LU, paddingZ] = mmread (LUfullname);
 
 
     umfStart= tic;
-    [l,u,p,q,D]=lu(A, 'vector');
+    %[l,u,p,q,D]=lu(A, 'vector');
+    [l, u, p, q, r, Info]= umfpack (A);
     umfElaps = toc(umfStart);
-    
 
-	L=tril(LU,-1)+speye(size(LU));
-	U=triu(LU); 
+
+    L=tril(LU,-1)+speye(size(LU));
+    U=triu(LU); 
+
     myErr = lu_normest(A(rowp,colp),L,U);
-    matlabErr = lu_normest(D(:,p)\A(:,q),l,u);
+    %umfErr = lu_normest(D(:,p)\A(:,q),l,u);
+    umfErr = lu_normest(p*(r\A)*q,l,u);
 
-    fprintf(ff,'%d\tmyErr=%g\tmatlabErr=%g\t\n',id,myErr, matlabErr);
-    fprintf(ff,'%d\tmyElaps=%g\tmatlabElaps=%g\t',id,myElaps, umfElaps);
-    if(myErr <= 100*matlabErr || myErr < err)
-        %fprintf('Pass\n')
+    nnzumfp = nnz(l)+nnz(u) - size(A,1);
+    mynnz = nnz(LU) + nnz(paddingZ);
+    myflop = luflop(L,U);
+    umfflop = luflop(l,u);
+
+    fprintf(ff,'%d\t%g\t%g\t%g', id, myErr, umfErr, myErr/umfErr);
+    fprintf(ff,'\t%g\t%g\t%g', myElaps, umfElaps, myElaps/umfElaps);
+    fprintf(ff,'\t%g\t%g\t%g', mynnz , nnzumfp, mynnz/nnzumfp );
+    fprintf(ff,'\t%g\t%g\t%g', myflop, umfflop, myflop/umfflop);
+
+
+    if(myErr <= 100*umfErr || myErr < err)
         fprintf(ff,'\tPass\n');
     else
-        %fprintf('Fail\n')
         fprintf(ff,'\tFail\n');
-        %pause
     end
-%pause
+
+    % cleaning the files because of the memory problem
+    str = ['rm  ' path LU_name];    system(str);
+    str = ['rm  ' path col_name];    system(str);
+    str = ['rm  ' path row_name];    system(str);
 end
 fclose (ff) ;

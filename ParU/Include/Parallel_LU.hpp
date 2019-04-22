@@ -11,7 +11,7 @@
     #define NPR
 #endif
 //for printing information uncomment this; to activate assertions uncomment 
-//NDEBUG in ./SPQR/Include/spqr.hpp line 42
+//NDEBUG in ./SPQR/Include/spqr.hpp line 41
 #undef NPR
 
 
@@ -289,6 +289,8 @@ Int paru_remove_rowTuple(tupleList *RowList, Int row, Int t);
 
 void paru_assemble(paru_matrix *paruMatInfo, Int f, cholmod_common *cc);
 
+void paru_front (paru_matrix *paruMatInfo, Int f, cholmod_common *cc);
+
 
 Int paru_dgetrf (double *F, Int *frowList, Int m, Int n, BLAS_INT *ipiv);
 Int paru_factorize(double *F, Int *frowList, Int lm, Int ln, Int *panel_row, 
@@ -317,4 +319,8 @@ void paru_init_rel (paru_matrix *paruMatInfo, Int f);
 void paru_update_rel_ind (Element *el, Element *cb_el, 
         char rc, cholmod_common *cc );
 
-void paru_write( paru_matrix *paruMatInfo, cholmod_common *cc);
+void paru_write( paru_matrix *paruMatInfo, char *id, cholmod_common *cc);
+void paru_update_rowDeg ( Int panel_num,  Int row_end, 
+                 Int f, paru_matrix *paruMatInfo);
+
+void paru_finalize (paru_matrix *paruMatInfo, Int f, cholmod_common *cc);

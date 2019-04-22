@@ -188,10 +188,5 @@ void paru_update_rel_ind (Element *el, Element *cb_el,
             RelIndex [i] = found;
             ASSERT (found != -1);
         }
-        //       paru_free ( 2*len_el, sizeof(Int), Work, cc); 
-        //       if (rc == 'r')
-        //           el->rWork = NULL;
-        //       else
-        //           el->cWork = NULL;
     }
 }

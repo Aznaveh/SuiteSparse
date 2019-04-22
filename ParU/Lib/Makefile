@@ -40,6 +40,7 @@ OBJ = \
 	paru_init_rowFronts.o\
 	paru_tuples.o\
 	paru_assemble.o\
+	paru_front.o\
 	paru_factorize.o\
 	paru_create_element.o\
 	paru_numeric_assemble.o\
@@ -49,6 +50,8 @@ OBJ = \
 	paru_fourPass.o\
 	paru_init_rel.o\
 	paru_update_rel_ind.o\
+	paru_update_rowDeg.o\
+	paru_finalize.o\
 	paru_write.o
 
 $(OBJ): $(INC)
@@ -81,6 +84,9 @@ paru_tuples.o: ../Source/paru_tuples.cpp
 paru_assemble.o: ../Source/paru_assemble.cpp
 	$(C) -c $<
 
+paru_front.o: ../Source/paru_front.cpp
+	$(C) -c $<
+
 paru_factorize.o: ../Source/paru_factorize.cpp
 	$(C) -c $<
 
@@ -109,6 +115,12 @@ paru_update_rel_ind.o: ../Source/paru_update_rel_ind.cpp
 	$(C) -c $<
 
 paru_write.o: ../Source/paru_write.cpp
+	$(C) -c $<
+
+paru_update_rowDeg.o: ../Source/paru_update_rowDeg.cpp
+	$(C) -c $<
+
+paru_finalize.o: ../Source/paru_finalize.cpp
 	$(C) -c $<
 
 #-------------------------------------------------------------------------------

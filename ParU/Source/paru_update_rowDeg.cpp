@@ -19,9 +19,18 @@
  */
 
 void paru_update_rowDeg ( Int panel_num,  Int row_end, 
-        Int *fcolList, Int &colCount, Int f, paru_matrix *paruMatInfo){
+        Int f, paru_matrix *paruMatInfo){
 
+    DEBUGLEVEL(0);
+    PRLEVEL (1, ("%%-------ROW degree update of panel %ld of front %ld \n", 
+             panel_num, f ));
     Int panel_width = paruMatInfo->panel_width;
+    Element **elementList = paruMatInfo->elementList;
+    work_struct *Work =  paruMatInfo->Work;
+    Int elCMark = Work -> elCMark;
+
+    Int *elRow = Work -> elRow; 
+    Int *elCol = Work -> elCol;
 
     paru_symbolic *LUsym =  paruMatInfo->LUsym;
     Int *Super = LUsym->Super;
@@ -29,10 +38,11 @@ void paru_update_rowDeg ( Int panel_num,  Int row_end,
     Int col2 = Super [f+1];
     Int fp = col2 - col1;   /* first fp columns are pivotal */ 
 
-    Int time_f = paruMatInfo->time_stamp[f];
+    Int time_f = ++paruMatInfo->time_stamp[f]; //making all the markings invalid
     Int npMark = time_f; //Mark for non pivotal rows
     Int pMark = npMark; pMark++;    //Mark for non pivotal rows
 
+    Int colCount = paruMatInfo->fcolCount[f] ;
     Int past_col = colCount;   //saving how many colums are in this front so far
 
     Int j1 = panel_num*panel_width; // panel starting column
@@ -40,6 +50,8 @@ void paru_update_rowDeg ( Int panel_num,  Int row_end,
         j1 + panel_width : fp;
 
 
+    Int rowCount = paruMatInfo->frowCount[f];
+    Int *row_degree_bound = paruMatInfo->row_degree_bound;
 
     /*************** finding set of non pivotal cols in current front *********/
 
@@ -79,11 +91,10 @@ void paru_update_rowDeg ( Int panel_num,  Int row_end,
 
 
 
-    work_struct *Work =  paruMatInfo->Work;
     Int *isColInCBcolSet = Work -> colSize;
     Int colMark = Work -> colMark;
-    m = paruMatInfo-> m;
-    n = paruMatInfo-> n;
+    Int m = paruMatInfo-> m;
+    Int n = paruMatInfo-> n;
 
     if (colMark < 0) {  // in rare case of overflow
         //        memset (isRowInFront, -1, n*sizeof(Int)); //Bug detected
@@ -93,10 +104,10 @@ void paru_update_rowDeg ( Int panel_num,  Int row_end,
 
     Int *frowList = paruMatInfo->frowList[f];
     Int *fcolList = paruMatInfo->fcolList[f];
-    Int colCount = 0;
 
 #ifndef NDEBUG
     std::set<Int> stl_colSet;
+    std::set<Int>::iterator it;
 #endif  
 
     tupleList *RowList = paruMatInfo->RowList;
@@ -183,12 +194,11 @@ void paru_update_rowDeg ( Int panel_num,  Int row_end,
 
     if (colCount == 0){  // there is no CB, Nothing to be done
         Work->rowMark +=  rowCount;
-        PRLEVEL (1, ("%% pivotalFront =%p\n",pivotalFront));
         return;
     }
 
 #ifndef NDEBUG /* Checking if columns are correct */
-    p = 1;
+    Int p = 1;
     PRLEVEL (p, ("%% There are %ld columns in this contribution block: \n",
                 colCount));
     for (Int i = 0; i < colCount; i++)
@@ -212,12 +222,7 @@ void paru_update_rowDeg ( Int panel_num,  Int row_end,
         return; 
     }
 
-
-
-    /************* After this step the Upart can be assembled partly **********/
-    /************* but I am not sure if it would have a good performance ******/
-
-
+    paruMatInfo->fcolCount[f] = colCount;
 
 
     /************* travers over new non pivotal columns ***********************/
@@ -259,6 +264,9 @@ void paru_update_rowDeg ( Int panel_num,  Int row_end,
      *                                             
      */
     tupleList *ColList = paruMatInfo->ColList;
+    Int *snM = LUsym->super2atree;
+    Int el_ind = snM [f]; 
+    Int *first = LUsym->first;
     for (Int k = past_col; k < colCount; k++){
         Int c = fcolList [k];   //non pivotal column list
         tupleList *curColTupleList = &ColList[c];
@@ -343,11 +351,12 @@ void paru_update_rowDeg ( Int panel_num,  Int row_end,
      * v              |___....______________|              
      *                         
      */
-    tupleList *RowList = paruMatInfo->RowList;
+    Int new_row_degree_bound_for_r;
+ 
     for (Int k = j2; k < row_end; k++){
         Int r = frowList [k];
 
-        new_row_degree_bound_for_r = curFr->nrows ;
+        new_row_degree_bound_for_r = rowCount;
 
         tupleList *curRowTupleList = &RowList[r];
         Int numTuple = curRowTupleList->numTuple;
@@ -406,14 +415,19 @@ void paru_update_rowDeg ( Int panel_num,  Int row_end,
 
         }
 
-        Int old_bound_updated = row_degree_bound [r] + curFr->nrows - 1 ;
+        Int old_bound_updated = row_degree_bound [r] + rowCount - 1 ;
 
+#ifndef NDEBUG
+        p = 0;
+        PRLEVEL (p, ("%%old_bound_updated =%ld \n",old_bound_updated));
+        PRLEVEL (p, ("%%new_row_degree_bound_for_r=%ld \n",
+                   new_row_degree_bound_for_r));
+        PRLEVEL (p, ("%%row_degroo_bound[%ld]=%ld \n",r, row_degree_bound[r]));
+#endif
         row_degree_bound [r] =  // min
             old_bound_updated < new_row_degree_bound_for_r ? 
             old_bound_updated : new_row_degree_bound_for_r;
-
-
     }
 
-
+    paruMatInfo->time_stamp[f]+= 2; //making all the markings invalid again
 }

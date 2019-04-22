@@ -8,7 +8,7 @@
  *    it must be called after ther result are computed
  *  @author Aznaveh
  */
-void paru_write( paru_matrix *paruMatInfo, cholmod_common *cc){
+void paru_write( paru_matrix *paruMatInfo, char* id,  cholmod_common *cc){
 
     DEBUGLEVEL(0);
     paru_symbolic *LUsym = paruMatInfo-> LUsym;
@@ -22,73 +22,123 @@ void paru_write( paru_matrix *paruMatInfo, cholmod_common *cc){
     paru_fac *Us =  paruMatInfo->partial_Us;
     Int *Super = LUsym->Super;
 
-    //-------------------- writing column permutation to a file
-    FILE *colfptr;
-//    colfptr = ( fopen("./col.txt","w"));
-    colfptr = ( fopen("/users/aznaveh/SuiteSparse/ParU/Demo/col.txt","w"));
-    if (colfptr == NULL ){
-        printf ("Error in opening a file");
-        return;
-    }
-    for (Int col = 0 ; col < n ; col++){    // for each column of A(:,Qfill)
-        Int j = Qfill ? Qfill [col] : col ; // col of S is column j of A
-        fprintf (colfptr, "%ld\n", j );
-    }
- 
-    fprintf (colfptr, "%%cols\n");
-    fclose(colfptr);
-    //--------------------
- 
+    char default_name[] = "0";
+    char *name;
+    if (id)
+        name = id;
+    else 
+        name = default_name;
     
-    //-------------------- writing row permutation to a file
-    FILE *rowfptr;
-    rowfptr = ( fopen("/users/aznaveh/SuiteSparse/ParU/Demo/row.txt","w"));
-    if (rowfptr == NULL ){
-        printf ("Error in opening a file");
-        return;
+
+
+//    char dpath[] = "/export/scratch/multifrontal/aznaveh/myResults/";
+    char dpath[] = "/users/aznaveh/SuiteSparse/ParU/Demo/Res/";
+
+
+    //-------------------- writing column permutation to a file
+    {
+        FILE *colfptr;
+
+        char fname [100] = "";
+        strcat (fname,dpath);
+        strcat (fname,name);
+        strcat (fname,"_col.txt");
+        colfptr = ( fopen(fname,"w"));
+
+    //colfptr = ( fopen("/users/aznaveh/SuiteSparse/ParU/Demo/%s_col.txt","w"));
+        //    colfptr = ( fopen("./col.txt","w"));
+        if (colfptr == NULL ){
+            printf ("Error in opening a file");
+            return;
+        }
+        for (Int col = 0 ; col < n ; col++){    // for each column of A(:,Qfill)
+            Int j = Qfill ? Qfill [col] : col ; // col of S is column j of A
+            fprintf (colfptr, "%ld\n", j );
+        }
+
+        fprintf (colfptr, "%%cols\n");
+        fclose(colfptr);
     }
-    fprintf (rowfptr, "%%rows\n");
+    //--------------------
+
+
     Int *oldRofS= (Int*) paru_alloc ( m, sizeof (Int), cc); // S -> LU
     Int *PofA= (Int*) paru_alloc ( m, sizeof (Int), cc);    // inv(PLinv)
+    //-------------------- writing row permutation to a file
+    {
+        FILE *rowfptr;
+        char fname [100] = "";
+        strcat (fname,dpath);
+        strcat (fname,name);
+        strcat (fname,"_row.txt");
+        rowfptr = ( fopen(fname,"w"));
 
-    for(Int k = 0; k < m ; k++){
-        PofA[PLinv[k]] = k;
-    }
- 
-    Int ip = 0;
-    for(Int f = 0; f < nf ; f++){   
-        Int col1 = Super [f];     
-        Int col2 = Super [f+1];
-        Int fp = col2-col1;
-        Int *frowList =  paruMatInfo->frowList[f];
-        for (Int k = 0; k<fp ; k++){
-            oldRofS[ip++] = frowList[k];
-            fprintf (rowfptr, "%ld\n", PofA[frowList[k]] );
+
+        // rowfptr = ( fopen("/users/aznaveh/SuiteSparse/ParU/Demo/row.txt","w"));
+        if (rowfptr == NULL ){
+            printf ("Error in opening a file");
+            return;
         }
+        fprintf (rowfptr, "%%rows\n");
+        for(Int k = 0; k < m ; k++){
+            PofA[PLinv[k]] = k;
+        }
+
+        Int ip = 0;
+        for(Int f = 0; f < nf ; f++){   
+            Int col1 = Super [f];     
+            Int col2 = Super [f+1];
+            Int fp = col2-col1;
+            Int *frowList =  paruMatInfo->frowList[f];
+            for (Int k = 0; k<fp ; k++){
+                oldRofS[ip++] = frowList[k];
+                fprintf (rowfptr, "%ld\n", PofA[frowList[k]] );
+            }
+        }
+        paru_free ( m, sizeof (Int), PofA, cc);
+        fclose(rowfptr);
     }
-    paru_free ( m, sizeof (Int), PofA, cc);
-    fclose(rowfptr);
     //--------------------
 
 
-    
+
     Int *newRofS= (Int*) paru_alloc ( m, sizeof (Int), cc);
 
     for(Int k = 0; k < m ; k++){
         newRofS[oldRofS[k]] = k;
     }
-    
 
+    //--------------------
+
+    //-------------------- writing results to a file
     FILE *LUfptr;
-    //LUfptr = ( fopen("./out.txt","w"));
-    LUfptr = ( fopen("/users/aznaveh/SuiteSparse/ParU/Demo/out.txt","w"));
+    char fname [100] = "";
+    strcat (fname,dpath);
+    strcat (fname,name);
+    strcat (fname,"_LU.txt");
+    LUfptr = ( fopen(fname,"w"));
+
+
+    //LUfptr = ( fopen("/users/aznaveh/SuiteSparse/ParU/Demo/out.txt","w"));
     if (LUfptr == NULL ){
         printf ("Error in opening a file");
         return;
     }
 
-    fprintf (LUfptr, "%%MatrixMarket matrix coordinate real general\n");
+    //computing nnnz
+    Int nnz = 0;
+    for(Int f = 0; f < nf ; f++){   
+        Int colCount =  paruMatInfo->fcolCount[f];
+        Int rowCount =  paruMatInfo->frowCount[f];
+        Int col1 = Super [f];     
+        Int col2 = Super [f+1];
+        Int fp = col2-col1;
+        nnz += fp*(rowCount + colCount);
+    }
 
+    fprintf (LUfptr, "%%%MatrixMarket matrix coordinate real general\n");
+    fprintf (LUfptr, "%%-----------produced by ParU ---------------\n");
+    fprintf (LUfptr, "%ld  %ld %ld\n",m ,n ,nnz );
 
     for(Int f = 0; f < nf ; f++){   
         Int colCount =  paruMatInfo->fcolCount[f];
@@ -99,19 +149,19 @@ void paru_write( paru_matrix *paruMatInfo, cholmod_common *cc){
         Int col2 = Super [f+1];
         Int fp = col2-col1;
 
-        Int nnz = 0;
         //Printing LU part
         double *pivotalFront= LUs[f].p  ;
+        PRLEVEL (0, ("%% pivotalFront =%p \n", pivotalFront));
         for (Int j = col1 ; j < col2; j++)
             for (Int i = 0; i < rowCount ; i++){
-                fprintf (LUfptr, "%ld  %ld %.16g\n", newRofS[frowList[i]], j, 
+                fprintf (LUfptr, "%ld  %ld %.16g\n",
+                        newRofS[frowList[i]]+1, j+1, 
                         pivotalFront[(j-col1)*rowCount+i]);
-                nnz++;
             }
 
 #ifndef NDEBUG  // Printing the pivotal front
-        Int p = 1;
-        PRLEVEL (p, ("\n%% Luf{%ld}= [",f+1));
+        Int p = 0;
+        PRLEVEL (p, ("\n%%Inside paru_write Luf{%ld}= [",f+1));
         for (Int r = 0; r < rowCount; r++){
             PRLEVEL (p, (" "));
             for (Int c = col1; c < col2; c++){
@@ -119,16 +169,15 @@ void paru_write( paru_matrix *paruMatInfo, cholmod_common *cc){
             }
             PRLEVEL (p, (";\n  %% "));
         }
-            PRLEVEL (p, (";\n"));
+        PRLEVEL (p, (";\n"));
 #endif
 
         //Printing U part
         double *uPart = Us[f].p  ;
         for (Int j = 0; j < colCount; j++)
             for (Int i = 0; i < fp; i++){
-                fprintf (LUfptr, "%ld  %ld %.16g\n", newRofS[frowList[i]],
-                        fcolList[j], uPart[fp*j+i]);
-                nnz++;
+                fprintf (LUfptr, "%ld  %ld %.16g\n", newRofS[frowList[i]]+1,
+                        fcolList[j]+1, uPart[fp*j+i]);
             }
 #ifndef NDEBUG  // Printing the  U part
         p = 1;
@@ -142,11 +191,8 @@ void paru_write( paru_matrix *paruMatInfo, cholmod_common *cc){
 
         PRLEVEL (p, ("\n"));
 #endif
-
-
-
-
     }
+
     fclose (LUfptr);
 
     paru_free ( m, sizeof (Int), oldRofS, cc);

@@ -21,15 +21,12 @@
  * @param  a list of tuples and the the tuple we want to add
  * @return 0 on sucess 
  */
-void paru_assemble (
-        paru_matrix *paruMatInfo,
+void paru_assemble ( paru_matrix *paruMatInfo, 
         /* RowCol list/tuples and LUsym handle */
-        Int f,
-        /* front need to be assembled */
-        cholmod_common *cc)
+        Int f, /* front need to be assembled */
+        cholmod_common *cc){
 
-{
-    DEBUGLEVEL(-2);
+    DEBUGLEVEL(0);
     /* 
      * -2 Print Nothing
      * -1 Just Matlab
@@ -68,9 +65,10 @@ void paru_assemble (
     Int *elCol = Work -> elCol;
     Int elCMark = Work -> elCMark;
 
-    PRLEVEL (0, ("%% fp=%ld pivotal columns:clo1=%ld...col2=%ld\n", 
+    PRLEVEL (1, ("%% fp=%ld pivotal columns:clo1=%ld...col2=%ld\n", 
                 fp, col1, col2-1));
-    PRLEVEL (1, ("%%Upper bound number of columns: Rj[%ld]=%ld ... Rj[%ld]=%ld\n", 
+    PRLEVEL (1, 
+            ("%%Upper bound number of columns: Rj[%ld]=%ld ... Rj[%ld]=%ld\n", 
                 p1, Rj [p1], p2, Rj [p2-1]));
     ASSERT (fp > 0 );
     ASSERT (fp <= fn );
@@ -95,7 +93,7 @@ void paru_assemble (
     }
 
 
-    PRLEVEL (0, ("%% the size of fm is %ld\n",fm));
+    PRLEVEL (1, ("%% the size of fm is %ld\n",fm));
     Int *frowList = (Int*) paru_alloc (fm, sizeof (Int), cc);
     paruMatInfo->frowList[f] = frowList;
     if (frowList == NULL ){
@@ -176,7 +174,7 @@ void paru_assemble (
                 el->rValid = time_f;
 #ifndef NDEBUG            
                 if (el->rValid >  time_f )
-                    PRLEVEL (0, ("%%time_f =%ld  rVal= %ld\n",
+                    PRLEVEL (1, ("%%time_f =%ld  rVal= %ld\n",
                                 time_f , el->rValid));
 #endif               
                 ASSERT(el->rValid <= time_f);
@@ -231,7 +229,7 @@ void paru_assemble (
     ASSERT (panel_num == (Int) ceil( (double)fp/panel_width) );
 
 #ifndef NDEBUG /* Checking if pivotal rows are correct */
-    Int p = 0;
+    Int p = 1;
     PRLEVEL (p, ("%%There are %ld rows in this front: \n", rowCount));
     for (Int i = 0; i < rowCount; i++)
         PRLEVEL (p, ("%% %ld", frowList [i]));
@@ -412,7 +410,7 @@ void paru_assemble (
     //BLAS_INT *ipiv = (BLAS_INT*) (Work->scratch+rowCount);
     //Int fac = paru_dgetrf (pivotalFront, frowList, rowCount, fp, ipiv);
     if (rowCount < fp){
-        PRLEVEL (0, ("%% %ldx%ld \n",rowCount, fp));
+        PRLEVEL (1, ("%% %ldx%ld \n",rowCount, fp));
         printf ("structural problem\n");
         exit(0);
     }
@@ -541,7 +539,7 @@ void paru_assemble (
                 el->cValid = time_f;
 #ifndef NDEBUG            
                 if (el->cValid >  time_f )
-                    PRLEVEL (0, ("%%time_f =%ld  cVal= %ld\n", 
+                    PRLEVEL (1, ("%%time_f =%ld  cVal= %ld\n", 
                                 time_f , el->cValid));
 #endif    
                 ASSERT(el->cValid <= time_f);

@@ -321,7 +321,7 @@ Int paru_dgetrf (double *F, Int *frowList, Int lm, Int ln,
 
 Int paru_factorize(double *F, Int *frowList, Int rowCount, Int f, 
         Int *panel_row, paru_matrix *paruMatInfo){
-    DEBUGLEVEL (0);
+    DEBUGLEVEL (1);
 
     Int *Super = paruMatInfo->LUsym->Super;
     Int col1 = Super [f];       /* fornt F has columns col1:col2-1 */
@@ -359,8 +359,13 @@ Int paru_factorize(double *F, Int *frowList, Int rowCount, Int f,
         // factorize current panel
         paru_panel_factorize ( F, frowList, rowCount, fp, 
                 panel_width, panel_num, row_end, paruMatInfo);
-        if ( j2 >= fp) //if it is not the last panel
+
+        // This can be done parallel to the  next part
+        paru_update_rowDeg ( panel_num, row_end, f, paruMatInfo);
+
+        if ( j2 >= fp){ //if it is the last panel
             break;
+        }
         /*               trsm
          *
          *        F = fully summed part of the pivotal front
@@ -502,18 +507,7 @@ Int paru_factorize(double *F, Int *frowList, Int rowCount, Int f,
             }
             PRLEVEL (p, ("\n"));
         }
-
 #endif
-
-
-        paruMatInfo->time_stamp[f]++;
-        //        paru_update_rowDeg ( panel_num, row_end, colCount, f, 
-        //                fcolList, paruMatInfo);
-        paruMatInfo->time_stamp[f]+= 2;
-
-
     }
-
-
     return 0;
 }
