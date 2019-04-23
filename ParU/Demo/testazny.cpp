@@ -4,12 +4,21 @@
 int main (int argc, char **argv)
 {
     DEBUGLEVEL(0); 
-    printf("%%%%%%%%%%%%%%%%%% START %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% \n");
+    PRLEVEL (0, ("%%%%%%%%%%%%%%%%%% START %%%%%%%%%%%%%%%%%%%%%%%%%%%%%% \n"));
     PRLEVEL (0, ("clear all\n" ));
     cholmod_common Common, *cc;
     cholmod_sparse *A;
     int mtype;
     paru_symbolic *LUsym;
+
+    char name[25];
+    //fgets(name, 25, stdin);
+    //fscanf (stdin, "%s", &name);
+    //printf("The name is %s\n", name);
+    //fseek(stdin, 0, SEEK_SET);
+
+    
+
 
     // start CHOLMOD
     cc = &Common;
@@ -43,6 +52,7 @@ int main (int argc, char **argv)
         exit(0);
     }
 
+
     Int m,n,nf;
     m = paruMatInfo-> m;
     n = paruMatInfo-> n;
@@ -71,36 +81,30 @@ int main (int argc, char **argv)
     }
 
     for (Int i = 0; i < nf; i++) {
-        paru_assemble (paruMatInfo, i, cc);
+        //paru_assemble (paruMatInfo, i, cc);
+        paru_front (paruMatInfo, i, cc);
     }
 
-
-    paru_write(paruMatInfo, cc);
+    paru_write(paruMatInfo, argv[1], cc);
 
     cholmod_l_free_sparse (&A, cc);
+
     paru_freemat (&paruMatInfo, cc);
-
     paru_freesym (&LUsym,cc);
-
-
-    //  spqr_symbolic *QRsym = 
-    //      spqr_analyze (A, SPQR_ORDERING_CHOLMOD, FALSE,FALSE , FALSE, cc);
-    //           spqr_freesym (&QRsym, cc);
-    //  PRLEVEL (1, ("malloc_count %ld inuse %ld\n", 
-    //cc->malloc_count, cc->memory_inuse));
 
     cholmod_l_finish (cc);
 
     //Matlab
     //
-    Int p=0;
+    Int p = 0;
     PRLEVEL (p, ("err = 1e-9; [m n] =size(S);\n"));
     PRLEVEL (p, ("format long g\n"));
     PRLEVEL (p, ("oldR=[]; c=[];\n"));
     PRLEVEL (p, ("%%Finalizing the permutation\n"));
     PRLEVEL (p, ("for f=1:%ld\n",nf));
     PRLEVEL (p, ("\tnpivots(f) = length(cols{f});\n"));
-    PRLEVEL (p, ("\toldR=[oldR, rows{f}(1:npivots(f))]; c=[c, cols{f}];\nend\n"));
+    PRLEVEL (p, (
+                "\toldR=[oldR, rows{f}(1:npivots(f))]; c=[c, cols{f}];\nend\n"));
     PRLEVEL (p, ("oldR = [oldR setdiff(1:m,oldR)];\n"));
     PRLEVEL (p, ("newR(oldR)=1:length(oldR);\n"));
 
@@ -124,8 +128,8 @@ int main (int argc, char **argv)
     PRLEVEL (p, ("if(myErr <= 100*matlabErr || myErr<err)\n" ));
     PRLEVEL (p, ("\tfprintf('Pass\\n')\nelse\n\tfprintf('Fail\\n')\nend\n" ));
     PRLEVEL (p, ("pause\n" ));
-    
-    printf("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*\n");
+
+    PRLEVEL (p, ("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%\n"));
     //   printf 
     //   ("malloc_count %ld inuse %ld\n", cc->malloc_count, cc->memory_inuse);
 }

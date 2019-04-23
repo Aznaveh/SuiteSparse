@@ -72,8 +72,6 @@ void paru_finalize (paru_matrix *paruMatInfo, Int f, cholmod_common *cc){
 #endif
 
         for (Int i = 0; i < numTuple; i++){
-            //for (Int psrc = 0; psrc < numTuple; psrc ++){}
-            //            Tuple curTpl = listColTuples [psrc];
             Tuple curTpl = listColTuples [i];
             Int e = curTpl.e;
             //if (e == el_ind){ //current element}
@@ -97,7 +95,7 @@ void paru_finalize (paru_matrix *paruMatInfo, Int f, cholmod_common *cc){
             Int *rowRelIndex = relRowInd (el);
             Int *colRelIndex    = relColInd (el);
 
-            if (el_colIndex [curColIndex] < 0 ){
+            if (el_colIndex [curColIndex] < 0 ){ //already assembled somewhere
                 continue;  
             }
 
@@ -110,7 +108,33 @@ void paru_finalize (paru_matrix *paruMatInfo, Int f, cholmod_common *cc){
             PRLEVEL (1, ("%% time_f =%ld \n", time_f));
 
             if (elRow [e] == 0 ){         //all the columns are in CB
-                if (elCol[e] == 0) continue; //already assembled
+                if (elCol[e] == 0) {    // Whole prior front assembly
+                    // do complete assembly of e into current front, now
+                    paru_update_rel_ind (curFr, el, 'r',cc) ;
+                    paru_update_rel_ind (curFr, el, 'c', cc) ;
+
+                    Int *rowRelIndex = relRowInd (el);
+                    Int *colRelIndex = relColInd (el);
+
+                    Int *el_rowIndex = rowIndex_pointer (el);
+                    Int *el_colIndex = colIndex_pointer (el);
+
+                    double *el_Num = numeric_pointer (el);
+                    assemble_all (el_Num, cur_Numeric,
+                            el->nrows, el->ncols, curFr->nrows,
+                            rowRelIndex, colRelIndex);
+                    // delete e
+                    el->nrowsleft = el->ncolsleft = 0;
+                    for (Int j=0; j < el->nrows; j++){
+                        rowRelIndex[j] = -1;
+                        el_rowIndex [j] = -1;
+                    }
+                    for (Int i=0; i < el->ncols; i++){
+                        colRelIndex[i] = -1;
+                        el_colIndex [i] = -1;
+                    }
+
+                }
                 ASSERT ( e < el_ind && e >= first[el_ind]);
 
                 if(el->rValid !=  time_f){ /*  Update rowRelIndex	 */
