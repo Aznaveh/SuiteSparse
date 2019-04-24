@@ -34,6 +34,9 @@ id = 212;
 % Good one vs UMFPACK
 id = 113; 
 
+%test
+id = 1294; 
+
 Prob = ssget(id);
 A = Prob.A;
 group = index.Group {id} ;

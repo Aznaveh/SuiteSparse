@@ -12,7 +12,7 @@
 #endif
 //for printing information uncomment this; to activate assertions uncomment 
 //NDEBUG in ./SPQR/Include/spqr.hpp line 41
-#undef NPR
+//#undef NPR
 
 
 #ifndef NPR
