@@ -21,9 +21,6 @@ for k = 1:nmat
     thisnz = index.nnz (id) + index.nzero (id) ;
     if (thisnz ~= nzlast)
         fnew = [fnew id] ;
-       % fprintf ('%20s/%-30s n: %10d nnz: %10d\n', ...
-       %     index.Group {id}, index.Name {id}, ...
-       %     index.nrows (id), thisnz) ;
     end
     nzlast = thisnz ;
 end
@@ -33,32 +30,54 @@ nmat = length (fnew) ;
 
 
 err = 1e-5;
+s = 1;
 
-ff = fopen ('results.out', 'w') ;
+ff = fopen ('results.csv', 'w') ;
 
 % Headers
-fprintf(ff,'id\tmyErr\tumfErr\tratio' );
-fprintf(ff,'\tmyElaps\tumfElaps\tratio');
-fprintf(ff,'\tmynnz\tumfnnz\tratio');
-fprintf(ff,'\tmyflop\tumfflop\tratio\n');
+fprintf(ff,'id,nnzA,myErr,umfErr,logratio' );
+fprintf(ff,',myElaps,umfElaps,ratio');
+fprintf(ff,',mynnz,umfnnz,ratio');
+fprintf(ff,',myflop,umfflop,ratio\n');
 
 
-for k = 1:nmat
+%for k = 1:nmat
+for k = 700:710
     id = fnew (k) ;
     group = index.Group {id} ;
     name = index.Name {id} ;
 
     Prob = ssget(id);
     A = Prob.A;
+    [dp,dq,dr,ds,dcc,drr] = dmperm(A);
 
-    str1 = 'tar zvfxO ~/SuiteSparseCollection//MM/';
-    str2 = sprintf ('%s/%s.tar.gz %s/%s.mtx | ../Demo/testazny %d', ...
-    group, name, name, name, id) ;
-    str = strcat (str1,str2);
+%    if (size(A) ~= [dm dn])
+    if (size(dr) ~= 2 )
+        if (norm(diff(dr)-diff(ds)) ~= 0 )
+            sprintf('Unexpected')
+            continue;
+        end
+        B = A(dp,dq);
+        [M,I] = max(diff(dr));
+        A = B(dr(I):dr(I+1)-1, dr(I):dr(I+1)-1 );
 
-    myStart = tic;
-    system(str);
-    myElaps = toc(myStart);
+        mmwrite('../Matrix/ParUTst/tmp.mtx', A);
+        str = sprintf ('../Demo/testazny %d < ../Matrix/ParUTst/tmp.mtx', id );
+        system(str);
+    else 
+        str1 = 'tar zvfxO ~/SuiteSparseCollection//MM/';
+        str2 = sprintf ('%s/%s.tar.gz %s/%s.mtx | ../Demo/testazny %d %d', ...
+        group, name, name, name, id, s) ;
+        str = strcat (str1,str2);
+        system(str);
+
+        %scaling
+        %A = sparse(diag(1./max(abs(A),[],2)))*A;
+        %mmwrite('../Matrix/ParUTst/tmp.mtx', A);
+        %str = sprintf ('../Demo/testazny %d < ../Matrix/ParUTst/tmp.mtx', id );
+        %system(str);
+
+    end
 
 
     % Loading the results into Matlab
@@ -75,8 +94,20 @@ for k = 1:nmat
     colp = load (colfullname);
     colp = colp+1;
 
+    if(s == 1)
+        s_name = sprintf ('%d_scale.txt', id);
+        scalefullname = strcat(path, s_name);
+        scale= load (scalefullname);
+    end
+
+
     LU_name = sprintf ('%d_LU.txt',id);
     LUfullname = strcat(path, LU_name);
+
+    info_name = sprintf ('%d_info.txt',id);
+    infofullname = strcat(path, info_name);
+    myElaps = load (infofullname);
+
 
     [LU, paddingZ] = mmread (LUfullname);
 
@@ -90,30 +121,51 @@ for k = 1:nmat
     L=tril(LU,-1)+speye(size(LU));
     U=triu(LU); 
 
-    myErr = lu_normest(A(rowp,colp),L,U);
+    if (s == 1)
+        sA = sparse(diag(scale))*A;
+    else
+        sA = A;
+    end
+    myErr = lu_normest(sA(rowp,colp),L,U);
     %umfErr = lu_normest(D(:,p)\A(:,q),l,u);
     umfErr = lu_normest(p*(r\A)*q,l,u);
 
-    nnzumfp = nnz(l)+nnz(u) - size(A,1);
+    umfpnnz= nnz(l)+nnz(u) - size(A,1);
     mynnz = nnz(LU) + nnz(paddingZ);
-    myflop = luflop(L,U);
-    umfflop = luflop(l,u);
 
-    fprintf(ff,'%d\t%g\t%g\t%g', id, myErr, umfErr, myErr/umfErr);
-    fprintf(ff,'\t%g\t%g\t%g', myElaps, umfElaps, myElaps/umfElaps);
-    fprintf(ff,'\t%g\t%g\t%g', mynnz , nnzumfp, mynnz/nnzumfp );
-    fprintf(ff,'\t%g\t%g\t%g', myflop, umfflop, myflop/umfflop);
+
+    %setting up KLU
+    opts.tol = 0; opts.btf = 0; opts.ordering = 2;
+
+    B = A(rowp,colp); B = B + 5*speye(size(B));
+    [myx, myinfo, c]  = klu(B, opts);
+    %myflop = luflop(L,U);
+    myflop = myinfo.flops;
+
+    B = p*(r\A)*q; B = B + 5*speye(size(B));
+    [umpfx, umpfinfo, c]  = klu(B, opts);
+    %umfflop = luflop(l,u);
+    umfflop = umpfinfo.flops;
+
+    fprintf(ff,'%d,%d,%g,%g,%g', id, nnz(A), myErr, umfErr, log(myErr/umfErr));
+    fprintf(ff,',%g,%g,%g', myElaps, umfElaps, myElaps/umfElaps);
+    fprintf(ff,',%g,%g,%g', mynnz , umfpnnz, mynnz/umfpnnz );
+    fprintf(ff,',%g,%g,%g', myflop, umfflop, myflop/umfflop);
 
 
     if(myErr <= 100*umfErr || myErr < err)
-        fprintf(ff,'\tPass\n');
+        fprintf(ff,',Pass\n');
     else
-        fprintf(ff,'\tFail\n');
+        fprintf(ff,',Fail\n');
     end
 
     % cleaning the files because of the memory problem
     str = ['rm  ' path LU_name];    system(str);
     str = ['rm  ' path col_name];    system(str);
     str = ['rm  ' path row_name];    system(str);
+    str = ['rm  ' path info_name];    system(str);
+    if (s == 1)
+        str = ['rm  ' path s_name];    system(str);
+    end
 end
 fclose (ff) ;

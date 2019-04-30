@@ -232,7 +232,7 @@ void paru_update_rowDeg ( Int panel_num,  Int row_end,
      *   
      *                <----------fp--------->
      *                                                  
-     *                                 fcolList      ^         ^         
+     *                                 fcolList       ^         ^         
      *                                        \       |   HERE  |
      *             F                           [QQQQQ|OOOOOOOOO|....
      *              \  ____..._________...__ _____________________________...
@@ -373,8 +373,8 @@ void paru_update_rowDeg ( Int panel_num,  Int row_end,
             Tuple curTpl = listRowTuples [i];
             Int e = curTpl.e;
 
-            //    if (e == el_ind){ //current element}
-            if ( e >= el_ind || e < first[el_ind]){ //Not any of descendents
+              if (e == el_ind){ //current element}
+            //if ( e >= el_ind || e < first[el_ind]){ //Not any of descendents
                 continue;
             }
 

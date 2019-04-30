@@ -8,7 +8,8 @@
  *    it must be called after ther result are computed
  *  @author Aznaveh
  */
-void paru_write( paru_matrix *paruMatInfo, char* id,  cholmod_common *cc){
+void paru_write( paru_matrix *paruMatInfo, int scale,
+        char* id,  cholmod_common *cc){
 
     DEBUGLEVEL(0);
     paru_symbolic *LUsym = paruMatInfo-> LUsym;
@@ -101,13 +102,53 @@ void paru_write( paru_matrix *paruMatInfo, char* id,  cholmod_common *cc){
     //--------------------
 
 
-
+    //-------- computing the direct permutation
     Int *newRofS= (Int*) paru_alloc ( m, sizeof (Int), cc);
-
     for(Int k = 0; k < m ; k++){
         newRofS[oldRofS[k]] = k;
     }
 
+    //--------------------
+
+
+    //-------------------- writing row scales to a file
+    if (scale) {
+        double *scale_row = paruMatInfo->scale_row;
+        FILE *scalefptr;
+        char fname [100] = "";
+        strcat (fname,dpath);
+        strcat (fname,name);
+        strcat (fname,"_scale.txt");
+        scalefptr = ( fopen(fname,"w"));
+
+
+        if (scalefptr== NULL ){
+            printf ("Error in opening a file");
+            return;
+        }
+        for(Int row = 0; row < m ; row++)  
+            fprintf (scalefptr, "%16g\n",1/scale_row[row]);
+        fclose(scalefptr);
+    }
+    //--------------------
+
+    //-------------------- writing info to a file
+    {
+        FILE *infofptr;
+        char fname [100] = "";
+        strcat (fname,dpath);
+        strcat (fname,name);
+        strcat (fname,"_info.txt");
+        infofptr = ( fopen(fname,"w"));
+
+
+        if (infofptr == NULL ){
+            printf ("Error in opening a file");
+            return;
+        }
+        fprintf (infofptr, "%16g\n",paruMatInfo->time);
+        fclose(infofptr);
+    }
     //--------------------
 
     //-------------------- writing results to a file

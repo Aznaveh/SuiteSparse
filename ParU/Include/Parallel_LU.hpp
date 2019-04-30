@@ -36,8 +36,8 @@
 // This makes parallelism easier to manage, since all threads can
 // have access to this object without synchronization.
 //
-typedef struct /* paru_symbolic*/
-{
+typedef struct {/* paru_symbolic*/
+
 
     // -------------------------------------------------------------------------
     // row-form of the input matrix and its permutations
@@ -136,8 +136,8 @@ typedef struct /* paru_symbolic*/
 // =============================================================================
 //      Tuple, Row and Column data structure 
 // =============================================================================
-typedef struct /* Tuple */
-{
+typedef struct {/* Tuple */
+
     /* The (e,f) tuples for element lists */
     Int e,   /*  element number */
         f;  /*   offest */
@@ -147,8 +147,8 @@ typedef struct /* Tuple */
 /* An element */
 /* -------------------------------------------------------------------------- */
 
-typedef struct	/* Element */
-{
+typedef struct	{/* Element */
+
     Int
 
         nrowsleft,	/* number of rows remaining */
@@ -198,8 +198,8 @@ inline double *numeric_pointer (Element *curEl)
 
 
 
-typedef struct  /*List of tuples */
-{
+typedef struct  {/*List of tuples */
+
     /*element of a column or a row*/
     Int
         numTuple,   /*  number of Tuples in this element */
@@ -208,8 +208,8 @@ typedef struct  /*List of tuples */
 
 }   tupleList;
 
-typedef struct  /*work_struct*/
-{
+typedef struct  {/*work_struct*/
+
    Int *rowSize;     // Initalized data structure, size of rows        
    Int rowMark;      // rowSize[x] < rowMark
    
@@ -230,14 +230,12 @@ typedef struct  /*work_struct*/
 
 }   work_struct;
 
-typedef struct  /*dense factorized part pointer*/
-{
+typedef struct  {/*dense factorized part pointer*/
     Int m,n;   /* mxn dense matrix */
     double *p; /* point to factorized parts */
 } paru_fac; 
 
-typedef struct  /*Matrix */
-{
+typedef struct  {/*Matrix */
     Int m, n;
     paru_symbolic *LUsym;
     tupleList *RowList;     /* size n of dynamic list */
@@ -247,19 +245,23 @@ typedef struct  /*Matrix */
 
     Int *time_stamp;                /* for relative index update
                                        not initialized */
- 
+
     //Computed parts of each front
     Int *frowCount;          /* size nf   size(CB) = rowCount[f]x         */
     Int *fcolCount;          /* size nf                        colCount[f]*/
     Int **frowList;          /* size nf   frowList[f] is rows of the matrix S */
     Int **fcolList;          /* size nf   colList[f] is non pivotal cols of the
-                                                            matrix S */
+                                matrix S */
     paru_fac *partial_Us;   /* size nf   size(Us)= fp*colCount[f]    */
     paru_fac *partial_LUs;  /* size nf   size(LUs)= rowCount[f]*fp   */
 
-    
-   Int *row_degree_bound;          /* row degree size number of rows */
+
+    Int *row_degree_bound;          /* row degree size number of rows */
     Int panel_width;                /* width of panel for dense factorizaiton*/
+
+
+    double *scale_row;
+    double time;
 }   paru_matrix;
 
 
@@ -267,14 +269,14 @@ paru_symbolic *paru_sym_analyse
 ( cholmod_sparse *A, cholmod_common *cc) ;
 
 paru_matrix *paru_init_rowFronts 
-(cholmod_sparse *A, paru_symbolic *LUsym, cholmod_common *cc);
+(cholmod_sparse *A, int scale, paru_symbolic *LUsym,   cholmod_common *cc);
 
 /* Wrappers for managing memory */
 void *paru_alloc(Int n, Int size, cholmod_common *cc);
 void *paru_calloc(Int n, Int size, cholmod_common *cc);
 void *paru_realloc(Int newsize, Int size_Entry,
         void *oldP, Int *size, cholmod_common *cc);
- 
+
 void paru_free(Int n, Int size, void *p,  cholmod_common *cc);
 void paru_freesym(paru_symbolic **LUsym_handle,cholmod_common *cc);
 void paru_freemat(paru_matrix **paruMatInfo_handle, cholmod_common *cc);
@@ -295,17 +297,17 @@ void paru_front (paru_matrix *paruMatInfo, Int f, cholmod_common *cc);
 Int paru_dgetrf (double *F, Int *frowList, Int m, Int n, BLAS_INT *ipiv);
 Int paru_factorize(double *F, Int *frowList, Int lm, Int ln, Int *panel_row, 
         paru_matrix *paruMatInfo);
-        
+
 
 
 Element *paru_create_element (Int nrows, Int ncols, 
         Int init, cholmod_common *cc);
 void assemble_col (const double *sR, double *dR, Int m, const Int *relRowInd);
 void assemble_row (const double *sM, double *dM, Int sm, Int sn, Int dm, Int sR, 
-                    Int dR, const Int *relColInd);
+        Int dR, const Int *relColInd);
 void assemble_all (double *s, double *d, Int sm, Int sn, Int dm,    
         Int *relRowInd, Int *relColInd);
- 
+
 Int paru_trsm(double *pF, double *uPart, Int fp, Int rowCount, Int colCount);
 Int paru_dgemm(double *pF, double *uPart, double *el, Int fp, 
         Int rowCount, Int colCount);
@@ -319,8 +321,9 @@ void paru_init_rel (paru_matrix *paruMatInfo, Int f);
 void paru_update_rel_ind (Element *el, Element *cb_el, 
         char rc, cholmod_common *cc );
 
-void paru_write( paru_matrix *paruMatInfo, char *id, cholmod_common *cc);
+void paru_write( paru_matrix *paruMatInfo, int scale, 
+        char *id, cholmod_common *cc);
 void paru_update_rowDeg ( Int panel_num,  Int row_end, 
-                 Int f, paru_matrix *paruMatInfo);
+        Int f, paru_matrix *paruMatInfo);
 
 void paru_finalize (paru_matrix *paruMatInfo, Int f, cholmod_common *cc);

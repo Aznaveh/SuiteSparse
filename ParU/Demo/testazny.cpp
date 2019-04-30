@@ -1,6 +1,18 @@
+/** =========================================================================  /
+ * =======================  paru_test========================================  /
+ * ==========================================================================  /
+ * @brief   doing the LU factorization of the matrix one by one
+ *          argv[1] = name of the input matrix that is used for output
+ *                  default is zero
+ *          argv[2] = 0 if it doesnt needs to be scaled
+ *                  default is no scaling
+ *
+ * @author Aznaveh
+ * */
 #include "Parallel_LU.hpp"
-#define PRINTCBsTUPLES 0
+#include <omp.h>
 
+#define PRINTCBsTUPLES 0
 int main (int argc, char **argv)
 {
     DEBUGLEVEL(0); 
@@ -41,13 +53,23 @@ int main (int argc, char **argv)
         exit (1);
     }
 
+
     LUsym = paru_sym_analyse (A, cc);
     if (LUsym == NULL) {
         exit(0);
     }
 
 
-    paru_matrix *paruMatInfo = paru_init_rowFronts (A, LUsym, cc);
+    //~~~~~~~~~~~~~~~~~~~Starting computation~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    double start_time = omp_get_wtime();
+
+    int scale = 0;
+    if (argc == 3){
+        scale = atoi(argv[2]);
+        if (scale) printf ("The input matrix will be scaled\n");
+    }
+        
+    paru_matrix *paruMatInfo = paru_init_rowFronts (A, scale, LUsym, cc);
     if (paruMatInfo == NULL) {
         exit(0);
     }
@@ -84,8 +106,11 @@ int main (int argc, char **argv)
         //paru_assemble (paruMatInfo, i, cc);
         paru_front (paruMatInfo, i, cc);
     }
+    double time = omp_get_wtime() - start_time;
+    paruMatInfo->time = time;
+    //~~~~~~~~~~~~~~~~~~~End computation~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    paru_write(paruMatInfo, argv[1], cc);
+    paru_write(paruMatInfo, scale,  argv[1], cc);
 
     cholmod_l_free_sparse (&A, cc);
 
