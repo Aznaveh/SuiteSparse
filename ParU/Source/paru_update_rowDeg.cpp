@@ -62,7 +62,7 @@ void paru_update_rowDeg ( Int panel_num,  Int row_end,
      *
      *                <----------fp--------->
      *                        j1     j2              Update here
-     *                         ^     ^             past_col    colcount
+     *                         ^     ^             past_col    colCount
      *                         |     | fcolList      ^ . . .   ^
      *                         |     |        \       |         |
      *             F           |     |         [QQQQQ|OOOOOOOOO|....
@@ -356,7 +356,8 @@ void paru_update_rowDeg ( Int panel_num,  Int row_end,
     for (Int k = j2; k < row_end; k++){
         Int r = frowList [k];
 
-        new_row_degree_bound_for_r = rowCount;
+//        new_row_degree_bound_for_r = rowCount;
+        new_row_degree_bound_for_r = colCount;
 
         tupleList *curRowTupleList = &RowList[r];
         Int numTuple = curRowTupleList->numTuple;
@@ -415,7 +416,8 @@ void paru_update_rowDeg ( Int panel_num,  Int row_end,
 
         }
 
-        Int old_bound_updated = row_degree_bound [r] + rowCount - 1 ;
+//        Int old_bound_updated = row_degree_bound [r] + rowCount - 1 ;
+        Int old_bound_updated = row_degree_bound [r] + colCount - 1 ;
 
 #ifndef NDEBUG
         p = 0;

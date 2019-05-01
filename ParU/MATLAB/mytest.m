@@ -30,7 +30,8 @@ nmat = length (fnew) ;
 
 
 err = 1e-5;
-s = 1;
+%Don't scale the matrix if s ==0 scale otherwise
+s = 0;
 
 ff = fopen ('results.csv', 'w') ;
 
@@ -41,8 +42,8 @@ fprintf(ff,',mynnz,umfnnz,ratio');
 fprintf(ff,',myflop,umfflop,ratio\n');
 
 
-%for k = 1:nmat
-for k = 700:710
+for k = 1:nmat
+%for k = 800:810
     id = fnew (k) ;
     group = index.Group {id} ;
     name = index.Name {id} ;

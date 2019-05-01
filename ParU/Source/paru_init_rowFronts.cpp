@@ -234,28 +234,14 @@ paru_matrix *paru_init_rowFronts (
            return NULL;
        }
 
-       //    for(Int row = 0; row < m ; row++){  
-       //        for ( Int p = Ap [row]; p < Ap [row+1]; p++){
-       //            if ( fabs(Sx[p]) > max_row[row] ){
-       //                max_row[row] = fabs(Sx[p]);
-       //            }
-       //        }
-       //    }
-       //    for(Int row = 0; row < m ; row++){  
-       //        for ( Int p = Ap [row]; p < Ap [row+1]; p++){
-       //            ASSERT (max_row[row] > 0 ); //TODO 0 or epsilon
-       //            Sx[p] /= max_row[row];
-       //        }
-       //    }
-       //
-       for(Int col = 0; col < n ; col++){  
+      for(Int col = 0; col < n ; col++){  // finding the max in a row
            for ( Int p = Ap [col]; p < Ap [col+1]; p++){
                if ( fabs(Ax[p]) > max_row[Ai[p]] ){
                    max_row[Ai[p]] = fabs(Ax[p]);
                }
            }
        }
-       for(Int col = 0; col < n ; col++){  
+       for(Int col = 0; col < n ; col++){ // dividing by the max of row 
            for ( Int p = Ap [col]; p < Ap [col+1]; p++){
                ASSERT (max_row[Ai[p]] > 0 ); //TODO 0 or epsilon
                Ax[p] /= max_row[Ai[p]];

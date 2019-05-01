@@ -66,7 +66,8 @@ int main (int argc, char **argv)
     int scale = 0;
     if (argc == 3){
         scale = atoi(argv[2]);
-        if (scale) printf ("The input matrix will be scaled\n");
+        if (scale) 
+            PRLEVEL (1, ("The input matrix will be scaled\n"));
     }
         
     paru_matrix *paruMatInfo = paru_init_rowFronts (A, scale, LUsym, cc);

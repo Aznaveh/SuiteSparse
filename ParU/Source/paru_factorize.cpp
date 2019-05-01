@@ -10,7 +10,7 @@
  
 
 #include "Parallel_LU.hpp"
-#define TOLER .1  //pivot tolerance
+#define TOLER 0.1  //pivot tolerance
 
 extern "C" void dgetrf_( BLAS_INT *dim1, BLAS_INT *dim2, double *a, 
         BLAS_INT *lda, BLAS_INT *ipiv, BLAS_INT *info);
