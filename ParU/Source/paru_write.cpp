@@ -127,7 +127,7 @@ void paru_write( paru_matrix *paruMatInfo, int scale,
             return;
         }
         for(Int row = 0; row < m ; row++)  
-            fprintf (scalefptr, "%16g\n",1/scale_row[row]);
+            fprintf (scalefptr, "%16g\n",scale_row[row]);
         fclose(scalefptr);
     }
     //--------------------
@@ -192,7 +192,7 @@ void paru_write( paru_matrix *paruMatInfo, int scale,
 
         //Printing LU part
         double *pivotalFront= LUs[f].p  ;
-        PRLEVEL (0, ("%% pivotalFront =%p \n", pivotalFront));
+        PRLEVEL (1, ("%% pivotalFront =%p \n", pivotalFront));
         for (Int j = col1 ; j < col2; j++)
             for (Int i = 0; i < rowCount ; i++){
                 fprintf (LUfptr, "%ld  %ld %.16g\n",
@@ -201,7 +201,7 @@ void paru_write( paru_matrix *paruMatInfo, int scale,
             }
 
 #ifndef NDEBUG  // Printing the pivotal front
-        Int p = 0;
+        Int p = 1;
         PRLEVEL (p, ("\n%%Inside paru_write Luf{%ld}= [",f+1));
         for (Int r = 0; r < rowCount; r++){
             PRLEVEL (p, (" "));

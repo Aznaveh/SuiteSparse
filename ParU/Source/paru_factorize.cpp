@@ -321,7 +321,7 @@ Int paru_dgetrf (double *F, Int *frowList, Int lm, Int ln,
 
 Int paru_factorize(double *F, Int *frowList, Int rowCount, Int f, 
         Int *panel_row, paru_matrix *paruMatInfo){
-    DEBUGLEVEL (1);
+    DEBUGLEVEL (0);
 
     Int *Super = paruMatInfo->LUsym->Super;
     Int col1 = Super [f];       /* fornt F has columns col1:col2-1 */

@@ -2,7 +2,7 @@
  * ============================== paru_sym_analyse =========================   /
  * =========================================================================   /
  * @brief Computing augmented tree and using QRsym data structure and add it 
- *         to LUsym
+ *         to LUsym borrowed from SPQR/Include/SuiteSparseQR.hpp
  *
  * Example: ./Matrix/problem.mtx
  * original post ordered etree:          augmented tree: (Row elements)
