@@ -282,7 +282,7 @@ paru_matrix *paru_init_rowFronts (
     Int *Sp = LUsym->Sp;
     if (cc->status == CHOLMOD_OK){
         // use Wi as workspace (Iwork (0:m-1)) [
-        spqr_stranspose2 (A, Qfill, Sp, PLinv, Sx, Wi) ;
+        //spqr_stranspose2 (A, Qfill, Sp, PLinv, Sx, Wi) ;
         // Wi no longer needed ]
     }//
     

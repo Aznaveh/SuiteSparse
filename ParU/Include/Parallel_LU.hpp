@@ -1,27 +1,52 @@
 // ============================================================================/  
 // ======================= Parallel_LU.hpp ====================================/
 // ============================================================================/
-#include "spqr.hpp"
+//#include "spqr.hpp"
+
+#include "umfpack.h"
+#include <stdlib.h>
+#include <math.h>
+#include <float.h>
+#include <stdio.h>
+#include <cstring>
+
+extern "C"
+{
+#include "cholmod.h"
+#include "cholmod_blas.h"
+}
+
 
 // -----------------------------------------------------------------------------
 // debugging and printing macros
 // -----------------------------------------------------------------------------
 
 #ifndef NPR
-    #define NPR
+#define NPR
 #endif
 //for printing information uncomment this; to activate assertions uncomment 
 //NDEBUG in ./SPQR/Include/spqr.hpp line 41
-//#undef NPR
+#undef NPR
 
+//from spqr.hpp
+//Aznaveh For MATLAB OUTPUT UNCOMMENT HERE
+// uncomment the following line to turn on debugging (SPQR will be slow!)
+#undef NDEBUG
+
+
+
+#ifndef NDEBUG
+    #include <assert.h>
+    #define ASSERT(e) assert (e)
+#endif
 
 #ifndef NPR
-    static int print_level = 0 ;
-    #define PRLEVEL(level,param) { if (print_level >= level) printf param ; }
-    #define DEBUGLEVEL(level) { print_level = level ; }
+static int print_level = 0 ;
+#define PRLEVEL(level,param) { if (print_level >= level) printf param ; }
+#define DEBUGLEVEL(level) { print_level = level ; }
 #else
-    #define PRLEVEL(level,param)
-    #define DEBUGLEVEL(level)
+#define PRLEVEL(level,param)
+#define DEBUGLEVEL(level)
 #endif
 
 #define Int SuiteSparse_long
@@ -88,8 +113,8 @@ typedef struct {/* paru_symbolic*/
     Int maxfn ;     // max # of columns in any front
 
     // parent, child, and childp define the row merge tree or etree (A'A)
-    Int *Parent ;   // size nf+1
-    Int *Child ;    // size nf+1
+    Int *Parent ;   // size nf+1  Add another node just to make the forest a 
+    Int *Child ;    // size nf+1      tree
     Int *Childp ;   // size nf+2
 
     // The parent of a front f is Parent [f], or EMPTY if f=nf.
@@ -105,7 +130,7 @@ typedef struct {/* paru_symbolic*/
     Int *aChild;  // size m+nf+1
     Int *aChildp; // size m+nf+2
     Int *first;   // size m+nf first successor of front in augmented postordered 
-                  //  tree; all successors are between first[eli]...eli-1
+    //  tree; all successors are between first[eli]...eli-1
 
 
     // pivot column in the front F.  This refers to a column of S.  The
@@ -119,15 +144,15 @@ typedef struct {/* paru_symbolic*/
     Int *Cm ;               // size nf+1
 
     Int *Super ;    // size nf+1.  Super [f] gives the first
-        // pivot column in the front F.  This refers to a column of S.  The
-        // number of expected pivot columns in F is thus
-        // Super [f+1] - Super [f].
+    // pivot column in the front F.  This refers to a column of S.  The
+    // number of expected pivot columns in F is thus
+    // Super [f+1] - Super [f].
 
     Int *Rp ;       // size nf+1
     Int *Rj ;       // size rjsize; compressed supernodal form of R
 
     Int rjsize ;    // size of Rj
- 
+
     Int *row2atree;       //Mapping from rows to augmented tree size m
     Int *super2atree;     //Mapping from super nodes to augmented tree size nf
 
@@ -166,9 +191,9 @@ typedef struct	{/* Element */
        row [0..nrows-1] ;	row indices of this element
 
        relColInd [0..ncols-1];	relative indices of this element for
-                                                            current front
+       current front
        relRowInd [0..nrows-1],	relative indices of this element for 
-                                                            current front
+       current front
        double ncols*nrows; numeric values
        */
 
@@ -182,18 +207,18 @@ inline Int *rowIndex_pointer (Element *curEl)
 
 
 inline Int *relColInd (Element *curEl)
-//{    return (Int*)(curEl+1) + curEl->ncols + curEl->nrows + 1;}
+    //{    return (Int*)(curEl+1) + curEl->ncols + curEl->nrows + 1;}
 {    return (Int*)(curEl+1) + curEl->ncols + curEl->nrows  ;}
 
 
 inline Int *relRowInd (Element *curEl)
-//{    return (Int*)(curEl+1) + 2*curEl->ncols + curEl->nrows + 2;}
+    //{    return (Int*)(curEl+1) + 2*curEl->ncols + curEl->nrows + 2;}
 {    return (Int*)(curEl+1) + 2*curEl->ncols + curEl->nrows ;}
 
 
 inline double *numeric_pointer (Element *curEl)
     // sizeof Int and double are same, but I keep it like this for clarity
-//{    return (double*)((Int*)(curEl+1) + 2*curEl->ncols + 2*curEl->nrows + 2);}
+    //{    return (double*)((Int*)(curEl+1) + 2*curEl->ncols + 2*curEl->nrows + 2);}
 {    return (double*)((Int*)(curEl+1) + 2*curEl->ncols + 2*curEl->nrows );}
 
 
@@ -210,23 +235,23 @@ typedef struct  {/*List of tuples */
 
 typedef struct  {/*work_struct*/
 
-   Int *rowSize;     // Initalized data structure, size of rows        
-   Int rowMark;      // rowSize[x] < rowMark
-   
-   Int *scratch;     // size of 2*rows + sizeof cols
-                     // Used for 3 things in paru_assemble so far
-                     //     1) frowList: List of fully summed rows < |m|
-                     //     2) ipiv: permutation of frowList  < |m|
-                     //     4) fcolList: list of nonpivotal columns < |n|
+    Int *rowSize;     // Initalized data structure, size of rows        
+    Int rowMark;      // rowSize[x] < rowMark
 
-   Int *colSize;     // Initalized data structure, size of columns
-   Int colMark;      // colSize[x] < colMark
+    Int *scratch;     // size of 2*rows + sizeof cols
+    // Used for 3 things in paru_assemble so far
+    //     1) frowList: List of fully summed rows < |m|
+    //     2) ipiv: permutation of frowList  < |m|
+    //     4) fcolList: list of nonpivotal columns < |n|
+
+    Int *colSize;     // Initalized data structure, size of columns
+    Int colMark;      // colSize[x] < colMark
 
 
-   Int *elRow;      // Initalized data structure, size m+nf 
-   Int elRMark;
-   Int *elCol;      // Initalized data structure, size m+nf 
-   Int elCMark;
+    Int *elRow;      // Initalized data structure, size m+nf 
+    Int elRMark;
+    Int *elCol;      // Initalized data structure, size m+nf 
+    Int elCMark;
 
 }   work_struct;
 
@@ -265,8 +290,10 @@ typedef struct  {/*Matrix */
 }   paru_matrix;
 
 
-paru_symbolic *paru_sym_analyse
-( cholmod_sparse *A, cholmod_common *cc) ;
+// works with spqr
+//paru_symbolic *paru_sym_analyse ( cholmod_sparse *A, cholmod_common *cc) ;
+// works with umfpack
+paru_symbolic *paru_analyze ( cholmod_sparse *A, cholmod_common *cc) ;
 
 paru_matrix *paru_init_rowFronts 
 (cholmod_sparse *A, int scale, paru_symbolic *LUsym,   cholmod_common *cc);
@@ -289,8 +316,9 @@ Int paru_add_colTuple (tupleList *ColList, Int col,
 Int paru_remove_colTuple(tupleList *ColList, Int col, Int t);
 Int paru_remove_rowTuple(tupleList *RowList, Int row, Int t);
 
+// older version does not include row degree update after each panel
 void paru_assemble(paru_matrix *paruMatInfo, Int f, cholmod_common *cc);
-
+//newer version
 void paru_front (paru_matrix *paruMatInfo, Int f, cholmod_common *cc);
 
 
@@ -312,6 +340,7 @@ Int paru_trsm(double *pF, double *uPart, Int fp, Int rowCount, Int colCount);
 Int paru_dgemm(double *pF, double *uPart, double *el, Int fp, 
         Int rowCount, Int colCount);
 
+// I am not using it like this anymore
 void paru_fourPass (paru_matrix *paruMatInfo,  Int f, Int fp, 
         cholmod_common *cc);
 
@@ -327,3 +356,4 @@ void paru_update_rowDeg ( Int panel_num,  Int row_end,
         Int f, paru_matrix *paruMatInfo);
 
 void paru_finalize (paru_matrix *paruMatInfo, Int f, cholmod_common *cc);
+Int paru_cumsum (Int n, Int *X);
