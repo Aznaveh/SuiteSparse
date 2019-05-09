@@ -313,7 +313,7 @@ paru_symbolic *paru_analyze
     }
     paru_cumsum (nf+2, Childp);
 #ifndef NDEBUG
-    p = 1;
+    p = 2;
     PRLEVEL (p, ("%%%%-Chidlp-----"));
     for (Int f = 0; f < nf+2; f++){
         PRLEVEL (p, ("%ld ", Childp[f]));
@@ -324,21 +324,15 @@ paru_symbolic *paru_analyze
     LUsym->Child  =  Child;
     //copy of Childp
     Int *cChildp = (Int *) paru_alloc ((nf+2), sizeof (Int), cc); 
-    memcpy(cChildp, Childp, nf+2);
-    for (Int f = 0; f < nf+2; f++){
-   //     ASSERT (cChildp[f] == Childp[f]);
-        cChildp[f] = Childp[f];
-    }
+    memcpy(cChildp, Childp, (nf+2)*sizeof(Int) );
 #ifndef NDEBUG
-    p = 1;
+    p = 2;
     PRLEVEL (p, ("%%%%After Copy_cChidlp_____"));
     for (Int f = 0; f < nf+2; f++){
         PRLEVEL (p, ("%ld ",  cChildp[f]));
     }
     PRLEVEL (p, ("\n"));
 #endif
-
-
     for (Int f = 0; f < nf; f++){
         if (Parent [f] > 0)
             Child[cChildp[Parent[f]]++] = f;
