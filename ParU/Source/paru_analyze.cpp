@@ -47,7 +47,17 @@ paru_symbolic *paru_analyze
     double *Ax = (double*) A->x;
     Int m = A->nrow;
     Int n = A->ncol;
-
+    
+    // Initializaing pointers with NULL; just in case for an early release
+    // not to free an uninitialized space
+    LUsym->Chain_start = LUsym->Chain_maxrows = LUsym->Chain_maxcols = NULL;
+    LUsym->Parent = LUsym->Super = LUsym->Child = LUsym->Childp = NULL;
+    LUsym->Qfill = LUsym->PLinv = NULL;
+    LUsym->Sp = LUsym->Sj = LUsym->Sleft= NULL;
+    LUsym->Fm= LUsym->Cm= LUsym->Rj= LUsym->Rp= NULL;
+    LUsym->aParent = LUsym->aChildp = LUsym->aChild = LUsym->row2atree = NULL;
+    LUsym->super2atree = LUsym->first = NULL;
+ 
     //############  Calling UMFPACK and retrieving data structure ##############
 
     /* ---------------------------------------------------------------------- */
@@ -183,6 +193,7 @@ paru_symbolic *paru_analyze
         umfpack_dl_report_info (Control, Info);
         umfpack_dl_report_status (Control, status);
         printf ("umfpack_dl_symbolic failed");
+        paru_freesym (&LUsym , cc);
         return NULL;
     }
 
@@ -227,7 +238,21 @@ paru_symbolic *paru_analyze
             Symbolic);
     if (status < 0)    {
         printf ("symbolic factorization invalid");
-        return NULL;
+
+        //free memory
+        paru_free ((n+1), sizeof (Int), Pinit, cc);
+        paru_free ((n+1), sizeof (Int), Qinit, cc);
+        paru_free ((n+1), sizeof (Int), Front_npivcol, cc);
+        paru_free ((n+1), sizeof (Int), Front_1strow, cc);
+        paru_free ((n+1), sizeof (Int), Front_leftmostdesc, cc);
+        paru_free ((n+1), sizeof (Int), Front_parent, cc);
+        paru_free ((n+1), sizeof (Int), Chain_start, cc);
+        paru_free ((n+1), sizeof (Int), Chain_maxrows, cc);
+        paru_free ((n+1), sizeof (Int), Chain_maxcols, cc);
+
+        paru_freesym (&LUsym , cc);
+
+        return NULL; 
     }
 #ifndef NDEBUG
     p = 2;
@@ -267,7 +292,7 @@ paru_symbolic *paru_analyze
 
     umfpack_dl_free_symbolic (&Symbolic);
 
-    paru_free ((n+1), sizeof (Int) , Front_1strow, cc);
+    paru_free ((n+1), sizeof (Int), Front_1strow, cc);
     paru_free ((n+1), sizeof (Int), Front_leftmostdesc, cc);
 
     //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
@@ -285,6 +310,8 @@ paru_symbolic *paru_analyze
     LUsym->Chain_start = Chain_start;
     LUsym->Chain_maxrows = Chain_maxrows;
     LUsym->Chain_maxcols = Chain_maxcols;
+    Int *Qfill =  LUsym->Qfill = Qinit;
+    Int *PLinv =  LUsym->PLinv = Pinit; ///It is not an invert; naming TODO
     //    rjsize =  LUsym->rjsize = QRsym->rjsize;
     //
 
@@ -296,11 +323,7 @@ paru_symbolic *paru_analyze
     //    PRLEVEL (0, ("%% anz = %ld  rjsize=%ld\n", anz, rjsize));
     //
 
-
-    Int   *PLinv;
-    paru_free ((n+1), sizeof (Int), Pinit, cc);
-    //brain transplant
-
+    
     // Parent size is nf+1 potentially smaller than what UMFPACK allocate
     Int size = n + 1;
     Int *Parent = 
@@ -308,7 +331,12 @@ paru_symbolic *paru_analyze
     ASSERT (size < n+1);
     if (Parent == NULL){    // should not happen anyway it is always shrinking
         printf ("memory problem");
-        return NULL;
+        //free memory
+        paru_free ((n+1), sizeof (Int), Front_npivcol, cc);
+        paru_free ((n+1), sizeof (Int), Front_parent, cc);
+
+        paru_freesym (&LUsym , cc);
+        return NULL;  
     }
     LUsym->Parent = Parent; 
 
@@ -370,15 +398,57 @@ paru_symbolic *paru_analyze
     }
 #endif 
     paru_free ((nf+2), sizeof (Int), cChildp, cc);
-       
     
-    Int *Qfill =  LUsym->Qfill = Qinit;
     
-    LUsym->PLinv = NULL;
+    /* ---------------------------------------------------------------------- */
+    /*                   computing the Staircase structures                   */
+    /* ---------------------------------------------------------------------- */
+    Int *Sp = (Int*) paru_calloc (m+1, sizeof(Int),cc);
+    Int *Sj = (Int*) paru_alloc (anz, sizeof(Int),cc);
+    Int *Sleft = (Int*) paru_alloc (n+2, sizeof(Int),cc);
+    LUsym->Sp = Sp;
+    LUsym->Sj = Sj;
+    LUsym->Sleft= Sleft;
+    Int *Ps; // new row permutation for just the Submatrix part
+    Ps = (Int*) paru_calloc (m-n1, sizeof(Int),cc); 
+    Int snnz; //nnz in submatrix excluding singletons
+    int rowcount = 0;
+    for (Int newcol = n1; newcol < n ; newcol++){
+        Int oldcol = Qinit [newcol];
+        for(Int p = Ap[oldcol] ; p < Ap[oldcol+1]; p++){
+            Int oldrow = Ai[p];
+            Int newrow = Pinit[oldrow];
+            Int srow = newrow - n1;
+            if (srow > 0){  // it is insdie S otherwise it is part of singleton
+                if(Sp[srow] == 0){ //first time seen
+                    Ps[rowcount++] = oldrow;
+                }
+                snnz++;
+                Sp[srow]++;
+            }
+        }
+    }
+    //TODO update Pinit
+    paru_free ( (m-n1), sizeof (Int), Ps, cc);
+
+    if (rowcount != m-n1-1){
+        printf("empty rows in submatrix\n");
+        PRLEVEL (1, ("m = %ld, n1 = %ld, rowcount = %ld\n",m , n1 ,rowcount));
+        paru_freesym (&LUsym , cc);
+        return NULL; //Free memory
+    }
+                                   
+
+
+    
+   // LUsym->PLinv = NULL;
     //    PLinv =  LUsym->PLinv =  QRsym->PLinv;  
     //    QRsym->PLinv = NULL;
 
-
+    /* ---------------------------------------------------------------------- */
+    /*                   computing the Upper bound of rows and cols           */
+    /* ---------------------------------------------------------------------- */
+ 
     LUsym->Fm= NULL;
     //    LUsym->Fm = QRsym->Fm; 
     //    QRsym->Fm = NULL;
@@ -397,20 +467,6 @@ paru_symbolic *paru_analyze
     LUsym->Rp= NULL;
     //    LUsym->Rp = QRsym->Rp; 
     //    QRsym->Rp = NULL;
-    //
-    //Staircase structure
-    // Int *Sp, *Sj, *Sleft;
-    LUsym->Sp= NULL;
-    // Sp =  LUsym->Sp = QRsym->Sp;     
-    // QRsym->Sp = NULL;
-    LUsym->Sj= NULL;
-    // Sj =  LUsym->Sj = QRsym->Sj;     
-    // QRsym->Sj = NULL;
-    LUsym->Sleft= NULL;
-    // Sleft = LUsym->Sleft = QRsym->Sleft;  
-    // QRsym->Sleft = NULL;
-
-
     /*Computing augmented tree */
     Int *aParent = LUsym->aParent = NULL; //augmented tree size m+nf
     Int *aChildp = LUsym->aChildp = NULL;  // size m+nf+2
