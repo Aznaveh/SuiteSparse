@@ -110,7 +110,9 @@ typedef struct {/* paru_symbolic*/
     // numerical factorization.
 
     Int nf ;        // number of frontal matrices; nf <= MIN (m,n)
-    Int maxfn ;     // max # of columns in any front
+    Int n1;         // number of singletons in the matrix
+                    // the matrix S is the one without any singletons
+    Int rs1, cs1;   // number of row and column singletons, n1 = rs1+cs1;
 
     // parent, child, and childp define the row merge tree or etree (A'A)
     Int *Parent ;   // size nf+1  Add another node just to make the forest a 
@@ -155,6 +157,22 @@ typedef struct {/* paru_symbolic*/
 
     Int *row2atree;       //Mapping from rows to augmented tree size m
     Int *super2atree;     //Mapping from super nodes to augmented tree size nf
+
+    Int *Chain_start;   // size = n_col +1;  actual size = nfr+1
+    // The kth frontal matrix chain consists of frontal
+    // matrices Chain_start [k] through Chain_start [k+1]-1.
+    // Thus, Chain_start [0] is always 0 and 
+    // Chain_start[nchains] is the total number of frontal
+    // matrices, nfr. For two adjacent fornts f and f+1
+    // within a single chian, f+1 is always the parent of f
+    // (that is, Front_parent [f] = f+1).
+
+    Int *Chain_maxrows;  // size = n_col +1;  actual size = nfr+1
+    Int *Chain_maxcols;  // The kth frontal matrix chain requires a single 
+    // working array of dimension Chain_maxrows [k] by
+    // Chain_maxcols [k], for the unifrontal technique that
+    // factorizes the frontal matrix chain. Since the
+    // symbolic factorization only provides 
 
 } paru_symbolic;
 

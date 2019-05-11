@@ -102,6 +102,12 @@ void paru_freesym (paru_symbolic **LUsym_handle,
     paru_free (anz, sizeof (Int), LUsym->Sj, cc);
     paru_free (n+2, sizeof (Int), LUsym->Sleft, cc);
 
+    paru_free ((n+1), sizeof (Int), LUsym->Chain_start, cc) ;
+    paru_free ((n+1), sizeof (Int), LUsym->Chain_maxrows, cc);
+    paru_free ((n+1), sizeof (Int), LUsym->Chain_maxcols, cc);
+
+
+
     paru_free (m+nf, sizeof (Int), LUsym->aParent, cc);
     paru_free (m+nf+1, sizeof (Int), LUsym->aChild, cc);
     paru_free (m+nf+2, sizeof (Int), LUsym->aChildp, cc);

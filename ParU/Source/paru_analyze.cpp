@@ -65,7 +65,7 @@ paru_symbolic *paru_analyze
                   //       |   \***********r                              
                   //       |    *\         |
                   //       |    ***\       |
-                  //       |    ***xx\xxxxx|            \                  
+                  //       |    ***xx\xxxxx|            |                  
                   //       |    ***xxxx\xxx|            +   = n1
                   //       -----ccc--------            /
                   //             |
@@ -171,12 +171,14 @@ paru_symbolic *paru_analyze
     /* get the default control parameters */
     umfpack_dl_defaults (Control) ;
 
+#ifndef NDEBUG
     /* print the control parameters */
-    umfpack_dl_report_control (Control) ;
+    Int p = 1;
+    if (p <= 0)  umfpack_dl_report_control (Control) ;
+#endif
 
     /* performing the symbolic analysis */ 
     status = umfpack_dl_symbolic (m, n, Ap, Ai, Ax, &Symbolic, Control, Info);
-
     if (status < 0){
         umfpack_dl_report_info (Control, Info);
         umfpack_dl_report_status (Control, status);
@@ -184,8 +186,19 @@ paru_symbolic *paru_analyze
         return NULL;
     }
 
-    printf ("\nSymbolic factorization of A: ");
-    (void) umfpack_dl_report_symbolic (Symbolic, Control);
+    Int cs1 = Info[UMFPACK_COL_SINGLETONS];
+    Int rs1 = Info[UMFPACK_ROW_SINGLETONS];
+//    Int maxnrows = Symbolic->maxnrows;  // I can not access to inside of 
+//    Int maxncols = Symbolic->maxncols;  // SymbolicType it is internal in
+//                                          UMFPACK
+    
+#ifndef NDEBUG
+    p = 1;
+    PRLEVEL (p, ("\n%%Symbolic factorization of A: "));
+    if (p <= 0) (void) umfpack_dl_report_symbolic (Symbolic, Control);
+    PRLEVEL(p, ("\n %%colsingleton = %ld, rowsingleton=%ld",cs1,rs1));
+//    PRLEVEL(p, ("\n %%maxnrow= %ld, maxncol=%ld",maxnrows, maxncols));
+#endif
 
     /* ---------------------------------------------------------------------- */
     /*    Copy the contents of Symbolic in my data structure                  */
@@ -196,8 +209,8 @@ paru_symbolic *paru_analyze
     Front_1strow = (Int *) paru_alloc ((n+1), sizeof (Int) , cc);
     Front_leftmostdesc = (Int *) paru_alloc ((n+1), sizeof (Int), cc);
     Front_parent = (Int *) paru_alloc ((n+1), sizeof (Int), cc);
-    Chain_maxrows = (Int *) paru_alloc ((n+1), sizeof (Int), cc);
     Chain_start = (Int *) paru_alloc ((n+1), sizeof (Int), cc);
+    Chain_maxrows = (Int *) paru_alloc ((n+1), sizeof (Int), cc);
     Chain_maxcols = (Int *) paru_alloc ((n+1), sizeof (Int), cc);
 
     if (!Pinit || !Qinit || !Front_npivcol || !Front_parent || !Chain_start ||
@@ -217,8 +230,7 @@ paru_symbolic *paru_analyze
         return NULL;
     }
 #ifndef NDEBUG
-    Int p = 1;
-
+    p = 2;
     PRLEVEL (p, ("%%%% n1 is %d\n", n1 ));
     PRLEVEL (p, ("From the Symbolic object,\
                 C is of dimension %ld-by-%ld\n", nr, nc));
@@ -255,14 +267,8 @@ paru_symbolic *paru_analyze
 
     umfpack_dl_free_symbolic (&Symbolic);
 
-    paru_free ((n+1), sizeof (Int), Pinit, cc);
-    paru_free ((n+1), sizeof (Int), Qinit, cc);
     paru_free ((n+1), sizeof (Int) , Front_1strow, cc);
     paru_free ((n+1), sizeof (Int), Front_leftmostdesc, cc);
-    paru_free ((n+1), sizeof (Int), Chain_start, cc) ;
-    paru_free ((n+1), sizeof (Int), Chain_maxrows, cc);
-    paru_free ((n+1), sizeof (Int), Chain_maxcols, cc);
-
 
     //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
@@ -271,8 +277,14 @@ paru_symbolic *paru_analyze
 
     LUsym->m = m;
     LUsym->n = n;
+    LUsym->n1 = n1;
+    LUsym->rs1= rs1;
+    LUsym->cs1= cs1;
     LUsym->anz = anz;
     Int nf =  LUsym->nf = nfr;
+    LUsym->Chain_start = Chain_start;
+    LUsym->Chain_maxrows = Chain_maxrows;
+    LUsym->Chain_maxcols = Chain_maxcols;
     //    rjsize =  LUsym->rjsize = QRsym->rjsize;
     //
 
@@ -284,16 +296,21 @@ paru_symbolic *paru_analyze
     //    PRLEVEL (0, ("%% anz = %ld  rjsize=%ld\n", anz, rjsize));
     //
 
-    //    LUsym->maxfn = QRsym->maxfn;
 
-    Int  *Qfill, *PLinv;
+    Int   *PLinv;
+    paru_free ((n+1), sizeof (Int), Pinit, cc);
     //brain transplant
 
     // Parent size is nf+1 potentially smaller than what UMFPACK allocate
     Int size = n + 1;
     Int *Parent = 
         (Int*) paru_realloc (nf+1, sizeof(Int), Front_parent, &size, cc);
-    LUsym->Parent = Parent  = Front_parent;
+    ASSERT (size < n+1);
+    if (Parent == NULL){    // should not happen anyway it is always shrinking
+        printf ("memory problem");
+        return NULL;
+    }
+    LUsym->Parent = Parent; 
 
     // Making Super like SPQR: Super[f]<= pivotal columns of (f) < Super[f+1]
     Int *Super =  LUsym->Super = (Int *) paru_alloc ((nf+1), sizeof (Int), cc); 
@@ -355,9 +372,7 @@ paru_symbolic *paru_analyze
     paru_free ((nf+2), sizeof (Int), cChildp, cc);
        
     
-    LUsym->Qfill = NULL;
-    //    Qfill =  LUsym->Qfill =  QRsym->Qfill;  
-    //    QRsym->Qfill = NULL;
+    Int *Qfill =  LUsym->Qfill = Qinit;
     
     LUsym->PLinv = NULL;
     //    PLinv =  LUsym->PLinv =  QRsym->PLinv;  
@@ -536,24 +551,23 @@ paru_symbolic *paru_analyze
     //        }else
     //            lastChildFlag = 0;  
     //    }
-    //
-    //    LUsym->aParent = aParent;
-    //    LUsym->aChildp = aChildp;
-    //    LUsym->aChild = aChild;
-    //    LUsym->row2atree = rM;
-    //    LUsym->super2atree = snM;
-    //
+   //
     //    //Initialize first descendent of augmented tree
     //    for(Int i=0 ; i<m+nf; i++){
     //        for (Int r = i; r!= -1 && first[r] == -1; r = aParent[r])
     //            first[r] = i;
     //    }
-    //
-    //
-    //    LUsym->first= first;
+
+    LUsym->aParent = aParent;
+    LUsym->aChildp = aChildp;
+    LUsym->aChild = aChild;
+    LUsym->row2atree = rM;
+    LUsym->super2atree = snM;
+
+    LUsym->first= first;
     //
     //#ifndef NDEBUG
-    //    Int p = 1;
+    //    p = 1;
     //    PRLEVEL (p,("%% super node mapping (snM): ")); 
     //    for (Int f = 0; f < nf; f++){
     //        ASSERT (snM [f] != -1);

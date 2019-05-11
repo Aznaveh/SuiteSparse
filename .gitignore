@@ -36,6 +36,8 @@ my_*.out
 .nfs*
 tags
 core.*
+pfile
+tfile
 
 # ignore these specific programs in the Package/Demo directories
 AMD/Demo/amd_demo
@@ -113,6 +115,7 @@ ParU/Demo/pfile
 ParU/Demo/tfile
 ParU/Demo/tmp
 ParU/Demo/*.m
+ParU/Demo/Res/*
 
 # ignore these specific programs in the Package/Tcov directories
 CHOLMOD/Tcov/cl

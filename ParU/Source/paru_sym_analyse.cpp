@@ -65,8 +65,6 @@ paru_symbolic *paru_sym_analyse
     PRLEVEL (0, ("%% anz = %ld  rjsize=%ld\n", anz, rjsize));
 
 
-    LUsym->maxfn = QRsym->maxfn;
-
     Int *Parent, *Child, *Childp, 
         *Super, *Qfill, *PLinv;
     //brain transplant
