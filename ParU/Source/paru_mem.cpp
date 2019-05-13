@@ -91,7 +91,7 @@ void paru_freesym (paru_symbolic **LUsym_handle,
     paru_free (nf+2, sizeof (Int), LUsym->Childp, cc);
     paru_free (nf+1, sizeof (Int), LUsym->Super, cc);
     paru_free (n, sizeof (Int), LUsym->Qfill , cc);
-    paru_free (m, sizeof (Int), LUsym->PLinv, cc);
+    paru_free (m, sizeof (Int), LUsym->Pinv, cc);
     paru_free (nf+1, sizeof (Int), LUsym->Fm, cc);
     paru_free (nf+1, sizeof (Int), LUsym->Cm, cc);
 

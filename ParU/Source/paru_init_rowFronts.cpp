@@ -261,7 +261,7 @@ paru_matrix *paru_init_rowFronts (
      // create S = A (p,q)', or S=A(p,q) if S is considered to be in row-form
      // -------------------------------------------------------------------------
      Int *Qfill = LUsym->Qfill;
-     Int *PLinv = LUsym->PLinv;
+     Int *Pinv = LUsym->Pinv;
      Int anz = LUsym->anz;
      Int *Wi = (Int *) cc->Iwork ;   // size m, aliased with the rest of Iwork
 
@@ -282,7 +282,7 @@ paru_matrix *paru_init_rowFronts (
     Int *Sp = LUsym->Sp;
     if (cc->status == CHOLMOD_OK){
         // use Wi as workspace (Iwork (0:m-1)) [
-        //spqr_stranspose2 (A, Qfill, Sp, PLinv, Sx, Wi) ;
+        //spqr_stranspose2 (A, Qfill, Sp, Pinv, Sx, Wi) ;
         // Wi no longer needed ]
     }//
     

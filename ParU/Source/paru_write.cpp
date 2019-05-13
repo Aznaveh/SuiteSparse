@@ -16,7 +16,7 @@ void paru_write( paru_matrix *paruMatInfo, int scale,
     Int nf = LUsym->nf;
     Int m = LUsym->m;
     Int n = LUsym->n;
-    Int *PLinv =  LUsym->PLinv;  
+    Int *Pinv =  LUsym->Pinv;  
     Int *Qfill =  LUsym->Qfill;
 
     paru_fac *LUs =  paruMatInfo->partial_LUs;
@@ -64,7 +64,7 @@ void paru_write( paru_matrix *paruMatInfo, int scale,
 
 
     Int *oldRofS= (Int*) paru_alloc ( m, sizeof (Int), cc); // S -> LU
-    Int *PofA= (Int*) paru_alloc ( m, sizeof (Int), cc);    // inv(PLinv)
+    Int *PofA= (Int*) paru_alloc ( m, sizeof (Int), cc);    // inv(Pinv)
     //-------------------- writing row permutation to a file
     {
         FILE *rowfptr;
@@ -82,7 +82,7 @@ void paru_write( paru_matrix *paruMatInfo, int scale,
         }
         fprintf (rowfptr, "%%rows\n");
         for(Int k = 0; k < m ; k++){
-            PofA[PLinv[k]] = k;
+            PofA[Pinv[k]] = k;
         }
 
         Int ip = 0;

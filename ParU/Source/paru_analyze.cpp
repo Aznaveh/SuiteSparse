@@ -52,7 +52,7 @@ paru_symbolic *paru_analyze
     // not to free an uninitialized space
     LUsym->Chain_start = LUsym->Chain_maxrows = LUsym->Chain_maxcols = NULL;
     LUsym->Parent = LUsym->Super = LUsym->Child = LUsym->Childp = NULL;
-    LUsym->Qfill = LUsym->PLinv = NULL;
+    LUsym->Qfill = LUsym->Pinv = NULL;
     LUsym->Sp = LUsym->Sj = LUsym->Sleft= NULL;
     LUsym->Fm= LUsym->Cm= LUsym->Rj= LUsym->Rp= NULL;
     LUsym->aParent = LUsym->aChildp = LUsym->aChild = LUsym->row2atree = NULL;
@@ -105,7 +105,7 @@ paru_symbolic *paru_analyze
                   // during numerical factorization, P[k] = i also defines the
                   // fianl permutation of umfpack_*_numeric, for the symmetric
                   // strategy.
-                  // NOTE: SPQR uses PLinv for stairecase structure and that is
+                  // NOTE: SPQR uses Pinv for stairecase structure and that is
                   // an invert permutation that I have to compute the direct
                   // permutation in paru_write.
 
@@ -214,7 +214,7 @@ paru_symbolic *paru_analyze
     /* ---------------------------------------------------------------------- */
     /*    Copy the contents of Symbolic in my data structure                  */
     /* ---------------------------------------------------------------------- */
-    Pinit = (Int *) paru_alloc ((n+1), sizeof (Int), cc);
+    Pinit = (Int *) paru_alloc ((m+1), sizeof (Int), cc);
     Qinit = (Int *) paru_alloc ((n+1), sizeof (Int), cc);
     Front_npivcol = (Int *) paru_alloc ((n+1), sizeof (Int), cc);
     Front_1strow = (Int *) paru_alloc ((n+1), sizeof (Int) , cc);
@@ -240,7 +240,7 @@ paru_symbolic *paru_analyze
         printf ("symbolic factorization invalid");
 
         //free memory
-        paru_free ((n+1), sizeof (Int), Pinit, cc);
+        paru_free ((m+1), sizeof (Int), Pinit, cc);
         paru_free ((n+1), sizeof (Int), Qinit, cc);
         paru_free ((n+1), sizeof (Int), Front_npivcol, cc);
         paru_free ((n+1), sizeof (Int), Front_1strow, cc);
@@ -311,7 +311,6 @@ paru_symbolic *paru_analyze
     LUsym->Chain_maxrows = Chain_maxrows;
     LUsym->Chain_maxcols = Chain_maxcols;
     Int *Qfill =  LUsym->Qfill = Qinit;
-    Int *PLinv =  LUsym->PLinv = Pinit; ///It is not an invert; naming TODO
     //    rjsize =  LUsym->rjsize = QRsym->rjsize;
     //
 
@@ -322,7 +321,9 @@ paru_symbolic *paru_analyze
     PRLEVEL (0, ("%% nf=%ld\n",nf ));
     //    PRLEVEL (0, ("%% anz = %ld  rjsize=%ld\n", anz, rjsize));
     //
-
+    /* ---------------------------------------------------------------------- */
+    /*           Fixing Parent and computing Children datat structure         */
+    /* ---------------------------------------------------------------------- */
     
     // Parent size is nf+1 potentially smaller than what UMFPACK allocate
     Int size = n + 1;
@@ -340,7 +341,8 @@ paru_symbolic *paru_analyze
     }
     LUsym->Parent = Parent; 
 
-    // Making Super like SPQR: Super[f]<= pivotal columns of (f) < Super[f+1]
+    // Making Super data structure
+    // like SPQR: Super[f]<= pivotal columns of (f) < Super[f+1]
     Int *Super =  LUsym->Super = (Int *) paru_alloc ((nf+1), sizeof (Int), cc); 
     Super [0] = 0;
     for(Int k = 1; k <= nf ; k++){
@@ -367,88 +369,177 @@ paru_symbolic *paru_analyze
 #endif 
     Int *Child = (Int *) paru_calloc ((nf+1), sizeof (Int), cc); 
     LUsym->Child  =  Child;
-    //copy of Childp
-    Int *cChildp = (Int *) paru_alloc ((nf+2), sizeof (Int), cc); 
+    //copy of Childp using Work for other places also
+    Int *Work = (Int *) paru_alloc ((MAX(m,n)+2), sizeof (Int), cc); 
+    Int *cChildp = Work;
     memcpy(cChildp, Childp, (nf+2)*sizeof(Int) );
-#ifndef NDEBUG
-    p = 2;
-    PRLEVEL (p, ("%%%%After Copy_cChidlp_____"));
-    for (Int f = 0; f < nf+2; f++){
-        PRLEVEL (p, ("%ld ",  cChildp[f]));
-    }
-    PRLEVEL (p, ("\n"));
-#endif
+
     for (Int f = 0; f < nf; f++){
         if (Parent [f] > 0)
             Child[cChildp[Parent[f]]++] = f;
     }
 #ifndef NDEBUG
-    p = 1;
+    p = 2;
     PRLEVEL (p, ("%%%%_cChidlp_____"));
     for (Int f = 0; f < nf+2; f++){
         PRLEVEL (p, ("%ld ",  cChildp[f]));
     }
     PRLEVEL (p, ("\n"));
-
-    for (Int f = 0; f < nf; f++){
-       if (cChildp[f] != Childp[f+1])
-           PRLEVEL (p, ("%% cChildp [%ld] == %ld & Chldp[%ld+1] = %ld",
-                       f, cChildp[f], f , Childp[f+1]));
-       ASSERT (cChildp[f] == Childp[f+1]);
-    }
 #endif 
-    paru_free ((nf+2), sizeof (Int), cChildp, cc);
-    
+
+  
     
     /* ---------------------------------------------------------------------- */
     /*                   computing the Staircase structures                   */
     /* ---------------------------------------------------------------------- */
-    Int *Sp = (Int*) paru_calloc (m+1, sizeof(Int),cc);
-    Int *Sj = (Int*) paru_alloc (anz, sizeof(Int),cc);
-    Int *Sleft = (Int*) paru_alloc (n+2, sizeof(Int),cc);
+
+    Int *Sp = (Int*) paru_calloc (m+1-n1, sizeof(Int),cc);
+    Int *Sleft = (Int*) paru_alloc (n+2-n1, sizeof(Int),cc);
+    LUsym->Sleft = Sleft;
     LUsym->Sp = Sp;
-    LUsym->Sj = Sj;
-    LUsym->Sleft= Sleft;
+    //-------- computing the inverse permutation for P
+    Int *Pinv =  LUsym->Pinv =  (Int *) paru_alloc (m+1, sizeof (Int), cc);
+    for(Int i = 0; i < m ; i++){
+        Pinv[Pinit[i]] = i;
+    }
+#ifndef NDEBUG
+    p = 1;
+    PRLEVEL (p, ("Qinit =\n"));
+    for (Int j = 0; j < m; j++){
+        PRLEVEL (p, ("%ld ", Qinit[j]));
+    }
+    PRLEVEL (p, ("\n"));
+
+    PRLEVEL (p, ("Pinv =\n"));
+    for (Int i = 0; i < m; i++){
+        PRLEVEL (p, ("%ld ", Pinv[i]));
+    }
+    PRLEVEL (p, ("\n"));
+
+#endif
+ 
+
+
     Int *Ps; // new row permutation for just the Submatrix part
     Ps = (Int*) paru_calloc (m-n1, sizeof(Int),cc); 
-    Int snnz; //nnz in submatrix excluding singletons
+    Int snnz = 0;  //nnz in submatrix excluding singletons
     int rowcount = 0;
+    Sleft[0] = 0;
+    //counting number of entries in each row of submatrix Sp
+    PRLEVEL (1, ("Computing Staircase Structure\n"));
     for (Int newcol = n1; newcol < n ; newcol++){
         Int oldcol = Qinit [newcol];
+        PRLEVEL (1, ("newcol = %ld oldcol=%ld\n",newcol, oldcol));
         for(Int p = Ap[oldcol] ; p < Ap[oldcol+1]; p++){
             Int oldrow = Ai[p];
-            Int newrow = Pinit[oldrow];
+            Int newrow = Pinv[oldrow]; 
             Int srow = newrow - n1;
-            if (srow > 0){  // it is insdie S otherwise it is part of singleton
-                if(Sp[srow] == 0){ //first time seen
+            PRLEVEL (1, ("\tnewrow=%ld oldrow=%ld srow=%ld n1=%ld\n",
+                        newrow, oldrow, srow, n1));
+            if (srow >= 0){  // it is insdie S otherwise it is part of singleton
+                if(Sp[srow+1] == 0){ //first time seen
+                    PRLEVEL (1, ("\tPs[%ld]= %ld\n",rowcount, oldrow));
                     Ps[rowcount++] = oldrow;
                 }
                 snnz++;
-                Sp[srow]++;
+                Sp[srow+1]++;
+            } 
+        }
+        Sleft[newcol-n1+1] = rowcount;
+    }
+    Sleft[n-n1+1] = m-n1-rowcount;  //empty rows of S
+
+
+
+#ifndef NDEBUG
+    p = 1;
+    PRLEVEL (p, ("Ps =\n"));
+    for (Int k = 0; k < rowcount; k++){
+        PRLEVEL (p, ("%ld ", Ps[k]));
+    }
+    PRLEVEL (p, ("\n"));
+#endif
+
+    if (rowcount < m-n1){
+        printf("Empty rows in submatrix\n"); //I think that must not happen
+#ifndef NDEBUG
+        PRLEVEL (1, ("m = %ld, n1 = %ld, rowcount = %ld, snnz = %ld\n",
+                    m , n1 ,rowcount, snnz));
+        for(Int srow = 0; srow < m-n1; srow++){
+            if(Sp[srow] == 0){
+                PRLEVEL (1, ("Row %ld is empty\n",srow));
             }
         }
-    }
-    //TODO update Pinit
-    paru_free ( (m-n1), sizeof (Int), Ps, cc);
-
-    if (rowcount != m-n1-1){
-        printf("empty rows in submatrix\n");
-        PRLEVEL (1, ("m = %ld, n1 = %ld, rowcount = %ld\n",m , n1 ,rowcount));
+#endif
         paru_freesym (&LUsym , cc);
         return NULL; //Free memory
     }
-                                   
+    ASSERT (rowcount == m-n1);
+
+    // update Pinit
+    for (Int i = n1; i < m; i++){
+        ASSERT (Pinv[Ps [i-n1]] >= n1); // ensure that Ps is within S
+        Pinit [i] = Ps [i-n1];
+    }
+    // update Pinv
+    for (Int i = n1; i < m; i++){
+        Pinv[Pinit[i]] = i;
+    }
+#ifndef NDEBUG
+    PRLEVEL (p, ("After Stair case Pinv =\n"));
+    for (Int i = 0; i < m; i++){
+        PRLEVEL (p, ("%ld ", Pinv[i]));
+    }
+    PRLEVEL (p, ("\n"));
+#endif
+
+    paru_free ((m+1), sizeof (Int), Pinit, cc);
+
+    //Updating Sj using copy of Sp
+    paru_cumsum (m+1-n1, Sp);
+    Int *cSp = Work;
+    memcpy(cSp, Sp, (m+1-n1)*sizeof(Int) );
+#ifndef NDEBUG
+    PRLEVEL (p, ("cSp =\n"));
+    for (Int i = n1; i < m; i++){
+        PRLEVEL (p, ("%ld ", cSp[i]));
+    }
+    PRLEVEL (p, ("\n"));
+#endif
 
 
-    
-   // LUsym->PLinv = NULL;
-    //    PLinv =  LUsym->PLinv =  QRsym->PLinv;  
-    //    QRsym->PLinv = NULL;
+
+    Int *Sj = (Int*) paru_alloc (anz, sizeof(Int),cc);
+    LUsym->Sj = Sj;
+    //TODO  construct Sj
+    PRLEVEL (1, ("Constructing Sj\n"));
+    for (Int newcol = n1; newcol < n ; newcol++){
+        Int oldcol = Qinit [newcol];
+        PRLEVEL (1, ("newcol = %ld oldcol=%ld\n",newcol, oldcol));
+        for(Int p = Ap[oldcol] ; p < Ap[oldcol+1]; p++){
+            Int oldrow = Ai[p];
+            Int newrow = Pinv[oldrow]; 
+            Int srow = newrow - n1;
+            PRLEVEL (1, ("\tnewrow=%ld oldrow=%ld srow=%ld \n",
+                        newrow, oldrow, srow));
+            if (srow > 0){  // it is insdie S otherwise it is part of singleton
+                Sj[cSp[srow]++] = newcol;
+            } 
+        }
+    }
+
+    paru_free ( (m-n1), sizeof (Int), Ps, cc);
+    paru_free ((MAX(m,n)+2), sizeof (Int), Work, cc);
+
+
+    // LUsym->Pinv = NULL;
+    //    Pinv =  LUsym->Pinv =  QRsym->Pinv;  
+    //    QRsym->Pinv = NULL;
 
     /* ---------------------------------------------------------------------- */
     /*                   computing the Upper bound of rows and cols           */
     /* ---------------------------------------------------------------------- */
- 
+
     LUsym->Fm= NULL;
     //    LUsym->Fm = QRsym->Fm; 
     //    QRsym->Fm = NULL;
@@ -497,6 +588,7 @@ paru_symbolic *paru_analyze
     //
 
 #ifndef NDEBUG
+    p = 1;
     /* print fronts*/
     for (Int f = 0; f < nf; f++){
         //       Int fm = LUsym->Fm[f];
@@ -504,8 +596,6 @@ paru_symbolic *paru_analyze
         Int col1 = Super[f]; 
         Int col2 = Super[f+1]; 
         Int fp = Super[f+1]-Super[f];
-
-        Int p=1;
         PRLEVEL (p,("%% Front=%ld Parent=%ld\n", f,  Parent[f]));
         PRLEVEL (p,("%% %ld...%ld npivotal=%ld\n", col1, col2, fp));
         PRLEVEL (p,("%% list of %ld children: ", Childp[f+1]-Childp[f]));
@@ -515,14 +605,13 @@ paru_symbolic *paru_analyze
     }
 #endif 
 
-    aParent = (Int*) paru_alloc (m+nf, sizeof(Int),cc);
-    aChild =  (Int*) paru_alloc (m+nf+1, sizeof(Int),cc);
-    aChildp = (Int*) paru_alloc (m+nf+2, sizeof(Int),cc);
-    first= (Int*) paru_alloc (m+nf, sizeof(Int),cc);
+    LUsym->aParent = aParent = (Int*) paru_alloc (m+nf, sizeof(Int),cc);
+    LUsym->aChild = aChild =  (Int*) paru_alloc (m+nf+1, sizeof(Int),cc);
+    LUsym->aChildp = aChildp = (Int*) paru_alloc (m+nf+2, sizeof(Int),cc);
+    LUsym->first = first= (Int*) paru_alloc (m+nf, sizeof(Int),cc);
+    LUsym->row2atree = rM =  (Int*) paru_alloc(m  ,sizeof(Int), cc);
+    LUsym->super2atree = snM = (Int*) paru_alloc(nf ,sizeof(Int), cc);
 
-
-    rM =  (Int*) paru_alloc(m  ,sizeof(Int), cc);
-    snM = (Int*) paru_alloc(nf ,sizeof(Int), cc);
 
     if(aParent == NULL || aChild == NULL || aChildp == NULL ||
             rM == NULL  || snM == NULL || free == NULL){
@@ -607,20 +696,13 @@ paru_symbolic *paru_analyze
     //        }else
     //            lastChildFlag = 0;  
     //    }
-   //
+    //
     //    //Initialize first descendent of augmented tree
     //    for(Int i=0 ; i<m+nf; i++){
     //        for (Int r = i; r!= -1 && first[r] == -1; r = aParent[r])
     //            first[r] = i;
     //    }
 
-    LUsym->aParent = aParent;
-    LUsym->aChildp = aChildp;
-    LUsym->aChild = aChild;
-    LUsym->row2atree = rM;
-    LUsym->super2atree = snM;
-
-    LUsym->first= first;
     //
     //#ifndef NDEBUG
     //    p = 1;

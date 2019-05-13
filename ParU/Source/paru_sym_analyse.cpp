@@ -66,7 +66,7 @@ paru_symbolic *paru_sym_analyse
 
 
     Int *Parent, *Child, *Childp, 
-        *Super, *Qfill, *PLinv;
+        *Super, *Qfill, *Pinv;
     //brain transplant
     Parent = LUsym->Parent = QRsym->Parent;
     QRsym->Parent = NULL;
@@ -78,8 +78,8 @@ paru_symbolic *paru_sym_analyse
     QRsym->Super = NULL;
     Qfill =  LUsym->Qfill =  QRsym->Qfill;  
     QRsym->Qfill = NULL;
-    PLinv =  LUsym->PLinv =  QRsym->PLinv;  
-    QRsym->PLinv = NULL;
+    Pinv =  LUsym->Pinv =  QRsym->Pinv;  
+    QRsym->Pinv = NULL;
     LUsym->Fm = QRsym->Fm; 
     QRsym->Fm = NULL;
     LUsym->Cm = QRsym->Cm; 
