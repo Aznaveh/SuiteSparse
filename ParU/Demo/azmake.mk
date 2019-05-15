@@ -18,3 +18,4 @@ run:
 #	./testazny < ../Matrix/ash219.mtx
 	./testazny < ../Matrix/b1_ss.mtx
 #	./testazny < ../Matrix/test.mtx
+

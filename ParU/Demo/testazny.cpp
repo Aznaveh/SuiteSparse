@@ -23,15 +23,8 @@ int main (int argc, char **argv)
     int mtype;
     paru_symbolic *LUsym;
 
-    char name[25];
-    //fgets(name, 25, stdin);
-    //fscanf (stdin, "%s", &name);
-    //printf("The name is %s\n", name);
-    //fseek(stdin, 0, SEEK_SET);
 
-    
-
-
+    //~~~~~~~~~Reading the input matrix and test if the format is OK~~~~~~~~~~~~
     // start CHOLMOD
     cc = &Common;
     cholmod_l_start (cc);
@@ -53,6 +46,18 @@ int main (int argc, char **argv)
         exit (1);
     }
 
+    // No scaling by default
+    int scale = 0;
+    if (argc == 3){
+        scale = atoi(argv[2]);
+        if (scale) 
+            PRLEVEL (1, ("The input matrix will be scaled\n"));
+    }
+ 
+
+    //~~~~~~~~~~~~~~~~~~~Starting computation~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    double start_time = omp_get_wtime();
+
 
     LUsym = paru_sym_analyse (A, cc);
     if (LUsym == NULL) {
@@ -60,16 +65,7 @@ int main (int argc, char **argv)
     }
 
 
-    //~~~~~~~~~~~~~~~~~~~Starting computation~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    double start_time = omp_get_wtime();
-
-    int scale = 0;
-    if (argc == 3){
-        scale = atoi(argv[2]);
-        if (scale) 
-            PRLEVEL (1, ("The input matrix will be scaled\n"));
-    }
-        
+       
     paru_matrix *paruMatInfo = paru_init_rowFronts (A, scale, LUsym, cc);
     if (paruMatInfo == NULL) {
         exit(0);
@@ -111,10 +107,11 @@ int main (int argc, char **argv)
     paruMatInfo->time = time;
     //~~~~~~~~~~~~~~~~~~~End computation~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+    // Writing results to a file
     paru_write(paruMatInfo, scale,  argv[1], cc);
 
+    //~~~~~~~~~~~~~~~~~~~Free Everything~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     cholmod_l_free_sparse (&A, cc);
-
     paru_freemat (&paruMatInfo, cc);
     paru_freesym (&LUsym,cc);
 

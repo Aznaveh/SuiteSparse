@@ -51,6 +51,23 @@ static int print_level = 0 ;
 
 #define Int SuiteSparse_long
 
+// -----------------------------------------------------------------------------
+// basic macros
+// -----------------------------------------------------------------------------
+
+#define MIN(a,b) (((a) < (b)) ? (a) : (b))
+#define MAX(a,b) (((a) > (b)) ? (a) : (b))
+#define EMPTY (-1)
+#define TRUE 1
+#define FALSE 0 
+#define IMPLIES(p,q) (!(p) || (q))
+
+// NULL should already be defined, but ensure it is here.
+#ifndef NULL
+#define NULL ((void *) 0)
+#endif
+
+
 // =============================================================================
 // === paru_symbolic ===========================================================
 // =============================================================================
@@ -72,24 +89,24 @@ typedef struct {/* paru_symbolic*/
     // constructed, where A is the user's input matrix.  Its numerical values
     // are also constructed, but they do not become part of the Symbolic
     // object.  The matrix S is stored in row-oriented form.  The rows of S are
-    // sorted according to their leftmost column index (via PLinv).  Column
+    // sorted according to their leftmost column index (via Pinv).  Column
     // indices in each row of S are in strictly ascending order, even though
     // the input matrix A need not be sorted.
 
     Int m, n, anz ; // S is m-by-n with anz entries
 
-    Int *Sp ;       // size m+1, row pointers of S
-
-    Int *Sj ;       // size anz = Sp [n], column indices of S
+    Int *Sp ;       // size m+1-n1, row pointers of S
+    Int snz;        // nnz in submatrix
+    Int *Sj ;       // size snz = Sp [n], column indices of S
 
     Int *Qfill ;    // size n, fill-reducing column permutation.
     // Qfill [k] = j if column k of A is column j of S.
 
-    Int *PLinv ;    // size m, inverse row permutation that places
+    Int *Pinv ;    // size m, inverse row permutation that places
     // S=A(P,Q) in increasing order of leftmost column
-    // index.  PLinv [i] = k if row i of A is row k of S.
+    // index.  Pinv [i] = k if row i of A is row k of S.
 
-    Int *Sleft ;    // size n+2.  The list of rows of S whose
+    Int *Sleft ;    // size n-n1+2.  The list of rows of S whose
     // leftmost column index is j is given by
     // Sleft [j] ... Sleft [j+1]-1.  This can be empty (that is, Sleft
     // [j] can equal Sleft [j+1]).  Sleft [n] is the number of
@@ -279,7 +296,7 @@ typedef struct  {/*dense factorized part pointer*/
 } paru_fac; 
 
 typedef struct  {/*Matrix */
-    Int m, n;
+    Int m, n;               /* size of the sumbatrix that is factorized */
     paru_symbolic *LUsym;
     tupleList *RowList;     /* size n of dynamic list */
     tupleList *ColList;     /* size m of dynamic list */

@@ -47,7 +47,7 @@ paru_symbolic *paru_analyze
     double *Ax = (double*) A->x;
     Int m = A->nrow;
     Int n = A->ncol;
-    
+
     // Initializaing pointers with NULL; just in case for an early release
     // not to free an uninitialized space
     LUsym->Chain_start = LUsym->Chain_maxrows = LUsym->Chain_maxcols = NULL;
@@ -57,7 +57,7 @@ paru_symbolic *paru_analyze
     LUsym->Fm= LUsym->Cm= LUsym->Rj= LUsym->Rp= NULL;
     LUsym->aParent = LUsym->aChildp = LUsym->aChild = LUsym->row2atree = NULL;
     LUsym->super2atree = LUsym->first = NULL;
- 
+
     //############  Calling UMFPACK and retrieving data structure ##############
 
     /* ---------------------------------------------------------------------- */
@@ -67,113 +67,113 @@ paru_symbolic *paru_analyze
     Int nr, nc,   // A is nrxnc, I will use mxn; they should be the same anyway
 
         n1,       // The number of pivots with zero Markowitz cost.
-                  // Info[UMFPACK_COL_SINGLETONS]+Info[UMFPACK_ROW_SINGLETONS]
-                  // They apper first in the output permutations P and Q
-                  //        _______________
-                  //       |\**************r    
-                  //       |  \************r -> UMFPACK_ROW_SINGLETONS
-                  //       |   \***********r                              
-                  //       |    *\         |
-                  //       |    ***\       |
-                  //       |    ***xx\xxxxx|            |                  
-                  //       |    ***xxxx\xxx|            +   = n1
-                  //       -----ccc--------            /
-                  //             |
-                  //            UMFPACK_COL_SINGLETONS
+        // Info[UMFPACK_COL_SINGLETONS]+Info[UMFPACK_ROW_SINGLETONS]
+        // They apper first in the output permutations P and Q
+        //        _______________
+        //       |\**************r    
+        //       |  \************r -> UMFPACK_ROW_SINGLETONS
+        //       |   \***********r                              
+        //       |    *\         |
+        //       |    ***\       |
+        //       |    ***xx\xxxxx|            |                  
+        //       |    ***xxxx\xxx|            +   = n1
+        //       -----ccc--------            /
+        //             |
+        //            UMFPACK_COL_SINGLETONS
 
         nfr,      // The number of frontam matrices; nf in SPQR analysis
 
         nchains,  // The frontal matrices are related to one another by the 
-                  // supernodal column elimination tree. Each nod in this tree
-                  // is one frontal matrix. The tree is partitioned into a set
-                  // of disjoint paths, and a frontal matrix chaing is one path
-                  // in this tree.  UMFPACK uses unifrontal technique to 
-                  // factroize chains, with a single working array that holds
-                  // each frontal matrix in the chain, one at a time. nchains is
-                  // in the range 0 to nfr
-                  
+        // supernodal column elimination tree. Each nod in this tree
+        // is one frontal matrix. The tree is partitioned into a set
+        // of disjoint paths, and a frontal matrix chaing is one path
+        // in this tree.  UMFPACK uses unifrontal technique to 
+        // factroize chains, with a single working array that holds
+        // each frontal matrix in the chain, one at a time. nchains is
+        // in the range 0 to nfr
+
         *Pinit,   // The inital row permutation. If P [k] = i, then this means
-                  // that row i is the kth row in the pre-ordered matrix. 
-                  // For the unsymmetric strategy, P defines the row-merge
-                  // order. Let j be the column index of the leftmost nonzero
-                  // entry in row i of A*Q. The P defines a sort of the rows
-                  // according to this value. A row can appear earlier in this
-                  // ordering if it is aggressively absorbed before it can
-                  // become a pivot row. If P [k]= i, row i typically will not
-                  // be the kth pivot row.
-                  // For the symmetric strategy, P = Q. If no pivoting occurs
-                  // during numerical factorization, P[k] = i also defines the
-                  // fianl permutation of umfpack_*_numeric, for the symmetric
-                  // strategy.
-                  // NOTE: SPQR uses Pinv for stairecase structure and that is
-                  // an invert permutation that I have to compute the direct
-                  // permutation in paru_write.
+        // that row i is the kth row in the pre-ordered matrix. 
+        // For the unsymmetric strategy, P defines the row-merge
+        // order. Let j be the column index of the leftmost nonzero
+        // entry in row i of A*Q. The P defines a sort of the rows
+        // according to this value. A row can appear earlier in this
+        // ordering if it is aggressively absorbed before it can
+        // become a pivot row. If P [k]= i, row i typically will not
+        // be the kth pivot row.
+        // For the symmetric strategy, P = Q. If no pivoting occurs
+        // during numerical factorization, P[k] = i also defines the
+        // fianl permutation of umfpack_*_numeric, for the symmetric
+        // strategy.
+        // NOTE: SPQR uses Pinv for stairecase structure and that is
+        // an invert permutation that I have to compute the direct
+        // permutation in paru_write.
 
         *Qinit,   // The inital column permutation. If Q [k] = j, then this 
-                  // means that column j is the kth pivot column in pre-ordered
-                  // matrix. Q is not necessearily the same as final column
-                  // permutation in UMFPACK. In UMFPACK if the matrix is
-                  // structurally singular, and if the symmetric strategy is
-                  // used (or if Control [UMFPACK_FIXQ] > 0), then this Q will
-                  // be the same as the final column permutaion.
-                  // NOTE: there is no column permutation in paru. So the
-                  // initial permutaion would stay. SPQR uses Qfill for
-                  // staircase structure and that is the column permutation for
-                  // paru also.
+        // means that column j is the kth pivot column in pre-ordered
+        // matrix. Q is not necessearily the same as final column
+        // permutation in UMFPACK. In UMFPACK if the matrix is
+        // structurally singular, and if the symmetric strategy is
+        // used (or if Control [UMFPACK_FIXQ] > 0), then this Q will
+        // be the same as the final column permutaion.
+        // NOTE: there is no column permutation in paru. So the
+        // initial permutaion would stay. SPQR uses Qfill for
+        // staircase structure and that is the column permutation for
+        // paru also.
 
         *Front_npivcol, // size = n_col +1;  actual size = nfr+1
-                        // NOTE: This is not the case for SPQR 
-                        // I think SPQR is easier:
-                        // Front_npivcol [f] = Super [f] - Super [f+1]
-                        // Front_parent [nfr+1] is a place holder for columns
-                        // with no entries
+        // NOTE: This is not the case for SPQR 
+        // I think SPQR is easier:
+        // Front_npivcol [f] = Super [f] - Super [f+1]
+        // Front_parent [nfr+1] is a place holder for columns
+        // with no entries
 
         *Front_parent,  // size = n_col +1;  actual size = nfr+1
-                        // NOTE: This is not the case for SPQR 
-                        // Parent is the one I should use instead.
- 
+        // NOTE: This is not the case for SPQR 
+        // Parent is the one I should use instead.
+
         *Front_1strow,  // size = n_col +1;  actual size = nfr+1
-                        // Front_1strow [k] is the row index of the first row in
-                        // A (P,Q) whose leftmost entry is in pivot column for
-                        // kth front. 
-                        // This is necessary only to properly factorize singular
-                        // matrices. Rows in the range Front_1strow [k] to
-                        // Front_1strow [k+1]-1 first become pivot row candidate
-                        // at the kth front. Any rows not eliminated in the kth
-                        // front maybe selected as pivot rows in the parent of k
-                        // (Front_1strow [k]) and so on up the tree.
-                        // Aznaveh: I am not sure if I need to keep it
- 
+        // Front_1strow [k] is the row index of the first row in
+        // A (P,Q) whose leftmost entry is in pivot column for
+        // kth front. 
+        // This is necessary only to properly factorize singular
+        // matrices. Rows in the range Front_1strow [k] to
+        // Front_1strow [k+1]-1 first become pivot row candidate
+        // at the kth front. Any rows not eliminated in the kth
+        // front maybe selected as pivot rows in the parent of k
+        // (Front_1strow [k]) and so on up the tree.
+        // Aznaveh: I am not sure if I need to keep it
+
         *Front_leftmostdesc, // size = n_col +1;  actual size = nfr+1
-                             // Aznaveh: I have a module computing leftmostdesc
-                             // for my augmented tree; so maybe do not need it
+        // Aznaveh: I have a module computing leftmostdesc
+        // for my augmented tree; so maybe do not need it
 
         *Chain_start,   // size = n_col +1;  actual size = nfr+1
-                        // The kth frontal matrix chain consists of frontal
-                        // matrices Chain_start [k] through Chain_start [k+1]-1.
-                        // Thus, Chain_start [0] is always 0 and 
-                        // Chain_start[nchains] is the total number of frontal
-                        // matrices, nfr. For two adjacent fornts f and f+1
-                        // within a single chian, f+1 is always the parent of f
-                        // (that is, Front_parent [f] = f+1).
-                        // 
+        // The kth frontal matrix chain consists of frontal
+        // matrices Chain_start [k] through Chain_start [k+1]-1.
+        // Thus, Chain_start [0] is always 0 and 
+        // Chain_start[nchains] is the total number of frontal
+        // matrices, nfr. For two adjacent fornts f and f+1
+        // within a single chian, f+1 is always the parent of f
+        // (that is, Front_parent [f] = f+1).
+        // 
         *Chain_maxrows,  // size = n_col +1;  actual size = nfr+1
         *Chain_maxcols;  // The kth frontal matrix chain requires a single 
-                         // working array of dimension Chain_maxrows [k] by
-                         // Chain_maxcols [k], for the unifrontal technique that
-                         // factorizes the frontal matrix chain. Since the
-                         // symbolic factorization only provides 
+    // working array of dimension Chain_maxrows [k] by
+    // Chain_maxcols [k], for the unifrontal technique that
+    // factorizes the frontal matrix chain. Since the
+    // symbolic factorization only provides 
 
     void *Symbolic;  // Output argument in umf_dl_symbolc;
-                     // holds a pointer to the Symbolic object  if succesful 
-                     // and NULL otherwise
+    // holds a pointer to the Symbolic object  if succesful 
+    // and NULL otherwise
 
     double status,   // Info [UMFPACK_STATUS] 
-           Info[UMFPACK_INFO],// Contains statistics about the symbolic analysis
-           Control [UMFPACK_CONTROL]; // it is set in umfpack_dl_defaults and
-                                      // is used in umfpack_dl_symbolic; if
-                                      // passed NULL it will use the defaults
-                                      //
+    Info[UMFPACK_INFO],// Contains statistics about the symbolic analysis
+    Control [UMFPACK_CONTROL]; // it is set in umfpack_dl_defaults and
+    // is used in umfpack_dl_symbolic; if
+    // passed NULL it will use the defaults
+    //
     /* ---------------------------------------------------------------------- */
     /*    Setting up umfpakc symbolic analysis and do the  analysis phase     */
     /* ---------------------------------------------------------------------- */
@@ -199,16 +199,16 @@ paru_symbolic *paru_analyze
 
     Int cs1 = Info[UMFPACK_COL_SINGLETONS];
     Int rs1 = Info[UMFPACK_ROW_SINGLETONS];
-//    Int maxnrows = Symbolic->maxnrows;  // I can not access to inside of 
-//    Int maxncols = Symbolic->maxncols;  // SymbolicType it is internal in
-//                                          UMFPACK
-    
+    //    Int maxnrows = Symbolic->maxnrows;  // I can not access to inside of 
+    //    Int maxncols = Symbolic->maxncols;  // SymbolicType it is internal in
+    //                                          UMFPACK
+
 #ifndef NDEBUG
     p = 1;
     PRLEVEL (p, ("\n%%Symbolic factorization of A: "));
     if (p <= 0) (void) umfpack_dl_report_symbolic (Symbolic, Control);
     PRLEVEL(p, ("\n %%colsingleton = %ld, rowsingleton=%ld",cs1,rs1));
-//    PRLEVEL(p, ("\n %%maxnrow= %ld, maxncol=%ld",maxnrows, maxncols));
+    //    PRLEVEL(p, ("\n %%maxnrow= %ld, maxncol=%ld",maxnrows, maxncols));
 #endif
 
     /* ---------------------------------------------------------------------- */
@@ -255,11 +255,12 @@ paru_symbolic *paru_analyze
         return NULL; 
     }
 #ifndef NDEBUG
-    p = 2;
+    p = 0;
     PRLEVEL (p, ("%%%% n1 is %d\n", n1 ));
     PRLEVEL (p, ("From the Symbolic object,\
                 C is of dimension %ld-by-%ld\n", nr, nc));
     PRLEVEL (p, ("   with nz = %ld, number of fronts = %ld,\n", anz, nfr));
+    p = 1;
     PRLEVEL (p, ("   number of frontal matrix chains = %ld\n", nchains));
 
     PRLEVEL (1, ("\nPivot columns in each front, and parent of each front:\n"));
@@ -324,7 +325,7 @@ paru_symbolic *paru_analyze
     /* ---------------------------------------------------------------------- */
     /*           Fixing Parent and computing Children datat structure         */
     /* ---------------------------------------------------------------------- */
-    
+
     // Parent size is nf+1 potentially smaller than what UMFPACK allocate
     Int size = n + 1;
     Int *Parent = 
@@ -360,7 +361,7 @@ paru_symbolic *paru_analyze
     }
     paru_cumsum (nf+2, Childp);
 #ifndef NDEBUG
-    p = 2;
+    p = 1;
     PRLEVEL (p, ("%%%%-Chidlp-----"));
     for (Int f = 0; f < nf+2; f++){
         PRLEVEL (p, ("%ld ", Childp[f]));
@@ -379,7 +380,7 @@ paru_symbolic *paru_analyze
             Child[cChildp[Parent[f]]++] = f;
     }
 #ifndef NDEBUG
-    p = 2;
+    p = 1;
     PRLEVEL (p, ("%%%%_cChidlp_____"));
     for (Int f = 0; f < nf+2; f++){
         PRLEVEL (p, ("%ld ",  cChildp[f]));
@@ -387,8 +388,8 @@ paru_symbolic *paru_analyze
     PRLEVEL (p, ("\n"));
 #endif 
 
-  
-    
+
+
     /* ---------------------------------------------------------------------- */
     /*                   computing the Staircase structures                   */
     /* ---------------------------------------------------------------------- */
@@ -410,6 +411,13 @@ paru_symbolic *paru_analyze
     }
     PRLEVEL (p, ("\n"));
 
+    PRLEVEL (p, ("Pinit =\n"));
+    for (Int i = 0; i < m; i++){
+        PRLEVEL (p, ("%ld ", Pinit[i]));
+    }
+    PRLEVEL (p, ("\n"));
+
+
     PRLEVEL (p, ("Pinv =\n"));
     for (Int i = 0; i < m; i++){
         PRLEVEL (p, ("%ld ", Pinv[i]));
@@ -417,12 +425,12 @@ paru_symbolic *paru_analyze
     PRLEVEL (p, ("\n"));
 
 #endif
- 
+
 
 
     Int *Ps; // new row permutation for just the Submatrix part
     Ps = (Int*) paru_calloc (m-n1, sizeof(Int),cc); 
-    Int snnz = 0;  //nnz in submatrix excluding singletons
+    Int snz = 0;  //nnz in submatrix excluding singletons
     int rowcount = 0;
     Sleft[0] = 0;
     //counting number of entries in each row of submatrix Sp
@@ -434,22 +442,23 @@ paru_symbolic *paru_analyze
             Int oldrow = Ai[p];
             Int newrow = Pinv[oldrow]; 
             Int srow = newrow - n1;
-            PRLEVEL (1, ("\tnewrow=%ld oldrow=%ld srow=%ld n1=%ld\n",
-                        newrow, oldrow, srow, n1));
+            PRLEVEL (1, ("\tnewrow=%ld oldrow=%ld srow=%ld\n",
+                        newrow, oldrow, srow));
             if (srow >= 0){  // it is insdie S otherwise it is part of singleton
                 if(Sp[srow+1] == 0){ //first time seen
-                    PRLEVEL (1, ("\tPs[%ld]= %ld\n",rowcount, oldrow));
-                    Ps[rowcount++] = oldrow;
+                    PRLEVEL (1, ("\tPs[%ld]= %ld\n",rowcount, srow));
+                    Ps[rowcount] = srow;
+                    Pinit[n1+rowcount] = oldrow;
+                    rowcount++;
                 }
-                snnz++;
+                snz++;
                 Sp[srow+1]++;
             } 
         }
         Sleft[newcol-n1+1] = rowcount;
     }
-    Sleft[n-n1+1] = m-n1-rowcount;  //empty rows of S
-
-
+    Sleft[n-n1+1] = m-n1-rowcount;  //empty rows of S if any
+    LUsym->snz = snz;
 
 #ifndef NDEBUG
     p = 1;
@@ -461,10 +470,11 @@ paru_symbolic *paru_analyze
 #endif
 
     if (rowcount < m-n1){
-        printf("Empty rows in submatrix\n"); //I think that must not happen
+        //I think that must not happen anyway while umfpack finds it
+        printf("Empty rows in submatrix\n"); 
 #ifndef NDEBUG
-        PRLEVEL (1, ("m = %ld, n1 = %ld, rowcount = %ld, snnz = %ld\n",
-                    m , n1 ,rowcount, snnz));
+        PRLEVEL (1, ("m = %ld, n1 = %ld, rowcount = %ld, snz = %ld\n",
+                    m , n1 ,rowcount, snz));
         for(Int srow = 0; srow < m-n1; srow++){
             if(Sp[srow] == 0){
                 PRLEVEL (1, ("Row %ld is empty\n",srow));
@@ -476,16 +486,74 @@ paru_symbolic *paru_analyze
     }
     ASSERT (rowcount == m-n1);
 
-    // update Pinit
-    for (Int i = n1; i < m; i++){
-        ASSERT (Pinv[Ps [i-n1]] >= n1); // ensure that Ps is within S
-        Pinit [i] = Ps [i-n1];
+    //Update Sp based on new permutation for Sp[1...m+1]
+#ifndef NDEBUG
+    p = 0;
+    PRLEVEL (p, ("Before permutation Sp =\n"));
+    for (Int i = n1; i <= m; i++){
+        PRLEVEL (p, ("%ld ", Sp[i-n1]));
     }
+    PRLEVEL (p, ("\n"));
+#endif
+
     // update Pinv
     for (Int i = n1; i < m; i++){
         Pinv[Pinit[i]] = i;
     }
+
+    
+
+///////////////////////////////////////////////////////////////
+    Int *cSp = Work;
+    for (Int i = n1; i < m; i++){
+        Int row = i - n1 ;
+        PRLEVEL (1, ("Permutation row = %ld, Ps[row]= %ld, Sp[row]=%ld\n",
+                    row, Ps[row], Sp[row]));
+        cSp[row+1] = Sp[Ps[row]+1];
+    }
+//    ////JUST FOR TEST
+//    PRLEVEL (p, ("In the TEST=\n"));
+//    memset (cSp, 0, (m-n1+1)*sizeof(Int));
+//    for (Int newcol = n1; newcol < n ; newcol++){
+//        Int oldcol = Qinit [newcol];
+//        PRLEVEL (1, ("newcol = %ld oldcol=%ld\n",newcol, oldcol));
+//        for(Int p = Ap[oldcol] ; p < Ap[oldcol+1]; p++){
+//            Int oldrow = Ai[p];
+//            Int newrow = Pinv[oldrow]; 
+//            Int srow = newrow - n1;
+//            PRLEVEL (1, ("\tnewrow=%ld oldrow=%ld srow=%ld\n",
+//                        newrow, oldrow, srow));
+//            if (srow >= 0){  // it is insdie S otherwise it is part of singleton
+//                cSp[srow+1]++;
+//                PRLEVEL (1, ("cSp[%ld] = %ld\n",srow+1, cSp[srow+1]));
+//            } 
+//        }
+//    }
+// 
 #ifndef NDEBUG
+    p = 0;
+    PRLEVEL (p, ("After permutation Sp =\n"));
+    for (Int i = n1; i <= m; i++){
+        PRLEVEL (p, ("%ld ", cSp[i-n1]));
+    }
+    PRLEVEL (p, ("\n"));
+#endif
+    memcpy(Sp, cSp, (m+1-n1)*sizeof(Int) );
+    paru_cumsum (m+1-n1, Sp);
+    memcpy(cSp, Sp, (m+1-n1)*sizeof(Int) );
+
+#ifndef NDEBUG
+    p = 0;
+    PRLEVEL (p, ("After cumsum  Sp =\n"));
+    for (Int i = n1; i <= m; i++){
+        PRLEVEL (p, ("%ld ", Sp[i-n1]));
+    }
+    PRLEVEL (p, ("\n"));
+#endif
+
+
+#ifndef NDEBUG
+    p = 1;
     PRLEVEL (p, ("After Stair case Pinv =\n"));
     for (Int i = 0; i < m; i++){
         PRLEVEL (p, ("%ld ", Pinv[i]));
@@ -494,41 +562,56 @@ paru_symbolic *paru_analyze
 #endif
 
     paru_free ((m+1), sizeof (Int), Pinit, cc);
-
-    //Updating Sj using copy of Sp
-    paru_cumsum (m+1-n1, Sp);
-    Int *cSp = Work;
-    memcpy(cSp, Sp, (m+1-n1)*sizeof(Int) );
+///////////////////////////////////////////////////////////////
 #ifndef NDEBUG
-    PRLEVEL (p, ("cSp =\n"));
-    for (Int i = n1; i < m; i++){
-        PRLEVEL (p, ("%ld ", cSp[i]));
+    p = 0;
+    PRLEVEL (p, ("Before Sj Sp =\n"));
+    for (Int i = n1; i <= m; i++){
+        PRLEVEL (p, ("%ld ", cSp[i-n1]));
     }
     PRLEVEL (p, ("\n"));
 #endif
 
-
-
-    Int *Sj = (Int*) paru_alloc (anz, sizeof(Int),cc);
+    //Updating Sj using copy of Sp
+    Int *Sj = (Int*) paru_alloc (snz, sizeof(Int),cc); 
     LUsym->Sj = Sj;
-    //TODO  construct Sj
-    PRLEVEL (1, ("Constructing Sj\n"));
+    //construct Sj
+    PRLEVEL (2, ("Constructing Sj\n"));
     for (Int newcol = n1; newcol < n ; newcol++){
         Int oldcol = Qinit [newcol];
-        PRLEVEL (1, ("newcol = %ld oldcol=%ld\n",newcol, oldcol));
+        PRLEVEL (2, ("newcol = %ld oldcol=%ld\n",newcol, oldcol));
         for(Int p = Ap[oldcol] ; p < Ap[oldcol+1]; p++){
             Int oldrow = Ai[p];
             Int newrow = Pinv[oldrow]; 
             Int srow = newrow - n1;
-            PRLEVEL (1, ("\tnewrow=%ld oldrow=%ld srow=%ld \n",
+            Int scol = newcol - n1;
+            PRLEVEL (2, ("\tnewrow=%ld oldrow=%ld srow=%ld \n",
                         newrow, oldrow, srow));
-            if (srow > 0){  // it is insdie S otherwise it is part of singleton
-                Sj[cSp[srow]++] = newcol;
+            if (srow >= 0){  // it is insdie S otherwise it is part of singleton
+                Sj[cSp[srow]++] = scol;
             } 
         }
     }
 
     paru_free ( (m-n1), sizeof (Int), Ps, cc);
+#ifndef NDEBUG
+    p = 0;
+    PRLEVEL (p, ("After Sj cSp =\n"));
+    for (Int i = n1; i <= m; i++){
+        PRLEVEL (p, ("%ld ", cSp[i-n1]));
+    }
+    PRLEVEL (p, ("\n"));
+
+    PRLEVEL (p, ("Sj =\n"));
+    for (Int k = 0; k < snz; k++){
+        PRLEVEL (p, ("%ld ", Sj[k]));
+    }
+    PRLEVEL (p, ("\n"));
+    for (Int i = 0; i < m-n1; i++){
+        PRLEVEL (p, (" i=%ld cSp=%ld Sp=%ld\n",i, cSp[i],Sp[i+1]));
+        ASSERT (cSp[i] == Sp[i+1]);
+    }
+#endif
     paru_free ((MAX(m,n)+2), sizeof (Int), Work, cc);
 
 
@@ -537,7 +620,7 @@ paru_symbolic *paru_analyze
     //    QRsym->Pinv = NULL;
 
     /* ---------------------------------------------------------------------- */
-    /*                   computing the Upper bound of rows and cols           */
+    /*         Finding the Upper bound of rows and cols                       */
     /* ---------------------------------------------------------------------- */
 
     LUsym->Fm= NULL;
@@ -558,34 +641,21 @@ paru_symbolic *paru_analyze
     LUsym->Rp= NULL;
     //    LUsym->Rp = QRsym->Rp; 
     //    QRsym->Rp = NULL;
+
+
+    /* ---------------------------------------------------------------------- */
+    /*    computing the augmented tree and the data structures related        */
+    /* ---------------------------------------------------------------------- */
+
     /*Computing augmented tree */
     Int *aParent = LUsym->aParent = NULL; //augmented tree size m+nf
     Int *aChildp = LUsym->aChildp = NULL;  // size m+nf+2
     Int *aChild = LUsym->aChild = NULL;// size m+nf+1
     Int *rM = LUsym->row2atree = NULL; // row map 
     Int *snM = LUsym->super2atree = NULL; //and supernode map
-    Int *first= LUsym->first = NULL; //first in augmented tree
+    Int *first= LUsym->first = NULL; //first descendent in augmented tree
     // augmented tree size m+nf
 
-    /*! Check if there exist empty row or column in square part*/
-    // TODO: after making the staircase
-    //    for (Int row = 0; row < m; row++){
-    //        PRLEVEL (1,("Sprow[%ld]=%ld\n", row, Sp[row]));
-    //        if (Sp [row] == Sp[row+1] ){
-    //            printf("%%Empty Row\n");
-    //            paru_freesym (&LUsym , cc);
-    //            return NULL;
-    //        }
-    //    }
-    //    for (Int col = 0; col < n; col++){
-    //        Int *Ap =(Int*) A->p;
-    //        if (Ap [col] == Ap [col+1]){
-    //            printf("%%Empty Column\n");
-    //            paru_freesym (&LUsym , cc);
-    //            return NULL;
-    //        }
-    //    }
-    //
 
 #ifndef NDEBUG
     p = 1;
@@ -605,11 +675,15 @@ paru_symbolic *paru_analyze
     }
 #endif 
 
-    LUsym->aParent = aParent = (Int*) paru_alloc (m+nf, sizeof(Int),cc);
-    LUsym->aChild = aChild =  (Int*) paru_alloc (m+nf+1, sizeof(Int),cc);
-    LUsym->aChildp = aChildp = (Int*) paru_alloc (m+nf+2, sizeof(Int),cc);
-    LUsym->first = first= (Int*) paru_alloc (m+nf, sizeof(Int),cc);
-    LUsym->row2atree = rM =  (Int*) paru_alloc(m  ,sizeof(Int), cc);
+    Int ms = m-n1;  Int ns = n-n1; //submatrix is msxns
+
+
+
+    LUsym->aParent = aParent = (Int*) paru_alloc (ms+nf, sizeof(Int),cc);
+    LUsym->aChild = aChild =  (Int*) paru_alloc (ms+nf+1, sizeof(Int),cc);
+    LUsym->aChildp = aChildp = (Int*) paru_alloc (ms+nf+2, sizeof(Int),cc);
+    LUsym->first = first= (Int*) paru_alloc (ms+nf, sizeof(Int),cc);
+    LUsym->row2atree = rM =  (Int*) paru_alloc(ms  ,sizeof(Int), cc);
     LUsym->super2atree = snM = (Int*) paru_alloc(nf ,sizeof(Int), cc);
 
 
@@ -619,131 +693,128 @@ paru_symbolic *paru_analyze
         paru_freesym (&LUsym , cc);
         return NULL;
     }
+    //initialization
+    /*aParent needs initialization*/
+    //memset (snM, -1, nf*sizeof(Int));
+    //memset (rM, -1, ms*sizeof(Int));
+    memset (aParent, -1, (ms+nf)*sizeof(Int));
+    memset (aChild, -1, (ms+nf+1)*sizeof(Int)); // I thought I can leave it 
+    // uninitialized. Valgrind
+    // complains
+    memset (aChildp, -1, (ms+nf+2)*sizeof(Int));
+    memset (first, -1, (ms+nf)*sizeof(Int));
 
-    /* ---------------------------------------------------------------------- */
-    /*    computing the augmented tree and the data structures related        */
-    /* ---------------------------------------------------------------------- */
+    aChildp[0] = 0;
+    Int offset = 0; //number of rows visited in each iteration orig front+ rows
+    Int lastChildFlag = 0;
+    Int childpointer = 0;
 
-    //    //initialization
-    //    /*aParent needs initialization*/
-    //    //memset (snM, -1, nf*sizeof(Int));
-    //    //memset (rM, -1, m*sizeof(Int));
-    //    memset (aParent, -1, (m+nf)*sizeof(Int));
-    //    //memset (aChild, -1, (m+nf+1)*sizeof(Int));
-    //    memset (aChildp, -1, (m+nf+2)*sizeof(Int));
-    //    memset (first, -1, (m+nf)*sizeof(Int));
-    //
-    //    aChildp[0] = 0;
-    //    Int offset = 0; //number of rows visited in each iteration orig front+ rows
-    //    Int lastChildFlag = 0;
-    //    Int childpointer = 0;
-    //
-    //    for (Int f = 0; f < nf; f++) {
-    //        PRLEVEL (1,("%% Front %ld\n", f)) ;
-    //        PRLEVEL (1,("%% pivot columns [ %ld to %ld ] n: %ld \n",
-    //                    Super [f], Super [f+1]-1, n)) ;
-    //        ASSERT(Super[f+1] <= n);
-    //        Int numRow =Sleft[Super[f+1]]-Sleft[Super[f]] ;
-    //
-    //        Int numoforiginalChild=0;
-    //        if (lastChildFlag){  // the current node is the parent
-    //            PRLEVEL (1,("%% Childs of %ld: ",f)) ;
-    //            numoforiginalChild= Childp[f+1] - Childp[f];
-    //
-    //            for (Int i = Childp[f]; i <= Childp[f+1]-1; i++) {
-    //                PRLEVEL (1,("%ld ",Child[i]));
-    //                Int c= Child [i];
-    //                ASSERT(snM[c] < m+nf+1);
-    //                aParent[ snM[c]]=offset+numRow;
-    //                PRLEVEL (1, ("%% aParent[%ld] =%ld\n", 
-    //                            aParent[snM [c]], offset+numRow));
-    //                ASSERT(childpointer < m+nf+1);
-    //                aChild[childpointer++] = snM[c];
-    //            }
-    //        }
-    //
-    //        PRLEVEL (1,("%% numRow=%ld ",numRow));
-    //        PRLEVEL (1,("#offset=%ld\n",offset));
-    //        for(Int i = offset ; i < offset+numRow ; i++){
-    //            ASSERT (aChildp [i+1] == -1);
-    //            aChildp[i+1] = aChildp[i];
-    //            PRLEVEL (1, ("%% @i=%ld aCp[%ld]=%ld aCp[%ld]=%ld",
-    //                        i, i+1, aChildp[i+1], i, aChildp[i]));
-    //        }
-    //
-    //        for (Int i = Sleft[Super[f]]; i < Sleft[Super[f+1]]; i++){
-    //            // number of rows
-    //            ASSERT(i < m);
-    //
-    //            rM[i] = i+f;
-    //            ASSERT(i+f < m+nf+1);
-    //            aParent[i+f] = offset+numRow;
-    //            ASSERT(childpointer < m+nf+1);
-    //            aChild[childpointer++] = i+f;
-    //        }
-    //
-    //        offset += numRow;
-    //        snM[f] = offset++;
-    //        ASSERT(offset < m+nf+1);
-    //        ASSERT (aChildp [offset] == -1);
-    //        aChildp[offset] = aChildp[offset-1]+numRow+numoforiginalChild;
-    //        PRLEVEL (1, ("\n %% f=%ld numoforiginalChild=%ld\n",
-    //                    f, numoforiginalChild));
-    //
-    //        if( Parent[f] == f+1){  //last child due to staircase
-    //            PRLEVEL (1, ("%% last Child =%ld\n", f));
-    //            lastChildFlag = 1;  
-    //        }else
-    //            lastChildFlag = 0;  
-    //    }
-    //
-    //    //Initialize first descendent of augmented tree
-    //    for(Int i=0 ; i<m+nf; i++){
-    //        for (Int r = i; r!= -1 && first[r] == -1; r = aParent[r])
-    //            first[r] = i;
-    //    }
+    for (Int f = 0; f < nf; f++) {
+        PRLEVEL (1,("%% Front %ld\n", f)) ;
+        PRLEVEL (1,("%% pivot columns [ %ld to %ld ] n: %ld \n",
+                    Super [f], Super [f+1]-1, ns)) ;
+        ASSERT(Super[f+1] <= ns);
+        Int numRow =Sleft[Super[f+1]]-Sleft[Super[f]] ;
 
-    //
-    //#ifndef NDEBUG
-    //    p = 1;
-    //    PRLEVEL (p,("%% super node mapping (snM): ")); 
-    //    for (Int f = 0; f < nf; f++){
-    //        ASSERT (snM [f] != -1);
-    //        PRLEVEL (p,("%ld ",snM[f]));     
-    //    }
-    //    PRLEVEL (p,("\n"));
-    //
-    //    PRLEVEL (p,("%% row mapping (rM): "));  
-    //    for (Int i = 0; i < m; i++){
-    //        ASSERT (rM [i] != -1);
-    //        PRLEVEL (p,("%ld ",rM[i]));        
-    //    }
-    //    PRLEVEL (p,("\n"));
-    //
-    //    PRLEVEL (p,("%% aParent: ")); 
-    //    for (Int i = 0; i < m+nf; i++) PRLEVEL (p,("%ld ",aParent[i]));
-    //    PRLEVEL (p,("%% \n"));
-    //
-    //    PRLEVEL (p,("%% aChildp: "));
-    //    for (Int i = 0; i < m+nf+2; i++) PRLEVEL (p,("%ld ",aChildp[i]));
-    //    PRLEVEL (p,("\n"));
-    //
-    //    PRLEVEL (p,("%% aChild: ")); 
-    //    for (Int i = 0; i < m+nf+1; i++) PRLEVEL (p,("%ld ",aChild[i]));
-    //    PRLEVEL (p,("\n"));
-    //
-    //    for(Int i=0; i< m+nf; i++){
-    //        PRLEVEL (p,("%% anode:%ld",i));
-    //        for(Int c=aChildp[i]; c< aChildp[i+1]; c++)
-    //            PRLEVEL (p,(" %ld,",aChild[c]));  
-    //        PRLEVEL (p,("\n"));
-    //    }
-    //
-    //    PRLEVEL (p,("%% first: ")); 
-    //    for (Int i = 0; i < m+nf; i++) 
-    //        PRLEVEL (p,("first[%ld]=%ld ",i,first[i]));
-    //    PRLEVEL (p,("\n"));
-    //
-    //#endif
+        Int numoforiginalChild=0;
+        if (lastChildFlag){  // the current node is the parent
+            PRLEVEL (1,("%% Childs of %ld: ",f)) ;
+            numoforiginalChild= Childp[f+1] - Childp[f];
+
+            for (Int i = Childp[f]; i <= Childp[f+1]-1; i++) {
+                PRLEVEL (1,("%ld ",Child[i]));
+                Int c= Child [i];
+                ASSERT(snM[c] < ms+nf+1);
+                aParent[ snM[c]]=offset+numRow;
+                PRLEVEL (1, ("%% aParent[%ld] =%ld\n", 
+                            aParent[snM [c]], offset+numRow));
+                ASSERT(childpointer < ms+nf+1);
+                aChild[childpointer++] = snM[c];
+            }
+        }
+
+        PRLEVEL (1,("%% numRow=%ld ",numRow));
+        PRLEVEL (1,("#offset=%ld\n",offset));
+        for(Int i = offset ; i < offset+numRow ; i++){
+            ASSERT (aChildp [i+1] == -1);
+            aChildp[i+1] = aChildp[i];
+            PRLEVEL (1, ("%% @i=%ld aCp[%ld]=%ld aCp[%ld]=%ld",
+                        i, i+1, aChildp[i+1], i, aChildp[i]));
+        }
+
+        for (Int i = Sleft[Super[f]]; i < Sleft[Super[f+1]]; i++){
+            // number of rows
+            ASSERT(i < ms);
+
+            rM[i] = i+f;
+            ASSERT(i+f < ms+nf+1);
+            aParent[i+f] = offset+numRow;
+            ASSERT(childpointer < ms+nf+1);
+            aChild[childpointer++] = i+f;
+        }
+
+        offset += numRow;
+        snM[f] = offset++;
+        ASSERT(offset < ms+nf+1);
+        ASSERT (aChildp [offset] == -1);
+        aChildp[offset] = aChildp[offset-1]+numRow+numoforiginalChild;
+        PRLEVEL (1, ("\n %% f=%ld numoforiginalChild=%ld\n",
+                    f, numoforiginalChild));
+
+        if( Parent[f] == f+1){  //last child due to staircase
+            PRLEVEL (1, ("%% last Child =%ld\n", f));
+            lastChildFlag = 1;  
+        }else
+            lastChildFlag = 0;  
+    }
+
+    //Initialize first descendent of augmented tree
+    for(Int i=0 ; i<ms+nf; i++){
+        for (Int r = i; r!= -1 && first[r] == -1; r = aParent[r])
+            first[r] = i;
+    }
+
+
+#ifndef NDEBUG
+    p = 1;
+    PRLEVEL (p,("%% super node mapping (snM): ")); 
+    for (Int f = 0; f < nf; f++){
+        ASSERT (snM [f] != -1);
+        PRLEVEL (p,("%ld ",snM[f]));     
+    }
+    PRLEVEL (p,("\n"));
+
+    PRLEVEL (p,("%% row mapping (rM): "));  
+    for (Int i = 0; i < ms; i++){
+        ASSERT (rM [i] != -1);
+        PRLEVEL (p,("%ld ",rM[i]));        
+    }
+    PRLEVEL (p,("\n"));
+
+    PRLEVEL (p,("%% aParent: ")); 
+    for (Int i = 0; i < ms+nf; i++) PRLEVEL (p,("%ld ",aParent[i]));
+    PRLEVEL (p,("%% \n"));
+
+    PRLEVEL (p,("%% aChildp: "));
+    for (Int i = 0; i < ms+nf+2; i++) PRLEVEL (p,("%ld ",aChildp[i]));
+    PRLEVEL (p,("\n"));
+
+    PRLEVEL (p,("%% aChild: ")); 
+    for (Int i = 0; i < ms+nf+1; i++) PRLEVEL (p,("%ld ",aChild[i]));
+    PRLEVEL (p,("\n"));
+
+    for(Int i=0; i< ms+nf; i++){
+        PRLEVEL (p,("%% anode:%ld",i));
+        for(Int c=aChildp[i]; c< aChildp[i+1]; c++)
+            PRLEVEL (p,(" %ld,",aChild[c]));  
+        PRLEVEL (p,("\n"));
+    }
+
+    PRLEVEL (p,("%% first: ")); 
+    for (Int i = 0; i < ms+nf; i++) 
+        PRLEVEL (p,("first[%ld]=%ld ",i,first[i]));
+    PRLEVEL (p,("\n"));
+
+#endif
     return (LUsym) ;
 }

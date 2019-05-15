@@ -76,13 +76,14 @@ void paru_freesym (paru_symbolic **LUsym_handle,
     paru_symbolic *LUsym;
     LUsym = *LUsym_handle;
 
-    Int m, n, anz, nf, rjsize; 
 
-    m = LUsym->m;
-    n = LUsym->n;
-    nf = LUsym->nf; 
-    anz = LUsym->anz; 
-    rjsize = LUsym->rjsize;
+    Int m = LUsym->m;
+    Int n = LUsym->n;
+    Int n1 = LUsym->n1;
+    Int nf = LUsym->nf; 
+    Int anz = LUsym->anz; 
+    Int snz = LUsym->snz; 
+    Int rjsize = LUsym->rjsize;
     PRLEVEL (1, ("%% In free sym: m=%ld n=%ld\n nf=%ld\
                 anz=%ld rjsize=%ld\n", m, n, nf, anz, rjsize ));
 
@@ -98,22 +99,24 @@ void paru_freesym (paru_symbolic **LUsym_handle,
     paru_free (rjsize, sizeof (Int), LUsym->Rj, cc);
     paru_free (nf+1,   sizeof (Int), LUsym->Rp, cc);
 
-    paru_free (m+1, sizeof (Int), LUsym->Sp, cc);
-    paru_free (anz, sizeof (Int), LUsym->Sj, cc);
-    paru_free (n+2, sizeof (Int), LUsym->Sleft, cc);
+    paru_free (m+1-n1, sizeof (Int), LUsym->Sp, cc);
+    paru_free (snz, sizeof (Int), LUsym->Sj, cc);
+    paru_free (n+2-n1, sizeof (Int), LUsym->Sleft, cc);
 
     paru_free ((n+1), sizeof (Int), LUsym->Chain_start, cc) ;
     paru_free ((n+1), sizeof (Int), LUsym->Chain_maxrows, cc);
     paru_free ((n+1), sizeof (Int), LUsym->Chain_maxcols, cc);
 
 
+    
+    Int ms = m-n1;  //submatrix is msxns
 
-    paru_free (m+nf, sizeof (Int), LUsym->aParent, cc);
-    paru_free (m+nf+1, sizeof (Int), LUsym->aChild, cc);
-    paru_free (m+nf+2, sizeof (Int), LUsym->aChildp, cc);
-    paru_free (m, sizeof (Int), LUsym->row2atree, cc);
+    paru_free (ms+nf, sizeof (Int), LUsym->aParent, cc);
+    paru_free (ms+nf+1, sizeof (Int), LUsym->aChild, cc);
+    paru_free (ms+nf+2, sizeof (Int), LUsym->aChildp, cc);
+    paru_free (ms, sizeof (Int), LUsym->row2atree, cc);
     paru_free (nf, sizeof (Int), LUsym->super2atree, cc);
-    paru_free (m+nf, sizeof (Int), LUsym->first, cc);
+    paru_free (ms+nf, sizeof (Int), LUsym->first, cc);
 
     paru_free (1, sizeof (paru_symbolic), LUsym, cc);
 
@@ -130,10 +133,9 @@ void paru_freemat (paru_matrix **paruMatInfo_handle,
     }
     paru_matrix *paruMatInfo;
     paruMatInfo = *paruMatInfo_handle;
-
-    Int m,n;  
-    m = paruMatInfo->m;       
-    n = paruMatInfo->n; 
+    
+    Int m = paruMatInfo->m;       // m and n is different than LUsym
+    Int n = paruMatInfo->n;       // Here there are submatrix size 
 
     tupleList *RowList = paruMatInfo->RowList;
     PRLEVEL (1, ("%% RowList =%p\n", RowList));

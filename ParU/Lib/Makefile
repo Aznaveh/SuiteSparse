@@ -14,7 +14,11 @@ include ../../SuiteSparse_config/SuiteSparse_config.mk
 
 
 # ParU depends on SPQR, CHOLMOD, AMD, COLAMD, LAPACK, the BLAS and SuiteSparse_config
-LDLIBS += -lspqr -lamd -lcolamd -lcholmod -lsuitesparseconfig $(LAPACK) $(BLAS)
+#LDLIBS += -lspqr -lamd -lcolamd -lcholmod -lsuitesparseconfig $(LAPACK) $(BLAS)
+#
+# newer version  of ParU depends on UMFPACK, CHOLMOD, AMD, COLAMD, LAPACK, 
+# the BLAS and SuiteSparse_config
+LDLIBS += -lumfpack -lamd -lcolamd -lcholmod -lsuitesparseconfig $(LAPACK) $(BLAS)
 
 # compile and install in SuiteSparse/lib
 library:
@@ -36,7 +40,7 @@ INC = ../Include/Parallel_LU.hpp
 
 OBJ = \
     paru_mem.o \
-    paru_sym_analyse.o \
+    paru_analyze.o \
 	paru_init_rowFronts.o\
 	paru_tuples.o\
 	paru_assemble.o\
@@ -52,13 +56,17 @@ OBJ = \
 	paru_update_rel_ind.o\
 	paru_update_rowDeg.o\
 	paru_finalize.o\
-	paru_write.o
+	paru_write.o\
+	paru_cumsum.o
+#    paru_sym_analyse.o \
 
 $(OBJ): $(INC)
 
-I = -I../../SPQR/Include -I../../CHOLMOD/Include -I../../SuiteSparse_config -I../Include
+#I = -I../../SPQR/Include -I../../CHOLMOD/Include -I../../SuiteSparse_config -I../Include
+I = -I../../UMFPACK/Include  -I../../CHOLMOD/Include -I../../AMD/Include  -I../../SuiteSparse_config -I../Include
 
-C = $(CXX) $(CF) $(SPQR_CONFIG) $(CHOLMOD_CONFIG) $(CONFIG_PARTITION) $(I)
+#C = $(CXX) $(CF) $(SPQR_CONFIG) $(CHOLMOD_CONFIG) $(CONFIG_PARTITION) $(I)
+C = $(CXX) $(CF)  $(CHOLMOD_CONFIG) $(CONFIG_PARTITION) $(I)
 #-------------------------------------------------------------------------------
 
 static: $(AR_TARGET)
@@ -72,7 +80,10 @@ $(AR_TARGET): $(OBJ)
 paru_mem.o: ../Source/paru_mem.cpp
 	$(C) -c $<
 
-paru_sym_analyse.o: ../Source/paru_sym_analyse.cpp
+#paru_sym_analyse.o: ../Source/paru_sym_analyse.cpp
+#	$(C) -c $<
+
+paru_analyze.o: ../Source/paru_analyze.cpp
 	$(C) -c $<
 
 paru_init_rowFronts.o: ../Source/paru_init_rowFronts.cpp
@@ -121,6 +132,9 @@ paru_update_rowDeg.o: ../Source/paru_update_rowDeg.cpp
 	$(C) -c $<
 
 paru_finalize.o: ../Source/paru_finalize.cpp
+	$(C) -c $<
+
+paru_cumsum.o: ../Source/paru_cumsum.cpp
 	$(C) -c $<
 
 #-------------------------------------------------------------------------------

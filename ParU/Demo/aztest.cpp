@@ -34,11 +34,11 @@ int main (int argc, char **argv)
     Super=QRsym->Super;
 
     //Staircase structure
-    Long *Sp, *Sj, *Sleft, *Qfill, *PLinv;
+    Long *Sp, *Sj, *Sleft, *Qfill, *Pinv;
     Sp=QRsym->Sp;
     Sj=QRsym->Sj;
     Qfill=QRsym->Qfill;
-    PLinv=QRsym->PLinv;
+    Pinv=QRsym->Pinv;
     Sleft = QRsym->Sleft;
 
     printf ("%ldx%ld nnz:%ld\n",QRsym->m, QRsym->n, QRsym->anz) ; // mxn nnz

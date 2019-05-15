@@ -49,8 +49,9 @@ paru_matrix *paru_init_rowFronts (
     Int m,n,nf;  
 
     paruMatInfo->LUsym = LUsym;
-    m = paruMatInfo->m = LUsym->m;   
-    n = paruMatInfo->n = LUsym->n; 
+
+    m = paruMatInfo->m = LUsym->m - LUsym->n1;   
+    n = paruMatInfo->n = LUsym->n - LUsym->n1; 
     nf =  LUsym->nf; 
     paruMatInfo->panel_width = 8;
 

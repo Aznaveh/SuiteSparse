@@ -35,10 +35,9 @@ void paru_front ( paru_matrix *paruMatInfo,
      */
     paru_symbolic *LUsym =  paruMatInfo->LUsym;
 
-    Int m,n,nf;
-    m = paruMatInfo-> m;
-    n = paruMatInfo-> n;
-    nf = paruMatInfo->LUsym->nf;
+    Int m = paruMatInfo-> m;
+    Int n = paruMatInfo-> n;
+    Int nf = paruMatInfo->LUsym->nf;
     Int *Super = LUsym->Super;
     /* ---------------------------------------------------------------------- */
     /* get the front F  */
