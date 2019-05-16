@@ -60,7 +60,6 @@ void paru_free (Int n, Int size, void *p,  cholmod_common *cc){
 #endif
     PRLEVEL (1, ("%% free %ld in %p total= %ld\n", 
                 n*size, p, free_count));
-
 }
 
 void paru_freesym (paru_symbolic **LUsym_handle,
@@ -101,6 +100,7 @@ void paru_freesym (paru_symbolic **LUsym_handle,
 
     paru_free (m+1-n1, sizeof (Int), LUsym->Sp, cc);
     paru_free (snz, sizeof (Int), LUsym->Sj, cc);
+    paru_free (snz, sizeof (double), LUsym->Sx, cc);
     paru_free (n+2-n1, sizeof (Int), LUsym->Sleft, cc);
 
     paru_free ((n+1), sizeof (Int), LUsym->Chain_start, cc) ;

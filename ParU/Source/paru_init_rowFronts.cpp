@@ -24,7 +24,7 @@ paru_matrix *paru_init_rowFronts (
         cholmod_common *cc
         ){
 
-    DEBUGLEVEL(-1);
+    DEBUGLEVEL(0);
     if (!A->packed){
         printf ("A is not packed; Wrong format \n");
         return NULL;
@@ -263,16 +263,19 @@ paru_matrix *paru_init_rowFronts (
      // -------------------------------------------------------------------------
      Int *Qfill = LUsym->Qfill;
      Int *Pinv = LUsym->Pinv;
-     Int anz = LUsym->anz;
-     Int *Wi = (Int *) cc->Iwork ;   // size m, aliased with the rest of Iwork
+     //   Int anz = LUsym->anz;
+     Int snz = LUsym->snz; 
+     //   Int *Wi = (Int *) cc->Iwork ;   // size m, aliased with the rest of Iwork
 
      // create numeric values of S = A(p,q) in row-form in Sx
-     double *Sx = (double*) paru_alloc (anz, sizeof (double), cc) ;
-     if (Sx == NULL){   //out of memory
-         paru_freemat (&paruMatInfo, cc);
-         printf("Out of memory: Sx\n");
-         return NULL;
-     }
+     double *Sx = LUsym->Sx;
+//     double *Sx = (double*) paru_alloc (anz, sizeof (double), cc) ;
+//     if (Sx == NULL){   //out of memory
+//         paru_freemat (&paruMatInfo, cc);
+//         printf("Out of memory: Sx\n");
+//         return NULL;
+//     }
+
      Int *W = (Int*) paru_alloc (m, sizeof (Int), cc) ;
      if (W == NULL){   //out of memory
         paru_freemat (&paruMatInfo, cc);
@@ -281,15 +284,33 @@ paru_matrix *paru_init_rowFronts (
     }
 
     Int *Sp = LUsym->Sp;
-    if (cc->status == CHOLMOD_OK){
-        // use Wi as workspace (Iwork (0:m-1)) [
-        //spqr_stranspose2 (A, Qfill, Sp, Pinv, Sx, Wi) ;
-        // Wi no longer needed ]
-    }//
-    
+//    if (cc->status == CHOLMOD_OK){
+//        // use Wi as workspace (Iwork (0:m-1)) [
+//        //spqr_stranspose2 (A, Qfill, Sp, Pinv, Sx, Wi) ;
+//        // Wi no longer needed ]
+//    }//
+//    
 
     Int *Ap = (Int*) A->p;
     Int *Sj= LUsym->Sj;
+#ifndef NDEBUG
+    Int p = 0;
+    PRLEVEL (p, ("\nInsid init row fronts\n"));
+    PRLEVEL (p, ("Sp =\n"));
+    for (Int i = 0; i <= m; i++){
+        PRLEVEL (p, ("%ld ", Sp[i]));
+    }
+    PRLEVEL (p, ("\n"));
+
+    PRLEVEL (p, ("Sj =\n"));
+    for (Int k = 0; k < snz; k++){
+        PRLEVEL (p, ("%ld ", Sj[k]));
+    }
+    PRLEVEL (p, ("\n"));
+
+#endif
+
+
     //constants for initialzing lists
     Int slackRow = 2;
     Int slackCol = 2;
@@ -406,7 +427,13 @@ paru_matrix *paru_init_rowFronts (
     PRLEVEL (0, ("X = InMatrix(:,3);\n") );
     PRLEVEL (0, ("S=sparse(I,J,X);\n") );
 
-    paru_free (anz, sizeof (double), Sx , cc) ;
     paru_free (m, sizeof (Int), W, cc) ;
+
+//    Int snz = LUsym->snz; // will be freed in mem 
+//    paru_free (snz, sizeof (double), Sx , cc) ;
+//    paru_free (snz, sizeof (Int), Sj, cc);
+//    Sx = NULL; Sj = NULL;
+
+    
     return paruMatInfo;
 }

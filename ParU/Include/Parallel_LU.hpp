@@ -95,9 +95,10 @@ typedef struct {/* paru_symbolic*/
 
     Int m, n, anz ; // S is m-by-n with anz entries
 
-    Int *Sp ;       // size m+1-n1, row pointers of S
     Int snz;        // nnz in submatrix
+    Int *Sp ;       // size m+1-n1, row pointers of S
     Int *Sj ;       // size snz = Sp [n], column indices of S
+    double *Sx;     // size snz = Sp [n], numeric values of S
 
     Int *Qfill ;    // size n, fill-reducing column permutation.
     // Qfill [k] = j if column k of A is column j of S.

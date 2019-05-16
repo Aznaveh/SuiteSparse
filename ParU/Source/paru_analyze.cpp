@@ -29,7 +29,7 @@ paru_symbolic *paru_analyze
  // workspace and parameters
  cholmod_common *cc ){   
 
-    DEBUGLEVEL(1);
+    DEBUGLEVEL(0);
     paru_symbolic *LUsym;
 
     LUsym = (paru_symbolic*) paru_alloc (1, sizeof(paru_symbolic), cc);
@@ -53,10 +53,12 @@ paru_symbolic *paru_analyze
     LUsym->Chain_start = LUsym->Chain_maxrows = LUsym->Chain_maxcols = NULL;
     LUsym->Parent = LUsym->Super = LUsym->Child = LUsym->Childp = NULL;
     LUsym->Qfill = LUsym->Pinv = NULL;
-    LUsym->Sp = LUsym->Sj = LUsym->Sleft= NULL;
+    LUsym->Sp = LUsym->Sj = LUsym->Sleft= NULL; LUsym->Sx = NULL;
     LUsym->Fm= LUsym->Cm= LUsym->Rj= LUsym->Rp= NULL;
     LUsym->aParent = LUsym->aChildp = LUsym->aChild = LUsym->row2atree = NULL;
     LUsym->super2atree = LUsym->first = NULL;
+    
+    
 
     //############  Calling UMFPACK and retrieving data structure ##############
 
@@ -255,7 +257,7 @@ paru_symbolic *paru_analyze
         return NULL; 
     }
 #ifndef NDEBUG
-    p = 0;
+    p = 1;
     PRLEVEL (p, ("%%%% n1 is %d\n", n1 ));
     PRLEVEL (p, ("From the Symbolic object,\
                 C is of dimension %ld-by-%ld\n", nr, nc));
@@ -345,6 +347,11 @@ paru_symbolic *paru_analyze
     // Making Super data structure
     // like SPQR: Super[f]<= pivotal columns of (f) < Super[f+1]
     Int *Super =  LUsym->Super = (Int *) paru_alloc ((nf+1), sizeof (Int), cc); 
+    if (Super == NULL){   
+        printf ("memory problem");
+        paru_freesym (&LUsym , cc);
+        return NULL;  
+    }
     Super [0] = 0;
     for(Int k = 1; k <= nf ; k++){
         Super[k] = Front_npivcol[k-1];
@@ -355,6 +362,12 @@ paru_symbolic *paru_analyze
     //Making Children list
     Int *Childp = (Int *) paru_calloc ((nf+2), sizeof (Int), cc);
     LUsym->Childp =  Childp;
+    if (Childp== NULL){   
+        printf ("memory problem");
+        paru_freesym (&LUsym , cc);
+        return NULL;  
+    }
+
     for (Int f = 0; f < nf; f++){
         if (Parent [f] > 0)
             Childp[Parent[f]+1]++;
@@ -370,9 +383,22 @@ paru_symbolic *paru_analyze
 #endif 
     Int *Child = (Int *) paru_calloc ((nf+1), sizeof (Int), cc); 
     LUsym->Child  =  Child;
+    if (Child == NULL){   
+        printf ("memory problem");
+        paru_freesym (&LUsym , cc);
+        return NULL;  
+    }
+
     //copy of Childp using Work for other places also
     Int *Work = (Int *) paru_alloc ((MAX(m,n)+2), sizeof (Int), cc); 
     Int *cChildp = Work;
+    if (cChildp == NULL){   
+        printf ("memory problem");
+        paru_freesym (&LUsym , cc);
+        return NULL;  
+    }
+
+
     memcpy(cChildp, Childp, (nf+2)*sizeof(Int) );
 
     for (Int f = 0; f < nf; f++){
@@ -394,15 +420,21 @@ paru_symbolic *paru_analyze
     /*                   computing the Staircase structures                   */
     /* ---------------------------------------------------------------------- */
 
-    Int *Sp = (Int*) paru_calloc (m+1-n1, sizeof(Int),cc);
-    Int *Sleft = (Int*) paru_alloc (n+2-n1, sizeof(Int),cc);
-    LUsym->Sleft = Sleft;
-    LUsym->Sp = Sp;
-    //-------- computing the inverse permutation for P
+    Int *Sp = LUsym->Sp = (Int*) paru_calloc (m+1-n1, sizeof(Int),cc);
+    Int *Sleft = LUsym->Sleft = (Int*) paru_alloc (n+2-n1, sizeof(Int),cc);
     Int *Pinv =  LUsym->Pinv =  (Int *) paru_alloc (m+1, sizeof (Int), cc);
+
+    if (Sp == NULL || Sleft == NULL || Pinv == NULL ){   
+        printf ("memory problem");
+        paru_freesym (&LUsym , cc);
+        return NULL;  
+    }
+
+    //-------- computing the inverse permutation for P
     for(Int i = 0; i < m ; i++){
         Pinv[Pinit[i]] = i;
     }
+    
 #ifndef NDEBUG
     p = 1;
     PRLEVEL (p, ("Qinit =\n"));
@@ -430,6 +462,12 @@ paru_symbolic *paru_analyze
 
     Int *Ps; // new row permutation for just the Submatrix part
     Ps = (Int*) paru_calloc (m-n1, sizeof(Int),cc); 
+    if (Ps == NULL ){   
+        printf ("memory problem");
+        paru_freesym (&LUsym , cc);
+        return NULL;  
+    }
+
     Int snz = 0;  //nnz in submatrix excluding singletons
     int rowcount = 0;
     Sleft[0] = 0;
@@ -488,7 +526,7 @@ paru_symbolic *paru_analyze
 
     //Update Sp based on new permutation for Sp[1...m+1]
 #ifndef NDEBUG
-    p = 0;
+    p = 1;
     PRLEVEL (p, ("Before permutation Sp =\n"));
     for (Int i = n1; i <= m; i++){
         PRLEVEL (p, ("%ld ", Sp[i-n1]));
@@ -511,27 +549,9 @@ paru_symbolic *paru_analyze
                     row, Ps[row], Sp[row]));
         cSp[row+1] = Sp[Ps[row]+1];
     }
-//    ////JUST FOR TEST
-//    PRLEVEL (p, ("In the TEST=\n"));
-//    memset (cSp, 0, (m-n1+1)*sizeof(Int));
-//    for (Int newcol = n1; newcol < n ; newcol++){
-//        Int oldcol = Qinit [newcol];
-//        PRLEVEL (1, ("newcol = %ld oldcol=%ld\n",newcol, oldcol));
-//        for(Int p = Ap[oldcol] ; p < Ap[oldcol+1]; p++){
-//            Int oldrow = Ai[p];
-//            Int newrow = Pinv[oldrow]; 
-//            Int srow = newrow - n1;
-//            PRLEVEL (1, ("\tnewrow=%ld oldrow=%ld srow=%ld\n",
-//                        newrow, oldrow, srow));
-//            if (srow >= 0){  // it is insdie S otherwise it is part of singleton
-//                cSp[srow+1]++;
-//                PRLEVEL (1, ("cSp[%ld] = %ld\n",srow+1, cSp[srow+1]));
-//            } 
-//        }
-//    }
-// 
+
 #ifndef NDEBUG
-    p = 0;
+    p = 1;
     PRLEVEL (p, ("After permutation Sp =\n"));
     for (Int i = n1; i <= m; i++){
         PRLEVEL (p, ("%ld ", cSp[i-n1]));
@@ -543,7 +563,7 @@ paru_symbolic *paru_analyze
     memcpy(cSp, Sp, (m+1-n1)*sizeof(Int) );
 
 #ifndef NDEBUG
-    p = 0;
+    p = 1;
     PRLEVEL (p, ("After cumsum  Sp =\n"));
     for (Int i = n1; i <= m; i++){
         PRLEVEL (p, ("%ld ", Sp[i-n1]));
@@ -564,7 +584,7 @@ paru_symbolic *paru_analyze
     paru_free ((m+1), sizeof (Int), Pinit, cc);
 ///////////////////////////////////////////////////////////////
 #ifndef NDEBUG
-    p = 0;
+    p = 1;
     PRLEVEL (p, ("Before Sj Sp =\n"));
     for (Int i = n1; i <= m; i++){
         PRLEVEL (p, ("%ld ", cSp[i-n1]));
@@ -572,33 +592,43 @@ paru_symbolic *paru_analyze
     PRLEVEL (p, ("\n"));
 #endif
 
-    //Updating Sj using copy of Sp
+    //Updating Sj and Sx using copy of Sp
     Int *Sj = (Int*) paru_alloc (snz, sizeof(Int),cc); 
-    LUsym->Sj = Sj;
+    double *Sx = (double*) paru_alloc (snz, sizeof(double),cc); 
+    LUsym->Sj = Sj; LUsym->Sx = Sx;
+
+    if (Sj == NULL || Sx == NULL){   
+        printf ("memory problem");
+        paru_freesym (&LUsym , cc);
+        return NULL;  
+    }
+
+
     //construct Sj
-    PRLEVEL (2, ("Constructing Sj\n"));
+    PRLEVEL (1, ("Constructing Sj\n"));
     for (Int newcol = n1; newcol < n ; newcol++){
         Int oldcol = Qinit [newcol];
-        PRLEVEL (2, ("newcol = %ld oldcol=%ld\n",newcol, oldcol));
+        PRLEVEL (1, ("newcol = %ld oldcol=%ld\n",newcol, oldcol));
         for(Int p = Ap[oldcol] ; p < Ap[oldcol+1]; p++){
             Int oldrow = Ai[p];
             Int newrow = Pinv[oldrow]; 
             Int srow = newrow - n1;
             Int scol = newcol - n1;
-            PRLEVEL (2, ("\tnewrow=%ld oldrow=%ld srow=%ld \n",
+            PRLEVEL (1, ("\tnewrow=%ld oldrow=%ld srow=%ld \n",
                         newrow, oldrow, srow));
             if (srow >= 0){  // it is insdie S otherwise it is part of singleton
-                Sj[cSp[srow]++] = scol;
+                Sj[cSp[srow]] = scol;
+                Sx[cSp[srow]++] = Ax[p];
             } 
         }
     }
 
     paru_free ( (m-n1), sizeof (Int), Ps, cc);
 #ifndef NDEBUG
-    p = 0;
-    PRLEVEL (p, ("After Sj cSp =\n"));
+    p = 1;
+    PRLEVEL (p, ("Sp =\n"));
     for (Int i = n1; i <= m; i++){
-        PRLEVEL (p, ("%ld ", cSp[i-n1]));
+        PRLEVEL (p, ("%ld ", Sp[i-n1]));
     }
     PRLEVEL (p, ("\n"));
 
@@ -606,6 +636,7 @@ paru_symbolic *paru_analyze
     for (Int k = 0; k < snz; k++){
         PRLEVEL (p, ("%ld ", Sj[k]));
     }
+    p = 1;
     PRLEVEL (p, ("\n"));
     for (Int i = 0; i < m-n1; i++){
         PRLEVEL (p, (" i=%ld cSp=%ld Sp=%ld\n",i, cSp[i],Sp[i+1]));
@@ -613,11 +644,6 @@ paru_symbolic *paru_analyze
     }
 #endif
     paru_free ((MAX(m,n)+2), sizeof (Int), Work, cc);
-
-
-    // LUsym->Pinv = NULL;
-    //    Pinv =  LUsym->Pinv =  QRsym->Pinv;  
-    //    QRsym->Pinv = NULL;
 
     /* ---------------------------------------------------------------------- */
     /*         Finding the Upper bound of rows and cols                       */
