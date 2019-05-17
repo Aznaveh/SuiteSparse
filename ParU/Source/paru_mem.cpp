@@ -48,18 +48,19 @@ void *paru_realloc(
 
 void paru_free (Int n, Int size, void *p,  cholmod_common *cc){
     DEBUGLEVEL(0);
-//#ifndef NDEBUG
-    static Int free_count =0;
-    free_count+= n*size ;
-//#endif
+    static Int free_count = 0;
+    free_count += n*size ;
+
+    // Valgrind is unhappy about some part here
+    //    PRLEVEL (1, ("%% free %ld in %p total= %ld\n", 
+    //                n*size, p, free_count));
+
+    //#endif
     if(p != NULL)
         cholmod_l_free (n,   size, p, cc);
-#ifndef NDEBUG
-    if(p == NULL)
-        PRLEVEL (1, ("%% freeing a NULL pointer = \n" ));
-#endif
-    PRLEVEL (1, ("%% free %ld in %p total= %ld\n", 
-                n*size, p, free_count));
+    else {
+        PRLEVEL (1, ("%% freeing a NULL pointer  \n" ));
+    }
 }
 
 void paru_freesym (paru_symbolic **LUsym_handle,
@@ -108,7 +109,7 @@ void paru_freesym (paru_symbolic **LUsym_handle,
     paru_free ((n+1), sizeof (Int), LUsym->Chain_maxcols, cc);
 
 
-    
+
     Int ms = m-n1;  //submatrix is msxns
 
     paru_free (ms+nf, sizeof (Int), LUsym->aParent, cc);
@@ -133,7 +134,7 @@ void paru_freemat (paru_matrix **paruMatInfo_handle,
     }
     paru_matrix *paruMatInfo;
     paruMatInfo = *paruMatInfo_handle;
-    
+
     Int m = paruMatInfo->m;       // m and n is different than LUsym
     Int n = paruMatInfo->n;       // Here there are submatrix size 
 
@@ -200,14 +201,14 @@ void paru_freemat (paru_matrix **paruMatInfo_handle,
             sizeof(double)*nrows*ncols;
         PRLEVEL (1, ("%% nrows =%ld ", nrows));
         PRLEVEL (1, ("%% ncols =%ld tot_size=%ld\n", ncols, tot_size));
-       paru_free (1, tot_size, curEl, cc);
+        paru_free (1, tot_size, curEl, cc);
     }
 
     //free the answer
     paru_fac *LUs =  paruMatInfo->partial_LUs;
     paru_fac *Us =  paruMatInfo->partial_Us;
     for(Int i = 0; i < nf ; i++){  
-        
+
         paru_free (paruMatInfo->frowCount[i], 
                 sizeof(Int), paruMatInfo->frowList[i], cc);
 

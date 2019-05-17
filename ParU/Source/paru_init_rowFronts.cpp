@@ -24,7 +24,7 @@ paru_matrix *paru_init_rowFronts (
         cholmod_common *cc
         ){
 
-    DEBUGLEVEL(0);
+    DEBUGLEVEL(-1);
     if (!A->packed){
         printf ("A is not packed; Wrong format \n");
         return NULL;
@@ -73,12 +73,6 @@ paru_matrix *paru_init_rowFronts (
     memset (rowSize, -1, m*sizeof(Int));
     PRLEVEL (1, ("%% rowSize pointer=%p size=%ld \n", rowSize,m*sizeof(Int) ));
 
-    //    Int *scratch= (Int*) paru_alloc (2*m+n, sizeof (Int), cc);
-    //    if (scratch == NULL){   //out of memory
-    //        printf ("Out of memory: Work\n");
-    //        return NULL;
-    //    }
-    //    PRLEVEL (1, ("%% scratch=%p\n",scratch));
 
     Int *colSize= (Int*) paru_alloc (n, sizeof (Int), cc);
     if (colSize == NULL){   //out of memory
@@ -127,7 +121,6 @@ paru_matrix *paru_init_rowFronts (
     PRLEVEL (1, ("%% Work =%p\n ", Work));
     paruMatInfo->Work = Work;
 
-    //memset (Work, 0, m*sizeof(Int) );
 
 
     PRLEVEL (1, ("%% m=%ld, n=%ld\n",m,n));
@@ -224,6 +217,7 @@ paru_matrix *paru_init_rowFronts (
 
 
    //~~~~~~~~~~ scaling the A matrix
+   //TODO change this part using S matrix
    if (scale){
        Int *Ap = (Int*) A->p;
        Int *Ai = (Int*) A->i;
@@ -263,177 +257,150 @@ paru_matrix *paru_init_rowFronts (
      // -------------------------------------------------------------------------
      Int *Qfill = LUsym->Qfill;
      Int *Pinv = LUsym->Pinv;
-     //   Int anz = LUsym->anz;
      Int snz = LUsym->snz; 
-     //   Int *Wi = (Int *) cc->Iwork ;   // size m, aliased with the rest of Iwork
-
-     // create numeric values of S = A(p,q) in row-form in Sx
      double *Sx = LUsym->Sx;
-//     double *Sx = (double*) paru_alloc (anz, sizeof (double), cc) ;
-//     if (Sx == NULL){   //out of memory
-//         paru_freemat (&paruMatInfo, cc);
-//         printf("Out of memory: Sx\n");
-//         return NULL;
-//     }
+     Int *Sp = LUsym->Sp;
+     Int *Sj= LUsym->Sj;
 
-     Int *W = (Int*) paru_alloc (m, sizeof (Int), cc) ;
-     if (W == NULL){   //out of memory
-        paru_freemat (&paruMatInfo, cc);
-        printf("Out of memory: W\n");
-        return NULL;
-    }
-
-    Int *Sp = LUsym->Sp;
-//    if (cc->status == CHOLMOD_OK){
-//        // use Wi as workspace (Iwork (0:m-1)) [
-//        //spqr_stranspose2 (A, Qfill, Sp, Pinv, Sx, Wi) ;
-//        // Wi no longer needed ]
-//    }//
-//    
-
-    Int *Ap = (Int*) A->p;
-    Int *Sj= LUsym->Sj;
+     Int *Ap = (Int*) A->p;
 #ifndef NDEBUG
-    Int p = 0;
-    PRLEVEL (p, ("\nInsid init row fronts\n"));
-    PRLEVEL (p, ("Sp =\n"));
-    for (Int i = 0; i <= m; i++){
-        PRLEVEL (p, ("%ld ", Sp[i]));
-    }
-    PRLEVEL (p, ("\n"));
+     Int p = 1;
+     PRLEVEL (p, ("\n%% Insid init row fronts\n"));
+     PRLEVEL (p, ("%% Sp =\n%%"));
+     for (Int i = 0; i <= m; i++){
+         PRLEVEL (p, ("%ld ", Sp[i]));
+     }
+     PRLEVEL (p, ("\n"));
 
-    PRLEVEL (p, ("Sj =\n"));
-    for (Int k = 0; k < snz; k++){
-        PRLEVEL (p, ("%ld ", Sj[k]));
-    }
-    PRLEVEL (p, ("\n"));
+     PRLEVEL (p, ("Sj =\n"));
+     for (Int k = 0; k < snz; k++){
+         PRLEVEL (p, ("%ld ", Sj[k]));
+     }
+     PRLEVEL (p, ("\n"));
 
 #endif
 
 
-    //constants for initialzing lists
-    Int slackRow = 2;
-    Int slackCol = 2;
+     //constants for initialzing lists
+     Int slackRow = 2;
+     Int slackCol = 2;
 
-    /* allocating column list must happend beforehand
-     *  I need number of column members of S
-     *  while S is row based I am using A so 
-     */
-    for (Int col = 0 ; col < n ; col++){     //allocating Column list tuple 
-        Int j = Qfill ? Qfill [col] : col ;  // col of S is column j of A
-        Int ncols = Ap[j+1]-Ap[j];
+     /* allocating column list must happend beforehand
+      *  I need number of column members of S
+      *  while S is row based and column permutation did nt change 
+      *  I am using A so 
+      */
+     for (Int col = 0 ; col < n ; col++){     //allocating Column list tuple 
+         Int j = Qfill ? Qfill [col] : col ;  // col of S is column j of A
+         Int ncols = Ap[j+1]-Ap[j];
 
-        PRLEVEL (2, ("%% ncols[%ld]=%ld\n",col,ncols));
+         PRLEVEL (2, ("%% ncols[%ld]=%ld\n",col,ncols));
 
-        ColList[col].numTuple = 0;
-        ColList[col].len = slackCol*ncols;
-        ColList[col].list = 
-            (Tuple*) paru_alloc (slackCol*ncols, sizeof(Tuple), cc);
-        if (ColList[col].list == NULL){   //out of memory
-            paru_freemat (&paruMatInfo, cc);
-            printf("Out of memory: ColList[col].list\n");
-            return NULL;
-        }
-    }
+         ColList[col].numTuple = 0;
+         ColList[col].len = slackCol*ncols;
+         ColList[col].list = 
+             (Tuple*) paru_alloc (slackCol*ncols, sizeof(Tuple), cc);
+         if (ColList[col].list == NULL){   //out of memory
+             paru_freemat (&paruMatInfo, cc);
+             printf("Out of memory: ColList[col].list\n");
+             return NULL;
+         }
+     }
 
-   PRLEVEL (0, ("InMatrix=[\n") ); //MATLAB matrix, 
-    //Activating after this parts comments will break the matlab input matrix
-
-
- 
+     PRLEVEL (0, ("InMatrix=[\n") ); //MATLAB matrix, 
+     //Activating comments after this parts will break the matlab input matrix
 
 
 
-   // allocating row tuples, elements and updating column tuples
-   for(Int row = 0; row < m ; row++){  
-       Int e = LUsym->row2atree[row]; 
-       Int nrows = 1, 
-           ncols = Sp[row+1]-Sp[row]; //nrows and ncols of current front/row
+     // allocating row tuples, elements and updating column tuples
+     for(Int row = 0; row < m ; row++){  
+         Int e = LUsym->row2atree[row]; 
+         Int nrows = 1, 
+             ncols = Sp[row+1]-Sp[row]; //nrows and ncols of current front/row
 
-        PRLEVEL (1, ("%% element %ld = %ld x %ld\n", e, nrows, ncols));
+         PRLEVEL (1, ("%% element %ld = %ld x %ld\n", e, nrows, ncols));
 
-        row_degree_bound [row] = ncols; //Initialzing row degree
+         row_degree_bound [row] = ncols; //Initialzing row degree
 
-        Element *curEl = elementList[e] = paru_create_element (nrows, ncols,
-                0 ,cc);
-        if (curEl == NULL){   //out of memory
-            paru_freemat (&paruMatInfo, cc);
-            printf("Out of memory: curEl\n");
-            return NULL;
-        }
+         Element *curEl = elementList[e] = paru_create_element (nrows, ncols,
+                 0 ,cc);
+         if (curEl == NULL){   //out of memory
+             paru_freemat (&paruMatInfo, cc);
+             printf("Out of memory: curEl\n");
+             return NULL;
+         }
 #ifndef NDEBUG  // Printing the pointers info
-        Int p=1;
-        PRLEVEL (p, ("%% curEl = %p ", curEl));
-        Int size= sizeof(Element)+
-            sizeof(Int)*(2*(nrows+ncols))+
-            sizeof(double)*nrows*ncols;
-        PRLEVEL (p, ("size= %ld", size));
-        PRLEVEL (p, ("\n"));
+         Int p=1;
+         PRLEVEL (p, ("%% curEl = %p ", curEl));
+         Int size= sizeof(Element)+
+             sizeof(Int)*(2*(nrows+ncols))+
+             sizeof(double)*nrows*ncols;
+         PRLEVEL (p, ("size= %ld", size));
+         PRLEVEL (p, ("\n"));
 #endif
 
-        // Allocating Rowlist and updating its tuples
-        RowList[row].list =
-            (Tuple*) paru_alloc (slackRow*nrows, sizeof(Tuple), cc);
-        if (RowList[row].list == NULL){   //out of memory
-            paru_freemat (&paruMatInfo, cc);
-            printf("Out of memory: RowList[row].list \n");
-            return NULL;
-        }
-        RowList[row].numTuple = 0;
-        RowList[row].len = slackRow;
+         // Allocating Rowlist and updating its tuples
+         RowList[row].list =
+             (Tuple*) paru_alloc (slackRow*nrows, sizeof(Tuple), cc);
+         if (RowList[row].list == NULL){   //out of memory
+             paru_freemat (&paruMatInfo, cc);
+             printf("Out of memory: RowList[row].list \n");
+             return NULL;
+         }
+         RowList[row].numTuple = 0;
+         RowList[row].len = slackRow;
 
-        Tuple rowTuple;
-        rowTuple.e = e;
-        rowTuple.f = 0;
-        if (paru_add_rowTuple (RowList, row, rowTuple, cc) ){
-            paru_freemat (&paruMatInfo, cc);
-            printf("Out of memory: add_rowTuple \n");
-            return NULL;
-        }
+         Tuple rowTuple;
+         rowTuple.e = e;
+         rowTuple.f = 0;
+         if (paru_add_rowTuple (RowList, row, rowTuple, cc) ){
+             paru_freemat (&paruMatInfo, cc);
+             printf("Out of memory: add_rowTuple \n");
+             return NULL;
+         }
 
-        //Allocating elements, and updating column tuple list
-        Int *el_colrowIndex = colIndex_pointer (curEl); 
-        double *el_colrowNum = numeric_pointer (curEl);
+         //Allocating elements, and updating column tuple list
+         Int *el_colrowIndex = colIndex_pointer (curEl); 
+         double *el_colrowNum = numeric_pointer (curEl);
 
-        PRLEVEL (1, ("el_colrowIndex =%p, el_colrowNum = %p \n", 
-                    el_colrowIndex, el_colrowNum));
+         PRLEVEL (1, ("el_colrowIndex =%p, el_colrowNum = %p \n", 
+                     el_colrowIndex, el_colrowNum));
 
-        Int j = 0;  //Index inside an element
-        for ( Int p = Sp [row]; p < Sp [row+1]; p++){
-            // adding column tuple
-            Tuple colTuple;
-            colTuple.e = e;
-            colTuple.f = j;
+         Int j = 0;  //Index inside an element
+         for ( Int p = Sp [row]; p < Sp [row+1]; p++){
+             // adding column tuple
+             Tuple colTuple;
+             colTuple.e = e;
+             colTuple.f = j;
 
-            el_colrowIndex[j] = Sj[p];
-            el_colrowNum[j++] =   Sx[p];
-            PRLEVEL (1, ("Sj[%ld] =%ld Sx[%ld]=%lf\n", p, Sj[p], p, Sx[p] ));
-            //for Matlab
-            PRLEVEL (0, ("%ld,%ld, %.16lf;\n", row+1,Sj[p]+1, Sx[p]) );
+             el_colrowIndex[j] = Sj[p];
+             el_colrowNum[j++] =   Sx[p];
+             PRLEVEL (1, ("Sj[%ld] =%ld Sx[%ld]=%lf\n", p, Sj[p], p, Sx[p] ));
+             //for Matlab
+             PRLEVEL (0, ("%ld,%ld, %.16lf;\n", row+1,Sj[p]+1, Sx[p]) );
 
 
-            if (paru_add_colTuple (ColList, Sj [p], colTuple, cc) ){
-                paru_freemat (&paruMatInfo, cc);
-                printf("Out of memory: add_colTuple \n");
-                return NULL;
-            }
-        }
-        el_colrowIndex[j++] = row;  //initializing element row index 
-    }
+             if (paru_add_colTuple (ColList, Sj [p], colTuple, cc) ){
+                 paru_freemat (&paruMatInfo, cc);
+                 printf("Out of memory: add_colTuple \n");
+                 return NULL;
+             }
+         }
+         el_colrowIndex[j++] = row;  //initializing element row index 
+     }
 
-    PRLEVEL (0, ("];\n") );
-    PRLEVEL (0, ("I = InMatrix(:,1);\n") );
-    PRLEVEL (0, ("J = InMatrix(:,2);\n") );
-    PRLEVEL (0, ("X = InMatrix(:,3);\n") );
-    PRLEVEL (0, ("S=sparse(I,J,X);\n") );
+     PRLEVEL (0, ("];\n") );
+     PRLEVEL (0, ("I = InMatrix(:,1);\n") );
+     PRLEVEL (0, ("J = InMatrix(:,2);\n") );
+     PRLEVEL (0, ("X = InMatrix(:,3);\n") );
+     PRLEVEL (0, ("S=sparse(I,J,X);\n") );
 
-    paru_free (m, sizeof (Int), W, cc) ;
+     // Free here or if not wil be freed in paru_mem anyway
+     paru_free (snz, sizeof (double), Sx , cc) ;
+     paru_free (snz, sizeof (Int), Sj, cc);
+     LUsym->Sx = NULL; LUsym->Sj = NULL;
+     
 
-//    Int snz = LUsym->snz; // will be freed in mem 
-//    paru_free (snz, sizeof (double), Sx , cc) ;
-//    paru_free (snz, sizeof (Int), Sj, cc);
-//    Sx = NULL; Sj = NULL;
 
-    
-    return paruMatInfo;
+     return paruMatInfo;
 }

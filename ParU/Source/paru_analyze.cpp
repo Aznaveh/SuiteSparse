@@ -720,13 +720,8 @@ paru_symbolic *paru_analyze
         return NULL;
     }
     //initialization
-    /*aParent needs initialization*/
-    //memset (snM, -1, nf*sizeof(Int));
-    //memset (rM, -1, ms*sizeof(Int));
     memset (aParent, -1, (ms+nf)*sizeof(Int));
-    memset (aChild, -1, (ms+nf+1)*sizeof(Int)); // I thought I can leave it 
-    // uninitialized. Valgrind
-    // complains
+    //memset (aChild, -1, (ms+nf+1)*sizeof(Int));  //doens't need
     memset (aChildp, -1, (ms+nf+2)*sizeof(Int));
     memset (first, -1, (ms+nf)*sizeof(Int));
 
