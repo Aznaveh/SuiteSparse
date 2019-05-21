@@ -24,21 +24,27 @@ for k = 1:nmat
 end
 
 err = 10e-9;
-s = 0;
+s = 1;
 
 %test
 id = 801;
-id = 1865;
+id = 1298; %%time consuming
 
 
+
+id = 1865; %% shows the fill
+id = 449; %% simple
+id = 262; %% west0067
 Prob = ssget(id);
 A = Prob.A;
+[m n] = size (A);
 group = index.Group {id} ;
 name = index.Name {id} ;
 [dp,dq,dr,ds,dcc,drr] = dmperm(A);
 
 str1 = 'tar zvfxO ~/SuiteSparseCollection//MM/';
-str2 = sprintf ('%s/%s.tar.gz %s/%s.mtx | ../Demo/testazny %d %d', ...
+%str2 = sprintf ('%s/%s.tar.gz %s/%s.mtx | ../Demo/testazny %d %d', ...
+str2 = sprintf ('%s/%s.tar.gz %s/%s.mtx | ../Demo/umfout %d %d', ...
 group, name, name, name, id, s) ;
 str = strcat (str1,str2);
 
@@ -67,7 +73,8 @@ colp = colp+1;
 if(s==1)
         s_name = sprintf ('%d_scale.txt', id);
         scalefullname = strcat(path, s_name);
-        scale= load (scalefullname);
+        Rvec = load (scalefullname);
+        R = spdiags (Rvec, 0, m, m);
     end
 
 
@@ -91,7 +98,8 @@ if(s==1)
     U=triu(LU); 
 
     if (s == 1)
-        sA = sparse(diag(scale))*A;
+        %sA = sparse(diag(scale))*A;
+        sA = R\A;
     else
         sA = A;
     end
@@ -101,22 +109,12 @@ if(s==1)
     umfErr = lu_normest(p*(r\A)*q,l,u)
 
     umfpnnz = nnz(l)+nnz(u) - size(A,1)
-    mynnz = nnz(LU) + nnz(paddingZ)
+    mynnz = nnz(LU) %+ nnz(paddingZ)
 
-    %setting up KL
-    opts.tol = 0; opts.btf = 0; opts.ordering = 2;
-
-
-    B = sA(rowp,colp); B = B + 5*speye(size(B));
-    [myx, myinfo, c]  = klu(B, opts);
-    %myflop = luflop(L,U);
-    myflop = myinfo.flops
+    myflop = luflop(L,U)
 
 
-    B = p*(r\A)*q; B = B + 5*speye(size(B));
-    [umpfx, umpfinfo, c]  = klu(B, opts);
-    %umfflop = luflop(l,u);
-    umfflop = umpfinfo.flops
+    umfflop = luflop(l,u)
 
     myflop/umfflop
 

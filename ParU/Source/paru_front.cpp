@@ -48,14 +48,19 @@ void paru_front ( paru_matrix *paruMatInfo,
     /* pivotal columns Super [f] ... Super [f+1]-1 */
     Int col1 = Super [f];       /* fornt F has columns col1:col2-1 */
     Int col2 = Super [f+1];
-    Int *Rp = LUsym->Rp;
-    Int *Rj = LUsym->Rj;
-    Int p1 = Rp [f];        /* Rj [p1:p2-1] = columns in F */
-    Int p2 = Rp [f+1];
     Int fp = col2 - col1;   /* first fp columns are pivotal */ 
 
-    Int fn = p2 - p1;          /* Upper bound number of columns of F */ 
-    Int fm = LUsym->Fm[f];     /* Upper bound number of rows of F */ 
+    //TODO: I should use umfpack somehow to get these info
+//    Int *Rp = LUsym->Rp;
+//    Int *Rj = LUsym->Rj;
+//    Int p1 = Rp [f];        /* Rj [p1:p2-1] = columns in F */
+//    Int p2 = Rp [f+1];
+//
+//    Int fn = p2 - p1;          /* Upper bound number of columns of F */ 
+//    Int fm = LUsym->Fm[f];     /* Upper bound number of rows of F */ 
+    Int fm = m;     // TODO: a very bad estimate for rows and columns in each 
+    Int fn = n;     // front. It is just for a transient test 
+
     Element **elementList = paruMatInfo->elementList;
     work_struct *Work =  paruMatInfo->Work;
 
@@ -66,9 +71,11 @@ void paru_front ( paru_matrix *paruMatInfo,
 
     PRLEVEL (1, ("%% fp=%ld pivotal columns:clo1=%ld...col2=%ld\n", 
                 fp, col1, col2-1));
-    PRLEVEL (1, 
-            ("%%Upper bound number of columns: Rj[%ld]=%ld ... Rj[%ld]=%ld\n", 
-                p1, Rj [p1], p2, Rj [p2-1]));
+    //TODO: uncomment this when they are updated
+//    PRLEVEL (1, 
+//            ("%%Upper bound number of columns: Rj[%ld]=%ld ... Rj[%ld]=%ld\n", 
+//                p1, Rj [p1], p2, Rj [p2-1]));
+
     ASSERT (fp > 0 );
     ASSERT (fp <= fn );
 

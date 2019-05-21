@@ -144,7 +144,7 @@ void paru_update_rowDeg ( Int panel_num,  Int row_end,
                 el->cValid = pMark;
 #ifndef NDEBUG            
                 if (el->cValid >  pMark)
-                    PRLEVEL (0, ("%%pMark=%ld  cVal= %ld\n", 
+                    PRLEVEL (1, ("%%pMark=%ld  cVal= %ld\n", 
                                 pMark, el->cValid));
 #endif    
                 ASSERT(el->cValid <= pMark);
@@ -214,7 +214,8 @@ void paru_update_rowDeg ( Int panel_num,  Int row_end,
             PRLEVEL (p, ("%%  %ld", fcolList [i]));
         PRLEVEL (p, ("\n"));
     }
-    ASSERT (colCount == stl_colSize );
+    //TODO: check this assertion
+    //ASSERT (colCount == stl_colSize );
 #endif 
 
     // if the front did not grow, there is nothing else to do
@@ -420,7 +421,7 @@ void paru_update_rowDeg ( Int panel_num,  Int row_end,
         Int old_bound_updated = row_degree_bound [r] + colCount - 1 ;
 
 #ifndef NDEBUG
-        p = 0;
+        p = 1;
         PRLEVEL (p, ("%%old_bound_updated =%ld \n",old_bound_updated));
         PRLEVEL (p, ("%%new_row_degree_bound_for_r=%ld \n",
                    new_row_degree_bound_for_r));

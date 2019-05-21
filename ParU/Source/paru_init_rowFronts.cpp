@@ -24,7 +24,7 @@ paru_matrix *paru_init_rowFronts (
         cholmod_common *cc
         ){
 
-    DEBUGLEVEL(-1);
+    DEBUGLEVEL(0);
     if (!A->packed){
         printf ("A is not packed; Wrong format \n");
         return NULL;

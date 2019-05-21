@@ -320,7 +320,7 @@ paru_symbolic *paru_analyze
     PRLEVEL (0, ("%% A  is  %ld x %ld \n",m, n ));
     PRLEVEL (-1, ("LU = zeros(%ld,%ld);\n",m, n ));
     PRLEVEL (-1, ("npivots =[]; \n" ));
-    PRLEVEL (-1, ("S = zeros(%ld,%ld);\n",m, n ));
+    PRLEVEL (-1, ("S = zeros(%ld,%ld); %% n1 = %ld\n",m, n, n1 ));
     PRLEVEL (0, ("%% nf=%ld\n",nf ));
     //    PRLEVEL (0, ("%% anz = %ld  rjsize=%ld\n", anz, rjsize));
     //
@@ -654,7 +654,7 @@ paru_symbolic *paru_analyze
     //    QRsym->Fm = NULL;
 
 
-    LUsym->Cm= NULL;
+    LUsym->Cm= NULL;    //It seems I have never used it anyway
     //    LUsym->Cm = QRsym->Cm; 
     //    QRsym->Cm = NULL;
 
@@ -684,7 +684,7 @@ paru_symbolic *paru_analyze
 
 
 #ifndef NDEBUG
-    p = 1;
+    p = 0;
     /* print fronts*/
     for (Int f = 0; f < nf; f++){
         //       Int fm = LUsym->Fm[f];

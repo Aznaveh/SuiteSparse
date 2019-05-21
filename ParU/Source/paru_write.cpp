@@ -14,8 +14,14 @@ void paru_write( paru_matrix *paruMatInfo, int scale,
     DEBUGLEVEL(0);
     paru_symbolic *LUsym = paruMatInfo-> LUsym;
     Int nf = LUsym->nf;
+    
     Int m = LUsym->m;
     Int n = LUsym->n;
+    Int n1 = LUsym->n1;
+
+//    Int m = paruMatInfo->m;
+//    Int n = paruMatInfo->n;
+
     Int *Pinv =  LUsym->Pinv;  
     Int *Qfill =  LUsym->Qfill;
 
@@ -29,10 +35,7 @@ void paru_write( paru_matrix *paruMatInfo, int scale,
         name = id;
     else 
         name = default_name;
-    
 
-
-//    char dpath[] = "/export/scratch/multifrontal/aznaveh/myResults/";
     char dpath[] = "/users/aznaveh/SuiteSparse/ParU/Demo/Res/";
 
 
@@ -46,8 +49,6 @@ void paru_write( paru_matrix *paruMatInfo, int scale,
         strcat (fname,"_col.txt");
         colfptr = ( fopen(fname,"w"));
 
-    //colfptr = ( fopen("/users/aznaveh/SuiteSparse/ParU/Demo/%s_col.txt","w"));
-        //    colfptr = ( fopen("./col.txt","w"));
         if (colfptr == NULL ){
             printf ("Error in opening a file");
             return;
@@ -62,10 +63,23 @@ void paru_write( paru_matrix *paruMatInfo, int scale,
     }
     //--------------------
 
+    //--------------------computing and  writing row permutation to a file
 
-    Int *oldRofS= (Int*) paru_alloc ( m, sizeof (Int), cc); // S -> LU
-    Int *PofA= (Int*) paru_alloc ( m, sizeof (Int), cc);    // inv(Pinv)
-    //-------------------- writing row permutation to a file
+    //some working memory that is freed in this function 
+    Int *oldRofS = NULL; Int *PofA = NULL; Int *newRofS = NULL;    
+
+    oldRofS = (Int*) paru_alloc ( m, sizeof (Int), cc); // S -> LU P
+    PofA = (Int*) paru_alloc ( m, sizeof (Int), cc);    // P direct of A 
+    newRofS = (Int*) paru_alloc ( m, sizeof (Int), cc); //Pinv of S
+
+    if (oldRofS == NULL || PofA == NULL || newRofS == NULL){
+        printf ("memory problem for writing into files\n");
+        paru_free  ( m, sizeof (Int), oldRofS, cc);
+        paru_free ( m, sizeof (Int), PofA, cc);
+        paru_free ( m, sizeof (Int), newRofS, cc);
+        return;
+    }
+
     {
         FILE *rowfptr;
         char fname [100] = "";
@@ -75,24 +89,31 @@ void paru_write( paru_matrix *paruMatInfo, int scale,
         rowfptr = ( fopen(fname,"w"));
 
 
-        // rowfptr = ( fopen("/users/aznaveh/SuiteSparse/ParU/Demo/row.txt","w"));
         if (rowfptr == NULL ){
             printf ("Error in opening a file");
             return;
         }
-        fprintf (rowfptr, "%%rows\n");
-        for(Int k = 0; k < m ; k++){
-            PofA[Pinv[k]] = k;
+        fprintf (rowfptr, "%%rows\n"); 
+
+        for(Int k = 0; k < m ; k++){ //direct permutation from Pinv
+            PofA[Pinv[k]] = k;       // actually I have it now with UMFPACK
+                                     // but didn't save it
         }
 
-        Int ip = 0;
-        for(Int f = 0; f < nf ; f++){   
+        Int ip = 0; //number of rows seen so far
+        for (Int k = 0; k < n1 ; k++){ //first singletons
+            fprintf (rowfptr, "%ld\n", PofA[k] );
+        }
+        for(Int f = 0; f < nf ; f++){  // rows for each front 
             Int col1 = Super [f];     
             Int col2 = Super [f+1];
             Int fp = col2-col1;
             Int *frowList =  paruMatInfo->frowList[f];
-            for (Int k = 0; k<fp ; k++){
-                oldRofS[ip++] = frowList[k];
+
+
+            for (Int k = 0; k < fp ; k++){
+                oldRofS[ip++] = frowList[k];   // computing permutation for S
+                                               // P[k] = i 
                 fprintf (rowfptr, "%ld\n", PofA[frowList[k]] );
             }
         }
@@ -102,9 +123,8 @@ void paru_write( paru_matrix *paruMatInfo, int scale,
     //--------------------
 
 
-    //-------- computing the direct permutation
-    Int *newRofS= (Int*) paru_alloc ( m, sizeof (Int), cc);
-    for(Int k = 0; k < m ; k++){
+    //-------- computing the direct permutation of S
+    for(Int k = 0; k < m-n1 ; k++){ // Inv permutation for S Pinv[i] = k;
         newRofS[oldRofS[k]] = k;
     }
 
@@ -160,13 +180,12 @@ void paru_write( paru_matrix *paruMatInfo, int scale,
     LUfptr = ( fopen(fname,"w"));
 
 
-    //LUfptr = ( fopen("/users/aznaveh/SuiteSparse/ParU/Demo/out.txt","w"));
     if (LUfptr == NULL ){
         printf ("Error in opening a file");
         return;
     }
 
-    //computing nnnz
+    //computing nnnz of S
     Int nnz = 0;
     for(Int f = 0; f < nf ; f++){   
         Int colCount =  paruMatInfo->fcolCount[f];
@@ -196,7 +215,7 @@ void paru_write( paru_matrix *paruMatInfo, int scale,
         for (Int j = col1 ; j < col2; j++)
             for (Int i = 0; i < rowCount ; i++){
                 fprintf (LUfptr, "%ld  %ld %.16g\n",
-                        newRofS[frowList[i]]+1, j+1, 
+                        newRofS[frowList[i]]+n1+1, j+n1+1, 
                         pivotalFront[(j-col1)*rowCount+i]);
             }
 
@@ -217,8 +236,8 @@ void paru_write( paru_matrix *paruMatInfo, int scale,
         double *uPart = Us[f].p  ;
         for (Int j = 0; j < colCount; j++)
             for (Int i = 0; i < fp; i++){
-                fprintf (LUfptr, "%ld  %ld %.16g\n", newRofS[frowList[i]]+1,
-                        fcolList[j]+1, uPart[fp*j+i]);
+                fprintf (LUfptr, "%ld  %ld %.16g\n", newRofS[frowList[i]]+n1+1,
+                        fcolList[j]+n1+1, uPart[fp*j+i]);
             }
 #ifndef NDEBUG  // Printing the  U part
         p = 1;
