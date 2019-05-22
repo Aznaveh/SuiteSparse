@@ -37,7 +37,7 @@ Int paru_panel_factorize (double *F, Int *frowList, Int m, Int n,
         paru_matrix *paruMatInfo) {
     // works like dgetf2f.f in netlib v3.0  here is a link:
     // https://github.com/xianyi/OpenBLAS/blob/develop/reference/dgetf2f.f
-    DEBUGLEVEL(0);
+    DEBUGLEVEL(1);
     PRLEVEL (1, ("%% Inside panel factorization %ld \n",panel_num));
 
 
@@ -77,16 +77,19 @@ Int paru_panel_factorize (double *F, Int *frowList, Int m, Int n,
 
         //Initializing maximum element in the column
         Int row_max = j;
-        Int row_deg_max = row_degree_bound[row_max];
+        Int row_deg_max = row_degree_bound[frowList[row_max]];
+
         double maxval = F[ j*m + row_max ];
-        PRLEVEL (1, ("%% before search max value= %2.4lf\n", maxval));
+        PRLEVEL (1, ("%% before search max value= %2.4lf row_deg = %ld\n",
+                    maxval, row_deg_max));
 
         //find max
         for (Int i = j+1 ; i < row_end; i++){ 
-            PRLEVEL (1, ("%%i=%ld value= %2.4lf\n", i, F[j*m+i]));
+            PRLEVEL (1, ("%%i=%ld value= %2.4lf", i, F[j*m+i]));
+            PRLEVEL (1, (" deg = %ld \n", row_degree_bound[frowList[i]]));
             if (fabs (maxval) < fabs(F[j*m+i])){
                 row_max = i; 
-                row_deg_max = row_degree_bound[i];
+                row_deg_max = row_degree_bound[frowList[i]];
                 maxval = F[j*m + i];
             }
         }
@@ -97,20 +100,20 @@ Int paru_panel_factorize (double *F, Int *frowList, Int m, Int n,
  
         //initialzing pivot as max numeric value
         Int row_sp = row_max;
-        Int row_deg_sp= row_degree_bound[row_max];
+        Int row_deg_sp= row_degree_bound[frowList[row_max]];
         double piv= maxval;
 
 
         //find sparsest between accepteble ones
         for (Int i = j; i < row_end; i++) 
             if ( fabs(TOLER*maxval) < fabs(F[j*m+i]) &&//numerically acceptalbe
-                    row_degree_bound[i] < row_deg_sp){     // and sparser
+                    row_degree_bound[frowList[i]] < row_deg_sp){     // and sparser
                 piv = F[j*m+i];
-                row_deg_sp = row_degree_bound[i];
+                row_deg_sp = row_degree_bound[frowList[i]];
                 row_sp = i;
             }
 
-        PRLEVEL (1, ("%% piv value= %2.4lf\n", piv));
+        PRLEVEL (1, ("%% piv value= %2.4lf row_deg=%ld\n", piv, row_deg_sp));
 
        //swap rows
         PRLEVEL (1, ("%% Swaping rows j=%ld, spr=%ld\n", j, row_sp));
