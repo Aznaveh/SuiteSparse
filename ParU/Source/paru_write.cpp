@@ -17,7 +17,7 @@ void paru_write( paru_matrix *paruMatInfo, int scale,
     
     Int m = LUsym->m;
     Int n = LUsym->n;
-    Int n1 = LUsym->n1;
+    Int n1 = LUsym->n1; // row+col singletons
 
 //    Int m = paruMatInfo->m;
 //    Int n = paruMatInfo->n;
@@ -185,7 +185,7 @@ void paru_write( paru_matrix *paruMatInfo, int scale,
         return;
     }
 
-    //computing nnnz of S
+    //computing nnz of factorized S
     Int nnz = 0;
     for(Int f = 0; f < nf ; f++){   
         Int colCount =  paruMatInfo->fcolCount[f];
@@ -195,11 +195,16 @@ void paru_write( paru_matrix *paruMatInfo, int scale,
         Int fp = col2-col1;
         nnz += fp*(rowCount + colCount);
     }
+    nnz += LUsym->anz - LUsym->snz; //adding singletons
 
     fprintf (LUfptr, "%%%MatrixMarket matrix coordinate real general\n");
     fprintf (LUfptr, "%%-----------produced by ParU ---------------\n");
     fprintf (LUfptr, "%ld  %ld %ld\n",m ,n ,nnz );
 
+    // writing the singletons
+    // TODO
+
+    // writing the L and U factors
     for(Int f = 0; f < nf ; f++){   
         Int colCount =  paruMatInfo->fcolCount[f];
         Int *fcolList =  paruMatInfo->fcolList[f];

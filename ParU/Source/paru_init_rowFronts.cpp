@@ -393,7 +393,7 @@ paru_matrix *paru_init_rowFronts (
      PRLEVEL (0, ("I = InMatrix(:,1);\n") );
      PRLEVEL (0, ("J = InMatrix(:,2);\n") );
      PRLEVEL (0, ("X = InMatrix(:,3);\n") );
-     PRLEVEL (0, ("S=sparse(I,J,X);\n") );
+     PRLEVEL (0, ("S = sparse(I,J,X);\n") );
 
      // Free here or if not wil be freed in paru_mem anyway
      paru_free (snz, sizeof (double), Sx , cc) ;

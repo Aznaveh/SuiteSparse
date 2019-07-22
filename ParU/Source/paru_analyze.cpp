@@ -172,16 +172,24 @@ paru_symbolic *paru_analyze
 
     double status,   // Info [UMFPACK_STATUS] 
     Info[UMFPACK_INFO],// Contains statistics about the symbolic analysis
+    
     Control [UMFPACK_CONTROL]; // it is set in umfpack_dl_defaults and
-    // is used in umfpack_dl_symbolic; if
-    // passed NULL it will use the defaults
-    //
+                               // is used in umfpack_dl_symbolic; if
+                               // passed NULL it will use the defaults
+    
     /* ---------------------------------------------------------------------- */
     /*    Setting up umfpakc symbolic analysis and do the  analysis phase     */
     /* ---------------------------------------------------------------------- */
 
     /* get the default control parameters */
+
+    // Here is where the pre-ordering strategy is being chosen. I need a nested
+    // dissection method here like metis: 
+    //      Control [UMFPACK_ORDERING] = UMFPACK_ORDERING_METIS;
+    //      However I am using the default for now; Page 40 UMFPACK_UserGuide
+    //      Page 22 UserGuide
     umfpack_dl_defaults (Control) ;
+    Control [UMFPACK_ORDERING] = UMFPACK_ORDERING_METIS;
 
 #ifndef NDEBUG
     /* print the control parameters */
@@ -468,7 +476,8 @@ paru_symbolic *paru_analyze
         return NULL;  
     }
 
-    Int snz = 0;  //nnz in submatrix excluding singletons
+    Int unz = 0;  // U nnz: singlteton nnzero of s
+    Int snz = 0;  //s nonzero: nnz in submatrix excluding singletons
     int rowcount = 0;
     Sleft[0] = 0;
     //counting number of entries in each row of submatrix Sp
@@ -492,6 +501,9 @@ paru_symbolic *paru_analyze
                 snz++;
                 Sp[srow+1]++;
             } 
+            else { // inside the upart
+               unz++; 
+            }
         }
         Sleft[newcol-n1+1] = rowcount;
     }
@@ -648,6 +660,7 @@ paru_symbolic *paru_analyze
     /* ---------------------------------------------------------------------- */
     /*         Finding the Upper bound of rows and cols                       */
     /* ---------------------------------------------------------------------- */
+    //TODO: it must computed somehow from UMFPACK
 
     LUsym->Fm= NULL;
     //    LUsym->Fm = QRsym->Fm; 
@@ -684,7 +697,7 @@ paru_symbolic *paru_analyze
 
 
 #ifndef NDEBUG
-    p = 0;
+    p = 1;
     /* print fronts*/
     for (Int f = 0; f < nf; f++){
         //       Int fm = LUsym->Fm[f];
