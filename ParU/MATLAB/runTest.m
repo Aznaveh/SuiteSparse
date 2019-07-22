@@ -33,17 +33,17 @@ err = 1e-5;
 %Don't scale the matrix if s ==0 scale otherwise
 s = 0;
 
-ff = fopen ('results.csv', 'w') ;
+ff = fopen ('myRes.m', 'w') ;
 
 % Headers
-fprintf(ff,'id,nnzA,myErr,umfErr,logratio' );
-fprintf(ff,',myElaps,umfElaps,ratio');
-fprintf(ff,',mynnz,umfnnz,ratio');
-fprintf(ff,',myflop,umfflop,ratio\n');
+fprintf(ff,'id nnzA myErr umfErr logratio' );
+fprintf(ff,' myElaps umfElaps ratio');
+fprintf(ff,' mynnz umfnnz ratio');
+fprintf(ff,' myflop umfflop ratio\n');
 
 
-%for k = 1:nmat
-for k = 1:100
+for k = 1:nmat
+%for k = 1:10
     id = fnew (k) ;
     group = index.Group {id} ;
     name = index.Name {id} ;
@@ -144,9 +144,9 @@ for k = 1:100
 
     fprintf(ff,'%d,%d,%g,%g,%g', id, nnz(A), myErr, umfErr, ...
         log10(myErr/umfErr));
-    fprintf(ff,',%g,%g,%g', myElaps, umfElaps, myElaps/umfElaps);
-    fprintf(ff,',%g,%g,%g', mynnz , umfpnnz, mynnz/umfpnnz );
-    fprintf(ff,',%g,%g,%g\n', myflop, umfflop, myflop/umfflop);
+    fprintf(ff,' %g %g %g', myElaps, umfElaps, myElaps/umfElaps);
+    fprintf(ff,' %g %g %g', mynnz , umfpnnz, mynnz/umfpnnz );
+    fprintf(ff,' %g %g %g\n', myflop, umfflop, myflop/umfflop);
 
 
     % cleaning the files because of the memory problem

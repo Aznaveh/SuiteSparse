@@ -24,7 +24,7 @@ for k = 1:nmat
 end
 
 err = 10e-9;
-s = 1;
+s = 0;
 
 %test
 id = 801;
@@ -35,6 +35,9 @@ id = 1298; %%time consuming
 id = 1865; %% shows the fill
 id = 449; %% simple
 id = 262; %% west0067
+id = 2569; %%problematic
+id = 298;
+id = 2748;
 Prob = ssget(id);
 A = Prob.A;
 [m n] = size (A);
