@@ -6,6 +6,7 @@
  * @author Aznaveh
  * */
 #include "Parallel_LU.hpp"
+#include <omp.h>
 
 int main (int argc, char **argv)
 {
@@ -40,6 +41,8 @@ int main (int argc, char **argv)
     }
 
     //~~~~~~~~~~~~~~~~~~~Starting computation~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    double start_time = omp_get_wtime();
+
     LUsym = paru_analyze (A, cc);
     if (LUsym == NULL) {
         exit(0);
@@ -54,29 +57,33 @@ int main (int argc, char **argv)
             PRLEVEL (1, ("The input matrix will be scaled\n"));
     }
         
-//    paru_matrix *paruMatInfo = paru_init_rowFronts (A, scale, LUsym, cc);
-//    if (paruMatInfo == NULL) {
-//        exit(0);
-//    }
+    paru_matrix *paruMatInfo = paru_init_rowFronts (A, scale, LUsym, cc);
+    if (paruMatInfo == NULL) {
+        exit(0);
+    }
 
 
-//    Int m,n,nf;
-//    m = paruMatInfo-> m;
-//    n = paruMatInfo-> n;
-//    nf = paruMatInfo->LUsym->nf;
-//
+    Int m,n,nf;
+    m = paruMatInfo-> m;
+    n = paruMatInfo-> n;
+    nf = paruMatInfo->LUsym->nf;
 
-//    for (Int i = 0; i < nf; i++) {
-//        //paru_assemble (paruMatInfo, i, cc);
-//        paru_front (paruMatInfo, i, cc);
-//    }
+
+    for (Int i = 0; i < nf; i++) {
+        paru_front (paruMatInfo, i, cc);
+    }
+    double time = omp_get_wtime() - start_time;
+    paruMatInfo->time = time;
+ 
     //~~~~~~~~~~~~~~~~~~~End computation~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+    // Writing results to a file
+    paru_write(paruMatInfo, scale,  argv[1], cc);
 
     //~~~~~~~~~~~~~~~~~~~Free Everything~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     cholmod_l_free_sparse (&A, cc);
 
-//    paru_freemat (&paruMatInfo, cc);
+    paru_freemat (&paruMatInfo, cc);
     paru_freesym (&LUsym,cc);
 
     cholmod_l_finish (cc);

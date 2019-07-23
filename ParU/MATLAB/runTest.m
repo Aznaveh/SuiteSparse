@@ -142,7 +142,7 @@ for k = 1:nmat
 
     umfflop = luflop(l,u);
 
-    fprintf(ff,'%d,%d,%g,%g,%g', id, nnz(A), myErr, umfErr, ...
+    fprintf(ff,'%d %d %g %g %g', id, nnz(A), myErr, umfErr, ...
         log10(myErr/umfErr));
     fprintf(ff,' %g %g %g', myElaps, umfElaps, myElaps/umfElaps);
     fprintf(ff,' %g %g %g', mynnz , umfpnnz, mynnz/umfpnnz );

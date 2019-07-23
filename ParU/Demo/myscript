@@ -1,5 +1,5 @@
 #tar zvfxO ~/SuiteSparseCollection//MM/Grund/b1_ss.tar.gz b1_ss/b1_ss.mtx | ./umfout
-tar zvfxO ~/SuiteSparseCollection//MM/HB/jgl009.tar.gz jgl009/jgl009.mtx | ./umfout
+#tar zvfxO ~/SuiteSparseCollection//MM/HB/jgl009.tar.gz jgl009/jgl009.mtx | ./umfout
 #tar zvfxO ~/SuiteSparseCollection//MM/HB/jgl011.tar.gz jgl011/jgl011.mtx | ./umfout
 #tar zvfxO ~/SuiteSparseCollection//MM/Hamrle/Hamrle1.tar.gz Hamrle1/Hamrle1.mtx | ./umfout
 #tar zvfxO ~/SuiteSparseCollection//MM/HB/bcspwr01.tar.gz bcspwr01/bcspwr01.mtx | ./umfout
@@ -10,11 +10,11 @@ tar zvfxO ~/SuiteSparseCollection//MM/HB/jgl009.tar.gz jgl009/jgl009.mtx | ./umf
 #tar zvfxO ~/SuiteSparseCollection//MM/HB/pores_1.tar.gz pores_1/pores_1.mtx | ./testazny
 #tar zvfxO ~/SuiteSparseCollection//MM/HB/can_62.tar.gz can_62/can_62.mtx | ./testazny
 #tar zvfxO ~/SuiteSparseCollection//MM/HB/dwt_72.tar.gz dwt_72/dwt_72.mtx | ./testazny
-#tar zvfxO ~/SuiteSparseCollection//MM/Grund/d_dyn.tar.gz d_dyn/d_dyn.mtx | ./umfout  ####
+#tar zvfxO ~/SuiteSparseCollection//MM/Grund/d_dyn.tar.gz d_dyn/d_dyn.mtx | ./umfout 
 #tar zvfxO ~/SuiteSparseCollection//MM/HB/dwt_59.tar.gz dwt_59/dwt_59.mtx | ./testazny
 #tar zvfxO ~/SuiteSparseCollection//MM/HB/will57.tar.gz will57/will57.mtx | ./testazny
 #tar zvfxO ~/SuiteSparseCollection//MM/HB/curtis54.tar.gz curtis54/curtis54.mtx | ./testazny
-#tar zvfxO ~/SuiteSparseCollection//MM/HB/west0067.tar.gz west0067/west0067.mtx | ./testazny
+tar zvfxO ~/SuiteSparseCollection//MM/HB/west0067.tar.gz west0067/west0067.mtx | ./umfout
 #tar zvfxO ~/SuiteSparseCollection//MM/MathWorks/pivtol.tar.gz pivtol/pivtol.mtx | ./testazny
 #tar zvfxO ~/SuiteSparseCollection//MM/HB/impcol_b.tar.gz impcol_b/impcol_b.mtx | ./testazny
 #tar zvfxO ~/SuiteSparseCollection//MM/HB/dwt_66.tar.gz dwt_66/dwt_66.mtx | ./testazny
