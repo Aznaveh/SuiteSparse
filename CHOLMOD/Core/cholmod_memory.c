@@ -191,44 +191,24 @@ void *CHOLMOD(free)	/* always returns NULL */
 )
 {
     RETURN_IF_NULL_COMMON (NULL) ;
-
-    /*Aznaveh*/
-    PRINTM (("\nin cholmod_free: n %g size %g inuse %g\n",
-        (double) n, (double) size,
-        (double) Common->memory_inuse)) ;
-
-
     if (p != NULL)
     {
-        //Aznaveh: 
-        // ASSERT (Common->memory_inuse >= (n * size)) ;
+	/* only free the object if the pointer is not NULL */
+	/* call free, or its equivalent */
+	SuiteSparse_free (p) ;
 
-        /* only free the object if the pointer is not NULL */
-        /* call free, or its equivalent */
-        SuiteSparse_free (p) ;
-
-        Common->malloc_count-- ;
-        Common->memory_inuse -= (n * size) ;
-        PRINTM (("cholmod_free   %p %g cnt: %g inuse %g\n",
-                    p, (double) n*size, (double) Common->malloc_count,
-                    (double) Common->memory_inuse)) ;
-
-        /* This assertion will fail if the user calls cholmod_malloc and
-         * cholmod_free with mismatched memory sizes.  It shouldn't fail
-         * otherwise. */
-        //Aznaveh:
-        //ASSERT (IMPLIES (Common->malloc_count == 0, Common->memory_inuse == 0));
+	Common->malloc_count-- ;
+	Common->memory_inuse -= (n * size) ;
+	PRINTM (("cholmod_free   %p %g cnt: %g inuse %g\n",
+		p, (double) n*size, (double) Common->malloc_count,
+                (double) Common->memory_inuse)) ;
+	/* This assertion will fail if the user calls cholmod_malloc and
+	 * cholmod_free with mismatched memory sizes.  It shouldn't fail
+	 * otherwise. */
+	ASSERT (IMPLIES (Common->malloc_count == 0, Common->memory_inuse == 0));
     }
     /* return NULL, and the caller should assign this to p.  This avoids
      * freeing the same pointer twice. */
-
-    /*Aznaveh*/
-
-    PRINTM (("done cholmod_free: n %g size %g inuse %g\n",
-                (double) n, (double) size,
-                (double) Common->memory_inuse)) ;
-
-
     return (NULL) ;
 }
 
@@ -245,13 +225,13 @@ void *CHOLMOD(free)	/* always returns NULL */
  */
 
 void *CHOLMOD(calloc)	/* returns pointer to the newly calloc'd block */
-    (
-     /* ---- input ---- */
-     size_t n,		/* number of items */
-     size_t size,	/* size of each item */
-     /* --------------- */
-     cholmod_common *Common
-    )
+(
+    /* ---- input ---- */
+    size_t n,		/* number of items */
+    size_t size,	/* size of each item */
+    /* --------------- */
+    cholmod_common *Common
+)
 {
     void *p ;
 

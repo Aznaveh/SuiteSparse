@@ -263,17 +263,15 @@ int CHOLMOD(defaults)
     /* use simplicial factorization if flop/nnz(L) < 40, supernodal otherwise */
     Common->supernodal = CHOLMOD_AUTO ;
     Common->supernodal_switch = 40 ;
+    /*Aznaveh
+      Common->nrelax [0] = 0 ;
+      Common->nrelax [1] = 0 ;
+      Common->nrelax [2] = 0 ;
+      */
+    Common->nrelax [0] = 4 ;
+    Common->nrelax [1] = 16 ;
+    Common->nrelax [2] = 48 ;
 
-/* Azny:
- * Common->nrelax [0] = 4 ;
-/*    Common->nrelax [1] = 16 ;
-/*    Common->nrelax [2] = 48 ;
- */
-
-    Common->nrelax [0] = 0 ;
-    Common->nrelax [1] = 0 ;
-    Common->nrelax [2] = 0 ;
- 
     Common->zrelax [0] = 0.8 ;
     Common->zrelax [1] = 0.1 ;
     Common->zrelax [2] = 0.05 ;
@@ -316,27 +314,27 @@ int CHOLMOD(defaults)
     /* first, fill each method with default parameters */
     for (i = 0 ; i <= CHOLMOD_MAXMETHODS ; i++)
     {
-	/* CHOLMOD's default method is AMD for A or AA' */
-	Common->method [i].ordering = CHOLMOD_AMD ;
+        /* CHOLMOD's default method is AMD for A or AA' */
+        Common->method [i].ordering = CHOLMOD_AMD ;
 
-	/* CHOLMOD nested dissection and minimum degree parameter */
-	Common->method [i].prune_dense = 10.0 ;	/* dense row/col control */
+        /* CHOLMOD nested dissection and minimum degree parameter */
+        Common->method [i].prune_dense = 10.0 ;	/* dense row/col control */
 
-	/* min degree parameters (AMD, COLAMD, SYMAMD, CAMD, CCOLAMD, CSYMAMD)*/
-	Common->method [i].prune_dense2 = -1 ;	/* COLAMD dense row control */
-	Common->method [i].aggressive = TRUE ;	/* aggressive absorption */
-	Common->method [i].order_for_lu = FALSE ;/* order for Cholesky not LU */
+        /* min degree parameters (AMD, COLAMD, SYMAMD, CAMD, CCOLAMD, CSYMAMD)*/
+        Common->method [i].prune_dense2 = -1 ;	/* COLAMD dense row control */
+        Common->method [i].aggressive = TRUE ;	/* aggressive absorption */
+        Common->method [i].order_for_lu = FALSE ;/* order for Cholesky not LU */
 
-	/* CHOLMOD's nested dissection (METIS + constrained AMD) */
-	Common->method [i].nd_small = 200 ;	/* small graphs aren't cut */
-	Common->method [i].nd_compress = TRUE ;	/* compress graph & subgraphs */
-	Common->method [i].nd_camd = 1 ;	/* use CAMD */
-	Common->method [i].nd_components = FALSE ;  /* lump connected comp. */
-	Common->method [i].nd_oksep = 1.0 ;	/* sep ok if < oksep*n */
+        /* CHOLMOD's nested dissection (METIS + constrained AMD) */
+        Common->method [i].nd_small = 200 ;	/* small graphs aren't cut */
+        Common->method [i].nd_compress = TRUE ;	/* compress graph & subgraphs */
+        Common->method [i].nd_camd = 1 ;	/* use CAMD */
+        Common->method [i].nd_components = FALSE ;  /* lump connected comp. */
+        Common->method [i].nd_oksep = 1.0 ;	/* sep ok if < oksep*n */
 
-	/* statistics for each method are not yet computed */
-	Common->method [i].fl = EMPTY ;
-	Common->method [i].lnz = EMPTY ;
+        /* statistics for each method are not yet computed */
+        Common->method [i].fl = EMPTY ;
+        Common->method [i].lnz = EMPTY ;
     }
 
     Common->postorder = TRUE ;	/* follow ordering with weighted postorder */
@@ -392,10 +390,10 @@ int CHOLMOD(defaults)
  * cholmod_free_work.
  */
 
-int CHOLMOD(finish)
+    int CHOLMOD(finish)
 (
-    cholmod_common *Common
-)
+ cholmod_common *Common
+ )
 {
     return (CHOLMOD(free_work) (Common)) ;
 }
@@ -413,14 +411,14 @@ int CHOLMOD(finish)
  */
 
 int CHOLMOD(allocate_work)
-(
-    /* ---- input ---- */
-    size_t nrow,	/* # of rows in the matrix A */
-    size_t iworksize,	/* size of Iwork */
-    size_t xworksize,	/* size of Xwork */
-    /* --------------- */
-    cholmod_common *Common
-)
+    (
+     /* ---- input ---- */
+     size_t nrow,	/* # of rows in the matrix A */
+     size_t iworksize,	/* size of Iwork */
+     size_t xworksize,	/* size of Xwork */
+     /* --------------- */
+     cholmod_common *Common
+    )
 {
     double *W ;
     Int *Head ;
@@ -445,47 +443,47 @@ int CHOLMOD(allocate_work)
     nrow1 = CHOLMOD(add_size_t) (nrow, 1, &ok) ;
     if (!ok)
     {
-	/* nrow+1 causes size_t overflow ; problem is too large */
-	Common->status = CHOLMOD_TOO_LARGE ;
-	CHOLMOD(free_work) (Common) ;
-	return (FALSE) ;
+        /* nrow+1 causes size_t overflow ; problem is too large */
+        Common->status = CHOLMOD_TOO_LARGE ;
+        CHOLMOD(free_work) (Common) ;
+        return (FALSE) ;
     }
 
     if (nrow > Common->nrow)
     {
 
-	if (Common->no_workspace_reallocate)
-	{
-	    /* CHOLMOD is not allowed to change the workspace here */
-	    Common->status = CHOLMOD_INVALID ;
-	    return (FALSE) ;
-	}
+        if (Common->no_workspace_reallocate)
+        {
+            /* CHOLMOD is not allowed to change the workspace here */
+            Common->status = CHOLMOD_INVALID ;
+            return (FALSE) ;
+        }
 
-	/* free the old workspace (if any) and allocate new space */
-	Common->Flag = CHOLMOD(free) (Common->nrow,  sizeof (Int), Common->Flag,
-		Common) ;
-	Common->Head = CHOLMOD(free) (Common->nrow+1,sizeof (Int), Common->Head,
-		Common) ;
-	Common->Flag = CHOLMOD(malloc) (nrow,   sizeof (Int), Common) ;
-	Common->Head = CHOLMOD(malloc) (nrow1, sizeof (Int), Common) ;
+        /* free the old workspace (if any) and allocate new space */
+        Common->Flag = CHOLMOD(free) (Common->nrow,  sizeof (Int), Common->Flag,
+                Common) ;
+        Common->Head = CHOLMOD(free) (Common->nrow+1,sizeof (Int), Common->Head,
+                Common) ;
+        Common->Flag = CHOLMOD(malloc) (nrow,   sizeof (Int), Common) ;
+        Common->Head = CHOLMOD(malloc) (nrow1, sizeof (Int), Common) ;
 
-	/* record the new size of Flag and Head */
-	Common->nrow = nrow ;
+        /* record the new size of Flag and Head */
+        Common->nrow = nrow ;
 
-	if (Common->status < CHOLMOD_OK)
-	{
-	    CHOLMOD(free_work) (Common) ;
-	    return (FALSE) ;
-	}
+        if (Common->status < CHOLMOD_OK)
+        {
+            CHOLMOD(free_work) (Common) ;
+            return (FALSE) ;
+        }
 
-	/* initialize Flag and Head */
-	Common->mark = EMPTY ;
-	CHOLMOD(clear_flag) (Common) ;
-	Head = Common->Head ;
-	for (i = 0 ; i <= (Int) (nrow) ; i++)
-	{
-	    Head [i] = EMPTY ;
-	}
+        /* initialize Flag and Head */
+        Common->mark = EMPTY ;
+        CHOLMOD(clear_flag) (Common) ;
+        Head = Common->Head ;
+        for (i = 0 ; i <= (Int) (nrow) ; i++)
+        {
+            Head [i] = EMPTY ;
+        }
     }
 
     /* ---------------------------------------------------------------------- */
@@ -496,28 +494,28 @@ int CHOLMOD(allocate_work)
     if (iworksize > Common->iworksize)
     {
 
-	if (Common->no_workspace_reallocate)
-	{
-	    /* CHOLMOD is not allowed to change the workspace here */
-	    Common->status = CHOLMOD_INVALID ;
-	    return (FALSE) ;
-	}
+        if (Common->no_workspace_reallocate)
+        {
+            /* CHOLMOD is not allowed to change the workspace here */
+            Common->status = CHOLMOD_INVALID ;
+            return (FALSE) ;
+        }
 
-	/* free the old workspace (if any) and allocate new space.
-	 * integer overflow safely detected in cholmod_malloc */
-	CHOLMOD(free) (Common->iworksize, sizeof (Int), Common->Iwork, Common) ;
-	Common->Iwork = CHOLMOD(malloc) (iworksize, sizeof (Int), Common) ;
+        /* free the old workspace (if any) and allocate new space.
+         * integer overflow safely detected in cholmod_malloc */
+        CHOLMOD(free) (Common->iworksize, sizeof (Int), Common->Iwork, Common) ;
+        Common->Iwork = CHOLMOD(malloc) (iworksize, sizeof (Int), Common) ;
 
-	/* record the new size of Iwork */
-	Common->iworksize = iworksize ;
+        /* record the new size of Iwork */
+        Common->iworksize = iworksize ;
 
-	if (Common->status < CHOLMOD_OK)
-	{
-	    CHOLMOD(free_work) (Common) ;
-	    return (FALSE) ;
-	}
+        if (Common->status < CHOLMOD_OK)
+        {
+            CHOLMOD(free_work) (Common) ;
+            return (FALSE) ;
+        }
 
-	/* note that Iwork does not need to be initialized */
+        /* note that Iwork does not need to be initialized */
     }
 
     /* ---------------------------------------------------------------------- */
@@ -529,33 +527,33 @@ int CHOLMOD(allocate_work)
     if (xworksize > Common->xworksize)
     {
 
-	if (Common->no_workspace_reallocate)
-	{
-	    /* CHOLMOD is not allowed to change the workspace here */
-	    Common->status = CHOLMOD_INVALID ;
-	    return (FALSE) ;
-	}
+        if (Common->no_workspace_reallocate)
+        {
+            /* CHOLMOD is not allowed to change the workspace here */
+            Common->status = CHOLMOD_INVALID ;
+            return (FALSE) ;
+        }
 
-	/* free the old workspace (if any) and allocate new space */
-	CHOLMOD(free) (Common->xworksize, sizeof (double), Common->Xwork,
-		Common) ;
-	Common->Xwork = CHOLMOD(malloc) (xworksize, sizeof (double), Common) ;
+        /* free the old workspace (if any) and allocate new space */
+        CHOLMOD(free) (Common->xworksize, sizeof (double), Common->Xwork,
+                Common) ;
+        Common->Xwork = CHOLMOD(malloc) (xworksize, sizeof (double), Common) ;
 
-	/* record the new size of Xwork */
-	Common->xworksize = xworksize ;
+        /* record the new size of Xwork */
+        Common->xworksize = xworksize ;
 
-	if (Common->status < CHOLMOD_OK)
-	{
-	    CHOLMOD(free_work) (Common) ;
-	    return (FALSE) ;
-	}
+        if (Common->status < CHOLMOD_OK)
+        {
+            CHOLMOD(free_work) (Common) ;
+            return (FALSE) ;
+        }
 
-	/* initialize Xwork */
-	W = Common->Xwork ;
-	for (i = 0 ; i < (Int) xworksize ; i++)
-	{
-	    W [i] = 0. ;
-	}
+        /* initialize Xwork */
+        W = Common->Xwork ;
+        for (i = 0 ; i < (Int) xworksize ; i++)
+        {
+            W [i] = 0. ;
+        }
     }
 
     return (TRUE) ;
@@ -571,45 +569,20 @@ int CHOLMOD(allocate_work)
  * workspace: deallocates all workspace in Common
  */
 
-int CHOLMOD(free_work)
+    int CHOLMOD(free_work)
 (
-    cholmod_common *Common
-)
+ cholmod_common *Common
+ )
 {
     RETURN_IF_NULL_COMMON (FALSE) ;
-
-    /* Aznaveh */
-    //printf ("free CHOLMOD work, nrow %ld iworksize %ld xworksize %ld\n",
-       // Common->nrow, Common->iworksize, Common->xworksize) ;
-
     Common->Flag  = CHOLMOD(free) (Common->nrow, sizeof (Int),
-	    Common->Flag, Common) ;
-
-    /* Aznaveh */
-    //printf ("free CHOLMOD work, nrow %ld iworksize %ld xworksize %ld\n",
-      //  Common->nrow, Common->iworksize, Common->xworksize) ;
-
+            Common->Flag, Common) ;
     Common->Head  = CHOLMOD(free) (Common->nrow+1, sizeof (Int),
-	    Common->Head, Common) ;
-
-    /* Aznaveh */
-    //printf ("free CHOLMOD work, nrow %ld iworksize %ld xworksize %ld\n",
-     //   Common->nrow, Common->iworksize, Common->xworksize) ;
-
+            Common->Head, Common) ;
     Common->Iwork = CHOLMOD(free) (Common->iworksize, sizeof (Int),
-	    Common->Iwork, Common) ;
-
-    /* Aznaveh */
-    //printf ("free CHOLMOD work, nrow %ld iworksize %ld xworksize %ld\n",
-    //    Common->nrow, Common->iworksize, Common->xworksize) ;
-
+            Common->Iwork, Common) ;
     Common->Xwork = CHOLMOD(free) (Common->xworksize, sizeof (double),
-	    Common->Xwork, Common) ;
-
-    /* Aznaveh */
-   // printf ("free CHOLMOD work, nrow %ld iworksize %ld xworksize %ld\n",
-   //     Common->nrow, Common->iworksize, Common->xworksize) ;
-
+            Common->Xwork, Common) ;
     Common->nrow = 0 ;
     Common->iworksize = 0 ;
     Common->xworksize = 0 ;
@@ -632,10 +605,10 @@ int CHOLMOD(free_work)
  * workspace: Flag (nrow).  Does not modify Flag if nrow is zero.
  */
 
-SuiteSparse_long CHOLMOD(clear_flag)
+    SuiteSparse_long CHOLMOD(clear_flag)
 (
-    cholmod_common *Common
-)
+ cholmod_common *Common
+ )
 {
     Int i, nrow, *Flag ;
 
@@ -644,15 +617,15 @@ SuiteSparse_long CHOLMOD(clear_flag)
     Common->mark++ ;
     if (Common->mark <= 0)
     {
-	nrow = Common->nrow ;
-	Flag = Common->Flag ;
-	PRINT2 (("reset Flag: nrow "ID"\n", nrow)) ;
-	PRINT2 (("reset Flag: mark %ld\n", Common->mark)) ;
-	for (i = 0 ; i < nrow ; i++)
-	{
-	    Flag [i] = EMPTY ;
-	}
-	Common->mark = 0 ;
+        nrow = Common->nrow ;
+        Flag = Common->Flag ;
+        PRINT2 (("reset Flag: nrow "ID"\n", nrow)) ;
+        PRINT2 (("reset Flag: mark %ld\n", Common->mark)) ;
+        for (i = 0 ; i < nrow ; i++)
+        {
+            Flag [i] = EMPTY ;
+        }
+        Common->mark = 0 ;
     }
     return (Common->mark) ;
 }
@@ -666,38 +639,38 @@ SuiteSparse_long CHOLMOD(clear_flag)
  * if successful. */
 
 size_t CHOLMOD(maxrank)	/* returns validated value of Common->maxrank */
-(
-    /* ---- input ---- */
-    size_t n,		/* A and L will have n rows */
-    /* --------------- */
-    cholmod_common *Common
-)
+    (
+     /* ---- input ---- */
+     size_t n,		/* A and L will have n rows */
+     /* --------------- */
+     cholmod_common *Common
+    )
 {
     size_t maxrank ;
     RETURN_IF_NULL_COMMON (0) ;
     maxrank = Common->maxrank ;
     if (n > 0)
     {
-	/* Ensure maxrank*n*sizeof(double) does not result in integer overflow.
-	 * If n is so large that 2*n*sizeof(double) results in integer overflow
-	 * (n = 268,435,455 if an Int is 32 bits), then maxrank will be 0 or 1,
-	 * but maxrank will be set to 2 below.  2*n will not result in integer
-	 * overflow, and CHOLMOD will run out of memory or safely detect integer
-	 * overflow elsewhere.
-	 */
-	maxrank = MIN (maxrank, Size_max / (n * sizeof (double))) ;
+        /* Ensure maxrank*n*sizeof(double) does not result in integer overflow.
+         * If n is so large that 2*n*sizeof(double) results in integer overflow
+         * (n = 268,435,455 if an Int is 32 bits), then maxrank will be 0 or 1,
+         * but maxrank will be set to 2 below.  2*n will not result in integer
+         * overflow, and CHOLMOD will run out of memory or safely detect integer
+         * overflow elsewhere.
+         */
+        maxrank = MIN (maxrank, Size_max / (n * sizeof (double))) ;
     }
     if (maxrank <= 2)
     {
-	maxrank = 2 ;
+        maxrank = 2 ;
     }
     else if (maxrank <= 4)
     {
-	maxrank = 4 ;
+        maxrank = 4 ;
     }
     else
     {
-	maxrank = 8 ;
+        maxrank = 8 ;
     }
     return (maxrank) ;
 }
@@ -716,42 +689,42 @@ size_t CHOLMOD(maxrank)	/* returns validated value of Common->maxrank */
  */
 
 double CHOLMOD(dbound)	/* returns modified diagonal entry of D */
-(
-    /* ---- input ---- */
-    double dj,		/* diagonal entry of D, for LDL' factorization */
-    /* --------------- */
-    cholmod_common *Common
-)
+    (
+     /* ---- input ---- */
+     double dj,		/* diagonal entry of D, for LDL' factorization */
+     /* --------------- */
+     cholmod_common *Common
+    )
 {
     double dbound ;
     RETURN_IF_NULL_COMMON (0) ;
     if (!IS_NAN (dj))
     {
-	dbound = Common->dbound ;
-	if (dj < 0)
-	{
-	    if (dj > -dbound)
-	    {
-		dj = -dbound ;
-		Common->ndbounds_hit++ ;
-		if (Common->status == CHOLMOD_OK)
-		{
-		    ERROR (CHOLMOD_DSMALL, "diagonal below threshold") ;
-		}
-	    }
-	}
-	else
-	{
-	    if (dj < dbound)
-	    {
-		dj = dbound ;
-		Common->ndbounds_hit++ ;
-		if (Common->status == CHOLMOD_OK)
-		{
-		    ERROR (CHOLMOD_DSMALL, "diagonal below threshold") ;
-		}
-	    }
-	}
+        dbound = Common->dbound ;
+        if (dj < 0)
+        {
+            if (dj > -dbound)
+            {
+                dj = -dbound ;
+                Common->ndbounds_hit++ ;
+                if (Common->status == CHOLMOD_OK)
+                {
+                    ERROR (CHOLMOD_DSMALL, "diagonal below threshold") ;
+                }
+            }
+        }
+        else
+        {
+            if (dj < dbound)
+            {
+                dj = dbound ;
+                Common->ndbounds_hit++ ;
+                if (Common->status == CHOLMOD_OK)
+                {
+                    ERROR (CHOLMOD_DSMALL, "diagonal below threshold") ;
+                }
+            }
+        }
     }
     return (dj) ;
 }
@@ -763,14 +736,14 @@ double CHOLMOD(dbound)	/* returns modified diagonal entry of D */
 
 /* For sorting descendant supernodes with qsort */
 int CHOLMOD(score_comp) (struct cholmod_descendant_score_t *i, 
-			       struct cholmod_descendant_score_t *j)
+        struct cholmod_descendant_score_t *j)
 {
-  if ((*i).score < (*j).score)
+    if ((*i).score < (*j).score)
     {
-	return (1) ;
+        return (1) ;
     }
     else
     {
-	return (-1) ;
+        return (-1) ;
     }
 }

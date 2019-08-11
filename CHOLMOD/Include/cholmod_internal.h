@@ -50,8 +50,8 @@
 #endif
 
 /* Uncomment this line to enable debugging.  CHOLMOD will be very slow.
- */
 #undef NDEBUG
+ */
 
 #ifdef MATLAB_MEX_FILE
 #include "mex.h"
