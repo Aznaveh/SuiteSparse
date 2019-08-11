@@ -19,6 +19,13 @@
 #include <stdio.h>
 #include <cstring>
 
+extern "C"
+{
+#include "SuiteSparseQR_definitions.h"
+#include "cholmod.h"
+}
+
+
 #include <complex>
 typedef std::complex<double> Complex ;
 
