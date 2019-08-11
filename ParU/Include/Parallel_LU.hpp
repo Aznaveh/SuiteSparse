@@ -1,9 +1,13 @@
 // ============================================================================/  
 // ======================= Parallel_LU.hpp ====================================/
 // ============================================================================/
-//#include "spqr.hpp"
 
-#include "umfpack.h"
+#ifndef PARU_H
+#define PARU_H
+
+//#include "umfpack.h"
+#include "umf_internal.h"
+
 #include <stdlib.h>
 #include <math.h>
 #include <float.h>
@@ -21,23 +25,32 @@ extern "C"
 // debugging and printing macros
 // -----------------------------------------------------------------------------
 
+
+// force debugging off
+#ifndef NDEBUG
+#define NDEBUG
+#endif
+
+
 #ifndef NPR
 #define NPR
 #endif
+
 //for printing information uncomment this; to activate assertions uncomment 
-//NDEBUG in ./SPQR/Include/spqr.hpp line 41
-#undef NPR
+//#undef NPR    ||1||
 
 //from spqr.hpp
 //Aznaveh For MATLAB OUTPUT UNCOMMENT HERE
-// uncomment the following line to turn on debugging (SPQR will be slow!)
-#undef NDEBUG
+// uncomment the following line to turn on debugging 
+//#undef NDEBUG  ||2||
 
 
 
 #ifndef NDEBUG
     #include <assert.h>
     #define ASSERT(e) assert (e)
+#else
+    #define ASSERT(e)
 #endif
 
 #ifndef NPR
@@ -58,8 +71,8 @@ static int print_level = 0 ;
 #define MIN(a,b) (((a) < (b)) ? (a) : (b))
 #define MAX(a,b) (((a) > (b)) ? (a) : (b))
 #define EMPTY (-1)
-#define TRUE 1
-#define FALSE 0 
+//defined in amd #define TRUE 1
+//defined in amd #define FALSE 0 
 #define IMPLIES(p,q) (!(p) || (q))
 
 // NULL should already be defined, but ensure it is here.
@@ -292,6 +305,14 @@ typedef struct  {/*work_struct*/
 }   work_struct;
 
 typedef struct  {/*dense factorized part pointer*/
+    Int size,   // allocated memory for the index
+        count,  // number of indices that are in the sturcture
+        upperBound; // upperBound on the size  count <= size <= upperBound  
+    Int **listp;      // pointer to the pointer to the data structure 
+} paru_Index; 
+
+
+typedef struct  {/*dense factorized part pointer*/
     Int m,n;   /* mxn dense matrix */
     double *p; /* point to factorized parts */
 } paru_fac; 
@@ -393,3 +414,5 @@ void paru_update_rowDeg ( Int panel_num,  Int row_end,
 
 void paru_finalize (paru_matrix *paruMatInfo, Int f, cholmod_common *cc);
 Int paru_cumsum (Int n, Int *X);
+
+#endif

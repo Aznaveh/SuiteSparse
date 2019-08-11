@@ -13,12 +13,14 @@ ccode: all
 include ../../SuiteSparse_config/SuiteSparse_config.mk
 
 
-# ParU depends on SPQR, CHOLMOD, AMD, COLAMD, LAPACK, the BLAS and SuiteSparse_config
+# ParU depends on SPQR, CHOLMOD, AMD, COLAMD, LAPACK, the BLAS and 
+# SuiteSparse_config
 #LDLIBS += -lspqr -lamd -lcolamd -lcholmod -lsuitesparseconfig $(LAPACK) $(BLAS)
 #
 # newer version  of ParU depends on UMFPACK, CHOLMOD, AMD, COLAMD, LAPACK, 
 # the BLAS and SuiteSparse_config
-LDLIBS += -lumfpack -lamd -lcolamd -lcholmod -lsuitesparseconfig $(LAPACK) $(BLAS)
+LDLIBS += -lumfpack -lamd -lcolamd -lcholmod -lsuitesparseconfig\
+		  $(LAPACK) $(BLAS)
 
 # compile and install in SuiteSparse/lib
 library:
@@ -62,8 +64,14 @@ OBJ = \
 
 $(OBJ): $(INC)
 
-#I = -I../../SPQR/Include -I../../CHOLMOD/Include -I../../SuiteSparse_config -I../Include
-I = -I../../UMFPACK/Include  -I../../CHOLMOD/Include -I../../AMD/Include  -I../../SuiteSparse_config -I../Include
+#I = -I../../SPQR/Include -I../../CHOLMOD/Include -I../../SuiteSparse_config\
+	-I../Include
+
+#I = -I../../UMFPACK/Include  -I../../CHOLMOD/Include -I../../AMD/Include\
+	-I../../SuiteSparse_config -I../Include
+
+I = -I ../../UMFPACK/Source -I../../UMFPACK/Include -I ../../CHOLMOD/Include\
+	-I ../../AMD/Include  -I ../../SuiteSparse_config -I../Include
 
 #C = $(CXX) $(CF) $(SPQR_CONFIG) $(CHOLMOD_CONFIG) $(CONFIG_PARTITION) $(I)
 C = $(CXX) $(CF)  $(CHOLMOD_CONFIG) $(CONFIG_PARTITION) $(I)
