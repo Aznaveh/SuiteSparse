@@ -30,24 +30,6 @@
 #include "umf_singletons.h"
 #include "umf_cholmod.h"
 
-typedef struct	/* SWType */
-{
-    Int *Front_npivcol ;    /* size n_col + 1 */
-    Int *Front_nrows ;	    /* size n_col */
-    Int *Front_ncols ;	    /* size n_col */
-    Int *Front_parent ;	    /* size n_col */
-    Int *Front_cols ;	    /* size n_col */
-    Int *InFront ;	    /* size n_row */
-    Int *Ci ;		    /* size Clen */
-    Int *Cperm1 ;	    /* size n_col */
-    Int *Rperm1 ;	    /* size n_row */
-    Int *InvRperm1 ;	    /* size n_row */
-    Int *Si ;		    /* size nz */
-    Int *Sp ;		    /* size n_col + 1 */
-    double *Rs ;	    /* size n_row */
-
-} SWType ;
-
 PRIVATE void free_work
 (
     SWType *SW
@@ -691,7 +673,12 @@ PRIVATE Int symbolic_analysis
     ),
     void *user_params,  /* passed to user_ordering function */
 
+    /* output: symbolic analysis: */
     void **SymbolicHandle,
+
+    /* optional output: further symbolic analysis: */
+    void **SW_Handle,
+
     const double Control [UMFPACK_CONTROL],
     double User_Info [UMFPACK_INFO]
 )
@@ -2594,13 +2581,22 @@ PRIVATE Int symbolic_analysis
      * return routine, below).
      */
 
-    free_work (SW) ;
+    if (SW_Handle != NULL)
+    {
+        /* do not free the workspace; return it to umfpack_*_azn_symbolic */
+        (*SW_Handle) = (void *) SW ;
+    }
+    else
+    {
+        /* free the workspace; this is the normal case for UMFPACK */
+        free_work (SW) ;
 
-    DEBUG0 (("(3)Symbolic UMF_malloc_count - init_count = "ID"\n",
-	UMF_malloc_count - init_count)) ;
-    ASSERT (UMF_malloc_count == init_count + 12
-	+ (Symbolic->Esize != (Int *) NULL)
-	+ (Symbolic->Diagonal_map != (Int *) NULL)) ;
+        DEBUG0 (("(3)Symbolic UMF_malloc_count - init_count = "ID"\n",
+            UMF_malloc_count - init_count)) ;
+        ASSERT (UMF_malloc_count == init_count + 12
+            + (Symbolic->Esize != (Int *) NULL)
+            + (Symbolic->Diagonal_map != (Int *) NULL)) ;
+    }
 
     /* ---------------------------------------------------------------------- */
     /* get the time used by UMFPACK_*symbolic */
@@ -2641,6 +2637,24 @@ PRIVATE void free_work
     }
 }
 
+
+/* ========================================================================== */
+/* === UMFPACK_azn_free_sw ================================================== */
+/* ========================================================================== */
+
+GLOBAL void UMFPACK_azn_free_sw
+(
+    void **SW_Handle
+)
+{
+    SWType *SW ;
+    if (!SW_Handle)
+    {
+        return ;
+    }
+    SW = *((SWType **) SW_Handle) ;
+    free_work (SW) ;
+}
 
 /* ========================================================================== */
 /* === error ================================================================ */
@@ -2693,7 +2707,12 @@ GLOBAL Int UMFPACK_qsymbolic
         (void *) NULL,
         (void *) NULL,
 
-        SymbolicHandle, Control, User_Info)) ;
+        SymbolicHandle,
+
+        /* do not return SW to the caller */
+        (void *) NULL,
+
+        Control, User_Info)) ;
 }
 
 
@@ -2744,9 +2763,81 @@ GLOBAL Int UMFPACK_fsymbolic
 
         /* user ordering not provided */
         (Int *) NULL,
+
         /* user ordering functions used instead */
         user_ordering,
         user_params,
 
-        SymbolicHandle, Control, User_Info)) ;
+        SymbolicHandle,
+
+        /* do not return SW to the caller */
+        (void *) NULL,
+
+        Control, User_Info)) ;
 }
+
+
+/* ========================================================================== */
+/* === UMFPACK_azn_symbolic ================================================= */
+/* ========================================================================== */
+
+GLOBAL Int UMFPACK_azn_symbolic
+(
+    Int n_row,
+    Int n_col,
+    const Int Ap [ ],
+    const Int Ai [ ],
+    const double Ax [ ],
+#ifdef COMPLEX
+    const double Az [ ],
+#endif
+
+    /* user-provided ordering */
+    const Int Quser [ ],
+
+    /* user-provided ordering function */
+    int (*user_ordering)    /* TRUE if OK, FALSE otherwise */
+    (
+        /* inputs, not modified on output */
+        Int,            /* nrow */
+        Int,            /* ncol */
+        Int,            /* sym: if TRUE and nrow==ncol do A+A', else do A'A */
+        Int *,          /* Ap, size ncol+1 */
+        Int *,          /* Ai, size nz */
+        /* output */
+        Int *,          /* size ncol, fill-reducing permutation */
+        /* input/output */
+        void *,         /* user_params (ignored by UMFPACK) */
+        double *        /* user_info[0..2], optional output for symmetric case.
+                           user_info[0]: max column count for L=chol(P(A+A')P')
+                           user_info[1]: nnz (L)
+                           user_info[2]: flop count for chol, if A real */
+    ),
+    void *user_params,  /* passed to user_ordering function */
+
+    void **SymbolicHandle,  /* symbolic analysis */
+    void **SW_Handle,       /* additional symbolic analysis information */
+    const double Control [UMFPACK_CONTROL],
+    double User_Info [UMFPACK_INFO]
+)
+{
+    return (symbolic_analysis (n_row, n_col, Ap, Ai, Ax,
+#ifdef COMPLEX
+        Az,
+#endif
+        /* user-provided ordering */
+        Quser,
+
+        /* user ordering functions */
+        user_ordering,
+        user_params,
+
+        /* return the symbolic analysis object to the caller */
+        SymbolicHandle,
+
+        /* also return SW to the caller */
+        SW_Handle,
+
+        Control, User_Info)) ;
+}
+
