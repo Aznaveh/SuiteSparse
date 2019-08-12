@@ -131,7 +131,7 @@ void paru_assemble ( paru_matrix *paruMatInfo,
         tupleList *curColTupleList = &ColList[c];
         Int numTuple = curColTupleList->numTuple;
         ASSERT (numTuple >= 0);
-        Tuple *listColTuples = curColTupleList->list;
+        paru_Tuple *listColTuples = curColTupleList->list;
 
 #ifndef NDEBUG            
         Int p = 1;
@@ -140,7 +140,7 @@ void paru_assemble ( paru_matrix *paruMatInfo,
             paru_print_tupleList (ColList, c);
 #endif
         for (Int i = 0; i < numTuple; i++){
-            Tuple curTpl = listColTuples [i];
+            paru_Tuple curTpl = listColTuples [i];
             Int e = curTpl.e;
             Int curColIndex = curTpl.f;
             PRLEVEL (1, ("%%e =%ld  curColIndex = %ld\n", e, curColIndex));
@@ -304,14 +304,14 @@ void paru_assemble ( paru_matrix *paruMatInfo,
         tupleList *curTupleList = &ColList[c];
         Int numTuple = curTupleList->numTuple;
         ASSERT (numTuple >= 0);
-        Tuple *l = curTupleList->list;
+        paru_Tuple *l = curTupleList->list;
         PRLEVEL (1, ("%% c =%ld numTuple = %ld\n", c, numTuple));
 
         Int colIndexF = c - col1;  // relative column index
 
         for (Int i = 0; i < numTuple; i++){
 
-            Tuple curTpl = l [i];
+            paru_Tuple curTpl = l [i];
             Int e = curTpl.e;
             Int curColIndex = curTpl.f;
 
@@ -514,10 +514,10 @@ void paru_assemble ( paru_matrix *paruMatInfo,
         tupleList *curRowTupleList = &RowList [curFsRow];
         Int numTuple = curRowTupleList->numTuple;
         ASSERT (numTuple >= 0);
-        Tuple *listRowTuples = curRowTupleList->list;
+        paru_Tuple *listRowTuples = curRowTupleList->list;
         PRLEVEL (1, ("%% 4: numTuple = %ld\n", numTuple));
         for (Int i = 0; i < numTuple; i++){
-            Tuple curTpl = listRowTuples [i];
+            paru_Tuple curTpl = listRowTuples [i];
             Int e = curTpl.e;
             Int curRowIndex = curTpl.f;
             if(e < 0 || curRowIndex < 0) continue;
@@ -650,10 +650,10 @@ void paru_assemble ( paru_matrix *paruMatInfo,
         Int numTuple = curRowTupleList->numTuple;
         ASSERT (numTuple >= 0);
         ASSERT (numTuple <= m);
-        Tuple *listRowTuples = curRowTupleList->list;
+        paru_Tuple *listRowTuples = curRowTupleList->list;
         PRLEVEL (1, ("%% numTuple = %ld\n", numTuple));
         for (Int i = 0; i < numTuple; i++){
-            Tuple curTpl = listRowTuples [i];
+            paru_Tuple curTpl = listRowTuples [i];
             Int e = curTpl.e;
             Int curRowIndex = curTpl.f;
 
@@ -760,7 +760,7 @@ void paru_assemble ( paru_matrix *paruMatInfo,
     Int *el_colIndex = colIndex_pointer (curEl);
     for (Int i = 0; i < colCount; ++ i) {
         el_colIndex [i] = fcolList[i];
-        Tuple colTuple;
+        paru_Tuple colTuple;
     }
     Int *el_rowIndex = rowIndex_pointer (curEl);
     for (Int i = fp; i < rowCount; ++ i) {
@@ -803,7 +803,7 @@ void paru_assemble ( paru_matrix *paruMatInfo,
 
     // adding tuples for current front
     for (Int i = 0; i < colCount; ++ i) {
-        Tuple colTuple;
+        paru_Tuple colTuple;
         colTuple.e = eli;
         colTuple.f = i;
         if (paru_add_colTuple (ColList, fcolList[i], colTuple, cc) ){
@@ -813,7 +813,7 @@ void paru_assemble ( paru_matrix *paruMatInfo,
     }
     for (Int i = fp; i < rowCount; ++ i) {
         Int locIndx = i-fp; 
-       Tuple rowTuple;
+       paru_Tuple rowTuple;
         rowTuple.e = eli;
         rowTuple.f = locIndx;
         if (paru_add_rowTuple (RowList, frowList[i], rowTuple, cc) ){

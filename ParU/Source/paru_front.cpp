@@ -51,13 +51,13 @@ void paru_front ( paru_matrix *paruMatInfo,
     Int fp = col2 - col1;   /* first fp columns are pivotal */ 
 
     //TODO: I should use umfpack somehow to get these info
-//    Int *Rp = LUsym->Rp;
-//    Int *Rj = LUsym->Rj;
-//    Int p1 = Rp [f];        /* Rj [p1:p2-1] = columns in F */
-//    Int p2 = Rp [f+1];
-//
-//    Int fn = p2 - p1;          /* Upper bound number of columns of F */ 
-//    Int fm = LUsym->Fm[f];     /* Upper bound number of rows of F */ 
+    //    Int *Rp = LUsym->Rp;
+    //    Int *Rj = LUsym->Rj;
+    //    Int p1 = Rp [f];        /* Rj [p1:p2-1] = columns in F */
+    //    Int p2 = Rp [f+1];
+    //
+    //    Int fn = p2 - p1;          /* Upper bound number of columns of F */ 
+    //    Int fm = LUsym->Fm[f];     /* Upper bound number of rows of F */ 
     Int fm = m;     // TODO: a very bad estimate for rows and columns in each 
     Int fn = n;     // front. It is just for a transient test 
 
@@ -72,9 +72,9 @@ void paru_front ( paru_matrix *paruMatInfo,
     PRLEVEL (1, ("%% fp=%ld pivotal columns:clo1=%ld...col2=%ld\n", 
                 fp, col1, col2-1));
     //TODO: uncomment this when they are updated
-//    PRLEVEL (1, 
-//            ("%%Upper bound number of columns: Rj[%ld]=%ld ... Rj[%ld]=%ld\n", 
-//                p1, Rj [p1], p2, Rj [p2-1]));
+    //    PRLEVEL (1, 
+    //     ("%%Upper bound number of columns: Rj[%ld]=%ld ... Rj[%ld]=%ld\n", 
+    //                p1, Rj [p1], p2, Rj [p2-1]));
 
     ASSERT (fp > 0 );
     ASSERT (fp <= fn );
@@ -85,7 +85,7 @@ void paru_front ( paru_matrix *paruMatInfo,
     Int rowCount= 0;
     paruMatInfo->frowCount[f] = rowCount;
     Int panel_num = 0; Int panel_width = paruMatInfo->panel_width;
-    
+
     Int *panel_row = (Int*) paru_alloc ( (Int) ceil( (double)fp/panel_width) , 
             sizeof (Int), cc);
 
@@ -137,7 +137,7 @@ void paru_front ( paru_matrix *paruMatInfo,
         tupleList *curColTupleList = &ColList[c];
         Int numTuple = curColTupleList->numTuple;
         ASSERT (numTuple >= 0);
-        Tuple *listColTuples = curColTupleList->list;
+        paru_Tuple *listColTuples = curColTupleList->list;
 
 #ifndef NDEBUG            
         Int p = 1;
@@ -146,7 +146,7 @@ void paru_front ( paru_matrix *paruMatInfo,
             paru_print_tupleList (ColList, c);
 #endif
         for (Int i = 0; i < numTuple; i++){
-            Tuple curTpl = listColTuples [i];
+            paru_Tuple curTpl = listColTuples [i];
             Int e = curTpl.e;
             Int curColIndex = curTpl.f;
             PRLEVEL (1, ("%%e =%ld  curColIndex = %ld\n", e, curColIndex));
@@ -311,14 +311,14 @@ void paru_front ( paru_matrix *paruMatInfo,
         tupleList *curTupleList = &ColList[c];
         Int numTuple = curTupleList->numTuple;
         ASSERT (numTuple >= 0);
-        Tuple *l = curTupleList->list;
+        paru_Tuple *l = curTupleList->list;
         PRLEVEL (1, ("%% c =%ld numTuple = %ld\n", c, numTuple));
 
         Int colIndexF = c - col1;  // relative column index
 
         for (Int i = 0; i < numTuple; i++){
 
-            Tuple curTpl = l [i];
+            paru_Tuple curTpl = l [i];
             Int e = curTpl.e;
             Int curColIndex = curTpl.f;
 
@@ -414,7 +414,7 @@ void paru_front ( paru_matrix *paruMatInfo,
     Int *fcolList = (Int*) paru_alloc (fn, sizeof (Int), cc);
     paruMatInfo->fcolList[f] = fcolList;
     paruMatInfo->fcolCount[f] = 0;
- 
+
 
     if (rowCount < fp){
         PRLEVEL (1, ("%% %ldx%ld \n",rowCount, fp));
@@ -543,10 +543,10 @@ void paru_front ( paru_matrix *paruMatInfo,
         Int numTuple = curRowTupleList->numTuple;
         ASSERT (numTuple >= 0);
         ASSERT (numTuple <= m);
-        Tuple *listRowTuples = curRowTupleList->list;
+        paru_Tuple *listRowTuples = curRowTupleList->list;
         PRLEVEL (1, ("%% numTuple = %ld\n", numTuple));
         for (Int i = 0; i < numTuple; i++){
-            Tuple curTpl = listRowTuples [i];
+            paru_Tuple curTpl = listRowTuples [i];
             Int e = curTpl.e;
             Int curRowIndex = curTpl.f;
 
@@ -653,7 +653,7 @@ void paru_front ( paru_matrix *paruMatInfo,
     Int *el_colIndex = colIndex_pointer (curEl);
     for (Int i = 0; i < colCount; ++ i) {
         el_colIndex [i] = fcolList[i];
-        Tuple colTuple;
+        paru_Tuple colTuple;
     }
     Int *el_rowIndex = rowIndex_pointer (curEl);
     for (Int i = fp; i < rowCount; ++ i) {
@@ -697,7 +697,7 @@ void paru_front ( paru_matrix *paruMatInfo,
 
     // adding tuples for current front
     for (Int i = 0; i < colCount; ++ i) {
-        Tuple colTuple;
+        paru_Tuple colTuple;
         colTuple.e = eli;
         colTuple.f = i;
         if (paru_add_colTuple (ColList, fcolList[i], colTuple, cc) ){
@@ -707,7 +707,7 @@ void paru_front ( paru_matrix *paruMatInfo,
     }
     for (Int i = fp; i < rowCount; ++ i) {
         Int locIndx = i-fp; 
-       Tuple rowTuple;
+        paru_Tuple rowTuple;
         rowTuple.e = eli;
         rowTuple.f = locIndx;
         if (paru_add_rowTuple (RowList, frowList[i], rowTuple, cc) ){

@@ -208,14 +208,14 @@ typedef struct {/* paru_symbolic*/
 } paru_symbolic;
 
 // =============================================================================
-//      Tuple, Row and Column data structure 
+//      paru_Tuple, Row and Column data structure 
 // =============================================================================
-typedef struct {/* Tuple */
+typedef struct {/* paru_Tuple */
 
     /* The (e,f) tuples for element lists */
     Int e,   /*  element number */
         f;  /*   offest */
-} Tuple;
+} paru_Tuple;
 
 /* -------------------------------------------------------------------------- */
 /* An element */
@@ -278,7 +278,7 @@ typedef struct  {/*List of tuples */
     Int
         numTuple,   /*  number of Tuples in this element */
         len;    /*  length of allocated space for current list*/
-    Tuple *list;    /* list of tuples regarding to this element */
+    paru_Tuple *list;    /* list of tuples regarding to this element */
 
 }   tupleList;
 
@@ -366,10 +366,10 @@ void paru_freesym(paru_symbolic **LUsym_handle,cholmod_common *cc);
 void paru_freemat(paru_matrix **paruMatInfo_handle, cholmod_common *cc);
 
 /* add tuple functions defintions */
-Int paru_add_rowTuple (tupleList *RowList, Int row, Tuple T, 
+Int paru_add_rowTuple (tupleList *RowList, Int row, paru_Tuple T, 
         cholmod_common *cc);
 Int paru_add_colTuple (tupleList *ColList, Int col, 
-        Tuple T, cholmod_common *cc);
+        paru_Tuple T, cholmod_common *cc);
 Int paru_remove_colTuple(tupleList *ColList, Int col, Int t);
 Int paru_remove_rowTuple(tupleList *RowList, Int row, Int t);
 

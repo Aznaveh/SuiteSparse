@@ -20,7 +20,7 @@
 Int paru_add_rowTuple (
         tupleList *RowList, 
         Int row, 
-        Tuple T, 
+        paru_Tuple T, 
         cholmod_common *cc)
 {
     DEBUGLEVEL(0);
@@ -32,15 +32,15 @@ Int paru_add_rowTuple (
         cur->list[cur->numTuple++] = T;
 
     else{
-        PRLEVEL (1, ("%%Row Tuple reallocating space\n"));
+        PRLEVEL (1, ("%%Row paru_Tuple reallocating space\n"));
         Int newLen = cur->len*2 + 1;
-        Tuple *newList = 
-            (Tuple*) paru_alloc (newLen, sizeof(Tuple), cc);
+        paru_Tuple *newList = 
+            (paru_Tuple*) paru_alloc (newLen, sizeof(paru_Tuple), cc);
         if (newList == NULL)    // Error in allocating memory
             return 1;
         for (Int i = 0; i < cur->numTuple; ++i) //copy old to new
             newList [i] = cur->list [i];
-        paru_free (cur->len, sizeof(Tuple), cur->list, cc); 
+        paru_free (cur->len, sizeof(paru_Tuple), cur->list, cc); 
         cur->len = newLen;
         cur->list = newList;
         cur->list [cur->numTuple++] = T;
@@ -49,7 +49,7 @@ Int paru_add_rowTuple (
 }
 
 Int paru_add_colTuple (tupleList *ColList, Int col, 
-        Tuple T, cholmod_common *cc)  
+        paru_Tuple T, cholmod_common *cc)  
 {
     DEBUGLEVEL(0);
     PRLEVEL (1, ("%% col=%ld, (%ld,%ld)\n", col, T.e, T.f));
@@ -58,15 +58,15 @@ Int paru_add_colTuple (tupleList *ColList, Int col,
     if (cur->len > cur->numTuple)
         cur->list [cur->numTuple++] = T;
     else{
-        PRLEVEL (1, ("%% Col Tuple reallocating space\n"));
+        PRLEVEL (1, ("%% Col paru_Tuple reallocating space\n"));
         Int newLen = cur->len*2 + 1;
-        Tuple *newList = 
-            (Tuple*) paru_alloc (newLen, sizeof(Tuple), cc);
+        paru_Tuple *newList = 
+            (paru_Tuple*) paru_alloc (newLen, sizeof(paru_Tuple), cc);
         if (newList == NULL)    // Error in allocating memory
             return 1;
         for (Int i = 0; i < cur->numTuple; ++i) //copy old to new
             newList [i] = cur->list [i];
-        paru_free (cur->len, sizeof(Tuple), cur->list, cc); 
+        paru_free (cur->len, sizeof(paru_Tuple), cur->list, cc); 
         cur->len = newLen;
         cur->list = newList;
         cur->list [cur->numTuple++] = T;
@@ -81,7 +81,7 @@ Int paru_remove_colTuple(tupleList *ColList, Int col, Int t){
     tupleList *curColTupleList = &ColList[col];
     Int  numTuple = curColTupleList -> numTuple;
     PRLEVEL (1, ("%% cur->numTuple =%ld\n", numTuple));
-    Tuple *listColTuples = curColTupleList->list;
+    paru_Tuple *listColTuples = curColTupleList->list;
     listColTuples [t] = listColTuples [numTuple-1];
     curColTupleList -> numTuple--;
     return 0;
@@ -93,7 +93,7 @@ Int paru_remove_rowTuple(tupleList *RowList, Int row, Int t){
     tupleList *curRowTupleList = &RowList[row];
     Int  numTuple = curRowTupleList -> numTuple;
     PRLEVEL (1, ("%% cur->numTuple =%ld\n", numTuple));
-    Tuple *listRowTuples = curRowTupleList->list;
+    paru_Tuple *listRowTuples = curRowTupleList->list;
     listRowTuples [t] = listRowTuples [numTuple-1];
     curRowTupleList -> numTuple--;
     return 0;

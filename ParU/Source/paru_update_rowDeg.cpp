@@ -119,10 +119,10 @@ void paru_update_rowDeg ( Int panel_num,  Int row_end,
         tupleList *curRowTupleList = &RowList [curFsRow];
         Int numTuple = curRowTupleList->numTuple;
         ASSERT (numTuple >= 0);
-        Tuple *listRowTuples = curRowTupleList->list;
+        paru_Tuple *listRowTuples = curRowTupleList->list;
         PRLEVEL (1, ("%% 4: numTuple = %ld\n", numTuple));
         for (Int i = 0; i < numTuple; i++){
-            Tuple curTpl = listRowTuples [i];
+            paru_Tuple curTpl = listRowTuples [i];
             Int e = curTpl.e;
             Int curRowIndex = curTpl.f;
             if(e < 0 || curRowIndex < 0) continue;
@@ -273,7 +273,7 @@ void paru_update_rowDeg ( Int panel_num,  Int row_end,
         tupleList *curColTupleList = &ColList[c];
         Int numTuple = curColTupleList->numTuple;
         ASSERT (numTuple >= 0);
-        Tuple *listColTuples = curColTupleList->list;
+        paru_Tuple *listColTuples = curColTupleList->list;
 #ifndef NDEBUG        
         Int p = 1;
         PRLEVEL (p, ("\n %%--------> 1st: c =%ld  numTuple = %ld\n", 
@@ -282,7 +282,7 @@ void paru_update_rowDeg ( Int panel_num,  Int row_end,
             paru_print_tupleList (ColList, c);
 #endif
         for (Int i = 0; i < numTuple; i++){
-            Tuple curTpl = listColTuples [i];
+            paru_Tuple curTpl = listColTuples [i];
             Int e = curTpl.e;
             // if (e == el_ind){ //current element}
             if ( e >= el_ind || e < first[el_ind]){ //Not any of descendents
@@ -363,7 +363,7 @@ void paru_update_rowDeg ( Int panel_num,  Int row_end,
         tupleList *curRowTupleList = &RowList[r];
         Int numTuple = curRowTupleList->numTuple;
         ASSERT (numTuple >= 0);
-        Tuple *listRowTuples = curRowTupleList->list;
+        paru_Tuple *listRowTuples = curRowTupleList->list;
 #ifndef NDEBUG        
         Int p = 1;
         PRLEVEL (p, ("\n %%--------> 2nd r =%ld  numTuple = %ld\n"
@@ -372,7 +372,7 @@ void paru_update_rowDeg ( Int panel_num,  Int row_end,
             paru_print_tupleList (RowList, r);
 #endif
         for (Int i = 0; i < numTuple; i++){
-            Tuple curTpl = listRowTuples [i];
+            paru_Tuple curTpl = listRowTuples [i];
             Int e = curTpl.e;
 
               if (e == el_ind){ //current element}

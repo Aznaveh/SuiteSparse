@@ -299,7 +299,7 @@ paru_matrix *paru_init_rowFronts (
          ColList[col].numTuple = 0;
          ColList[col].len = slackCol*ncols;
          ColList[col].list = 
-             (Tuple*) paru_alloc (slackCol*ncols, sizeof(Tuple), cc);
+             (paru_Tuple*) paru_alloc (slackCol*ncols, sizeof(paru_Tuple), cc);
          if (ColList[col].list == NULL){   //out of memory
              paru_freemat (&paruMatInfo, cc);
              printf("Out of memory: ColList[col].list\n");
@@ -341,7 +341,7 @@ paru_matrix *paru_init_rowFronts (
 
          // Allocating Rowlist and updating its tuples
          RowList[row].list =
-             (Tuple*) paru_alloc (slackRow*nrows, sizeof(Tuple), cc);
+             (paru_Tuple*) paru_alloc (slackRow*nrows, sizeof(paru_Tuple), cc);
          if (RowList[row].list == NULL){   //out of memory
              paru_freemat (&paruMatInfo, cc);
              printf("Out of memory: RowList[row].list \n");
@@ -350,7 +350,7 @@ paru_matrix *paru_init_rowFronts (
          RowList[row].numTuple = 0;
          RowList[row].len = slackRow;
 
-         Tuple rowTuple;
+         paru_Tuple rowTuple;
          rowTuple.e = e;
          rowTuple.f = 0;
          if (paru_add_rowTuple (RowList, row, rowTuple, cc) ){
@@ -369,7 +369,7 @@ paru_matrix *paru_init_rowFronts (
          Int j = 0;  //Index inside an element
          for ( Int p = Sp [row]; p < Sp [row+1]; p++){
              // adding column tuple
-             Tuple colTuple;
+             paru_Tuple colTuple;
              colTuple.e = e;
              colTuple.f = j;
 

@@ -5,10 +5,10 @@
 
 void *paru_alloc (Int n, Int size, cholmod_common *cc){
     DEBUGLEVEL(0);
-//#ifndef NDEBUG
+    //#ifndef NDEBUG
     static Int alloc_count =0;
     alloc_count += n*size ;
-//#endif
+    //#endif
     void *p = cholmod_l_malloc (n,size,cc);
     PRLEVEL (1, ("%% allocated %ld in %p total= %ld\n", 
                 n*size, p, alloc_count ));
@@ -17,10 +17,10 @@ void *paru_alloc (Int n, Int size, cholmod_common *cc){
 
 void *paru_calloc(Int n, Int size, cholmod_common *cc){
     DEBUGLEVEL(0);
-//#ifndef NDEBUG
+    //#ifndef NDEBUG
     static Int calloc_count =0;
     calloc_count += n*size ;
-//#endif
+    //#endif
     void *p= cholmod_l_calloc (n,size,cc);       
     PRLEVEL (1, ("%% callocated %ld in %p total= %ld\n", 
                 n*size, p, calloc_count ));
@@ -35,10 +35,10 @@ void *paru_realloc(
         cholmod_common *cc){
 
     DEBUGLEVEL(0);
-//#ifndef NDEBUG
+    //#ifndef NDEBUG
     static Int realloc_count =0;
     realloc_count += newsize*size_Entry - *size;
-//#endif
+    //#endif
     void *p= cholmod_l_realloc (newsize, size_Entry, oldP, (size_t*)size, cc);
     PRLEVEL (1, ("%% reallocated %ld in %p and freed %p total= %ld\n", 
                 newsize*size_Entry, p, oldP, realloc_count ));
@@ -154,13 +154,13 @@ void paru_freemat (paru_matrix **paruMatInfo_handle,
         //  point
         if (len > m+nf )                        
             PRLEVEL (1, ("%% too much space used for %ld\n",col););
-        paru_free (len , sizeof (Tuple), ColList[col].list, cc);
+        paru_free (len , sizeof (paru_Tuple), ColList[col].list, cc);
     }
     paru_free (1, n*sizeof(tupleList), ColList, cc);
 
     for (Int row = 0; row < m; row++) {
         Int len = RowList [row].len;
-        paru_free (len , sizeof (Tuple), RowList[row].list, cc);
+        paru_free (len , sizeof (paru_Tuple), RowList[row].list, cc);
     }
     paru_free (1, m*sizeof(tupleList), RowList, cc);
 
