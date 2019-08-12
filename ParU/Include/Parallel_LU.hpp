@@ -221,7 +221,7 @@ typedef struct {/* paru_Tuple */
 /* An element */
 /* -------------------------------------------------------------------------- */
 
-typedef struct	{/* Element */
+typedef struct	{/* paru_Element */
 
     Int
 
@@ -246,26 +246,26 @@ typedef struct	{/* Element */
        double ncols*nrows; numeric values
        */
 
-} Element ; // contribution block
+} paru_Element ; // contribution block
 
-inline Int *colIndex_pointer (Element *curEl)
+inline Int *colIndex_pointer (paru_Element *curEl)
 {    return (Int*)(curEl+1);}
 // Never ever use these functions prior to initializing ncols and nrows
-inline Int *rowIndex_pointer (Element *curEl)
+inline Int *rowIndex_pointer (paru_Element *curEl)
 {    return (Int*)(curEl+1) + curEl->ncols;}
 
 
-inline Int *relColInd (Element *curEl)
+inline Int *relColInd (paru_Element *curEl)
     //{    return (Int*)(curEl+1) + curEl->ncols + curEl->nrows + 1;}
 {    return (Int*)(curEl+1) + curEl->ncols + curEl->nrows  ;}
 
 
-inline Int *relRowInd (Element *curEl)
+inline Int *relRowInd (paru_Element *curEl)
     //{    return (Int*)(curEl+1) + 2*curEl->ncols + curEl->nrows + 2;}
 {    return (Int*)(curEl+1) + 2*curEl->ncols + curEl->nrows ;}
 
 
-inline double *numeric_pointer (Element *curEl)
+inline double *numeric_pointer (paru_Element *curEl)
     // sizeof Int and double are same, but I keep it like this for clarity
     //{    return (double*)((Int*)(curEl+1) + 2*curEl->ncols + 2*curEl->nrows + 2);}
 {    return (double*)((Int*)(curEl+1) + 2*curEl->ncols + 2*curEl->nrows );}
@@ -322,7 +322,7 @@ typedef struct  {/*Matrix */
     paru_symbolic *LUsym;
     tupleList *RowList;     /* size n of dynamic list */
     tupleList *ColList;     /* size m of dynamic list */
-    Element **elementList;  /* pointers to all elements, size = m+nf+1 */
+    paru_Element **elementList;  /* pointers to all elements, size = m+nf+1 */
     work_struct *Work;             
 
     Int *time_stamp;                /* for relative index update
@@ -385,7 +385,7 @@ Int paru_factorize(double *F, Int *frowList, Int lm, Int ln, Int *panel_row,
 
 
 
-Element *paru_create_element (Int nrows, Int ncols, 
+paru_Element *paru_create_element (Int nrows, Int ncols, 
         Int init, cholmod_common *cc);
 void assemble_col (const double *sR, double *dR, Int m, const Int *relRowInd);
 void assemble_row (const double *sM, double *dM, Int sm, Int sn, Int dm, Int sR, 
@@ -404,7 +404,7 @@ void paru_fourPass (paru_matrix *paruMatInfo,  Int f, Int fp,
 void paru_print_element (paru_matrix *paruMatInfo, Int e);
 void paru_print_tupleList (tupleList *listSet, Int index);
 void paru_init_rel (paru_matrix *paruMatInfo, Int f);
-void paru_update_rel_ind (Element *el, Element *cb_el, 
+void paru_update_rel_ind (paru_Element *el, paru_Element *cb_el, 
         char rc, cholmod_common *cc );
 
 void paru_write( paru_matrix *paruMatInfo, int scale, 

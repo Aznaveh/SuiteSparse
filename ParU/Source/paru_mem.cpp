@@ -165,7 +165,7 @@ void paru_freemat (paru_matrix **paruMatInfo_handle,
     paru_free (1, m*sizeof(tupleList), RowList, cc);
 
 
-    Element **elementList; 
+    paru_Element **elementList; 
     elementList = paruMatInfo->elementList;
 
 
@@ -178,13 +178,13 @@ void paru_freemat (paru_matrix **paruMatInfo_handle,
         }
         Int e = LUsym->row2atree[i];    //element number in augmented tree
         PRLEVEL (1, ("%% e =%ld\t", e));
-        Element *curEl = elementList[e];
+        paru_Element *curEl = elementList[e];
         if (curEl == NULL) continue;
         Int nrows = curEl->nrows,
             ncols = curEl->ncols;
         PRLEVEL (1, ("%% nrows =%ld ", nrows));
         PRLEVEL (1, ("%% ncols =%ld\n", ncols));
-        paru_free (1, sizeof(Element)+sizeof(Int)*(2*(nrows+ncols)+2)+
+        paru_free (1, sizeof(paru_Element)+sizeof(Int)*(2*(nrows+ncols)+2)+
                 sizeof(double)*nrows*ncols, curEl, cc);
     }
 
@@ -193,11 +193,11 @@ void paru_freemat (paru_matrix **paruMatInfo_handle,
     for(Int i = 0; i < nf ; i++){        // freeing all other elements
         Int e = LUsym->super2atree[i];    //element number in augmented tree
         PRLEVEL (1, ("%% e =%ld\t", e));
-        Element *curEl = elementList[e];
+        paru_Element *curEl = elementList[e];
         if (curEl == NULL) continue; /* CB not used */
         Int nrows = curEl->nrows,
             ncols = curEl->ncols;
-        Int tot_size = sizeof(Element)+sizeof(Int)*(2*(nrows+ncols))+
+        Int tot_size = sizeof(paru_Element)+sizeof(Int)*(2*(nrows+ncols))+
             sizeof(double)*nrows*ncols;
         PRLEVEL (1, ("%% nrows =%ld ", nrows));
         PRLEVEL (1, ("%% ncols =%ld tot_size=%ld\n", ncols, tot_size));
@@ -239,7 +239,7 @@ void paru_freemat (paru_matrix **paruMatInfo_handle,
     paru_free(1, nf*sizeof(Int),paruMatInfo->time_stamp, cc);
 
 
-    paru_free (1, (m+nf+1)*sizeof(Element), elementList, cc);
+    paru_free (1, (m+nf+1)*sizeof(paru_Element), elementList, cc);
     work_struct *Work = paruMatInfo->Work;
     paru_free (m, sizeof(Int), Work->rowSize, cc);
     //    paru_free (2*m+n, sizeof(Int), Work->scratch, cc);

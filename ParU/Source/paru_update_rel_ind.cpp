@@ -4,8 +4,8 @@
 
 #include "Parallel_LU.hpp"
 /*! @brief updating element's relative indices in regard to another element 
- * @param Element *el: current front which all the rleative indices are valid
- *        Element *cb_el: contributing element that the relative indices need to
+ * @param paru_Element *el: current front which all the rleative indices are valid
+ *        paru_Element *cb_el: contributing element that the relative indices need to
  *           be updated. There might be invalid rows/cols in contribution block
  *        char rc: it is either 'r' or 'c' row or column update
  *        cholmod_common *cc: Memory allcoation is needed here so cc must be
@@ -95,7 +95,7 @@ Int bin_srch  (Int *srt_lst, Int *ind_lst, Int l, Int r, Int num){
 }
 
 
-void paru_update_rel_ind (Element *el, Element *cb_el, 
+void paru_update_rel_ind (paru_Element *el, paru_Element *cb_el, 
         char rc, cholmod_common *cc) 
 {
     DEBUGLEVEL(0);

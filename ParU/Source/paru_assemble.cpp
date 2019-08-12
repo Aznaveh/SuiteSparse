@@ -57,7 +57,7 @@ void paru_assemble ( paru_matrix *paruMatInfo,
 
     Int fn = p2 - p1;          /* Upper bound number of columns of F */ 
     Int fm = LUsym->Fm[f];     /* Upper bound number of rows of F */ 
-    Element **elementList = paruMatInfo->elementList;
+    paru_Element **elementList = paruMatInfo->elementList;
     work_struct *Work =  paruMatInfo->Work;
 
     Int *elRow = Work -> elRow; 
@@ -148,7 +148,7 @@ void paru_assemble ( paru_matrix *paruMatInfo,
             /*! TODO: Never negate e or f for now... keep it?	 */
             if(e < 0 || curColIndex < 0 ) continue;  //already deleted
 
-            Element *el = elementList[e];
+            paru_Element *el = elementList[e];
             Int mEl = el->nrows;
             Int *el_rowIndex = rowIndex_pointer (el); //pointers to row index
             Int *rowRelIndex = relRowInd (el);
@@ -317,7 +317,7 @@ void paru_assemble ( paru_matrix *paruMatInfo,
 
             // Assembly of column curColIndex of e in colIndexF
 
-            Element *el = elementList[e];
+            paru_Element *el = elementList[e];
             Int mEl = el->nrows;
             Int nEl = el->ncols;
 
@@ -522,7 +522,7 @@ void paru_assemble ( paru_matrix *paruMatInfo,
             Int curRowIndex = curTpl.f;
             if(e < 0 || curRowIndex < 0) continue;
 
-            Element *el = elementList[e];
+            paru_Element *el = elementList[e];
             Int mEl = el->nrows;
             Int nEl = el->ncols;
             Int *el_rowIndex = rowIndex_pointer (el);
@@ -657,7 +657,7 @@ void paru_assemble ( paru_matrix *paruMatInfo,
             Int e = curTpl.e;
             Int curRowIndex = curTpl.f;
 
-            Element *el = elementList[e];
+            paru_Element *el = elementList[e];
             Int mEl = el->nrows;
             Int nEl = el->ncols;
             Int *el_rowIndex = rowIndex_pointer (el);
@@ -740,8 +740,8 @@ void paru_assemble ( paru_matrix *paruMatInfo,
 
 
     Int *snM = LUsym->super2atree;
-    Int eli = snM [f]; // Element index of the one that is going to be assembled
-    Element *curEl;
+    Int eli = snM [f]; // paru_Element index of the one that is going to be assembled
+    paru_Element *curEl;
     PRLEVEL (1, ("%% rowCount=%ld, colCount=%ld, fp=%ld\n",
                 rowCount, colCount, fp));
     PRLEVEL (1, ("%% curEl is %ld by %ld\n",rowCount-fp,colCount));

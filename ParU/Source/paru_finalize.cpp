@@ -30,8 +30,8 @@ void paru_finalize (paru_matrix *paruMatInfo, Int f, cholmod_common *cc){
     Int fp = col2-col1;
 
 
-    Element **elementList = paruMatInfo->elementList;
-    Element *curFr = elementList[el_ind]; 
+    paru_Element **elementList = paruMatInfo->elementList;
+    paru_Element *curFr = elementList[el_ind]; 
     Int rowCount= curFr->nrows + fp;
     Int colCount = curFr->ncols;
 
@@ -86,7 +86,7 @@ void paru_finalize (paru_matrix *paruMatInfo, Int f, cholmod_common *cc){
             ASSERT (e != el_ind);
             ASSERT (curColIndex >= 0);
 
-            Element *el = elementList[e];
+            paru_Element *el = elementList[e];
             Int mEl = el->nrows;
             Int nEl = el->ncols;
 
@@ -241,7 +241,7 @@ void paru_finalize (paru_matrix *paruMatInfo, Int f, cholmod_common *cc){
             ASSERT (e >= 0);
             ASSERT (curRowIndex >= 0);
 
-            Element *el = elementList[e];
+            paru_Element *el = elementList[e];
             Int mEl = el->nrows;
             Int nEl = el->ncols;
 
@@ -342,7 +342,7 @@ void paru_finalize (paru_matrix *paruMatInfo, Int f, cholmod_common *cc){
 
 
 
-            Element *el = elementList[e];
+            paru_Element *el = elementList[e];
             Int mEl = el->nrows;
             Int nEl = el->ncols;
 
@@ -404,7 +404,7 @@ void paru_finalize (paru_matrix *paruMatInfo, Int f, cholmod_common *cc){
             PRLEVEL (1, ("%% element= %ld  f =%ld \n",e, curRowIndex));
 
 
-            Element *el = elementList[e];
+            paru_Element *el = elementList[e];
             Int mEl = el->nrows;
             Int nEl = el->ncols;
 

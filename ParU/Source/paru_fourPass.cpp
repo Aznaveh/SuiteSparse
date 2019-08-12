@@ -30,8 +30,8 @@ void paru_fourPass (paru_matrix *paruMatInfo,
     Int el_ind = snM [f]; 
 
 
-    Element **elementList = paruMatInfo->elementList;
-    Element *curFr = elementList[el_ind]; 
+    paru_Element **elementList = paruMatInfo->elementList;
+    paru_Element *curFr = elementList[el_ind]; 
     Int rowCount= curFr->nrows + fp;
     Int colCount = curFr->ncols;
 
@@ -75,7 +75,7 @@ void paru_fourPass (paru_matrix *paruMatInfo,
                 paru_print_element (paruMatInfo, e);
 #endif
             Int curColIndex = curTpl.f;
-            Element *el = elementList[e];
+            paru_Element *el = elementList[e];
             Int *el_colIndex = colIndex_pointer (el);
 
             Int *rowRelIndex = relRowInd (el);
@@ -143,7 +143,7 @@ void paru_fourPass (paru_matrix *paruMatInfo,
                 paru_print_element (paruMatInfo, e);
 #endif
             Int curRowIndex = curTpl.f;
-            Element *el = elementList[e];
+            paru_Element *el = elementList[e];
             Int *el_colIndex = colIndex_pointer (el);//pointers to row index
             Int *el_rowIndex = rowIndex_pointer (el);
 
@@ -258,7 +258,7 @@ void paru_fourPass (paru_matrix *paruMatInfo,
             ASSERT (e != el_ind);
             ASSERT (curColIndex >= 0);
 
-            Element *el = elementList[e];
+            paru_Element *el = elementList[e];
             Int mEl = el->nrows;
             Int nEl = el->ncols;
 
@@ -386,7 +386,7 @@ void paru_fourPass (paru_matrix *paruMatInfo,
             ASSERT (e >= 0);
             ASSERT (curRowIndex >= 0);
 
-            Element *el = elementList[e];
+            paru_Element *el = elementList[e];
             Int mEl = el->nrows;
             Int nEl = el->ncols;
 
@@ -487,7 +487,7 @@ void paru_fourPass (paru_matrix *paruMatInfo,
 
 
 
-            Element *el = elementList[e];
+            paru_Element *el = elementList[e];
             Int mEl = el->nrows;
             Int nEl = el->ncols;
 
@@ -549,7 +549,7 @@ void paru_fourPass (paru_matrix *paruMatInfo,
             PRLEVEL (1, ("%% element= %ld  f =%ld \n",e, curRowIndex));
 
 
-            Element *el = elementList[e];
+            paru_Element *el = elementList[e];
             Int mEl = el->nrows;
             Int nEl = el->ncols;
 

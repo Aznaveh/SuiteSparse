@@ -9,21 +9,21 @@
  * */
 void paru_print_element (paru_matrix *paruMatInfo, Int e){
     // print out contribution blocks
-    Element **elementList; 
+    paru_Element **elementList; 
     elementList = paruMatInfo->elementList;
-    Element *curEl = elementList[e];
+    paru_Element *curEl = elementList[e];
 
     Int morign = paruMatInfo->m;
     Int nf = paruMatInfo->LUsym->nf;
 
     if ( e > morign + nf +1){
-        printf("%% Element %ld is out of range; just %ld elements \n", 
+        printf("%% paru_Element %ld is out of range; just %ld elements \n", 
                 e,  morign + nf +1);
         return;
     }
 
     if (curEl == NULL){
-        printf("%% Element %ld is empty\n",e );
+        printf("%% paru_Element %ld is empty\n",e );
         return;
     }
 
@@ -40,7 +40,7 @@ void paru_print_element (paru_matrix *paruMatInfo, Int e){
     double *el_colrowNum = numeric_pointer (curEl);
 
     printf("\n"); 
-    printf("%% Element %ld is %ld x %ld:\n", e, m, n);
+    printf("%% paru_Element %ld is %ld x %ld:\n", e, m, n);
 
 
     printf("\t"); 

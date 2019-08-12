@@ -25,7 +25,7 @@ void paru_update_rowDeg ( Int panel_num,  Int row_end,
     PRLEVEL (1, ("%%-------ROW degree update of panel %ld of front %ld \n", 
              panel_num, f ));
     Int panel_width = paruMatInfo->panel_width;
-    Element **elementList = paruMatInfo->elementList;
+    paru_Element **elementList = paruMatInfo->elementList;
     work_struct *Work =  paruMatInfo->Work;
     Int elCMark = Work -> elCMark;
 
@@ -127,7 +127,7 @@ void paru_update_rowDeg ( Int panel_num,  Int row_end,
             Int curRowIndex = curTpl.f;
             if(e < 0 || curRowIndex < 0) continue;
 
-            Element *el = elementList[e];
+            paru_Element *el = elementList[e];
             Int mEl = el->nrows;
             Int nEl = el->ncols;
             Int *el_rowIndex = rowIndex_pointer (el);
@@ -293,7 +293,7 @@ void paru_update_rowDeg ( Int panel_num,  Int row_end,
                 paru_print_element (paruMatInfo, e);
 #endif
             Int curColIndex = curTpl.f;
-            Element *el = elementList[e];
+            paru_Element *el = elementList[e];
             Int *el_colIndex = colIndex_pointer (el);
 
             Int *rowRelIndex = relRowInd (el);
@@ -386,7 +386,7 @@ void paru_update_rowDeg ( Int panel_num,  Int row_end,
                 paru_print_element (paruMatInfo, e);
 #endif
             Int curRowIndex = curTpl.f;
-            Element *el = elementList[e];
+            paru_Element *el = elementList[e];
             Int *el_colIndex = colIndex_pointer (el);//pointers to row index
             Int *el_rowIndex = rowIndex_pointer (el);
 

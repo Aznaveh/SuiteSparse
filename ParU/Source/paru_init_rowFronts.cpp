@@ -152,9 +152,9 @@ paru_matrix *paru_init_rowFronts (
     }
     PRLEVEL (1, ("%% $ColList =%p\n", ColList));
 
-    Element **elementList; 
+    paru_Element **elementList; 
     elementList = paruMatInfo->elementList = // Initialize with NULL
-        (Element**) paru_calloc (1, (m+nf+1)*sizeof(Element), cc);
+        (paru_Element**) paru_calloc (1, (m+nf+1)*sizeof(paru_Element), cc);
     if (elementList == NULL){   //out of memory
         paru_freemat (&paruMatInfo, cc);
         printf("Out of memory: elementList\n");
@@ -322,8 +322,8 @@ paru_matrix *paru_init_rowFronts (
 
          row_degree_bound [row] = ncols; //Initialzing row degree
 
-         Element *curEl = elementList[e] = paru_create_element (nrows, ncols,
-                 0 ,cc);
+         paru_Element *curEl = elementList[e] = 
+             paru_create_element (nrows, ncols,0 ,cc);
          if (curEl == NULL){   //out of memory
              paru_freemat (&paruMatInfo, cc);
              printf("Out of memory: curEl\n");
@@ -332,7 +332,7 @@ paru_matrix *paru_init_rowFronts (
 #ifndef NDEBUG  // Printing the pointers info
          Int p=1;
          PRLEVEL (p, ("%% curEl = %p ", curEl));
-         Int size= sizeof(Element)+
+         Int size= sizeof(paru_Element)+
              sizeof(Int)*(2*(nrows+ncols))+
              sizeof(double)*nrows*ncols;
          PRLEVEL (p, ("size= %ld", size));

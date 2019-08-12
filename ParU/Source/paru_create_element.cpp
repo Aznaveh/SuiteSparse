@@ -16,19 +16,19 @@
  * @author Aznaveh
  *  */
 #include "Parallel_LU.hpp"
-Element *paru_create_element (Int nrows, Int ncols, 
+paru_Element *paru_create_element (Int nrows, Int ncols, 
         Int init, cholmod_common *cc)
 {
     DEBUGLEVEL(0);
 
     PRLEVEL (1, ("%% creating %ldx%ld element ", nrows, ncols));
-    Element *curEl;
-    Int tot_size = sizeof(Element)+ sizeof(Int)*(2*(nrows+ncols))+
+    paru_Element *curEl;
+    Int tot_size = sizeof(paru_Element)+ sizeof(Int)*(2*(nrows+ncols))+
                 sizeof(double)*nrows*ncols;
     if (init)
-        curEl = (Element*) paru_calloc(1, tot_size , cc);
+        curEl = (paru_Element*) paru_calloc(1, tot_size , cc);
     else
-        curEl = (Element*) paru_alloc(1, tot_size , cc);
+        curEl = (paru_Element*) paru_alloc(1, tot_size , cc);
     if (curEl == NULL) return NULL; // do not do error checking
 
     PRLEVEL (1, ("%% with size of %ld in %p\n", tot_size, curEl));
