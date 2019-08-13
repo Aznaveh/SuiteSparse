@@ -45,7 +45,10 @@ extern "C"
 //#undef NDEBUG  ||2||
 
 
-
+// defined somewhere else
+#ifdef ASSERT
+#undef ASSERT
+#endif
 #ifndef NDEBUG
     #include <assert.h>
     #define ASSERT(e) assert (e)
@@ -62,6 +65,10 @@ static int print_level = 0 ;
 #define DEBUGLEVEL(level)
 #endif
 
+
+#ifdef Int // defined in amd
+#undef Int
+#endif
 #define Int SuiteSparse_long
 
 // -----------------------------------------------------------------------------

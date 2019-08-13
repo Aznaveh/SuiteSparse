@@ -73,8 +73,10 @@ $(OBJ): $(INC)
 I = -I ../../UMFPACK/Source -I../../UMFPACK/Include -I ../../CHOLMOD/Include\
 	-I ../../AMD/Include  -I ../../SuiteSparse_config -I../Include
 
+FLAG = -Wno-write-strings 
+
 #C = $(CXX) $(CF) $(SPQR_CONFIG) $(CHOLMOD_CONFIG) $(CONFIG_PARTITION) $(I)
-C = $(CXX) $(CF)  $(CHOLMOD_CONFIG) $(CONFIG_PARTITION) $(I)
+C = $(CXX) $(CF)  $(CHOLMOD_CONFIG) $(CONFIG_PARTITION) $(I) $(FLAG)
 #-------------------------------------------------------------------------------
 
 static: $(AR_TARGET)
