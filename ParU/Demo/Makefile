@@ -7,7 +7,7 @@ CLIB = $(LDFLAGS) -L../../lib -lparu -lumfpack -lsuitesparseconfig -lcholmod -la
 FLIB = $(LAPACK) $(BLAS)
 
 
-I = -I../../include  -I ../Include
+I = -I../../include  -I ../Include -I../../UMFPACK/Source -I../../AMD/Include
 
 
 C = $(CXX) $(CF) $(UMFPACK_CONFIG) $(CONFIG_PARTITION) $(CONFIG_GPU) $(I) \

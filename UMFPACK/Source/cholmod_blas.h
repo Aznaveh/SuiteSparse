@@ -75,6 +75,7 @@
 #define SUN64
 #endif
 
+/*
 #ifdef SUN64
 
 #define BLAS_DTRSV dtrsv_64_
@@ -96,6 +97,7 @@
 #define LAPACK_ZPOTRF zpotrf_64_
 
 #elif defined (BLAS_NO_UNDERSCORE)
+*/
 
 #define BLAS_DTRSV dtrsv
 #define BLAS_DGEMV dgemv
@@ -115,6 +117,7 @@
 #define BLAS_ZSCAL zscal
 #define LAPACK_ZPOTRF zpotrf
 
+/*
 #else
 
 #define BLAS_DTRSV dtrsv_
@@ -136,6 +139,7 @@
 #define LAPACK_ZPOTRF zpotrf_
 
 #endif
+*/
 
 /* ========================================================================== */
 /* === BLAS and LAPACK integer arguments ==================================== */

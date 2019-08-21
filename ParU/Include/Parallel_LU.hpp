@@ -5,9 +5,6 @@
 #ifndef PARU_H
 #define PARU_H
 
-//#include "umfpack.h"
-#include "umf_internal.h"
-
 #include <stdlib.h>
 #include <math.h>
 #include <float.h>
@@ -16,6 +13,8 @@
 
 extern "C"
 {
+// #include "umfpack.h"
+#include "umf_internal.h"
 #include "cholmod.h"
 #include "cholmod_blas.h"
 }
