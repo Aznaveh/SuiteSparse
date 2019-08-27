@@ -198,7 +198,21 @@ paru_symbolic *paru_analyze
 #endif
 
     /* performing the symbolic analysis */ 
-    status = umfpack_dl_symbolic (m, n, Ap, Ai, Ax, &Symbolic, Control, Info);
+    //status = umfpack_dl_symbolic (m, n, Ap, Ai, Ax, &Symbolic, Control, Info);
+
+   void *SW; 
+   //const Int Quser[];
+   status = umfpack_dl_azn_symbolic
+      (m, n, Ap, Ai, Ax,
+       NULL,    // user provided ordering
+       FALSE,
+       NULL,    // user params
+       &Symbolic,
+       &SW,
+       Control, Info);
+
+
+
     if (status < 0){
         umfpack_dl_report_info (Control, Info);
         umfpack_dl_report_status (Control, status);
@@ -209,9 +223,14 @@ paru_symbolic *paru_analyze
 
     Int cs1 = Info[UMFPACK_COL_SINGLETONS];
     Int rs1 = Info[UMFPACK_ROW_SINGLETONS];
-    //    Int maxnrows = Symbolic->maxnrows;  // I can not access to inside of 
-    //    Int maxncols = Symbolic->maxncols;  // SymbolicType it is internal in
-    //                                          UMFPACK
+
+//    Int maxnrows = Symbolic->maxnrows;  // I can not access to inside of 
+//    Int maxncols = Symbolic->maxncols;  // SymbolicType it is internal in
+                                        //  UMFPACK
+                                        //      
+    SWType *mySW = (SWType *)SW;
+    Int *Front_nrows = (Int *) mySW->Front_nrows;
+    mySW->Front_nrows = NULL; //TODO is it OK? or I should copy
 
 #ifndef NDEBUG
     p = 1;
@@ -302,6 +321,7 @@ paru_symbolic *paru_analyze
 #endif
 
     umfpack_dl_free_symbolic (&Symbolic);
+    UMFPACK_azn_free_sw (&SW);
 
     paru_free ((n+1), sizeof (Int), Front_1strow, cc);
     paru_free ((n+1), sizeof (Int), Front_leftmostdesc, cc);
@@ -803,7 +823,7 @@ paru_symbolic *paru_analyze
     }
 
     //Initialize first descendent of augmented tree
-    for(Int i=0 ; i<ms+nf; i++){
+    for(Int i=0 ; i < ms+nf; i++){
         for (Int r = i; r!= -1 && first[r] == -1; r = aParent[r])
             first[r] = i;
     }
