@@ -36,7 +36,8 @@ void paru_write( paru_matrix *paruMatInfo, int scale,
     else 
         name = default_name;
 
-    char dpath[] = "./Res/";
+    char dpath[] = "../Demo/Res/";
+    //char dpath[] = "/users/aznaveh/SuiteSparse/ParU/Demo/Res/";
 
 
     //-------------------- writing column permutation to a file
@@ -50,7 +51,7 @@ void paru_write( paru_matrix *paruMatInfo, int scale,
         colfptr = ( fopen(fname,"w"));
 
         if (colfptr == NULL ){
-            printf ("Error in making a file to write the results!\n");
+            printf ("Error in making %s to write the results!\n", fname);
             return;
         }
         for (Int col = 0 ; col < n ; col++){    // for each column of A(:,Qfill)

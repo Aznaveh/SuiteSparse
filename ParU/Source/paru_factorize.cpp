@@ -37,7 +37,7 @@ Int paru_panel_factorize (double *F, Int *frowList, Int m, Int n,
         paru_matrix *paruMatInfo) {
     // works like dgetf2f.f in netlib v3.0  here is a link:
     // https://github.com/xianyi/OpenBLAS/blob/develop/reference/dgetf2f.f
-    DEBUGLEVEL(1);
+    DEBUGLEVEL(0);
     PRLEVEL (1, ("%% Inside panel factorization %ld \n",panel_num));
 
 

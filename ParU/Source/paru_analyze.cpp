@@ -29,7 +29,7 @@ paru_symbolic *paru_analyze
  // workspace and parameters
  cholmod_common *cc ){   
 
-    DEBUGLEVEL(0);
+    DEBUGLEVEL(1);
     paru_symbolic *LUsym;
 
     LUsym = (paru_symbolic*) paru_alloc (1, sizeof(paru_symbolic), cc);
@@ -198,19 +198,17 @@ paru_symbolic *paru_analyze
 #endif
 
     /* performing the symbolic analysis */ 
-    //status = umfpack_dl_symbolic (m, n, Ap, Ai, Ax, &Symbolic, Control, Info);
+    status = umfpack_dl_symbolic (m, n, Ap, Ai, Ax, &Symbolic, Control, Info);
 
    void *SW; 
-   //const Int Quser[];
    status = umfpack_dl_azn_symbolic
       (m, n, Ap, Ai, Ax,
        NULL,    // user provided ordering
-       FALSE,
+       FALSE,   // No user ordering
        NULL,    // user params
        &Symbolic,
-       &SW,
+       &SW,   // new in/out
        Control, Info);
-
 
 
     if (status < 0){
@@ -224,19 +222,16 @@ paru_symbolic *paru_analyze
     Int cs1 = Info[UMFPACK_COL_SINGLETONS];
     Int rs1 = Info[UMFPACK_ROW_SINGLETONS];
 
-//    Int maxnrows = Symbolic->maxnrows;  // I can not access to inside of 
-//    Int maxncols = Symbolic->maxncols;  // SymbolicType it is internal in
-                                        //  UMFPACK
-                                        //      
-    SWType *mySW = (SWType *)SW;
-    Int *Front_nrows = (Int *) mySW->Front_nrows;
-    mySW->Front_nrows = NULL; //TODO is it OK? or I should copy
+    //TODO
+   // SWType *mySW = (SWType *)SW;
+   // Int *Front_nrows = (Int *) mySW->Front_nrows;
+   // mySW->Front_nrows = NULL; //TODO is it OK? or I should copy
 
 #ifndef NDEBUG
     p = 1;
-    PRLEVEL (p, ("\n%%Symbolic factorization of A: "));
+    PRLEVEL (p, ("\n%% Symbolic factorization of A: "));
     if (p <= 0) (void) umfpack_dl_report_symbolic (Symbolic, Control);
-    PRLEVEL(p, ("\n %%colsingleton = %ld, rowsingleton=%ld",cs1,rs1));
+    PRLEVEL(p, ("\n%%\tcolsingleton = %ld, rowsingleton=%ld",cs1,rs1));
     //    PRLEVEL(p, ("\n %%maxnrow= %ld, maxncol=%ld",maxnrows, maxncols));
 #endif
 
@@ -302,26 +297,27 @@ paru_symbolic *paru_analyze
         for (Int j = 0 ; j < fnpiv ; j++)
         {
             Int col = Qinit [k];
-            PRLEVEL (p, ("%ld-th pivot column is column %ld\
-                        in original matrix\n", k, col));
+            PRLEVEL (p, ("%ld-th pivot column is column %ld"
+                        " in original matrix\n", k, col));
             k++;
         }
     }
 
-    PRLEVEL (p, ("\nTotal number of pivot columns\
-                in frontal matrices: %ld\n", k));
+    PRLEVEL (p, ("\nTotal number of pivot columns "
+                "in frontal matrices: %ld\n", k));
 
     PRLEVEL (p, ("\nFrontal matrix chains:\n"));
     for (Int j = 0 ; j < nchains ; j++){
-        PRLEVEL (p, ("Frontal matrices %ld to %ld are factorized in a single\n",
-                    Chain_start [j], Chain_start [j+1] - 1));
-        PRLEVEL (p, ("        working array of size %ld-by-%ld\n",
-                    Chain_maxrows [j], Chain_maxcols [j]));
+       // PRLEVEL (p, ("Frontal matrices %ld to %ld are factorized in a single\n",
+       //             Chain_start [j], Chain_start [j+1] - 1));
+       // PRLEVEL (p, ("        working array of size %ld-by-%ld\n",
+       //             Chain_maxrows [j], Chain_maxcols [j]));
     }
 #endif
 
     umfpack_dl_free_symbolic (&Symbolic);
-    UMFPACK_azn_free_sw (&SW);
+    //TODO
+    umfpack_dl_azn_free_sw (&SW);
 
     paru_free ((n+1), sizeof (Int), Front_1strow, cc);
     paru_free ((n+1), sizeof (Int), Front_leftmostdesc, cc);
@@ -754,7 +750,9 @@ paru_symbolic *paru_analyze
     }
     //initialization
     memset (aParent, -1, (ms+nf)*sizeof(Int));
-    //memset (aChild, -1, (ms+nf+1)*sizeof(Int));  //doens't need
+#ifndef NDEBUG //TODO: should it be in debug mode?
+    memset (aChild, -1, (ms+nf+1)*sizeof(Int));
+#endif 
     memset (aChildp, -1, (ms+nf+2)*sizeof(Int));
     memset (first, -1, (ms+nf)*sizeof(Int));
 
@@ -854,12 +852,12 @@ paru_symbolic *paru_analyze
     PRLEVEL (p,("\n"));
 
     PRLEVEL (p,("%% aChild: ")); 
-    for (Int i = 0; i < ms+nf+1; i++) PRLEVEL (p,("%ld ",aChild[i]));
+    for (Int i = 0; i < ms+nf+1; i++) PRLEVEL (p,("%ld ", aChild[i]));
     PRLEVEL (p,("\n"));
 
-    for(Int i=0; i< ms+nf; i++){
+    for(Int i = 0; i < ms+nf; i++){
         PRLEVEL (p,("%% anode:%ld",i));
-        for(Int c=aChildp[i]; c< aChildp[i+1]; c++)
+        for(Int c = aChildp[i]; c < aChildp[i+1]; c++)
             PRLEVEL (p,(" %ld,",aChild[c]));  
         PRLEVEL (p,("\n"));
     }
