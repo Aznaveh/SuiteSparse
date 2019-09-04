@@ -111,11 +111,12 @@ UMFPACK/Demo/umfpack_zi_demo
 UMFPACK/Demo/umfpack_zl_demo
 
 ParU/Demo/testazny
-ParU/Demo/umfout
+ParU/Demo/umpfout
 ParU/Demo/pfile
 ParU/Demo/tfile
 ParU/Demo/tmp
 ParU/Demo/*.m
+ParU/Demo/valgrindlogfile.log"
 ParU/Demo/Res/*
 
 # ignore these specific programs in the Package/Tcov directories
