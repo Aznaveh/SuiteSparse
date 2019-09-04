@@ -72,7 +72,7 @@ SUITESPARSE_VERSION = 5.5.0
     # optimization level
     #---------------------------------------------------------------------------
 
-    OPTIMIZATION ?= -O3
+    OPTIMIZATION ?= -g
 
     #---------------------------------------------------------------------------
     # statement coverage for */Tcov
@@ -110,7 +110,7 @@ SUITESPARSE_VERSION = 5.5.0
     # instead of $(CC), $(CXX), and $(F77).  To disable this feature and
     # use the $(CC), $(CXX), and $(F77) compilers, use 'make AUTOCC=no'
 
-    AUTOCC ?= yes
+    AUTOCC ?= no
 
     ifneq ($(AUTOCC),no)
         ifneq ($(shell which icc 2>/dev/null),)
@@ -161,6 +161,7 @@ SUITESPARSE_VERSION = 5.5.0
     # installed.
 
     LAPACK ?= -llapack
+    # BLAS ?= -lopenblas
 
     ifndef BLAS
         ifdef MKLROOT
@@ -254,6 +255,8 @@ SUITESPARSE_VERSION = 5.5.0
     #---------------------------------------------------------------------------
     # UMFPACK configuration:
     #---------------------------------------------------------------------------
+
+    # CF += -DBLAS_NO_UNDERSCORE
 
     # Configuration for UMFPACK.  See UMFPACK/Source/umf_config.h for details.
     #

@@ -36,7 +36,8 @@ void paru_write( paru_matrix *paruMatInfo, int scale,
     else 
         name = default_name;
 
-    char dpath[] = "../Demo/Res/";
+    //char dpath[] = "../Demo/Res/";
+    char dpath[] = "./";
     //char dpath[] = "/users/aznaveh/SuiteSparse/ParU/Demo/Res/";
 
 

@@ -198,7 +198,7 @@ paru_symbolic *paru_analyze
 #endif
 
     /* performing the symbolic analysis */ 
-    status = umfpack_dl_symbolic (m, n, Ap, Ai, Ax, &Symbolic, Control, Info);
+//  status = umfpack_dl_symbolic (m, n, Ap, Ai, Ax, &Symbolic, Control, Info);
 
    void *SW; 
    status = umfpack_dl_azn_symbolic
