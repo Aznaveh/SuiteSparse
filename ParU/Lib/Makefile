@@ -45,7 +45,6 @@ OBJ = \
     paru_analyze.o \
 	paru_init_rowFronts.o\
 	paru_tuples.o\
-	paru_assemble.o\
 	paru_front.o\
 	paru_factorize.o\
 	paru_create_element.o\
@@ -61,6 +60,7 @@ OBJ = \
 	paru_write.o\
 	paru_cumsum.o
 #    paru_sym_analyse.o \
+	paru_assemble.o\
 
 $(OBJ): $(INC)
 
@@ -102,8 +102,8 @@ paru_init_rowFronts.o: ../Source/paru_init_rowFronts.cpp
 paru_tuples.o: ../Source/paru_tuples.cpp
 	$(C) -c $<
 
-paru_assemble.o: ../Source/paru_assemble.cpp
-	$(C) -c $<
+#paru_assemble.o: ../Source/paru_assemble.cpp
+#	$(C) -c $<
 
 paru_front.o: ../Source/paru_front.cpp
 	$(C) -c $<

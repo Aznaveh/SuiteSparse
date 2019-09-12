@@ -381,7 +381,7 @@ Int paru_remove_colTuple(tupleList *ColList, Int col, Int t);
 Int paru_remove_rowTuple(tupleList *RowList, Int row, Int t);
 
 // older version does not include row degree update after each panel
-void paru_assemble(paru_matrix *paruMatInfo, Int f, cholmod_common *cc);
+//void paru_assemble(paru_matrix *paruMatInfo, Int f, cholmod_common *cc);
 //newer version
 void paru_front (paru_matrix *paruMatInfo, Int f, cholmod_common *cc);
 

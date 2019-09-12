@@ -222,11 +222,6 @@ paru_symbolic *paru_analyze
     Int cs1 = Info[UMFPACK_COL_SINGLETONS];
     Int rs1 = Info[UMFPACK_ROW_SINGLETONS];
 
-    //TODO
-   // SWType *mySW = (SWType *)SW;
-   // Int *Front_nrows = (Int *) mySW->Front_nrows;
-   // mySW->Front_nrows = NULL; //TODO is it OK? or I should copy
-
 #ifndef NDEBUG
     p = 1;
     PRLEVEL (p, ("\n%% Symbolic factorization of A: "));
@@ -316,8 +311,6 @@ paru_symbolic *paru_analyze
 #endif
 
     umfpack_dl_free_symbolic (&Symbolic);
-    //TODO
-    umfpack_dl_azn_free_sw (&SW);
 
     paru_free ((n+1), sizeof (Int), Front_1strow, cc);
     paru_free ((n+1), sizeof (Int), Front_leftmostdesc, cc);
@@ -676,16 +669,40 @@ paru_symbolic *paru_analyze
     /* ---------------------------------------------------------------------- */
     /*         Finding the Upper bound of rows and cols                       */
     /* ---------------------------------------------------------------------- */
-    //TODO: it must computed somehow from UMFPACK
+    
+    SWType *mySW = (SWType *)SW;
+    Int *Front_nrows = (Int *) mySW->Front_nrows;
+    Int *Front_ncols = (Int *) mySW->Front_ncols;
+
 
     LUsym->Fm= NULL;
     //    LUsym->Fm = QRsym->Fm; 
     //    QRsym->Fm = NULL;
+    Int *Fm = (Int *) paru_alloc ((nf+1), sizeof (Int), cc);
+    LUsym->Fm =  Fm;
+    if ( Fm == NULL){   
+        printf ("memory problem");
+        paru_freesym (&LUsym , cc);
+        return NULL;  
+    }
+    // Copying first nf+1 elements of Front_nrows(UMFPACK) into Fm(SPQR like)
+    for (Int i = 0 ; i < nf+1 ; i++)
+        Fm[i] = Front_nrows [i];
 
 
-    LUsym->Cm= NULL;    //It seems I have never used it anyway
-    //    LUsym->Cm = QRsym->Cm; 
-    //    QRsym->Cm = NULL;
+
+    LUsym->Cm= NULL;    //Upper bound on number of columns
+    Int *Cm = (Int *) paru_alloc ((nf+1), sizeof (Int), cc);
+    LUsym->Cm =  Cm;
+    if ( Cm == NULL){   
+        printf ("memory problem");
+        paru_freesym (&LUsym , cc);
+        return NULL;  
+    }
+    // Copying first nf+1 elements of Front_ncols(UMFPACK) into Cm(SPQR like)
+    for (Int i = 0 ; i < nf+1 ; i++)
+        Cm[i] = Front_ncols [i];
+
 
 
     LUsym->Rj= NULL;
@@ -697,6 +714,7 @@ paru_symbolic *paru_analyze
     //    LUsym->Rp = QRsym->Rp; 
     //    QRsym->Rp = NULL;
 
+    umfpack_dl_azn_free_sw (&SW);
 
     /* ---------------------------------------------------------------------- */
     /*    computing the augmented tree and the data structures related        */

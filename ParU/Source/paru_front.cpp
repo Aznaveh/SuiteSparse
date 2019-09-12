@@ -26,7 +26,7 @@ void paru_front ( paru_matrix *paruMatInfo,
         Int f, /* front need to be assembled */
         cholmod_common *cc){
 
-    DEBUGLEVEL(-1);
+    DEBUGLEVEL(0);
     /* 
      * -2 Print Nothing
      * -1 Just Matlab
@@ -50,16 +50,8 @@ void paru_front ( paru_matrix *paruMatInfo,
     Int col2 = Super [f+1];
     Int fp = col2 - col1;   /* first fp columns are pivotal */ 
 
-    //TODO: I should use umfpack somehow to get these info
-    //    Int *Rp = LUsym->Rp;
-    //    Int *Rj = LUsym->Rj;
-    //    Int p1 = Rp [f];        /* Rj [p1:p2-1] = columns in F */
-    //    Int p2 = Rp [f+1];
-    //
-    //    Int fn = p2 - p1;          /* Upper bound number of columns of F */ 
-    //    Int fm = LUsym->Fm[f];     /* Upper bound number of rows of F */ 
-    Int fm = m;     // TODO: a very bad estimate for rows and columns in each 
-    Int fn = n;     // front. It is just for a transient test 
+    Int fm = LUsym->Fm[f];     /* Upper bound number of rows of F */ 
+    Int fn = LUsym->Cm[f];     /* Upper bound number of cols of F */ 
 
     paru_Element **elementList = paruMatInfo->elementList;
     work_struct *Work =  paruMatInfo->Work;
