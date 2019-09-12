@@ -91,7 +91,7 @@ void paru_front ( paru_matrix *paruMatInfo,
     }
 
 
-    PRLEVEL (1, ("%% the size of fm is %ld\n",fm));
+    PRLEVEL (0, ("%% the size of fm is %ld\n",fm));
     Int *frowList = (Int*) paru_alloc (fm, sizeof (Int), cc);
     if (frowList == NULL ){
         printf ("%% Out of memory when tried to allocate for frowList %ld",f);
@@ -257,7 +257,8 @@ void paru_front ( paru_matrix *paruMatInfo,
         return;
     }
 
-    PRLEVEL (1, ("%% fm=%ld rowCount = %ld \n", fm, rowCount));
+    PRLEVEL (1, ("%% fm=%ld rowCount = %ld \n", fm, LUsym->Fm[f]));
+    PRLEVEL (1, ("%% fn=%ld rowCount = %ld \n", fn, LUsym->Cm[f]));
     PRLEVEL (0, ("%% pivotalFront =%p \n", pivotalFront));
     ASSERT ( fm >= rowCount );
     //freeing extra space for rows
@@ -397,8 +398,8 @@ void paru_front ( paru_matrix *paruMatInfo,
 #ifndef NDEBUG  // Printing the list of rows
     p = 1;
     PRLEVEL (p, ("%% Befor factorization (inside assemble): \n"));
-    for (int i = 0; i < rowCount; i++){
-        PRLEVEL (p, ("%% frowList [%d] =%d\n",i, frowList [i]));
+    for (Int i = 0; i < rowCount; i++){
+        PRLEVEL (p, ("%% frowList [%ld] =%ld\n",i, frowList [i]));
     }
     PRLEVEL (p, ("\n"));
 #endif
@@ -428,8 +429,8 @@ void paru_front ( paru_matrix *paruMatInfo,
 #ifndef NDEBUG  // Printing the list of rows
     p = 1;
     PRLEVEL (p, ("%% After factorization (inside assemble): \n"));
-    for (int i = 0; i < rowCount; i++){
-        PRLEVEL (p, ("%% frowList [%d] =%d\n",i, frowList [i]));
+    for (Int i = 0; i < rowCount; i++){
+        PRLEVEL (p, ("%% frowList [%ld] =%ld\n",i, frowList [i]));
     }
     PRLEVEL (p, ("\n"));
 #endif
@@ -438,12 +439,12 @@ void paru_front ( paru_matrix *paruMatInfo,
 #ifndef NDEBUG  // Printing the permutation
     p = 1;
     PRLEVEL (p, ("%% pivotal rows:\n"));
-    for (int i = 0; i < fp; i++){
-        PRLEVEL (p, ("%% frowList[%d] =%d\n",i, frowList[i]));
+    for (Int i = 0; i < fp; i++){
+        PRLEVEL (p, ("%% frowList[%ld] =%ld\n",i, frowList[i]));
     }
     PRLEVEL (p, ("%% =======\n"));
-    for (int i = fp; i < rowCount; i++){
-        PRLEVEL (p, ("%% frowList[%d] =%d\n",i, frowList[i]));
+    for (Int i = fp; i < rowCount; i++){
+        PRLEVEL (p, ("%% frowList[%ld] =%ld\n",i, frowList[i]));
     }
     PRLEVEL (p, ("\n"));
 #endif
