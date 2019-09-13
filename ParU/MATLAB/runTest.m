@@ -42,8 +42,8 @@ fprintf(ff,' mynnz umfnnz ratio');
 fprintf(ff,' myflop umfflop ratio\n');
 
 
-%for k = 1:nmat
-for k = 1:100
+for k = 1:nmat
+%for k = 1:10
     id = fnew (k) ;
     group = index.Group {id} ;
     name = index.Name {id} ;
@@ -54,7 +54,7 @@ for k = 1:100
 
     [m n] = size (A);
     if (size(dr) ~= 2 )
-       % continue 
+       %continue 
         if (norm(diff(dr)-diff(ds)) ~= 0 )
             sprintf('Unexpected')
             continue;
