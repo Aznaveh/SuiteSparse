@@ -1,9 +1,9 @@
 index = ssget ;
 
 f = find (index.nrows == index.ncols & ...
-index.sprank == index.ncols & ...
-~index.posdef & ...
-index.isReal & ~index.isGraph) ;
+    index.sprank == index.ncols & ...
+    ~index.posdef & ...
+    index.isReal & ~index.isGraph) ;
 
 [ignore, i] = sort (index.nnz (f) + index.nzero (f)) ;
 
@@ -32,12 +32,7 @@ id = 1298; %%time consuming
 
 
 
-id = 1865; %% shows the fill
-id = 449; %% simple
-id = 262; %% west0067
-id = 2569; %%problematic
-id = 298;
-id = 2716;
+id = 2194;
 Prob = ssget(id);
 A = Prob.A;
 [m n] = size (A);
@@ -46,9 +41,8 @@ name = index.Name {id} ;
 [dp,dq,dr,ds,dcc,drr] = dmperm(A);
 
 str1 = 'tar zvfxO ~/SuiteSparseCollection//MM/';
-%str2 = sprintf ('%s/%s.tar.gz %s/%s.mtx | ../Demo/testazny %d %d', ...
-str2 = sprintf ('%s/%s.tar.gz %s/%s.mtx | ../Demo/umfout %d %d', ...
-group, name, name, name, id, s) ;
+str2 = sprintf ('%s/%s.tar.gz %s/%s.mtx | ../Demo/umpfout %d %d', ...
+    group, name, name, name, id, s) ;
 str = strcat (str1,str2);
 
 system(str);
@@ -74,65 +68,65 @@ colp = load (colfullname);
 colp = colp+1;
 
 if(s==1)
-        s_name = sprintf ('%d_scale.txt', id);
-        scalefullname = strcat(path, s_name);
-        Rvec = load (scalefullname);
-        R = spdiags (Rvec, 0, m, m);
-    end
+    s_name = sprintf ('%d_scale.txt', id);
+    scalefullname = strcat(path, s_name);
+    Rvec = load (scalefullname);
+    R = spdiags (Rvec, 0, m, m);
+end
 
 
-    LU_name = sprintf ('%d_LU.txt', id);
-    LUfullname = strcat(path, LU_name);
-    [LU, paddingZ] = mmread (LUfullname);
+LU_name = sprintf ('%d_LU.txt', id);
+LUfullname = strcat(path, LU_name);
+[LU, paddingZ] = mmread (LUfullname);
 
-    info_name = sprintf ('%d_info.txt',id);
-    infofullname = strcat(path, info_name);
-    myElaps = load (infofullname)
-
-
-
-    umfStart= tic;
-    %[l, u, p, q, D]=lu(A, 'vector');
-    [l, u, p, q, r, Info]= umfpack (A);
-    umfElaps = toc(umfStart)
+info_name = sprintf ('%d_info.txt',id);
+infofullname = strcat(path, info_name);
+myElaps = load (infofullname)
 
 
-    L=tril(LU,-1)+speye(size(LU));
-    U=triu(LU); 
 
-    if (s == 1)
-        %sA = sparse(diag(scale))*A;
-        sA = R\A;
-    else
-        sA = A;
-    end
-
-    myErr = lu_normest(sA(rowp,colp),L,U)
-    %umfErr = lu_normest(D(:,p)\A(:,q),l,u)
-    umfErr = lu_normest(p*(r\A)*q,l,u)
-
-    umfpnnz = nnz(l)+nnz(u) - size(A,1)
-    mynnz = nnz(LU) %+ nnz(paddingZ)
-
-    myflop = luflop(L,U)
+umfStart= tic;
+%[l, u, p, q, D]=lu(A, 'vector');
+[l, u, p, q, r, Info]= umfpack (A);
+umfElaps = toc(umfStart)
 
 
-    umfflop = luflop(l,u)
+L=tril(LU,-1)+speye(size(LU));
+U=triu(LU); 
 
-    myflop/umfflop
+if (s == 1)
+    %sA = sparse(diag(scale))*A;
+    sA = R\A;
+else
+    sA = A;
+end
+
+myErr = lu_normest(sA(rowp,colp),L,U)
+%umfErr = lu_normest(D(:,p)\A(:,q),l,u)
+umfErr = lu_normest(p*(r\A)*q,l,u)
+
+umfpnnz = nnz(l)+nnz(u) - size(A,1)
+mynnz = nnz(LU) %+ nnz(paddingZ)
+
+myflop = luflop(L,U)
 
 
-    if(myErr <= 100*umfErr || myErr < err)
-        fprintf('Pass\n')
-    else
-        fprintf('Fail\n')
-    end
+umfflop = luflop(l,u)
 
-    % cleaning the files because of the memory problem
-    str = ['rm  ' path LU_name];    system(str);
-    str = ['rm  ' path col_name];    system(str);
-    str = ['rm  ' path row_name];    system(str);
-    str = ['rm  ' path info_name];    system(str);
-    if (s == 1)
-        str = ['rm  ' path s_name];    system(str);
-    end
+myflop/umfflop
+
+
+if(myErr <= 100*umfErr || myErr < err)
+    fprintf('Pass\n')
+else
+    fprintf('Fail\n')
+end
+
+% cleaning the files because of the memory problem
+str = ['rm  ' path LU_name];    system(str);
+str = ['rm  ' path col_name];    system(str);
+str = ['rm  ' path row_name];    system(str);
+str = ['rm  ' path info_name];    system(str);
+if (s == 1)
+    str = ['rm  ' path s_name];    system(str);
+end

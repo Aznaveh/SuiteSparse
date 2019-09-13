@@ -36,12 +36,12 @@ extern "C"
 #endif
 
 //for printing information uncomment this; to activate assertions uncomment 
-#undef NPR    //1\\
+//#undef NPR    //1\\
 
 //from spqr.hpp
 //Aznaveh For MATLAB OUTPUT UNCOMMENT HERE
 // uncomment the following line to turn on debugging 
-#undef NDEBUG  //2\\
+//#undef NDEBUG  //2\\
 
 
 // defined somewhere else

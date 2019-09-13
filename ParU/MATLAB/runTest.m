@@ -5,7 +5,7 @@ index = ssget ;
 f = find (index.nrows == index.ncols & ...
     index.sprank == index.ncols & ...
     ~index.posdef & ...
-    index.isReal & ~index.isGraph) ;
+    index.isReal & ~index.isGraph & index.pattern_symmetry<.5) ;
 
 [ignore, i] = sort (index.nnz (f) + index.nzero (f)) ;
 
@@ -42,8 +42,8 @@ fprintf(ff,' mynnz umfnnz ratio');
 fprintf(ff,' myflop umfflop ratio\n');
 
 
-for k = 1:nmat
-%for k = 1:10
+%for k = 1:nmat
+for k = 1:100
     id = fnew (k) ;
     group = index.Group {id} ;
     name = index.Name {id} ;
@@ -54,21 +54,28 @@ for k = 1:nmat
 
     [m n] = size (A);
     if (size(dr) ~= 2 )
-       continue 
-       % if (norm(diff(dr)-diff(ds)) ~= 0 )
-       %     sprintf('Unexpected')
-       %     continue;
-       % end
-       % B = A(dp,dq);
-       % [M,I] = max(diff(dr));
-       % A = B(dr(I):dr(I+1)-1, dr(I):dr(I+1)-1 );
+       % continue 
+        if (norm(diff(dr)-diff(ds)) ~= 0 )
+            sprintf('Unexpected')
+            continue;
+        end
+        B = A(dp,dq);
+        [M,I] = max(diff(dr));
+        A = B(dr(I):dr(I+1)-1, dr(I):dr(I+1)-1 );
 
-       % mmwrite('../Matrix/ParUTst/tmp.mtx', A);
-       % str = sprintf ('../Demo/umfout %d < ../Matrix/ParUTst/tmp.mtx', id );
-       % system(str);
+        [m n] = size (A);
+        if ( m== 1)
+            sprintf('not worth trying');
+            continue;
+        end
+        
+
+        mmwrite('../Matrix/ParUTst/tmp.mtx', A);
+        str = sprintf ('../Demo/umpfout %d < ../Matrix/ParUTst/tmp.mtx', id );
+        system(str);
     else 
         str1 = 'tar zvfxO ~/SuiteSparseCollection//MM/';
-        str2 = sprintf ('%s/%s.tar.gz %s/%s.mtx | ../Demo/umfout %d %d', ...
+        str2 = sprintf ('%s/%s.tar.gz %s/%s.mtx | ../Demo/umpfout %d %d', ...
         group, name, name, name, id, s) ;
         dostr = strcat (str1,str2);
         system(dostr);
