@@ -215,6 +215,8 @@ paru_symbolic *paru_analyze
         umfpack_dl_report_info (Control, Info);
         umfpack_dl_report_status (Control, status);
         printf ("umfpack_dl_symbolic failed");
+        umfpack_dl_azn_free_sw (&SW);
+        umfpack_dl_free_symbolic (&Symbolic);
         paru_freesym (&LUsym , cc);
         return NULL;
     }
@@ -246,7 +248,25 @@ paru_symbolic *paru_analyze
     if (!Pinit || !Qinit || !Front_npivcol || !Front_parent || !Chain_start ||
             !Chain_maxrows || !Chain_maxcols || 
             !Front_1strow || !Front_leftmostdesc){
+
+        paru_free ((m+1), sizeof (Int), Pinit, cc);
+        paru_free ((n+1), sizeof (Int), Qinit, cc);
+        paru_free ((n+1), sizeof (Int), Front_npivcol, cc);
+        paru_free ((n+1), sizeof (Int), Front_1strow, cc);
+        paru_free ((n+1), sizeof (Int), Front_leftmostdesc, cc);
+        paru_free ((n+1), sizeof (Int), Front_parent, cc);
+        paru_free ((n+1), sizeof (Int), Chain_start, cc);
+        paru_free ((n+1), sizeof (Int), Chain_maxrows, cc);
+        paru_free ((n+1), sizeof (Int), Chain_maxcols, cc);
+
         printf("out of memory") ;
+
+        paru_freesym (&LUsym , cc);
+        umfpack_dl_free_symbolic (&Symbolic);
+        umfpack_dl_azn_free_sw (&SW);
+
+        return NULL; 
+ 
     }
 
 
@@ -270,6 +290,8 @@ paru_symbolic *paru_analyze
         paru_free ((n+1), sizeof (Int), Chain_maxcols, cc);
 
         paru_freesym (&LUsym , cc);
+        umfpack_dl_free_symbolic (&Symbolic);
+        umfpack_dl_azn_free_sw (&SW);
 
         return NULL; 
     }
@@ -357,6 +379,7 @@ paru_symbolic *paru_analyze
         paru_free ((n+1), sizeof (Int), Front_parent, cc);
 
         paru_freesym (&LUsym , cc);
+        umfpack_dl_azn_free_sw (&SW);
         return NULL;  
     }
     LUsym->Parent = Parent; 
@@ -367,6 +390,7 @@ paru_symbolic *paru_analyze
     if (Super == NULL){   
         printf ("memory problem");
         paru_freesym (&LUsym , cc);
+        umfpack_dl_azn_free_sw (&SW);
         return NULL;  
     }
     Super [0] = 0;
@@ -382,6 +406,7 @@ paru_symbolic *paru_analyze
     if (Childp== NULL){   
         printf ("memory problem");
         paru_freesym (&LUsym , cc);
+        umfpack_dl_azn_free_sw (&SW);
         return NULL;  
     }
 
@@ -403,6 +428,7 @@ paru_symbolic *paru_analyze
     if (Child == NULL){   
         printf ("memory problem");
         paru_freesym (&LUsym , cc);
+        umfpack_dl_azn_free_sw (&SW);
         return NULL;  
     }
 
@@ -412,6 +438,7 @@ paru_symbolic *paru_analyze
     if (cChildp == NULL){   
         printf ("memory problem");
         paru_freesym (&LUsym , cc);
+        umfpack_dl_azn_free_sw (&SW);
         return NULL;  
     }
 
@@ -444,6 +471,7 @@ paru_symbolic *paru_analyze
     if (Sp == NULL || Sleft == NULL || Pinv == NULL ){   
         printf ("memory problem");
         paru_freesym (&LUsym , cc);
+        umfpack_dl_azn_free_sw (&SW);
         return NULL;  
     }
 
@@ -478,9 +506,10 @@ paru_symbolic *paru_analyze
 
 
     Int *Ps; // new row permutation for just the Submatrix part
-    Ps = (Int*) paru_calloc (m-n1, sizeof(Int),cc); 
+    Ps = (Int*) paru_calloc (m-n1, sizeof(Int), cc); 
     if (Ps == NULL ){   
         printf ("memory problem");
+        umfpack_dl_azn_free_sw (&SW);
         paru_freesym (&LUsym , cc);
         return NULL;  
     }
@@ -531,6 +560,7 @@ paru_symbolic *paru_analyze
     if (rowcount < m-n1){
         //I think that must not happen anyway while umfpack finds it
         printf("Empty rows in submatrix\n"); 
+
 #ifndef NDEBUG
         PRLEVEL (1, ("m = %ld, n1 = %ld, rowcount = %ld, snz = %ld\n",
                     m , n1 ,rowcount, snz));
@@ -540,7 +570,9 @@ paru_symbolic *paru_analyze
             }
         }
 #endif
+        paru_free ( (m-n1), sizeof (Int), Ps, cc);
         paru_freesym (&LUsym , cc);
+        umfpack_dl_azn_free_sw (&SW);
         return NULL; //Free memory
     }
     ASSERT (rowcount == m-n1);
@@ -621,6 +653,7 @@ paru_symbolic *paru_analyze
     if (Sj == NULL || Sx == NULL){   
         printf ("memory problem");
         paru_freesym (&LUsym , cc);
+        umfpack_dl_azn_free_sw (&SW);
         return NULL;  
     }
 
@@ -683,6 +716,7 @@ paru_symbolic *paru_analyze
     if ( Fm == NULL){   
         printf ("memory problem");
         paru_freesym (&LUsym , cc);
+        umfpack_dl_azn_free_sw (&SW);
         return NULL;  
     }
     // Copying first nf+1 elements of Front_nrows(UMFPACK) into Fm(SPQR like)
@@ -697,6 +731,7 @@ paru_symbolic *paru_analyze
     if ( Cm == NULL){   
         printf ("memory problem");
         paru_freesym (&LUsym , cc);
+        umfpack_dl_azn_free_sw (&SW);
         return NULL;  
     }
     // Copying first nf+1 elements of Front_ncols(UMFPACK) into Cm(SPQR like)

@@ -27,12 +27,10 @@ err = 10e-9;
 s = 0;
 
 %test
-id = 801;
-id = 1298; %%time consuming
+id = 2056;
 
 
 
-id = 2194;
 Prob = ssget(id);
 A = Prob.A;
 [m n] = size (A);
@@ -40,38 +38,58 @@ group = index.Group {id} ;
 name = index.Name {id} ;
 [dp,dq,dr,ds,dcc,drr] = dmperm(A);
 
-str1 = 'tar zvfxO ~/SuiteSparseCollection//MM/';
-str2 = sprintf ('%s/%s.tar.gz %s/%s.mtx | ../Demo/umpfout %d %d', ...
-    group, name, name, name, id, s) ;
-str = strcat (str1,str2);
+[m n] = size (A);
+if (size(dr) ~= 2 )
+    if (norm(diff(dr)-diff(ds)) ~= 0 )
+        sprintf('Unexpected')
+    end
+    B = A(dp,dq);
+    [M,I] = max(diff(dr));
+    A = B(dr(I):dr(I+1)-1, dr(I):dr(I+1)-1 );
 
-system(str);
+    [m n] = size (A);
+    if ( m== 1)
+        sprintf('not worth trying');
+    end
 
-%%scaling now it is in the code
-%A = sparse(diag(1./max(abs(A),[],2)))*A;
-%mmwrite('../Matrix/ParUTst/tmp.mtx', A);
-%str = sprintf ('../Demo/testazny %d < ../Matrix/ParUTst/tmp.mtx', id );
-%system(str);
+    mmwrite('../Matrix/ParUTst/tmp.mtx', A);
+    str = sprintf ('../Demo/umpfout %d < ../Matrix/ParUTst/tmp.mtx', id );
+    system(str);
+
+else
+    str1 = 'tar zvfxO ~/SuiteSparseCollection//MM/';
+    str2 = sprintf ('%s/%s.tar.gz %s/%s.mtx | ../Demo/umpfout %d %d', ...
+        group, name, name, name, id, s) ;
+    str = strcat (str1,str2);
+
+    system(str);
+end
+
+    %%scaling now it is in the code
+    %A = sparse(diag(1./max(abs(A),[],2)))*A;
+    %mmwrite('../Matrix/ParUTst/tmp.mtx', A);
+    %str = sprintf ('../Demo/testazny %d < ../Matrix/ParUTst/tmp.mtx', id );
+    %system(str);
 
 
-% Loading the results into Matlab
-path = '../Demo/Res/';
+    % Loading the results into Matlab
+    path = '../Demo/Res/';
 
-row_name = sprintf ('%d_row.txt', id);
-rowfullname = strcat(path, row_name);
-rowp = load (rowfullname);
-rowp = rowp+1;
+    row_name = sprintf ('%d_row.txt', id);
+    rowfullname = strcat(path, row_name);
+    rowp = load (rowfullname);
+    rowp = rowp+1;
 
-col_name = sprintf ('%d_col.txt', id);
-colfullname = strcat(path, col_name);
-colp = load (colfullname);
-colp = colp+1;
+    col_name = sprintf ('%d_col.txt', id);
+    colfullname = strcat(path, col_name);
+    colp = load (colfullname);
+    colp = colp+1;
 
-if(s==1)
-    s_name = sprintf ('%d_scale.txt', id);
-    scalefullname = strcat(path, s_name);
-    Rvec = load (scalefullname);
-    R = spdiags (Rvec, 0, m, m);
+    if(s==1)
+        s_name = sprintf ('%d_scale.txt', id);
+        scalefullname = strcat(path, s_name);
+        Rvec = load (scalefullname);
+        R = spdiags (Rvec, 0, m, m);
 end
 
 

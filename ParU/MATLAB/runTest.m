@@ -5,7 +5,8 @@ index = ssget ;
 f = find (index.nrows == index.ncols & ...
     index.sprank == index.ncols & ...
     ~index.posdef & ...
-    index.isReal & ~index.isGraph & index.pattern_symmetry<.5) ;
+    index.isReal & ~index.isGraph & ...
+    index.pattern_symmetry <= .5) ;
 
 [ignore, i] = sort (index.nnz (f) + index.nzero (f)) ;
 
@@ -44,7 +45,10 @@ fprintf(ff,' myflop umfflop ratio\n');
 
 for k = 1:nmat
 %for k = 1:10
-    id = fnew (k) ;
+    id = fnew (k) 
+    if (id == 2056) leak
+        continue;
+    end
     group = index.Group {id} ;
     name = index.Name {id} ;
 

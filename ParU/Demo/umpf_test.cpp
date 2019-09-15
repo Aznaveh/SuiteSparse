@@ -63,10 +63,9 @@ int main (int argc, char **argv)
     }
 
 
-    Int m,n,nf;
-    m = paruMatInfo-> m;
-    n = paruMatInfo-> n;
-    nf = paruMatInfo->LUsym->nf;
+    //Int m = paruMatInfo-> m;
+    //Int n = paruMatInfo-> n;
+    Int nf = paruMatInfo->LUsym->nf;
 
 
     for (Int i = 0; i < nf; i++) {

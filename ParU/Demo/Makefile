@@ -32,8 +32,8 @@ VGFLAGS =  --leak-check=yes  --log-file="valgrindlogfile.log"\
 
 val:
 
-#	valgrind	$(VGFLAGS)	./umpfout < ../Matrix/ParUTst/tmp.mtx
-	valgrind	$(VGFLAGS)	./umpfout < ../Matrix/west0067.mtx 
+	valgrind	$(VGFLAGS)	./umpfout < ../Matrix/ParUTst/tmp.mtx
+#	valgrind	$(VGFLAGS)	./umpfout < ../Matrix/west0067.mtx 
 #	valgrind	$(VGFLAGS)	./umpfout < ../Matrix/b1_ss.mtx
 
 	
@@ -41,10 +41,16 @@ debug:
 	$(C) $(FLAG) -g umpf_test.cpp -o umpfout $(LIBS)
 	gdb ./umpfout < ../Matrix/c32.mtx		#3x2 	 #OK
 
+profile:
+	$(C) -Wall -pg -O0 -no-pie umpf_test.cpp -o prof $(LIBS)
+	./prof < ../Matrix/west0067.mtx 
+	gprof -b prof gmon.out > analysis.txt
+
 purge: distclean
 
 distclean: clean
 	- $(RM) umpfout
+	- $(RM) prof gmon.out analysis.txt
 	- $(RM) paneltest
 	- $(RM) *.dot pfile tfile
 	- $(RM) -r $(PURGE)
