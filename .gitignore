@@ -117,7 +117,8 @@ ParU/Demo/tfile
 ParU/Demo/tmp
 ParU/Demo/*.m
 ParU/Demo/valgrindlogfile.log"
-ParU/Demo/Res/*
+ParU/Demo/analysis.txt
+ParU/Demo/callgrind.out.*
 
 # ignore these specific programs in the Package/Tcov directories
 CHOLMOD/Tcov/cl

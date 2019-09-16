@@ -42,15 +42,16 @@ debug:
 	gdb ./umpfout < ../Matrix/c32.mtx		#3x2 	 #OK
 
 profile:
-	$(C) -Wall -pg -O0 -no-pie umpf_test.cpp -o prof $(LIBS)
-	./prof < ../Matrix/west0067.mtx 
-	gprof -b prof gmon.out > analysis.txt
+#	$(C) -Wall -pg -O0 -no-pie umpf_test.cpp -o prof $(LIBS)
+#	./prof < ../Matrix/west0067.mtx 
+#	gprof -b prof gmon.out > analysis.txt
+	valgrind	-tool=callgrind ./umpfout < ../Matrix/west0067.mtx
 
 purge: distclean
 
 distclean: clean
 	- $(RM) umpfout
-	- $(RM) prof gmon.out analysis.txt
+	- $(RM) prof gmon.out analysis.txt callgrind.out.*
 	- $(RM) paneltest
 	- $(RM) *.dot pfile tfile
 	- $(RM) -r $(PURGE)
