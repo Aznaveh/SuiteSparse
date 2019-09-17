@@ -150,7 +150,7 @@ void paru_write( paru_matrix *paruMatInfo, int scale,
             return;
         }
         for(Int row = 0; row < m ; row++)  
-            fprintf (scalefptr, "%10.21g\n",scale_row[row]);
+            fprintf (scalefptr, "%.17g\n",scale_row[row]);
         fclose(scalefptr);
     }
     //--------------------
@@ -169,7 +169,7 @@ void paru_write( paru_matrix *paruMatInfo, int scale,
             printf ("Error in opening a file");
             return;
         }
-        fprintf (infofptr, "%10.21g\n",paruMatInfo->time);
+        fprintf (infofptr, "%.17g\n",paruMatInfo->time);
         fclose(infofptr);
     }
     //--------------------
@@ -222,7 +222,7 @@ void paru_write( paru_matrix *paruMatInfo, int scale,
         PRLEVEL (1, ("%% pivotalFront =%p \n", pivotalFront));
         for (Int j = col1 ; j < col2; j++)
             for (Int i = 0; i < rowCount ; i++){
-                fprintf (LUfptr, "%ld  %ld %10.21g\n",
+                fprintf (LUfptr, "%ld  %ld %.17g\n",
                         newRofS[frowList[i]]+n1+1, j+n1+1, 
                         pivotalFront[(j-col1)*rowCount+i]);
             }
@@ -244,7 +244,7 @@ void paru_write( paru_matrix *paruMatInfo, int scale,
         double *uPart = Us[f].p  ;
         for (Int j = 0; j < colCount; j++)
             for (Int i = 0; i < fp; i++){
-                fprintf (LUfptr, "%ld  %ld %10.21g\n", newRofS[frowList[i]]+n1+1,
+                fprintf (LUfptr, "%ld  %ld %.17g\n", newRofS[frowList[i]]+n1+1,
                         fcolList[j]+n1+1, uPart[fp*j+i]);
             }
 #ifndef NDEBUG  // Printing the  U part
