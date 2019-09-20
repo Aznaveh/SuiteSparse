@@ -43,8 +43,8 @@ fprintf(ff,' mynnz umfnnz ratio');
 fprintf(ff,' myflop umfflop ratio\n');
 
 
-for k = 1:nmat
-%for k = 1:10
+%for k = 1:nmat
+for k = 1:10
     id = fnew (k) 
     % some problem in these matrice
     if (id == 2056 || id == 2034) 
@@ -56,9 +56,9 @@ for k = 1:nmat
     Prob = ssget(id);
     A = Prob.A;
 
-    if (nnz(A) < 10000)
-        continue;
-    end;
+%    if (nnz(A) < 10000)
+%        continue;
+%    end;
 
 
     [dp,dq,dr,ds,dcc,drr] = dmperm(A);
@@ -74,9 +74,9 @@ for k = 1:nmat
         [M,I] = max(diff(dr));
         A = B(dr(I):dr(I+1)-1, dr(I):dr(I+1)-1 );
 
-        if (nnz(A) < 10000)
-            continue;
-        end;
+%        if (nnz(A) < 10000)
+%            continue;
+%        end;
 
 
         [m n] = size (A);

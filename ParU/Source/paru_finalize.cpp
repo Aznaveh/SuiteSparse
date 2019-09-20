@@ -74,7 +74,6 @@ void paru_finalize (paru_matrix *paruMatInfo, Int f, cholmod_common *cc){
         for (Int i = 0; i < numTuple; i++){
             paru_Tuple curTpl = listColTuples [i];
             Int e = curTpl.e;
-            //if (e == el_ind){ //current element}
             if ( e >= el_ind || e < first[el_ind]){ 
                 //Not any of descendents
                 continue;
@@ -227,7 +226,6 @@ void paru_finalize (paru_matrix *paruMatInfo, Int f, cholmod_common *cc){
         for (Int i = 0; i < numTuple; i++){
             paru_Tuple curTpl = listRowTuples [i];
             Int e = curTpl.e;
-            //if (e == el_ind){ //current element}
             if ( e >= el_ind || e < first[el_ind]){
                 //Not any of descendents
                 continue;
@@ -311,7 +309,7 @@ void paru_finalize (paru_matrix *paruMatInfo, Int f, cholmod_common *cc){
     }
 
 
-    /********************* 3th path: clearing column tuples and uncheck *******/
+    /********************* 3rd path: clearing column tuples and uncheck *******/
     for (Int k = 0; k < colCount; k++){
         Int c = fcolList [k];   //non pivotal column list
         tupleList *curColTupleList = &ColList[c];
@@ -332,11 +330,6 @@ void paru_finalize (paru_matrix *paruMatInfo, Int f, cholmod_common *cc){
         for (Int psrc = 0; psrc < numTuple; psrc ++){
             paru_Tuple curTpl = listColTuples [psrc];
             Int e = curTpl.e;
-            if (e == el_ind){ //current element
-                listColTuples [pdst++] = curTpl; //keeping the tuple
-                continue;
-            }
-
             Int curColIndex = curTpl.f;
             PRLEVEL (1, ("%% element= %ld  f =%ld \n",e, curColIndex));
 
@@ -395,11 +388,6 @@ void paru_finalize (paru_matrix *paruMatInfo, Int f, cholmod_common *cc){
         for (Int psrc = 0; psrc < numTuple; psrc ++){
             paru_Tuple curTpl = listRowTuples [psrc];
             Int e = curTpl.e;
-            if (e == el_ind){ //current element
-                listRowTuples [pdst++] = curTpl; //keeping the tuple
-                continue;
-            }
-
             Int curRowIndex = curTpl.f;
             PRLEVEL (1, ("%% element= %ld  f =%ld \n",e, curRowIndex));
 

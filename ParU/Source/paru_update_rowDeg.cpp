@@ -284,7 +284,6 @@ void paru_update_rowDeg ( Int panel_num,  Int row_end,
         for (Int i = 0; i < numTuple; i++){
             paru_Tuple curTpl = listColTuples [i];
             Int e = curTpl.e;
-            // if (e == el_ind){ //current element}
             if ( e >= el_ind || e < first[el_ind]){ //Not any of descendents
                 continue;
             }
@@ -374,11 +373,6 @@ void paru_update_rowDeg ( Int panel_num,  Int row_end,
         for (Int i = 0; i < numTuple; i++){
             paru_Tuple curTpl = listRowTuples [i];
             Int e = curTpl.e;
-
-              if (e == el_ind){ //current element}
-            //if ( e >= el_ind || e < first[el_ind]){ //Not any of descendents
-                continue;
-            }
 
 
 #ifndef NDEBUG        
