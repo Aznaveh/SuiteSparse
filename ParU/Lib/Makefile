@@ -52,15 +52,12 @@ OBJ = \
 	paru_trsm.o\
 	paru_dgemm.o\
 	paru_print.o\
-	paru_fourPass.o\
 	paru_init_rel.o\
 	paru_update_rel_ind.o\
 	paru_update_rowDeg.o\
 	paru_finalize.o\
 	paru_write.o\
 	paru_cumsum.o
-#    paru_sym_analyse.o \
-	paru_assemble.o\
 
 $(OBJ): $(INC)
 
@@ -121,9 +118,6 @@ paru_trsm.o: ../Source/paru_trsm.cpp
 	$(C) -c $<
 
 paru_dgemm.o: ../Source/paru_dgemm.cpp
-	$(C) -c $<
-
-paru_fourPass.o: ../Source/paru_fourPass.cpp
 	$(C) -c $<
 
 paru_print.o: ../Source/paru_print.cpp
