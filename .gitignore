@@ -116,6 +116,7 @@ ParU/Demo/pfile
 ParU/Demo/tfile
 ParU/Demo/tmp
 ParU/Demo/*.m
+ParU/Demo/Res/*
 ParU/Demo/valgrindlogfile.log"
 ParU/Demo/analysis.txt
 ParU/Demo/callgrind.out.*
