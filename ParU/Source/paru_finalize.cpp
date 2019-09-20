@@ -230,6 +230,10 @@ void paru_finalize (paru_matrix *paruMatInfo, Int f, cholmod_common *cc){
                 //Not any of descendents
                 continue;
             }
+        //TODO: these assertion doesn't work: why?
+       // ASSERT ( e >= el_ind );
+       // ASSERT ( e < first[el_ind] );
+
             Int curColIndex = curTpl.f;
             PRLEVEL (1, ("%% element= %ld  f =%ld \n",
                         e, curColIndex));
@@ -325,7 +329,7 @@ void paru_finalize (paru_matrix *paruMatInfo, Int f, cholmod_common *cc){
             paru_print_element (paruMatInfo, el_ind);
         }
 #endif
-        Int pdst = 0,psrc;
+        Int pdst = 0, psrc;
 
         for (psrc = 0; psrc < numTuple; psrc ++){
             paru_Tuple curTpl = listColTuples [psrc];
@@ -383,7 +387,7 @@ void paru_finalize (paru_matrix *paruMatInfo, Int f, cholmod_common *cc){
             paru_print_element (paruMatInfo, el_ind);
         }
 #endif
-        Int pdst = 0,psrc;
+        Int pdst = 0, psrc;
 
         for (psrc = 0; psrc < numTuple; psrc ++){
             paru_Tuple curTpl = listRowTuples [psrc];
