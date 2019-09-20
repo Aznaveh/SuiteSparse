@@ -327,7 +327,7 @@ void paru_finalize (paru_matrix *paruMatInfo, Int f, cholmod_common *cc){
 #endif
         Int pdst = 0,psrc;
 
-        for (Int psrc = 0; psrc < numTuple; psrc ++){
+        for (psrc = 0; psrc < numTuple; psrc ++){
             paru_Tuple curTpl = listColTuples [psrc];
             Int e = curTpl.e;
             Int curColIndex = curTpl.f;
@@ -385,7 +385,7 @@ void paru_finalize (paru_matrix *paruMatInfo, Int f, cholmod_common *cc){
 #endif
         Int pdst = 0,psrc;
 
-        for (Int psrc = 0; psrc < numTuple; psrc ++){
+        for (psrc = 0; psrc < numTuple; psrc ++){
             paru_Tuple curTpl = listRowTuples [psrc];
             Int e = curTpl.e;
             Int curRowIndex = curTpl.f;
