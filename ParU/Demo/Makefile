@@ -27,13 +27,14 @@ run:
 	./umpfout < ../Matrix/b1_ss.mtx  	#7x7
 #	./umpfout < ../Matrix/ParUTst/tmp.mtx
 
-VGFLAGS =  --leak-check=yes  --log-file="valgrindlogfile.log"\
-			--track-origins=yes
+VGFLAGS =  --leak-check=yes\
+		   --log-file="valgrindlogfile.log"\
+		   --track-origins=yes
 
 val:
 
-	valgrind	$(VGFLAGS)	./umpfout < ../Matrix/ParUTst/tmp.mtx
-#	valgrind	$(VGFLAGS)	./umpfout < ../Matrix/west0067.mtx 
+#	valgrind	$(VGFLAGS)	./umpfout < ../Matrix/ParUTst/tmp.mtx
+	valgrind	$(VGFLAGS)	./umpfout < ../Matrix/west0067.mtx 
 #	valgrind	$(VGFLAGS)	./umpfout < ../Matrix/b1_ss.mtx
 
 	

@@ -86,6 +86,7 @@ void paru_finalize (paru_matrix *paruMatInfo, Int f, cholmod_common *cc){
             ASSERT (curColIndex >= 0);
 
             paru_Element *el = elementList[e];
+            if (el == NULL) continue;
             Int mEl = el->nrows;
             Int nEl = el->ncols;
 
@@ -123,17 +124,15 @@ void paru_finalize (paru_matrix *paruMatInfo, Int f, cholmod_common *cc){
                             el->nrows, el->ncols, curFr->nrows,
                             rowRelIndex, colRelIndex);
                     // delete e
-                    el->nrowsleft = el->ncolsleft = 0;
-                    for (Int j=0; j < el->nrows; j++){
-                        rowRelIndex[j] = -1;
-                        el_rowIndex [j] = -1;
-                    }
-                    for (Int i=0; i < el->ncols; i++){
-                        colRelIndex[i] = -1;
-                        el_colIndex [i] = -1;
-                    }
+                    //TODO: free element
+                    Int tot_size = sizeof(paru_Element) +
+                        sizeof(Int)*(2*(mEl+nEl)) + sizeof(double)*nEl*mEl;
+                    paru_free (1, tot_size, el, cc);
+                    elementList[e] = NULL;
 
+                   continue;
                 }
+
                 ASSERT ( e < el_ind && e >= first[el_ind]);
 
                 if(el->rValid !=  time_f){ /*  Update rowRelIndex	 */
@@ -244,6 +243,7 @@ void paru_finalize (paru_matrix *paruMatInfo, Int f, cholmod_common *cc){
             ASSERT (curRowIndex >= 0);
 
             paru_Element *el = elementList[e];
+            if (el == NULL) continue;
             Int mEl = el->nrows;
             Int nEl = el->ncols;
 
@@ -313,6 +313,7 @@ void paru_finalize (paru_matrix *paruMatInfo, Int f, cholmod_common *cc){
     }
 
 
+    DEBUGLEVEL(1);
     /********************* 3rd path: clearing column tuples and uncheck *******/
     for (Int k = 0; k < colCount; k++){
         Int c = fcolList [k];   //non pivotal column list
@@ -340,6 +341,7 @@ void paru_finalize (paru_matrix *paruMatInfo, Int f, cholmod_common *cc){
 
 
             paru_Element *el = elementList[e];
+            if (el == NULL) continue;
             Int mEl = el->nrows;
             Int nEl = el->ncols;
 
@@ -363,6 +365,7 @@ void paru_finalize (paru_matrix *paruMatInfo, Int f, cholmod_common *cc){
         curColTupleList->numTuple = pdst;
         PRLEVEL (1, ("%% new number of tuple=%ld\n", pdst));
 #ifndef NDEBUG
+        p = 0;
         if (p <= 0)
             paru_print_tupleList (ColList, c);
 #endif
@@ -397,6 +400,7 @@ void paru_finalize (paru_matrix *paruMatInfo, Int f, cholmod_common *cc){
 
 
             paru_Element *el = elementList[e];
+            if (el == NULL) continue;
             Int mEl = el->nrows;
             Int nEl = el->ncols;
 
@@ -422,6 +426,7 @@ void paru_finalize (paru_matrix *paruMatInfo, Int f, cholmod_common *cc){
         curFr->cWork = NULL;
 
 #ifndef NDEBUG            
+        p = 0;
         if (p <= 0 )
             paru_print_tupleList (RowList, r);
 #endif
