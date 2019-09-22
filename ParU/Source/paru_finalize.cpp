@@ -11,6 +11,10 @@
 void paru_finalize (paru_matrix *paruMatInfo, Int f, cholmod_common *cc){
 
     DEBUGLEVEL(0);
+#ifndef NDEBUG
+    Int p = 0;
+#endif
+
     work_struct *Work =  paruMatInfo->Work;
 
     Int *isRowInFront = Work->rowSize; 
@@ -62,7 +66,9 @@ void paru_finalize (paru_matrix *paruMatInfo, Int f, cholmod_common *cc){
         ASSERT (numTuple >= 0);
         paru_Tuple *listColTuples = curColTupleList->list;
 #ifndef NDEBUG            
-        Int p = 1;
+        p = 1;
+        Int ent=0,cnt=0;
+        
         PRLEVEL (p, ("\n %%-------->  3rd: c =%ld  numTuple = %ld\n",
                     c, numTuple));
         if (p <= 0 ){
@@ -74,10 +80,17 @@ void paru_finalize (paru_matrix *paruMatInfo, Int f, cholmod_common *cc){
         for (Int i = 0; i < numTuple; i++){
             paru_Tuple curTpl = listColTuples [i];
             Int e = curTpl.e;
+#ifndef NDEBUG
+            ent++;
+#endif
             if ( e >= el_ind || e < first[el_ind]){ 
                 //Not any of descendents
                 continue;
             }
+#ifndef NDEBUG
+            cnt++;
+#endif
+ 
             Int curColIndex = curTpl.f;
             PRLEVEL (1, ("%% element= %ld  f =%ld \n",e, curColIndex));
 
@@ -124,13 +137,12 @@ void paru_finalize (paru_matrix *paruMatInfo, Int f, cholmod_common *cc){
                             el->nrows, el->ncols, curFr->nrows,
                             rowRelIndex, colRelIndex);
                     // delete e
-                    //TODO: free element
                     Int tot_size = sizeof(paru_Element) +
                         sizeof(Int)*(2*(mEl+nEl)) + sizeof(double)*nEl*mEl;
                     paru_free (1, tot_size, el, cc);
                     elementList[e] = NULL;
 
-                   continue;
+                    continue;
                 }
 
                 ASSERT ( e < el_ind && e >= first[el_ind]);
@@ -197,6 +209,8 @@ void paru_finalize (paru_matrix *paruMatInfo, Int f, cholmod_common *cc){
 #ifndef NDEBUG
         if (p <= 0)
             paru_print_tupleList (ColList, c);
+        p = 0;
+        PRLEVEL (p, ("\n%%ent=%ld cnt=%ld\n",ent, cnt));
 #endif
 
     }
@@ -213,7 +227,7 @@ void paru_finalize (paru_matrix *paruMatInfo, Int f, cholmod_common *cc){
         ASSERT (numTuple >= 0);
         paru_Tuple *listRowTuples = curRowTupleList->list;
 #ifndef NDEBUG            
-        Int p = 1;
+        p = 1;
         PRLEVEL (1, ("\n %%------->  4th: r =%ld  numTuple = %ld\n",
                     r, numTuple));
         if (p <= 0 ){
@@ -229,9 +243,9 @@ void paru_finalize (paru_matrix *paruMatInfo, Int f, cholmod_common *cc){
                 //Not any of descendents
                 continue;
             }
-        //TODO: these assertion doesn't work: why?
-       // ASSERT ( e >= el_ind );
-       // ASSERT ( e < first[el_ind] );
+            //TODO: these assertion doesn't work: why?
+            // ASSERT ( e >= el_ind );
+            // ASSERT ( e < first[el_ind] );
 
             Int curColIndex = curTpl.f;
             PRLEVEL (1, ("%% element= %ld  f =%ld \n",
@@ -272,7 +286,7 @@ void paru_finalize (paru_matrix *paruMatInfo, Int f, cholmod_common *cc){
                 ASSERT ( e < el_ind && e >= first[el_ind]);
 
 #ifndef NDEBUG            
-                Int p = 1;
+                p = 1;
                 PRLEVEL (1, ("%% Before row assembly: \n" ));
                 if (p <= 0 ){
                     paru_print_element (paruMatInfo, e);
@@ -322,7 +336,7 @@ void paru_finalize (paru_matrix *paruMatInfo, Int f, cholmod_common *cc){
         ASSERT (numTuple >= 0);
         paru_Tuple *listColTuples = curColTupleList->list;
 #ifndef NDEBUG            
-        Int p = 1;
+        p = 1;
         PRLEVEL (p, ("\n %%-------->  5th: c =%ld  numTuple = %ld\n",
                     c, numTuple));
         if (p <= 0 ){
@@ -382,7 +396,7 @@ void paru_finalize (paru_matrix *paruMatInfo, Int f, cholmod_common *cc){
         ASSERT (numTuple >= 0);
         paru_Tuple *listRowTuples = curRowTupleList->list;
 #ifndef NDEBUG            
-        Int p = 1;
+        p = 1;
         PRLEVEL (p, ("\n %%-------->  6th: r =%ld  numTuple = %ld\n",
                     r, numTuple));
         if (p <= 0 ){

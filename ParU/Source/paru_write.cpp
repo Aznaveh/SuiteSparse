@@ -233,7 +233,7 @@ void paru_write( paru_matrix *paruMatInfo, int scale,
         for (Int r = 0; r < rowCount; r++){
             PRLEVEL (p, (" "));
             for (Int c = col1; c < col2; c++){
-                PRLEVEL (p, (" %.*g ", pivotalFront [(c-col1)*rowCount + r]));
+                PRLEVEL (p, (" %.17g ", pivotalFront [(c-col1)*rowCount + r]));
             }
             PRLEVEL (p, (";\n  %% "));
         }

@@ -6,7 +6,7 @@ f = find (index.nrows == index.ncols & ...
     index.sprank == index.ncols & ...
     ~index.posdef & ...
     index.isReal & ~index.isGraph & ...
-    index.pattern_symmetry <= .7) ;
+    index.pattern_symmetry <= .6) ;
 
 [ignore, i] = sort (index.nnz (f) + index.nzero (f)) ;
 
@@ -44,7 +44,7 @@ fprintf(ff,' myflop umfflop ratio\n');
 
 
 %for k = 1:nmat
-for k = 1:10
+for k = 1:100
     id = fnew (k) 
     % some problem in these matrice
     if (id == 2056 || id == 2034) 
