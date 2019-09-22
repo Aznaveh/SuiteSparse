@@ -22,6 +22,10 @@ void paru_update_rowDeg ( Int panel_num,  Int row_end,
         Int f, paru_matrix *paruMatInfo){
 
     DEBUGLEVEL(0);
+#ifndef NDEBUG
+    Int p = 1;
+    static Int r1 = 0, r2 = 0, r3 = 0, r4 = 0;
+#endif
     PRLEVEL (1, ("%%-------ROW degree update of panel %ld of front %ld \n", 
              panel_num, f ));
     Int panel_width = paruMatInfo->panel_width;
@@ -125,6 +129,9 @@ void paru_update_rowDeg ( Int panel_num,  Int row_end,
             paru_Tuple curTpl = listRowTuples [i];
             Int e = curTpl.e;
             Int curRowIndex = curTpl.f;
+#ifndef NDEBUG
+            r1++;
+#endif
             if(e < 0 || curRowIndex < 0) continue;
 
             paru_Element *el = elementList[e];
@@ -198,7 +205,7 @@ void paru_update_rowDeg ( Int panel_num,  Int row_end,
     }
 
 #ifndef NDEBUG /* Checking if columns are correct */
-    Int p = 1;
+    p = 1;
     PRLEVEL (p, ("%% There are %ld columns in this contribution block: \n",
                 colCount));
     for (Int i = 0; i < colCount; i++)
@@ -275,7 +282,7 @@ void paru_update_rowDeg ( Int panel_num,  Int row_end,
         ASSERT (numTuple >= 0);
         paru_Tuple *listColTuples = curColTupleList->list;
 #ifndef NDEBUG        
-        Int p = 1;
+        p = 1;
         PRLEVEL (p, ("\n %%--------> 1st: c =%ld  numTuple = %ld\n", 
                     c, numTuple));
         if (p <= 0)
@@ -284,6 +291,10 @@ void paru_update_rowDeg ( Int panel_num,  Int row_end,
         for (Int i = 0; i < numTuple; i++){
             paru_Tuple curTpl = listColTuples [i];
             Int e = curTpl.e;
+#ifndef NDEBUG
+            r2++;
+#endif
+
             if ( e >= el_ind || e < first[el_ind]){ //Not any of descendents
                 continue;
             }
@@ -372,6 +383,9 @@ void paru_update_rowDeg ( Int panel_num,  Int row_end,
         for (Int i = 0; i < numTuple; i++){
             paru_Tuple curTpl = listRowTuples [i];
             Int e = curTpl.e;
+#ifndef NDEBUG
+            r3++;
+#endif
 
 
 #ifndef NDEBUG        
@@ -425,4 +439,7 @@ void paru_update_rowDeg ( Int panel_num,  Int row_end,
     }
 
     paruMatInfo->time_stamp[f]+= 2; //making all the markings invalid again
+    PRLEVEL (0, ("%% Finalized counters r1=%ld r2=%ld r3=%ld sum=%ld\n", 
+                r1, r2, r3, r1+r2+r3));
+
 }

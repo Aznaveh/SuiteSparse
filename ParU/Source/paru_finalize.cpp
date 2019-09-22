@@ -13,6 +13,7 @@ void paru_finalize (paru_matrix *paruMatInfo, Int f, cholmod_common *cc){
     DEBUGLEVEL(0);
 #ifndef NDEBUG
     Int p = 0;
+    static Int f1 = 0, f2 = 0, f3 = 0, f4 = 0;
 #endif
 
     work_struct *Work =  paruMatInfo->Work;
@@ -67,7 +68,6 @@ void paru_finalize (paru_matrix *paruMatInfo, Int f, cholmod_common *cc){
         paru_Tuple *listColTuples = curColTupleList->list;
 #ifndef NDEBUG            
         p = 1;
-        Int ent=0,cnt=0;
         
         PRLEVEL (p, ("\n %%-------->  3rd: c =%ld  numTuple = %ld\n",
                     c, numTuple));
@@ -81,16 +81,13 @@ void paru_finalize (paru_matrix *paruMatInfo, Int f, cholmod_common *cc){
             paru_Tuple curTpl = listColTuples [i];
             Int e = curTpl.e;
 #ifndef NDEBUG
-            ent++;
+            f1++;
 #endif
             if ( e >= el_ind || e < first[el_ind]){ 
                 //Not any of descendents
                 continue;
             }
-#ifndef NDEBUG
-            cnt++;
-#endif
- 
+
             Int curColIndex = curTpl.f;
             PRLEVEL (1, ("%% element= %ld  f =%ld \n",e, curColIndex));
 
@@ -209,8 +206,6 @@ void paru_finalize (paru_matrix *paruMatInfo, Int f, cholmod_common *cc){
 #ifndef NDEBUG
         if (p <= 0)
             paru_print_tupleList (ColList, c);
-        p = 0;
-        PRLEVEL (p, ("\n%%ent=%ld cnt=%ld\n",ent, cnt));
 #endif
 
     }
@@ -239,6 +234,10 @@ void paru_finalize (paru_matrix *paruMatInfo, Int f, cholmod_common *cc){
         for (Int i = 0; i < numTuple; i++){
             paru_Tuple curTpl = listRowTuples [i];
             Int e = curTpl.e;
+#ifndef NDEBUG
+            f2++;
+#endif
+ 
             if ( e >= el_ind || e < first[el_ind]){
                 //Not any of descendents
                 continue;
@@ -352,6 +351,10 @@ void paru_finalize (paru_matrix *paruMatInfo, Int f, cholmod_common *cc){
             Int curColIndex = curTpl.f;
             PRLEVEL (1, ("%% element= %ld  f =%ld \n",e, curColIndex));
 
+#ifndef NDEBUG
+            f3++;
+#endif
+ 
 
 
             paru_Element *el = elementList[e];
@@ -411,7 +414,10 @@ void paru_finalize (paru_matrix *paruMatInfo, Int f, cholmod_common *cc){
             Int e = curTpl.e;
             Int curRowIndex = curTpl.f;
             PRLEVEL (1, ("%% element= %ld  f =%ld \n",e, curRowIndex));
-
+#ifndef NDEBUG
+            f4++;
+#endif
+ 
 
             paru_Element *el = elementList[e];
             if (el == NULL) continue;
@@ -443,6 +449,9 @@ void paru_finalize (paru_matrix *paruMatInfo, Int f, cholmod_common *cc){
         p = 0;
         if (p <= 0 )
             paru_print_tupleList (RowList, r);
+
+        PRLEVEL (p, ("%% Finalized counters f1=%ld f2=%ld f3=%ld f4=%ld"
+                    " sum=%ld\n", f1, f2, f3, f4, f1+f2+f3+f4));
 #endif
     }
 }
