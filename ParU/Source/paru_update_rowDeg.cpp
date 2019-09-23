@@ -125,8 +125,15 @@ void paru_update_rowDeg ( Int panel_num,  Int row_end,
         ASSERT (numTuple >= 0);
         paru_Tuple *listRowTuples = curRowTupleList->list;
         PRLEVEL (1, ("%% 4: numTuple = %ld\n", numTuple));
-        for (Int i = 0; i < numTuple; i++){
-            paru_Tuple curTpl = listRowTuples [i];
+
+
+
+        Int pdst = 0, psrc;
+        for (psrc = 0; psrc < numTuple; psrc ++){
+        //for (Int i = 0; i < numTuple; i++){
+           // paru_Tuple curTpl = listRowTuples [i];
+            paru_Tuple curTpl = listRowTuples [psrc];
+
             Int e = curTpl.e;
             Int curRowIndex = curTpl.f;
 #ifndef NDEBUG
@@ -135,6 +142,9 @@ void paru_update_rowDeg ( Int panel_num,  Int row_end,
             if(e < 0 || curRowIndex < 0) continue;
 
             paru_Element *el = elementList[e];
+
+            if (el == NULL) continue;
+
             Int mEl = el->nrows;
             Int nEl = el->ncols;
             Int *el_rowIndex = rowIndex_pointer (el);
@@ -143,6 +153,9 @@ void paru_update_rowDeg ( Int panel_num,  Int row_end,
             Int *rowRelIndex = relRowInd (el);
 
             if (el_rowIndex [curRowIndex] < 0 ) continue;
+
+            listRowTuples [pdst++] = curTpl; //keeping the tuple
+
             ASSERT (el_rowIndex[curRowIndex] == curFsRow);
 
             rowRelIndex [curTpl.f] = curFsRow;
@@ -197,6 +210,8 @@ void paru_update_rowDeg ( Int panel_num,  Int row_end,
                 ASSERT (colCount <= n);
             }
         }
+
+        curRowTupleList->numTuple = pdst;
     }
 
     if (colCount == 0){  // there is no CB, Nothing to be done
@@ -380,8 +395,12 @@ void paru_update_rowDeg ( Int panel_num,  Int row_end,
         if (p <= 0)
             paru_print_tupleList (RowList, r);
 #endif
-        for (Int i = 0; i < numTuple; i++){
-            paru_Tuple curTpl = listRowTuples [i];
+        Int pdst = 0, psrc;
+        for (psrc = 0; psrc < numTuple; psrc ++){
+ 
+        //for (Int i = 0; i < numTuple; i++){
+            //paru_Tuple curTpl = listRowTuples [i];
+            paru_Tuple curTpl = listRowTuples [psrc];
             Int e = curTpl.e;
 #ifndef NDEBUG
             r3++;
@@ -393,13 +412,19 @@ void paru_update_rowDeg ( Int panel_num,  Int row_end,
                 paru_print_element (paruMatInfo, e);
 #endif
             Int curRowIndex = curTpl.f;
+
+            if(e < 0 || curRowIndex < 0) continue;
+
             paru_Element *el = elementList[e];
+            if (el == NULL) continue;
+
             Int *el_colIndex = colIndex_pointer (el);//pointers to row index
             Int *el_rowIndex = rowIndex_pointer (el);
 
             if (el_rowIndex [curRowIndex] < 0 ){
                 continue;  
             }
+            listRowTuples [pdst++] = curTpl; //keeping the tuple
 
             if(el->cValid !=  time_f){
                 el->cValid =  time_f;
@@ -424,6 +449,7 @@ void paru_update_rowDeg ( Int panel_num,  Int row_end,
 
         }
 
+        curRowTupleList->numTuple = pdst;
         Int old_bound_updated = row_degree_bound [r] + colCount - 1 ;
 
 #ifndef NDEBUG
