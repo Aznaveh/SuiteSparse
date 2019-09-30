@@ -319,6 +319,7 @@ void paru_update_rowDeg ( Int panel_num,  Int row_end,
 #endif
             Int curColIndex = curTpl.f;
             paru_Element *el = elementList[e];
+            if (el == NULL) continue;
             Int *el_colIndex = colIndex_pointer (el);
 
             Int *rowRelIndex = relRowInd (el);

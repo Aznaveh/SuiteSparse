@@ -147,6 +147,7 @@ void paru_front ( paru_matrix *paruMatInfo,
             if(e < 0 || curColIndex < 0 ) continue;  //already deleted
 
             paru_Element *el = elementList[e];
+            if (el == NULL) continue;
             Int mEl = el->nrows;
             Int *el_rowIndex = rowIndex_pointer (el); //pointers to row index
             Int *rowRelIndex = relRowInd (el);
@@ -318,6 +319,7 @@ void paru_front ( paru_matrix *paruMatInfo,
             // Assembly of column curColIndex of e in colIndexF
 
             paru_Element *el = elementList[e];
+            if (el == NULL) continue;
             Int mEl = el->nrows;
             Int nEl = el->ncols;
 
@@ -544,6 +546,7 @@ void paru_front ( paru_matrix *paruMatInfo,
             Int curRowIndex = curTpl.f;
 
             paru_Element *el = elementList[e];
+            if (el == NULL) continue;
             Int mEl = el->nrows;
             Int nEl = el->ncols;
             Int *el_rowIndex = rowIndex_pointer (el);
@@ -680,10 +683,10 @@ void paru_front ( paru_matrix *paruMatInfo,
     /**** 7 **** Count number of rows and columsn of prior CBs to asslemble ***/ 
 
     paruMatInfo->time_stamp[f]++; //invalidating all the marks
-    PRLEVEL (-1, ("\n%%||||  Start FourPass %ld ||||\n", f));
+    PRLEVEL (-1, ("\n%%||||  Start Finalize %ld ||||\n", f));
     //paru_fourPass (paruMatInfo, f, fp, cc);
     paru_finalize (paruMatInfo, f, cc);
-    PRLEVEL (-1, ("\n%%||||  Finish FourPass %ld ||||\n", f));
+    PRLEVEL (-1, ("\n%%||||  Finish Finalize %ld ||||\n", f));
 
 
     ////////////////////////////////////////////////////////////////////////////

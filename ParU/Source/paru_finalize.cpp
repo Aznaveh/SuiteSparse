@@ -10,7 +10,7 @@
 
 void paru_finalize (paru_matrix *paruMatInfo, Int f, cholmod_common *cc){
 
-    DEBUGLEVEL(0);
+    DEBUGLEVEL(1);
 #ifndef NDEBUG
     Int p = 0;
     static Int f1 = 0, f2 = 0, f3 = 0, f4 = 0;
@@ -89,7 +89,7 @@ void paru_finalize (paru_matrix *paruMatInfo, Int f, cholmod_common *cc){
             }
 
             Int curColIndex = curTpl.f;
-            PRLEVEL (1, ("%% element= %ld  f =%ld \n",e, curColIndex));
+            PRLEVEL (0, ("%% element= %ld  f =%ld \n",e, curColIndex));
 
             ASSERT (e >= 0);
             ASSERT (e != el_ind);
@@ -118,8 +118,12 @@ void paru_finalize (paru_matrix *paruMatInfo, Int f, cholmod_common *cc){
             PRLEVEL (1, ("%% time_f =%ld \n", time_f));
 
             if (elRow [e] == 0 ){         //all the columns are in CB
+
+
                 if (elCol[e] == 0) {    // Whole prior front assembly
                     // do complete assembly of e into current front, now
+                    PRLEVEL (0, ("%% element %ld is going to be eliminated\n",
+                                e));
                     paru_update_rel_ind (curFr, el, 'r',cc) ;
                     paru_update_rel_ind (curFr, el, 'c', cc) ;
 
@@ -138,18 +142,19 @@ void paru_finalize (paru_matrix *paruMatInfo, Int f, cholmod_common *cc){
                         sizeof(Int)*(2*(mEl+nEl)) + sizeof(double)*nEl*mEl;
                     paru_free (1, tot_size, el, cc);
                     elementList[e] = NULL;
-
+                    PRLEVEL (0, ("%% NULLIFIED\n"));
                     continue;
                 }
 
                 ASSERT ( e < el_ind && e >= first[el_ind]);
 
                 if(el->rValid !=  time_f){ /*  Update rowRelIndex	 */
-                    PRLEVEL (1, ("%% update row relative element%ld\n",
-                                e ));
+
+
 #ifndef NDEBUG
-                    //Printing the contribution block prior index update 
                     p = 1;
+                    PRLEVEL (p, ("%% update row relative element%ld\n", e ));
+                    //Printing the contribution block prior index update 
                     if (p <= 0) {
                         PRLEVEL (p, ("\n%%Before index update %ld:",e));
                         paru_print_element (paruMatInfo, e);
@@ -176,13 +181,12 @@ void paru_finalize (paru_matrix *paruMatInfo, Int f, cholmod_common *cc){
                     paru_print_element (paruMatInfo, el_ind);
                     paru_print_element (paruMatInfo, e);
                 }
-#endif
 
-
-                PRLEVEL (1, ("%%colCount=%ld k=%ld", colCount, k));
-                PRLEVEL (1, ("%%curFr->nrows=%ld ", curFr->nrows));
-                PRLEVEL (1, ("%% cur_Numeric=%2.4lf\n",
+                PRLEVEL (p, ("%%colCount=%ld k=%ld", colCount, k));
+                PRLEVEL (p, ("%%curFr->nrows=%ld ", curFr->nrows));
+                PRLEVEL (p, ("%% cur_Numeric=%2.4lf\n",
                             *(cur_Numeric+k*curFr->nrows)));
+#endif
 
                 assemble_col (el_Num+curColIndex*mEl,
                         cur_Numeric+k*curFr->nrows, mEl, rowRelIndex);
@@ -281,7 +285,10 @@ void paru_finalize (paru_matrix *paruMatInfo, Int f, cholmod_common *cc){
             PRLEVEL (1, ("%% elCol[%ld]=%ld ",e, elCol[e]));
 
             if (elCol [e] == 0 ){ //all the rows are in CB
-                if (elRow[e] == 0) continue; //already assembled
+
+                if (elRow[e] == 0){
+                    continue; //already assembled
+                }
                 ASSERT ( e < el_ind && e >= first[el_ind]);
 
 #ifndef NDEBUG            
@@ -321,12 +328,12 @@ void paru_finalize (paru_matrix *paruMatInfo, Int f, cholmod_common *cc){
                 el_rowIndex [curRowIndex] = -1;
                 el->nrowsleft --;
             } 
+            elRow [e] = -1;
         }
 
     }
 
 
-    DEBUGLEVEL(1);
     /********************* 3rd path: clearing column tuples and uncheck *******/
     for (Int k = 0; k < colCount; k++){
         Int c = fcolList [k];   //non pivotal column list
@@ -335,7 +342,7 @@ void paru_finalize (paru_matrix *paruMatInfo, Int f, cholmod_common *cc){
         ASSERT (numTuple >= 0);
         paru_Tuple *listColTuples = curColTupleList->list;
 #ifndef NDEBUG            
-        p = 1;
+        p = 0;
         PRLEVEL (p, ("\n %%-------->  5th: c =%ld  numTuple = %ld\n",
                     c, numTuple));
         if (p <= 0 ){
@@ -354,20 +361,16 @@ void paru_finalize (paru_matrix *paruMatInfo, Int f, cholmod_common *cc){
 #ifndef NDEBUG
             f3++;
 #endif
- 
-
-
             paru_Element *el = elementList[e];
-            if (el == NULL) continue;
+            if (el == NULL){
+                PRLEVEL (1, ("%% El==NULL\n"));
+                continue;
+            }
             Int mEl = el->nrows;
             Int nEl = el->ncols;
 
             Int *el_colIndex = colIndex_pointer (el);
-            Int *el_rowIndex = rowIndex_pointer (el);
-            Int *rowRelIndex = relRowInd (el);
-            Int *colRelIndex    = relColInd (el);
-
-            elCol[e]= -1;
+            // elCol[e]= -1;
 
             if (el_colIndex [curColIndex] < 0 ){ //it will be deleted here
                 PRLEVEL (1, ("%% psrc=%ld\n", psrc));
@@ -390,8 +393,8 @@ void paru_finalize (paru_matrix *paruMatInfo, Int f, cholmod_common *cc){
     }
     /**************************************************************************/
 
-
-    /********************* 4th path: clearing row tuples and unhceck **********/
+#if 0
+    /************** 4th path: clearing row tuples and unhceck elRow************/
     for (Int k = fp; k < rowCount; k++){
         Int r = frowList [k];
         tupleList *curRowTupleList = &RowList[r];
@@ -417,7 +420,7 @@ void paru_finalize (paru_matrix *paruMatInfo, Int f, cholmod_common *cc){
 #ifndef NDEBUG
             f4++;
 #endif
- 
+
 
             paru_Element *el = elementList[e];
             if (el == NULL) continue;
@@ -440,11 +443,6 @@ void paru_finalize (paru_matrix *paruMatInfo, Int f, cholmod_common *cc){
         PRLEVEL (1, ("%% new number of tuples=%ld\n", pdst));
 
 
-        paru_free ( 2*curFr->nrows, sizeof(Int), curFr->rWork, cc); 
-        curFr->rWork = NULL;
-        paru_free ( 2*curFr->ncols, sizeof(Int), curFr->cWork, cc); 
-        curFr->cWork = NULL;
-
 #ifndef NDEBUG            
         p = 0;
         if (p <= 0 )
@@ -454,4 +452,12 @@ void paru_finalize (paru_matrix *paruMatInfo, Int f, cholmod_common *cc){
                     " sum=%ld\n", f1, f2, f3, f4, f1+f2+f3+f4));
 #endif
     }
+#endif
+
+    // free the sorting space if allocated
+    paru_free ( 2*curFr->nrows, sizeof(Int), curFr->rWork, cc); 
+    curFr->rWork = NULL;
+    paru_free ( 2*curFr->ncols, sizeof(Int), curFr->cWork, cc); 
+    curFr->cWork = NULL;
+
 }
