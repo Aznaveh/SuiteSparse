@@ -285,7 +285,7 @@ void paru_finalize (paru_matrix *paruMatInfo, Int f, cholmod_common *cc){
             double *el_Num = numeric_pointer (el);
             PRLEVEL (1, ("%% elCol[%ld]=%ld ",e, elCol[e]));
 
-#if 0
+#if 1
             if (elCol [e] == 0 ){ //all the rows are in CB
 
                 if (elRow[e] == 0){
