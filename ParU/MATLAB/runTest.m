@@ -37,14 +37,23 @@ s = 0;
 ff = fopen ('myRes.m', 'w') ;
 
 % Headers
+
+%%matlab format
 fprintf(ff,'id nnzA myErr umfErr logratio' );
 fprintf(ff,' myElaps umfElaps ratio');
 fprintf(ff,' mynnz umfnnz ratio');
 fprintf(ff,' myflop umfflop ratio\n');
 
+%%csv format
+%fprintf(ff,'id, nnzA, myErr, umfErr, logratio,' );
+%fprintf(ff,' myElaps, umfElaps, ratio,');
+%fprintf(ff,' mynnz, umfnnz, ratio,');
+%fprintf(ff,' myflop, umfflop, ratio\n');
+
+
 
 %for k = 1:nmat
-for k = 1:100
+for k = 1:200
     id = fnew (k) 
     % some problem in these matrice
     if (id == 2056 || id == 2034) 
@@ -90,11 +99,16 @@ for k = 1:100
         str = sprintf ('../Demo/umpfout %d < ../Matrix/ParUTst/tmp.mtx', id );
         system(str);
     else 
-        str1 = 'tar zvfxO ~/SuiteSparseCollection//MM/';
-        str2 = sprintf ('%s/%s.tar.gz %s/%s.mtx | ../Demo/umpfout %d %d', ...
-            group, name, name, name, id, s) ;
-        dostr = strcat (str1,str2);
-        system(dostr);
+       % str1 = 'tar zvfxO ~/SuiteSparseCollection//MM/';
+       % str2 = sprintf ('%s/%s.tar.gz %s/%s.mtx | ../Demo/umpfout %d %d', ...
+       %     group, name, name, name, id, s) ;
+       % dostr = strcat (str1,str2);
+       % system(dostr);
+
+       mmwrite('../Matrix/ParUTst/tmp.mtx', A);
+       str = sprintf ('../Demo/umpfout %d < ../Matrix/ParUTst/tmp.mtx', id );
+       system(str);
+ 
 
         %scaling
         %A = sparse(diag(1./max(abs(A),[],2)))*A;
@@ -165,11 +179,21 @@ for k = 1:100
 
     umfflop = luflop(l,u);
 
+%%matlab format
     fprintf(ff,'%d %d %g %g %g', id, nnz(A), myErr, umfErr, ...
         log10(myErr/umfErr));
     fprintf(ff,' %g %g %g', myElaps, umfElaps, myElaps/umfElaps);
     fprintf(ff,' %g %g %g', mynnz , umfpnnz, mynnz/umfpnnz );
     fprintf(ff,' %g %g %g\n', myflop, umfflop, myflop/umfflop);
+    
+%%csv format
+%    fprintf(ff,'%d %d %g %g %g', id, nnz(A), myErr, umfErr, ...
+%    fprintf(ff,'%d, %d, %g, %g, %g,', id, nnz(A), myErr, umfErr, ...
+%        log10(myErr/umfErr));
+%    fprintf(ff,' %g, %g, %g,', myElaps, umfElaps, myElaps/umfElaps);
+%    fprintf(ff,' %g, %g, %g,', mynnz , umfpnnz, mynnz/umfpnnz );
+%    fprintf(ff,' %g, %g, %g\n', myflop, umfflop, myflop/umfflop);
+
 
 
     % cleaning the files because of the memory problem

@@ -13,6 +13,7 @@ void paru_finalize (paru_matrix *paruMatInfo, Int f, cholmod_common *cc){
     DEBUGLEVEL(1);
 #ifndef NDEBUG
     Int p = 0;
+    // counters to check the status of tuples scanning
     static Int f1 = 0, f2 = 0, f3 = 0, f4 = 0;
 #endif
 
@@ -284,6 +285,7 @@ void paru_finalize (paru_matrix *paruMatInfo, Int f, cholmod_common *cc){
             double *el_Num = numeric_pointer (el);
             PRLEVEL (1, ("%% elCol[%ld]=%ld ",e, elCol[e]));
 
+#if 0
             if (elCol [e] == 0 ){ //all the rows are in CB
 
                 if (elRow[e] == 0){
@@ -328,6 +330,7 @@ void paru_finalize (paru_matrix *paruMatInfo, Int f, cholmod_common *cc){
                 el_rowIndex [curRowIndex] = -1;
                 el->nrowsleft --;
             } 
+#endif
             elRow [e] = -1;
         }
 
