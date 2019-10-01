@@ -53,7 +53,7 @@ fprintf(ff,' myflop umfflop ratio\n');
 
 
 %for k = 1:nmat
-for k = 1:200
+for k = 1:100
     id = fnew (k) 
     % some problem in these matrice
     if (id == 2056 || id == 2034) 

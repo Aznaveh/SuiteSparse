@@ -30,7 +30,7 @@ s = 0;
 id = 2056;
 id = 2034; % Cholmaod error
 
-id = 902;
+id = 2560;
 
 Prob = ssget(id);
 A = Prob.A;
