@@ -18,13 +18,13 @@
  *  @param  
  */
 
-void paru_update_rowDeg ( Int panel_num,  Int row_end, 
-        Int f, paru_matrix *paruMatInfo){
+void paru_update_rowDeg ( Int panel_num,  Int row_end, Int f, Int *next,
+        paru_matrix *paruMatInfo){
 
     DEBUGLEVEL(0);
 #ifndef NDEBUG
     Int p = 1;
-    static Int r1 = 0, r2 = 0, r3 = 0, r4 = 0;
+    static Int r1 = 0, r2 = 0, r3 = 0 ;
 #endif
     PRLEVEL (1, ("%%-------ROW degree update of panel %ld of front %ld \n", 
              panel_num, f ));
@@ -448,6 +448,15 @@ void paru_update_rowDeg ( Int panel_num,  Int row_end,
                 PRLEVEL (1, ("%%seen before: elRow[e]=%ld \n", elRow[e]));
             }
 
+            if (elRow [e] == 0) {
+                if(elCol[e] == 0){
+                    // adding the element to the list of children
+                    el->next = *next;
+                    *next = e;
+                }
+            }
+
+
         }
 
         curRowTupleList->numTuple = pdst;
@@ -457,16 +466,16 @@ void paru_update_rowDeg ( Int panel_num,  Int row_end,
         p = 1;
         PRLEVEL (p, ("%%old_bound_updated =%ld \n",old_bound_updated));
         PRLEVEL (p, ("%%new_row_degree_bound_for_r=%ld \n",
-                   new_row_degree_bound_for_r));
+                    new_row_degree_bound_for_r));
         PRLEVEL (p, ("%%row_degroo_bound[%ld]=%ld \n",r, row_degree_bound[r]));
 #endif
         row_degree_bound [r] =  // min
             old_bound_updated < new_row_degree_bound_for_r ? 
             old_bound_updated : new_row_degree_bound_for_r;
+        }
+
+        paruMatInfo->time_stamp[f]+= 2; //making all the markings invalid again
+        PRLEVEL (0, ("%% Finalized counters r1=%ld r2=%ld r3=%ld sum=%ld\n", 
+                    r1, r2, r3, r1+r2+r3));
+
     }
-
-    paruMatInfo->time_stamp[f]+= 2; //making all the markings invalid again
-    PRLEVEL (0, ("%% Finalized counters r1=%ld r2=%ld r3=%ld sum=%ld\n", 
-                r1, r2, r3, r1+r2+r3));
-
-}

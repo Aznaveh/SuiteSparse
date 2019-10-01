@@ -81,9 +81,9 @@ Int paru_dgemm(double *pF, double *uPart,
     BLAS_INT ldc = (BLAS_INT) (rowCount - fp);
 
     PRLEVEL (1, ("%% alpha =%lf  ", alpha));
-    PRLEVEL (1, ("%% lda =%ld  ", lda));
-    PRLEVEL (1, ("%% ldb =%ld  ", ldb));
-    PRLEVEL (1, ("%% ldc =%ld\n", ldc));
+    PRLEVEL (1, ("%% lda =%d  ", lda));
+    PRLEVEL (1, ("%% ldb =%d  ", ldb));
+    PRLEVEL (1, ("%% ldc =%d\n", ldc));
 
 
     double beta= 0; //U part is not initialized

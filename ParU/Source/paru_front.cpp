@@ -416,8 +416,10 @@ void paru_front ( paru_matrix *paruMatInfo,
         printf ("structural problem\n");
         exit(0);
     }
-    Int fac = paru_factorize(pivotalFront, frowList, rowCount, f, 
-            panel_row, paruMatInfo);
+    Int next = -1;
+
+    Int fac = paru_factorize(pivotalFront, frowList, rowCount, f, panel_row, 
+            &next, paruMatInfo);
 
     /* To this point fully summed part of the front is computed and L and U    /  
      *  The next part is to find columns of nonfully summed then rows
@@ -645,6 +647,7 @@ void paru_front ( paru_matrix *paruMatInfo,
         }
         PRLEVEL (1, ("%% curEl =%p\n", curEl));
     }
+    curEl->next = next;
     // Initializing curEl global indices
     Int *el_colIndex = colIndex_pointer (curEl);
     for (Int i = 0; i < colCount; ++ i) {
@@ -684,7 +687,6 @@ void paru_front ( paru_matrix *paruMatInfo,
 
     paruMatInfo->time_stamp[f]++; //invalidating all the marks
     PRLEVEL (-1, ("\n%%||||  Start Finalize %ld ||||\n", f));
-    //paru_fourPass (paruMatInfo, f, fp, cc);
     paru_finalize (paruMatInfo, f, cc);
     PRLEVEL (-1, ("\n%%||||  Finish Finalize %ld ||||\n", f));
 

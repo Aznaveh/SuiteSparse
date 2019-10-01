@@ -58,6 +58,18 @@ void paru_finalize (paru_matrix *paruMatInfo, Int f, cholmod_common *cc){
     Int *frowList = paruMatInfo->frowList[f] ;
     /**************************************************************************/
 
+    PRLEVEL (p, ("%%*** List of children of %ld\n%%", el_ind));
+    paru_Element *curEl = curFr;
+    Int next = curFr-> next;
+    while (next > 0) {
+       curEl->next = -1; 
+       curEl = elementList[next];
+       PRLEVEL (p, (" %ld -", next));
+        ASSERT (elRow[next] == 0 && elCol [next] == 0);
+       next = elementList[next]->next;
+    }
+
+
 
     /****************************1st pass: assemble columns********************/
     tupleList *ColList = paruMatInfo->ColList;
@@ -69,7 +81,7 @@ void paru_finalize (paru_matrix *paruMatInfo, Int f, cholmod_common *cc){
         paru_Tuple *listColTuples = curColTupleList->list;
 #ifndef NDEBUG            
         p = 1;
-        
+
         PRLEVEL (p, ("\n %%-------->  3rd: c =%ld  numTuple = %ld\n",
                     c, numTuple));
         if (p <= 0 ){
@@ -396,67 +408,13 @@ void paru_finalize (paru_matrix *paruMatInfo, Int f, cholmod_common *cc){
     }
     /**************************************************************************/
 
-#if 0
-    /************** 4th path: clearing row tuples and unhceck elRow************/
-    for (Int k = fp; k < rowCount; k++){
-        Int r = frowList [k];
-        tupleList *curRowTupleList = &RowList[r];
-        Int numTuple = curRowTupleList->numTuple;
-        ASSERT (numTuple >= 0);
-        paru_Tuple *listRowTuples = curRowTupleList->list;
-#ifndef NDEBUG            
-        p = 1;
-        PRLEVEL (p, ("\n %%-------->  6th: r =%ld  numTuple = %ld\n",
-                    r, numTuple));
-        if (p <= 0 ){
-            paru_print_tupleList (RowList, r);
-            paru_print_element (paruMatInfo, el_ind);
-        }
-#endif
-        Int pdst = 0, psrc;
-
-        for (psrc = 0; psrc < numTuple; psrc ++){
-            paru_Tuple curTpl = listRowTuples [psrc];
-            Int e = curTpl.e;
-            Int curRowIndex = curTpl.f;
-            PRLEVEL (1, ("%% element= %ld  f =%ld \n",e, curRowIndex));
-#ifndef NDEBUG
-            f4++;
-#endif
-
-
-            paru_Element *el = elementList[e];
-            if (el == NULL) continue;
-            Int mEl = el->nrows;
-            Int nEl = el->ncols;
-
-            Int *el_rowIndex = rowIndex_pointer (el);
-            elRow[e]= -1;
-
-            if (el_rowIndex [curRowIndex] < 0 ){ //it will be deleted here
-                PRLEVEL (1, ("%% psrc=%ld\n", psrc));
-                continue;  
-            }
-            else 
-                listRowTuples [pdst++] = curTpl; //keeping the tuple
-            PRLEVEL (1, ("%% time_f =%ld \n", time_f));
-
-        }
-        curRowTupleList->numTuple = pdst;
-        PRLEVEL (1, ("%% new number of tuples=%ld\n", pdst));
-
-
 #ifndef NDEBUG            
         p = 0;
-        if (p <= 0 )
-            paru_print_tupleList (RowList, r);
 
         PRLEVEL (p, ("%% Finalized counters f1=%ld f2=%ld f3=%ld f4=%ld"
                     " sum=%ld\n", f1, f2, f3, f4, f1+f2+f3+f4));
 #endif
-    }
-#endif
-
+ 
     // free the sorting space if allocated
     paru_free ( 2*curFr->nrows, sizeof(Int), curFr->rWork, cc); 
     curFr->rWork = NULL;
