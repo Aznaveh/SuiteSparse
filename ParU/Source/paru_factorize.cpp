@@ -262,7 +262,7 @@ Int paru_dgetrf (double *F, Int *frowList, Int lm, Int ln,
     p = 1;
     PRLEVEL (p, ("Befor factorization (inside factorize): \n"));
     for (int i = 0; i < m ; i++){
-        PRLEVEL (p, ("frowList [%d] =%d\n",i, frowList [i]));
+        PRLEVEL (p, ("frowList [%ld] =%d\n",i, frowList [i]));
     }
     PRLEVEL (p, ("\n"));
 #endif
@@ -323,7 +323,7 @@ Int paru_dgetrf (double *F, Int *frowList, Int lm, Int ln,
 }
 
 Int paru_factorize(double *F, Int *frowList, Int rowCount, Int f, 
-        Int *panel_row, paru_matrix *paruMatInfo){
+        Int *panel_row, Int *next, paru_matrix *paruMatInfo){
     DEBUGLEVEL (0);
 
     Int *Super = paruMatInfo->LUsym->Super;
@@ -334,11 +334,6 @@ Int paru_factorize(double *F, Int *frowList, Int rowCount, Int f,
 
     work_struct *Work =  paruMatInfo->Work;
     Int *row_degree_bound = paruMatInfo->row_degree_bound;
-    //    return paru_panel_factorize ( F, frowList, rowCount, fp, 
-    //                fp, 0, rowCount, paruMatInfo);
-
-    //BLAS_INT *ipiv = (BLAS_INT*) (Work->scratch+rowCount);
-    //return paru_dgetrf (F , frowList, rowCount, fp, ipiv);
 
     Int panel_width = paruMatInfo->panel_width;
     for(Int panel_num = 0; ; panel_num++){
@@ -364,7 +359,7 @@ Int paru_factorize(double *F, Int *frowList, Int rowCount, Int f,
                 panel_width, panel_num, row_end, paruMatInfo);
 
         // This can be done parallel to the  next part
-        paru_update_rowDeg ( panel_num, row_end, f, paruMatInfo);
+        paru_update_rowDeg ( panel_num, row_end, f, next, paruMatInfo);
 
         if ( j2 >= fp){ //if it is the last panel
             break;

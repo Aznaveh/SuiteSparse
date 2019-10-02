@@ -147,9 +147,9 @@ void paru_update_rel_ind (paru_Element *el, paru_Element *cb_el,
                     continue;
                 }
 #ifndef NDEBUG
-            ASSERT (found == 1);
             if(found != 1)
-                PRLEVEL (1, ("%%\t %ld Not found in \n",global_ind));
+                PRLEVEL (0, ("%%t Not found in %ld \n",global_ind));
+            ASSERT (found == 1);
 
 #endif
         }

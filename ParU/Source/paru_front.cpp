@@ -147,6 +147,7 @@ void paru_front ( paru_matrix *paruMatInfo,
             if(e < 0 || curColIndex < 0 ) continue;  //already deleted
 
             paru_Element *el = elementList[e];
+            if (el == NULL) continue;
             Int mEl = el->nrows;
             Int *el_rowIndex = rowIndex_pointer (el); //pointers to row index
             Int *rowRelIndex = relRowInd (el);
@@ -318,6 +319,7 @@ void paru_front ( paru_matrix *paruMatInfo,
             // Assembly of column curColIndex of e in colIndexF
 
             paru_Element *el = elementList[e];
+            if (el == NULL) continue;
             Int mEl = el->nrows;
             Int nEl = el->ncols;
 
@@ -414,8 +416,10 @@ void paru_front ( paru_matrix *paruMatInfo,
         printf ("structural problem\n");
         exit(0);
     }
-    Int fac = paru_factorize(pivotalFront, frowList, rowCount, f, 
-            panel_row, paruMatInfo);
+    Int next = -1;
+
+    Int fac = paru_factorize(pivotalFront, frowList, rowCount, f, panel_row, 
+            &next, paruMatInfo);
 
     /* To this point fully summed part of the front is computed and L and U    /  
      *  The next part is to find columns of nonfully summed then rows
@@ -544,6 +548,7 @@ void paru_front ( paru_matrix *paruMatInfo,
             Int curRowIndex = curTpl.f;
 
             paru_Element *el = elementList[e];
+            if (el == NULL) continue;
             Int mEl = el->nrows;
             Int nEl = el->ncols;
             Int *el_rowIndex = rowIndex_pointer (el);
@@ -642,6 +647,7 @@ void paru_front ( paru_matrix *paruMatInfo,
         }
         PRLEVEL (1, ("%% curEl =%p\n", curEl));
     }
+    curEl->next = next;
     // Initializing curEl global indices
     Int *el_colIndex = colIndex_pointer (curEl);
     for (Int i = 0; i < colCount; ++ i) {
@@ -680,10 +686,9 @@ void paru_front ( paru_matrix *paruMatInfo,
     /**** 7 **** Count number of rows and columsn of prior CBs to asslemble ***/ 
 
     paruMatInfo->time_stamp[f]++; //invalidating all the marks
-    PRLEVEL (-1, ("\n%%||||  Start FourPass %ld ||||\n", f));
-    //paru_fourPass (paruMatInfo, f, fp, cc);
+    PRLEVEL (-1, ("\n%%||||  Start Finalize %ld ||||\n", f));
     paru_finalize (paruMatInfo, f, cc);
-    PRLEVEL (-1, ("\n%%||||  Finish FourPass %ld ||||\n", f));
+    PRLEVEL (-1, ("\n%%||||  Finish Finalize %ld ||||\n", f));
 
 
     ////////////////////////////////////////////////////////////////////////////

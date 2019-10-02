@@ -49,7 +49,6 @@ int main (int argc, char **argv)
     }
 
 
-
     int scale = 0;
     if (argc == 3){
         scale = atoi(argv[2]);

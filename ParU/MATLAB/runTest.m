@@ -6,7 +6,7 @@ f = find (index.nrows == index.ncols & ...
     index.sprank == index.ncols & ...
     ~index.posdef & ...
     index.isReal & ~index.isGraph & ...
-    index.pattern_symmetry <= .5) ;
+    index.pattern_symmetry <= .6) ;
 
 [ignore, i] = sort (index.nnz (f) + index.nzero (f)) ;
 
@@ -37,16 +37,26 @@ s = 0;
 ff = fopen ('myRes.m', 'w') ;
 
 % Headers
+
+%%matlab format
 fprintf(ff,'id nnzA myErr umfErr logratio' );
 fprintf(ff,' myElaps umfElaps ratio');
 fprintf(ff,' mynnz umfnnz ratio');
 fprintf(ff,' myflop umfflop ratio\n');
 
+%%csv format
+%fprintf(ff,'id, nnzA, myErr, umfErr, logratio,' );
+%fprintf(ff,' myElaps, umfElaps, ratio,');
+%fprintf(ff,' mynnz, umfnnz, ratio,');
+%fprintf(ff,' myflop, umfflop, ratio\n');
 
-for k = 1:nmat
-%for k = 1:10
+
+
+%for k = 1:nmat
+for k = 1:100
     id = fnew (k) 
-    if (id == 2056) leak
+    % some problem in these matrice
+    if (id == 2056 || id == 2034) 
         continue;
     end
     group = index.Group {id} ;
@@ -54,6 +64,12 @@ for k = 1:nmat
 
     Prob = ssget(id);
     A = Prob.A;
+
+%    if (nnz(A) < 10000)
+%        continue;
+%    end;
+
+
     [dp,dq,dr,ds,dcc,drr] = dmperm(A);
 
     [m n] = size (A);
@@ -67,22 +83,32 @@ for k = 1:nmat
         [M,I] = max(diff(dr));
         A = B(dr(I):dr(I+1)-1, dr(I):dr(I+1)-1 );
 
+%        if (nnz(A) < 10000)
+%            continue;
+%        end;
+
+
         [m n] = size (A);
         if ( m== 1)
             sprintf('not worth trying');
             continue;
         end
-        
+
 
         mmwrite('../Matrix/ParUTst/tmp.mtx', A);
         str = sprintf ('../Demo/umpfout %d < ../Matrix/ParUTst/tmp.mtx', id );
         system(str);
     else 
-        str1 = 'tar zvfxO ~/SuiteSparseCollection//MM/';
-        str2 = sprintf ('%s/%s.tar.gz %s/%s.mtx | ../Demo/umpfout %d %d', ...
-        group, name, name, name, id, s) ;
-        dostr = strcat (str1,str2);
-        system(dostr);
+       % str1 = 'tar zvfxO ~/SuiteSparseCollection//MM/';
+       % str2 = sprintf ('%s/%s.tar.gz %s/%s.mtx | ../Demo/umpfout %d %d', ...
+       %     group, name, name, name, id, s) ;
+       % dostr = strcat (str1,str2);
+       % system(dostr);
+
+       mmwrite('../Matrix/ParUTst/tmp.mtx', A);
+       str = sprintf ('../Demo/umpfout %d < ../Matrix/ParUTst/tmp.mtx', id );
+       system(str);
+ 
 
         %scaling
         %A = sparse(diag(1./max(abs(A),[],2)))*A;
@@ -153,11 +179,21 @@ for k = 1:nmat
 
     umfflop = luflop(l,u);
 
+%%matlab format
     fprintf(ff,'%d %d %g %g %g', id, nnz(A), myErr, umfErr, ...
         log10(myErr/umfErr));
     fprintf(ff,' %g %g %g', myElaps, umfElaps, myElaps/umfElaps);
     fprintf(ff,' %g %g %g', mynnz , umfpnnz, mynnz/umfpnnz );
     fprintf(ff,' %g %g %g\n', myflop, umfflop, myflop/umfflop);
+    
+%%csv format
+%    fprintf(ff,'%d %d %g %g %g', id, nnz(A), myErr, umfErr, ...
+%    fprintf(ff,'%d, %d, %g, %g, %g,', id, nnz(A), myErr, umfErr, ...
+%        log10(myErr/umfErr));
+%    fprintf(ff,' %g, %g, %g,', myElaps, umfElaps, myElaps/umfElaps);
+%    fprintf(ff,' %g, %g, %g,', mynnz , umfpnnz, mynnz/umfpnnz );
+%    fprintf(ff,' %g, %g, %g\n', myflop, umfflop, myflop/umfflop);
+
 
 
     % cleaning the files because of the memory problem
