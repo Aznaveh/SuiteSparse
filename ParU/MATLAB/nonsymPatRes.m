@@ -1,4 +1,5 @@
-id nnzA myErr umfErr logratio myElaps umfElaps ratio mynnz umfnnz ratio myflop umfflop ratio
+% id nnzA myErr umfErr logratio myElaps umfElaps ratio mynnz umfnnz ratio myflop umfflop ratio
+results = [
 449 15 1.38778e-17 2.77556e-17 -0.30103 0.00289488 0.119725 0.0241794 19 19 1 18 18 1
 185 50 4.44089e-16 0 Inf 0.00825286 0.005947 1.38773 35 27 1.2963 101 51 1.98039
 1199 98 1.11022e-16 2.86229e-17 0.588696 0.00830603 0.000268 30.9926 148 130 1.13846 298 186 1.60215
@@ -129,4 +130,35 @@ id nnzA myErr umfErr logratio myElaps umfElaps ratio mynnz umfnnz ratio myflop u
 283 326852 1.25088e-10 7.22982e-14 3.23809 1.7284 0.434682 3.97624 3.85298e+06 3.63018e+06 1.06137 1.65883e+09 1.95277e+09 0.849474
 590 308123 1.15148e-07 2.15151e-11 3.72852 10.4082 3.80306 2.73679 1.25078e+07 2.97619e+07 0.420264 5.20792e+09 4.37641e+10 0.119
 746 75204 9.91386e-14 3.85151e-13 -0.589388 0.334608 0.062452 5.35784 293665 244003 1.20353 1.4945e+07 9.49476e+06 1.57403
-556 329983 9.58116e-11 5.65859e-11 0.22871 19.7407 1.62852 12.1219 9.21358e+06 1.33052e+07 0.69248 5.35132e+09 1.27005e+10 0.421347
+556 329983 9.58116e-11 5.65859e-11 0.22871 19.7407 1.62852 12.1219 9.21358e+06 1.33052e+07 0.69248 5.35132e+09 1.27005e+10 0.421347 ] ;
+
+id = results (:,1) ;
+nnzA = results (:,2) ;
+
+myErr = results (:,3) ;
+umfErr = results (:,4) ;
+logratio = results (:,5) ;
+
+myElaps = results (:,6) ;
+umfElaps = results (:,7) ;
+tratio = results (:,8) ;
+
+mynnz = results (:,9) ;
+umfnnz = results (:,10) ;
+nzratio = results (:,11) ;
+
+myflop = results (:,12) ;
+umfflop = results (:,13) ;
+flratio = results (:,14) ;
+
+intensity = umfflop ./ umfnnz ;
+
+figure (1) ;
+subplot (1,3,1) ;
+loglog (intensity,  tratio, 'o', 'MarkerSize', 10) ;
+subplot (1,3,2) ;
+loglog (intensity,  nzratio, 'o', 'MarkerSize', 10) ;
+
+subplot (1,3,3) ;
+loglog (intensity,  flratio, 'o', 'MarkerSize', 10) ;
+
