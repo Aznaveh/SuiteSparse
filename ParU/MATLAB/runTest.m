@@ -39,10 +39,10 @@ ff = fopen ('myRes.m', 'w') ;
 % Headers
 
 %%matlab format
-fprintf(ff,'id nnzA myErr umfErr logratio' );
+fprintf(ff,'%% id nnzA myErr umfErr logratio' );
 fprintf(ff,' myElaps umfElaps ratio');
 fprintf(ff,' mynnz umfnnz ratio');
-fprintf(ff,' myflop umfflop ratio\n');
+fprintf(ff,' myflop umfflop ratio\n results = [');
 
 %%csv format
 %fprintf(ff,'id, nnzA, myErr, umfErr, logratio,' );
@@ -205,4 +205,42 @@ for k = 1:100
         str = ['rm  ' path s_name];    system(str);
     end
 end
+
+fprintf(ff,'];\n\n');
+fprintf(ff,'id = results (:,1) ;\n');
+fprintf(ff,'nnzA = results (:,2) ;\n');
+fprintf(ff,'\n');
+
+fprintf(ff,'myErr = results (:,3) ;\n');
+fprintf(ff,'umfErr = results (:,4) ;\n');
+fprintf(ff,'logratio = results (:,5) ;\n');
+fprintf(ff,'\n');
+
+fprintf(ff,'myElaps = results (:,6) ;\n');
+fprintf(ff,'umfElaps = results (:,7) ;\n');
+fprintf(ff,'tratio = results (:,8) ;\n');
+fprintf(ff,'\n');
+
+fprintf(ff,'mynnz = results (:,9) ;\n');
+fprintf(ff,'umfnnz = results (:,10) ;\n');
+fprintf(ff,'nzratio = results (:,11) ;\n');
+fprintf(ff,'\n');
+
+fprintf(ff,'myflop = results (:,12) ;\n');
+fprintf(ff,'umfflop = results (:,13) ;\n');
+fprintf(ff,'flratio = results (:,14) ;\n');
+fprintf(ff,'\n');
+
+fprintf(ff,'intensity = umfflop ./ umfnnz ;\n');
+
+fprintf(ff,'figure(1);\n');
+fprintf(ff,'subplot (1,3,1) ;\n');
+fprintf(ff,'loglog (intensity,  tratio, ''o'', ''MarkerSize'', 10) ;\n');
+
+fprintf(ff,'subplot (1,3,2) ;\n');
+fprintf(ff,'loglog (intensity,  nzratio, ''o'', ''MarkerSize'', 10) ;\n');
+
+fprintf(ff,'subplot (1,3,3) ;\n');
+fprintf(ff,'loglog (intensity,  flratio, ''o'', ''MarkerSize'', 10) ;\n');
+
 fclose (ff) ;
