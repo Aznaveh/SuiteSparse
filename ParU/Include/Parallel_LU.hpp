@@ -421,7 +421,8 @@ void paru_write( paru_matrix *paruMatInfo, int scale,
 void paru_update_rowDeg ( Int panel_num,  Int row_end, 
         Int f, Int *next, paru_matrix *paruMatInfo);
 
-void paru_finalize (paru_matrix *paruMatInfo, Int f, cholmod_common *cc);
+void paru_finalize (paru_matrix *paruMatInfo, Int f, Int start_fac, 
+        cholmod_common *cc);
 Int paru_cumsum (Int n, Int *X);
 
 #endif

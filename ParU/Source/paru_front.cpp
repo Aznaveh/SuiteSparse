@@ -117,6 +117,8 @@ void paru_front ( paru_matrix *paruMatInfo,
     // Initializing relative index validation flag of current front
     paru_init_rel (paruMatInfo, f);
     Int time_f = paruMatInfo->time_stamp[f];
+    
+    PRLEVEL (0, ("%% Begin of Front %ld time_f = %ld\n", f, time_f));
 
     /**** 1 ******** finding set of rows in current front *********************/
     for (Int c = col1; c < col2; c++){
@@ -418,8 +420,12 @@ void paru_front ( paru_matrix *paruMatInfo,
     }
     Int next = -1;
 
+    Int start_fac = paruMatInfo->time_stamp[f]; 
+    PRLEVEL (1, ("%% start_fac= %ld\n",start_fac));
     Int fac = paru_factorize(pivotalFront, frowList, rowCount, f, panel_row, 
             &next, paruMatInfo);
+    time_f = paruMatInfo->time_stamp[f]; 
+    PRLEVEL (1, ("%%After factorization time_f = %ld\n",time_f));
 
     /* To this point fully summed part of the front is computed and L and U    /  
      *  The next part is to find columns of nonfully summed then rows
@@ -687,7 +693,7 @@ void paru_front ( paru_matrix *paruMatInfo,
 
     paruMatInfo->time_stamp[f]++; //invalidating all the marks
     PRLEVEL (-1, ("\n%%||||  Start Finalize %ld ||||\n", f));
-    paru_finalize (paruMatInfo, f, cc);
+    paru_finalize (paruMatInfo,  f, start_fac, cc);
     PRLEVEL (-1, ("\n%%||||  Finish Finalize %ld ||||\n", f));
 
 

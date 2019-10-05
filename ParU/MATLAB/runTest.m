@@ -6,7 +6,7 @@ f = find (index.nrows == index.ncols & ...
     index.sprank == index.ncols & ...
     ~index.posdef & ...
     index.isReal & ~index.isGraph & ...
-    index.pattern_symmetry <= .6) ;
+   index.pattern_symmetry <= 1) ;
 
 [ignore, i] = sort (index.nnz (f) + index.nzero (f)) ;
 
@@ -53,10 +53,10 @@ fprintf(ff,' myflop umfflop ratio\n results = [');
 
 
 %for k = 1:nmat
-for k = 1:100
+for k = 100:150
     id = fnew (k) 
     % some problem in these matrice
-    if (id == 2056 || id == 2034) 
+    if (id == 234 || id == 1189 || id == 823 || id == 2056 || id == 2034) 
         continue;
     end
     group = index.Group {id} ;
@@ -68,6 +68,8 @@ for k = 1:100
 %    if (nnz(A) < 10000)
 %        continue;
 %    end;
+
+
 
 
     [dp,dq,dr,ds,dcc,drr] = dmperm(A);
@@ -204,6 +206,8 @@ for k = 1:100
     if (s == 1)
         str = ['rm  ' path s_name];    system(str);
     end
+    id
+    %pause;
 end
 
 fprintf(ff,'];\n\n');

@@ -414,10 +414,10 @@ void paru_update_rowDeg ( Int panel_num,  Int row_end, Int f, Int *next,
 #endif
             Int curRowIndex = curTpl.f;
 
-            if(e < 0 || curRowIndex < 0) continue;
+            if(e < 0 || curRowIndex < 0){ continue;}
 
             paru_Element *el = elementList[e];
-            if (el == NULL) continue;
+            if (el == NULL) {continue;}
 
             Int *el_colIndex = colIndex_pointer (el);//pointers to row index
             Int *el_rowIndex = rowIndex_pointer (el);
@@ -438,9 +438,9 @@ void paru_update_rowDeg ( Int panel_num,  Int row_end, Int f, Int *next,
             if(el->rValid != npMark){
                 el->rValid =  npMark;
                 elRow [e] = el ->nrowsleft - 1; //initiaze
-                PRLEVEL (1, ("%%rValid=%ld \n",el->rValid));
-                PRLEVEL (1, ("%%first time seen elRow[e]=%ld \n",
-                            elRow[e]));
+                PRLEVEL (0, ("%%rValid=%ld \n",el->rValid));
+                PRLEVEL (0, ("%%first time seen elRow[%ld]=%ld \n",
+                            e, elRow[e]));
             }
             else{ 
                 elRow [e]--;
@@ -449,6 +449,8 @@ void paru_update_rowDeg ( Int panel_num,  Int row_end, Int f, Int *next,
             }
 
             if (elRow [e] == 0) {
+                
+                PRLEVEL (1, ("%% elRow[%ld]=%ld \n",e,  elRow[e]));
                 if(elCol[e] == 0){
                     // adding the element to the list of children
                     el->next = *next;
@@ -475,7 +477,7 @@ void paru_update_rowDeg ( Int panel_num,  Int row_end, Int f, Int *next,
         }
 
         paruMatInfo->time_stamp[f]+= 2; //making all the markings invalid again
-        PRLEVEL (0, ("%% Finalized counters r1=%ld r2=%ld r3=%ld sum=%ld\n", 
+        PRLEVEL (1, ("%% Finalized counters r1=%ld r2=%ld r3=%ld sum=%ld\n", 
                     r1, r2, r3, r1+r2+r3));
 
     }

@@ -48,7 +48,7 @@ profile:
 #	./prof < ../Matrix/west0067.mtx 
 #	gprof -b prof gmon.out > analysis.txt
 
-#	valgrind	--tool=callgrind ./umpfout < ../Matrix/west0067.mtx
+#	valgrind	--tool=callgrind -v ./umpfout < ../Matrix/west0067.mtx
 	valgrind	--tool=callgrind -v ./umpfout < ../Matrix/ParUTst/tmp.mtx
 
 purge: distclean
