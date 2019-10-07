@@ -355,7 +355,13 @@ void paru_front ( paru_matrix *paruMatInfo,
             //FLIP(el_colIndex[curColIndex]); //marking column as assembled
             el_colIndex[curColIndex] = -1;
             colRelIndex [curColIndex] = -1;
-            el->ncolsleft--;     // After each assembly Az: Added later
+            el->ncolsleft--;     
+            if (el->ncolsleft == 0){ //free el
+                    Int tot_size = sizeof(paru_Element) +
+                        sizeof(Int)*(2*(mEl+nEl)) + sizeof(double)*nEl*mEl;
+                    paru_free (1, tot_size, el, cc);
+                    elementList[e] = NULL;
+            }
 
 
 #ifndef NDEBUG  // Printing the pivotal front
@@ -578,7 +584,15 @@ void paru_front ( paru_matrix *paruMatInfo,
             //FLIP(el_rowIndex[curRowIndex]); //marking column as assembled
             el_rowIndex[curRowIndex] = -1;
             rowRelIndex [curRowIndex] = -1;
-            el->nrowsleft--;  // After each assembly Az: Added later
+            el->nrowsleft--;  
+            if (el->nrowsleft == 0){ //free el
+                Int tot_size = sizeof(paru_Element) +
+                    sizeof(Int)*(2*(mEl+nEl)) + sizeof(double)*nEl*mEl;
+                paru_free (1, tot_size, el, cc);
+                elementList[e] = NULL;
+            }
+
+
 
         }
     }
@@ -682,7 +696,7 @@ void paru_front ( paru_matrix *paruMatInfo,
 
 #ifndef NDEBUG
     //Printing the contribution block after dgemm
-    p = 1;
+    p = 0;
     PRLEVEL (p, ("\n%%After DGEMM:"));
     if (p <= 0)
         paru_print_element (paruMatInfo, eli);
@@ -723,7 +737,7 @@ void paru_front ( paru_matrix *paruMatInfo,
 
 #ifndef NDEBUG
     //Printing the contribution block after prior blocks assembly
-    p = 1;
+    p = 0;
     PRLEVEL (p, ("\n%%After prior blocks assembly:"));
     if (p <= 0)
         paru_print_element (paruMatInfo, eli);

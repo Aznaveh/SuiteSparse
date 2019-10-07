@@ -18,7 +18,8 @@ void paru_finalize (paru_matrix *paruMatInfo, Int f, Int start_fac,
     static Int f1 = 0, f2 = 0, f3 = 0, f4 = 0;
     // counters to find if it is children or their progeny that are fully or
     // partially assembled
-    static Int child_FA = 0, noChild_FA = 0, child_PA = 0, noChild_PA= 0;
+    static Int child_FA = 0, noChild_FA = 0, child_row_PA = 0, 
+              noChild_row_PA = 0,  child_col_PA= 0,  noChild_col_PA= 0;
 #endif
 
     work_struct *Work =  paruMatInfo->Work;
@@ -118,7 +119,7 @@ void paru_finalize (paru_matrix *paruMatInfo, Int f, Int start_fac,
         ASSERT (numTuple >= 0);
         paru_Tuple *listColTuples = curColTupleList->list;
 #ifndef NDEBUG            
-        p = 0;
+        p = 1;
 
         PRLEVEL (p, ("\n %%-------->  3rd: c =%ld  numTuple = %ld\n",
                     c, numTuple));
@@ -164,19 +165,21 @@ void paru_finalize (paru_matrix *paruMatInfo, Int f, Int start_fac,
             ASSERT (curColIndex < nEl);
 
             double *el_Num = numeric_pointer (el);
-            PRLEVEL (1, ("%% elRow[%ld]=%ld currVal= %ld ", 
-                        e, elRow[e], el->rValid ));
+            PRLEVEL (1, ("%% elRow[%ld]=%ld currVal= %ld, curcVal=%ld ", 
+                        e, elRow[e], el->rValid , el->cValid));
             PRLEVEL (1, ("%% time_f =%ld ", time_f));
             PRLEVEL (1, ("%% start_fac=%ld \n", start_fac));
 
-            if (elRow [e] == 0 && el->rValid > start_fac 
-               //){
-                && el->rValid < time_f){
+            if (elRow [e] == 0) {
+               
+                ASSERT ( el->rValid > start_fac);
+                //ASSERT ( el->rValid < time_f);
 
                 //all the columns are in CB
-                if (elCol[e] == 0 && el->cValid > start_fac
-               //){
-               && el->rValid < time_f){
+                if (elCol[e] == 0 ){
+               
+                ASSERT ( el->cValid > start_fac);
+                ASSERT ( el->cValid < time_f);
 
                     // Whole prior front assembly
                     // do complete assembly of e into current front, now
@@ -278,9 +281,9 @@ void paru_finalize (paru_matrix *paruMatInfo, Int f, Int start_fac,
                 }
 
                 if (aParent [e] = el_ind )
-                    child_PA++ ;
+                    child_row_PA++ ;
                 else
-                    noChild_PA++ ;
+                    noChild_row_PA++ ;
 #endif
 
             } 
@@ -305,7 +308,7 @@ void paru_finalize (paru_matrix *paruMatInfo, Int f, Int start_fac,
         ASSERT (numTuple >= 0);
         paru_Tuple *listRowTuples = curRowTupleList->list;
 #ifndef NDEBUG            
-        p = 0;
+        p = 1;
         PRLEVEL (1, ("\n %%------->  4th: r =%ld  numTuple = %ld\n",
                     r, numTuple));
         if (p <= 0 ){
@@ -322,8 +325,9 @@ void paru_finalize (paru_matrix *paruMatInfo, Int f, Int start_fac,
 #endif
 
             if ( e >= el_ind || e < first[el_ind]){
+                //Not any of descendents; clear elRow if changed not to mangle
+                //with other's computation
                 elRow [e] = -1;
-                //Not any of descendents
                 continue;
             }
             //TODO: these assertion doesn't work: why?
@@ -364,7 +368,7 @@ void paru_finalize (paru_matrix *paruMatInfo, Int f, Int start_fac,
             double *el_Num = numeric_pointer (el);
             PRLEVEL (1, ("%% elCol[%ld]=%ld ",e, elCol[e]));
 
-            if (elCol [e] == 0 && el->cValid > start_fac){
+            if (elCol [e] == 0){ // && el->cValid > start_fac){
                 //all the rows are in CB
 
                 if (elRow[e] == 0){
@@ -399,7 +403,7 @@ void paru_finalize (paru_matrix *paruMatInfo, Int f, Int start_fac,
                 assemble_row (el_Num, cur_Numeric, mEl, nEl, 
                         curFr->nrows, curRowIndex , k-fp, colRelIndex );
 #ifndef NDEBUG            
-                p = 0;
+                p = 1;
                 PRLEVEL (p, ("%% after row assembly: \n" ));
                 if (p <= 0 ){
                     paru_print_element (paruMatInfo, e);
@@ -407,9 +411,9 @@ void paru_finalize (paru_matrix *paruMatInfo, Int f, Int start_fac,
                 }
 
                 if (aParent [e] = el_ind )
-                    child_PA++ ;
+                    child_col_PA++ ;
                 else
-                    noChild_PA++ ;
+                    noChild_col_PA++ ;
 #endif
                 rowRelIndex [curRowIndex] = -1;
                 el_rowIndex [curRowIndex] = -1;
@@ -491,9 +495,13 @@ void paru_finalize (paru_matrix *paruMatInfo, Int f, Int start_fac,
                 " sum=%ld\n", f1, f2, f3, f4, f1+f2+f3+f4));
 
     p = 0;
-    if(f == LUsym-> nf -2)
-        PRLEVEL (p, ("%% child_FA=%ld noChild_FA=%ld child_PA=%ld noChild_PA=%ld\n"
-                    , child_FA, noChild_FA, child_PA, noChild_PA));
+    //if(f == LUsym-> nf -2)
+        PRLEVEL (p, ("%% child_FA=%ld noChild_FA=%ld"
+                    "  child_col_PA=%ld noChild_col_PA=%ld\n" 
+                    "  child_row_PA=%ld noChild_row_PA=%ld\n" ,
+                    child_FA, noChild_FA, child_col_PA, 
+                    noChild_col_PA, child_row_PA, noChild_row_PA 
+                    ));
 
 #endif
 

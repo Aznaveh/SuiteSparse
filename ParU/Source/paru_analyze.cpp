@@ -29,7 +29,7 @@ paru_symbolic *paru_analyze
  // workspace and parameters
  cholmod_common *cc ){   
 
-    DEBUGLEVEL(0);
+    DEBUGLEVEL(1);
     paru_symbolic *LUsym;
 
     LUsym = (paru_symbolic*) paru_alloc (1, sizeof(paru_symbolic), cc);
