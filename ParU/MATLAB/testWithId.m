@@ -30,8 +30,8 @@ s = 0;
 id = 2056;
 %id = 2034; % Cholmaod error
 
-id = 823;
-%id = 234;
+%id = 823;
+id = 234;
 %id = 1189;
 
 
@@ -43,7 +43,7 @@ name = index.Name {id} ;
 [dp,dq,dr,ds,dcc,drr] = dmperm(A);
 
 [m n] = size (A);
-if (size(dr) ~= 2 )
+%if (size(dr) ~= 2 )
     if (norm(diff(dr)-diff(ds)) ~= 0 )
         sprintf('Unexpected')
     end
@@ -60,14 +60,14 @@ if (size(dr) ~= 2 )
     str = sprintf ('../Demo/umpfout %d < ../Matrix/ParUTst/tmp.mtx', id );
     system(str);
 
-else
-    str1 = 'tar zvfxO ~/SuiteSparseCollection//MM/';
-    str2 = sprintf ('%s/%s.tar.gz %s/%s.mtx | ../Demo/umpfout %d %d', ...
-        group, name, name, name, id, s) ;
-    str = strcat (str1,str2);
-
-    system(str);
-end
+%else
+%    str1 = 'tar zvfxO ~/SuiteSparseCollection//MM/';
+%    str2 = sprintf ('%s/%s.tar.gz %s/%s.mtx | ../Demo/umpfout %d %d', ...
+%        group, name, name, name, id, s) ;
+%    str = strcat (str1,str2);
+%
+%    system(str);
+%end
 
     %%scaling now it is in the code
     %A = sparse(diag(1./max(abs(A),[],2)))*A;

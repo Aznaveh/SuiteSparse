@@ -53,12 +53,12 @@ fprintf(ff,' myflop umfflop ratio\n results = [');
 
 
 %for k = 1:nmat
-for k = 100:150
+for k = 1:250
     id = fnew (k) 
     % some problem in these matrice
-    if (id == 234 || id == 1189 || id == 823 || id == 2056 || id == 2034) 
-        continue;
-    end
+%    if (id == 234 || id == 1189 || id == 823 || id == 2056 || id == 2034) 
+%        continue;
+%    end
     group = index.Group {id} ;
     name = index.Name {id} ;
 
@@ -206,7 +206,7 @@ for k = 100:150
     if (s == 1)
         str = ['rm  ' path s_name];    system(str);
     end
-    id
+    %id
     %pause;
 end
 
