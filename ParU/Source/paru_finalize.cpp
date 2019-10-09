@@ -270,6 +270,15 @@ void paru_finalize (paru_matrix *paruMatInfo, Int f, Int start_fac,
                 colRelIndex [curColIndex] = -1;
                 el_colIndex [curColIndex] = -1;
                 el->ncolsleft --;
+
+                if (el->ncolsleft == 0){ //free el
+                    Int tot_size = sizeof(paru_Element) +
+                        sizeof(Int)*(2*(mEl+nEl)) + sizeof(double)*nEl*mEl;
+                    paru_free (1, tot_size, el, cc);
+                    elementList[e] = NULL;
+                }
+
+
 #ifndef NDEBUG
                 //Printing the contribution block after 
                 //  prior blocks assembly
@@ -300,6 +309,7 @@ void paru_finalize (paru_matrix *paruMatInfo, Int f, Int start_fac,
     /**************************************************************************/
 
     /*******************       2nd pass: assemble rows            *************/
+
     tupleList *RowList = paruMatInfo->RowList;
     for (Int k = fp; k < rowCount; k++){
         Int r = frowList [k];
@@ -368,6 +378,7 @@ void paru_finalize (paru_matrix *paruMatInfo, Int f, Int start_fac,
             double *el_Num = numeric_pointer (el);
             PRLEVEL (1, ("%% elCol[%ld]=%ld ",e, elCol[e]));
 
+//#if 0
             if (elCol [e] == 0){ // && el->cValid > start_fac){
                 //all the rows are in CB
 
@@ -418,52 +429,60 @@ void paru_finalize (paru_matrix *paruMatInfo, Int f, Int start_fac,
                 rowRelIndex [curRowIndex] = -1;
                 el_rowIndex [curRowIndex] = -1;
                 el->nrowsleft --;
+                if (el->nrowsleft == 0){ //free el
+                    Int tot_size = sizeof(paru_Element) +
+                        sizeof(Int)*(2*(mEl+nEl)) + sizeof(double)*nEl*mEl;
+                    paru_free (1, tot_size, el, cc);
+                    elementList[e] = NULL;
+                }
+
+
             } 
+//#endif
             PRLEVEL (1, ("%% RESET elRow[%ld]=%ld \n",e,  elRow[e]));
             elRow [e] = -1;
             PRLEVEL (1, ("%% After SET elRow[%ld]=%ld \n",e,  elRow[e]));
-            //el->rValid = -1;
+            }
+
         }
 
-    }
 
-
-    /********************* 3rd path: clearing column tuples and uncheck *******/
-    for (Int k = 0; k < colCount; k++){
-        Int c = fcolList [k];   //non pivotal column list
-        tupleList *curColTupleList = &ColList[c];
-        Int numTuple = curColTupleList->numTuple;
-        ASSERT (numTuple >= 0);
-        paru_Tuple *listColTuples = curColTupleList->list;
+        /********************* 3rd path: clearing column tuples and uncheck *******/
+        for (Int k = 0; k < colCount; k++){
+            Int c = fcolList [k];   //non pivotal column list
+            tupleList *curColTupleList = &ColList[c];
+            Int numTuple = curColTupleList->numTuple;
+            ASSERT (numTuple >= 0);
+            paru_Tuple *listColTuples = curColTupleList->list;
 #ifndef NDEBUG            
-        p = 1;
-        PRLEVEL (p, ("\n %%-------->  5th: c =%ld  numTuple = %ld\n",
-                    c, numTuple));
-        if (p <= 0 ){
-            paru_print_tupleList (ColList, c);
-            paru_print_element (paruMatInfo, el_ind);
-        }
+            p = 1;
+            PRLEVEL (p, ("\n %%-------->  5th: c =%ld  numTuple = %ld\n",
+                        c, numTuple));
+            if (p <= 0 ){
+                paru_print_tupleList (ColList, c);
+                paru_print_element (paruMatInfo, el_ind);
+            }
 #endif
-        Int pdst = 0, psrc;
+            Int pdst = 0, psrc;
 
-        for (psrc = 0; psrc < numTuple; psrc ++){
-            paru_Tuple curTpl = listColTuples [psrc];
-            Int e = curTpl.e;
-            Int curColIndex = curTpl.f;
-            PRLEVEL (1, ("%% element= %ld  f =%ld \n",e, curColIndex));
+            for (psrc = 0; psrc < numTuple; psrc ++){
+                paru_Tuple curTpl = listColTuples [psrc];
+                Int e = curTpl.e;
+                Int curColIndex = curTpl.f;
+                PRLEVEL (1, ("%% element= %ld  f =%ld \n",e, curColIndex));
 
 #ifndef NDEBUG
-            f3++;
+                f3++;
 #endif
-            paru_Element *el = elementList[e];
-            if (el == NULL){
-                PRLEVEL (1, ("%% El==NULL\n"));
-                continue;
-            }
-            Int mEl = el->nrows;
-            Int nEl = el->ncols;
+                paru_Element *el = elementList[e];
+                if (el == NULL){
+                    PRLEVEL (1, ("%% El==NULL\n"));
+                    continue;
+                }
+                Int mEl = el->nrows;
+                Int nEl = el->ncols;
 
-            Int *el_colIndex = colIndex_pointer (el);
+                Int *el_colIndex = colIndex_pointer (el);
             // elCol[e]= -1;
             //el->cValid = -1;
 

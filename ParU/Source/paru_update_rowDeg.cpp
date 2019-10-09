@@ -337,7 +337,6 @@ void paru_update_rowDeg ( Int panel_num,  Int row_end, Int f, Int *next,
             else{ 
                 elCol [e]--; 
                 PRLEVEL (1, ("%%seen before: elCol[e]=%ld \n", elCol[e]));
-                continue;
             }
         }
     }
