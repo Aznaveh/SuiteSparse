@@ -72,8 +72,8 @@ myflop = luflop(L,U);
 
 
 %B = p*(r\A)*q; B = B + 5*speye(size(B));
-%[umpfx, umpfinfo, c]  = klu(B, opts);
-%umfflop = umpfinfo.flops
+%[umfx, umfinfo, c]  = klu(B, opts);
+%umfflop = umfinfo.flops
 umfflop = luflop(l,u);
 
 myflop/umfflop;

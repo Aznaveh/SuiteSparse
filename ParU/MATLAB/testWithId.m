@@ -57,12 +57,12 @@ name = index.Name {id} ;
     end
 
     mmwrite('../Matrix/ParUTst/tmp.mtx', A);
-    str = sprintf ('../Demo/umpfout %d < ../Matrix/ParUTst/tmp.mtx', id );
+    str = sprintf ('../Demo/umfout %d < ../Matrix/ParUTst/tmp.mtx', id );
     system(str);
 
 %else
 %    str1 = 'tar zvfxO ~/SuiteSparseCollection//MM/';
-%    str2 = sprintf ('%s/%s.tar.gz %s/%s.mtx | ../Demo/umpfout %d %d', ...
+%    str2 = sprintf ('%s/%s.tar.gz %s/%s.mtx | ../Demo/umfout %d %d', ...
 %        group, name, name, name, id, s) ;
 %    str = strcat (str1,str2);
 %

@@ -41,7 +41,7 @@ run:
 #	./testazny < ../Matrix/ParUTst/lpi_galenet_transposed.mtx
 #	./testazny < ../Matrix/permuted_b1_ss.mtx  #7x7
 #
-#	./testazny < ../Matrix/pwr01b.mtx	    #sample 39x39
+#	./testazny < ../Matrix/pwr01b.mtx	    #sample 39x39 #HERE
 #
 #	./testazny < ../Matrix/ParUTst/lp_kb2/lp_kb2.mtx
 #	./testazny < ../Matrix/ParUTst/lpi_woodinfe/lpi_woodinfe.mtx

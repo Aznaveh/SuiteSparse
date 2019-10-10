@@ -52,8 +52,8 @@ fprintf(ff,' myflop umfflop ratio\n results = [');
 
 
 
+for k = 1:500
 %for k = 1:nmat
-for k = 1:250
     id = fnew (k) 
     % some problem in these matrice
 %    if (id == 234 || id == 1189 || id == 823 || id == 2056 || id == 2034) 
@@ -98,17 +98,17 @@ for k = 1:250
 
 
         mmwrite('../Matrix/ParUTst/tmp.mtx', A);
-        str = sprintf ('../Demo/umpfout %d < ../Matrix/ParUTst/tmp.mtx', id );
+        str = sprintf ('../Demo/umfout %d < ../Matrix/ParUTst/tmp.mtx', id );
         system(str);
     else 
        % str1 = 'tar zvfxO ~/SuiteSparseCollection//MM/';
-       % str2 = sprintf ('%s/%s.tar.gz %s/%s.mtx | ../Demo/umpfout %d %d', ...
+       % str2 = sprintf ('%s/%s.tar.gz %s/%s.mtx | ../Demo/umfout %d %d', ...
        %     group, name, name, name, id, s) ;
        % dostr = strcat (str1,str2);
        % system(dostr);
 
        mmwrite('../Matrix/ParUTst/tmp.mtx', A);
-       str = sprintf ('../Demo/umpfout %d < ../Matrix/ParUTst/tmp.mtx', id );
+       str = sprintf ('../Demo/umfout %d < ../Matrix/ParUTst/tmp.mtx', id );
        system(str);
  
 
@@ -148,7 +148,9 @@ for k = 1:250
 
     info_name = sprintf ('%d_info.txt',id);
     infofullname = strcat(path, info_name);
-    myElaps = load (infofullname);
+    t_Info = load (infofullname);
+    myElaps = t_Info(1);
+    fromCode_umf_Elaps = t_Info(2);
 
 
     [LU, paddingZ] = mmread (LUfullname);
@@ -157,7 +159,8 @@ for k = 1:250
     umfStart= tic;
     %[l,u,p,q,D]=lu(A, 'vector');
     [l, u, p, q, r, Info]= umfpack (A);
-    umfElaps = toc(umfStart);
+    %umfElaps = toc(umfStart);
+    umfElaps = fromCode_umf_Elaps;
 
 
     L=tril(LU,-1)+speye(size(LU));

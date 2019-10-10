@@ -352,7 +352,10 @@ typedef struct  {/*Matrix */
 
 
     double *scale_row;
-    double time;
+
+    // analysis information
+    double my_time;
+    double umf_time;
 }   paru_matrix;
 
 

@@ -41,7 +41,7 @@ int main (int argc, char **argv)
     }
 
     //~~~~~~~~~~~~~~~~~~~Starting computation~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    double start_time = omp_get_wtime();
+    double my_start_time = omp_get_wtime();
 
     LUsym = paru_analyze (A, cc);
     if (LUsym == NULL) {
@@ -70,10 +70,53 @@ int main (int argc, char **argv)
     for (Int i = 0; i < nf; i++) {
         paru_front (paruMatInfo, i, cc);
     }
-    double time = omp_get_wtime() - start_time;
-    paruMatInfo->time = time;
+    double my_time = omp_get_wtime() - my_start_time;
+    paruMatInfo->my_time = my_time;
  
-    //~~~~~~~~~~~~~~~~~~~End computation~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    //~~~~~~~~~~~~~~~~~~~End computation~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+    //~~~~~~~~~~~~~~~~~~~Calling umfpack~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    
+    double umf_start_time = omp_get_wtime();
+    
+    double status,   // Info [UMFPACK_STATUS] 
+    Info[UMFPACK_INFO],// Contains statistics about the symbolic analysis
+
+    Control [UMFPACK_CONTROL]; // it is set in umfpack_dl_defaults and
+    // is used in umfpack_dl_symbolic; if
+    // passed NULL it will use the defaults
+    umfpack_dl_defaults (Control) ;
+    Control [UMFPACK_ORDERING] = UMFPACK_ORDERING_METIS;
+
+    Int *Ap = (Int*) A->p;
+    Int *Ai = (Int*) A->i;
+    double *Ax = (double*) A->x;
+    Int m = A->nrow;
+    Int n = A->ncol;
+    void *Symbolic, *Numeric;  // Output argument in umf_dl_symbolc;
+    status = umfpack_dl_symbolic (n, n, Ap, Ai, Ax, &Symbolic,
+            Control, Info) ;
+    if (status < 0)
+    {
+        umfpack_dl_report_info (Control, Info) ;
+        umfpack_dl_report_status (Control, status) ;
+        printf ("umfpack_dl_symbolic failed\n") ;
+    }
+    status = umfpack_dl_numeric (Ap, Ai, Ax, Symbolic, &Numeric,
+	Control, Info) ;
+    if (status < 0)
+    {
+	umfpack_dl_report_info (Control, Info) ;
+	umfpack_dl_report_status (Control, status) ;
+	printf ("umfpack_dl_numeric failed\n") ;
+    }
+
+    double umf_time = omp_get_wtime() - umf_start_time;
+
+    paruMatInfo->umf_time = umf_time;
+
+
 
     // Writing results to a file
     paru_write(paruMatInfo, scale,  argv[1], cc);
