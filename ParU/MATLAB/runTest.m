@@ -6,7 +6,7 @@ f = find (index.nrows == index.ncols & ...
     index.sprank == index.ncols & ...
     ~index.posdef & ...
     index.isReal & ~index.isGraph & ...
-   index.pattern_symmetry <= 1) ;
+   index.pattern_symmetry <= .5) ;
 
 [ignore, i] = sort (index.nnz (f) + index.nzero (f)) ;
 
@@ -52,13 +52,13 @@ fprintf(ff,' myflop umfflop ratio\n results = [');
 
 
 
-for k = 1:500
-%for k = 1:nmat
+%for k = 1:500
+for k = 1:nmat
     id = fnew (k) 
     % some problem in these matrice
-%    if (id == 234 || id == 1189 || id == 823 || id == 2056 || id == 2034) 
-%        continue;
-%    end
+    if ( id == 2056 ) 
+        continue;
+    end
     group = index.Group {id} ;
     name = index.Name {id} ;
 

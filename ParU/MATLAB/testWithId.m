@@ -1,37 +1,15 @@
+function A = testWithID(id)
 index = ssget ;
-
-f = find (index.nrows == index.ncols & ...
-    index.sprank == index.ncols & ...
-    ~index.posdef & ...
-    index.isReal & ~index.isGraph) ;
-
-[ignore, i] = sort (index.nnz (f) + index.nzero (f)) ;
-
-f = f (i) ;
-
-nzlast = -1 ;
-fnew = [ ] ;
-
-nmat = length (f) ;
-for k = 1:nmat
-    id = f (k) ;
-
-    thisnz = index.nnz (id) + index.nzero (id) ;
-    if (thisnz ~= nzlast)
-        fnew = [fnew id] ;
-    end
-    nzlast = thisnz ;
-end
 
 err = 10e-9;
 s = 0;
 
 %test
-id = 2056;
+%id = 2056;
 %id = 2034; % Cholmaod error
 
 %id = 823;
-id = 234;
+%id = 234;
 %id = 1189;
 
 
@@ -44,7 +22,7 @@ name = index.Name {id} ;
 
 [m n] = size (A);
 %if (size(dr) ~= 2 )
-    if (norm(diff(dr)-diff(ds)) ~= 0 )
+if (norm(diff(dr)-diff(ds)) ~= 0 )
         sprintf('Unexpected')
     end
     B = A(dp,dq);
@@ -60,14 +38,14 @@ name = index.Name {id} ;
     str = sprintf ('../Demo/umfout %d < ../Matrix/ParUTst/tmp.mtx', id );
     system(str);
 
-%else
-%    str1 = 'tar zvfxO ~/SuiteSparseCollection//MM/';
-%    str2 = sprintf ('%s/%s.tar.gz %s/%s.mtx | ../Demo/umfout %d %d', ...
-%        group, name, name, name, id, s) ;
-%    str = strcat (str1,str2);
-%
-%    system(str);
-%end
+    %else
+    %    str1 = 'tar zvfxO ~/SuiteSparseCollection//MM/';
+    %    str2 = sprintf ('%s/%s.tar.gz %s/%s.mtx | ../Demo/umfout %d %d', ...
+    %        group, name, name, name, id, s) ;
+    %    str = strcat (str1,str2);
+    %
+    %    system(str);
+    %end
 
     %%scaling now it is in the code
     %A = sparse(diag(1./max(abs(A),[],2)))*A;
@@ -103,14 +81,18 @@ LUfullname = strcat(path, LU_name);
 
 info_name = sprintf ('%d_info.txt',id);
 infofullname = strcat(path, info_name);
-myElaps = load (infofullname)
+t_Info = load (infofullname);
+myElaps = t_Info(1)
+fromCode_umf_Elaps = t_Info(2);
+
 
 
 
 umfStart= tic;
 %[l, u, p, q, D]=lu(A, 'vector');
 [l, u, p, q, r, Info]= umfpack (A);
-umfElaps = toc(umfStart)
+%umfElaps = toc(umfStart)
+umfElaps = fromCode_umf_Elaps
 
 
 L=tril(LU,-1)+speye(size(LU));
@@ -135,7 +117,7 @@ myflop = luflop(L,U)
 
 umfflop = luflop(l,u)
 
-myflop/umfflop
+flopratio = myflop/umfflop
 
 
 if(myErr <= 100*umfErr || myErr < err)
