@@ -28,7 +28,6 @@ void paru_finalize (paru_matrix *paruMatInfo, Int f, Int start_fac,
     work_struct *Work =  paruMatInfo->Work;
 
     Int *isRowInFront = Work->rowSize; 
-    Int rowMark = Work->rowMark;
 
     // Couning how many rows/cols of an element is seen
     Int *elRow = Work -> elRow; 
@@ -53,18 +52,14 @@ void paru_finalize (paru_matrix *paruMatInfo, Int f, Int start_fac,
 
     Int *fcolList = paruMatInfo->fcolList[f] ;
 
-    Int *isColInCBcolSet = Work -> colSize;
-    Int colMark = Work -> colMark;
 
     Int *first = LUsym->first;
-    Int *row_degree_bound = paruMatInfo->row_degree_bound;
 
 
     Int time_f = ++paruMatInfo->time_stamp[f]; //making all the markings invalid 
 
 
     double *cur_Numeric = numeric_pointer (curFr);
-    Int new_row_degree_bound_for_r ;
     Int *frowList = paruMatInfo->frowList[f] ;
     /**************************************************************************/
 
@@ -153,19 +148,20 @@ void paru_finalize (paru_matrix *paruMatInfo, Int f, Int start_fac,
 
             paru_Element *el = elementList[e];
             if (el == NULL) continue;
-            Int mEl = el->nrows;
-            Int nEl = el->ncols;
+
 
             Int *el_colIndex = colIndex_pointer (el);
-            Int *el_rowIndex = rowIndex_pointer (el);
-            Int *rowRelIndex = relRowInd (el);
-            Int *colRelIndex    = relColInd (el);
-
             if (el_colIndex [curColIndex] < 0 ){ //already assembled somewhere
                 continue;  
             }
 
+            Int *el_rowIndex = rowIndex_pointer (el);
+            Int *rowRelIndex = relRowInd (el);
+            Int *colRelIndex    = relColInd (el);
+
             ASSERT (el_colIndex[curColIndex] == c);
+            Int nEl = el->ncols;
+            Int mEl = el->nrows;
             ASSERT (curColIndex < nEl);
 
             double *el_Num = numeric_pointer (el);
@@ -175,15 +171,14 @@ void paru_finalize (paru_matrix *paruMatInfo, Int f, Int start_fac,
             PRLEVEL (1, ("%% start_fac=%ld \n", start_fac));
 
             if (elRow [e] == 0) {
-               
+
                 ASSERT ( el->rValid > start_fac);
-                //ASSERT ( el->rValid < time_f);
 
                 //all the columns are in CB
                 if (elCol[e] == 0 ){
-               
-                ASSERT ( el->cValid > start_fac);
-                ASSERT ( el->cValid < time_f);
+
+                    ASSERT ( el->cValid > start_fac);
+                    ASSERT ( el->cValid < time_f);
 
                     // Whole prior front assembly
                     // do complete assembly of e into current front, now
@@ -203,10 +198,6 @@ void paru_finalize (paru_matrix *paruMatInfo, Int f, Int start_fac,
                     Int *rowRelIndex = relRowInd (el);
                     Int *colRelIndex = relColInd (el);
 
-                    Int *el_rowIndex = rowIndex_pointer (el);
-                    Int *el_colIndex = colIndex_pointer (el);
-
-                    double *el_Num = numeric_pointer (el);
 
                     assemble_all (el_Num, cur_Numeric,
                             el->nrows, el->ncols, curFr->nrows,
@@ -215,6 +206,8 @@ void paru_finalize (paru_matrix *paruMatInfo, Int f, Int start_fac,
                     Int tot_size = sizeof(paru_Element) +
                         sizeof(Int)*(2*(mEl+nEl)) + sizeof(double)*nEl*mEl;
                     paru_free (1, tot_size, el, cc);
+
+
 #ifndef NDEBUG
                     if (aParent [e] = el_ind )
                         child_FA++ ;
@@ -223,14 +216,12 @@ void paru_finalize (paru_matrix *paruMatInfo, Int f, Int start_fac,
 
 #endif
                     elementList[e] = NULL;
-                    PRLEVEL (1, ("%% NULLIFIED\n"));
                     continue;
                 }
 
-                ASSERT ( e < el_ind && e >= first[el_ind]);
 
-                if(el->rValid !=  time_f){ /*  Update rowRelIndex	 */
-
+                if(el->rValid !=  time_f){ 
+                    /*  Update rowRelIndex just once	 */
 
 #ifndef NDEBUG
                     p = 0;
@@ -352,53 +343,38 @@ void paru_finalize (paru_matrix *paruMatInfo, Int f, Int start_fac,
                 elRow [e] = -1;
                 continue;
             }
-            //TODO: these assertion doesn't work: why?
-            // ASSERT ( e >= el_ind );
-            // ASSERT ( e < first[el_ind] );
-
-            Int curColIndex = curTpl.f;
-            PRLEVEL (1, ("%% element= %ld  f =%ld \n",
-                        e, curColIndex));
-
-
-            Int curRowIndex = curTpl.f;
-            ASSERT (e >= 0);
-            ASSERT (curRowIndex >= 0);
 
             paru_Element *el = elementList[e];
             if (el == NULL) continue;
-            Int mEl = el->nrows;
-            Int nEl = el->ncols;
-
-            Int *el_colIndex = colIndex_pointer (el);
+ 
+            Int curRowIndex = curTpl.f;
             Int *el_rowIndex = rowIndex_pointer (el);
-            Int *rowRelIndex = relRowInd (el);
-            Int *colRelIndex    = relColInd (el);
-
 
             if (el_rowIndex [curRowIndex] < 0 ){ 
                 // it will be deleted here
                 continue;  
             }
-            if (el_rowIndex[curRowIndex] < 0)  
-                continue; //not valid
-            PRLEVEL (1, ("%% el_rowIndex [%ld] =%ld\n", 
-                        curRowIndex, el_rowIndex [curRowIndex]));
-            ASSERT (el_rowIndex[curRowIndex] == r);
-            ASSERT (curRowIndex < mEl);
 
             double *el_Num = numeric_pointer (el);
             PRLEVEL (1, ("%% elCol[%ld]=%ld ",e, elCol[e]));
 
-//#if 0
-            if (elCol [e] == 0){ // && el->cValid > start_fac){
+            //#if 0
+            if (elCol [e] == 0){ 
                 //all the rows are in CB
 
-                if (elRow[e] == 0){
-                    PRLEVEL (1, ("%% %ld is already assembled \n",e ));
-                    continue; //already assembled
-                }
-                ASSERT ( e < el_ind && e >= first[el_ind]);
+                Int mEl = el->nrows;
+                Int nEl = el->ncols;
+
+                Int *el_colIndex = colIndex_pointer (el);
+                Int *rowRelIndex = relRowInd (el);
+                Int *colRelIndex    = relColInd (el);
+
+
+                ASSERT (el_rowIndex[curRowIndex] == r);
+                ASSERT (curRowIndex < mEl);
+
+
+                ASSERT (elRow[e] != 0);
 
 #ifndef NDEBUG            
                 p = 1;
