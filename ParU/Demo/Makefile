@@ -43,13 +43,13 @@ debug:
 	gdb ./umfout < ../Matrix/c32.mtx		#3x2 	 #OK
 
 profile:
-	$(C) $(FLAG) -g umf_test.cpp -o umfout $(LIBS)
+	$(C) $(FLAG) -g umf_test.cpp -o prof $(LIBS)
 #	$(C) -Wall -pg -O0 -no-pie umf_test.cpp -o prof $(LIBS)
 #	./prof < ../Matrix/west0067.mtx 
 #	gprof -b prof gmon.out > analysis.txt
 
-#	valgrind	--tool=callgrind -v ./umfout < ../Matrix/west0067.mtx
-	valgrind	--tool=callgrind -v ./umfout < ../Matrix/ParUTst/tmp.mtx
+#	valgrind	--tool=callgrind -v ./prof< ../Matrix/west0067.mtx
+#	valgrind	--tool=callgrind -v ./prof< ../Matrix/ParUTst/tmp.mtx
 
 purge: distclean
 

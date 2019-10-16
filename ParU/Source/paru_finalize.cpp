@@ -18,8 +18,11 @@ void paru_finalize (paru_matrix *paruMatInfo, Int f, Int start_fac,
     static Int f1 = 0, f2 = 0, f3 = 0, f4 = 0;
     // counters to find if it is children or their progeny that are fully or
     // partially assembled
-    static Int child_FA = 0, noChild_FA = 0, child_row_PA = 0, 
-              noChild_row_PA = 0,  child_col_PA= 0,  noChild_col_PA= 0;
+    static Int child_FA = 0, noChild_FA = 0, 
+               child_rowPA = 0, noChild_rowPA = 0,  
+               elRow_child_rowPA = 0, elRow_noChild_rowPA = 0,  
+               child_colPA= 0,  noChild_colPA= 0,
+               elRow_child_colPA= 0,  elRow_noChild_colPA= 0;
 #endif
 
     work_struct *Work =  paruMatInfo->Work;
@@ -33,6 +36,7 @@ void paru_finalize (paru_matrix *paruMatInfo, Int f, Int start_fac,
 
     paru_symbolic *LUsym =  paruMatInfo->LUsym;
     Int *snM = LUsym->super2atree;
+    Int *rM = LUsym->row2atree;
     Int *aParent = LUsym->aParent; //augmented tree size m+nf
     Int el_ind = snM [f]; 
 
@@ -289,10 +293,18 @@ void paru_finalize (paru_matrix *paruMatInfo, Int f, Int start_fac,
                     paru_print_element (paruMatInfo, e);
                 }
 
-                if (aParent [e] = el_ind )
-                    child_row_PA++ ;
-                else
-                    noChild_row_PA++ ;
+                if (aParent [e] = el_ind ){
+                    if (mEl == 1 && rM[el_rowIndex[0]] == e ) //elRow
+                        elRow_child_rowPA++;
+                    else
+                        child_rowPA++ ;
+                }
+                else{
+                    if (mEl == 1 && rM[el_rowIndex[0]] == e ) //elRow
+                        elRow_noChild_rowPA++ ;
+                    else
+                        noChild_rowPA++ ;
+                }
 #endif
 
             } 
@@ -421,10 +433,18 @@ void paru_finalize (paru_matrix *paruMatInfo, Int f, Int start_fac,
                     paru_print_element (paruMatInfo, el_ind);
                 }
 
-                if (aParent [e] = el_ind )
-                    child_col_PA++ ;
-                else
-                    noChild_col_PA++ ;
+                if (aParent [e] = el_ind ){
+                    if (mEl == 1 && rM[el_rowIndex[0]] == e ) //elRow
+                        elRow_child_colPA++ ;
+                    else
+                        child_colPA++ ;
+                }
+                else{
+                    if (mEl == 1 && rM[el_rowIndex[0]] == e ) //elRow
+                        elRow_child_colPA++ ;
+                    else
+                        noChild_colPA++ ;
+                }
 #endif
                 rowRelIndex [curRowIndex] = -1;
                 el_rowIndex [curRowIndex] = -1;
@@ -438,7 +458,7 @@ void paru_finalize (paru_matrix *paruMatInfo, Int f, Int start_fac,
 
 
             } 
-//#endif
+            //#endif
             PRLEVEL (1, ("%% RESET elRow[%ld]=%ld \n",e,  elRow[e]));
             elRow [e] = -1;
             PRLEVEL (1, ("%% After SET elRow[%ld]=%ld \n",e,  elRow[e]));
@@ -516,10 +536,14 @@ void paru_finalize (paru_matrix *paruMatInfo, Int f, Int start_fac,
     p = 0;
     //if(f == LUsym-> nf -2)
         PRLEVEL (p, ("%% child_FA=%ld noChild_FA=%ld"
-                    "  child_col_PA=%ld noChild_col_PA=%ld\n" 
-                    "  child_row_PA=%ld noChild_row_PA=%ld\n" ,
-                    child_FA, noChild_FA, child_col_PA, 
-                    noChild_col_PA, child_row_PA, noChild_row_PA 
+                    "  child_colPA=%ld noChild_colPA=%ld\n" 
+                    "  elRow_child_colPA=%ld elRow_noChild_colPA=%ld\n" 
+                    "  child_rowPA=%ld noChild_rowPA=%ld\n" 
+                    "  elRow_child_rowPA=%ld elRow_noChild_rowPA=%ld\n" ,
+                    child_FA, noChild_FA, child_colPA, noChild_colPA, 
+                    elRow_child_colPA, elRow_noChild_colPA, 
+                    child_rowPA, noChild_rowPA,
+                    elRow_child_rowPA, elRow_noChild_rowPA 
                     ));
 
 #endif
