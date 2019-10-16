@@ -159,7 +159,7 @@ void paru_finalize (paru_matrix *paruMatInfo, Int f, Int start_fac,
             Int *el_colIndex = colIndex_pointer (el);
             Int *el_rowIndex = rowIndex_pointer (el);
             Int *rowRelIndex = relRowInd (el);
-            Int *colRelIndex    = relColInd (el);
+//          Int *colRelIndex    = relColInd (el);
 
             if (el_colIndex [curColIndex] < 0 ){ //already assembled somewhere
                 continue;  
@@ -402,6 +402,7 @@ void paru_finalize (paru_matrix *paruMatInfo, Int f, Int start_fac,
 
 #ifndef NDEBUG            
                 p = 1;
+
                 PRLEVEL (1, ("%% Before row assembly: \n" ));
                 if (p <= 0 ){
                     paru_print_element (paruMatInfo, e);
