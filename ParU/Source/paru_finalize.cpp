@@ -330,8 +330,11 @@ void paru_finalize (paru_matrix *paruMatInfo, Int f, Int start_fac,
         }
 #endif
 
-        for (Int i = 0; i < numTuple; i++){
-            paru_Tuple curTpl = listRowTuples [i];
+        // for (Int i = 0; i < numTuple; i++){
+        //     paru_Tuple curTpl = listRowTuples [i];
+        Int pdst = 0, psrc;
+        for (psrc = 0; psrc < numTuple; psrc ++){
+            paru_Tuple curTpl = listRowTuples [psrc];
             Int e = curTpl.e;
 #ifndef NDEBUG
             f2++;
@@ -341,12 +344,13 @@ void paru_finalize (paru_matrix *paruMatInfo, Int f, Int start_fac,
                 //Not any of descendents; clear elRow if changed not to mangle
                 //with other's computation
                 elRow [e] = -1;
+                listRowTuples [pdst++] = curTpl; //keeping the tuple
                 continue;
             }
 
             paru_Element *el = elementList[e];
             if (el == NULL) continue;
- 
+
             Int curRowIndex = curTpl.f;
             Int *el_rowIndex = rowIndex_pointer (el);
 
@@ -355,36 +359,26 @@ void paru_finalize (paru_matrix *paruMatInfo, Int f, Int start_fac,
                 continue;  
             }
 
-            double *el_Num = numeric_pointer (el);
             PRLEVEL (1, ("%% elCol[%ld]=%ld ",e, elCol[e]));
 
-            //#if 0
+            //#if 0 // not do row assembly at all
+
             if (elCol [e] == 0){ 
                 //all the rows are in CB
 
-                Int mEl = el->nrows;
-                Int nEl = el->ncols;
-
-                Int *el_colIndex = colIndex_pointer (el);
-                Int *rowRelIndex = relRowInd (el);
-                Int *colRelIndex    = relColInd (el);
-
-
                 ASSERT (el_rowIndex[curRowIndex] == r);
                 ASSERT (curRowIndex < mEl);
-
-
                 ASSERT (elRow[e] != 0);
 
 #ifndef NDEBUG            
                 p = 1;
-
                 PRLEVEL (1, ("%% Before row assembly: \n" ));
                 if (p <= 0 ){
                     paru_print_element (paruMatInfo, e);
                     paru_print_element (paruMatInfo, el_ind);
                 }
 #endif
+                Int *colRelIndex    = relColInd (el);
                 if(el->cValid !=  time_f){
                     /* Update colRelIndex	 */
                     PRLEVEL (1, ("%% update column relative index %ld\n"
@@ -400,6 +394,11 @@ void paru_finalize (paru_matrix *paruMatInfo, Int f, Int start_fac,
 #endif
                     el->cValid =  time_f;
                 }
+
+                double *el_Num = numeric_pointer (el);
+                Int mEl = el->nrows;
+                Int nEl = el->ncols;
+
                 assemble_row (el_Num, cur_Numeric, mEl, nEl, 
                         curFr->nrows, curRowIndex , k-fp, colRelIndex );
 #ifndef NDEBUG            
@@ -423,6 +422,7 @@ void paru_finalize (paru_matrix *paruMatInfo, Int f, Int start_fac,
                         noChild_colPA++ ;
                 }
 #endif
+                Int *rowRelIndex = relRowInd (el);
                 rowRelIndex [curRowIndex] = -1;
                 el_rowIndex [curRowIndex] = -1;
                 el->nrowsleft --;
@@ -435,53 +435,51 @@ void paru_finalize (paru_matrix *paruMatInfo, Int f, Int start_fac,
 
 
             } 
+            else
+                listRowTuples [pdst++] = curTpl; //keeping the tuple
             //#endif
             PRLEVEL (1, ("%% RESET elRow[%ld]=%ld \n",e,  elRow[e]));
             elRow [e] = -1;
             PRLEVEL (1, ("%% After SET elRow[%ld]=%ld \n",e,  elRow[e]));
-            }
-
         }
+        curRowTupleList->numTuple = pdst;
+
+    }
 
 
-        /********************* 3rd path: clearing column tuples and uncheck *******/
-        for (Int k = 0; k < colCount; k++){
-            Int c = fcolList [k];   //non pivotal column list
-            tupleList *curColTupleList = &ColList[c];
-            Int numTuple = curColTupleList->numTuple;
-            ASSERT (numTuple >= 0);
-            paru_Tuple *listColTuples = curColTupleList->list;
+    /********************* 3rd path: clearing column tuples and uncheck *******/
+    for (Int k = 0; k < colCount; k++){
+        Int c = fcolList [k];   //non pivotal column list
+        tupleList *curColTupleList = &ColList[c];
+        Int numTuple = curColTupleList->numTuple;
+        paru_Tuple *listColTuples = curColTupleList->list;
 #ifndef NDEBUG            
-            p = 1;
-            PRLEVEL (p, ("\n %%-------->  5th: c =%ld  numTuple = %ld\n",
-                        c, numTuple));
-            if (p <= 0 ){
-                paru_print_tupleList (ColList, c);
-                paru_print_element (paruMatInfo, el_ind);
-            }
+        p = 1;
+        PRLEVEL (p, ("\n %%-------->  5th: c =%ld  numTuple = %ld\n",
+                    c, numTuple));
+        if (p <= 0 ){
+            paru_print_tupleList (ColList, c);
+            paru_print_element (paruMatInfo, el_ind);
+        }
 #endif
-            Int pdst = 0, psrc;
+        Int pdst = 0, psrc;
 
-            for (psrc = 0; psrc < numTuple; psrc ++){
-                paru_Tuple curTpl = listColTuples [psrc];
-                Int e = curTpl.e;
-                Int curColIndex = curTpl.f;
-                PRLEVEL (1, ("%% element= %ld  f =%ld \n",e, curColIndex));
+        for (psrc = 0; psrc < numTuple; psrc ++){
+            paru_Tuple curTpl = listColTuples [psrc];
+            Int e = curTpl.e;
+            Int curColIndex = curTpl.f;
+            PRLEVEL (1, ("%% element= %ld  f =%ld \n",e, curColIndex));
 
 #ifndef NDEBUG
-                f3++;
+            f3++;
 #endif
-                paru_Element *el = elementList[e];
-                if (el == NULL){
-                    PRLEVEL (1, ("%% El==NULL\n"));
-                    continue;
-                }
-                Int mEl = el->nrows;
-                Int nEl = el->ncols;
+            paru_Element *el = elementList[e];
+            if (el == NULL){
+                PRLEVEL (1, ("%% El==NULL\n"));
+                continue;
+            }
 
-                Int *el_colIndex = colIndex_pointer (el);
-            // elCol[e]= -1;
-            //el->cValid = -1;
+            Int *el_colIndex = colIndex_pointer (el);
 
             if (el_colIndex [curColIndex] < 0 ){ //it will be deleted here
                 PRLEVEL (1, ("%% psrc=%ld\n", psrc));
@@ -512,16 +510,16 @@ void paru_finalize (paru_matrix *paruMatInfo, Int f, Int start_fac,
 
     p = 0;
     //if(f == LUsym-> nf -2)
-        PRLEVEL (p, ("%% child_FA=%ld noChild_FA=%ld"
-                    "  child_colPA=%ld noChild_colPA=%ld\n" 
-                    "  elRow_child_colPA=%ld elRow_noChild_colPA=%ld\n" 
-                    "  child_rowPA=%ld noChild_rowPA=%ld\n" 
-                    "  elRow_child_rowPA=%ld elRow_noChild_rowPA=%ld\n" ,
-                    child_FA, noChild_FA, child_colPA, noChild_colPA, 
-                    elRow_child_colPA, elRow_noChild_colPA, 
-                    child_rowPA, noChild_rowPA,
-                    elRow_child_rowPA, elRow_noChild_rowPA 
-                    ));
+    PRLEVEL (p, ("%% child_FA=%ld noChild_FA=%ld"
+                "  child_colPA=%ld noChild_colPA=%ld\n" 
+                "  elRow_child_colPA=%ld elRow_noChild_colPA=%ld\n" 
+                "  child_rowPA=%ld noChild_rowPA=%ld\n" 
+                "  elRow_child_rowPA=%ld elRow_noChild_rowPA=%ld\n" ,
+                child_FA, noChild_FA, child_colPA, noChild_colPA, 
+                elRow_child_colPA, elRow_noChild_colPA, 
+                child_rowPA, noChild_rowPA,
+                elRow_child_rowPA, elRow_noChild_rowPA 
+                ));
 
 #endif
 
