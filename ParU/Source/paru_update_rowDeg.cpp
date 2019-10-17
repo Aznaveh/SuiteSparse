@@ -97,7 +97,6 @@ void paru_update_rowDeg ( Int panel_num,  Int row_end, Int f, Int *next,
 
     Int *isColInCBcolSet = Work -> colSize;
     Int colMark = Work -> colMark;
-    Int m = paruMatInfo-> m;
     Int n = paruMatInfo-> n;
 
     if (colMark < 0) {  // in rare case of overflow
@@ -127,7 +126,6 @@ void paru_update_rowDeg ( Int panel_num,  Int row_end, Int f, Int *next,
         PRLEVEL (1, ("%% 4: numTuple = %ld\n", numTuple));
 
 
-
         Int pdst = 0, psrc;
         for (psrc = 0; psrc < numTuple; psrc ++){
         //for (Int i = 0; i < numTuple; i++){
@@ -145,20 +143,20 @@ void paru_update_rowDeg ( Int panel_num,  Int row_end, Int f, Int *next,
 
             if (el == NULL) continue;
 
-            Int mEl = el->nrows;
             Int nEl = el->ncols;
-            Int *el_rowIndex = rowIndex_pointer (el);
-            Int *el_colIndex = colIndex_pointer (el);
-            Int *colRelIndex = relColInd (el);
-            Int *rowRelIndex = relRowInd (el);
-
+            //Int *el_rowIndex = rowIndex_pointer (el);
+            Int *el_rowIndex = (Int*)(el+1)+nEl;
             if (el_rowIndex [curRowIndex] < 0 ) continue;
+
+            Int mEl = el->nrows;
+            //Int *rowRelIndex = relRowInd (el);
+            Int *rowRelIndex = (Int*)(el+1) + 2*nEl + mEl;
+            rowRelIndex [curTpl.f] = curFsRow;
 
             listRowTuples [pdst++] = curTpl; //keeping the tuple
 
             ASSERT (el_rowIndex[curRowIndex] == curFsRow);
 
-            rowRelIndex [curTpl.f] = curFsRow;
 
             if(el->cValid !=  pMark){// an element never seen before
                 el->cValid = pMark;
@@ -178,6 +176,13 @@ void paru_update_rowDeg ( Int panel_num,  Int row_end, Int f, Int *next,
                 //   elRow [e]--;
                 continue;
             }
+
+            //Int *el_colIndex = colIndex_pointer (el);
+            Int *el_colIndex = (Int*)(el+1);
+
+            //Int *colRelIndex = relColInd (el);
+            Int *colRelIndex = (Int*)(el+1) + mEl + nEl;
+
 
             PRLEVEL (1, ("%% element= %ld  nEl =%ld \n",e, nEl));
             for (Int cEl = 0; cEl < nEl; cEl++){
@@ -317,12 +322,12 @@ void paru_update_rowDeg ( Int panel_num,  Int row_end, Int f, Int *next,
             if (p <= 0)
                 paru_print_element (paruMatInfo, e);
 #endif
-            Int curColIndex = curTpl.f;
             paru_Element *el = elementList[e];
             if (el == NULL) continue;
-            Int *el_colIndex = colIndex_pointer (el);
 
-            Int *rowRelIndex = relRowInd (el);
+            Int curColIndex = curTpl.f;
+            //Int *el_colIndex = colIndex_pointer (el);
+            Int *el_colIndex = (Int*)(el+1);
 
             if (el_colIndex [curColIndex] < 0 ){
                 continue;  
@@ -418,7 +423,6 @@ void paru_update_rowDeg ( Int panel_num,  Int row_end, Int f, Int *next,
             paru_Element *el = elementList[e];
             if (el == NULL) {continue;}
 
-            Int *el_colIndex = colIndex_pointer (el);//pointers to row index
             Int *el_rowIndex = rowIndex_pointer (el);
 
             if (el_rowIndex [curRowIndex] < 0 ){
@@ -479,4 +483,4 @@ void paru_update_rowDeg ( Int panel_num,  Int row_end, Int f, Int *next,
         PRLEVEL (1, ("%% Finalized counters r1=%ld r2=%ld r3=%ld sum=%ld\n", 
                     r1, r2, r3, r1+r2+r3));
 
-    }
+}

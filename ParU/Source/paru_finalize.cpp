@@ -47,7 +47,8 @@ void paru_finalize (paru_matrix *paruMatInfo, Int f, Int start_fac,
 
     paru_Element **elementList = paruMatInfo->elementList;
     paru_Element *curFr = elementList[el_ind]; 
-    Int rowCount= curFr->nrows + fp;
+    Int curFrNrows = curFr->nrows;
+    Int rowCount= curFrNrows + fp;
     Int colCount = curFr->ncols;
 
     Int *fcolList = paruMatInfo->fcolList[f] ;
@@ -58,7 +59,9 @@ void paru_finalize (paru_matrix *paruMatInfo, Int f, Int start_fac,
     Int time_f = ++paruMatInfo->time_stamp[f]; //making all the markings invalid
 
 
-    double *cur_Numeric = numeric_pointer (curFr);
+    // double *cur_Numeric = numeric_pointer (curFr);
+    double *cur_Numeric = 
+        (double*)((Int*)(curFr+1) + 2*colCount + 2*curFrNrows);
     /**************************************************************************/
 
 #ifndef NDEBUG
@@ -86,7 +89,7 @@ void paru_finalize (paru_matrix *paruMatInfo, Int f, Int start_fac,
 
         double *el_Num = numeric_pointer (el);
         assemble_all (el_Num, cur_Numeric,
-                el->nrows, el->ncols, curFr->nrows,
+                el->nrows, el->ncols, curFrNrows,
                 rowRelIndex, colRelIndex);
         // delete e
         Int tot_size = sizeof(paru_Element) +
@@ -148,7 +151,9 @@ void paru_finalize (paru_matrix *paruMatInfo, Int f, Int start_fac,
             if (el == NULL) continue;
 
 
-            Int *el_colIndex = colIndex_pointer (el);
+            //Int *el_colIndex = colIndex_pointer (el);
+            Int *el_colIndex = (Int*)(el+1);
+            
             if (el_colIndex [curColIndex] < 0 ){ //already assembled somewhere
                 continue;  
             }
@@ -198,7 +203,7 @@ void paru_finalize (paru_matrix *paruMatInfo, Int f, Int start_fac,
                     Int *colRelIndex = (Int*)(el+1) + mEl + nEl;
 
 
-                    assemble_all (el_Num, cur_Numeric, mEl, nEl, curFr->nrows,
+                    assemble_all (el_Num, cur_Numeric, mEl, nEl, curFrNrows,
                             rowRelIndex, colRelIndex);
                     // delete e
                     Int tot_size = sizeof(paru_Element) +
@@ -236,7 +241,7 @@ void paru_finalize (paru_matrix *paruMatInfo, Int f, Int start_fac,
                     for(Int i=0; i < el->nrows; i++){
                         PRLEVEL (1, ("%% rowRelIndex[%ld] =%ld\t", i,
                                     rowRelIndex [i]));
-                        ASSERT(rowRelIndex [i] < curFr->nrows);
+                        ASSERT(rowRelIndex [i] < curFrNrows);
                         PRLEVEL (1,("\n"));
                     }
 #endif
@@ -254,9 +259,9 @@ void paru_finalize (paru_matrix *paruMatInfo, Int f, Int start_fac,
                 }
 
                 PRLEVEL (p, ("%%colCount=%ld k=%ld", colCount, k));
-                PRLEVEL (p, ("%%curFr->nrows=%ld ", curFr->nrows));
+                PRLEVEL (p, ("%%curFr->nrows=%ld ", curFrNrows));
                 PRLEVEL (p, ("%% cur_Numeric=%2.4lf\n",
-                            *(cur_Numeric+k*curFr->nrows)));
+                            *(cur_Numeric+k*curFrNrows)));
 #endif
                 //Int *rowRelIndex = relRowInd (el);
                 Int *rowRelIndex = (Int*)(el+1) + 2*nEl +mEl;
@@ -265,7 +270,7 @@ void paru_finalize (paru_matrix *paruMatInfo, Int f, Int start_fac,
                 Int *colRelIndex = (Int*)(el+1) + mEl + nEl;
 
                 assemble_col (el_Num+curColIndex*mEl,
-                        cur_Numeric+k*curFr->nrows, mEl, rowRelIndex);
+                        cur_Numeric+k*curFrNrows, mEl, rowRelIndex);
                 colRelIndex [curColIndex] = -1;
                 el_colIndex [curColIndex] = -1;
                 el->ncolsleft --;
@@ -370,7 +375,6 @@ void paru_finalize (paru_matrix *paruMatInfo, Int f, Int start_fac,
 
             PRLEVEL (1, ("%% elCol[%ld]=%ld ",e, elCol[e]));
 
-            //#if 0 // not do row assembly at all
 
             if (elCol [e] == 0){ 
                 //all the rows are in CB
@@ -410,7 +414,7 @@ void paru_finalize (paru_matrix *paruMatInfo, Int f, Int start_fac,
                 double *el_Num = (double*)((Int*)(el+1) + 2*nEl+ 2*mEl);
 
                 assemble_row (el_Num, cur_Numeric, mEl, nEl, 
-                        curFr->nrows, curRowIndex , k-fp, colRelIndex );
+                        curFrNrows, curRowIndex , k-fp, colRelIndex );
 #ifndef NDEBUG            
                 p = 1;
                 PRLEVEL (p, ("%% after row assembly: \n" ));
@@ -536,7 +540,7 @@ void paru_finalize (paru_matrix *paruMatInfo, Int f, Int start_fac,
 #endif
 
     // free the sorting space if allocated
-    paru_free ( 2*curFr->nrows, sizeof(Int), curFr->rWork, cc); 
+    paru_free ( 2*curFrNrows, sizeof(Int), curFr->rWork, cc); 
     curFr->rWork = NULL;
     paru_free ( 2*curFr->ncols, sizeof(Int), curFr->cWork, cc); 
     curFr->cWork = NULL;
