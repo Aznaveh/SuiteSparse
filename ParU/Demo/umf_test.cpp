@@ -68,7 +68,10 @@ int main (int argc, char **argv)
 
 
     for (Int i = 0; i < nf; i++) {
-        paru_front (paruMatInfo, i, cc);
+        if (paru_front (paruMatInfo, i, cc)){
+            printf ("some problem\n");
+            break;
+        }
     }
     double my_time = omp_get_wtime() - my_start_time;
     paruMatInfo->my_time = my_time;
@@ -78,7 +81,6 @@ int main (int argc, char **argv)
 
     //~~~~~~~~~~~~~~~~~~~Calling umfpack~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     
-    double umf_start_time = omp_get_wtime();
     
     double status,   // Info [UMFPACK_STATUS] 
     Info[UMFPACK_INFO],// Contains statistics about the symbolic analysis
@@ -95,6 +97,8 @@ int main (int argc, char **argv)
     Int m = A->nrow;
     Int n = A->ncol;
     void *Symbolic, *Numeric;  // Output argument in umf_dl_symbolc;
+
+    double umf_start_time = omp_get_wtime();
     status = umfpack_dl_symbolic (n, n, Ap, Ai, Ax, &Symbolic,
             Control, Info) ;
     if (status < 0)
@@ -113,6 +117,8 @@ int main (int argc, char **argv)
     }
 
     double umf_time = omp_get_wtime() - umf_start_time;
+    umfpack_dl_free_symbolic (&Symbolic) ;
+    umfpack_dl_free_numeric (&Numeric) ;
 
     paruMatInfo->umf_time = umf_time;
 

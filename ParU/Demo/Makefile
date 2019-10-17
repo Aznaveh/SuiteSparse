@@ -27,9 +27,11 @@ run:
 	./umfout < ../Matrix/b1_ss.mtx  	#7x7
 #	./umfout < ../Matrix/ParUTst/tmp.mtx
 
-VGFLAGS =  --leak-check=yes\
-		   --log-file="valgrindlogfile.log"\
-		   --track-origins=yes
+			#leak-check=yes or full
+VGFLAGS =  --leak-check=yes  --log-file="valgrindlogfile.log"\
+		   --track-origins=yes\
+		   #--show-leak-kinds=all
+
 
 val:
 

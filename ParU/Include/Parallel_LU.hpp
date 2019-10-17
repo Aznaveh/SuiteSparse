@@ -388,7 +388,7 @@ Int paru_remove_rowTuple(tupleList *RowList, Int row, Int t);
 // older version does not include row degree update after each panel
 //void paru_assemble(paru_matrix *paruMatInfo, Int f, cholmod_common *cc);
 //newer version
-void paru_front (paru_matrix *paruMatInfo, Int f, cholmod_common *cc);
+int paru_front (paru_matrix *paruMatInfo, Int f, cholmod_common *cc);
 
 
 Int paru_dgetrf (double *F, Int *frowList, Int m, Int n, BLAS_INT *ipiv);
