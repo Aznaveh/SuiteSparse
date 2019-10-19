@@ -50,7 +50,7 @@ profile:
 #	./prof < ../Matrix/west0067.mtx 
 #	gprof -b prof gmon.out > analysis.txt
 
-#	valgrind	--tool=callgrind -v ./prof< ../Matrix/west0067.mtx
+	valgrind	--tool=callgrind -v ./prof< ../Matrix/west0067.mtx
 #	valgrind	--tool=callgrind -v ./prof< ../Matrix/ParUTst/tmp.mtx
 
 purge: distclean

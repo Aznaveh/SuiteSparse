@@ -40,7 +40,7 @@ paru_symbolic *paru_analyze
     }
 
 
-    Int  anz, rjsize ; 
+    Int  anz; 
 
     Int *Ap = (Int*) A->p;
     Int *Ai = (Int*) A->i;
@@ -48,7 +48,7 @@ paru_symbolic *paru_analyze
     Int m = A->nrow;
     Int n = A->ncol;
 
-    // Initializaing pointers with NULL; just in case for an early release
+    // Initializaing pointers with NULL; just in case for an early exit 
     // not to free an uninitialized space
     LUsym->Chain_start = LUsym->Chain_maxrows = LUsym->Chain_maxcols = NULL;
     LUsym->Parent = LUsym->Super = LUsym->Child = LUsym->Childp = NULL;
@@ -353,15 +353,12 @@ paru_symbolic *paru_analyze
     LUsym->Chain_maxrows = Chain_maxrows;
     LUsym->Chain_maxcols = Chain_maxcols;
     Int *Qfill =  LUsym->Qfill = Qinit;
-    //    rjsize =  LUsym->rjsize = QRsym->rjsize;
-    //
 
     PRLEVEL (0, ("%% A  is  %ld x %ld \n",m, n ));
     PRLEVEL (-1, ("LU = zeros(%ld,%ld);\n",m, n ));
     PRLEVEL (-1, ("npivots =[]; \n" ));
     PRLEVEL (-1, ("S = zeros(%ld,%ld); %% n1 = %ld\n",m, n, n1 ));
     PRLEVEL (0, ("%% nf=%ld\n",nf ));
-    //    PRLEVEL (0, ("%% anz = %ld  rjsize=%ld\n", anz, rjsize));
     //
     /* ---------------------------------------------------------------------- */
     /*           Fixing Parent and computing Children datat structure         */

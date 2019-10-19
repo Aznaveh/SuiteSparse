@@ -115,7 +115,7 @@ void paru_update_rowDeg ( Int panel_num,  Int row_end, Int f, Int *next,
 
     tupleList *RowList = paruMatInfo->RowList;
     for (Int i = j1; i < j2; i++){
-        Int curFsRowIndex =(Int) i; //current fully summed row index
+        Int curFsRowIndex = i; //current fully summed row index
         Int curFsRow = frowList [i];
         PRLEVEL (1, ("%% 4: curFsRowIndex = %ld\n", curFsRowIndex));
         PRLEVEL (1, ("%% curFsRow =%ld\n", curFsRow));
@@ -173,7 +173,6 @@ void paru_update_rowDeg ( Int panel_num,  Int row_end, Int f, Int *next,
 #endif
             }
             else {  //already added to pivotal rows
-                //   elRow [e]--;
                 continue;
             }
 
@@ -418,10 +417,10 @@ void paru_update_rowDeg ( Int panel_num,  Int row_end, Int f, Int *next,
 #endif
             Int curRowIndex = curTpl.f;
 
-            if(e < 0 || curRowIndex < 0){ continue;}
+            if(e < 0 || curRowIndex < 0) continue;
 
             paru_Element *el = elementList[e];
-            if (el == NULL) {continue;}
+            if (el == NULL) continue;
 
             Int *el_rowIndex = rowIndex_pointer (el);
 
@@ -450,6 +449,7 @@ void paru_update_rowDeg ( Int panel_num,  Int row_end, Int f, Int *next,
 
                 PRLEVEL (1, ("%%seen before: elRow[e]=%ld \n", elRow[e]));
             }
+#if 0
 
             if (elRow [e] == 0) {
                 
@@ -460,6 +460,7 @@ void paru_update_rowDeg ( Int panel_num,  Int row_end, Int f, Int *next,
                     *next = e;
                 }
             }
+#endif
 
 
         }

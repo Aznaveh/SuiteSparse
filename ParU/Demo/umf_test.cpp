@@ -41,7 +41,6 @@ int main (int argc, char **argv)
     }
 
     //~~~~~~~~~~~~~~~~~~~Starting computation~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    double my_start_time = omp_get_wtime();
 
     LUsym = paru_analyze (A, cc);
     if (LUsym == NULL) {
@@ -49,6 +48,7 @@ int main (int argc, char **argv)
     }
 
 
+    double my_start_time = omp_get_wtime();
     int scale = 0;
     if (argc == 3){
         scale = atoi(argv[2]);
@@ -82,6 +82,7 @@ int main (int argc, char **argv)
     //~~~~~~~~~~~~~~~~~~~Calling umfpack~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     
     
+    double umf_start_time = omp_get_wtime();
     double status,   // Info [UMFPACK_STATUS] 
     Info[UMFPACK_INFO],// Contains statistics about the symbolic analysis
 
@@ -90,6 +91,7 @@ int main (int argc, char **argv)
     // passed NULL it will use the defaults
     umfpack_dl_defaults (Control) ;
     Control [UMFPACK_ORDERING] = UMFPACK_ORDERING_METIS;
+    Control [UMFPACK_STRATEGY] =   UMFPACK_STRATEGY_UNSYMMETRIC;
 
     Int *Ap = (Int*) A->p;
     Int *Ai = (Int*) A->i;
@@ -98,7 +100,6 @@ int main (int argc, char **argv)
     Int n = A->ncol;
     void *Symbolic, *Numeric;  // Output argument in umf_dl_symbolc;
 
-    double umf_start_time = omp_get_wtime();
     status = umfpack_dl_symbolic (n, n, Ap, Ai, Ax, &Symbolic,
             Control, Info) ;
     if (status < 0)
