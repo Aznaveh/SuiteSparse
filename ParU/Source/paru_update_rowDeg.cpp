@@ -110,6 +110,8 @@ void paru_update_rowDeg ( Int panel_num,  Int row_end, Int f, Int *next,
 
 #ifndef NDEBUG
     std::set<Int> stl_colSet;
+    for (Int i=0 ; i < past_col; i ++)
+        stl_colSet.insert( fcolList[i] );
     std::set<Int>::iterator it;
 #endif  
 
@@ -164,9 +166,7 @@ void paru_update_rowDeg ( Int panel_num,  Int row_end, Int f, Int *next,
                 if (el->cValid >  pMark)
                     PRLEVEL (1, ("%%pMark=%ld  cVal= %ld\n", 
                                 pMark, el->cValid));
-#endif    
                 ASSERT(el->cValid <= pMark);
-#ifndef NDEBUG
                 if ( elCol [e] >= elCMark )
                     PRLEVEL (1, ("%% element %ld can be eaten wholly\n",e));
                 //And the rest of e is in U part 
@@ -186,7 +186,7 @@ void paru_update_rowDeg ( Int panel_num,  Int row_end, Int f, Int *next,
             PRLEVEL (1, ("%% element= %ld  nEl =%ld \n",e, nEl));
             for (Int cEl = 0; cEl < nEl; cEl++){
                 Int curCol = el_colIndex [cEl]; 
-                PRLEVEL (1, ("%% curCol =%ld\n", curCol));
+                PRLEVEL (0, ("%% curCol =%ld\n", curCol));
                 ASSERT (curCol < n);
 
                 if (curCol < 0 )  //already deleted
@@ -195,14 +195,18 @@ void paru_update_rowDeg ( Int panel_num,  Int row_end, Int f, Int *next,
                 if (curCol < col2 && curCol >= col1 )  /*is a pivotal col */ 
                     continue;
 #ifndef NDEBUG
+                p=0;
                 stl_colSet.insert (curCol);
+                for (it = stl_colSet.begin(); it != stl_colSet.end(); it++)
+                    PRLEVEL (p, ("%@  %ld", *it));
+
 #endif
-                PRLEVEL (1, ("%% %p ---> isColInCBcolSet[%ld]=%ld\n", 
+                PRLEVEL (0, ("%% %p ---> isColInCBcolSet[%ld]=%ld\n", 
                             isColInCBcolSet+curCol, curCol,
                             isColInCBcolSet[curCol]));
 
                 if (isColInCBcolSet [curCol] < colMark  ){
-                    PRLEVEL (1, ("%% curCol = %ld colCount=%ld\n", 
+                    PRLEVEL (0, ("%% curCol = %ld colCount=%ld\n", 
                                 curCol, colCount));
                     fcolList [colCount] = curCol;
                     colRelIndex [cEl] = colCount;
@@ -216,32 +220,35 @@ void paru_update_rowDeg ( Int panel_num,  Int row_end, Int f, Int *next,
         }
 
         curRowTupleList->numTuple = pdst;
-    }
+        }
 
-    if (colCount == 0){  // there is no CB, Nothing to be done
-        Work->rowMark +=  rowCount;
-        return;
-    }
+        if (colCount == 0){  // there is no CB, Nothing to be done
+            Work->rowMark +=  rowCount;
+            return;
+        }
 
 #ifndef NDEBUG /* Checking if columns are correct */
-    p = 1;
-    PRLEVEL (p, ("%% There are %ld columns in this contribution block: \n",
-                colCount));
-    for (Int i = 0; i < colCount; i++)
-        PRLEVEL (p, ("%%  %ld", fcolList [i]));
-    PRLEVEL (p, ("\n"));
-    Int stl_colSize = stl_colSet.size();
-    if (colCount != stl_colSize){
-        PRLEVEL (p, ("%% STL %ld:\n",stl_colSize));
-        for (it = stl_colSet.begin(); it != stl_colSet.end(); it++)
-            PRLEVEL (p, ("%%  %ld", *it));
-        PRLEVEL (p, ("\n%% My Set %ld:\n",colCount));
+        p = 0;
+        PRLEVEL (p, ("%% There are %ld columns in this contribution block: \n",
+                    colCount));
         for (Int i = 0; i < colCount; i++)
             PRLEVEL (p, ("%%  %ld", fcolList [i]));
         PRLEVEL (p, ("\n"));
-    }
-    //TODO: check this assertion
-    //ASSERT (colCount == stl_colSize );
+        Int stl_colSize = stl_colSet.size();
+        if (colCount != stl_colSize){
+            PRLEVEL (p, ("%% STL %ld:\n",stl_colSize));
+            for (it = stl_colSet.begin(); it != stl_colSet.end(); it++)
+                PRLEVEL (p, ("%%  %ld", *it));
+            PRLEVEL (p, ("\n%% My Set %ld:\n",colCount));
+            for (Int i = 0; i < colCount; i++){
+                PRLEVEL (p, ("%%  %ld", fcolList [i]));
+                if ( stl_colSet.find(fcolList [i]) == stl_colSet.end() )
+                    PRLEVEL (p, ("%%\n  %ld is NOT in the list\n", fcolList [i]));
+            }
+            PRLEVEL (p, ("\n"));
+        }
+        //TODO: check this assertion
+        ASSERT (colCount == stl_colSize );
 #endif 
 
     // if the front did not grow, there is nothing else to do
