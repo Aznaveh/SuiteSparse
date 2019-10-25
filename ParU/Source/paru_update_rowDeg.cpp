@@ -109,9 +109,12 @@ void paru_update_rowDeg ( Int panel_num,  Int row_end, Int f, Int *next,
     Int *fcolList = paruMatInfo->fcolList[f];
 
 #ifndef NDEBUG
-    std::set<Int> stl_colSet;
-    for (Int i=0 ; i < past_col; i ++)
-        stl_colSet.insert( fcolList[i] );
+    std::set<Int> stl_colSet{fcolList, fcolList+past_col};
+//    std::set<Int> stl_colSet;
+//    for (Int i=0 ; i < past_col; i ++)
+//        stl_colSet.insert( fcolList[i] );
+
+
     std::set<Int>::iterator it;
 #endif  
 

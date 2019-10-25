@@ -453,7 +453,6 @@ void paru_finalize (paru_matrix *paruMatInfo, Int f, Int start_fac,
             } 
             else
                 listRowTuples [pdst++] = curTpl; //keeping the tuple
-            //#endif
             PRLEVEL (1, ("%% RESET elRow[%ld]=%ld \n",e,  elRow[e]));
             elRow [e] = -1;
             PRLEVEL (1, ("%% After SET elRow[%ld]=%ld \n",e,  elRow[e]));
