@@ -81,7 +81,7 @@ int paru_front ( paru_matrix *paruMatInfo,
 
 
     Int fm = LUsym->Fm[f];     /* Upper bound number of rows of F */ 
-    PRLEVEL (0, ("%% the size of fm is %ld\n",fm));
+    PRLEVEL (1, ("%% the size of fm is %ld\n",fm));
     Int *frowList = (Int*) paru_alloc (fm, sizeof (Int), cc);
     if (frowList == NULL ){
         printf ("%% Out of memory when tried to allocate for frowList %ld",f);
@@ -161,7 +161,7 @@ int paru_front ( paru_matrix *paruMatInfo,
                 el->rValid = time_f;
 #ifndef NDEBUG            
                 if (el->rValid >  time_f )
-                    PRLEVEL (0, ("%%time_f =%ld  rVal= %ld\n",
+                    PRLEVEL (1, ("%%time_f =%ld  rVal= %ld\n",
                                 time_f , el->rValid));
 #endif               
                 ASSERT(el->rValid <= time_f);
@@ -231,7 +231,7 @@ int paru_front ( paru_matrix *paruMatInfo,
     ASSERT (panel_num == (Int) ceil( (double)fp/panel_width) );
 
 #ifndef NDEBUG /* Checking if pivotal rows are correct */
-    Int p = 0;
+    Int p = 1;
     PRLEVEL (p, ("%%There are %ld rows in this front: \n %%", rowCount));
     for (Int i = 0; i < rowCount; i++)
         PRLEVEL (p, (" %ld", frowList [i]));
@@ -263,7 +263,7 @@ int paru_front ( paru_matrix *paruMatInfo,
         return 1;
     }
 
-    PRLEVEL (0, ("%% pivotalFront =%p \n", pivotalFront));
+    PRLEVEL (1, ("%% pivotalFront =%p \n", pivotalFront));
     ASSERT ( fm >= rowCount );
     //freeing extra space for rows
     if (rowCount != fm){
@@ -718,7 +718,7 @@ int paru_front ( paru_matrix *paruMatInfo,
 
 #ifndef NDEBUG
     //Printing the contribution block after dgemm
-    p = 0;
+    p = 1;
     PRLEVEL (p, ("\n%%After DGEMM:"));
     if (p <= 0)
         paru_print_element (paruMatInfo, eli);

@@ -21,7 +21,7 @@
 void paru_update_rowDeg ( Int panel_num,  Int row_end, Int f, Int *next,
         paru_matrix *paruMatInfo){
 
-    DEBUGLEVEL(0);
+    DEBUGLEVEL(1);
 #ifndef NDEBUG
     Int p = 1;
     static Int r1 = 0, r2 = 0, r3 = 0 ;
@@ -44,7 +44,7 @@ void paru_update_rowDeg ( Int panel_num,  Int row_end, Int f, Int *next,
 
     Int time_f = ++paruMatInfo->time_stamp[f]; //making all the markings invalid
     Int npMark = time_f; //Mark for non pivotal rows
-    Int pMark = npMark; pMark++;    //Mark for non pivotal rows
+    Int pMark = npMark; pMark++;    //Mark for pivotal rows
 
     Int colCount = paruMatInfo->fcolCount[f] ;
     Int past_col = colCount;   //saving how many colums are in this front so far
@@ -163,19 +163,31 @@ void paru_update_rowDeg ( Int panel_num,  Int row_end, Int f, Int *next,
             ASSERT (el_rowIndex[curRowIndex] == curFsRow);
 
 
-            if(el->cValid !=  pMark){// an element never seen before
-                el->cValid = pMark;
+            if(el->rValid !=  pMark){// an element never seen before
+                el->rValid = pMark;
+
+                PRLEVEL (1, ("%%first time seen elRow[%ld]=%ld \n"
+                            , e, elRow[e]));
+                if (el->rValid != npMark){
+                    elRow [e] = el ->nrowsleft - 1; //initiaze
+                }
+                else { 
+                    elRow [e]--; //already seen in a non pivotal row
+                }
+                PRLEVEL (1, ("%%changed to elRow[%ld]=%ld \n", e, elRow[e]));
 #ifndef NDEBUG            
-                if (el->cValid >  pMark)
-                    PRLEVEL (1, ("%%pMark=%ld  cVal= %ld\n", 
-                                pMark, el->cValid));
-                ASSERT(el->cValid <= pMark);
+                if (el->rValid >  pMark)
+                    PRLEVEL (1, ("%%pMark=%ld  rVal= %ld\n", 
+                                pMark, el->rValid));
+                ASSERT(el->rValid <= pMark);
                 if ( elCol [e] >= elCMark )
                     PRLEVEL (1, ("%% element %ld can be eaten wholly\n",e));
                 //And the rest of e is in U part 
 #endif
             }
             else {  //already added to pivotal rows
+                elRow [e]--;
+                PRLEVEL (1, ("%%already seen elRow[%ld]=%ld \n",e, elRow[e]));
                 continue;
             }
 
@@ -189,7 +201,7 @@ void paru_update_rowDeg ( Int panel_num,  Int row_end, Int f, Int *next,
             PRLEVEL (1, ("%% element= %ld  nEl =%ld \n",e, nEl));
             for (Int cEl = 0; cEl < nEl; cEl++){
                 Int curCol = el_colIndex [cEl]; 
-                PRLEVEL (0, ("%% curCol =%ld\n", curCol));
+                PRLEVEL (1, ("%% curCol =%ld\n", curCol));
                 ASSERT (curCol < n);
 
                 if (curCol < 0 )  //already deleted
@@ -198,18 +210,18 @@ void paru_update_rowDeg ( Int panel_num,  Int row_end, Int f, Int *next,
                 if (curCol < col2 && curCol >= col1 )  /*is a pivotal col */ 
                     continue;
 #ifndef NDEBUG
-                p=0;
+                p=1;
                 stl_colSet.insert (curCol);
                 for (it = stl_colSet.begin(); it != stl_colSet.end(); it++)
                     PRLEVEL (p, ("%@  %ld", *it));
 
 #endif
-                PRLEVEL (0, ("%% %p ---> isColInCBcolSet[%ld]=%ld\n", 
+                PRLEVEL (1, ("%% %p ---> isColInCBcolSet[%ld]=%ld\n", 
                             isColInCBcolSet+curCol, curCol,
                             isColInCBcolSet[curCol]));
 
                 if (isColInCBcolSet [curCol] < colMark  ){
-                    PRLEVEL (0, ("%% curCol = %ld colCount=%ld\n", 
+                    PRLEVEL (1, ("%% curCol = %ld colCount=%ld\n", 
                                 curCol, colCount));
                     fcolList [colCount] = curCol;
                     colRelIndex [cEl] = colCount;
@@ -231,7 +243,7 @@ void paru_update_rowDeg ( Int panel_num,  Int row_end, Int f, Int *next,
         }
 
 #ifndef NDEBUG /* Checking if columns are correct */
-        p = 0;
+        p = 1;
         PRLEVEL (p, ("%% There are %ld columns in this contribution block: \n",
                     colCount));
         for (Int i = 0; i < colCount; i++)
@@ -250,7 +262,6 @@ void paru_update_rowDeg ( Int panel_num,  Int row_end, Int f, Int *next,
             }
             PRLEVEL (p, ("\n"));
         }
-        //TODO: check this assertion
         ASSERT (colCount == stl_colSize );
 #endif 
 
@@ -445,13 +456,20 @@ void paru_update_rowDeg ( Int panel_num,  Int row_end, Int f, Int *next,
             }
             new_row_degree_bound_for_r += elCol [e] ;
 
-            if(el->rValid == pMark) continue;  //already a pivot
+            PRLEVEL (1, ("%% pMark=%ld npMark=%ld \n",pMark, npMark));
+
+            if(el->rValid == pMark){  //already a pivot
+                //ASSERT (elRow[e] == 0); //TODO: something is wrong here
+                elRow [e]--;
+                PRLEVEL (1, ("%% Pivotal elRow[%ld]=%ld \n",e, elRow[e]));
+                continue;
+            }
 
             if(el->rValid != npMark){
                 el->rValid =  npMark;
                 elRow [e] = el ->nrowsleft - 1; //initiaze
-                PRLEVEL (0, ("%%rValid=%ld \n",el->rValid));
-                PRLEVEL (0, ("%%first time seen elRow[%ld]=%ld \n",
+                PRLEVEL (1, ("%%rValid=%ld \n",el->rValid));
+                PRLEVEL (1, ("%%first time seen elRow[%ld]=%ld \n",
                             e, elRow[e]));
             }
             else{ 
