@@ -1,17 +1,9 @@
-function A = testWithID(id)
-index = ssget ;
+%function A = testWithID(id)
 
 err = 10e-9;
 s = 0;
 
-%test
-%id = 2056;
-%id = 2034; % Cholmaod error
-
-%id = 823;
-%id = 234;
-%id = 1189;
-
+index = ssget ;
 
 Prob = ssget(id);
 A = Prob.A;
@@ -21,8 +13,8 @@ name = index.Name {id} ;
 [dp,dq,dr,ds,dcc,drr] = dmperm(A);
 
 [m n] = size (A);
-%if (size(dr) ~= 2 )
-if (norm(diff(dr)-diff(ds)) ~= 0 )
+if (size(dr) ~= 2 )
+    if (norm(diff(dr)-diff(ds)) ~= 0 )
         sprintf('Unexpected')
     end
     B = A(dp,dq);
@@ -34,40 +26,30 @@ if (norm(diff(dr)-diff(ds)) ~= 0 )
         sprintf('not worth trying');
     end
 
-    mmwrite('../Matrix/ParUTst/tmp.mtx', A);
-    str = sprintf ('../Demo/umfout %d < ../Matrix/ParUTst/tmp.mtx', id );
-    system(str);
+end
 
-    %else
-    %    str1 = 'tar zvfxO ~/SuiteSparseCollection//MM/';
-    %    str2 = sprintf ('%s/%s.tar.gz %s/%s.mtx | ../Demo/umfout %d %d', ...
-    %        group, name, name, name, id, s) ;
-    %    str = strcat (str1,str2);
-    %
-    %    system(str);
-    %end
+mmwrite('../Matrix/ParUTst/tmp.mtx', A);
+intel = sprintf('. /home/grads/a/aznaveh/intel/bin/compilervars.sh intel64;');
+str = sprintf ('../Demo/umfout %d < ../Matrix/ParUTst/tmp.mtx', id );
+str = strcat(intel, str);
 
-    %%scaling now it is in the code
-    %A = sparse(diag(1./max(abs(A),[],2)))*A;
-    %mmwrite('../Matrix/ParUTst/tmp.mtx', A);
-    %str = sprintf ('../Demo/testazny %d < ../Matrix/ParUTst/tmp.mtx', id );
-    %system(str);
+system(str);
 
 
-    % Loading the results into Matlab
-    path = '../Demo/Res/';
+% Loading the results into Matlab
+path = '../Demo/Res/';
 
-    row_name = sprintf ('%d_row.txt', id);
-    rowfullname = strcat(path, row_name);
-    rowp = load (rowfullname);
-    rowp = rowp+1;
+row_name = sprintf ('%d_row.txt', id);
+rowfullname = strcat(path, row_name);
+rowp = load (rowfullname);
+rowp = rowp+1;
 
-    col_name = sprintf ('%d_col.txt', id);
-    colfullname = strcat(path, col_name);
-    colp = load (colfullname);
-    colp = colp+1;
+col_name = sprintf ('%d_col.txt', id);
+colfullname = strcat(path, col_name);
+colp = load (colfullname);
+colp = colp+1;
 
-    if(s==1)
+if(s==1)
         s_name = sprintf ('%d_scale.txt', id);
         scalefullname = strcat(path, s_name);
         Rvec = load (scalefullname);
@@ -84,8 +66,6 @@ infofullname = strcat(path, info_name);
 t_Info = load (infofullname);
 myElaps = t_Info(1)
 fromCode_umf_Elaps = t_Info(2);
-
-
 
 
 umfStart= tic;

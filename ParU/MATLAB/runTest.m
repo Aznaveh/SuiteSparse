@@ -3,10 +3,10 @@ clear
 index = ssget ;
 
 f = find (index.nrows == index.ncols & ...
-    index.sprank == index.ncols & ...
-    ~index.posdef & ...
-    index.isReal & ~index.isGraph & ...
-   index.pattern_symmetry <= .5) ;
+index.sprank == index.ncols & ...
+~index.posdef & ...
+index.isReal & ~index.isGraph & ...
+index.pattern_symmetry <= .6 ) ;
 
 [ignore, i] = sort (index.nnz (f) + index.nzero (f)) ;
 
@@ -52,11 +52,11 @@ fprintf(ff,' myflop umfflop ratio\n results = [');
 
 
 
-%for k = 1:500
 for k = 1:nmat
+%for k = 1:nmat
     id = fnew (k) 
     % some problem in these matrice
-    if ( id == 2056 ) 
+    if ( id == 2056 || id == 2034 ) 
         continue;
     end
     group = index.Group {id} ;
@@ -65,18 +65,12 @@ for k = 1:nmat
     Prob = ssget(id);
     A = Prob.A;
 
-%    if (nnz(A) < 10000)
-%        continue;
-%    end;
-
-
-
 
     [dp,dq,dr,ds,dcc,drr] = dmperm(A);
 
     [m n] = size (A);
     if (size(dr) ~= 2 )
-       %continue 
+        %continue 
         if (norm(diff(dr)-diff(ds)) ~= 0 )
             sprintf('Unexpected')
             continue;
@@ -85,40 +79,24 @@ for k = 1:nmat
         [M,I] = max(diff(dr));
         A = B(dr(I):dr(I+1)-1, dr(I):dr(I+1)-1 );
 
-%        if (nnz(A) < 10000)
-%            continue;
-%        end;
-
 
         [m n] = size (A);
         if ( m== 1)
             sprintf('not worth trying');
             continue;
         end
-
-
-        mmwrite('../Matrix/ParUTst/tmp.mtx', A);
-        str = sprintf ('../Demo/umfout %d < ../Matrix/ParUTst/tmp.mtx', id );
-        system(str);
-    else 
-       % str1 = 'tar zvfxO ~/SuiteSparseCollection//MM/';
-       % str2 = sprintf ('%s/%s.tar.gz %s/%s.mtx | ../Demo/umfout %d %d', ...
-       %     group, name, name, name, id, s) ;
-       % dostr = strcat (str1,str2);
-       % system(dostr);
-
-       mmwrite('../Matrix/ParUTst/tmp.mtx', A);
-       str = sprintf ('../Demo/umfout %d < ../Matrix/ParUTst/tmp.mtx', id );
-       system(str);
- 
-
-        %scaling
-        %A = sparse(diag(1./max(abs(A),[],2)))*A;
-        %mmwrite('../Matrix/ParUTst/tmp.mtx', A);
-        %str = sprintf ('../Demo/testazny %d < ../Matrix/ParUTst/tmp.mtx', id );
-        %system(str);
-
     end
+
+    if (nnz(A) < 1000)
+            continue;
+    end;
+
+
+    mmwrite('../Matrix/ParUTst/tmp.mtx', A);
+    intel = sprintf('. /home/grads/a/aznaveh/intel/bin/compilervars.sh intel64;');
+    str = sprintf ('../Demo/umfout %d < ../Matrix/ParUTst/tmp.mtx', id );
+    str = strcat(intel, str);
+    system(str);
 
 
     % Loading the results into Matlab
@@ -136,10 +114,10 @@ for k = 1:nmat
     colp = colp+1;
 
     if(s == 1)
-        s_name = sprintf ('%d_scale.txt', id);
-        scalefullname = strcat(path, s_name);
-        Rvec = load (scalefullname);
-        R = spdiags (Rvec, 0, m, m);
+            s_name = sprintf ('%d_scale.txt', id);
+            scalefullname = strcat(path, s_name);
+            Rvec = load (scalefullname);
+            R = spdiags (Rvec, 0, m, m);
     end
 
 
@@ -184,20 +162,20 @@ for k = 1:nmat
 
     umfflop = luflop(l,u);
 
-%%matlab format
+    %%matlab format
     fprintf(ff,'%d %d %g %g %g', id, nnz(A), myErr, umfErr, ...
-        log10(myErr/umfErr));
+    log10(myErr/umfErr));
     fprintf(ff,' %g %g %g', myElaps, umfElaps, myElaps/umfElaps);
     fprintf(ff,' %g %g %g', mynnz , umfpnnz, mynnz/umfpnnz );
     fprintf(ff,' %g %g %g\n', myflop, umfflop, myflop/umfflop);
-    
-%%csv format
-%    fprintf(ff,'%d %d %g %g %g', id, nnz(A), myErr, umfErr, ...
-%    fprintf(ff,'%d, %d, %g, %g, %g,', id, nnz(A), myErr, umfErr, ...
-%        log10(myErr/umfErr));
-%    fprintf(ff,' %g, %g, %g,', myElaps, umfElaps, myElaps/umfElaps);
-%    fprintf(ff,' %g, %g, %g,', mynnz , umfpnnz, mynnz/umfpnnz );
-%    fprintf(ff,' %g, %g, %g\n', myflop, umfflop, myflop/umfflop);
+
+    %%csv format
+    %    fprintf(ff,'%d %d %g %g %g', id, nnz(A), myErr, umfErr, ...
+    %    fprintf(ff,'%d, %d, %g, %g, %g,', id, nnz(A), myErr, umfErr, ...
+    %        log10(myErr/umfErr));
+    %    fprintf(ff,' %g, %g, %g,', myElaps, umfElaps, myElaps/umfElaps);
+    %    fprintf(ff,' %g, %g, %g,', mynnz , umfpnnz, mynnz/umfpnnz );
+    %    fprintf(ff,' %g, %g, %g\n', myflop, umfflop, myflop/umfflop);
 
 
 

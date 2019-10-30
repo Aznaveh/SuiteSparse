@@ -21,7 +21,7 @@
 void paru_update_rowDeg ( Int panel_num,  Int row_end, Int f, Int *next,
         paru_matrix *paruMatInfo){
 
-    DEBUGLEVEL(1);
+    DEBUGLEVEL(0);
 #ifndef NDEBUG
     Int p = 1;
     static Int r1 = 0, r2 = 0, r3 = 0 ;

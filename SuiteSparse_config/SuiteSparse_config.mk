@@ -72,7 +72,7 @@ SUITESPARSE_VERSION = 5.5.0
     # optimization level
     #---------------------------------------------------------------------------
 
-    OPTIMIZATION ?= -g
+    OPTIMIZATION ?= -O3
 
     #---------------------------------------------------------------------------
     # statement coverage for */Tcov
@@ -110,7 +110,7 @@ SUITESPARSE_VERSION = 5.5.0
     # instead of $(CC), $(CXX), and $(F77).  To disable this feature and
     # use the $(CC), $(CXX), and $(F77) compilers, use 'make AUTOCC=no'
 
-    AUTOCC ?= no
+    AUTOCC ?= yes
 
     ifneq ($(AUTOCC),no)
         ifneq ($(shell which icc 2>/dev/null),)
