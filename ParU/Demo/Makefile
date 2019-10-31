@@ -44,20 +44,23 @@ debug:
 	$(C) $(FLAG) -g umf_test.cpp -o umfout $(LIBS)
 	gdb ./umfout < ../Matrix/c32.mtx		#3x2 	 #OK
 
-profile:
-	$(C) $(FLAG) -g umf_test.cpp -o prof $(LIBS)
-#	$(C) -Wall -pg -O0 -no-pie umf_test.cpp -o prof $(LIBS)
-#	./prof < ../Matrix/west0067.mtx 
-#	gprof -b prof gmon.out > analysis.txt
+gprofile:
+	$(C) $(FLAG) -no-pie -O0 -g -pg umf_test.cpp -o gprof.o $(LIBS)
+	./gprof.o < ../Matrix/west0067.mtx 
+	gprof gprof.o > analysis.txt
 
-	valgrind	--tool=callgrind -v ./prof< ../Matrix/west0067.mtx
-#	valgrind	--tool=callgrind -v ./prof< ../Matrix/ParUTst/tmp.mtx
+
+vprofile:
+
+	$(C) $(FLAG) -g umf_test.cpp -o vprof $(LIBS)
+#	valgrind	--tool=callgrind -v ./vprof< ../Matrix/west0067.mtx
+	valgrind	--tool=callgrind -v ./vprof< ../Matrix/ParUTst/tmp.mtx
 
 purge: distclean
 
 distclean: clean
-	- $(RM) umfout
-	- $(RM) prof gmon.out analysis.txt callgrind.out.*
+	- $(RM) umfout analysis.txt
+	- $(RM) gprof.o vprof gmon.out analysis.txt callgrind.out.*
 	- $(RM) paneltest
 	- $(RM) *.dot pfile tfile
 	- $(RM) -r $(PURGE)
