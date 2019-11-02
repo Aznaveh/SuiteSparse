@@ -204,7 +204,8 @@ void paru_finalize (paru_matrix *paruMatInfo, Int f, Int start_fac,
 
 
                     assemble_all (el_Num, cur_Numeric, mEl, nEl, curFrNrows,
-                            rowRelIndex, colRelIndex);
+                            el->nrowsleft, el->ncolsleft, rowRelIndex, 
+                            colRelIndex);
                     // delete e
                     Int tot_size = sizeof(paru_Element) +
                         sizeof(Int)*(2*(mEl+nEl)) + sizeof(double)*nEl*mEl;

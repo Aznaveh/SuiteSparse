@@ -36,12 +36,12 @@ extern "C"
 #endif
 
 //for printing information uncomment this; to activate assertions uncomment 
-//#undef NPR    //1\\
+//#undef NPR    /*1*/
 
 //from spqr.hpp
 //Aznaveh For MATLAB OUTPUT UNCOMMENT HERE
 // uncomment the following line to turn on debugging 
-//#undef NDEBUG  //2\\
+//#undef NDEBUG  /*2*/
 
 
 // defined somewhere else
@@ -403,7 +403,7 @@ void assemble_col (const double *sR, double *dR, Int m, const Int *relRowInd);
 void assemble_row (const double *sM, double *dM, Int sm, Int sn, Int dm, Int sR, 
         Int dR, const Int *relColInd);
 void assemble_all (double *s, double *d, Int sm, Int sn, Int dm,    
-        Int *relRowInd, Int *relColInd);
+        Int smleft, Int snleft, Int *relRowInd, Int *relColInd);
 
 Int paru_trsm(double *pF, double *uPart, Int fp, Int rowCount, Int colCount);
 Int paru_dgemm(double *pF, double *uPart, double *el, Int fp, 
