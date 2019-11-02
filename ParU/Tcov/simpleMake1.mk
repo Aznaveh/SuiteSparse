@@ -1,5 +1,5 @@
 all:
-	g++    -O3 -fexceptions -fPIC -fopenmp   -I../../include  ./paru_sym_analysis.cpp -o testazny -L/users/aznaveh/Sparse/SuiteSparse/lib -L../../lib -lspqr -lsuitesparseconfig -lcholmod -lamd -lcolamd -lccolamd -lcamd -lmetis  -lm -lrt -Wl,-rpath=/users/aznaveh/Sparse/SuiteSparse/lib -llapack -lopenblas 
+	g++  -O3 -fexceptions -fPIC -fopenmp   -I../../include  ./paru_sym_analysis.cpp -o testazny -L/users/aznaveh/Sparse/SuiteSparse/lib -L../../lib -lspqr -lsuitesparseconfig -lcholmod -lamd -lcolamd -lccolamd -lcamd -lmetis  -lm -lrt -Wl,-rpath=/users/aznaveh/Sparse/SuiteSparse/lib -llapack -lopenblas 
 run:
 #	./testazny < ../Matrix/c2.mtx
 #	./testazny < ../Matrix/Franz6_id1959_aug.mtx

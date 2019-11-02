@@ -19,6 +19,25 @@ LIBS = $(CLIB) $(FLIB) $(TBB) $(GPULIB)
 FLAG = -Wno-write-strings 
 #-O0 -fsanitize=address -g
 
+# this test requires gcc
+CC = gcc
+CXX= g++
+#BLAS = -lrefblas
+LAPACK = -llapack
+
+# for statement coverage (with gcov; see go) and picky compiler warnings
+CF = -pg \
+	-O0 -g -fprofile-arcs -ftest-coverage \
+	-Wall -W -Wshadow -Winline -Wno-unused-parameter \
+	-Wredundant-decls -Wdisabled-optimization \
+	-fexceptions -fopenmp
+
+# Using an optimized BLAS can cause problems in Valgrind
+# FLIB = -llapack_plain -lblas_plain -lgfortran
+# FLIB = -llapack_plain -lblas_plain -lgfortran -lg2c
+  FLIB = $(LAPACK) $(BLAS)
+
+
 all:
 	$(C) $(FLAG) umf_test.cpp -o umfout $(LIBS)
 
@@ -53,8 +72,8 @@ gprofile:
 vprofile:
 
 	$(C) $(FLAG) -g umf_test.cpp -o vprof $(LIBS)
-#	valgrind	--tool=callgrind -v ./vprof< ../Matrix/west0067.mtx
-	valgrind	--tool=callgrind -v ./vprof< ../Matrix/ParUTst/tmp.mtx
+	valgrind	--tool=callgrind -v ./vprof< ../Matrix/west0067.mtx
+#	valgrind	--tool=callgrind -v ./vprof< ../Matrix/ParUTst/tmp.mtx
 
 tcov:
 	#$(C) $(FLAG) -Wall -fprofile-arcs -ftest-coverage umf_test.cpp -o tcov $(LIBS)
@@ -77,4 +96,5 @@ clean:
 
 az:
 	(cd ..; $(MAKE) )
-	(cd Demo; $(MAKE) run )
+	($(MAKE) )
+	(cd Tcov; $(MAKE) run )
