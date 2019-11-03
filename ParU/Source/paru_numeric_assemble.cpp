@@ -54,22 +54,101 @@ void assemble_all (double *s, double *d,   //source and destination
 {
     DEBUGLEVEL (0);
     Int ii = 0, jj = 0; // row/cols visited sofar
-    for (Int j = 0; j < sn; j++) {
-        Int rj =relColInd[j];
-        if (rj  >= 0 ){  // If column is valid
-            jj++;
-            for (Int i = 0; i < sm; i++) {
-                Int ri =relRowInd[i] ;
-                if (ri >= 0 ){  // If row is valid
-                    ii++;
-                    d [rj*dm + ri ] += s[sm*j + i];
 
-                    if ( ii == smleft) 
-                        break;
+    if (snleft == 1 || sm == 1) {
+        for (Int j = 0; j < sn; j++) {
+            Int rj = relColInd[j];
+            if (rj  >= 0 ){  // If column is valid
+                jj++;
+                for (Int i = 0; i < sm; i++) {
+                    Int ri =relRowInd[i] ;
+                    if (ri >= 0 ){  // If row is valid
+                        ii++;
+                        PRLEVEL (1, ("%% s [%ld] =%2.5lf \n",
+                                    sm*j+i, s [sm*j+i] ));
+                        PRLEVEL (1, ("%% d [%ld] =%2.5lf \n", 
+                                    rj*dm+ri, d [rj*dm+ri]));
+                        d [rj*dm + ri ] += s[sm*j + i];
+                        PRLEVEL (1, ("%% _dM [%ld] =%2.5lf \n", 
+                                    rj*dm+ri, d [rj*dm+ri]));
+
+                        if ( ii == smleft) 
+                            break;
+                    }
+                }
+                if ( jj == snleft) 
+                    break;
+            }
+        }
+    }
+    else { 
+        Int tempRel[smleft]; 
+        // C99 keeping the row indices after fisrt iteration
+
+        //first column
+        Int j = 0;
+        for (; j < sn; j++) {
+            Int rj = relColInd[j];
+            if (rj  >= 0 ){  // If column is valid
+                jj++;
+                for (Int i = 0; i < sm; i++) {
+                    Int ri = relRowInd[i] ;
+                    if (ri >= 0 ){  // If row is valid
+
+                        ASSERT (ii < smleft);
+                        tempRel[ii] = i;
+                        ii++;
+                        PRLEVEL (1, ("%% i=%ld, j=%ld ri=%ld ii=%ld"
+                                    "first col\n", i, j,  ri,ii));
+
+                        PRLEVEL (1, ("%% s [%ld] =%2.5lf \n",
+                                    sm*j+i, s [sm*j+i] ));
+                        PRLEVEL (1, ("%% d [%ld] =%2.5lf \n", 
+                                    rj*dm+ri, d [rj*dm+ri]));
+
+                        d [rj*dm + ri ] += s[sm*j + i];
+
+                        PRLEVEL (1, ("%% _dM [%ld] =%2.5lf \n", 
+                                    rj*dm+ri, d [rj*dm+ri]));
+
+
+                        if ( ii == smleft) 
+                            break;
+                    }
+                }
+                if ( jj == 1) 
+                    break;
+            }
+        }
+
+        //rest of the columns
+        for (j++ ; j < sn; j++) {
+            Int rj = relColInd[j];
+            if (rj  >= 0 ){  // If column is valid
+                jj++;
+                for (Int ll = 0; ll < smleft; ll++) {
+                    Int i = tempRel[ll];
+                    Int ri = relRowInd[i];
+
+                        PRLEVEL (1, ("%% i=%ld, j=%ld ri=%ld ii=%ld"
+                                    "after first\n", i, j,  ri,ii));
+
+                    PRLEVEL (1, ("%% s [%ld] =%2.5lf \n",
+                                sm*j+i, s [sm*j+i] ));
+                    PRLEVEL (1, ("%% d [%ld] =%2.5lf \n", 
+                                rj*dm+ri, d [rj*dm+ri]));
+
+                    d [rj*dm + ri ] += s[sm*j + i];
+                    PRLEVEL (1, ("%% _dM [%ld] =%2.5lf \n", 
+                                rj*dm+ri, d [rj*dm+ri]));
+
+
                 }
             }
             if ( jj == snleft) 
                 break;
         }
+
     }
+
 }

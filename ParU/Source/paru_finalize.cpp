@@ -217,6 +217,17 @@ void paru_finalize (paru_matrix *paruMatInfo, Int f, Int start_fac,
                         child_FA++ ;
                     else
                         noChild_FA++ ;
+                    p = 0;
+                    if (p <= 0) {
+                        
+                        PRLEVEL (p, ("\n%%After ALL:"));
+
+                        PRLEVEL (p, ("\n%%Source%ld:",e));
+                        paru_print_element (paruMatInfo, e);
+ 
+                        PRLEVEL (p, ("\n%%Destin%ld:",el_ind));
+                        paru_print_element (paruMatInfo, el_ind);
+                    }
 
 #endif
                     elementList[e] = NULL;
@@ -228,7 +239,7 @@ void paru_finalize (paru_matrix *paruMatInfo, Int f, Int start_fac,
                     /*  Update rowRelIndex just once	 */
 
 #ifndef NDEBUG
-                    p = 1;
+                    p = 0;
                     PRLEVEL (p, ("%% update row relative element %ld\n", e ));
                     //Printing the contribution block prior index update 
                     if (p <= 0) {
@@ -252,7 +263,7 @@ void paru_finalize (paru_matrix *paruMatInfo, Int f, Int start_fac,
 #ifndef NDEBUG
                 //Printing the contribution block before 
                 //   prior blocks assembly
-                p = 1;
+                p = 0;
                 if (p <= 0){
                     PRLEVEL (p, ("\n%%Before column assembly of %ld:\n",e));
                     paru_print_element (paruMatInfo, el_ind);
@@ -471,7 +482,7 @@ void paru_finalize (paru_matrix *paruMatInfo, Int f, Int start_fac,
         Int numTuple = curColTupleList->numTuple;
         paru_Tuple *listColTuples = curColTupleList->list;
 #ifndef NDEBUG            
-        p = 1;
+        p = 0;
         PRLEVEL (p, ("\n %%-------->  5th: c =%ld  numTuple = %ld\n",
                     c, numTuple));
         if (p <= 0 ){
@@ -546,4 +557,4 @@ void paru_finalize (paru_matrix *paruMatInfo, Int f, Int start_fac,
     paru_free ( 2*curFr->ncols, sizeof(Int), curFr->cWork, cc); 
     curFr->cWork = NULL;
 
-}
+    }
