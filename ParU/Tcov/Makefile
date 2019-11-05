@@ -75,7 +75,7 @@ FLAG = -Wno-write-strings
 C = $(CXX) $(CF)  $(CHOLMOD_CONFIG) $(CONFIG_PARTITION) $(I) $(FLAG)
 #-------------------------------------------------------------------------------
 parutest: libraries $(INC) $(OBJ) 
-	$(C) $(FLAG) umf_test.cpp -o umfout $(LIBS)
+	$(C)  umf_test.cpp -o umfout $(LIBS)
 #-------------------------------------------------------------------------------
 
 paru_mem.o: ../Source/paru_mem.cpp
