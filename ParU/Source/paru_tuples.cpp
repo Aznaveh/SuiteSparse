@@ -73,28 +73,3 @@ Int paru_add_colTuple (tupleList *ColList, Int col,
     }
     return 0;
 }
-
-/*TODO I am not using remove functions so maybe delete them */
-Int paru_remove_colTuple(tupleList *ColList, Int col, Int t){
-    // pick the last tuple and insert into the one should be removed
-    DEBUGLEVEL(0);
-    tupleList *curColTupleList = &ColList[col];
-    Int  numTuple = curColTupleList -> numTuple;
-    PRLEVEL (1, ("%% cur->numTuple =%ld\n", numTuple));
-    paru_Tuple *listColTuples = curColTupleList->list;
-    listColTuples [t] = listColTuples [numTuple-1];
-    curColTupleList -> numTuple--;
-    return 0;
-}
-
-Int paru_remove_rowTuple(tupleList *RowList, Int row, Int t){
-    // pick the last tuple and insert into the one should be removed
-    DEBUGLEVEL(0);
-    tupleList *curRowTupleList = &RowList[row];
-    Int  numTuple = curRowTupleList -> numTuple;
-    PRLEVEL (1, ("%% cur->numTuple =%ld\n", numTuple));
-    paru_Tuple *listRowTuples = curRowTupleList->list;
-    listRowTuples [t] = listRowTuples [numTuple-1];
-    curRowTupleList -> numTuple--;
-    return 0;
-}
