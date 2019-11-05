@@ -31,7 +31,7 @@ void paru_update_rowDeg ( Int panel_num,  Int row_end, Int f, Int *next,
     Int panel_width = paruMatInfo->panel_width;
     paru_Element **elementList = paruMatInfo->elementList;
     work_struct *Work =  paruMatInfo->Work;
-    Int elCMark = Work -> elCMark;
+    // Int elCMark = Work -> elCMark;
 
     Int *elRow = Work -> elRow; 
     Int *elCol = Work -> elCol;
@@ -120,7 +120,9 @@ void paru_update_rowDeg ( Int panel_num,  Int row_end, Int f, Int *next,
 
     tupleList *RowList = paruMatInfo->RowList;
     for (Int i = j1; i < j2; i++){
+#ifndef NDEBUG
         Int curFsRowIndex = i; //current fully summed row index
+#endif  
         Int curFsRow = frowList [i];
         PRLEVEL (1, ("%% 4: curFsRowIndex = %ld\n", curFsRowIndex));
         PRLEVEL (1, ("%% curFsRow =%ld\n", curFsRow));
@@ -180,7 +182,7 @@ void paru_update_rowDeg ( Int panel_num,  Int row_end, Int f, Int *next,
                     PRLEVEL (1, ("%%pMark=%ld  rVal= %ld\n", 
                                 pMark, el->rValid));
                 ASSERT(el->rValid <= pMark);
-                if ( elCol [e] >= elCMark )
+                if ( elCol [e] >= Work -> elCMark )
                     PRLEVEL (1, ("%% element %ld can be eaten wholly\n",e));
                 //And the rest of e is in U part 
 #endif

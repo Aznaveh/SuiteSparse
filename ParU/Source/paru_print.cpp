@@ -34,8 +34,8 @@ void paru_print_element (paru_matrix *paruMatInfo, Int e){
     Int *el_colIndex = colIndex_pointer (curEl);
     Int *el_rowIndex = rowIndex_pointer (curEl);
 
-    Int *rel_col = relColInd (curEl);
-    Int *rel_row = relRowInd (curEl);
+    // Int *rel_col = relColInd (curEl);
+    // Int *rel_row = relRowInd (curEl);
 
     double *el_colrowNum = numeric_pointer (curEl);
 

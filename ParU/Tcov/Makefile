@@ -19,6 +19,9 @@ LIBS = $(CLIB) $(FLIB) $(TBB) $(GPULIB)
 FLAG = -Wno-write-strings 
 #-O0 -fsanitize=address -g
 
+
+print-%  : ; @echo $* = $($*)
+
 # this test requires gcc
 CC = gcc
 CXX= g++
@@ -38,10 +41,120 @@ CF = -pg \
   FLIB = $(LAPACK) $(BLAS)
 
 
-all:
+all: parutest
+	
+
+
+#-------------------------------------------------------------------------------
+INC = ../Include/Parallel_LU.hpp
+
+OBJ = \
+    paru_mem.o \
+    paru_analyze.o \
+	paru_init_rowFronts.o\
+	paru_tuples.o\
+	paru_front.o\
+	paru_factorize.o\
+	paru_create_element.o\
+	paru_numeric_assemble.o\
+	paru_trsm.o\
+	paru_dgemm.o\
+	paru_print.o\
+	paru_init_rel.o\
+	paru_update_rel_ind.o\
+	paru_update_rowDeg.o\
+	paru_finalize.o\
+	paru_write.o\
+	paru_cumsum.o
+
+$(OBJ): $(INC)
+
+I = -I ../../UMFPACK/Source -I../../UMFPACK/Include -I ../../CHOLMOD/Include\
+	-I ../../AMD/Include  -I ../../SuiteSparse_config -I../Include
+FLAG = -Wno-write-strings 
+C = $(CXX) $(CF)  $(CHOLMOD_CONFIG) $(CONFIG_PARTITION) $(I) $(FLAG)
+#-------------------------------------------------------------------------------
+parutest: libraries $(INC) $(OBJ) 
 	$(C) $(FLAG) umf_test.cpp -o umfout $(LIBS)
+#-------------------------------------------------------------------------------
+
+paru_mem.o: ../Source/paru_mem.cpp
+	$(C) -c $<
+
+#paru_sym_analyse.o: ../Source/paru_sym_analyse.cpp
+#	$(C) -c $<
+
+paru_analyze.o: ../Source/paru_analyze.cpp
+	$(C) -c $<
+
+paru_init_rowFronts.o: ../Source/paru_init_rowFronts.cpp
+	$(C) -c $<
+
+paru_tuples.o: ../Source/paru_tuples.cpp
+	$(C) -c $<
+
+#paru_assemble.o: ../Source/paru_assemble.cpp
+#	$(C) -c $<
+
+paru_front.o: ../Source/paru_front.cpp
+	$(C) -c $<
+
+paru_factorize.o: ../Source/paru_factorize.cpp
+	$(C) -c $<
+
+paru_create_element.o: ../Source/paru_create_element.cpp
+	$(C) -c $<
+
+paru_numeric_assemble.o: ../Source/paru_numeric_assemble.cpp
+	$(C) -c $<
+
+paru_trsm.o: ../Source/paru_trsm.cpp
+	$(C) -c $<
+
+paru_dgemm.o: ../Source/paru_dgemm.cpp
+	$(C) -c $<
+
+paru_print.o: ../Source/paru_print.cpp
+	$(C) -c $<
+
+paru_init_rel.o: ../Source/paru_init_rel.cpp
+	$(C) -c $<
+
+paru_update_rel_ind.o: ../Source/paru_update_rel_ind.cpp
+	$(C) -c $<
+
+paru_write.o: ../Source/paru_write.cpp
+	$(C) -c $<
+
+paru_update_rowDeg.o: ../Source/paru_update_rowDeg.cpp
+	$(C) -c $<
+
+paru_finalize.o: ../Source/paru_finalize.cpp
+	$(C) -c $<
+
+paru_cumsum.o: ../Source/paru_cumsum.cpp
+	$(C) -c $<
+
+#-------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------
+# libraries compiled without test coverage
+#-------------------------------------------------------------------------------
+
+libraries:
+	( cd ../.. && $(MAKE) metis )
+	( cd ../../SuiteSparse_config ; $(MAKE) library TCOV=yes )
+	( cd ../../AMD && $(MAKE) library TCOV=yes )
+	( cd ../../COLAMD && $(MAKE) library TCOV=yes )
+	( cd ../../CCOLAMD && $(MAKE) library TCOV=yes )
+	( cd ../../CAMD && $(MAKE) library TCOV=yes )
+	( cd ../../CHOLMOD && $(MAKE) library TCOV=yes )
+	( cd ../../UMFPACK && $(MAKE) library TCOV=yes )
+
+#-------------------------------------------------------------------------------
+#
 
 
+#-------------------------------------------------------------------------------
 run:
 	./umfout < ../Matrix/b1_ss.mtx  	#7x7
 #	./umfout < ../Matrix/ParUTst/tmp.mtx

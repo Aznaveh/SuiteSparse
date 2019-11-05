@@ -256,7 +256,7 @@ paru_matrix *paru_init_rowFronts (
      // create S = A (p,q)', or S=A(p,q) if S is considered to be in row-form
      // -------------------------------------------------------------------------
      Int *Qfill = LUsym->Qfill;
-     Int *Pinv = LUsym->Pinv;
+     // Int *Pinv = LUsym->Pinv;
      Int snz = LUsym->snz; 
      double *Sx = LUsym->Sx;
      Int *Sp = LUsym->Sp;

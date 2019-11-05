@@ -51,9 +51,10 @@ int paru_front ( paru_matrix *paruMatInfo,
     paru_Element **elementList = paruMatInfo->elementList;
     work_struct *Work =  paruMatInfo->Work;
 
-    Int elRMark = Work -> elRMark;
+    // Int elRMark = Work -> elRMark;
+    // Int elCMark = Work -> elCMark;
+    
     Int *elCol = Work -> elCol;
-    Int elCMark = Work -> elCMark;
 
     PRLEVEL (1, ("%% fp=%ld pivotal columns:clo1=%ld...col2=%ld\n", 
                 fp, col1, col2-1));
@@ -155,7 +156,7 @@ int paru_front ( paru_matrix *paruMatInfo,
             ASSERT (el_colIndex[curColIndex] == c);
 
             PRLEVEL (1, ("%%1:element= %ld elCol=%ld elCMark=%ld \n",
-                        e, elCol[e], elCMark));
+                        e, elCol[e], Work -> elCMark));
 
             if(el->rValid !=  time_f){  // an element never seen before
                 el->rValid = time_f;
@@ -576,8 +577,8 @@ int paru_front ( paru_matrix *paruMatInfo,
         ASSERT (numTuple <= m);
         paru_Tuple *listRowTuples = curRowTupleList->list;
         PRLEVEL (1, ("%% numTuple = %ld\n", numTuple));
-        for (Int i = 0; i < numTuple; i++){
-            paru_Tuple curTpl = listRowTuples [i];
+        for (Int k = 0; k < numTuple; k++){
+            paru_Tuple curTpl = listRowTuples [k];
             Int e = curTpl.e;
             paru_Element *el = elementList[e];
             if (el == NULL) continue;
@@ -700,7 +701,6 @@ int paru_front ( paru_matrix *paruMatInfo,
     Int *el_colIndex = colIndex_pointer (curEl);
     for (Int i = 0; i < colCount; ++ i) {
         el_colIndex [i] = fcolList[i];
-        paru_Tuple colTuple;
     }
     Int *el_rowIndex = rowIndex_pointer (curEl);
     for (Int i = fp; i < rowCount; ++ i) {
@@ -770,8 +770,7 @@ int paru_front ( paru_matrix *paruMatInfo,
     Work->rowMark +=  rowCount;
     rowMark = Work -> rowMark;
 
-    Work->colMark += colCount;
-    Int colMark = Work -> colMark;
+    Work-> colMark += colCount;
     /* Trying to DEBUG */ 
     Work -> elCMark += colCount;
     Work -> elRMark += colCount;

@@ -52,8 +52,9 @@ int main (int argc, char **argv)
     int scale = 0;
     if (argc == 3){
         scale = atoi(argv[2]);
-        if (scale) 
+        if (scale){ 
             PRLEVEL (1, ("The input matrix will be scaled\n"));
+        }
     }
         
     paru_matrix *paruMatInfo = paru_init_rowFronts (A, scale, LUsym, cc);
@@ -75,6 +76,7 @@ int main (int argc, char **argv)
     }
     double my_time = omp_get_wtime() - my_start_time;
     paruMatInfo->my_time = my_time;
+    paruMatInfo->umf_time = -1;
  
     //~~~~~~~~~~~~~~~~~~~End computation~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -82,7 +84,7 @@ int main (int argc, char **argv)
     //~~~~~~~~~~~~~~~~~~~Calling umfpack~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     
     
-#if 1
+#if 0
     double umf_start_time = omp_get_wtime();
     double status,   // Info [UMFPACK_STATUS] 
     Info[UMFPACK_INFO],// Contains statistics about the symbolic analysis
@@ -97,7 +99,7 @@ int main (int argc, char **argv)
     Int *Ap = (Int*) A->p;
     Int *Ai = (Int*) A->i;
     double *Ax = (double*) A->x;
-    Int m = A->nrow;
+    //Int m = A->nrow;
     Int n = A->ncol;
     void *Symbolic, *Numeric;  // Output argument in umf_dl_symbolc;
 

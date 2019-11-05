@@ -21,7 +21,6 @@ void paru_init_rel  (paru_matrix *paruMatInfo, Int f)
 
     Int *Child = LUsym->Child;
     Int *Childp = LUsym->Childp;
-    Int *snM = LUsym->super2atree;
     Int max_time = 0;
 
     PRLEVEL (1, ("%% begining=%ld end=%ld \n",Childp[f], Childp[f+1]));

@@ -50,7 +50,6 @@ Int paru_panel_factorize (double *F, Int *frowList, Int m, Int n,
     Int j2 = (j1 + panel_width < n ) ? 
         j1 + panel_width : n ;
 
-    Int num_col_panel=  j2 - j1 ;
     PRLEVEL (1, ("%% j1= %ld j2 =%ld \n", j1, j2));
     PRLEVEL (1, ("%% row_end= %ld\n", row_end));
 
@@ -58,6 +57,7 @@ Int paru_panel_factorize (double *F, Int *frowList, Int m, Int n,
     ASSERT ( row_end >= j2);
 
 #ifndef NDEBUG  // Printing the panel
+    Int num_col_panel =  j2 - j1 ;
     Int p = 1;
     PRLEVEL (p, ("%% Starting the factorization\n"));
     PRLEVEL (p, ("%% This Panel:\n"));
@@ -77,7 +77,9 @@ Int paru_panel_factorize (double *F, Int *frowList, Int m, Int n,
 
         //Initializing maximum element in the column
         Int row_max = j;
+#ifndef NDEBUG  
         Int row_deg_max = row_degree_bound[frowList[row_max]];
+#endif
 
         double maxval = F[ j*m + row_max ];
         PRLEVEL (1, ("%% before search max value= %2.4lf row_deg = %ld\n",
@@ -89,10 +91,14 @@ Int paru_panel_factorize (double *F, Int *frowList, Int m, Int n,
             PRLEVEL (1, (" deg = %ld \n", row_degree_bound[frowList[i]]));
             if (fabs (maxval) < fabs(F[j*m+i])){
                 row_max = i; 
-                row_deg_max = row_degree_bound[frowList[i]];
                 maxval = F[j*m + i];
             }
         }
+
+#ifndef NDEBUG  
+        row_deg_max = row_degree_bound[frowList[row_max]];
+#endif
+
         PRLEVEL (1, ("%% max value= %2.4lf\n", maxval));
         
         if (maxval == 0)  //no pivot found
@@ -107,7 +113,7 @@ Int paru_panel_factorize (double *F, Int *frowList, Int m, Int n,
         //find sparsest between accepteble ones
         for (Int i = j; i < row_end; i++) 
             if ( fabs(TOLER*maxval) < fabs(F[j*m+i]) &&//numerically acceptalbe
-                    row_degree_bound[frowList[i]] < row_deg_sp){     // and sparser
+                    row_degree_bound[frowList[i]] < row_deg_sp){// and sparser
                 piv = F[j*m+i];
                 row_deg_sp = row_degree_bound[frowList[i]];
                 row_sp = i;
@@ -330,10 +336,6 @@ Int paru_factorize(double *F, Int *frowList, Int rowCount, Int f,
     Int col1 = Super [f];       /* fornt F has columns col1:col2-1 */
     Int col2 = Super [f+1];
     Int fp = col2 - col1;   /* first fp columns are pivotal */ 
-
-
-    work_struct *Work =  paruMatInfo->Work;
-    Int *row_degree_bound = paruMatInfo->row_degree_bound;
 
     Int panel_width = paruMatInfo->panel_width;
     for(Int panel_num = 0; ; panel_num++){

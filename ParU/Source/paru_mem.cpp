@@ -81,11 +81,11 @@ void paru_freesym (paru_symbolic **LUsym_handle,
     Int n = LUsym->n;
     Int n1 = LUsym->n1;
     Int nf = LUsym->nf; 
-    Int anz = LUsym->anz; 
+    // Int anz = LUsym->anz; 
     Int snz = LUsym->snz; 
     Int rjsize = LUsym->rjsize;
     PRLEVEL (1, ("%% In free sym: m=%ld n=%ld\n nf=%ld\
-                anz=%ld rjsize=%ld\n", m, n, nf, anz, rjsize ));
+                LUsym->anz=%ld rjsize=%ld\n", m, n, nf, LUsym->anz, rjsize ));
 
     paru_free (nf+1, sizeof (Int), LUsym->Parent, cc);
     paru_free (nf+1, sizeof (Int), LUsym->Child, cc);
@@ -152,8 +152,12 @@ void paru_freemat (paru_matrix **paruMatInfo_handle,
         Int len = ColList [col].len;
         // ASSERT (len < m);  // it is a wrong assertion but there is a good
         //  point
-        if (len > m+nf )                        
+
+#ifndef NDEBUG
+        if (len > m+nf ){                        
             PRLEVEL (1, ("%% too much space used for %ld\n",col););
+        }
+#endif
         paru_free (len , sizeof (paru_Tuple), ColList[col].list, cc);
     }
     paru_free (1, n*sizeof(tupleList), ColList, cc);
@@ -218,12 +222,12 @@ void paru_freemat (paru_matrix **paruMatInfo_handle,
 
         PRLEVEL (1, ("%% Freeing Us=%p\n", Us[i].p));
         if(Us[i].p != NULL){
-            Int m=Us[i].m; Int n=Us[i].n;
+            Int m = Us[i].m; Int n = Us[i].n;
             paru_free (m*n, sizeof (double), Us[i].p, cc);
         }
         PRLEVEL (1, ("%% Freeing LUs=%p\n", LUs[i].p));
         if(LUs[i].p != NULL){
-            Int m=LUs[i].m; Int n=LUs[i].n;
+            Int m = LUs[i].m; Int n = LUs[i].n;
             paru_free (m*n, sizeof (double), LUs[i].p, cc);
         }
     }

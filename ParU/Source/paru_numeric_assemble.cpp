@@ -9,7 +9,7 @@
 #include "Parallel_LU.hpp"
 
 void assemble_col (const double *sC, double *dC,   //source col and destination col
-                    Int m, const Int *relRowInd)
+        Int m, const Int *relRowInd)
 {
     DEBUGLEVEL (0);
     for (Int i = 0; i < m; i++) {
@@ -26,11 +26,11 @@ void assemble_col (const double *sC, double *dC,   //source col and destination 
 }
 
 void assemble_row (const double *sM, double *dM,//source and destination matrix 
-                    Int sm, Int sn,    // dimension of source matrix
-                    Int dm,     // dimension of destination matrix
-                    Int sR, Int dR,     //source row and destination row
-                    const Int *relColInd)
-//Source and destination are stored column based
+        Int sm, Int sn,    // dimension of source matrix
+        Int dm,     // dimension of destination matrix
+        Int sR, Int dR,     //source row and destination row
+        const Int *relColInd)
+    //Source and destination are stored column based
 {
     DEBUGLEVEL (0);
     for (Int j = 0; j < sn; j++) {
@@ -56,6 +56,7 @@ void assemble_all (double *s, double *d,   //source and destination
     Int ii = 0, jj = 0; // row/cols visited sofar
 
     if (snleft == 1 || sm == 1) {
+        // In the case that saving row patter doesnt worth
         for (Int j = 0; j < sn; j++) {
             Int rj = relColInd[j];
             if (rj  >= 0 ){  // If column is valid
@@ -64,11 +65,14 @@ void assemble_all (double *s, double *d,   //source and destination
                     Int ri =relRowInd[i] ;
                     if (ri >= 0 ){  // If row is valid
                         ii++;
+
                         PRLEVEL (1, ("%% s [%ld] =%2.5lf \n",
                                     sm*j+i, s [sm*j+i] ));
                         PRLEVEL (1, ("%% d [%ld] =%2.5lf \n", 
                                     rj*dm+ri, d [rj*dm+ri]));
+
                         d [rj*dm + ri ] += s[sm*j + i];
+
                         PRLEVEL (1, ("%% _dM [%ld] =%2.5lf \n", 
                                     rj*dm+ri, d [rj*dm+ri]));
 
@@ -85,9 +89,9 @@ void assemble_all (double *s, double *d,   //source and destination
         Int tempRel[smleft]; 
         // C99 keeping the row indices after fisrt iteration
 
-        //first column
         Int j = 0;
         for (; j < sn; j++) {
+            //Just first column
             Int rj = relColInd[j];
             if (rj  >= 0 ){  // If column is valid
                 jj++;
@@ -98,9 +102,9 @@ void assemble_all (double *s, double *d,   //source and destination
                         ASSERT (ii < smleft);
                         tempRel[ii] = i;
                         ii++;
+
                         PRLEVEL (1, ("%% i=%ld, j=%ld ri=%ld ii=%ld"
                                     "first col\n", i, j,  ri,ii));
-
                         PRLEVEL (1, ("%% s [%ld] =%2.5lf \n",
                                     sm*j+i, s [sm*j+i] ));
                         PRLEVEL (1, ("%% d [%ld] =%2.5lf \n", 
@@ -121,8 +125,8 @@ void assemble_all (double *s, double *d,   //source and destination
             }
         }
 
-        //rest of the columns
         for (j++ ; j < sn; j++) {
+            //rest of the columns
             Int rj = relColInd[j];
             if (rj  >= 0 ){  // If column is valid
                 jj++;
@@ -130,19 +134,17 @@ void assemble_all (double *s, double *d,   //source and destination
                     Int i = tempRel[ll];
                     Int ri = relRowInd[i];
 
-                        PRLEVEL (1, ("%% i=%ld, j=%ld ri=%ld ii=%ld"
-                                    "after first\n", i, j,  ri,ii));
-
+                    PRLEVEL (1, ("%% i=%ld, j=%ld ri=%ld ii=%ld"
+                                "after first\n", i, j,  ri,ii));
                     PRLEVEL (1, ("%% s [%ld] =%2.5lf \n",
                                 sm*j+i, s [sm*j+i] ));
                     PRLEVEL (1, ("%% d [%ld] =%2.5lf \n", 
                                 rj*dm+ri, d [rj*dm+ri]));
 
                     d [rj*dm + ri ] += s[sm*j + i];
+
                     PRLEVEL (1, ("%% _dM [%ld] =%2.5lf \n", 
                                 rj*dm+ri, d [rj*dm+ri]));
-
-
                 }
             }
             if ( jj == snleft) 

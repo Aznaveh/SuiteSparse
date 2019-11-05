@@ -34,7 +34,7 @@ paru_symbolic *paru_analyze
 
     LUsym = (paru_symbolic*) paru_alloc (1, sizeof(paru_symbolic), cc);
     // ... check for LUsym NULL ...
-    if(LUsym == NULL){
+    if (LUsym == NULL) {
         //out of memory
         return NULL;
     }
@@ -352,7 +352,7 @@ paru_symbolic *paru_analyze
     LUsym->Chain_start = Chain_start;
     LUsym->Chain_maxrows = Chain_maxrows;
     LUsym->Chain_maxcols = Chain_maxcols;
-    Int *Qfill =  LUsym->Qfill = Qinit;
+    LUsym->Qfill = Qinit;
 
     PRLEVEL (0, ("%% A  is  %ld x %ld \n",m, n ));
     PRLEVEL (-1, ("LU = zeros(%ld,%ld);\n",m, n ));
@@ -554,7 +554,7 @@ paru_symbolic *paru_analyze
     PRLEVEL (p, ("\n"));
 #endif
 
-    if (rowcount < m-n1){
+    if (rowcount < m-n1 ) {
         //I think that must not happen anyway while umfpack finds it
         printf("Empty rows in submatrix\n"); 
 
@@ -562,7 +562,7 @@ paru_symbolic *paru_analyze
         PRLEVEL (1, ("m = %ld, n1 = %ld, rowcount = %ld, snz = %ld\n",
                     m , n1 ,rowcount, snz));
         for(Int srow = 0; srow < m-n1; srow++){
-            if(Sp[srow] == 0){
+            if (Sp[srow] == 0){
                 PRLEVEL (1, ("Row %ld is empty\n",srow));
             }
         }
@@ -779,8 +779,11 @@ paru_symbolic *paru_analyze
         PRLEVEL (p,("\n"));
     }
 #endif 
-
-    Int ms = m-n1;  Int ns = n-n1; //submatrix is msxns
+    //submatrix is msxns
+    Int ms = m-n1;  
+#ifndef NDEBUG
+    Int ns = n-n1; 
+#endif 
 
 
 
@@ -792,8 +795,8 @@ paru_symbolic *paru_analyze
     LUsym->super2atree = snM = (Int*) paru_alloc(nf ,sizeof(Int), cc);
 
 
-    if(aParent == NULL || aChild == NULL || aChildp == NULL ||
-            rM == NULL  || snM == NULL || free == NULL){
+    if (aParent == NULL || aChild == NULL || aChildp == NULL ||
+            rM == NULL  || snM == NULL || first == NULL){
         printf ("Out of memory in symbolic phase");
         paru_freesym (&LUsym , cc);
         return NULL;
@@ -863,7 +866,7 @@ paru_symbolic *paru_analyze
         PRLEVEL (1, ("\n %% f=%ld numoforiginalChild=%ld\n",
                     f, numoforiginalChild));
 
-        if( Parent[f] == f+1){  //last child due to staircase
+        if ( Parent[f] == f+1 ) {  //last child due to staircase
             PRLEVEL (1, ("%% last Child =%ld\n", f));
             lastChildFlag = 1;  
         }else

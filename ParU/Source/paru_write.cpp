@@ -204,7 +204,7 @@ void paru_write( paru_matrix *paruMatInfo, int scale,
     }
     nnz += LUsym->anz - LUsym->snz; //adding singletons
 
-    fprintf (LUfptr, "%%%MatrixMarket matrix coordinate real general\n");
+    fprintf (LUfptr, "%%%%MatrixMarket matrix coordinate real general\n");
     fprintf (LUfptr, "%%-----------produced by ParU ---------------\n");
     fprintf (LUfptr, "%ld  %ld %ld\n",m ,n ,nnz );
 
