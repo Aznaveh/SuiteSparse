@@ -44,6 +44,8 @@ int main (int argc, char **argv)
 
     LUsym = paru_analyze (A, cc);
     if (LUsym == NULL) {
+        cholmod_l_free_sparse (&A, cc);
+        cholmod_l_finish (cc);
         exit(0);
     }
 
@@ -52,12 +54,16 @@ int main (int argc, char **argv)
     int scale = 0;
     if (argc == 3){
         scale = atoi(argv[2]);
-        if (scale) 
+        if (scale) {
             PRLEVEL (1, ("The input matrix will be scaled\n"));
+        }
     }
         
     paru_matrix *paruMatInfo = paru_init_rowFronts (A, scale, LUsym, cc);
     if (paruMatInfo == NULL) {
+        paru_freesym (&LUsym,cc);
+        cholmod_l_free_sparse (&A, cc);
+        cholmod_l_finish (cc);
         exit(0);
     }
 
@@ -66,10 +72,13 @@ int main (int argc, char **argv)
     //Int n = paruMatInfo-> n;
     Int nf = paruMatInfo->LUsym->nf;
 
+    Int NoProblem = 1;
+
 
     for (Int i = 0; i < nf; i++) {
         if (paru_front (paruMatInfo, i, cc)){
             printf ("some problem\n");
+            NoProblem = 0;
             break;
         }
     }
@@ -97,7 +106,7 @@ int main (int argc, char **argv)
     Int *Ap = (Int*) A->p;
     Int *Ai = (Int*) A->i;
     double *Ax = (double*) A->x;
-    Int m = A->nrow;
+    //Int m = A->nrow;
     Int n = A->ncol;
     void *Symbolic, *Numeric;  // Output argument in umf_dl_symbolc;
 
@@ -127,7 +136,7 @@ int main (int argc, char **argv)
 #endif
 
     // Writing results to a file
-    paru_write(paruMatInfo, scale,  argv[1], cc);
+    if ( NoProblem ) paru_write(paruMatInfo, scale,  argv[1], cc);
 
     //~~~~~~~~~~~~~~~~~~~Free Everything~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     cholmod_l_free_sparse (&A, cc);

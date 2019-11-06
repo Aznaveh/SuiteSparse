@@ -374,7 +374,7 @@ paru_symbolic *paru_analyze
         //free memory
         paru_free ((n+1), sizeof (Int), Front_npivcol, cc);
         paru_free ((n+1), sizeof (Int), Front_parent, cc);
-
+        paru_free ((m+1), sizeof (Int), Pinit, cc);
         paru_freesym (&LUsym , cc);
         umfpack_dl_azn_free_sw (&SW);
         return NULL;  
@@ -386,6 +386,7 @@ paru_symbolic *paru_analyze
     Int *Super =  LUsym->Super = (Int *) paru_alloc ((nf+1), sizeof (Int), cc); 
     if (Super == NULL){   
         printf ("memory problem");
+        paru_free ((m+1), sizeof (Int), Pinit, cc);
         paru_freesym (&LUsym , cc);
         umfpack_dl_azn_free_sw (&SW);
         return NULL;  
@@ -402,6 +403,7 @@ paru_symbolic *paru_analyze
     LUsym->Childp =  Childp;
     if (Childp== NULL){   
         printf ("memory problem");
+        paru_free ((m+1), sizeof (Int), Pinit, cc);
         paru_freesym (&LUsym , cc);
         umfpack_dl_azn_free_sw (&SW);
         return NULL;  
@@ -424,6 +426,7 @@ paru_symbolic *paru_analyze
     LUsym->Child  =  Child;
     if (Child == NULL){   
         printf ("memory problem");
+        paru_free ((m+1), sizeof (Int), Pinit, cc);
         paru_freesym (&LUsym , cc);
         umfpack_dl_azn_free_sw (&SW);
         return NULL;  
@@ -434,6 +437,8 @@ paru_symbolic *paru_analyze
     Int *cChildp = Work;
     if (cChildp == NULL){   
         printf ("memory problem");
+        paru_free ((m+1), sizeof (Int), Pinit, cc);
+        paru_free ((MAX(m,n)+2), sizeof (Int), Work, cc);
         paru_freesym (&LUsym , cc);
         umfpack_dl_azn_free_sw (&SW);
         return NULL;  
@@ -467,8 +472,13 @@ paru_symbolic *paru_analyze
 
     if (Sp == NULL || Sleft == NULL || Pinv == NULL ){   
         printf ("memory problem");
+
+        paru_free ((m+1), sizeof (Int), Pinit, cc);
+        paru_free ((MAX(m,n)+2), sizeof (Int), Work, cc);
+
         paru_freesym (&LUsym , cc);
         umfpack_dl_azn_free_sw (&SW);
+
         return NULL;  
     }
 
@@ -476,7 +486,7 @@ paru_symbolic *paru_analyze
     for(Int i = 0; i < m ; i++){
         Pinv[Pinit[i]] = i;
     }
-    
+
 #ifndef NDEBUG
     p = 1;
     PRLEVEL (p, ("Qinit =\n"));
@@ -506,6 +516,10 @@ paru_symbolic *paru_analyze
     Ps = (Int*) paru_calloc (m-n1, sizeof(Int), cc); 
     if (Ps == NULL ){   
         printf ("memory problem");
+
+        paru_free ((m+1), sizeof (Int), Pinit, cc);
+        paru_free ((MAX(m,n)+2), sizeof (Int), Work, cc);
+ 
         umfpack_dl_azn_free_sw (&SW);
         paru_freesym (&LUsym , cc);
         return NULL;  
@@ -568,6 +582,9 @@ paru_symbolic *paru_analyze
         }
 #endif
         paru_free ( (m-n1), sizeof (Int), Ps, cc);
+        paru_free ((m+1), sizeof (Int), Pinit, cc);
+        paru_free ((MAX(m,n)+2), sizeof (Int), Work, cc);
+
         paru_freesym (&LUsym , cc);
         umfpack_dl_azn_free_sw (&SW);
         return NULL; //Free memory
