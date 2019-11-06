@@ -17,7 +17,7 @@ include ../../SuiteSparse_config/SuiteSparse_config.mk
 # SuiteSparse_config
 #LDLIBS += -lspqr -lamd -lcolamd -lcholmod -lsuitesparseconfig $(LAPACK) $(BLAS)
 #
-# newer version  of ParU depends on UMFPACK, CHOLMOD, AMD, COLAMD, LAPACK, 
+# newer version  of ParU depends on UMFPACK, CHOLMOD, AMD, COLAMD  
 # the BLAS and SuiteSparse_config
 LDLIBS += -lumfpack -lamd -lcolamd -lcholmod -lsuitesparseconfig\
 		  $(LAPACK) $(BLAS)
@@ -170,4 +170,3 @@ uninstall:
 	$(RM) $(INSTALL_INCLUDE)/Parallel_LU.hpp
 	$(RM) $(INSTALL_DOC)/paru_user_guide.pdf
 	$(RM) $(INSTALL_DOC)/PARU_README.txt
-
