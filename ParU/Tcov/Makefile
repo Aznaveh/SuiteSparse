@@ -2,7 +2,7 @@ default: all
 
 include ../../SuiteSparse_config/SuiteSparse_config.mk
 
-CLIB = $(LDFLAGS) -L../../lib -lparu -lumfpack -lsuitesparseconfig -lcholmod -lamd \
+CLIB = $(LDFLAGS) -L../../lib -lumfpack -lsuitesparseconfig -lcholmod -lamd \
         -lcolamd $(LIB_WITH_PARTITION)  $(LDLIBS)
 FLIB = $(LAPACK) $(BLAS)
 
@@ -75,17 +75,17 @@ FLAG = -Wno-write-strings
 C = $(CXX) $(CF)  $(CHOLMOD_CONFIG) $(CONFIG_PARTITION) $(I) $(FLAG)
 #-------------------------------------------------------------------------------
 parutest: libraries $(INC) $(OBJ) 
-	$(C)  umf_test.cpp -o umfout $(LIBS)
+	$(C)  umf_test.cpp -o umfout $(OBJ) $(LIBS)
 #-------------------------------------------------------------------------------
 
 paru_mem.o: ../Source/paru_mem.cpp
 	$(C) -c $<
 
-#paru_sym_analyse.o: ../Source/paru_sym_analyse.cpp
-#	$(C) -c $<
 
 paru_analyze.o: ../Source/paru_analyze.cpp
 	$(C) -c $<
+#	- ln -s ../Source/paru_analyze.cpp
+#	$(C) -c paru_analyze.cpp
 
 paru_init_rowFronts.o: ../Source/paru_init_rowFronts.cpp
 	$(C) -c $<
@@ -184,15 +184,9 @@ gprofile:
 
 vprofile:
 
-	$(C) $(FLAG) -g umf_test.cpp -o vprof $(LIBS)
+	$(C) $(FLAG) -g umf_test.cpp -o vprof $(OBJ) $(LIBS)
 	valgrind	--tool=callgrind -v ./vprof< ../Matrix/west0067.mtx
 #	valgrind	--tool=callgrind -v ./vprof< ../Matrix/ParUTst/tmp.mtx
-
-tcov:
-	#$(C) $(FLAG) -Wall -fprofile-arcs -ftest-coverage umf_test.cpp -o tcov $(LIBS)
-	$(C) $(FLAG) -Wall --coverage umf_test.cpp -o tcov $(LIBS)
-	./tcov < ../Matrix/west0067.mtx 
-	gcov ../Source/*.cpp umf_test.cpp 
 
 purge: distclean
 
