@@ -117,6 +117,7 @@ int main (int argc, char **argv)
         umfpack_dl_report_info (Control, Info) ;
         umfpack_dl_report_status (Control, status) ;
         printf ("umfpack_dl_symbolic failed\n") ;
+        exit(0);
     }
     status = umfpack_dl_numeric (Ap, Ai, Ax, Symbolic, &Numeric,
 	Control, Info) ;
