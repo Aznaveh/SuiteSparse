@@ -28,10 +28,14 @@ if (size(dr) ~= 2 )
 
 end
 
+A = spdiags (1./max (A,[], 2), 0, size(A,1), size(A,2)) * A ;
+
+
 mmwrite('../Matrix/ParUTst/tmp.mtx', A);
 intel = sprintf('. /home/grads/a/aznaveh/intel/bin/compilervars.sh intel64;');
-str = sprintf ('../Demo/umfout %d < ../Matrix/ParUTst/tmp.mtx', id );
-str = strcat(intel, str);
+intel = sprintf('. /opt/intel/compilers_and_libraries/linux/bin/compilervars.sh intel64;');
+str = sprintf ('../Demo/umfout %d %d< ../Matrix/ParUTst/tmp.mtx', id, s);
+%str = strcat(intel, str);
 
 system(str);
 
@@ -53,8 +57,11 @@ if(s==1)
         s_name = sprintf ('%d_scale.txt', id);
         scalefullname = strcat(path, s_name);
         Rvec = load (scalefullname);
+        Rvec = Rvec (rowp);
         R = spdiags (Rvec, 0, m, m);
-end
+    else 
+        r=1;
+end 
 
 
 LU_name = sprintf ('%d_LU.txt', id);
@@ -70,7 +77,8 @@ fromCode_umf_Elaps = t_Info(2);
 
 umfStart= tic;
 %[l, u, p, q, D]=lu(A, 'vector');
-[l, u, p, q, r, Info]= umfpack (A);
+%[l, u, p, q, r, Info]= umfpack (A);
+[l, u, p, q ]= umfpack (A);
 %umfElaps = toc(umfStart)
 umfElaps = fromCode_umf_Elaps
 
@@ -79,15 +87,14 @@ L=tril(LU,-1)+speye(size(LU));
 U=triu(LU); 
 
 if (s == 1)
-    %sA = sparse(diag(scale))*A;
     sA = R\A;
 else
     sA = A;
 end
 
-myErr = lu_normest(sA(rowp,colp),L,U)
+myErr = lu_normest(sA(rowp,colp),L,U)/norm(A,1)
 %umfErr = lu_normest(D(:,p)\A(:,q),l,u)
-umfErr = lu_normest(p*(r\A)*q,l,u)
+umfErr = lu_normest(p*(r\A)*q,l,u)/norm(A,1)
 
 umfpnnz = nnz(l)+nnz(u) - size(A,1)
 mynnz = nnz(LU) %+ nnz(paddingZ)

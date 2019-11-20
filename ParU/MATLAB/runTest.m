@@ -52,11 +52,12 @@ fprintf(ff,' myflop umfflop ratio\n results = [');
 
 
 
-for k = 1:nmat
+for k = 1:180
 %for k = 1:nmat
     id = fnew (k) 
     % some problem in these matrice
-    if ( id == 2056 || id == 2034 ) 
+    if ( id == 2056 || id == 2034 || id == 1867 || id == 2842 || id == 2843 || id == 2844 || id == 2845)  
+
         continue;
     end
     group = index.Group {id} ;
@@ -87,15 +88,18 @@ for k = 1:nmat
         end
     end
 
-    if (nnz(A) < 1000)
-            continue;
-    end;
+%    if (nnz(A) < 1000)
+%            continue;
+%    end;
 
 
+    %max scaling
+    A = spdiags (1./max (A,[], 2), 0, size(A,1), size(A,2)) * A ;
     mmwrite('../Matrix/ParUTst/tmp.mtx', A);
     intel = sprintf('. /home/grads/a/aznaveh/intel/bin/compilervars.sh intel64;');
+    intel = sprintf('. /opt/intel/compilers_and_libraries/linux/bin/compilervars.sh intel64;');
     str = sprintf ('../Demo/umfout %d < ../Matrix/ParUTst/tmp.mtx', id );
-    str = strcat(intel, str);
+    %str = strcat(intel, str);
     system(str);
 
 
@@ -118,6 +122,8 @@ for k = 1:nmat
             scalefullname = strcat(path, s_name);
             Rvec = load (scalefullname);
             R = spdiags (Rvec, 0, m, m);
+    else 
+        r = 1;
     end
 
 
@@ -136,7 +142,8 @@ for k = 1:nmat
 
     umfStart= tic;
     %[l,u,p,q,D]=lu(A, 'vector');
-    [l, u, p, q, r, Info]= umfpack (A);
+    %[l, u, p, q, r, Info]= umfpack (A); % with scaling
+    [l, u, p, q ]= umfpack (A);  %no scaling
     %umfElaps = toc(umfStart);
     umfElaps = fromCode_umf_Elaps;
 
@@ -149,9 +156,9 @@ for k = 1:nmat
     else
         sA = A;
     end
-    myErr = lu_normest(sA(rowp,colp),L,U);
+    myErr = lu_normest(sA(rowp,colp),L,U)/norm(A,1);
     %umfErr = lu_normest(D(:,p)\A(:,q),l,u);
-    umfErr = lu_normest(p*(r\A)*q,l,u);
+    umfErr = lu_normest(p*(r\A)*q,l,u)/norm(A,1);
 
     umfpnnz= nnz(l)+nnz(u) - m;
     mynnz = nnz(LU); %+ nnz(paddingZ);
