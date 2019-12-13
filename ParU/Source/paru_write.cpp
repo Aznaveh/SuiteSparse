@@ -174,6 +174,9 @@ void paru_write( paru_matrix *paruMatInfo, int scale,
         }
         fprintf (infofptr, "%.17g\n",paruMatInfo->my_time);
         fprintf (infofptr, "%.17g\n",paruMatInfo->umf_time);
+        fprintf (infofptr, "%.17g\n",paruMatInfo->flp_cnt_dgemm);
+        fprintf (infofptr, "%.17g\n",paruMatInfo->flp_cnt_trsm);
+        fprintf (infofptr, "%.17g\n",paruMatInfo->flp_cnt_dger);
         fclose(infofptr);
     }
     //--------------------

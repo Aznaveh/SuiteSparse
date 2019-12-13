@@ -121,6 +121,12 @@ paru_matrix *paru_init_rowFronts (
     PRLEVEL (1, ("%% Work =%p\n ", Work));
     paruMatInfo->Work = Work;
 
+#ifdef COUNT_FLOPS
+    //flop count info init
+    paruMatInfo->flp_cnt_dgemm = 
+    paruMatInfo->flp_cnt_trsm =
+    paruMatInfo->flp_cnt_dger = 0.0;
+#endif
 
 
     PRLEVEL (1, ("%% m=%ld, n=%ld\n",m,n));

@@ -61,6 +61,7 @@ Int paru_trsm(double *pF, double *uPart, Int fp, Int rowCount, Int colCount){
     BLAS_DTRSM ("L" ,"L" ,"N" ,"U", &mB, &nB, &alpha, pF, &lda, 
             uPart, &ldb);
 
+
 #ifndef NDEBUG  // Printing the  U part
     PRLEVEL (p, ("(I)U After Trsm: %ld x %ld\n", fp, colCount));
     for (Int i = 0; i < fp; i++){

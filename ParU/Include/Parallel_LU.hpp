@@ -43,6 +43,8 @@ extern "C"
 // uncomment the following line to turn on debugging 
 //#undef NDEBUG  //<<2>>
 
+//uncomment if you want to count hardware flops
+#define COUNT_FLOPS
 
 // defined somewhere else
 #ifdef ASSERT
@@ -356,6 +358,14 @@ typedef struct  {/*Matrix */
     // analysis information
     double my_time;
     double umf_time;
+
+#ifdef COUNT_FLOPS
+    //flop count info
+    double flp_cnt_dgemm;
+    double flp_cnt_trsm;
+    double flp_cnt_dger;
+#endif
+
 }   paru_matrix;
 
 

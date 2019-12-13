@@ -648,6 +648,10 @@ int paru_front ( paru_matrix *paruMatInfo,
     /**** 6 ****                     TRSM and DGEMM                         ***/ 
 
     paru_trsm(pivotalFront , uPart, fp, rowCount, colCount);
+#ifdef COUNT_FLOPS
+    paruMatInfo->flp_cnt_trsm += (double) .5*(fp+1)*fp*colCount*1e-9;
+#endif
+
 
 #ifndef NDEBUG  // Printing the  U part
     p = -1;
@@ -715,6 +719,10 @@ int paru_front ( paru_matrix *paruMatInfo,
         ((Int*)(curEl+1) + 2*colCount + 2*(rowCount-fp));
 
     paru_dgemm(pivotalFront, uPart, el_numbers, fp, rowCount, colCount);
+
+#ifdef COUNT_FLOPS
+    paruMatInfo->flp_cnt_dgemm += (double) 2*(rowCount -fp)*fp*colCount*1e-9;
+#endif
 
 #ifndef NDEBUG
     //Printing the contribution block after dgemm

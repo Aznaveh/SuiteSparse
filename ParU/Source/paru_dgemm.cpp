@@ -92,6 +92,9 @@ Int paru_dgemm(double *pF, double *uPart,
             &beta, el, &ldc);
 
 
+
+
+
 #ifndef NDEBUG 
     PRLEVEL (1, ("%%After DGEMM C =\n"));
     for(Int i = 0; i < mA; i++){

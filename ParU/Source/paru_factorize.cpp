@@ -210,6 +210,11 @@ Int paru_panel_factorize (double *F, Int *frowList, Int m, Int n,
 
 #endif
             BLAS_DGER(&M, &N, &alpha, X ,  &Incx, Y, &Incy , A, &lda);
+#ifdef COUNT_FLOPS
+    paruMatInfo->flp_cnt_dger += (double) M*N*1e-9;
+#endif
+
+
         }
 
 #ifndef NDEBUG  // Printing the pivotal front
@@ -228,6 +233,7 @@ Int paru_panel_factorize (double *F, Int *frowList, Int m, Int n,
     return 1;
 }
 
+// LU solve; I am not using it anymore-- I have my own dense lu solver
 Int paru_dgetrf (double *F, Int *frowList, Int lm, Int ln,
         BLAS_INT *ipiv){
     DEBUGLEVEL(0);
@@ -418,6 +424,10 @@ Int paru_factorize(double *F, Int *frowList, Int rowCount, Int f,
 #endif
             BLAS_DTRSM ("L" ,"L" ,"N" ,"U", &M, &N, &alpha, A, &lda, 
                     B, &ldb);
+#ifdef COUNT_FLOPS
+    paruMatInfo->flp_cnt_trsm += (double) .5*(M+1)*M*N*1e-9;
+#endif
+
 
 
 #ifndef NDEBUG  
@@ -493,6 +503,10 @@ Int paru_factorize(double *F, Int *frowList, Int rowCount, Int f,
 
             BLAS_DGEMM ("N", "N", &M, &N, &K, &alpha, A, &lda, B, &ldb, 
                     &beta, C, &ldc);
+#ifdef COUNT_FLOPS
+    paruMatInfo->flp_cnt_dgemm += (double) 2*M*N*K*1e-9;
+#endif
+
 
 
         }
