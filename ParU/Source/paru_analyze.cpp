@@ -29,7 +29,7 @@ paru_symbolic *paru_analyze
  // workspace and parameters
  cholmod_common *cc ){   
 
-    DEBUGLEVEL(0);
+    DEBUGLEVEL(-2);
     paru_symbolic *LUsym;
 
     LUsym = (paru_symbolic*) paru_alloc (1, sizeof(paru_symbolic), cc);
@@ -297,7 +297,7 @@ paru_symbolic *paru_analyze
     }
 #ifndef NDEBUG
     p = 1;
-    PRLEVEL (p, ("%%%% n1 is %d\n", n1 ));
+    PRLEVEL (p, ("%%%% n1 is %ld\n", n1 ));
     PRLEVEL (p, ("From the Symbolic object,\
                 C is of dimension %ld-by-%ld\n", nr, nc));
     PRLEVEL (p, ("   with nz = %ld, number of fronts = %ld,\n", anz, nfr));
@@ -527,7 +527,7 @@ paru_symbolic *paru_analyze
 
     Int unz = 0;  // U nnz: singlteton nnzero of s
     Int snz = 0;  //s nonzero: nnz in submatrix excluding singletons
-    int rowcount = 0;
+    Int rowcount = 0;
     Sleft[0] = 0;
     //counting number of entries in each row of submatrix Sp
     PRLEVEL (1, ("Computing Staircase Structure\n"));

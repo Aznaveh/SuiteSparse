@@ -26,7 +26,7 @@ int paru_front ( paru_matrix *paruMatInfo,
         Int f, /* front need to be assembled */
         cholmod_common *cc){
 
-    DEBUGLEVEL(0);
+    DEBUGLEVEL(-2);
     /* 
      * -2 Print Nothing
      * -1 Just Matlab
@@ -648,59 +648,64 @@ int paru_front ( paru_matrix *paruMatInfo,
     /**** 6 ****                     TRSM and DGEMM                         ***/ 
 
     paru_trsm(pivotalFront , uPart, fp, rowCount, colCount);
-#ifdef COUNT_FLOPS
-    paruMatInfo->flp_cnt_trsm += (double) .5*(fp+1)*fp*colCount*1e-9;
-#endif
 
+#ifdef COUNT_FLOPS
+   paruMatInfo->flp_cnt_trsm += (double) (fp+1)*fp*colCount;
+#ifndef NDEBUG  
+   p = 0;
+   PRLEVEL (p, ("\n%% FlopCount Trsm front %ld %ld ",fp, colCount  ));
+   PRLEVEL (p, ("cnt = %lf\n ",   paruMatInfo->flp_cnt_trsm ));
+#endif
+#endif
 
 #ifndef NDEBUG  // Printing the  U part
-    p = -1;
-    PRLEVEL (p, ("%% rowCount=%ld;\n",rowCount));
-    PRLEVEL (p, ("%% U part After TRSM: %ld x %ld\n", fp, colCount));
+   p = -1;
+   PRLEVEL (p, ("%% rowCount=%ld;\n",rowCount));
+   PRLEVEL (p, ("%% U part After TRSM: %ld x %ld\n", fp, colCount));
 
-    PRLEVEL (p, ("Ucols{%ld} = [",f+1));
-    for (Int i = 0; i < colCount; i++){
-        PRLEVEL (p, ("%ld ", fcolList[i]+1));
-    }
-    PRLEVEL (p, ("];\n"));
-
-
-    PRLEVEL (p, ("Urows{%ld} = [",f+1));
-    for (Int i = 0; i < fp; i++)
-        PRLEVEL (p, ("%ld ",  frowList [i]+1));
-    PRLEVEL (p, ("];\n"));
+   PRLEVEL (p, ("Ucols{%ld} = [",f+1));
+   for (Int i = 0; i < colCount; i++){
+       PRLEVEL (p, ("%ld ", fcolList[i]+1));
+   }
+   PRLEVEL (p, ("];\n"));
 
 
-    PRLEVEL (p, ("Us{%ld} = [",f+1));
+   PRLEVEL (p, ("Urows{%ld} = [",f+1));
+   for (Int i = 0; i < fp; i++)
+       PRLEVEL (p, ("%ld ",  frowList [i]+1));
+   PRLEVEL (p, ("];\n"));
 
-    for (Int i = 0; i < fp; i++){
-        for (Int j = 0; j < colCount; j++){
-            PRLEVEL (p, (" %.16g ", uPart[j*fp+i]));
-        }
-        PRLEVEL (p, (";\n    "));
-    }
-    PRLEVEL (p, ("];\n"));
+
+   PRLEVEL (p, ("Us{%ld} = [",f+1));
+
+   for (Int i = 0; i < fp; i++){
+       for (Int j = 0; j < colCount; j++){
+           PRLEVEL (p, (" %.16g ", uPart[j*fp+i]));
+       }
+       PRLEVEL (p, (";\n    "));
+   }
+   PRLEVEL (p, ("];\n"));
 #endif
 
 
-    Int *snM = LUsym->super2atree;
-    Int eli = snM [f]; 
-    paru_Element *curEl;
-    PRLEVEL (1, ("%% rowCount=%ld, colCount=%ld, fp=%ld\n",
-                rowCount, colCount, fp));
-    PRLEVEL (1, ("%% curEl is %ld by %ld\n",rowCount-fp,colCount));
-    if (fp <= rowCount ){ 
-        curEl = elementList[eli] = paru_create_element (rowCount-fp,
-              colCount, 0 ,cc); // allocating an un-initialized part of memory
-        // While insided the DGEMM BETA == 0
-        if ( curEl == NULL ){
-            printf ("%% Out of memory when tried to allocate current CB %ld",
-                    eli);
-            return 1;
-        }
-        PRLEVEL (1, ("%% curEl =%p\n", curEl));
-    }
-    curEl->next = next;
+   Int *snM = LUsym->super2atree;
+   Int eli = snM [f]; 
+   paru_Element *curEl;
+   PRLEVEL (1, ("%% rowCount=%ld, colCount=%ld, fp=%ld\n",
+               rowCount, colCount, fp));
+   PRLEVEL (1, ("%% curEl is %ld by %ld\n",rowCount-fp,colCount));
+   if (fp <= rowCount ){ 
+       curEl = elementList[eli] = paru_create_element (rowCount-fp,
+               colCount, 0 ,cc); // allocating an un-initialized part of memory
+       // While insided the DGEMM BETA == 0
+       if ( curEl == NULL ){
+           printf ("%% Out of memory when tried to allocate current CB %ld",
+                   eli);
+           return 1;
+       }
+       PRLEVEL (1, ("%% curEl =%p\n", curEl));
+   }
+   curEl->next = next;
     // Initializing curEl global indices
     Int *el_colIndex = colIndex_pointer (curEl);
     for (Int i = 0; i < colCount; ++ i) {
@@ -721,7 +726,12 @@ int paru_front ( paru_matrix *paruMatInfo,
     paru_dgemm(pivotalFront, uPart, el_numbers, fp, rowCount, colCount);
 
 #ifdef COUNT_FLOPS
-    paruMatInfo->flp_cnt_dgemm += (double) 2*(rowCount -fp)*fp*colCount*1e-9;
+    paruMatInfo->flp_cnt_dgemm += (double) 2*(rowCount -fp)*fp*colCount;
+#ifndef NDEBUG  
+        PRLEVEL (p, ("\n%% FlopCount Dgemm front %ld %ld %ld \n",rowCount -fp,
+                    fp, colCount  ));
+        PRLEVEL (p, ("cnt = %lf\n ",   paruMatInfo->flp_cnt_dgemm ));
+#endif
 #endif
 
 #ifndef NDEBUG

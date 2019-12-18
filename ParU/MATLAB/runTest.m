@@ -52,7 +52,7 @@ fprintf(ff,' myflop umfflop ratio\n results = [');
 
 
 
-for k = 1:180
+for k = 1:10
 %for k = 1:nmat
     id = fnew (k) 
     % some problem in these matrice
@@ -135,6 +135,11 @@ for k = 1:180
     t_Info = load (infofullname);
     myElaps = t_Info(1);
     fromCode_umf_Elaps = t_Info(2);
+    flp_cnt_dgemm = t_Info(3);
+    flp_cnt_trsm = t_Info(4);
+    flp_cnt_dger = t_Info(5);
+    hardware_flp_cnt = flp_cnt_dgemm + flp_cnt_trsm + flp_cnt_dger;
+
 
 
     [LU, paddingZ] = mmread (LUfullname);
@@ -174,7 +179,9 @@ for k = 1:180
     log10(myErr/umfErr));
     fprintf(ff,' %g %g %g', myElaps, umfElaps, myElaps/umfElaps);
     fprintf(ff,' %g %g %g', mynnz , umfpnnz, mynnz/umfpnnz );
-    fprintf(ff,' %g %g %g\n', myflop, umfflop, myflop/umfflop);
+    fprintf(ff,' %g %g %g', myflop, umfflop, myflop/umfflop);
+
+    fprintf(ff,' %g \n', hardware_flp_cnt);
 
     %%csv format
     %    fprintf(ff,'%d %d %g %g %g', id, nnz(A), myErr, umfErr, ...

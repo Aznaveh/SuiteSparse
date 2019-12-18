@@ -215,7 +215,7 @@ void paru_update_rowDeg ( Int panel_num,  Int row_end, Int f, Int *next,
                 p=1;
                 stl_colSet.insert (curCol);
                 for (it = stl_colSet.begin(); it != stl_colSet.end(); it++)
-                    PRLEVEL (p, ("%@  %ld", *it));
+                    PRLEVEL (p, ("%%@  %ld", *it));
 
 #endif
                 PRLEVEL (1, ("%% %p ---> isColInCBcolSet[%ld]=%ld\n", 

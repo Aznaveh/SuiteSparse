@@ -24,7 +24,7 @@ paru_matrix *paru_init_rowFronts (
         cholmod_common *cc
         ){
 
-    DEBUGLEVEL(0);
+    DEBUGLEVEL(-2);
     if (!A->packed){
         printf ("A is not packed; Wrong format \n");
         return NULL;
@@ -46,7 +46,7 @@ paru_matrix *paru_init_rowFronts (
 
 
 
-    Int m,n,nf;  
+    Int m, n, nf;  
 
     paruMatInfo->LUsym = LUsym;
 

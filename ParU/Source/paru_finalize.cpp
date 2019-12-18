@@ -11,7 +11,7 @@
 void paru_finalize (paru_matrix *paruMatInfo, Int f, Int start_fac, 
         cholmod_common *cc){
 
-    DEBUGLEVEL(1);
+    DEBUGLEVEL(-2);
 #ifndef NDEBUG
     Int p = 1;
     // counters to check the status of tuples scanning

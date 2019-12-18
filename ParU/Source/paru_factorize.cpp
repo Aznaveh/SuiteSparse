@@ -37,7 +37,7 @@ Int paru_panel_factorize (double *F, Int *frowList, Int m, Int n,
         paru_matrix *paruMatInfo) {
     // works like dgetf2f.f in netlib v3.0  here is a link:
     // https://github.com/xianyi/OpenBLAS/blob/develop/reference/dgetf2f.f
-    DEBUGLEVEL(0);
+    DEBUGLEVEL(-2);
     PRLEVEL (1, ("%% Inside panel factorization %ld \n",panel_num));
 
 
@@ -149,7 +149,7 @@ Int paru_panel_factorize (double *F, Int *frowList, Int m, Int n,
             for (Int i = j +1 ; i < row_end; i++){ 
                 PRLEVEL (1, ("%%i=%ld before cal value= %2.4lf", i, F[j*m+i]));
                 F[j*m + i] /= piv;
-                PRLEVEL (1, (" after dscal value= %2.4lf\n", i, F[j*m+i]));
+                PRLEVEL (1, (" after dscal value= %2.4lf\n", F[j*m+i]));
             }
         }
 
@@ -203,7 +203,7 @@ Int paru_panel_factorize (double *F, Int *frowList, Int m, Int n,
             PRLEVEL (p, ("N =%d \n %% x= ",  N));
             for (Int i=0; i<M; i++)
                 PRLEVEL (p, (" %lf ",  X[i] ));
-            PRLEVEL (p, ("\n %% y= ",  N));
+            PRLEVEL (p, ("\n %% y= %d",  N));
             for (Int j=0; j<N; j++)
                 PRLEVEL (p, (" %lf ",  Y[j*m] ));
             PRLEVEL (p, ("\n"));
@@ -211,7 +211,11 @@ Int paru_panel_factorize (double *F, Int *frowList, Int m, Int n,
 #endif
             BLAS_DGER(&M, &N, &alpha, X ,  &Incx, Y, &Incy , A, &lda);
 #ifdef COUNT_FLOPS
-    paruMatInfo->flp_cnt_dger += (double) M*N*1e-9;
+    paruMatInfo->flp_cnt_dger += (double) 2*M*N;
+#ifndef NDEBUG  
+        PRLEVEL (p, ("\n%% FlopCount Dger fac %d %d ",M, N));
+        PRLEVEL (p, ("cnt = %lf\n ",   paruMatInfo->flp_cnt_dger ));
+#endif
 #endif
 
 
@@ -261,7 +265,7 @@ Int paru_dgetrf (double *F, Int *frowList, Int lm, Int ln,
 
 
 #ifndef NDEBUG  // Initializing permutation; just for debug
-    for (int i = 0; i < lda ; i++){
+    for (Int i = 0; i < lda ; i++){
         ipiv [i] = -1;
     }
     if (m < n ){
@@ -273,8 +277,8 @@ Int paru_dgetrf (double *F, Int *frowList, Int lm, Int ln,
 #ifndef NDEBUG  // Printing the list of rows
     p = 1;
     PRLEVEL (p, ("Befor factorization (inside factorize): \n"));
-    for (int i = 0; i < m ; i++){
-        PRLEVEL (p, ("frowList [%ld] =%d\n",i, frowList [i]));
+    for (Int i = 0; i < m ; i++){
+        PRLEVEL (p, ("frowList [%ld] =%ld\n",i, frowList [i]));
     }
     PRLEVEL (p, ("\n"));
 #endif
@@ -293,8 +297,8 @@ Int paru_dgetrf (double *F, Int *frowList, Int lm, Int ln,
     p = 1;
     // ATTENTION: ipiv is 1 based
     PRLEVEL (p, ("swap permutation:\n"));
-    for (int i = 0; i < m; i++){
-        PRLEVEL (p, ("ipiv[%d] =%d\n",i, ipiv[i]));
+    for (Int i = 0; i < m; i++){
+        PRLEVEL (p, ("ipiv[%ld] =%d\n",i, ipiv[i]));
     }
     PRLEVEL (p, ("\n"));
 #endif 
@@ -304,7 +308,7 @@ Int paru_dgetrf (double *F, Int *frowList, Int lm, Int ln,
 
     // swap (frowList[ipiv [i]], frowList[i] ) and it is off by one
     for (Int i = 0; i < n; i++){
-        PRLEVEL (1, ("ipiv[%d] =%d\n", i, ipiv[i]));
+        PRLEVEL (1, ("ipiv[%ld] =%d\n", i, ipiv[i]));
         ASSERT (ipiv [i] > 0);
         ASSERT (ipiv [i] <= m);
         Int tmp =  frowList[ipiv [i]-1];
@@ -326,7 +330,7 @@ Int paru_dgetrf (double *F, Int *frowList, Int lm, Int ln,
     }
 #endif
 
-    PRLEVEL (1, ("info = %ld\n", info));
+    PRLEVEL (1, ("info = %d\n", info));
     if (info != 0 ){
         printf("%%Some problem in factorization\n");
         return info;
@@ -425,7 +429,13 @@ Int paru_factorize(double *F, Int *frowList, Int rowCount, Int f,
             BLAS_DTRSM ("L" ,"L" ,"N" ,"U", &M, &N, &alpha, A, &lda, 
                     B, &ldb);
 #ifdef COUNT_FLOPS
-    paruMatInfo->flp_cnt_trsm += (double) .5*(M+1)*M*N*1e-9;
+            paruMatInfo->flp_cnt_trsm += (double) (M+1)*M*N;
+#ifndef NDEBUG  
+            p = 0;
+            PRLEVEL (p, ("\n%% FlopCount Trsm factorize %d %d ",M, N));
+            PRLEVEL (p, ("cnt = %lf\n ",   paruMatInfo->flp_cnt_trsm ));
+#endif
+
 #endif
 
 
@@ -504,7 +514,12 @@ Int paru_factorize(double *F, Int *frowList, Int rowCount, Int f,
             BLAS_DGEMM ("N", "N", &M, &N, &K, &alpha, A, &lda, B, &ldb, 
                     &beta, C, &ldc);
 #ifdef COUNT_FLOPS
-    paruMatInfo->flp_cnt_dgemm += (double) 2*M*N*K*1e-9;
+            paruMatInfo->flp_cnt_dgemm += (double) 2*M*N*K;
+#ifndef NDEBUG  
+            PRLEVEL (p, ("\n%% FlopCount Dgemm factorize %d %d %d ",
+                        M, N, K));
+            PRLEVEL (p, ("cnt = %lf\n ",   paruMatInfo->flp_cnt_dgemm ));
+#endif
 #endif
 
 
