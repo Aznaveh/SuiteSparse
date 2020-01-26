@@ -189,7 +189,7 @@ void paru_finalize (paru_matrix *paruMatInfo, Int f, Int start_fac,
                     paru_update_rel_ind (curFr, el, 'c', cc) ;
 
 #ifndef NDEBUG            
-                    p = 0;
+                    p = 1;
                     PRLEVEL (p, ("%% Full assembly from: \n"));
                     if (p <= 0 ){
                         paru_print_element (paruMatInfo, e);
@@ -217,7 +217,7 @@ void paru_finalize (paru_matrix *paruMatInfo, Int f, Int start_fac,
                         child_FA++ ;
                     else
                         noChild_FA++ ;
-                    p = 0;
+                    p = 1;
                     if (p <= 0) {
                         
                         PRLEVEL (p, ("\n%%After ALL:"));
@@ -239,7 +239,7 @@ void paru_finalize (paru_matrix *paruMatInfo, Int f, Int start_fac,
                     /*  Update rowRelIndex just once	 */
 
 #ifndef NDEBUG
-                    p = 0;
+                    p = 1;
                     PRLEVEL (p, ("%% update row relative element %ld\n", e ));
                     //Printing the contribution block prior index update 
                     if (p <= 0) {
@@ -263,7 +263,7 @@ void paru_finalize (paru_matrix *paruMatInfo, Int f, Int start_fac,
 #ifndef NDEBUG
                 //Printing the contribution block before 
                 //   prior blocks assembly
-                p = 0;
+                p = 1;
                 if (p <= 0){
                     PRLEVEL (p, ("\n%%Before column assembly of %ld:\n",e));
                     paru_print_element (paruMatInfo, el_ind);
@@ -324,6 +324,7 @@ void paru_finalize (paru_matrix *paruMatInfo, Int f, Int start_fac,
         }
 
 #ifndef NDEBUG
+        p = 1;
         if (p <= 0)
             paru_print_tupleList (ColList, c);
 #endif
@@ -395,7 +396,7 @@ void paru_finalize (paru_matrix *paruMatInfo, Int f, Int start_fac,
                 ASSERT (elRow[e] != 0);
 
 #ifndef NDEBUG            
-                p = 0;
+                p = 1;
                 PRLEVEL (1, ("%% Before row assembly: \n" ));
                 PRLEVEL (1, ("%% elRow[%ld]=%ld ",e, elRow[e]));
                 if (p <= 0 ){
@@ -429,7 +430,7 @@ void paru_finalize (paru_matrix *paruMatInfo, Int f, Int start_fac,
                 assemble_row (el_Num, cur_Numeric, mEl, nEl, 
                         curFrNrows, curRowIndex , k-fp, colRelIndex );
 #ifndef NDEBUG            
-                p = 0;
+                p = 1;
                 PRLEVEL (p, ("%% after row assembly: \n" ));
                 if (p <= 0 ){
                     paru_print_element (paruMatInfo, e);
@@ -482,7 +483,7 @@ void paru_finalize (paru_matrix *paruMatInfo, Int f, Int start_fac,
         Int numTuple = curColTupleList->numTuple;
         paru_Tuple *listColTuples = curColTupleList->list;
 #ifndef NDEBUG            
-        p = 0;
+        p = 1;
         PRLEVEL (p, ("\n %%-------->  5th: c =%ld  numTuple = %ld\n",
                     c, numTuple));
         if (p <= 0 ){

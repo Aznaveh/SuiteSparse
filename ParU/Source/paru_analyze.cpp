@@ -306,13 +306,13 @@ paru_symbolic *paru_analyze
 
     PRLEVEL (1, ("\nPivot columns in each front, and parent of each front:\n"));
     Int k = 0;
-    for (Int i = 0 ; i < nfr ; i++)
-    {
+
+    for (Int i = 0 ; i < nfr ; i++) {
         Int fnpiv = Front_npivcol [i];
         PRLEVEL (p, ("Front %ld: parent front: %ld number of pivot cols: %ld\n",
                     i, Front_parent [i], fnpiv));
-        for (Int j = 0 ; j < fnpiv ; j++)
-        {
+
+        for (Int j = 0 ; j < fnpiv ; j++) {
             Int col = Qinit [k];
             PRLEVEL (p, ("%ld-th pivot column is column %ld"
                         " in original matrix\n", k, col));
@@ -325,10 +325,10 @@ paru_symbolic *paru_analyze
 
     PRLEVEL (p, ("\nFrontal matrix chains:\n"));
     for (Int j = 0 ; j < nchains ; j++){
-       // PRLEVEL (p, ("Frontal matrices %ld to %ld are factorized in a single\n",
-       //             Chain_start [j], Chain_start [j+1] - 1));
-       // PRLEVEL (p, ("        working array of size %ld-by-%ld\n",
-       //             Chain_maxrows [j], Chain_maxcols [j]));
+        PRLEVEL (p, ("Frontal matrices %ld to %ld in chain\n",
+                    Chain_start [j], Chain_start [j+1] - 1));
+        PRLEVEL (p, ("\tworking array of size %ld-by-%ld\n",
+                    Chain_maxrows [j], Chain_maxcols [j]));
     }
 #endif
 
@@ -397,6 +397,23 @@ paru_symbolic *paru_analyze
     }
     paru_cumsum (nf+1, Super);
     paru_free ((n+1), sizeof (Int), Front_npivcol, cc);
+
+
+    //TODO: Relax amalgamation before making the list of children
+    // The gist is to make a cumsum over Pivotal columns
+    // then start from children and see if I merge it to the father how many
+    // pivotal columns will it have;
+    // if it has less than threshold merge the child to the father
+    // Super and Parent will change here to a smaller etree that is also
+    // postordered 
+    // Super is already what I want here 
+    //
+    //
+    // Int nnpiv= Super[c] - Super[Parent[c]] ;  number of new pivots
+    // if (nnpiv < threshold (16) ) {  amalgmate c and its parent}
+    // TODO: how to amalgamate
+    //
+    //
 
     //Making Children list
     Int *Childp = (Int *) paru_calloc ((nf+2), sizeof (Int), cc);

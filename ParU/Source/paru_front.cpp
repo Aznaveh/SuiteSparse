@@ -26,7 +26,7 @@ int paru_front ( paru_matrix *paruMatInfo,
         Int f, /* front need to be assembled */
         cholmod_common *cc){
 
-    DEBUGLEVEL(-2);
+    DEBUGLEVEL(-1);
     /* 
      * -2 Print Nothing
      * -1 Just Matlab
@@ -198,7 +198,7 @@ int paru_front ( paru_matrix *paruMatInfo,
                 PRLEVEL (1, ("%%**curRow =%ld rEl=%ld\n", curRow, rEl));
                 ASSERT (curRow < m ) ;
 #ifndef NDEBUG
-                Int p=1;
+                Int p = 1;
                 if (p <= 0) paru_print_element (paruMatInfo, e);
                 stl_rowSet.insert (curRow);
                 PRLEVEL (1, ("%% %p ---> isRowInFront [%ld]=%ld\n", 
@@ -724,19 +724,24 @@ int paru_front ( paru_matrix *paruMatInfo,
         ((Int*)(curEl+1) + 2*colCount + 2*(rowCount-fp));
 
     paru_dgemm(pivotalFront, uPart, el_numbers, fp, rowCount, colCount);
+    //printf ("%ld %ld %ld \n",rowCount-fp, colCount, fp);
 
 #ifdef COUNT_FLOPS
     paruMatInfo->flp_cnt_dgemm += (double) 2*(rowCount -fp)*fp*colCount;
+
 #ifndef NDEBUG  
         PRLEVEL (p, ("\n%% FlopCount Dgemm front %ld %ld %ld \n",rowCount -fp,
                     fp, colCount  ));
+        PRLEVEL (p, ("%ld %ld %ld \n",rowCount -fp,
+                    fp, colCount  ));
+ 
         PRLEVEL (p, ("cnt = %lf\n ",   paruMatInfo->flp_cnt_dgemm ));
 #endif
 #endif
 
 #ifndef NDEBUG
     //Printing the contribution block after dgemm
-    p = 0;
+    p = 1;
     PRLEVEL (p, ("\n%%After DGEMM:"));
     if (p <= 0)
         paru_print_element (paruMatInfo, eli);
@@ -777,7 +782,7 @@ int paru_front ( paru_matrix *paruMatInfo,
 
 #ifndef NDEBUG
     //Printing the contribution block after prior blocks assembly
-    p = 0;
+    p = 1;
     PRLEVEL (p, ("\n%%After prior blocks assembly:"));
     if (p <= 0)
         paru_print_element (paruMatInfo, eli);

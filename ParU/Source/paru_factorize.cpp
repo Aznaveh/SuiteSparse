@@ -513,11 +513,14 @@ Int paru_factorize(double *F, Int *frowList, Int rowCount, Int f,
 
             BLAS_DGEMM ("N", "N", &M, &N, &K, &alpha, A, &lda, B, &ldb, 
                     &beta, C, &ldc);
+            //printf ("%d %d %d \n",M ,N, K);
 #ifdef COUNT_FLOPS
             paruMatInfo->flp_cnt_dgemm += (double) 2*M*N*K;
 #ifndef NDEBUG  
             PRLEVEL (p, ("\n%% FlopCount Dgemm factorize %d %d %d ",
                         M, N, K));
+            PRLEVEL (p, ("%d %d %d \n",M ,N, K));
+
             PRLEVEL (p, ("cnt = %lf\n ",   paruMatInfo->flp_cnt_dgemm ));
 #endif
 #endif
