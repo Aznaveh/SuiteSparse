@@ -4,9 +4,30 @@
  * @brief Computing etree and do the symbolic analysis. In this file I am going
  * to use umfpack symbolic analysis instaed of spqrsym. However, I will keep the
  * style of spqr mostly.
- *         
+ * 
+ *  Relaxed amalgamation:
+ * 
+ *                      Example: ./Matrix/b1_ss.mtx
+ * original post ordered etree:          
  *
- * Example: ./Matrix/problem.mtx
+ *   5(2) <-- front(number of pivotal cols) 
+ *   |   \                                  
+ *   0(1) 4(1)__                            
+ *        |     \                           
+ *        1(1)   3(1)                       
+ *                \                          
+ *                2(1)                      
+ *
+ * Relaxed tree:  threshold=3
+ *   3(2)##5 
+ *   |       \                                  
+ *   0(1)##0 2(3)##2,3,4
+ *        |  
+ *        1(1)##2
+ *         
+ *  Augmented tree creation:
+ *
+ *                      Example: ./Matrix/problem.mtx
  * original post ordered etree:          augmented tree: (Row elements)
  *
  *   4___                                     16_____
@@ -29,7 +50,7 @@ paru_symbolic *paru_analyze
  // workspace and parameters
  cholmod_common *cc ){   
 
-    DEBUGLEVEL(-2);
+    DEBUGLEVEL(1);
     paru_symbolic *LUsym;
 
     LUsym = (paru_symbolic*) paru_alloc (1, sizeof(paru_symbolic), cc);
@@ -126,7 +147,10 @@ paru_symbolic *paru_analyze
         *Front_npivcol, // size = n_col +1;  actual size = nfr+1
         // NOTE: This is not the case for SPQR 
         // I think SPQR is easier:
-        // Front_npivcol [f] = Super [f] - Super [f+1]
+        // Front_npivcol [f] = Super [f+1] - Super [f]
+        // In the case of amalgamation of a child to the parent 
+        // then the number of pivotal column of the amalgamted node is:
+        //  Super [Parent[f]+1] - Super [f] 
         // Front_parent [nfr+1] is a place holder for columns
         // with no entries
 
@@ -245,9 +269,15 @@ paru_symbolic *paru_analyze
     Chain_maxrows = (Int *) paru_alloc ((n+1), sizeof (Int), cc);
     Chain_maxcols = (Int *) paru_alloc ((n+1), sizeof (Int), cc);
 
+
+    //temp amalgamation data structure
+    Int *fmap = (Int *) paru_alloc ((n+1), sizeof (Int), cc);
+    Int *newParent= (Int *) paru_alloc ((n+1), sizeof (Int), cc);
+
+
     if (!Pinit || !Qinit || !Front_npivcol || !Front_parent || !Chain_start ||
-            !Chain_maxrows || !Chain_maxcols || 
-            !Front_1strow || !Front_leftmostdesc){
+            !Chain_maxrows || !Chain_maxcols || !newParent ||
+            !Front_1strow || !Front_leftmostdesc || !fmap){
 
         paru_free ((m+1), sizeof (Int), Pinit, cc);
         paru_free ((n+1), sizeof (Int), Qinit, cc);
@@ -258,6 +288,9 @@ paru_symbolic *paru_analyze
         paru_free ((n+1), sizeof (Int), Chain_start, cc);
         paru_free ((n+1), sizeof (Int), Chain_maxrows, cc);
         paru_free ((n+1), sizeof (Int), Chain_maxcols, cc);
+
+        paru_free ((n+1), sizeof (Int), fmap, cc);
+        paru_free ((n+1), sizeof (Int), newParent, cc);
 
         printf("out of memory") ;
 
@@ -398,22 +431,111 @@ paru_symbolic *paru_analyze
     paru_cumsum (nf+1, Super);
     paru_free ((n+1), sizeof (Int), Front_npivcol, cc);
 
+    /* ---------------------------------------------------------------------- */
+    /*                          Relaxed amalgamation                          */
+    /* ---------------------------------------------------------------------- */
+
 
     //TODO: Relax amalgamation before making the list of children
     // The gist is to make a cumsum over Pivotal columns
     // then start from children and see if I merge it to the father how many
     // pivotal columns will it have;
     // if it has less than threshold merge the child to the father
-    // Super and Parent will change here to a smaller etree that is also
-    // postordered 
-    // Super is already what I want here 
+    // 
+    // Super and Parent  and upperbounds
+    // Parent needs an extra work space
+    // Super can be changed in space upperbound can be changed in space
+    // Upperbound how to do: maximum of pervious upperbounds
+    // Number of the columns of the root of each subtree
     //
-    //
-    // Int nnpiv= Super[c] - Super[Parent[c]] ;  number of new pivots
-    // if (nnpiv < threshold (16) ) {  amalgmate c and its parent}
-    // TODO: how to amalgamate
-    //
-    //
+    Int threshold = 4;
+    Int newF = 0;
+
+    for(Int f = 0; f < nf ; f++){ //finding representative for each front
+        Int repr = f;
+        //amalgamate till number of pivot columns is small
+        while ( Super[Parent[repr]+1] - Super[f] < threshold 
+                && Parent[repr] != -1) {
+            repr = Parent [repr];
+            PRLEVEL (1, ("%%Middle stage f= %ld repr = %ld\n",  f, repr));
+            PRLEVEL (1, ("%%number of pivot cols= %ld\n",
+                         Super[repr+1] - Super[f]));
+        }
+        
+        PRLEVEL (1, ("%% newF = %ld for:\n",  newF));
+        for (Int k = f; k <= repr; k++){
+            PRLEVEL (1, ("%%  %ld ",  k));
+            fmap[k] = newF;
+        }
+        PRLEVEL (1, ("%%repr = %ld\n",repr));
+        newF++;
+        f = repr;
+    }
+
+    Int newNf = newF; // new size of number of fronts
+    // newParent size is newF+1 potentially smaller than nf
+    newParent = 
+        (Int*) paru_realloc (newF+1, sizeof(Int), newParent, &size, cc);
+    ASSERT ( newF <= nf);
+    //TODO: add memory guard?
+    Int newSuper[newNf+2];
+ 
+    for(Int oldf = 0; oldf < nf ; oldf++){ //maping old to new 
+        Int newf = fmap[oldf];
+        Int oldParent = Parent[oldf];
+        newParent[newf] = oldParent >= 0 ? fmap[oldParent]: -1 ;
+        newSuper[newf] = Super[oldf] ;
+    }
+    newSuper[newNf+1] = Super[nf] ;
+
+
+    //TODO: updating Parent, Sn and Upperbound
+    //Parent = newParent; // free stuff not necessary
+    //for(int i=0; i< newNf; ++i)
+    // Super[i] = Super[fmap[i]] // shrinking
+  //  for(Int i=0; i< newNf ; ++i)
+  //      newSuper[i] = Super[fmap[i]]; // shrinking
+
+
+#ifndef NDEBUG
+            p = 1;
+    PRLEVEL (p, ("%%%% Wroking on relaxed amalgmation\n"));
+
+    PRLEVEL (p, ("%%%% Super:\n"));
+    for(Int k = 0; k <= nf ; k++){
+        PRLEVEL (p, ("  %ld", Super[k]));
+    }
+    PRLEVEL (p, ("\n"));
+
+    PRLEVEL (p, ("%%%% Parent:\n"));
+    for(Int k = 0; k <= nf ; k++){
+        PRLEVEL (p, ("  %ld", Parent[k]));
+    }
+    PRLEVEL (p, ("\n"));
+
+
+    PRLEVEL (p, ("%%%% fmap:\n"));
+    for(Int k = 0; k < nf ; k++){
+        PRLEVEL (p, ("  %ld", fmap[k]));
+    }
+    PRLEVEL (p, ("\n"));
+
+    PRLEVEL (p, ("%%%% newParent:\n"));
+    for(Int k = 0; k <= newNf ; k++){
+        PRLEVEL (p, ("  %ld", newParent[k]));
+    }
+    PRLEVEL (p, ("\n"));
+    
+    PRLEVEL (p, ("%%%% newSuper:\n"));
+    for(Int k = 0; k <= newNf; k++){
+        PRLEVEL (p, ("  %ld", newSuper[k]));
+    }
+    PRLEVEL (p, ("\n"));
+
+
+
+#endif
+    //////////////////////end of relaxed amalgamation/////////////////////////
 
     //Making Children list
     Int *Childp = (Int *) paru_calloc ((nf+2), sizeof (Int), cc);
@@ -750,6 +872,9 @@ paru_symbolic *paru_analyze
         umfpack_dl_azn_free_sw (&SW);
         return NULL;  
     }
+
+    //TODO: although I do not really use this data structure I should update it
+    //after relaxed amalgamation
     // Copying first nf+1 elements of Front_nrows(UMFPACK) into Fm(SPQR like)
     for (Int i = 0 ; i < nf+1 ; i++)
         Fm[i] = Front_nrows [i];
@@ -765,10 +890,15 @@ paru_symbolic *paru_analyze
         umfpack_dl_azn_free_sw (&SW);
         return NULL;  
     }
+    //TODO: It is the upperbound I should update it based on the new relaxed
+    //tree
     // Copying first nf+1 elements of Front_ncols(UMFPACK) into Cm(SPQR like)
+    // Cm[i] = Front_ncols [fmap[i]];
     for (Int i = 0 ; i < nf+1 ; i++)
         Cm[i] = Front_ncols [i];
 
+    //don't need fmap anymore
+    paru_free ((n+1), sizeof (Int), fmap, cc);
 
 
     LUsym->Rj= NULL;
