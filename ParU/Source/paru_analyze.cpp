@@ -473,20 +473,24 @@ paru_symbolic *paru_analyze
     }
 
     Int newNf = newF; // new size of number of fronts
+    nf =  LUsym->nf = newF;
     // newParent size is newF+1 potentially smaller than nf
     newParent = 
         (Int*) paru_realloc (newF+1, sizeof(Int), newParent, &size, cc);
     ASSERT ( newF <= nf);
     //TODO: add memory guard?
-    Int newSuper[newNf+2];
+    //Int newSuper[newNf+2];
  
     for(Int oldf = 0; oldf < nf ; oldf++){ //maping old to new 
         Int newf = fmap[oldf];
         Int oldParent = Parent[oldf];
         newParent[newf] = oldParent >= 0 ? fmap[oldParent]: -1 ;
-        newSuper[newf] = Super[oldf] ;
+        //newSuper[newf] = Super[oldf] ;
+        Super[newf] = Super[oldf] ;
     }
-    newSuper[newNf+1] = Super[nf] ;
+    PRLEVEL (1, ("%% newF = %ld and nf=%ld\n",  newNf, nf));
+    //newSuper[newNf] = Super[nf] ;
+    Super[newNf] = Super[nf] ;
 
 
     //TODO: updating Parent, Sn and Upperbound
@@ -526,12 +530,12 @@ paru_symbolic *paru_analyze
     }
     PRLEVEL (p, ("\n"));
     
-    PRLEVEL (p, ("%%%% newSuper:\n"));
-    for(Int k = 0; k <= newNf; k++){
-        PRLEVEL (p, ("  %ld", newSuper[k]));
-    }
-    PRLEVEL (p, ("\n"));
-
+//    PRLEVEL (p, ("%%%% newSuper:\n"));
+//    for(Int k = 0; k <= newNf; k++){
+//        PRLEVEL (p, ("  %ld", newSuper[k]));
+//    }
+//    PRLEVEL (p, ("\n"));
+//
 
 
 #endif
@@ -877,7 +881,8 @@ paru_symbolic *paru_analyze
     //after relaxed amalgamation
     // Copying first nf+1 elements of Front_nrows(UMFPACK) into Fm(SPQR like)
     for (Int i = 0 ; i < nf+1 ; i++)
-        Fm[i] = Front_nrows [i];
+        //Fm[i] = Front_nrows [i];
+        Fm[i] = Front_nrows [fmap[i]];
 
 
 
@@ -895,8 +900,18 @@ paru_symbolic *paru_analyze
     // Copying first nf+1 elements of Front_ncols(UMFPACK) into Cm(SPQR like)
     // Cm[i] = Front_ncols [fmap[i]];
     for (Int i = 0 ; i < nf+1 ; i++)
-        Cm[i] = Front_ncols [i];
+        //Cm[i] = Front_ncols [i];
+        Cm[i] = Front_ncols [fmap[i]];
 
+#ifndef NDEBUG
+    p = 1;
+    PRLEVEL (p, ("Cm =\n"));
+    for (Int i = 0; i < nf+1; i++){
+        PRLEVEL (p, ("%ld ", Cm[i]));
+    }
+    PRLEVEL (p, ("\n"));
+#endif
+ 
     //don't need fmap anymore
     paru_free ((n+1), sizeof (Int), fmap, cc);
 
