@@ -26,7 +26,7 @@ int paru_front ( paru_matrix *paruMatInfo,
         Int f, /* front need to be assembled */
         cholmod_common *cc){
 
-    DEBUGLEVEL(-2);
+    DEBUGLEVEL(1);
     /* 
      * -2 Print Nothing
      * -1 Just Matlab
@@ -265,6 +265,7 @@ int paru_front ( paru_matrix *paruMatInfo,
     }
 
     PRLEVEL (1, ("%% pivotalFront =%p \n", pivotalFront));
+    PRLEVEL (1, ("%% fm=%ld rowCount=%ld \n", fm, rowCount));
     ASSERT ( fm >= rowCount );
     //freeing extra space for rows
     if (rowCount != fm){

@@ -18,12 +18,18 @@
  *                \                          
  *                2(1)                      
  *
- * Relaxed tree:  threshold=3
+ * Relaxed tree:  threshold=3  front(number of pivotal cols)##oldfront 
  *   3(2)##5 
  *   |       \                                  
  *   0(1)##0 2(3)##2,3,4
- *        |  
- *        1(1)##2
+ *            |  
+ *            1(1)##1
+ *
+ *            0 1 2 3 4 5
+ *      fmap: 0 1 2 2 2 3            
+ *
+ *      fmap[oldf] == fmap [oldf+1]  amalgamated  
+ *      fmap[oldf-1] == fmap [oldf]  amalgamated  and root of subtree
  *         
  *  Augmented tree creation:
  *
@@ -429,11 +435,27 @@ paru_symbolic *paru_analyze
         Super[k] = Front_npivcol[k-1];
     }
     paru_cumsum (nf+1, Super);
-    paru_free ((n+1), sizeof (Int), Front_npivcol, cc);
 
     /* ---------------------------------------------------------------------- */
     /*                          Relaxed amalgamation                          */
     /* ---------------------------------------------------------------------- */
+#ifndef NDEBUG
+    p = 1;
+    PRLEVEL (p, ("%%%% Before relaxed amalgmation\n"));
+
+    PRLEVEL (p, ("%%%% Super:\n"));
+    for(Int k = 0; k <= nf ; k++){
+        PRLEVEL (p, ("  %ld", Super[k]));
+    }
+    PRLEVEL (p, ("\n"));
+
+   PRLEVEL (p, ("%%%% Parent:\n"));
+    for(Int k = 0; k <= nf ; k++){
+        PRLEVEL (p, ("  %ld", Parent[k]));
+    }
+    PRLEVEL (p, ("\n"));
+#endif
+
 
 
     //TODO: Relax amalgamation before making the list of children
@@ -473,50 +495,128 @@ paru_symbolic *paru_analyze
     }
 
     Int newNf = newF; // new size of number of fronts
-    nf =  LUsym->nf = newF;
+    //nf =  LUsym->nf = newF;
     // newParent size is newF+1 potentially smaller than nf
     newParent = 
         (Int*) paru_realloc (newF+1, sizeof(Int), newParent, &size, cc);
     ASSERT ( newF <= nf);
     //TODO: add memory guard?
     //Int newSuper[newNf+2];
- 
+
     for(Int oldf = 0; oldf < nf ; oldf++){ //maping old to new 
         Int newf = fmap[oldf];
         Int oldParent = Parent[oldf];
         newParent[newf] = oldParent >= 0 ? fmap[oldParent]: -1 ;
         //newSuper[newf] = Super[oldf] ;
-        Super[newf] = Super[oldf] ;
+        //Super[newf] = Super[oldf] ;
     }
     PRLEVEL (1, ("%% newF = %ld and nf=%ld\n",  newNf, nf));
     //newSuper[newNf] = Super[nf] ;
+
+
+    /* ---------------------------------------------------------------------- */
+    /*         Finding the Upper bound of rows and cols                       */
+    /* ---------------------------------------------------------------------- */
+
+    SWType *mySW = (SWType *)SW;
+    Int *Front_nrows = (Int *) mySW->Front_nrows;
+    Int *Front_ncols = (Int *) mySW->Front_ncols;
+
+
+    LUsym->Fm= NULL;    //Upper bound on number of rows
+    LUsym->Cm= NULL;    //Upper bound on number of columns
+    //    LUsym->Fm = QRsym->Fm; 
+    //    QRsym->Fm = NULL;
+    Int *Fm = (Int *) paru_calloc ((newNf+1), sizeof (Int), cc);
+    Int *Cm = (Int *) paru_alloc ((newNf+1), sizeof (Int), cc);
+    LUsym->Fm =  Fm;
+    LUsym->Cm =  Cm;
+
+
+    //TODO: I have not checked memory problems after changin the code
+    if ( Fm == NULL || Cm == NULL ){   
+        printf ("memory problem");
+        paru_freesym (&LUsym , cc);
+        umfpack_dl_azn_free_sw (&SW);
+        return NULL;  
+    }
+
+    //TODO: although I do not really use this data structure I should update it
+    //after relaxed amalgamation
+    // Copying first nf+1 elements of Front_nrows(UMFPACK) into Fm(SPQR like)
+    for (Int oldf = 0 ; oldf < nf ; oldf++) {
+        PRLEVEL (p, ("oldf=%ld\n",oldf));
+        Int newf = fmap[oldf];
+        PRLEVEL (p, ("newf=%ld\n",newf));
+        PRLEVEL (p, ("next=%ld\n",fmap[oldf+1]));
+
+        if (newf != fmap [oldf+1]){  //either root or not amalgamated
+            Fm[newf] += Front_nrows [oldf];
+            Cm[newf] = Front_ncols [oldf] ;//- Front_npivcol [oldf];
+            //newSuper[newf+1] = Super[oldf+1] ;
+            Super[newf+1] = Super[oldf+1] ;
+            PRLEVEL (p, ("Fm[newf]=%ld\n",Fm[newf]));
+            PRLEVEL (p, ("Cm[newf]=%ld\n",Cm[newf]));
+        }
+        else{
+            Fm[newf] += Front_npivcol[oldf];
+            PRLEVEL (p, ("Fm[newf]=%ld\n",Fm[newf]));
+        }
+    }
     Super[newNf] = Super[nf] ;
 
 
-    //TODO: updating Parent, Sn and Upperbound
-    //Parent = newParent; // free stuff not necessary
-    //for(int i=0; i< newNf; ++i)
-    // Super[i] = Super[fmap[i]] // shrinking
-  //  for(Int i=0; i< newNf ; ++i)
-  //      newSuper[i] = Super[fmap[i]]; // shrinking
+    LUsym->Rj= NULL;
+    //    LUsym->Rj = QRsym->Rj; 
+    //    QRsym->Rj = NULL;
 
+
+    LUsym->Rp= NULL;
+    //    LUsym->Rp = QRsym->Rp; 
+    //    QRsym->Rp = NULL;
 
 #ifndef NDEBUG
-            p = 1;
-    PRLEVEL (p, ("%%%% Wroking on relaxed amalgmation\n"));
+    p = 1;
+    PRLEVEL (p, ("%%%% After relaxed amalgmation\n"));
+
+    PRLEVEL (p, ("Cm =\n"));
+    for (Int i = 0; i < nf+1; i++){
+        PRLEVEL (p, ("%ld ", Cm[i]));
+    }
+    PRLEVEL (p, ("\n"));
+
+    PRLEVEL (p, ("Fm =\n"));
+    for (Int i = 0; i < nf+1; i++){
+        PRLEVEL (p, ("%ld ", Fm[i]));
+    }
+    PRLEVEL (p, ("\n"));
+
+    PRLEVEL (p, ("Pivot cols=\n"));
+    for (Int i = 0; i < nf+1; i++){
+        PRLEVEL (p, ("%ld ", Front_npivcol[i]));
+    }
+    PRLEVEL (p, ("\n"));
+
+
+    PRLEVEL (p, ("Upper bound on Rows =\n"));
+    for (Int i = 0; i < nf+1; i++){
+        PRLEVEL (p, ("%ld ", Front_nrows[i]));
+    }
+    PRLEVEL (p, ("\n"));
+
+    PRLEVEL (p, ("Upper bound on Cols=\n"));
+    for (Int i = 0; i < nf+1; i++){
+        PRLEVEL (p, ("%ld ", Front_ncols[i]));
+    }
+    PRLEVEL (p, ("\n"));
+
+
 
     PRLEVEL (p, ("%%%% Super:\n"));
     for(Int k = 0; k <= nf ; k++){
         PRLEVEL (p, ("  %ld", Super[k]));
     }
     PRLEVEL (p, ("\n"));
-
-    PRLEVEL (p, ("%%%% Parent:\n"));
-    for(Int k = 0; k <= nf ; k++){
-        PRLEVEL (p, ("  %ld", Parent[k]));
-    }
-    PRLEVEL (p, ("\n"));
-
 
     PRLEVEL (p, ("%%%% fmap:\n"));
     for(Int k = 0; k < nf ; k++){
@@ -529,16 +629,18 @@ paru_symbolic *paru_analyze
         PRLEVEL (p, ("  %ld", newParent[k]));
     }
     PRLEVEL (p, ("\n"));
-    
-//    PRLEVEL (p, ("%%%% newSuper:\n"));
-//    for(Int k = 0; k <= newNf; k++){
-//        PRLEVEL (p, ("  %ld", newSuper[k]));
-//    }
-//    PRLEVEL (p, ("\n"));
-//
-
 
 #endif
+
+    paru_free (nf+1, sizeof (Int), LUsym->Parent, cc);
+    LUsym->Parent = Parent = newParent; // TODO:free stuff not necessary
+    nf =  LUsym->nf = newNf;
+
+    umfpack_dl_azn_free_sw (&SW);
+    paru_free ((n+1), sizeof (Int), Front_npivcol, cc);
+    paru_free ((n+1), sizeof (Int), fmap, cc);
+
+
     //////////////////////end of relaxed amalgamation/////////////////////////
 
     //Making Children list
@@ -548,7 +650,7 @@ paru_symbolic *paru_analyze
         printf ("memory problem");
         paru_free ((m+1), sizeof (Int), Pinit, cc);
         paru_freesym (&LUsym , cc);
-        umfpack_dl_azn_free_sw (&SW);
+        //umfpack_dl_azn_free_sw (&SW);
         return NULL;  
     }
 
@@ -571,7 +673,7 @@ paru_symbolic *paru_analyze
         printf ("memory problem");
         paru_free ((m+1), sizeof (Int), Pinit, cc);
         paru_freesym (&LUsym , cc);
-        umfpack_dl_azn_free_sw (&SW);
+        // umfpack_dl_azn_free_sw (&SW);
         return NULL;  
     }
 
@@ -583,7 +685,7 @@ paru_symbolic *paru_analyze
         paru_free ((m+1), sizeof (Int), Pinit, cc);
         paru_free ((MAX(m,n)+2), sizeof (Int), Work, cc);
         paru_freesym (&LUsym , cc);
-        umfpack_dl_azn_free_sw (&SW);
+        //umfpack_dl_azn_free_sw (&SW);
         return NULL;  
     }
 
@@ -620,7 +722,7 @@ paru_symbolic *paru_analyze
         paru_free ((MAX(m,n)+2), sizeof (Int), Work, cc);
 
         paru_freesym (&LUsym , cc);
-        umfpack_dl_azn_free_sw (&SW);
+        //umfpack_dl_azn_free_sw (&SW);
 
         return NULL;  
     }
@@ -662,8 +764,8 @@ paru_symbolic *paru_analyze
 
         paru_free ((m+1), sizeof (Int), Pinit, cc);
         paru_free ((MAX(m,n)+2), sizeof (Int), Work, cc);
- 
-        umfpack_dl_azn_free_sw (&SW);
+
+        //umfpack_dl_azn_free_sw (&SW);
         paru_freesym (&LUsym , cc);
         return NULL;  
     }
@@ -694,7 +796,7 @@ paru_symbolic *paru_analyze
                 Sp[srow+1]++;
             } 
             else { // inside the upart
-               unz++; 
+                unz++; 
             }
         }
         Sleft[newcol-n1+1] = rowcount;
@@ -729,7 +831,7 @@ paru_symbolic *paru_analyze
         paru_free ((MAX(m,n)+2), sizeof (Int), Work, cc);
 
         paru_freesym (&LUsym , cc);
-        umfpack_dl_azn_free_sw (&SW);
+        //umfpack_dl_azn_free_sw (&SW);
         return NULL; //Free memory
     }
     ASSERT (rowcount == m-n1);
@@ -749,9 +851,9 @@ paru_symbolic *paru_analyze
         Pinv[Pinit[i]] = i;
     }
 
-    
 
-///////////////////////////////////////////////////////////////
+
+    ///////////////////////////////////////////////////////////////
     Int *cSp = Work;
     for (Int i = n1; i < m; i++){
         Int row = i - n1 ;
@@ -792,7 +894,7 @@ paru_symbolic *paru_analyze
 #endif
 
     paru_free ((m+1), sizeof (Int), Pinit, cc);
-///////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////
 #ifndef NDEBUG
     p = 1;
     PRLEVEL (p, ("Before Sj Sp =\n"));
@@ -810,7 +912,7 @@ paru_symbolic *paru_analyze
     if (Sj == NULL || Sx == NULL){   
         printf ("memory problem");
         paru_freesym (&LUsym , cc);
-        umfpack_dl_azn_free_sw (&SW);
+        //umfpack_dl_azn_free_sw (&SW);
         return NULL;  
     }
 
@@ -856,76 +958,7 @@ paru_symbolic *paru_analyze
 #endif
     paru_free ((MAX(m,n)+2), sizeof (Int), Work, cc);
 
-    /* ---------------------------------------------------------------------- */
-    /*         Finding the Upper bound of rows and cols                       */
-    /* ---------------------------------------------------------------------- */
-    
-    SWType *mySW = (SWType *)SW;
-    Int *Front_nrows = (Int *) mySW->Front_nrows;
-    Int *Front_ncols = (Int *) mySW->Front_ncols;
 
-
-    LUsym->Fm= NULL;
-    //    LUsym->Fm = QRsym->Fm; 
-    //    QRsym->Fm = NULL;
-    Int *Fm = (Int *) paru_alloc ((nf+1), sizeof (Int), cc);
-    LUsym->Fm =  Fm;
-    if ( Fm == NULL){   
-        printf ("memory problem");
-        paru_freesym (&LUsym , cc);
-        umfpack_dl_azn_free_sw (&SW);
-        return NULL;  
-    }
-
-    //TODO: although I do not really use this data structure I should update it
-    //after relaxed amalgamation
-    // Copying first nf+1 elements of Front_nrows(UMFPACK) into Fm(SPQR like)
-    for (Int i = 0 ; i < nf+1 ; i++)
-        //Fm[i] = Front_nrows [i];
-        Fm[i] = Front_nrows [fmap[i]];
-
-
-
-    LUsym->Cm= NULL;    //Upper bound on number of columns
-    Int *Cm = (Int *) paru_alloc ((nf+1), sizeof (Int), cc);
-    LUsym->Cm =  Cm;
-    if ( Cm == NULL){   
-        printf ("memory problem");
-        paru_freesym (&LUsym , cc);
-        umfpack_dl_azn_free_sw (&SW);
-        return NULL;  
-    }
-    //TODO: It is the upperbound I should update it based on the new relaxed
-    //tree
-    // Copying first nf+1 elements of Front_ncols(UMFPACK) into Cm(SPQR like)
-    // Cm[i] = Front_ncols [fmap[i]];
-    for (Int i = 0 ; i < nf+1 ; i++)
-        //Cm[i] = Front_ncols [i];
-        Cm[i] = Front_ncols [fmap[i]];
-
-#ifndef NDEBUG
-    p = 1;
-    PRLEVEL (p, ("Cm =\n"));
-    for (Int i = 0; i < nf+1; i++){
-        PRLEVEL (p, ("%ld ", Cm[i]));
-    }
-    PRLEVEL (p, ("\n"));
-#endif
- 
-    //don't need fmap anymore
-    paru_free ((n+1), sizeof (Int), fmap, cc);
-
-
-    LUsym->Rj= NULL;
-    //    LUsym->Rj = QRsym->Rj; 
-    //    QRsym->Rj = NULL;
-
-
-    LUsym->Rp= NULL;
-    //    LUsym->Rp = QRsym->Rp; 
-    //    QRsym->Rp = NULL;
-
-    umfpack_dl_azn_free_sw (&SW);
 
     /* ---------------------------------------------------------------------- */
     /*    computing the augmented tree and the data structures related        */
