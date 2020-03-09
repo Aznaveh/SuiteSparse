@@ -31,7 +31,8 @@ Int paru_add_rowTuple (
     if (cur->len > cur->numTuple)
         cur->list[cur->numTuple++] = T;
 
-    else{
+    else
+    {
         PRLEVEL (1, ("%%Row paru_Tuple reallocating space\n"));
         Int newLen = cur->len*2 + 1;
         paru_Tuple *newList = 
@@ -57,7 +58,8 @@ Int paru_add_colTuple (tupleList *ColList, Int col,
     PRLEVEL (1, ("%% cur->numTuple =%ld\n", cur->numTuple));
     if (cur->len > cur->numTuple)
         cur->list [cur->numTuple++] = T;
-    else{
+    else
+    {
         PRLEVEL (1, ("%% Col paru_Tuple reallocating space\n"));
         Int newLen = cur->len*2 + 1;
         paru_Tuple *newList = 

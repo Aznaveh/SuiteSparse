@@ -12,10 +12,12 @@ void assemble_col (const double *sC, double *dC,   //source col and destination 
         Int m, const Int *relRowInd)
 {
     DEBUGLEVEL (0);
-    for (Int i = 0; i < m; i++) {
+    for (Int i = 0; i < m; i++) 
+    {
         PRLEVEL (1, ("%% relRowInd [%ld] =%ld\n",i ,relRowInd [i] ));
         Int ri = relRowInd[i] ;
-        if ( ri >= 0 ) { // If still valid
+        if ( ri >= 0 ) 
+        { // If still valid
             PRLEVEL (1, ("%% sC [%ld] =%2.5lf \n", i, sC [i]));
             PRLEVEL (1, ("%% dC [%ld] =%2.5lf \n", i, dC [ri]));
             dC [ri ] += sC[i];
@@ -33,9 +35,11 @@ void assemble_row (const double *sM, double *dM,//source and destination matrix
     //Source and destination are stored column based
 {
     DEBUGLEVEL (0);
-    for (Int j = 0; j < sn; j++) {
+    for (Int j = 0; j < sn; j++) 
+    {
         Int rj =relColInd[j] ;
-        if ( rj >= 0 ){  // If still valid
+        if ( rj >= 0 )
+        {  // If still valid
             PRLEVEL (1, ("%% sM [%ld] =%2.5lf \n", sm*j+sR, sM [sm*j+sR] ));
             PRLEVEL (1, ("%% dM [%ld] =%2.5lf \n", rj*dm+dR, dM [rj*dm+dR]));
             dM [rj*dm + dR] += sM [sm*j + sR];
@@ -55,15 +59,20 @@ void assemble_all (double *s, double *d,   //source and destination
     DEBUGLEVEL (0);
     Int ii = 0, jj = 0; // row/cols visited sofar
 
-    if (snleft == 1 || sm == 1) {
+    if (snleft == 1 || sm == 1) 
+    {
         // In the case that saving row patter doesnt worth
-        for (Int j = 0; j < sn; j++) {
+        for (Int j = 0; j < sn; j++) 
+        {
             Int rj = relColInd[j];
-            if (rj  >= 0 ){  // If column is valid
+            if (rj  >= 0 )
+            {  // If column is valid
                 jj++;
-                for (Int i = 0; i < sm; i++) {
+                for (Int i = 0; i < sm; i++) 
+                {
                     Int ri =relRowInd[i] ;
-                    if (ri >= 0 ){  // If row is valid
+                    if (ri >= 0 )
+                    {  // If row is valid
                         ii++;
 
                         PRLEVEL (1, ("%% s [%ld] =%2.5lf \n",
@@ -85,19 +94,24 @@ void assemble_all (double *s, double *d,   //source and destination
             }
         }
     }
-    else { 
+    else 
+    { 
         Int tempRel[smleft]; 
         // C99 keeping the row indices after fisrt iteration
 
         Int j = 0;
-        for (; j < sn; j++) {
+        for (; j < sn; j++) 
+        {
             //Just first column
             Int rj = relColInd[j];
-            if (rj  >= 0 ){  // If column is valid
+            if (rj  >= 0 )
+            {  // If column is valid
                 jj++;
-                for (Int i = 0; i < sm; i++) {
+                for (Int i = 0; i < sm; i++) 
+                {
                     Int ri = relRowInd[i] ;
-                    if (ri >= 0 ){  // If row is valid
+                    if (ri >= 0 )
+                    {  // If row is valid
 
                         ASSERT (ii < smleft);
                         tempRel[ii] = i;
@@ -125,12 +139,15 @@ void assemble_all (double *s, double *d,   //source and destination
             }
         }
 
-        for (j++ ; j < sn; j++) {
+        for (j++ ; j < sn; j++) 
+        {
             //rest of the columns
             Int rj = relColInd[j];
-            if (rj  >= 0 ){  // If column is valid
+            if (rj  >= 0 )
+            {  // If column is valid
                 jj++;
-                for (Int ll = 0; ll < smleft; ll++) {
+                for (Int ll = 0; ll < smleft; ll++) 
+                {
                     Int i = tempRel[ll];
                     Int ri = relRowInd[i];
 

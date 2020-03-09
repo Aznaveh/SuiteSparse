@@ -25,7 +25,8 @@ void paru_init_rel  (paru_matrix *paruMatInfo, Int f)
 
     PRLEVEL (1, ("%% begining=%ld end=%ld \n",Childp[f], Childp[f+1]));
     PRLEVEL (1, ("%% children of %ld  are:\n", f));
-    for(Int p = Childp[f]; p <= Childp[f+1]-1; p++){
+    for(Int p = Childp[f]; p <= Childp[f+1]-1; p++)
+    {
        Int child_rel;
         ASSERT(Child[p] >= 0);
         child_rel = time_stamp [Child[p]]; 

@@ -27,7 +27,8 @@
 //
 
 Int paru_dgemm(double *pF, double *uPart, 
-        double *el, Int fp, Int rowCount, Int colCount){
+        double *el, Int fp, Int rowCount, Int colCount)
+{
 
     DEBUGLEVEL(0);
     PRLEVEL (1, ("%% rowCount =%ld  ", rowCount));
@@ -45,30 +46,32 @@ Int paru_dgemm(double *pF, double *uPart,
 #ifndef NDEBUG 
     double *Ap= pF+fp;
     PRLEVEL (1, ("%% A =\n"));
-    for(Int i = 0; i < mA; i++){
+    for(Int i = 0; i < mA; i++)
+    {
         PRLEVEL (1, ("%% "));
-        for(Int j = 0; j < nA; j++){
+        for(Int j = 0; j < nA; j++)
             PRLEVEL (1, ("%2.4lf\t",Ap[j*rowCount+i]));
-        }
         PRLEVEL (1, ("\n"));
     }
 
     Int mB = nA;
     double *Bp = uPart;
     PRLEVEL (1, ("%% B =\n"));
-    for(Int i = 0; i < mB; i++){
+    for(Int i = 0; i < mB; i++)
+    {
         PRLEVEL (1, ("%% "));
-        for(Int j = 0; j < nB; j++){
+        for(Int j = 0; j < nB; j++)
             PRLEVEL (1, ("%2.4lf\t",Bp[j*mB+i]));
-        }
         PRLEVEL (1, ("\n"));
     }
 
     double *Cp = el;
     PRLEVEL (1, ("%%Before DGEMM C =\n"));
-    for(Int i = 0; i < mA; i++){
+    for(Int i = 0; i < mA; i++)
+    {
         PRLEVEL (1, ("%% "));
-        for(Int j = 0; j < nB; j++){
+        for(Int j = 0; j < nB; j++)
+        {
             PRLEVEL (1, ("%2.4lf\t",Cp[j*mA+i]));
         }
         PRLEVEL (1, ("\n"));
@@ -97,11 +100,11 @@ Int paru_dgemm(double *pF, double *uPart,
 
 #ifndef NDEBUG 
     PRLEVEL (1, ("%%After DGEMM C =\n"));
-    for(Int i = 0; i < mA; i++){
+    for(Int i = 0; i < mA; i++)
+    {
         PRLEVEL (1, ("%% "));
-        for(Int j = 0; j < nB; j++){
+        for(Int j = 0; j < nB; j++)
             PRLEVEL (1, ("%2.4lf\t",Cp[j*mA+i]));
-        }
         PRLEVEL (1, ("\n"));
     }
 #endif 

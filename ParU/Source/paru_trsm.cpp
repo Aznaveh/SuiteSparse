@@ -35,7 +35,8 @@
 //                           int *m, int *n, double *alpha, double *a, int *lda,
 //                                                         double *b, int *ldb);
 
-Int paru_trsm(double *pF, double *uPart, Int fp, Int rowCount, Int colCount){
+Int paru_trsm(double *pF, double *uPart, Int fp, Int rowCount, Int colCount)
+{
 
     DEBUGLEVEL (0);
     BLAS_INT mB = (BLAS_INT) fp;
@@ -49,10 +50,10 @@ Int paru_trsm(double *pF, double *uPart, Int fp, Int rowCount, Int colCount){
     PRLEVEL (p, ("mB=%d nB = %d alpha = %f \n", mB, nB, alpha));
     PRLEVEL (p, ("lda =%d ldb =%d\n", lda, ldb));
     PRLEVEL (p, ("(I)U Before Trsm: %ld x %ld\n", fp, colCount));
-    for (Int i = 0; i < fp; i++){
-        for (Int j = 0; j < colCount; j++){
+    for (Int i = 0; i < fp; i++)
+    {
+        for (Int j = 0; j < colCount; j++)
             PRLEVEL (p, (" %2.5lf\t", uPart[j*fp+i]));
-        }
         PRLEVEL (p, ("\n"));
     }
 #endif
@@ -64,14 +65,13 @@ Int paru_trsm(double *pF, double *uPart, Int fp, Int rowCount, Int colCount){
 
 #ifndef NDEBUG  // Printing the  U part
     PRLEVEL (p, ("(I)U After Trsm: %ld x %ld\n", fp, colCount));
-    for (Int i = 0; i < fp; i++){
-        for (Int j = 0; j < colCount; j++){
+    for (Int i = 0; i < fp; i++)
+    {
+        for (Int j = 0; j < colCount; j++)
             PRLEVEL (p, (" %2.5lf\t", uPart[j*fp+i]));
-        }
         PRLEVEL (p, ("\n"));
     }
 #endif
-
 
     return 0;
 

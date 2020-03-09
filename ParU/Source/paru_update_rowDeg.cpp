@@ -19,7 +19,8 @@
  */
 
 void paru_update_rowDeg ( Int panel_num,  Int row_end, Int f, Int *next,
-        paru_matrix *paruMatInfo){
+        paru_matrix *paruMatInfo)
+{
 
     DEBUGLEVEL(0);
 #ifndef NDEBUG
@@ -99,7 +100,8 @@ void paru_update_rowDeg ( Int panel_num,  Int row_end, Int f, Int *next,
     Int colMark = Work -> colMark;
     Int n = paruMatInfo-> n;
 
-    if (colMark < 0) {  // in rare case of overflow
+    if (colMark < 0) 
+    {  // in rare case of overflow
         //        memset (isRowInFront, -1, n*sizeof(Int)); //Bug detected
         memset (isColInCBcolSet , -1, n*sizeof(Int));
         colMark = Work-> colMark = 0;
@@ -119,7 +121,8 @@ void paru_update_rowDeg ( Int panel_num,  Int row_end, Int f, Int *next,
 #endif  
 
     tupleList *RowList = paruMatInfo->RowList;
-    for (Int i = j1; i < j2; i++){
+    for (Int i = j1; i < j2; i++)
+    {
 #ifndef NDEBUG
         Int curFsRowIndex = i; //current fully summed row index
 #endif  
@@ -134,8 +137,10 @@ void paru_update_rowDeg ( Int panel_num,  Int row_end, Int f, Int *next,
 
 
         Int pdst = 0, psrc;
-        for (psrc = 0; psrc < numTuple; psrc ++){
-        //for (Int i = 0; i < numTuple; i++){
+        for (psrc = 0; psrc < numTuple; psrc ++)
+        {
+        //for (Int i = 0; i < numTuple; i++)
+        //{
            // paru_Tuple curTpl = listRowTuples [i];
             paru_Tuple curTpl = listRowTuples [psrc];
 
@@ -165,17 +170,17 @@ void paru_update_rowDeg ( Int panel_num,  Int row_end, Int f, Int *next,
             ASSERT (el_rowIndex[curRowIndex] == curFsRow);
 
 
-            if(el->rValid !=  pMark){// an element never seen before
+            if(el->rValid !=  pMark)
+            {// an element never seen before
                 el->rValid = pMark;
 
                 PRLEVEL (1, ("%%first time seen elRow[%ld]=%ld \n"
                             , e, elRow[e]));
-                if (el->rValid != npMark){
+                if (el->rValid != npMark)
                     elRow [e] = el ->nrowsleft - 1; //initiaze
-                }
-                else { 
+                else
                     elRow [e]--; //already seen in a non pivotal row
-                }
+
                 PRLEVEL (1, ("%%changed to elRow[%ld]=%ld \n", e, elRow[e]));
 #ifndef NDEBUG            
                 if (el->rValid >  pMark)
@@ -187,7 +192,8 @@ void paru_update_rowDeg ( Int panel_num,  Int row_end, Int f, Int *next,
                 //And the rest of e is in U part 
 #endif
             }
-            else {  //already added to pivotal rows
+            else 
+            {  //already added to pivotal rows
                 elRow [e]--;
                 PRLEVEL (1, ("%%already seen elRow[%ld]=%ld \n",e, elRow[e]));
                 continue;
@@ -201,7 +207,8 @@ void paru_update_rowDeg ( Int panel_num,  Int row_end, Int f, Int *next,
 
 
             PRLEVEL (1, ("%% element= %ld  nEl =%ld \n",e, nEl));
-            for (Int cEl = 0; cEl < nEl; cEl++){
+            for (Int cEl = 0; cEl < nEl; cEl++)
+            {
                 Int curCol = el_colIndex [cEl]; 
                 PRLEVEL (1, ("%% curCol =%ld\n", curCol));
                 ASSERT (curCol < n);
@@ -222,14 +229,16 @@ void paru_update_rowDeg ( Int panel_num,  Int row_end, Int f, Int *next,
                             isColInCBcolSet+curCol, curCol,
                             isColInCBcolSet[curCol]));
 
-                if (isColInCBcolSet [curCol] < colMark  ){
+                if (isColInCBcolSet [curCol] < colMark  )
+                {
                     PRLEVEL (1, ("%% curCol = %ld colCount=%ld\n", 
                                 curCol, colCount));
                     fcolList [colCount] = curCol;
                     colRelIndex [cEl] = colCount;
                     isColInCBcolSet [curCol] = colMark + colCount++; 
                 }
-                else{
+                else
+                {
                     colRelIndex [cEl] = isColInCBcolSet [curCol]- colMark;
                 }
                 ASSERT (colCount <= n);
@@ -239,7 +248,8 @@ void paru_update_rowDeg ( Int panel_num,  Int row_end, Int f, Int *next,
         curRowTupleList->numTuple = pdst;
         }
 
-        if (colCount == 0){  // there is no CB, Nothing to be done
+        if (colCount == 0)
+        {  // there is no CB, Nothing to be done
             Work->rowMark +=  rowCount;
             return;
         }
@@ -252,12 +262,15 @@ void paru_update_rowDeg ( Int panel_num,  Int row_end, Int f, Int *next,
             PRLEVEL (p, ("%%  %ld", fcolList [i]));
         PRLEVEL (p, ("\n"));
         Int stl_colSize = stl_colSet.size();
-        if (colCount != stl_colSize){
+
+        if (colCount != stl_colSize)
+        {
             PRLEVEL (p, ("%% STL %ld:\n",stl_colSize));
             for (it = stl_colSet.begin(); it != stl_colSet.end(); it++)
                 PRLEVEL (p, ("%%  %ld", *it));
             PRLEVEL (p, ("\n%% My Set %ld:\n",colCount));
-            for (Int i = 0; i < colCount; i++){
+            for (Int i = 0; i < colCount; i++)
+            {
                 PRLEVEL (p, ("%%  %ld", fcolList [i]));
                 if ( stl_colSet.find(fcolList [i]) == stl_colSet.end() )
                     PRLEVEL (p, ("%%\n  %ld is NOT in the list\n", fcolList [i]));
@@ -268,9 +281,8 @@ void paru_update_rowDeg ( Int panel_num,  Int row_end, Int f, Int *next,
 #endif 
 
     // if the front did not grow, there is nothing else to do
-    if (colCount == past_col ){
+    if (colCount == past_col )
         return; 
-    }
 
     paruMatInfo->fcolCount[f] = colCount;
 
@@ -317,7 +329,8 @@ void paru_update_rowDeg ( Int panel_num,  Int row_end, Int f, Int *next,
     Int *snM = LUsym->super2atree;
     Int el_ind = snM [f]; 
     Int *first = LUsym->first;
-    for (Int k = past_col; k < colCount; k++){
+    for (Int k = past_col; k < colCount; k++)
+    {
         Int c = fcolList [k];   //non pivotal column list
         tupleList *curColTupleList = &ColList[c];
         Int numTuple = curColTupleList->numTuple;
@@ -330,16 +343,16 @@ void paru_update_rowDeg ( Int panel_num,  Int row_end, Int f, Int *next,
         if (p <= 0)
             paru_print_tupleList (ColList, c);
 #endif
-        for (Int i = 0; i < numTuple; i++){
+        for (Int i = 0; i < numTuple; i++)
+        {
             paru_Tuple curTpl = listColTuples [i];
             Int e = curTpl.e;
 #ifndef NDEBUG
             r2++;
 #endif
 
-            if ( e >= el_ind || e < first[el_ind]){ //Not any of descendents
+            if ( e >= el_ind || e < first[el_ind])
                 continue;
-            }
 #ifndef NDEBUG        
             if (p <= 0)
                 paru_print_element (paruMatInfo, e);
@@ -351,17 +364,18 @@ void paru_update_rowDeg ( Int panel_num,  Int row_end, Int f, Int *next,
             //Int *el_colIndex = colIndex_pointer (el);
             Int *el_colIndex = (Int*)(el+1);
 
-            if (el_colIndex [curColIndex] < 0 ){
+            if (el_colIndex [curColIndex] < 0 )
                 continue;  
-            }
 
-            if(el->cValid !=  time_f){
+            if(el->cValid !=  time_f)
+            {
                 el->cValid =  time_f;
                 elCol [e] = el->ncolsleft - 1; //initiaze
                 PRLEVEL (1, ("%%cValid=%ld \n",el->cValid));
                 PRLEVEL (1, ("%%first time seen elCol[e]=%ld \n", elCol[e]));
             }
-            else{ 
+            else
+            { 
                 elCol [e]--; 
                 PRLEVEL (1, ("%%seen before: elCol[e]=%ld \n", elCol[e]));
             }
@@ -406,7 +420,8 @@ void paru_update_rowDeg ( Int panel_num,  Int row_end, Int f, Int *next,
      */
     Int new_row_degree_bound_for_r;
  
-    for (Int k = j2; k < row_end; k++){
+    for (Int k = j2; k < row_end; k++)
+    {
         Int r = frowList [k];
 
         new_row_degree_bound_for_r = colCount;
@@ -423,10 +438,9 @@ void paru_update_rowDeg ( Int panel_num,  Int row_end, Int f, Int *next,
             paru_print_tupleList (RowList, r);
 #endif
         Int pdst = 0, psrc;
-        for (psrc = 0; psrc < numTuple; psrc ++){
- 
-        //for (Int i = 0; i < numTuple; i++){
-            //paru_Tuple curTpl = listRowTuples [i];
+        for (psrc = 0; psrc < numTuple; psrc ++)
+        {
+
             paru_Tuple curTpl = listRowTuples [psrc];
             Int e = curTpl.e;
 #ifndef NDEBUG
@@ -447,12 +461,14 @@ void paru_update_rowDeg ( Int panel_num,  Int row_end, Int f, Int *next,
 
             Int *el_rowIndex = rowIndex_pointer (el);
 
-            if (el_rowIndex [curRowIndex] < 0 ){
+            if (el_rowIndex [curRowIndex] < 0 )
+            {
                 continue;  
             }
             listRowTuples [pdst++] = curTpl; //keeping the tuple
 
-            if(el->cValid !=  time_f){
+            if(el->cValid !=  time_f)
+            {
                 el->cValid =  time_f;
                 elCol [e] = el->ncolsleft ; //initiaze
             }
@@ -460,31 +476,36 @@ void paru_update_rowDeg ( Int panel_num,  Int row_end, Int f, Int *next,
 
             PRLEVEL (1, ("%% pMark=%ld npMark=%ld \n",pMark, npMark));
 
-            if(el->rValid == pMark){  //already a pivot
+            if(el->rValid == pMark)
+            {  //already a pivot
                 //ASSERT (elRow[e] == 0); //TODO: something is wrong here
                 elRow [e]--;
                 PRLEVEL (1, ("%% Pivotal elRow[%ld]=%ld \n",e, elRow[e]));
                 continue;
             }
 
-            if(el->rValid != npMark){
+            if(el->rValid != npMark)
+            {
                 el->rValid =  npMark;
                 elRow [e] = el ->nrowsleft - 1; //initiaze
                 PRLEVEL (1, ("%%rValid=%ld \n",el->rValid));
                 PRLEVEL (1, ("%%first time seen elRow[%ld]=%ld \n",
                             e, elRow[e]));
             }
-            else{ 
+            else
+            { 
                 elRow [e]--;
 
                 PRLEVEL (1, ("%%seen before: elRow[e]=%ld \n", elRow[e]));
             }
 #if 0
 
-            if (elRow [e] == 0) {
+            if (elRow [e] == 0) 
+            {
                 
                 PRLEVEL (1, ("%% elRow[%ld]=%ld \n",e,  elRow[e]));
-                if(elCol[e] == 0){
+                if(elCol[e] == 0)
+                {
                     // adding the element to the list of children
                     el->next = *next;
                     *next = e;

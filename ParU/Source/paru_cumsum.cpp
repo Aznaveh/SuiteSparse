@@ -11,10 +11,13 @@
  * 
  * @author Aznaveh
  */
-Int paru_cumsum (Int n, Int *X){   // n is size, X is size n and in/out
+Int paru_cumsum (Int n, Int *X)
+{   // n is size, X is size n and in/out
     Int tot = 0;
-    if (X != NULL){
-        for(Int k = 0; k < n ; k++){
+    if (X != NULL)
+    {
+        for(Int k = 0; k < n ; k++)
+        {
            X[k] += tot;     // tot = sum (X[0:k-1])
            tot = X[k];
         }

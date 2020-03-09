@@ -15,26 +15,26 @@
 extern "C" void dgetrf_( BLAS_INT *dim1, BLAS_INT *dim2, double *a, 
         BLAS_INT *lda, BLAS_INT *ipiv, BLAS_INT *info);
 //dger is already defined in ~/SuiteSparse/CHOLMOD/Include/cholmod_blas.h
-void inline swap_int(Int *a, Int *b){
-    Int tmp = *a; *a = *b; *b = tmp;
-}
+void inline swap_int(Int *a, Int *b)
+{    Int tmp = *a; *a = *b; *b = tmp; }
 
-template <class T> void inline swap (T &a,T &b){
-    T c(a); a=b; b=c;
-}
+template <class T> void inline swap (T &a,T &b)
+{    T c(a); a=b; b=c; }
 
-void swap_rows(double *F, Int *frowList, Int m, Int n, Int r1, Int r2){
+void swap_rows(double *F, Int *frowList, Int m, Int n, Int r1, Int r2)
+{
     //This function also swap rows r1 and r2 wholly and indices 
     if(r1 == r2) return;
     swap(frowList[r1], frowList[r2]);
-    for (Int j=0; j < n; j++){   //each column
+    for (Int j=0; j < n; j++)
+       //each column
         swap(F[j*m+r1],F[j*m+r2]);
-    }
 }
 
 Int paru_panel_factorize (double *F, Int *frowList, Int m, Int n, 
         const Int panel_width, Int panel_num, Int row_end, 
-        paru_matrix *paruMatInfo) {
+        paru_matrix *paruMatInfo) 
+{
     // works like dgetf2f.f in netlib v3.0  here is a link:
     // https://github.com/xianyi/OpenBLAS/blob/develop/reference/dgetf2f.f
     DEBUGLEVEL(-2);
@@ -61,17 +61,18 @@ Int paru_panel_factorize (double *F, Int *frowList, Int m, Int n,
     Int p = 1;
     PRLEVEL (p, ("%% Starting the factorization\n"));
     PRLEVEL (p, ("%% This Panel:\n"));
-    for (Int r = j1; r < row_end; r++){
+    for (Int r = j1; r < row_end; r++)
+    {
         PRLEVEL (p, ("%% %ld\t", frowList [r]));
-        for (Int c = j1; c < j2; c++){
+        for (Int c = j1; c < j2; c++)
             PRLEVEL (p, (" %2.5lf\t", F[c*m+ r]));
-        }
         PRLEVEL (p, ("\n"));
     }
 #endif
  
     //column jth of the panel
-    for (Int j = j1; j < j2 ; j++){ 
+    for (Int j = j1; j < j2 ; j++)
+    { 
 
         PRLEVEL (1, ("%% j = %ld\n", j));
 
@@ -86,10 +87,12 @@ Int paru_panel_factorize (double *F, Int *frowList, Int m, Int n,
                     maxval, row_deg_max));
 
         //find max
-        for (Int i = j+1 ; i < row_end; i++){ 
+        for (Int i = j+1 ; i < row_end; i++)
+        { 
             PRLEVEL (1, ("%%i=%ld value= %2.4lf", i, F[j*m+i]));
             PRLEVEL (1, (" deg = %ld \n", row_degree_bound[frowList[i]]));
-            if (fabs (maxval) < fabs(F[j*m+i])){
+            if (fabs (maxval) < fabs(F[j*m+i]))
+            {
                 row_max = i; 
                 maxval = F[j*m + i];
             }
@@ -112,8 +115,9 @@ Int paru_panel_factorize (double *F, Int *frowList, Int m, Int n,
 
         //find sparsest between accepteble ones
         for (Int i = j; i < row_end; i++) 
-            if ( fabs(TOLER*maxval) < fabs(F[j*m+i]) &&//numerically acceptalbe
-                    row_degree_bound[frowList[i]] < row_deg_sp){// and sparser
+            if ( fabs(TOLER*maxval) < fabs(F[j*m+i]) &&  
+                    row_degree_bound[frowList[i]] < row_deg_sp)
+            {// numerically acceptalbe and sparser
                 piv = F[j*m+i];
                 row_deg_sp = row_degree_bound[frowList[i]];
                 row_sp = i;
@@ -131,11 +135,11 @@ Int paru_panel_factorize (double *F, Int *frowList, Int m, Int n,
             PRLEVEL (p, ("%% \n"));
         PRLEVEL (p, ("%% After Swaping\n"));
         PRLEVEL (p, (" ;\n"));
-        for (Int r = 0; r < row_end; r++){
+        for (Int r = 0; r < row_end; r++)
+        {
             PRLEVEL (p, ("%% %ld\t", frowList [r]));
-            for (Int c = 0; c < num_col_panel; c++){
+            for (Int c = 0; c < num_col_panel; c++)
                 PRLEVEL (p, (" %2.5lf\t", F[c*m+ r]));
-            }
             PRLEVEL (p, ("\n"));
         }
 #endif
@@ -143,10 +147,12 @@ Int paru_panel_factorize (double *F, Int *frowList, Int m, Int n,
 
         //dscal //TODO?: loop unroll is also possible
 
-        if ( j < row_end-1 ){
+        if ( j < row_end-1 )
+        {
 
             PRLEVEL (1, ("%% dscal\n"));
-            for (Int i = j +1 ; i < row_end; i++){ 
+            for (Int i = j +1 ; i < row_end; i++)
+            { 
                 PRLEVEL (1, ("%%i=%ld before cal value= %2.4lf", i, F[j*m+i]));
                 F[j*m + i] /= piv;
                 PRLEVEL (1, (" after dscal value= %2.4lf\n", F[j*m+i]));
@@ -186,7 +192,8 @@ Int paru_panel_factorize (double *F, Int *frowList, Int m, Int n,
          */
 
 
-        if ( j < j2 - 1 ){
+        if ( j < j2 - 1 )
+        {
             BLAS_INT M = (BLAS_INT) row_end - 1 - j ; 
             BLAS_INT N = (BLAS_INT) j2 - 1 - j;
             double alpha = -1.0;
@@ -224,11 +231,11 @@ Int paru_panel_factorize (double *F, Int *frowList, Int m, Int n,
 #ifndef NDEBUG  // Printing the pivotal front
         Int p = 2;
         PRLEVEL (p, ("%% After dger\n"));
-        for (Int r = j1; r < row_end; r++){
+        for (Int r = j1; r < row_end; r++)
+        {
             PRLEVEL (p, ("%% %ld\t", frowList [r]));
-            for (Int c = j1; c < j2; c++){
+            for (Int c = j1; c < j2; c++)
                 PRLEVEL (p, (" %2.5lf\t", F[c*m+ r]));
-            }
             PRLEVEL (p, ("\n"));
         }
 #endif
@@ -239,7 +246,8 @@ Int paru_panel_factorize (double *F, Int *frowList, Int m, Int n,
 
 // LU solve; I am not using it anymore-- I have my own dense lu solver
 Int paru_dgetrf (double *F, Int *frowList, Int lm, Int ln,
-        BLAS_INT *ipiv){
+        BLAS_INT *ipiv)
+{
     DEBUGLEVEL(0);
 
     BLAS_INT m = (BLAS_INT) lm;
@@ -250,10 +258,10 @@ Int paru_dgetrf (double *F, Int *frowList, Int lm, Int ln,
 #ifndef NDEBUG  // Printing the pivotal front before computation
     Int p = 1;
     PRLEVEL (1, ("Befor factorization:\n"));
-    for (Int r = 0; r < m; r++){
-        for (Int c = 0; c < n; c++){
+    for (Int r = 0; r < m; r++)
+    {
+        for (Int c = 0; c < n; c++)
             PRLEVEL (p, (" %3.4lf\t", F[c*m+ r]));
-        }
         PRLEVEL (p, ("\n"));
     }
 #endif
@@ -265,10 +273,10 @@ Int paru_dgetrf (double *F, Int *frowList, Int lm, Int ln,
 
 
 #ifndef NDEBUG  // Initializing permutation; just for debug
-    for (Int i = 0; i < lda ; i++){
+    for (Int i = 0; i < lda ; i++)
         ipiv [i] = -1;
-    }
-    if (m < n ){
+    if (m < n )
+    {
         PRLEVEL (0, ("%%!!!!! FAIL m= %d  n= %d\n", m, n));
         return -1;
     }
@@ -277,7 +285,8 @@ Int paru_dgetrf (double *F, Int *frowList, Int lm, Int ln,
 #ifndef NDEBUG  // Printing the list of rows
     p = 1;
     PRLEVEL (p, ("Befor factorization (inside factorize): \n"));
-    for (Int i = 0; i < m ; i++){
+    for (Int i = 0; i < m ; i++)
+    {
         PRLEVEL (p, ("frowList [%ld] =%ld\n",i, frowList [i]));
     }
     PRLEVEL (p, ("\n"));
@@ -297,9 +306,8 @@ Int paru_dgetrf (double *F, Int *frowList, Int lm, Int ln,
     p = 1;
     // ATTENTION: ipiv is 1 based
     PRLEVEL (p, ("swap permutation:\n"));
-    for (Int i = 0; i < m; i++){
+    for (Int i = 0; i < m; i++)
         PRLEVEL (p, ("ipiv[%ld] =%d\n",i, ipiv[i]));
-    }
     PRLEVEL (p, ("\n"));
 #endif 
 
@@ -307,7 +315,8 @@ Int paru_dgetrf (double *F, Int *frowList, Int lm, Int ln,
 
 
     // swap (frowList[ipiv [i]], frowList[i] ) and it is off by one
-    for (Int i = 0; i < n; i++){
+    for (Int i = 0; i < n; i++)
+    {
         PRLEVEL (1, ("ipiv[%ld] =%d\n", i, ipiv[i]));
         ASSERT (ipiv [i] > 0);
         ASSERT (ipiv [i] <= m);
@@ -322,16 +331,17 @@ Int paru_dgetrf (double *F, Int *frowList, Int lm, Int ln,
 #ifndef NDEBUG   // Printing the LU decomposition
     p = 1;
     PRLEVEL (p, ("After factorization:\n"));
-    for (Int r = 0; r < m; r++){
-        for (Int c = 0; c < n; c++){
+    for (Int r = 0; r < m; r++)
+    {
+        for (Int c = 0; c < n; c++)
             PRLEVEL (p, (" %3.1lf\t", F[c*m+ r]));
-        }
         PRLEVEL (p, ("\n"));
     }
 #endif
 
     PRLEVEL (1, ("info = %d\n", info));
-    if (info != 0 ){
+    if (info != 0 )
+    {
         printf("%%Some problem in factorization\n");
         return info;
     }
@@ -339,7 +349,8 @@ Int paru_dgetrf (double *F, Int *frowList, Int lm, Int ln,
 }
 
 Int paru_factorize(double *F, Int *frowList, Int rowCount, Int f, 
-        Int *panel_row, Int *next, paru_matrix *paruMatInfo){
+        Int *panel_row, Int *next, paru_matrix *paruMatInfo)
+{
     DEBUGLEVEL (0);
 
     Int *Super = paruMatInfo->LUsym->Super;
@@ -348,15 +359,18 @@ Int paru_factorize(double *F, Int *frowList, Int rowCount, Int f,
     Int fp = col2 - col1;   /* first fp columns are pivotal */ 
 
     Int panel_width = paruMatInfo->panel_width;
-    for(Int panel_num = 0; ; panel_num++){
+    for(Int panel_num = 0; ; panel_num++)
+    {
 
 #ifndef NDEBUG  // Printing the pivotal front
     Int p = 1;
     PRLEVEL (p, ("%%Pivotal Front Before %ld\n",panel_num));
     
-    for (Int r = 0; r < rowCount; r++){
+    for (Int r = 0; r < rowCount; r++)
+    {
         PRLEVEL (p, ("%% %ld\t", frowList [r]));
-        for (Int c = 0; c < fp; c++){
+        for (Int c = 0; c < fp; c++)
+        {
             PRLEVEL (p, (" %2.5lf\t", F[c*rowCount+ r]));
         }
         PRLEVEL (p, ("\n"));
@@ -371,11 +385,12 @@ Int paru_factorize(double *F, Int *frowList, Int rowCount, Int f,
                 panel_width, panel_num, row_end, paruMatInfo);
 
         // This can be done parallel to the  next part
-        paru_update_rowDeg ( panel_num, row_end, f, next, paruMatInfo);
+        if (paruMatInfo->LUsym->Cm[f] != 0) //if there is potential column left
+            paru_update_rowDeg ( panel_num, row_end, f, next, paruMatInfo);
 
-        if ( j2 >= fp){ //if it is the last panel
+        if ( j2 >= fp) //if it is the last panel
             break;
-        }
+        
         /*               trsm
          *
          *        F = fully summed part of the pivotal front
@@ -402,7 +417,6 @@ Int paru_factorize(double *F, Int *frowList, Int rowCount, Int f,
          *                         
          */
         ASSERT (j2 < fp);
-
         {
             BLAS_INT M = (BLAS_INT) panel_width;
             BLAS_INT N = (BLAS_INT) fp - j2;
@@ -417,11 +431,11 @@ Int paru_factorize(double *F, Int *frowList, Int rowCount, Int f,
             PRLEVEL (p, ("%% lda =%d ldb =%d\n", lda, ldb));
             PRLEVEL (p, ("%% Pivotal Front Before Trsm: %ld x %ld\n",
                         fp, rowCount));
-            for (Int r = 0; r < rowCount; r++){
+            for (Int r = 0; r < rowCount; r++)
+            {
                 PRLEVEL (p, ("%% %ld\t", frowList [r]));
-                for (Int c = 0; c < fp; c++){
+                for (Int c = 0; c < fp; c++)
                     PRLEVEL (p, (" %2.5lf\t", F[c*rowCount+ r]));
-                }
                 PRLEVEL (p, ("\n"));
             }
 
@@ -443,11 +457,11 @@ Int paru_factorize(double *F, Int *frowList, Int rowCount, Int f,
 #ifndef NDEBUG  
             PRLEVEL (p, ("%% Pivotal Front After Trsm: %ld x %ld\n %%", 
                         fp, rowCount));
-            for (Int r = 0; r < rowCount; r++){
+            for (Int r = 0; r < rowCount; r++)
+            {
                 PRLEVEL (p, ("%% %ld\t", frowList [r]));
-                for (Int c = 0; c < fp; c++){
+                for (Int c = 0; c < fp; c++)
                     PRLEVEL (p, (" %2.5lf\t", F[c*rowCount+ r]));
-                }
                 PRLEVEL (p, ("\n"));
             }
 #endif
@@ -532,11 +546,11 @@ Int paru_factorize(double *F, Int *frowList, Int rowCount, Int f,
 #ifndef NDEBUG  
         PRLEVEL (p, ("%% Pivotal Front After Dgemm: %ld x %ld\n %%", 
                     fp, rowCount));
-        for (Int r = 0; r < rowCount; r++){
+        for (Int r = 0; r < rowCount; r++)
+        {
             PRLEVEL (p, ("%% %ld\t", frowList [r]));
-            for (Int c = 0; c < fp; c++){
+            for (Int c = 0; c < fp; c++)
                 PRLEVEL (p, (" %2.5lf\t", F[c*rowCount+ r]));
-            }
             PRLEVEL (p, ("\n"));
         }
 #endif

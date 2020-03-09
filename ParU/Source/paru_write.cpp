@@ -8,8 +8,9 @@
  *    it must be called after ther result are computed
  *  @author Aznaveh
  */
-void paru_write( paru_matrix *paruMatInfo, int scale,
-        char* id,  cholmod_common *cc){
+void paru_write( paru_matrix *paruMatInfo, int scale, 
+        char* id,  cholmod_common *cc)
+{
 
     DEBUGLEVEL(0);
     paru_symbolic *LUsym = paruMatInfo-> LUsym;
@@ -55,11 +56,13 @@ void paru_write( paru_matrix *paruMatInfo, int scale,
         strcat (fname,"_col.txt");
         colfptr = ( fopen(fname,"w"));
 
-        if (colfptr == NULL ){
+        if (colfptr == NULL )
+        {
             printf ("Error in making %s to write the results!\n", fname);
             return;
         }
-        for (Int col = 0 ; col < n ; col++){    // for each column of A(:,Qfill)
+        for (Int col = 0 ; col < n ; col++)
+        {    // for each column of A(:,Qfill)
             Int j = Qfill ? Qfill [col] : col ; // col of S is column j of A
             fprintf (colfptr, "%ld\n", j );
         }
@@ -78,7 +81,8 @@ void paru_write( paru_matrix *paruMatInfo, int scale,
     PofA = (Int*) paru_alloc ( m, sizeof (Int), cc);    // P direct of A 
     newRofS = (Int*) paru_alloc ( m, sizeof (Int), cc); //Pinv of S
 
-    if (oldRofS == NULL || PofA == NULL || newRofS == NULL){
+    if (oldRofS == NULL || PofA == NULL || newRofS == NULL)
+    {
         printf ("memory problem for writing into files\n");
         paru_free  ( m, sizeof (Int), oldRofS, cc);
         paru_free ( m, sizeof (Int), PofA, cc);
@@ -95,29 +99,34 @@ void paru_write( paru_matrix *paruMatInfo, int scale,
         rowfptr = ( fopen(fname,"w"));
 
 
-        if (rowfptr == NULL ){
+        if (rowfptr == NULL )
+        {
             printf ("Error in opening a file");
             return;
         }
         fprintf (rowfptr, "%%rows\n"); 
 
-        for(Int k = 0; k < m ; k++){ //direct permutation from Pinv
+        for(Int k = 0; k < m ; k++)
+        { //direct permutation from Pinv
             PofA[Pinv[k]] = k;       // actually I have it now with UMFPACK
                                      // but didn't save it
         }
 
         Int ip = 0; //number of rows seen so far
-        for (Int k = 0; k < n1 ; k++){ //first singletons
+        for (Int k = 0; k < n1 ; k++)
+         //first singletons
             fprintf (rowfptr, "%ld\n", PofA[k] );
-        }
-        for(Int f = 0; f < nf ; f++){  // rows for each front 
+        
+        for(Int f = 0; f < nf ; f++)
+        {  // rows for each front 
             Int col1 = Super [f];     
             Int col2 = Super [f+1];
             Int fp = col2-col1;
             Int *frowList =  paruMatInfo->frowList[f];
 
 
-            for (Int k = 0; k < fp ; k++){
+            for (Int k = 0; k < fp ; k++)
+            {
                 oldRofS[ip++] = frowList[k];   // computing permutation for S
                                                // P[k] = i 
                 fprintf (rowfptr, "%ld\n", PofA[frowList[k]] );
@@ -130,15 +139,16 @@ void paru_write( paru_matrix *paruMatInfo, int scale,
 
 
     //-------- computing the direct permutation of S
-    for(Int k = 0; k < m-n1 ; k++){ // Inv permutation for S Pinv[i] = k;
+    for(Int k = 0; k < m-n1 ; k++)
+     // Inv permutation for S Pinv[i] = k;
         newRofS[oldRofS[k]] = k;
-    }
 
     //--------------------
 
 
     //-------------------- writing row scales to a file
-    if (scale) {
+    if (scale) 
+    {
         double *scale_row = paruMatInfo->scale_row;
         FILE *scalefptr;
         char fname [100] = "";
@@ -148,7 +158,8 @@ void paru_write( paru_matrix *paruMatInfo, int scale,
         scalefptr = ( fopen(fname,"w"));
 
 
-        if (scalefptr== NULL ){
+        if (scalefptr== NULL )
+        {
             printf ("Error in opening a file");
             return;
         }
@@ -168,7 +179,8 @@ void paru_write( paru_matrix *paruMatInfo, int scale,
         infofptr = ( fopen(fname,"w"));
 
 
-        if (infofptr == NULL ){
+        if (infofptr == NULL )
+        {
             printf ("Error in opening a file");
             return;
         }
@@ -193,14 +205,16 @@ void paru_write( paru_matrix *paruMatInfo, int scale,
     LUfptr = ( fopen(fname,"w"));
 
 
-    if (LUfptr == NULL ){
+    if (LUfptr == NULL )
+    {
         printf ("Error in opening a file");
         return;
     }
 
     //computing nnz of factorized S
     Int nnz = 0;
-    for(Int f = 0; f < nf ; f++){   
+    for(Int f = 0; f < nf ; f++)
+    {   
         Int colCount =  paruMatInfo->fcolCount[f];
         Int rowCount =  paruMatInfo->frowCount[f];
         Int col1 = Super [f];     
@@ -218,7 +232,8 @@ void paru_write( paru_matrix *paruMatInfo, int scale,
     // TODO
 
     // writing the L and U factors
-    for(Int f = 0; f < nf ; f++){   
+    for(Int f = 0; f < nf ; f++)
+    {   
         Int colCount =  paruMatInfo->fcolCount[f];
         Int *fcolList =  paruMatInfo->fcolList[f];
         Int rowCount =  paruMatInfo->frowCount[f];
@@ -231,7 +246,8 @@ void paru_write( paru_matrix *paruMatInfo, int scale,
         double *pivotalFront= LUs[f].p  ;
         PRLEVEL (1, ("%% pivotalFront =%p \n", pivotalFront));
         for (Int j = col1 ; j < col2; j++)
-            for (Int i = 0; i < rowCount ; i++){
+            for (Int i = 0; i < rowCount ; i++)
+            {
                 fprintf (LUfptr, "%ld  %ld %.17g\n",
                         newRofS[frowList[i]]+n1+1, j+n1+1, 
                         pivotalFront[(j-col1)*rowCount+i]);
@@ -240,11 +256,11 @@ void paru_write( paru_matrix *paruMatInfo, int scale,
 #ifndef NDEBUG  // Printing the pivotal front
         Int p = 1;
         PRLEVEL (p, ("\n%%Inside paru_write Luf{%ld}= [",f+1));
-        for (Int r = 0; r < rowCount; r++){
+        for (Int r = 0; r < rowCount; r++)
+        {
             PRLEVEL (p, (" "));
-            for (Int c = col1; c < col2; c++){
+            for (Int c = col1; c < col2; c++)
                 PRLEVEL (p, (" %.17g ", pivotalFront [(c-col1)*rowCount + r]));
-            }
             PRLEVEL (p, (";\n  %% "));
         }
         PRLEVEL (p, (";\n"));
@@ -253,17 +269,18 @@ void paru_write( paru_matrix *paruMatInfo, int scale,
         //Printing U part
         double *uPart = Us[f].p  ;
         for (Int j = 0; j < colCount; j++)
-            for (Int i = 0; i < fp; i++){
+            for (Int i = 0; i < fp; i++)
+            {
                 fprintf (LUfptr, "%ld  %ld %.17g\n", newRofS[frowList[i]]+n1+1,
                         fcolList[j]+n1+1, uPart[fp*j+i]);
             }
 #ifndef NDEBUG  // Printing the  U part
         p = 1;
         PRLEVEL (p, ("\n"));
-        for (Int i = 0; i < fp; i++){
-            for (Int j = 0; j < colCount; j++){
+        for (Int i = 0; i < fp; i++)
+        {
+            for (Int j = 0; j < colCount; j++)
                 PRLEVEL (p, (" %2.5lf\t", uPart[j*fp+i]));
-            }
             PRLEVEL (p, (";\n  %% "));
         }
 

@@ -7,7 +7,8 @@
  *
  * @author Aznaveh
  * */
-void paru_print_element (paru_matrix *paruMatInfo, Int e){
+void paru_print_element (paru_matrix *paruMatInfo, Int e)
+{
     // print out contribution blocks
     paru_Element **elementList; 
     elementList = paruMatInfo->elementList;
@@ -16,13 +17,15 @@ void paru_print_element (paru_matrix *paruMatInfo, Int e){
     Int morign = paruMatInfo->m;
     Int nf = paruMatInfo->LUsym->nf;
 
-    if ( e > morign + nf +1){
+    if ( e > morign + nf +1)
+    {
         printf("%% paru_Element %ld is out of range; just %ld elements \n", 
                 e,  morign + nf +1);
         return;
     }
 
-    if (curEl == NULL){
+    if (curEl == NULL)
+    {
         printf("%% paru_Element %ld is empty\n",e );
         return;
     }
@@ -51,10 +54,12 @@ void paru_print_element (paru_matrix *paruMatInfo, Int e){
         printf("%% %ld\t", el_colIndex [j] );
 
     printf("\n"); 
-    for (int i = 0; i < m; i++) {
+    for (int i = 0; i < m; i++) 
+    {
         //     printf("%% %ld\t %ld\t",rel_row[i], el_rowIndex [i] );
         printf("%% %ld\t", el_rowIndex [i] );
-        for (int j = 0; j < n; j++) { 
+        for (int j = 0; j < n; j++) 
+        { 
             double value =  el_colrowNum [j*m + i];
             printf("%2.4lf\t",value );
         }
@@ -63,11 +68,13 @@ void paru_print_element (paru_matrix *paruMatInfo, Int e){
 
 }
 
-void paru_print_tupleList (tupleList *listSet, Int index){
+void paru_print_tupleList (tupleList *listSet, Int index)
+{
     DEBUGLEVEL(0);
     PRLEVEL (1, ("%% listSet =%p\n", listSet));
 
-    if (listSet == NULL) {
+    if (listSet == NULL) 
+    {
         printf("%% Empty tuple\n"); 
         return;
     }
@@ -77,7 +84,8 @@ void paru_print_tupleList (tupleList *listSet, Int index){
     paru_Tuple *l = cur.list;
 
     printf("%% There are %ld tuples in this list:\n %%", numTuple);
-    for (Int i = 0; i < numTuple; i++) {
+    for (Int i = 0; i < numTuple; i++) 
+    {
         paru_Tuple curTpl = l [i];
         printf(" (%ld,%ld)", curTpl.e, curTpl.f);
     }
