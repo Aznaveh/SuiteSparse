@@ -75,10 +75,10 @@ t_Info = load (infofullname);
 myElaps = t_Info(1)
 fromCode_umf_Elaps = t_Info(2);
 
-flp_cnt_dgemm = t_Info(3);
-flp_cnt_trsm = t_Info(4);
-flp_cnt_dger = t_Info(5);
-hardware_flp_cnt = flp_cnt_dgemm + flp_cnt_trsm + flp_cnt_dger;
+%flp_cnt_dgemm = t_Info(3);
+%flp_cnt_trsm = t_Info(4);
+%flp_cnt_dger = t_Info(5);
+%hardware_flp_cnt = flp_cnt_dgemm + flp_cnt_trsm + flp_cnt_dger;
 
 
 
@@ -114,9 +114,9 @@ umfflop = luflop(l,u)
 
 flopratio = myflop/umfflop
 
-hardware_flp_cnt 
-
-ratio = hardware_flp_cnt / myflop
+%hardware_flp_cnt 
+%
+%ratio = hardware_flp_cnt / myflop
 
 if(myErr <= 100*umfErr || myErr < err)
     fprintf('Pass\n')

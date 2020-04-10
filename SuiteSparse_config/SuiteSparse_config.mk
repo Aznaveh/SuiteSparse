@@ -110,7 +110,7 @@ SUITESPARSE_VERSION = 5.5.0
     # instead of $(CC), $(CXX), and $(F77).  To disable this feature and
     # use the $(CC), $(CXX), and $(F77) compilers, use 'make AUTOCC=no'
 
-    AUTOCC ?= yes
+    AUTOCC ?= no
 
     ifneq ($(AUTOCC),no)
         ifneq ($(shell which icc 2>/dev/null),)
@@ -160,8 +160,8 @@ SUITESPARSE_VERSION = 5.5.0
     # performance.  This script can also detect if the Intel MKL BLAS is
     # installed.
 
-    LAPACK ?= -llapack
-    # BLAS ?= -lopenblas
+    # LAPACK ?= -llapack
+     BLAS ?= -lopenblas
 
     ifndef BLAS
         ifdef MKLROOT

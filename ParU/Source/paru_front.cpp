@@ -578,6 +578,7 @@ int paru_front ( paru_matrix *paruMatInfo,
         return 0;
     }
 
+    //TODO: sort set of columns
 
     /**** 5 ** assemble U part         Row by Row                          ****/ 
 
@@ -590,8 +591,8 @@ int paru_front ( paru_matrix *paruMatInfo,
     }
 
     paru_fac *Us =  paruMatInfo->partial_Us;
-    Us[f].m=fp;
-    Us[f].n =colCount;
+    Us[f].m = fp;
+    Us[f].n = colCount;
     paruMatInfo->fcolCount[f] = colCount;
     ASSERT (Us[f].p == NULL);
     Us[f].p = uPart;

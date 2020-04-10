@@ -137,7 +137,10 @@ int main (int argc, char **argv)
 #endif
 
     // Writing results to a file
-    if ( NoProblem ) paru_write(paruMatInfo, scale,  argv[1], cc);
+    if ( NoProblem ){
+        paru_write(paruMatInfo, scale,  argv[1], cc);
+        printf ("Successfully Done!\n");
+    }
 
     //~~~~~~~~~~~~~~~~~~~Free Everything~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     cholmod_l_free_sparse (&A, cc);

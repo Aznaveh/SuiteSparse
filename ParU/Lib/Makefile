@@ -87,9 +87,6 @@ $(AR_TARGET): $(OBJ)
 paru_mem.o: ../Source/paru_mem.cpp
 	$(C) -c $<
 
-#paru_sym_analyse.o: ../Source/paru_sym_analyse.cpp
-#	$(C) -c $<
-
 paru_analyze.o: ../Source/paru_analyze.cpp
 	$(C) -c $<
 

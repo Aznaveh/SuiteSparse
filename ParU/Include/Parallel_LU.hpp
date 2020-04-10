@@ -36,15 +36,15 @@ extern "C"
 #endif
 
 //for printing information uncomment this; to activate assertions uncomment 
-#undef NPR    //<<1>>
+//#undef NPR    //<<1>>
 
 //from spqr.hpp
 //Aznaveh For MATLAB OUTPUT UNCOMMENT HERE
 // uncomment the following line to turn on debugging 
-#undef NDEBUG  //<<2>>
+//#undef NDEBUG  //<<2>>
 
 //uncomment if you want to count hardware flops
-#define COUNT_FLOPS
+//#define COUNT_FLOPS
 
 // defined somewhere else
 #ifdef ASSERT
@@ -100,7 +100,8 @@ static int print_level = 0 ;
 // This makes parallelism easier to manage, since all threads can
 // have access to this object without synchronization.
 //
-typedef struct {/* paru_symbolic*/
+typedef struct 
+{/* paru_symbolic*/
 
 
     // -------------------------------------------------------------------------
@@ -219,7 +220,8 @@ typedef struct {/* paru_symbolic*/
 // =============================================================================
 //      paru_Tuple, Row and Column data structure 
 // =============================================================================
-typedef struct {/* paru_Tuple */
+typedef struct 
+{/* paru_Tuple */
 
     /* The (e,f) tuples for element lists */
     Int e,   /*  element number */
@@ -230,7 +232,8 @@ typedef struct {/* paru_Tuple */
 /* An element */
 /* -------------------------------------------------------------------------- */
 
-typedef struct	{/* paru_Element */
+typedef struct	
+{/* paru_Element */
 
     Int
 
@@ -277,13 +280,14 @@ inline Int *relRowInd (paru_Element *curEl)
 
 
 inline double *numeric_pointer (paru_Element *curEl)
-    // sizeof Int and double are same, but I keep it like this for clarity
-    //{    return (double*)((Int*)(curEl+1) + 2*curEl->ncols + 2*curEl->nrows + 2);}
+// sizeof Int and double are same, but I keep it like this for clarity
+//{ return (double*)((Int*)(curEl+1) + 2*curEl->ncols + 2*curEl->nrows + 2);}
 {    return (double*)((Int*)(curEl+1) + 2*curEl->ncols + 2*curEl->nrows );}
 
 
 
-typedef struct  {/*List of tuples */
+typedef struct  
+{/*List of tuples */
 
     /*element of a column or a row*/
     Int
@@ -293,7 +297,8 @@ typedef struct  {/*List of tuples */
 
 }   tupleList;
 
-typedef struct  {/*work_struct*/
+typedef struct  
+{/*work_struct*/
 
     Int *rowSize;     // Initalized data structure, size of rows        
     Int rowMark;      // rowSize[x] < rowMark
@@ -315,7 +320,8 @@ typedef struct  {/*work_struct*/
 
 }   work_struct;
 
-typedef struct  {/*dense factorized part pointer*/
+typedef struct  
+{/*dense factorized part pointer*/
     Int size,   // allocated memory for the index
         count,  // number of indices that are in the sturcture
         upperBound; // upperBound on the size  count <= size <= upperBound  
@@ -323,12 +329,14 @@ typedef struct  {/*dense factorized part pointer*/
 } paru_Index; 
 
 
-typedef struct  {/*dense factorized part pointer*/
+typedef struct  
+{/*dense factorized part pointer*/
     Int m,n;   /* mxn dense matrix */
     double *p; /* point to factorized parts */
 } paru_fac; 
 
-typedef struct  {/*Matrix */
+typedef struct  
+{/*Matrix */
     Int m, n;               /* size of the sumbatrix that is factorized */
     paru_symbolic *LUsym;
     tupleList *RowList;     /* size n of dynamic list */

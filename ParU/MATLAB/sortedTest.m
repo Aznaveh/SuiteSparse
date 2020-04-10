@@ -1,40 +1,11 @@
-clear
-
+clear 
 index = ssget ;
 
-f = find (index.nrows == index.ncols & ...
-index.sprank == index.ncols & ...
-~index.posdef & ...
-index.isReal & ~index.isGraph  & ...
-index.pattern_symmetry <= .6 ) ;
-
-[ignore, i] = sort (index.nnz (f) + index.nzero (f)) ;
-
-f = f (i) ;
-
-nzlast = -1 ;
-fnew = [ ] ;
-
-nmat = length (f) ;
-for k = 1:nmat
-    id = f (k) ;
-
-    thisnz = index.nnz (id) + index.nzero (id) ;
-    if (thisnz ~= nzlast)
-        fnew = [fnew id] ;
-    end
-    nzlast = thisnz ;
-end
-
-fnew = fnew' ;
-nmat = length (fnew) ;
-
-
-err = 1e-5;
-%Don't scale the matrix if s ==0 scale otherwise
+List = load('sortedList.txt');
+ff = fopen ('sortedRes.m', 'w') ;
+nmat = length (List);
 s = 0;
 
-ff = fopen ('myRes.m', 'w') ;
 
 % Headers
 
@@ -44,23 +15,13 @@ fprintf(ff,' myElaps umfElaps ratio');
 fprintf(ff,' mynnz umfnnz ratio');
 fprintf(ff,' myflop umfflop ratio\n results = [');
 
-%%csv format
-%fprintf(ff,'id, nnzA, myErr, umfErr, logratio,' );
-%fprintf(ff,' myElaps, umfElaps, ratio,');
-%fprintf(ff,' mynnz, umfnnz, ratio,');
-%fprintf(ff,' myflop, umfflop, ratio\n');
 
 
-
-%for k = 1:100
-for k = 1:nmat
-    id = fnew (k) 
+for k = 1:120
+%for k = 1:nmat
+    id = List(k,1)
     % some problem in these matrice
-    if ( id == 2056 || id == 2034 || id == 1867 || id == 2842 || ...
-        id == 2843 ||    id == 2844 || id == 2845  ...
-        || id == 893) % || id == 823 ||...
-%        id == 2232 || id == 826  || id == 1212)  
-
+    if ( id == 2056 || id == 2034 ) 
         continue;
     end
     group = index.Group {id} ;
@@ -68,10 +29,6 @@ for k = 1:nmat
 
     Prob = ssget(id);
     A = Prob.A;
-
-    if (nnz(A) < 500)
-            continue;
-    end;
 
 
     [dp,dq,dr,ds,dcc,drr] = dmperm(A);
@@ -96,11 +53,8 @@ for k = 1:nmat
     end
 
 
-    %max scaling
-    A = spdiags (1./max (A,[], 2), 0, size(A,1), size(A,2)) * A ;
     mmwrite('../Matrix/ParUTst/tmp.mtx', A);
     intel = sprintf('. /home/grads/a/aznaveh/intel/bin/compilervars.sh intel64;');
-    intel = sprintf('. /opt/intel/compilers_and_libraries/linux/bin/compilervars.sh intel64;');
     str = sprintf ('../Demo/umfout %d < ../Matrix/ParUTst/tmp.mtx', id );
     %str = strcat(intel, str);
     system(str);
@@ -125,8 +79,6 @@ for k = 1:nmat
             scalefullname = strcat(path, s_name);
             Rvec = load (scalefullname);
             R = spdiags (Rvec, 0, m, m);
-    else 
-        r = 1;
     end
 
 
@@ -139,20 +91,13 @@ for k = 1:nmat
     myElaps = t_Info(1);
     fromCode_umf_Elaps = t_Info(2);
 
-%%    flp_cnt_dgemm = t_Info(3);
-%%    flp_cnt_trsm = t_Info(4);
-%%    flp_cnt_dger = t_Info(5);
-%%    hardware_flp_cnt = flp_cnt_dgemm + flp_cnt_trsm + flp_cnt_dger;
-
-
 
     [LU, paddingZ] = mmread (LUfullname);
 
 
     umfStart= tic;
     %[l,u,p,q,D]=lu(A, 'vector');
-    %[l, u, p, q, r, Info]= umfpack (A); % with scaling
-    [l, u, p, q ]= umfpack (A);  %no scaling
+    [l, u, p, q, r, Info]= umfpack (A);
     %umfElaps = toc(umfStart);
     umfElaps = fromCode_umf_Elaps;
 
@@ -165,9 +110,9 @@ for k = 1:nmat
     else
         sA = A;
     end
-    myErr = lu_normest(sA(rowp,colp),L,U)/norm(A,1);
+    myErr = lu_normest(sA(rowp,colp),L,U);
     %umfErr = lu_normest(D(:,p)\A(:,q),l,u);
-    umfErr = lu_normest(p*(r\A)*q,l,u)/norm(A,1);
+    umfErr = lu_normest(p*(r\A)*q,l,u);
 
     umfpnnz= nnz(l)+nnz(u) - m;
     mynnz = nnz(LU); %+ nnz(paddingZ);
@@ -183,10 +128,7 @@ for k = 1:nmat
     log10(myErr/umfErr));
     fprintf(ff,' %g %g %g', myElaps, umfElaps, myElaps/umfElaps);
     fprintf(ff,' %g %g %g', mynnz , umfpnnz, mynnz/umfpnnz );
-    fprintf(ff,' %g %g %g', myflop, umfflop, myflop/umfflop);
-
-    %% fprintf(ff,' %g ', hardware_flp_cnt);
-    fprintf(ff,' \n');
+    fprintf(ff,' %g %g %g\n', myflop, umfflop, myflop/umfflop);
 
     %%csv format
     %    fprintf(ff,'%d %d %g %g %g', id, nnz(A), myErr, umfErr, ...

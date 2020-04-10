@@ -127,6 +127,7 @@ ssget/RB
 ssget/mat
 ssget/svd
 ssget/SuiteSparseCollection
+ssget/files
 
 # ignore these specific programs in the Package/Tcov directories
 CHOLMOD/Tcov/cl

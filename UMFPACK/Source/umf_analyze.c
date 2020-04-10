@@ -30,15 +30,17 @@
 #include "umf_apply_order.h"
 #include "umf_fsize.h"
 
+/* Aznaveh: here changed for printing fronts info */
 #undef NDEBUG
 #undef DEBUG1
 #undef DEBUG2
 #undef DEBUG3
 #undef ASSERT
-#define DEBUG1(param) printf param
-#define DEBUG2(param) printf param
-#define DEBUG3(param) printf param
-#define ASSERT(param)
+/* Aznaveh: uncomment this to see the info*/
+//#define DEBUG1(param) printf param
+//#define DEBUG2(param) printf param
+//#define DEBUG3(param) printf param
+//#define ASSERT(param)
 
 /* ========================================================================== */
 

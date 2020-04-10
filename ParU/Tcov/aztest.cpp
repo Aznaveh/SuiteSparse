@@ -63,11 +63,13 @@ int main (int argc, char **argv)
 
     /* print Child matrix */
     printf("\n***Child: ");
-    for (int f = 0; f < nf+1; f++) {
+    for (int f = 0; f < nf+1; f++) 
+    {
         printf("%d ",Child[f]);    
     }
     printf("\n$$$Childp: ");
-    for (int f = 0; f < nf+2; f++) {
+    for (int f = 0; f < nf+2; f++) 
+    {
         printf("%d ",Childp[f]);    
     }
 
@@ -75,7 +77,8 @@ int main (int argc, char **argv)
 
     /* print matrix */
 
-    //     for (int j = 0; j < A->ncol; j++) {
+    //     for (int j = 0; j < A->ncol; j++) 
+    //     {
     //         for (int p = ((int*)A->p)[j]; p < ((int*)A->p)[j+1]; p++) {
     //             printf("(%d,%d) %lf\n",p+1,j+1, ((double*)A->x)[p]);
 
@@ -86,7 +89,8 @@ int main (int argc, char **argv)
 
     /* print fronts*/
     //   printf ("nf=%ld \n",QRsym->nf);
-    //   for (int f = 0; f < nf; f++) {
+    //   for (int f = 0; f < nf; f++) 
+    //   {
     //       Long fm, fn, fp;
     //       fm = QRsym->Fm[f];
     //       fn = QRsym->Rp[f+1]-QRsym->Rp[f];
@@ -131,10 +135,12 @@ int main (int argc, char **argv)
  //       printf("\n#%d\n",offset);
 
         int numoforiginalChild=0;
-        if (lastChildFlag){  // the current node is the parent
+        if (lastChildFlag)
+        {  // the current node is the parent
 //            printf("Childs of %d: ",f);
             numoforiginalChild=Child[Childp[f+1]-1]-Child[Childp[f]]+1;
-            for (int i = Child[Childp[f]]; i < Child[Childp[f+1]]; i++){
+            for (int i = Child[Childp[f]]; i < Child[Childp[f+1]]; i++)
+            {
  //               printf("%d,", i);
                 aParent[ snM[i]]=offset+numRow;
                 aChild[childpointer++]=snM[i];
@@ -146,7 +152,8 @@ int main (int argc, char **argv)
             aChildp[i+1]=aChildp[i];
 
 
-        for (int i = Sleft[Super[f]]; i < Sleft[Super[f]+1]; i++){ // number of rows
+        for (int i = Sleft[Super[f]]; i < Sleft[Super[f]+1]; i++)
+        { // number of rows
             rM[i]=i+f;
             aParent[i+f]=offset+numRow;
             aChild[childpointer++]=i+f;
@@ -162,13 +169,20 @@ int main (int argc, char **argv)
             lastChildFlag=0;  
 
     }
-    printf("\nsuper node->aP ");    for (int f = 0; f < nf; f++) printf("%d ",snM[f]); printf("\n");
-    printf("row->aP ");    for (int i = 0; i < m; i++) printf("%d ",rM[i]); printf("\n");
-    printf("aP: ");    for (int i = 0; i < m+nf+1; i++) printf("%d ",aParent[i]); printf("\n");
-    printf("aChildp: ");    for (int i = 0; i < m+nf+1; i++) printf("%d ",aChildp[i]); printf("\n");
-    printf("aChild: ");    for (int i = 0; i < m+nf+1; i++) printf("%d ",aChild[i]); printf("\n");
+    printf("\nsuper node->aP ");    
+    for (int f = 0; f < nf; f++) printf("%d ",snM[f]); printf("\n");
 
-    for(int i=0; i< m+nf; i++){
+    printf("row->aP ");    
+    for (int i = 0; i < m; i++) printf("%d ",rM[i]); printf("\n");
+    printf("aP: ");    
+    for (int i = 0; i < m+nf+1; i++)  printf("%d ",aParent[i]); printf("\n");
+    printf("aChildp: ");    
+    for (int i = 0; i < m+nf+1; i++) printf("%d ",aChildp[i]); printf("\n");
+    printf("aChild: ");    
+    for (int i = 0; i < m+nf+1; i++) printf("%d ",aChild[i]); printf("\n");
+
+    for(int i=0; i< m+nf; i++)
+    {
         printf("anode:%d",i);
         for(int c=aChildp[i]; c< aChildp[i+1]; c++)
             printf(" %d,",aChild[c]);

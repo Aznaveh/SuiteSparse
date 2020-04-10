@@ -25,17 +25,20 @@ int main (int argc, char **argv)
 
     // A = mread (stdin) ; read in the sparse matrix A
     A = (cholmod_sparse *) cholmod_l_read_matrix (stdin, 1, &mtype, cc);
-    if (A == NULL){
+    if (A == NULL)
+    {
         printf ("Paru: input matrix is invalid\n");
         exit (1);
     }
 
-    if (mtype != CHOLMOD_SPARSE){
+    if (mtype != CHOLMOD_SPARSE)
+    {
         printf ("Paru: input matrix must be sparse\n");
         exit (1);
     }
 
-    if (A->xtype != CHOLMOD_REAL){
+    if (A->xtype != CHOLMOD_REAL)
+    {
         printf ("Paru: input matrix must be real\n");
         exit (1);
     }
@@ -43,7 +46,8 @@ int main (int argc, char **argv)
     //~~~~~~~~~~~~~~~~~~~Starting computation~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     LUsym = paru_analyze (A, cc);
-    if (LUsym == NULL) {
+    if (LUsym == NULL) 
+    {
         cholmod_l_free_sparse (&A, cc);
         cholmod_l_finish (cc);
         exit(0);
@@ -52,15 +56,18 @@ int main (int argc, char **argv)
 
     double my_start_time = omp_get_wtime();
     int scale = 0;
-    if (argc == 3){
+    if (argc == 3)
+    {
         scale = atoi(argv[2]);
-        if (scale) {
+        if (scale) 
+        {
             PRLEVEL (1, ("The input matrix will be scaled\n"));
         }
     }
         
     paru_matrix *paruMatInfo = paru_init_rowFronts (A, scale, LUsym, cc);
-    if (paruMatInfo == NULL) {
+    if (paruMatInfo == NULL) 
+    {
         paru_freesym (&LUsym,cc);
         cholmod_l_free_sparse (&A, cc);
         cholmod_l_finish (cc);
@@ -71,12 +78,16 @@ int main (int argc, char **argv)
     //Int m = paruMatInfo-> m;
     //Int n = paruMatInfo-> n;
     Int nf = paruMatInfo->LUsym->nf;
+    //printf ("number of fronts: %ld\n",nf);
 
     Int NoProblem = 1;
 
 
-    for (Int i = 0; i < nf; i++) {
-        if (paru_front (paruMatInfo, i, cc)){
+    //nf = (nf > 10) ? 10 : nf;
+    for (Int i = 0; i < nf; i++) 
+    {
+        if (paru_front (paruMatInfo, i, cc))
+        {
             printf ("some problem\n");
             NoProblem = 0;
             break;

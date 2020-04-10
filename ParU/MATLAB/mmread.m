@@ -87,7 +87,7 @@ if ( strcmp(rep,'coordinate')) %  read matrix given in sparse
   cols = sizeinfo(2);
   entries = sizeinfo(3);
   
-  if  ( strcmp(field,'real') )               % real valued entries:
+  if  ( strcmp(field,'real') || strcmp(field,'integer'))% real valued entries:
   
     [T,count] = fscanf(mmfile,'%f',3);
     T = [T; fscanf(mmfile,'%f')];

@@ -1,6 +1,6 @@
 
-matrix_size = 100;
-band_width = 3;
+matrix_size = 10000;
+band_width = 30;
 k = 1; % 1/k part of the first row is nnz
 
 A = spdiags(ones(matrix_size,2*band_width+1),...

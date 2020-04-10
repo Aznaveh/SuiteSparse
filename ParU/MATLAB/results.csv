@@ -1,5 +1,6 @@
-% id nnzA myErr umfErr logratio myElaps umfElaps ratio mynnz umfnnz ratio myflop umfflop ratio
- results = [265 250 0 0 NaN 0.000212607 0.000718593 0.295866 349 333 1.04805 587 521 1.12668 
+id,nnzA,myErr,umfErr,logratio,myElaps,umfElaps,ratio,mynnz,umfnnz,ratio,myflop,umfflop,ratio
+
+265 250 0 0 NaN 0.000212607 0.000718593 0.295866 349 333 1.04805 587 521 1.12668 
 171 76 0 0 NaN 6.4665e-05 0.000370634 0.174471 117 92 1.27174 256 114 2.24561 
 158 527 2.56437e-17 1.50846e-17 0.230449 0.000299446 0.00102693 0.291594 471 478 0.985356 788 748 1.05348 
 273 667 1.8843e-15 6.16791e-17 1.48501 0.000451589 0.00148843 0.3034 1182 971 1.2173 3711 1650 2.24909 
@@ -173,33 +174,4 @@
 2243 9270 9.58989e-16 2.21695e-13 -2.36394 0.0070875 0.0109845 0.645229 25827 15741 1.64075 485952 121400 4.0029 
 2239 4203 5.95677e-16 6.08937e-14 -2.00956 0.00474 0.00427351 1.10916 8765 7152 1.22553 87820 51425 1.70773 
 1201 5514242 4.05991e-11 9.95631e-11 -0.389582 68.6902 50.0068 1.37362 3.12228e+08 4.41062e+08 0.707899 3.69357e+11 7.90779e+11 0.46708 
-];
 
-
-id = results (:,1) ;
-nnzA = results (:,2) ;
-
-myErr = results (:,3) ;
-umfErr = results (:,4) ;
-logratio = results (:,5) ;
-
-myElaps = results (:,6) ;
-umfElaps = results (:,7) ;
-tratio = results (:,8) ;
-
-mynnz = results (:,9) ;
-umfnnz = results (:,10) ;
-nzratio = results (:,11) ;
-
-myflop = results (:,12) ;
-umfflop = results (:,13) ;
-flratio = results (:,14) ;
-
-intensity = umfflop ./ umfnnz ;
-figure(1);
-subplot (1,3,1) ;
-loglog (intensity,  tratio, 'o', 'MarkerSize', 10) ;
-subplot (1,3,2) ;
-loglog (intensity,  nzratio, 'o', 'MarkerSize', 10) ;
-subplot (1,3,3) ;
-loglog (intensity,  flratio, 'o', 'MarkerSize', 10) ;

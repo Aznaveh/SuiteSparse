@@ -1,6 +1,6 @@
 % A must be there 
-id = 0
-s = 0
+id = 0;
+s = 0;
 [m n] = size (A);
 err = 10e-9;
 mmwrite('../Matrix/ParUTst/tmp.mtx', A);
@@ -36,14 +36,18 @@ LUfullname = strcat(path, LU_name);
 
 info_name = sprintf ('%d_info.txt',id);
 infofullname = strcat(path, info_name);
-myElaps = load (infofullname)
+
+t_Info = load (infofullname);
+myElaps = t_Info(1)
+
 
 
 
 umfStart= tic;
 %[l, u, p, q, D]=lu(A, 'vector');
 [l, u, p, q, r, Info]= umfpack (A);
-umfElaps = toc(umfStart)
+%umfElaps = toc(umfStart)
+umfElaps = t_Info(2)
 
 
 L=tril(LU,-1)+speye(size(LU));
@@ -56,25 +60,25 @@ else
     sA = A;
 end
 
-myErr = lu_normest(sA(rowp,colp),L,U)
+myErr = lu_normest(sA(rowp,colp),L,U)/norm(A,1)
 %umfErr = lu_normest(D(:,p)\A(:,q),l,u)
-umfErr = lu_normest(p*(r\A)*q,l,u)
+umfErr = lu_normest(p*(r\A)*q,l,u)/norm(A,1)
 
-umfpnnz = nnz(l)+nnz(u) - m;
-mynnz = nnz(LU); %+ nnz(paddingZ)
+umfpnnz = nnz(l)+nnz(u) - m
+mynnz = nnz(LU) %+ nnz(paddingZ)
 
 %setting up KL
 %opts.tol = 0; opts.btf = 0; opts.ordering = 2;
 %B = sA(rowp,colp); B = B + 5*speye(size(B));
 %[myx, myinfo, c]  = klu(B, opts);
 %myflop = myinfo.flops
-myflop = luflop(L,U);
+myflop = luflop(L,U)
 
 
 %B = p*(r\A)*q; B = B + 5*speye(size(B));
 %[umfx, umfinfo, c]  = klu(B, opts);
 %umfflop = umfinfo.flops
-umfflop = luflop(l,u);
+umfflop = luflop(l,u)
 
 myflop/umfflop;
 

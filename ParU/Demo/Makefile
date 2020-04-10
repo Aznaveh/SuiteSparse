@@ -54,7 +54,8 @@ vprofile:
 
 	$(C) $(FLAG) -g umf_test.cpp -o vprof $(LIBS)
 #	valgrind	--tool=callgrind -v ./vprof< ../Matrix/west0067.mtx
-	valgrind	--tool=callgrind -v ./vprof< ../Matrix/ParUTst/tmp.mtx
+#	valgrind	--tool=callgrind -v ./vprof< ../Matrix/cage5.mtx
+#	valgrind	--tool=callgrind -v ./vprof< ../Matrix/ParUTst/tmp.mtx
 
 tcov:
 	#$(C) $(FLAG) -Wall -fprofile-arcs -ftest-coverage umf_test.cpp -o tcov $(LIBS)
