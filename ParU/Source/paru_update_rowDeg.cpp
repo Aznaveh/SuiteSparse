@@ -472,7 +472,14 @@ void paru_update_rowDeg ( Int panel_num,  Int row_end, Int f, Int *next,
                 el->cValid =  time_f;
                 elCol [e] = el->ncolsleft ; //initiaze
             }
-            new_row_degree_bound_for_r += elCol [e] ;
+            
+            //TODO: change only if any thing remain
+            // if (elRow [e] == 0 && elCol [e] == 0)
+            if (elRow [e] == 0)
+                new_row_degree_bound_for_r += elCol [e] ;
+            else
+                new_row_degree_bound_for_r += el->ncolsleft ;
+
 
             PRLEVEL (1, ("%% pMark=%ld npMark=%ld \n",pMark, npMark));
 
@@ -502,7 +509,7 @@ void paru_update_rowDeg ( Int panel_num,  Int row_end, Int f, Int *next,
 
             if (elRow [e] == 0) 
             {
-                
+
                 PRLEVEL (1, ("%% elRow[%ld]=%ld \n",e,  elRow[e]));
                 if(elCol[e] == 0)
                 {
@@ -526,6 +533,7 @@ void paru_update_rowDeg ( Int panel_num,  Int row_end, Int f, Int *next,
                     new_row_degree_bound_for_r));
         PRLEVEL (p, ("%%row_degroo_bound[%ld]=%ld \n",r, row_degree_bound[r]));
 #endif
+        
         row_degree_bound [r] =  // min
             old_bound_updated < new_row_degree_bound_for_r ? 
             old_bound_updated : new_row_degree_bound_for_r;
