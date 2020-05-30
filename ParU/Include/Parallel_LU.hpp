@@ -11,6 +11,11 @@
 #include <stdio.h>
 #include <cstring>
 
+//To be able to use set
+#include <iostream>
+#include <algorithm>
+#include <set>
+
 extern "C"
 {
 // #include "umfpack.h"
@@ -36,12 +41,12 @@ extern "C"
 #endif
 
 //for printing information uncomment this; to activate assertions uncomment 
-//#undef NPR    //<<1>>
+#undef NPR    //<<1>>
 
 //from spqr.hpp
 //Aznaveh For MATLAB OUTPUT UNCOMMENT HERE
 // uncomment the following line to turn on debugging 
-//#undef NDEBUG  //<<2>>
+#undef NDEBUG  //<<2>>
 
 //uncomment if you want to count hardware flops
 //#define COUNT_FLOPS
@@ -411,7 +416,7 @@ int paru_front (paru_matrix *paruMatInfo, Int f, cholmod_common *cc);
 
 Int paru_dgetrf (double *F, Int *frowList, Int m, Int n, BLAS_INT *ipiv);
 Int paru_factorize(double *F, Int *frowList, Int lm, Int ln, Int *panel_row, 
-        Int *next, paru_matrix *paruMatInfo);
+        Int *next, std::set<Int> &stl_colSet, paru_matrix *paruMatInfo);
 
 
 
@@ -439,8 +444,9 @@ void paru_update_rel_ind (paru_Element *el, paru_Element *cb_el,
 
 void paru_write( paru_matrix *paruMatInfo, int scale, 
         char *id, cholmod_common *cc);
+        
 void paru_update_rowDeg ( Int panel_num,  Int row_end, 
-        Int f, Int *next, paru_matrix *paruMatInfo);
+        Int f, Int *next, std::set<Int> &stl_colSet, paru_matrix *paruMatInfo);
 
 void paru_finalize (paru_matrix *paruMatInfo, Int f, Int start_fac, 
         cholmod_common *cc);

@@ -4,12 +4,6 @@
 
 #include "Parallel_LU.hpp"
 
-#ifndef NDEBUG  // using STL for debugging
-#include <iostream>
-#include <algorithm>
-#include <set>
-#endif
-
 /*! @brief Computing factorization of current front and doing the numerical
  * assembly that ancestors will assemble. Degree update will be used in this
  * version. Just like ./paru_assemble.cpp
@@ -108,9 +102,9 @@ int paru_front ( paru_matrix *paruMatInfo,
 #endif 
 
 
+    std::set<Int>::iterator it;
 #ifndef NDEBUG
     std::set<Int> stl_rowSet;
-    std::set<Int>::iterator it;
 #endif 
     // Initializing relative index validation flag of current front
     paru_init_rel (paruMatInfo, f);
@@ -449,12 +443,17 @@ int paru_front ( paru_matrix *paruMatInfo,
 
     Int fn = LUsym->Cm[f];     /* Upper bound number of cols of F */ 
     Int *fcolList = NULL;
+    std::set<Int> stl_colSet;  /* used in this scope */
+
 
     if (fn != 0) 
     {
         PRLEVEL (1, ("%% fp=%ld fn=%ld \n", fp, fn));
         // This assertion is wrong
         // ASSERT (fp <= fn );
+        //
+        //TODO: initiate a stl_colList inside  paruMatInfo and use it in row
+        //update degree and delete it when freeing fcolList
         fcolList = (Int*) paru_alloc (fn, sizeof (Int), cc);
 
         if (fcolList == NULL)
@@ -483,8 +482,9 @@ int paru_front ( paru_matrix *paruMatInfo,
 
     Int start_fac = paruMatInfo->time_stamp[f]; 
     PRLEVEL (1, ("%% start_fac= %ld\n",start_fac));
+
     Int fac = paru_factorize(pivotalFront, frowList, rowCount, f, panel_row, 
-            &next, paruMatInfo);
+            &next, stl_colSet, paruMatInfo);
     time_f = paruMatInfo->time_stamp[f]; 
     PRLEVEL (1, ("%%After factorization time_f = %ld\n",time_f));
 
@@ -559,6 +559,11 @@ int paru_front ( paru_matrix *paruMatInfo,
 
     ASSERT ( fn >= colCount );
 
+    //TODO: fcolList copy from the stl_colSet
+    Int i=0;
+    for (it = stl_colSet.begin(); it != stl_colSet.end(); it++)
+        fcolList[i] = *it;
+
     //freeing extra space for cols
     if (colCount != fn)
     {
@@ -578,7 +583,6 @@ int paru_front ( paru_matrix *paruMatInfo,
         return 0;
     }
 
-    //TODO: sort set of columns
 
     /**** 5 ** assemble U part         Row by Row                          ****/ 
 
@@ -662,7 +666,7 @@ int paru_front ( paru_matrix *paruMatInfo,
     }
 
 #ifndef NDEBUG  // Printing the  U part
-    p = 1;
+    p = 0;
     PRLEVEL (p, ("%% U part Before TRSM: %ld x %ld\n", fp, colCount));
     PRLEVEL (p, ("%% U\t"));
     for (Int i = 0; i < colCount; i++)

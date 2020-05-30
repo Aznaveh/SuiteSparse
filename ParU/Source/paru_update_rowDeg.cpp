@@ -4,12 +4,6 @@
 
 #include "Parallel_LU.hpp"
 
-#ifndef NDEBUG  // using STL for debugging
-#include <iostream>
-#include <algorithm>
-#include <set>
-#endif
-
 /*! @brief  growing current front if necessary and update the row degree of
  *   current front for current panel. 
  * 
@@ -19,7 +13,7 @@
  */
 
 void paru_update_rowDeg ( Int panel_num,  Int row_end, Int f, Int *next,
-        paru_matrix *paruMatInfo)
+        std::set<Int> &stl_colSet, paru_matrix *paruMatInfo)
 {
 
     DEBUGLEVEL(0);
@@ -110,15 +104,8 @@ void paru_update_rowDeg ( Int panel_num,  Int row_end, Int f, Int *next,
     Int *frowList = paruMatInfo->frowList[f];
     Int *fcolList = paruMatInfo->fcolList[f];
 
-#ifndef NDEBUG
-    std::set<Int> stl_colSet{fcolList, fcolList+past_col};
-//    std::set<Int> stl_colSet;
-//    for (Int i=0 ; i < past_col; i ++)
-//        stl_colSet.insert( fcolList[i] );
-
 
     std::set<Int>::iterator it;
-#endif  
 
     tupleList *RowList = paruMatInfo->RowList;
     for (Int i = j1; i < j2; i++)
@@ -218,9 +205,10 @@ void paru_update_rowDeg ( Int panel_num,  Int row_end, Int f, Int *next,
                 
                 if (curCol < col2 && curCol >= col1 )  /*is a pivotal col */ 
                     continue;
+                stl_colSet.insert (curCol);
 #ifndef NDEBUG
                 p=1;
-                stl_colSet.insert (curCol);
+                //stl_colSet.insert (curCol);
                 for (it = stl_colSet.begin(); it != stl_colSet.end(); it++)
                     PRLEVEL (p, ("%%@  %ld", *it));
 
