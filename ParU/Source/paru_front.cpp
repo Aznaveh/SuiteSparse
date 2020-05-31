@@ -21,7 +21,7 @@ int paru_front ( paru_matrix *paruMatInfo,
         cholmod_common *cc)
 {
 
-    DEBUGLEVEL(1);
+    DEBUGLEVEL(0);
     /* 
      * -2 Print Nothing
      * -1 Just Matlab
@@ -560,9 +560,11 @@ int paru_front ( paru_matrix *paruMatInfo,
     ASSERT ( fn >= colCount );
 
     //TODO: fcolList copy from the stl_colSet
-    Int i=0;
-    for (it = stl_colSet.begin(); it != stl_colSet.end(); it++)
-        fcolList[i] = *it;
+    {
+        Int i = 0;
+        for (it = stl_colSet.begin(); it != stl_colSet.end(); it++)
+            fcolList[i++] = *it;
+    }
 
     //freeing extra space for cols
     if (colCount != fn)
