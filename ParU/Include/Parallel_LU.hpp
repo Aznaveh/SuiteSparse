@@ -15,6 +15,7 @@
 #include <iostream>
 #include <algorithm>
 #include <set>
+#include <unordered_map>
 
 extern "C"
 {
@@ -423,8 +424,15 @@ Int paru_factorize(double *F, Int *frowList, Int lm, Int ln, Int *panel_row,
 paru_Element *paru_create_element (Int nrows, Int ncols, 
         Int init, cholmod_common *cc);
 void assemble_col (const double *sR, double *dR, Int m, const Int *relRowInd);
-void assemble_row (const double *sM, double *dM, Int sm, Int sn, Int dm, Int sR, 
-        Int dR, const Int *relColInd);
+
+void assemble_row (const double *sM, double *dM, Int sm, Int sn, Int dm, 
+  Int sR, Int dR, const Int *relColInd);
+
+void assemble_row_hash (const double *sM, double *dM, Int sm, Int sn, Int dm, 
+        Int sR, Int dR, const Int *colInd, 
+        std::unordered_map <Int, Int> colHash); 
+
+
 void assemble_all (double *s, double *d, Int sm, Int sn, Int dm,    
         Int smleft, Int snleft, Int *relRowInd, Int *relColInd);
 

@@ -26,18 +26,39 @@ void assemble_col (const double *sC, double *dC,   //source col and destination 
     }
     PRLEVEL (1, ("\n"));
 }
-
 void assemble_row (const double *sM, double *dM,//source and destination matrix 
         Int sm, Int sn,    // dimension of source matrix
         Int dm,     // dimension of destination matrix
         Int sR, Int dR,     //source row and destination row
-        const Int *relColInd)
+        const Int *relColInd) 
     //Source and destination are stored column based
 {
     DEBUGLEVEL (0);
     for (Int j = 0; j < sn; j++) 
     {
         Int rj =relColInd[j] ;
+        if ( rj >= 0 )
+        {  // If still valid
+            PRLEVEL (1, ("%% sM [%ld] =%2.5lf \n", sm*j+sR, sM [sm*j+sR] ));
+            PRLEVEL (1, ("%% dM [%ld] =%2.5lf \n", rj*dm+dR, dM [rj*dm+dR]));
+            dM [rj*dm + dR] += sM [sm*j + sR];
+            PRLEVEL (1, ("%% dM [%ld] =%2.5lf \n", rj*dm+dR, dM [rj*dm+dR]));
+        }
+    }
+}
+
+void assemble_row_hash (const double *sM, double *dM,//source and destination matrix 
+        Int sm, Int sn,    // dimension of source matrix
+        Int dm,     // dimension of destination matrix
+        Int sR, Int dR,     //source row and destination row
+        const Int *colInd, //Col indext
+        std::unordered_map <Int, Int> colHash)
+    //Source and destination are stored column based
+{
+    DEBUGLEVEL (0);
+    for (Int j = 0; j < sn; j++) 
+    {
+        Int rj = colHash [colInd[j]];
         if ( rj >= 0 )
         {  // If still valid
             PRLEVEL (1, ("%% sM [%ld] =%2.5lf \n", sm*j+sR, sM [sm*j+sR] ));

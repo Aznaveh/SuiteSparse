@@ -559,12 +559,18 @@ int paru_front ( paru_matrix *paruMatInfo,
 
     ASSERT ( fn >= colCount );
 
+    //hasing from fcolList indices to column index 
+    std::unordered_map <Int, Int> colHash; 
+
     //TODO: fcolList copy from the stl_colSet
-    {
-        Int i = 0;
-        for (it = stl_colSet.begin(); it != stl_colSet.end(); it++)
-            fcolList[i++] = *it;
-    }
+//    {
+//        Int i = 0;
+//        for (it = stl_colSet.begin(); it != stl_colSet.end(); it++)
+//        {
+//            colHash.insert({*it , i});
+//            fcolList[i++] = *it;
+//        }
+//    }
 
     //freeing extra space for cols
     if (colCount != fn)
@@ -588,6 +594,7 @@ int paru_front ( paru_matrix *paruMatInfo,
 
     /**** 5 ** assemble U part         Row by Row                          ****/ 
 
+    //TODO the index is not correct
     double *uPart = 
         (double*) paru_calloc (fp*colCount, sizeof (double), cc);
     if ( uPart == NULL )
@@ -635,7 +642,8 @@ int paru_front ( paru_matrix *paruMatInfo,
             Int *rowRelIndex = (Int*) (el+1) + 2*nEl + mEl; 
 
             //Int *colRelIndex = relColInd (el);
-            Int *colRelIndex =  (Int*) (el+1) + nEl + mEl; 
+            Int *colRelIndex =  (Int*)(el+1)+ nEl + mEl;
+            Int *colIndex = (Int*)(el+1);
 
 
             PRLEVEL (1, ("%% curFsRowIndex =%ld\n", curFsRowIndex));
@@ -647,8 +655,12 @@ int paru_front ( paru_matrix *paruMatInfo,
             double *el_Num =  (double*)((Int*) (el+1) + 2*nEl + 2*mEl); 
             PRLEVEL (1, ("%% element= %ld  nEl =%ld \n",e, nEl));
 
-            assemble_row (el_Num, uPart, mEl, nEl, fp, 
-                    curRowIndex, curFsRowIndex, colRelIndex);
+//            assemble_row (el_Num, uPart, mEl, nEl, fp, 
+//                    curRowIndex, curFsRowIndex, colRelIndex);
+
+            assemble_row_hash (el_Num, uPart, mEl, nEl, fp, 
+                    curRowIndex, curFsRowIndex, colIndex, colHash);
+
 
             //FLIP(el_rowIndex[curRowIndex]); //marking column as assembled
             el_rowIndex[curRowIndex] = -1;
