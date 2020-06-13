@@ -19,7 +19,7 @@ include ../../SuiteSparse_config/SuiteSparse_config.mk
 #
 # newer version  of ParU depends on UMFPACK, CHOLMOD, AMD, COLAMD  
 # the BLAS and SuiteSparse_config
-LDLIBS += -lumfpack -lamd -lcolamd -lcholmod -lsuitesparseconfig\
+LDLIBS += -lumfpack -lamd -lcolamd -lcholmod -lsuitesparseconfig \
 		  $(LAPACK) $(BLAS)
 
 # compile and install in SuiteSparse/lib
@@ -39,6 +39,8 @@ clean:
 	- $(RM) -r $(CLEAN)
 
 INC = ../Include/Parallel_LU.hpp
+
+C11 = -std=c++11
 
 OBJ = \
     paru_mem.o \
@@ -73,7 +75,7 @@ I = -I ../../UMFPACK/Source -I../../UMFPACK/Include -I ../../CHOLMOD/Include\
 FLAG = -Wno-write-strings 
 
 #C = $(CXX) $(CF) $(SPQR_CONFIG) $(CHOLMOD_CONFIG) $(CONFIG_PARTITION) $(I)
-C = $(CXX) $(CF)  $(CHOLMOD_CONFIG) $(CONFIG_PARTITION) $(I) $(FLAG)
+C = $(CXX) $(CF)  $(CHOLMOD_CONFIG) $(CONFIG_PARTITION) $(I) $(FLAG) $(C11)
 #-------------------------------------------------------------------------------
 
 static: $(AR_TARGET)

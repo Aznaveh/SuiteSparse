@@ -16,11 +16,13 @@ C = $(CXX) $(CF) $(UMFPACK_CONFIG) $(CONFIG_PARTITION) $(CONFIG_GPU) $(I) \
 LIBS = $(CLIB) $(FLIB) $(TBB) $(GPULIB) 
 #-lasan
 
+#FLAG = -Wno-write-strings -std=c++11
 FLAG = -Wno-write-strings 
 #-O0 -fsanitize=address -g
+C11 = -std=c++11
 
 all:
-	$(C) $(FLAG) umf_test.cpp -o umfout $(LIBS)
+	$(C) $(FLAG) $(C11) umf_test.cpp -o umfout $(LIBS)
 
 
 run:
