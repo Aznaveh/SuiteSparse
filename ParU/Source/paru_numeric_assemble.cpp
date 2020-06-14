@@ -58,8 +58,10 @@ void assemble_row_hash (const double *sM, double *dM,//source and destination ma
     DEBUGLEVEL (0);
     for (Int j = 0; j < sn; j++) 
     {
-        Int rj = colHash [colInd[j]];
-        if ( rj >= 0 )
+        Int colIndj = colInd[j];
+        Int rj = colHash [colIndj];
+        PRLEVEL (1, ("%% j=%ld colInd[j]=%ld rj =%ld \n", j, colInd[j], rj ));
+        if ( colIndj >= 0 )
         {  // If still valid
             PRLEVEL (1, ("%% sM [%ld] =%2.5lf \n", sm*j+sR, sM [sm*j+sR] ));
             PRLEVEL (1, ("%% dM [%ld] =%2.5lf \n", rj*dm+dR, dM [rj*dm+dR]));
