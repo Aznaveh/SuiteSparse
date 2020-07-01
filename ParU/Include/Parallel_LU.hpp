@@ -291,6 +291,7 @@ inline double *numeric_pointer (paru_Element *curEl)
 {    return (double*)((Int*)(curEl+1) + 2*curEl->ncols + 2*curEl->nrows );}
 
 
+inline void flip (Int &colInd){ colInd = - (colInd -2); }
 
 typedef struct  
 {/*List of tuples */
