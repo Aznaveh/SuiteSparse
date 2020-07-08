@@ -42,12 +42,12 @@ extern "C"
 #endif
 
 //for printing information uncomment this; to activate assertions uncomment 
-#undef NPR    //<<1>>
+//#undef NPR    //<<1>>
 
 //from spqr.hpp
 //Aznaveh For MATLAB OUTPUT UNCOMMENT HERE
 // uncomment the following line to turn on debugging 
-#undef NDEBUG  //<<2>>
+//#undef NDEBUG  //<<2>>
 
 //uncomment if you want to count hardware flops
 //#define COUNT_FLOPS
@@ -291,7 +291,7 @@ inline double *numeric_pointer (paru_Element *curEl)
 {    return (double*)((Int*)(curEl+1) + 2*curEl->ncols + 2*curEl->nrows );}
 
 
-inline void flip (Int &colInd){ colInd = - (colInd -2); }
+inline Int flip (Int colInd){ return  - colInd -2; }
 
 typedef struct  
 {/*List of tuples */

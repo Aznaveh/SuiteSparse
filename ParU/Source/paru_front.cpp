@@ -378,7 +378,7 @@ int paru_front ( paru_matrix *paruMatInfo,
             //FLIP(el_colIndex[curColIndex]); //marking column as assembled
             
             //el_colIndex[curColIndex] = -1;
-            flip (el_colIndex[curColIndex] );
+            el_colIndex[curColIndex] = flip (el_colIndex[curColIndex] );
 
             colRelIndex [curColIndex] = -1;
             el->ncolsleft--;     

@@ -298,7 +298,7 @@ void paru_finalize (paru_matrix *paruMatInfo, Int f, Int start_fac,
                         cur_Numeric+k*curFrNrows, mEl, rowRelIndex);
                 colRelIndex [curColIndex] = -1;
                 //el_colIndex [curColIndex] = -1;
-                flip (el_colIndex[curColIndex] );
+                el_colIndex[curColIndex] = flip (el_colIndex[curColIndex] );
                 el->ncolsleft --;
 
                 if (el->ncolsleft == 0)
