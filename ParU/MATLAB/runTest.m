@@ -50,11 +50,12 @@ fprintf(ff,' myflop umfflop ratio\n results = [');
 %fprintf(ff,' mynnz, umfnnz, ratio,');
 %fprintf(ff,' myflop, umfflop, ratio\n');
 
+loop_cnt = 0;
 
 
 %for k = 1:100
 for k = 1:nmat
-    id = fnew (k) 
+    id = fnew (k); 
     % some problem in these matrice
     if ( id == 2056 || id == 2034 || id == 1867 || id == 2842 || ...
         id == 2843 ||    id == 2844 || id == 2845  ...
@@ -68,10 +69,6 @@ for k = 1:nmat
 
     Prob = ssget(id);
     A = Prob.A;
-
-    if (nnz(A) < 500)
-            continue;
-    end;
 
 
     [dp,dq,dr,ds,dcc,drr] = dmperm(A);
@@ -95,6 +92,17 @@ for k = 1:nmat
         end
     end
 
+    if (nnz(A) < 500)
+            continue;
+    end
+
+
+    loop_cnt = loop_cnt + 1;
+    id
+
+    if (loop_cnt > 10)
+        break;
+    end
 
     %max scaling
     A = spdiags (1./max (A,[], 2), 0, size(A,1), size(A,2)) * A ;
@@ -102,7 +110,7 @@ for k = 1:nmat
     intel = sprintf('. /home/grads/a/aznaveh/intel/bin/compilervars.sh intel64;');
     intel = sprintf('. /opt/intel/compilers_and_libraries/linux/bin/compilervars.sh intel64;');
     str = sprintf ('../Demo/umfout %d < ../Matrix/ParUTst/tmp.mtx', id );
-    %str = strcat(intel, str);
+    str = strcat(intel, str);
     system(str);
 
 
@@ -219,6 +227,10 @@ fprintf(ff,'myErr = results (:,3) ;\n');
 fprintf(ff,'umfErr = results (:,4) ;\n');
 fprintf(ff,'logratio = results (:,5) ;\n');
 fprintf(ff,'\n');
+
+fprintf(ff, ...
+    'noNanRatio = logratio(~any (isnan(logratio) | isinf(logratio),2),:); \n');
+
 
 fprintf(ff,'myElaps = results (:,6) ;\n');
 fprintf(ff,'umfElaps = results (:,7) ;\n');
