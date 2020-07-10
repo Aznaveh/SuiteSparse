@@ -42,7 +42,6 @@ void paru_update_rowDeg ( Int panel_num,  Int row_end, Int f, Int *next,
     Int pMark = npMark; pMark++;    //Mark for pivotal rows
 
     Int colCount = paruMatInfo->fcolCount[f] ;
-    Int past_col = colCount;   //saving how many colums are in this front so far
 
     Int j1 = panel_num*panel_width; // panel starting column
     Int j2 = (j1 + panel_width < fp ) ? 
@@ -52,6 +51,9 @@ void paru_update_rowDeg ( Int panel_num,  Int row_end, Int f, Int *next,
     Int rowCount = paruMatInfo->frowCount[f];
     Int *row_degree_bound = paruMatInfo->row_degree_bound;
 
+
+    std::set<Int> stl_newColSet;  // the list of new columns
+
     /*************** finding set of non pivotal cols in current front *********/
 
     /*               
@@ -59,10 +61,10 @@ void paru_update_rowDeg ( Int panel_num,  Int row_end, Int f, Int *next,
      *        if Marked already added to the list
      *        else all columns are added to the current front
      *
-     *                <----------fp--------->
+     *                <----------fp--------->           
      *                        j1     j2              Update here
-     *                         ^     ^             past_col    colCount
-     *                         |     | fcolList      ^ . . .   ^
+     *                         ^     ^                stl_newColSet colCount
+     *                         |     | fcolList       ^ . . .   ^
      *                         |     |        \       |         |
      *             F           |     |         [QQQQQ|OOOOOOOOO|....
      *              \  ____..._|_  ____...__ _____________________________...
@@ -96,13 +98,12 @@ void paru_update_rowDeg ( Int panel_num,  Int row_end, Int f, Int *next,
 
     if (colMark < 0) 
     {  // in rare case of overflow
-        //        memset (isRowInFront, -1, n*sizeof(Int)); //Bug detected
         memset (isColInCBcolSet , -1, n*sizeof(Int));
         colMark = Work-> colMark = 0;
     }
 
     Int *frowList = paruMatInfo->frowList[f];
-    Int *fcolList = paruMatInfo->fcolList[f];
+//    Int *fcolList = paruMatInfo->fcolList[f];
 
 
     std::set<Int>::iterator it;
@@ -205,7 +206,12 @@ void paru_update_rowDeg ( Int panel_num,  Int row_end, Int f, Int *next,
                 
                 if (curCol < col2 && curCol >= col1 )  /*is a pivotal col */ 
                     continue;
-                stl_colSet.insert (curCol);
+
+                if ( stl_colSet.find(curCol) == stl_colSet.end() )
+                {
+                    stl_colSet.insert (curCol);
+                    stl_newColSet.insert (curCol);
+                }
 #ifndef NDEBUG
                 p=1;
                 //stl_colSet.insert (curCol);
@@ -221,14 +227,16 @@ void paru_update_rowDeg ( Int panel_num,  Int row_end, Int f, Int *next,
                 {
                     PRLEVEL (1, ("%% curCol = %ld colCount=%ld\n", 
                                 curCol, colCount));
-                    fcolList [colCount] = curCol;
-                    colRelIndex [cEl] = colCount;
+                    //fcolList [colCount] = curCol;
+                    //colRelIndex [cEl] = colCount;
+                    
                     isColInCBcolSet [curCol] = colMark + colCount++; 
+
                 }
-                else
-                {
-                    colRelIndex [cEl] = isColInCBcolSet [curCol]- colMark;
-                }
+               // else
+               // {
+               //     //colRelIndex [cEl] = isColInCBcolSet [curCol]- colMark;
+               // }
                 ASSERT (colCount <= n);
             }
         }
@@ -246,8 +254,6 @@ void paru_update_rowDeg ( Int panel_num,  Int row_end, Int f, Int *next,
         p = 1;
         PRLEVEL (p, ("%% There are %ld columns in this contribution block: \n",
                     colCount));
-        for (Int i = 0; i < colCount; i++)
-            PRLEVEL (p, ("%%  %ld", fcolList [i]));
         PRLEVEL (p, ("\n"));
         Int stl_colSize = stl_colSet.size();
 
@@ -257,20 +263,14 @@ void paru_update_rowDeg ( Int panel_num,  Int row_end, Int f, Int *next,
             for (it = stl_colSet.begin(); it != stl_colSet.end(); it++)
                 PRLEVEL (p, ("%%  %ld", *it));
             PRLEVEL (p, ("\n%% My Set %ld:\n",colCount));
-            for (Int i = 0; i < colCount; i++)
-            {
-                PRLEVEL (p, ("%%  %ld", fcolList [i]));
-                if ( stl_colSet.find(fcolList [i]) == stl_colSet.end() )
-                    PRLEVEL (p, ("%%\n  %ld is NOT in the list\n", fcolList [i]));
-            }
             PRLEVEL (p, ("\n"));
         }
         ASSERT (colCount == stl_colSize );
 #endif 
 
     // if the front did not grow, there is nothing else to do
-    if (colCount == past_col )
-        return; 
+    if (stl_newColSet.size() == 0) 
+        return;
 
     paruMatInfo->fcolCount[f] = colCount;
 
@@ -317,9 +317,12 @@ void paru_update_rowDeg ( Int panel_num,  Int row_end, Int f, Int *next,
     Int *snM = LUsym->super2atree;
     Int el_ind = snM [f]; 
     Int *first = LUsym->first;
-    for (Int k = past_col; k < colCount; k++)
+
+    for (it = stl_newColSet.begin(); it != stl_newColSet.end(); it++)
     {
-        Int c = fcolList [k];   //non pivotal column list
+        //TODO: take c with another strategy
+        Int c = *it;
+
         tupleList *curColTupleList = &ColList[c];
         Int numTuple = curColTupleList->numTuple;
         ASSERT (numTuple >= 0);
