@@ -77,6 +77,7 @@ int paru_front ( paru_matrix *paruMatInfo,
         rowMark = Work->rowMark = 0;
     }
 
+    paruMatInfo->fcolCount[f] = 0;//initialize number of columsn in curent front
 
     Int fm = LUsym->Fm[f];     /* Upper bound number of rows of F */ 
     PRLEVEL (1, ("%% the size of fm is %ld\n",fm));
@@ -445,32 +446,8 @@ int paru_front ( paru_matrix *paruMatInfo,
 #endif
 
     Int fn = LUsym->Cm[f];     /* Upper bound number of cols of F */ 
-    Int *fcolList = NULL;
     std::set<Int> stl_colSet;  /* used in this scope */
 
-
-    if (fn != 0) 
-    {
-        PRLEVEL (1, ("%% fp=%ld fn=%ld \n", fp, fn));
-        // This assertion is wrong
-        // ASSERT (fp <= fn );
-        //
-        //TODO: initiate a stl_colList inside  paruMatInfo and use it in row
-        //update degree and delete it when freeing fcolList
-        fcolList = (Int*) paru_alloc (fn, sizeof (Int), cc);
-
-        if (fcolList == NULL)
-        {
-            printf ("%% Out of memory when tried to allocate for fcolList=%ld" 
-                    "with the size %ld", f, fn);
-            paru_free ( (Int) ceil( (double)fp/panel_width) ,
-                    sizeof (Int), panel_row, cc);
-            return 1;
-        }
-    }
-
-    paruMatInfo->fcolList[f] = fcolList;
-    paruMatInfo->fcolCount[f] = 0;
 
 
     if (rowCount < fp)
@@ -558,32 +535,37 @@ int paru_front ( paru_matrix *paruMatInfo,
 #endif
 
 
-    Int colCount = paruMatInfo->fcolCount[f] ;
-
+    Int colCount = stl_colSet.size();
     ASSERT ( fn >= colCount );
 
-    //hasing from fcolList indices to column index 
-    std::unordered_map <Int, Int> colHash; 
+    Int *fcolList = NULL;
 
-    //TODO: fcolList copy from the stl_colSet
+    if (fn != 0) 
     {
-        Int i = 0;
-        for (it = stl_colSet.begin(); it != stl_colSet.end(); it++)
+        PRLEVEL (1, ("%% fp=%ld fn=%ld \n", fp, fn));
+        fcolList = (Int*) paru_alloc (stl_colSet.size(), sizeof (Int), cc);
+
+        if (fcolList == NULL)
         {
-            colHash.insert({*it , i});
-            fcolList[i++] = *it;
+            printf ("%% Out of memory when tried to allocate for fcolList=%ld" 
+                    "with the size %ld", f, fn);
+            return 1;
         }
     }
 
-    //freeing extra space for cols
-    if (colCount != fn)
-    {
-        Int sz = sizeof(Int)*fn; 
-        fcolList =
-            (Int*) paru_realloc (colCount, sizeof(Int), fcolList, &sz, cc);
-        paruMatInfo ->fcolList[f] = fcolList;
-    }
+    paruMatInfo->fcolList[f] = fcolList;
+ 
+    
+    //hasing from fcolList indices to column index 
+    std::unordered_map <Int, Int> colHash; 
 
+    //fcolList copy from the stl_colSet
+    Int i = 0;
+    for (it = stl_colSet.begin(); it != stl_colSet.end(); it++)
+    {
+        colHash.insert({*it , i});
+        fcolList[i++] = *it;
+    }
 
     // EXIT point HERE 
     if (colCount == 0)
