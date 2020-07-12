@@ -100,7 +100,7 @@ for k = 1:nmat
     loop_cnt = loop_cnt + 1;
     id
 
-    if (loop_cnt > 10)
+    if (loop_cnt > 30)
         break;
     end
 

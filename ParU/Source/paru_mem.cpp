@@ -255,8 +255,6 @@ void paru_freemat (paru_matrix **paruMatInfo_handle, cholmod_common *cc)
     paru_free (1, (m+nf+1)*sizeof(paru_Element), elementList, cc);
     work_struct *Work = paruMatInfo->Work;
     paru_free (m, sizeof(Int), Work->rowSize, cc);
-    //    paru_free (2*m+n, sizeof(Int), Work->scratch, cc);
-    paru_free (n, sizeof(Int), Work->colSize, cc);
     paru_free (m+nf, sizeof(Int), Work->elRow, cc);
     paru_free (m+nf, sizeof(Int), Work->elCol, cc);
 

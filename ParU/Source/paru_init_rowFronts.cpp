@@ -80,15 +80,6 @@ paru_matrix *paru_init_rowFronts (
     PRLEVEL (1, ("%% rowSize pointer=%p size=%ld \n", rowSize,m*sizeof(Int) ));
 
 
-    Int *colSize= (Int*) paru_alloc (n, sizeof (Int), cc);
-    if (colSize == NULL)
-    {   //out of memory
-        printf ("Out of memory: Work\n");
-        return NULL;
-    }
-    memset (colSize, -1, n*sizeof(Int));
-    PRLEVEL (1, ("%% colSize=%p\n",colSize));
-
     Int *elRow = (Int*) paru_alloc (m+nf, sizeof (Int), cc);
     if (elRow == NULL)
     {   //out of memory
@@ -120,8 +111,7 @@ paru_matrix *paru_init_rowFronts (
     Work->rowSize = rowSize;
     Work->rowMark = 0;
     //    Work->scratch = scratch;
-    Work->colSize = colSize;
-    Work->colMark = 0;
+
 
     Work->elRow= elRow;
     Work->elRMark= 0;

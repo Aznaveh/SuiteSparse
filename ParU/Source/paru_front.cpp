@@ -77,7 +77,6 @@ int paru_front ( paru_matrix *paruMatInfo,
         rowMark = Work->rowMark = 0;
     }
 
-    paruMatInfo->fcolCount[f] = 0;//initialize number of columsn in curent front
 
     Int fm = LUsym->Fm[f];     /* Upper bound number of rows of F */ 
     PRLEVEL (1, ("%% the size of fm is %ld\n",fm));
@@ -836,7 +835,6 @@ int paru_front ( paru_matrix *paruMatInfo,
     Work->rowMark +=  rowCount;
     rowMark = Work -> rowMark;
 
-    Work-> colMark += colCount;
     /* Trying to DEBUG */ 
     Work -> elCMark += colCount;
     Work -> elRMark += colCount;

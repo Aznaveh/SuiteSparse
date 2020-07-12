@@ -42,12 +42,12 @@ extern "C"
 #endif
 
 //for printing information uncomment this; to activate assertions uncomment 
-//#undef NPR    //<<1>>
+#undef NPR    //<<1>>
 
 //from spqr.hpp
 //Aznaveh For MATLAB OUTPUT UNCOMMENT HERE
 // uncomment the following line to turn on debugging 
-//#undef NDEBUG  //<<2>>
+#undef NDEBUG  //<<2>>
 
 //uncomment if you want to count hardware flops
 //#define COUNT_FLOPS
@@ -316,8 +316,6 @@ typedef struct
     //     2) ipiv: permutation of frowList  < |m|
     //     4) fcolList: list of nonpivotal columns < |n|
 
-    Int *colSize;     // Initalized data structure, size of columns
-    Int colMark;      // colSize[x] < colMark
 
 
     Int *elRow;      // Initalized data structure, size m+nf 

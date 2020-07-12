@@ -26,7 +26,6 @@ void paru_update_rowDeg ( Int panel_num,  Int row_end, Int f, Int *next,
     Int panel_width = paruMatInfo->panel_width;
     paru_Element **elementList = paruMatInfo->elementList;
     work_struct *Work =  paruMatInfo->Work;
-    // Int elCMark = Work -> elCMark;
 
     Int *elRow = Work -> elRow; 
     Int *elCol = Work -> elCol;
@@ -41,7 +40,7 @@ void paru_update_rowDeg ( Int panel_num,  Int row_end, Int f, Int *next,
     Int npMark = time_f; //Mark for non pivotal rows
     Int pMark = npMark; pMark++;    //Mark for pivotal rows
 
-    Int colCount = paruMatInfo->fcolCount[f] ;
+    Int colCount = stl_colSet.size();
 
     Int j1 = panel_num*panel_width; // panel starting column
     Int j2 = (j1 + panel_width < fp ) ? 
@@ -92,18 +91,10 @@ void paru_update_rowDeg ( Int panel_num,  Int row_end, Int f, Int *next,
 
 
 
-    Int *isColInCBcolSet = Work -> colSize;
-    Int colMark = Work -> colMark;
     Int n = paruMatInfo-> n;
 
-    if (colMark < 0) 
-    {  // in rare case of overflow
-        memset (isColInCBcolSet , -1, n*sizeof(Int));
-        colMark = Work-> colMark = 0;
-    }
 
     Int *frowList = paruMatInfo->frowList[f];
-//    Int *fcolList = paruMatInfo->fcolList[f];
 
 
     std::set<Int>::iterator it;
@@ -211,6 +202,7 @@ void paru_update_rowDeg ( Int panel_num,  Int row_end, Int f, Int *next,
                 {
                     stl_colSet.insert (curCol);
                     stl_newColSet.insert (curCol);
+                    colCount++; 
                 }
 #ifndef NDEBUG
                 p=1;
@@ -219,24 +211,7 @@ void paru_update_rowDeg ( Int panel_num,  Int row_end, Int f, Int *next,
                     PRLEVEL (p, ("%%@  %ld", *it));
 
 #endif
-                PRLEVEL (1, ("%% %p ---> isColInCBcolSet[%ld]=%ld\n", 
-                            isColInCBcolSet+curCol, curCol,
-                            isColInCBcolSet[curCol]));
 
-                if (isColInCBcolSet [curCol] < colMark  )
-                {
-                    PRLEVEL (1, ("%% curCol = %ld colCount=%ld\n", 
-                                curCol, colCount));
-                    //fcolList [colCount] = curCol;
-                    //colRelIndex [cEl] = colCount;
-                    
-                    isColInCBcolSet [curCol] = colMark + colCount++; 
-
-                }
-               // else
-               // {
-               //     //colRelIndex [cEl] = isColInCBcolSet [curCol]- colMark;
-               // }
                 ASSERT (colCount <= n);
             }
         }
