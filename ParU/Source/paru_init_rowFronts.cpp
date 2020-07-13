@@ -110,7 +110,6 @@ paru_matrix *paru_init_rowFronts (
 
     Work->rowSize = rowSize;
     Work->rowMark = 0;
-    //    Work->scratch = scratch;
 
 
     Work->elRow= elRow;

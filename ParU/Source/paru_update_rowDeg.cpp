@@ -63,7 +63,7 @@ void paru_update_rowDeg ( Int panel_num,  Int row_end, Int f, Int *next,
      *                <----------fp--------->           
      *                        j1     j2              Update here
      *                         ^     ^                stl_newColSet colCount
-     *                         |     | fcolList       ^ . . .   ^
+     *                         |     | stl_colSet     ^ . . .   ^
      *                         |     |        \       |         |
      *             F           |     |         [QQQQQ|OOOOOOOOO|....
      *              \  ____..._|_  ____...__ _____________________________...
@@ -256,8 +256,8 @@ void paru_update_rowDeg ( Int panel_num,  Int row_end, Int f, Int *next,
      *  while there is no other column pass
      *   
      *                <----------fp--------->
-     *                                                  
-     *                                 fcolList       ^         ^         
+     *                                              stl_newColSet
+     *                                 stl_colSet     ^         ^         
      *                                        \       |   HERE  |
      *             F                           [QQQQQ|OOOOOOOOO|....
      *              \  ____..._________...__ _____________________________...
@@ -295,7 +295,6 @@ void paru_update_rowDeg ( Int panel_num,  Int row_end, Int f, Int *next,
 
     for (it = stl_newColSet.begin(); it != stl_newColSet.end(); it++)
     {
-        //TODO: take c with another strategy
         Int c = *it;
 
         tupleList *curColTupleList = &ColList[c];
@@ -358,8 +357,8 @@ void paru_update_rowDeg ( Int panel_num,  Int row_end, Int f, Int *next,
      *                <----------fp--------->
      *                        j1     j2
      *                         ^     ^
-     *                         |     | fcolList  Update here
-     *                         |     |        \
+     *                         |     | stl_colSet 
+     *                         |     |        \   Update here
      *             F           |     |         [QQQQQ|OOOOOOOOO|....
      *              \  ____..._|_  ____...__ _____________________________...
      * ^              |\      |     |       #  ^     |         | 
@@ -440,7 +439,7 @@ void paru_update_rowDeg ( Int panel_num,  Int row_end, Int f, Int *next,
             }
             
             //TODO: change only if any thing remain
-            // if (elRow [e] == 0 && elCol [e] == 0)
+             //if (elRow [e] == 0 && elCol [e] == 0)
             if (elRow [e] == 0)
                 new_row_degree_bound_for_r += elCol [e] ;
             else
