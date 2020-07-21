@@ -51,10 +51,11 @@ fprintf(ff,' myflop umfflop ratio\n results = [');
 %fprintf(ff,' myflop, umfflop, ratio\n');
 
 
+loop_cnt = 0;
 
 %for k = 1:100
 for k = 1:nmat
-    id = fnew (k) 
+    id = fnew (k); 
     % some problem in these matrice
     if ( id == 2056 || id == 2034 || id == 1867 || id == 2842 || ...
         id == 2843 ||    id == 2844 || id == 2845  ...
