@@ -6,20 +6,22 @@ s = 0;
 index = ssget ;
 
 Prob = ssget(id);
-A = Prob.A;
-[m n] = size (A);
+Aorig = Prob.A;
+[m n] = size (Aorig);
 group = index.Group {id} ;
 name = index.Name {id} ;
-[dp,dq,dr,ds,dcc,drr] = dmperm(A);
+[dp,dq,dr,ds,dcc,drr] = dmperm(Aorig);
 
-[m n] = size (A);
 if (size(dr) ~= 2 )
     if (norm(diff(dr)-diff(ds)) ~= 0 )
         sprintf('Unexpected')
     end
-    B = A(dp,dq);
+    B = Aorig(dp,dq);
     [M,I] = max(diff(dr));
-    A = B(dr(I):dr(I+1)-1, dr(I):dr(I+1)-1 );
+    p = dr(I):dr(I+1)-1;
+    q = ds(I):ds(I+1)-1;
+    %A = B(dr(I):dr(I+1)-1, dr(I):dr(I+1)-1 );
+    A = B(p,p);
 
     [m n] = size (A);
     if ( m== 1)
@@ -29,7 +31,7 @@ if (size(dr) ~= 2 )
 end
 
 %max scaling
-A = spdiags (1./max (A,[], 2), 0, size(A,1), size(A,2)) * A ;
+A = spdiags (1./max (abs(A),[], 2), 0, size(A,1), size(A,2)) * A ;
 
 
 mmwrite('../Matrix/ParUTst/tmp.mtx', A);

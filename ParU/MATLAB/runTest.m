@@ -67,25 +67,27 @@ for k = 1:nmat
     name = index.Name {id} ;
 
     Prob = ssget(id);
-    A = Prob.A;
+    Aorig = Prob.A;
+    [dp,dq,dr,ds,dcc,drr] = dmperm(Aorig);
+    [m n] = size (Aorig);
 
-    if (nnz(A) < 500)
+   if (nnz(Aorig) < 500)
             continue;
-    end;
+    end
+    A = Aorig;
 
-
-    [dp,dq,dr,ds,dcc,drr] = dmperm(A);
-
-    [m n] = size (A);
     if (size(dr) ~= 2 )
         %continue 
         if (norm(diff(dr)-diff(ds)) ~= 0 )
             sprintf('Unexpected')
             continue;
         end
-        B = A(dp,dq);
+        B = Aorig(dp,dq);
         [M,I] = max(diff(dr));
-        A = B(dr(I):dr(I+1)-1, dr(I):dr(I+1)-1 );
+        p = dr(I):dr(I+1)-1;
+        q = ds(I):ds(I+1)-1;
+        %A = B(dr(I):dr(I+1)-1, dr(I):dr(I+1)-1 );
+        A = B(p,p);
 
 
         [m n] = size (A);
@@ -95,9 +97,15 @@ for k = 1:nmat
         end
     end
 
+   loop_cnt = loop_cnt + 1;
+    id
+
+    if (loop_cnt > 30)
+        break;
+    end
 
     %max scaling
-    A = spdiags (1./max (A,[], 2), 0, size(A,1), size(A,2)) * A ;
+    A = spdiags (1./max (abs(A),[], 2), 0, size(A,1), size(A,2)) * A ;
     mmwrite('../Matrix/ParUTst/tmp.mtx', A);
     intel = sprintf('. /home/grads/a/aznaveh/intel/bin/compilervars.sh intel64;');
     intel = sprintf('. /opt/intel/compilers_and_libraries/linux/bin/compilervars.sh intel64;');
