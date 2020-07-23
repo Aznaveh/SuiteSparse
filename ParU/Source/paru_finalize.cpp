@@ -194,7 +194,8 @@ void paru_finalize (paru_matrix *paruMatInfo, Int f, Int start_fac,
                     // do complete assembly of e into current front, now
                     PRLEVEL (1, ("%% element %ld is going to be eliminated\n",
                                 e));
-                    paru_update_rel_ind (curFr, el, 'r',cc) ;
+                    //paru_update_rel_ind (curFr, el, 'r',cc) ;
+                    paru_update_rel_ind_row (curFr, el, cc) ;
                     paru_update_rel_ind (curFr, el, 'c', cc) ;
 
 #ifndef NDEBUG            
@@ -258,7 +259,8 @@ void paru_finalize (paru_matrix *paruMatInfo, Int f, Int start_fac,
                         paru_print_element (paruMatInfo, e);
                     }
 #endif
-                    paru_update_rel_ind (curFr, el, 'r',cc) ;
+                    //paru_update_rel_ind (curFr, el, 'r',cc) ;
+                    paru_update_rel_ind_row (curFr, el, cc) ;
 #ifndef NDEBUG            
                     Int *rowRelIndex = (Int*)(el+1) + 2*nEl +mEl;
                     for(Int i=0; i < el->nrows; i++)
