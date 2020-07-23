@@ -41,8 +41,6 @@ paru_Element *paru_create_element (Int nrows, Int ncols,
     curEl->next = -1;
 
     curEl->rWork = NULL;
-    curEl->cWork = NULL;
-
 
     return curEl;
 }

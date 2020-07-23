@@ -81,7 +81,7 @@ void paru_finalize (paru_matrix *paruMatInfo, Int f, Int start_fac,
         Int nEl = el->ncols;
 
         paru_update_rel_ind_row (curFr, el, cc) ;
-        paru_update_rel_ind_col (curFr, el, cc) ;
+        paru_update_rel_ind_col (paruMatInfo, f, curFr, el, cc) ;
 
 
         Int *rowRelIndex = relRowInd (el);
@@ -196,7 +196,7 @@ void paru_finalize (paru_matrix *paruMatInfo, Int f, Int start_fac,
                     PRLEVEL (1, ("%% element %ld is going to be eliminated\n",
                                 e));
                     paru_update_rel_ind_row (curFr, el, cc) ;
-                    paru_update_rel_ind_col (curFr, el, cc) ;
+                    paru_update_rel_ind_col (paruMatInfo, f, curFr, el, cc) ;
 
 #ifndef NDEBUG            
                     p = 1;
@@ -438,7 +438,7 @@ void paru_finalize (paru_matrix *paruMatInfo, Int f, Int start_fac,
                     /* Update colRelIndex	 */
                     PRLEVEL (1, ("%% update column relative index %ld\n"
                                 ,e ));
-                    paru_update_rel_ind_col (curFr, el, cc) ;
+                    paru_update_rel_ind_col (paruMatInfo, f, curFr, el, cc) ;
 #ifndef NDEBUG            
                     for(Int i=0 ; i <el->ncols ; i++)
                     {
@@ -591,7 +591,5 @@ void paru_finalize (paru_matrix *paruMatInfo, Int f, Int start_fac,
     // free the sorting space if allocated
     paru_free ( 2*curFrNrows, sizeof(Int), curFr->rWork, cc); 
     curFr->rWork = NULL;
-    paru_free ( 2*curFr->ncols, sizeof(Int), curFr->cWork, cc); 
-    curFr->cWork = NULL;
 
 }

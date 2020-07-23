@@ -249,8 +249,7 @@ typedef struct
         ncols,		/* number of columns */
         rValid,     /* validity of relative row index */
         cValid;     /* validity of relative column index */
-    Int *cWork,     /* work space for current front; basically for sort */
-        *rWork;
+    Int *rWork;     /* work space for current front; basically for sort */
 
     Int next;       /* For the link list saving the current front children*/
 
@@ -443,8 +442,8 @@ void paru_init_rel (paru_matrix *paruMatInfo, Int f);
 
 void paru_update_rel_ind_row (paru_Element *el, paru_Element *cb_el, 
         cholmod_common *cc );
-void paru_update_rel_ind_col (paru_Element *el, paru_Element *cb_el, 
-        cholmod_common *cc );
+void paru_update_rel_ind_col (paru_matrix *paruMatInfo, Int f, 
+        paru_Element *el, paru_Element *cb_el, cholmod_common *cc );
 
 
 
