@@ -80,8 +80,9 @@ void paru_finalize (paru_matrix *paruMatInfo, Int f, Int start_fac,
         Int mEl = el->nrows;
         Int nEl = el->ncols;
 
-        paru_update_rel_ind (curFr, el, 'r',cc) ;
-        paru_update_rel_ind (curFr, el, 'c', cc) ;
+        paru_update_rel_ind_row (curFr, el, cc) ;
+        paru_update_rel_ind_col (curFr, el, cc) ;
+
 
         Int *rowRelIndex = relRowInd (el);
         Int *colRelIndex = relColInd (el);
@@ -194,9 +195,8 @@ void paru_finalize (paru_matrix *paruMatInfo, Int f, Int start_fac,
                     // do complete assembly of e into current front, now
                     PRLEVEL (1, ("%% element %ld is going to be eliminated\n",
                                 e));
-                    //paru_update_rel_ind (curFr, el, 'r',cc) ;
                     paru_update_rel_ind_row (curFr, el, cc) ;
-                    paru_update_rel_ind (curFr, el, 'c', cc) ;
+                    paru_update_rel_ind_col (curFr, el, cc) ;
 
 #ifndef NDEBUG            
                     p = 1;
@@ -259,7 +259,6 @@ void paru_finalize (paru_matrix *paruMatInfo, Int f, Int start_fac,
                         paru_print_element (paruMatInfo, e);
                     }
 #endif
-                    //paru_update_rel_ind (curFr, el, 'r',cc) ;
                     paru_update_rel_ind_row (curFr, el, cc) ;
 #ifndef NDEBUG            
                     Int *rowRelIndex = (Int*)(el+1) + 2*nEl +mEl;
@@ -439,7 +438,7 @@ void paru_finalize (paru_matrix *paruMatInfo, Int f, Int start_fac,
                     /* Update colRelIndex	 */
                     PRLEVEL (1, ("%% update column relative index %ld\n"
                                 ,e ));
-                    paru_update_rel_ind (curFr, el, 'c', cc) ;
+                    paru_update_rel_ind_col (curFr, el, cc) ;
 #ifndef NDEBUG            
                     for(Int i=0 ; i <el->ncols ; i++)
                     {

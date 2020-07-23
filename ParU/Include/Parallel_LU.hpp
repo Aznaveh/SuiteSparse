@@ -440,11 +440,12 @@ void paru_fourPass (paru_matrix *paruMatInfo,  Int f, Int fp,
 void paru_print_element (paru_matrix *paruMatInfo, Int e);
 void paru_print_tupleList (tupleList *listSet, Int index);
 void paru_init_rel (paru_matrix *paruMatInfo, Int f);
-void paru_update_rel_ind (paru_Element *el, paru_Element *cb_el, 
-        char rc, cholmod_common *cc );
 
 void paru_update_rel_ind_row (paru_Element *el, paru_Element *cb_el, 
         cholmod_common *cc );
+void paru_update_rel_ind_col (paru_Element *el, paru_Element *cb_el, 
+        cholmod_common *cc );
+
 
 
 void paru_write( paru_matrix *paruMatInfo, int scale, 
