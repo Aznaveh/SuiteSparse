@@ -174,7 +174,8 @@ void paru_update_rel_ind_row (paru_Element *el, paru_Element *cb_el,
             if (global_ind < 0) continue;
             PRLEVEL (1, ("%% searching for: cb_index[%ld]=%ld\n",
                         i,  global_ind));
-            Int found = bin_srch (srt_lst, ind_lst, 0, len_el-1, global_ind);
+            Int found = bin_srch_ind 
+                (srt_lst, ind_lst, 0, len_el-1, global_ind);
             RelIndex [i] = found;
             ASSERT (found != -1);
         }
@@ -206,7 +207,7 @@ void paru_update_rel_ind_col (paru_matrix *paruMatInfo, Int f,
         if (global_ind < 0) continue;
         PRLEVEL (1, ("%% searching for: cb_index[%ld]=%ld\n",
                     i,  global_ind));
-        Int found = bin_srch_col (fcolList, 0, len_el-1, global_ind);
+        Int found = bin_srch (fcolList, 0, len_el-1, global_ind);
         RelIndex [i] = found;
         ASSERT (found != -1);
     }
