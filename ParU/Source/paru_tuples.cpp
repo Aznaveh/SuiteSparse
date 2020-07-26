@@ -1,8 +1,8 @@
 #include "Parallel_LU.hpp"
 /** =========================================================================  /
  * =======================  paru_tuples =====================================  /
- * ==========================================================================  /
- *! @brief adding tuples to row and column list
+ * ========================================================================== */
+/*! @brief adding tuples to row and column list
  *
  * Row and column tuple list add is basically the same in sequential case
  * I have two functions for my parallel algorithm
@@ -11,7 +11,7 @@
  * @return 0 on sucess 
  *
  * @author Aznaveh
- * */
+ */
 /*! TODO: Cap number of tuples to maximum number of elements; 
  *      How to do this? 
  *      The maximum number is a constant based on the input

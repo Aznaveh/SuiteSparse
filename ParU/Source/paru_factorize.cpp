@@ -1,12 +1,12 @@
 /** =========================================================================  /
  * =======================  paru_factorize  =================================  /
- * ========================================================================== 
- * @brief Doing the BLAS factorization in different panels and call degree
+ * ========================================================================== */
+/*! @brief Doing the BLAS factorization in different panels and call degree
  * update it it is necessary
  *   
  *         
  * @author Aznaveh
- **/
+ */
  
 
 #include "Parallel_LU.hpp"

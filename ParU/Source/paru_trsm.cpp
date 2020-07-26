@@ -1,8 +1,7 @@
 /** =========================================================================  /
  * =======================  paru_trsm =======================================  /
- * ========================================================================== 
- *
- * @brief trsm wrapper
+ * ========================================================================== */
+/*! @brief trsm wrapper
  *     l11*u12=a12 and u12 is unkonwn  so we need this:
  *              op( A ) * X = alpha*B 
  *             part(pF) * X = 1 * upart
@@ -22,12 +21,9 @@
  *
  *
  * @author Aznaveh
- * */
-
+ */
 
 #include "Parallel_LU.hpp"
-                                                        
-
 
 /// Already defined in /SuiteSparse/CHOLMOD/Include/cholmod_blas.h
 //          use BLAS_DTRSM insted

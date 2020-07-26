@@ -1,6 +1,12 @@
-/** Wrappers for managing memory 
- * allocating and freeing is done through cholmod and these wrappers
- * */
+/** =========================================================================  /
+ * =======================  paru_mem.cpp ====================================  /
+ * ========================================================================== */
+/*! @brief  Wrappers for managing memory 
+ *  allocating and freeing is done through cholmod and these wrappers        
+ *
+ * @author Aznaveh
+ * 
+ */
 #include "Parallel_LU.hpp"
 
 void *paru_alloc (Int n, Int size, cholmod_common *cc)

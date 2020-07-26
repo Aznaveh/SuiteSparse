@@ -1,7 +1,7 @@
 /** =========================================================================  /
  * =======================  paru_init_rowFronts  ============================  /
- * ==========================================================================  /
- * @brief  Initializing row fronts; fronts will be assembled later.
+ * ========================================================================== */
+/*!  @brief  Initializing row fronts; fronts will be assembled later.
  *         Initializing Row and column tuple lists: 
  *            allocating memory and updating lists and initializing matrix 
  *            structre
@@ -10,7 +10,7 @@
  *            updating the list
  *          
  * @author Aznaveh
- * */
+ */
 #include "Parallel_LU.hpp"
 
 
@@ -352,6 +352,11 @@ paru_matrix *paru_init_rowFronts (
              printf("Out of memory: curEl\n");
              return NULL;
          }
+
+         curEl->next = -1;
+         curEl->prev = -1;
+         curEl->lad = e;
+
 #ifndef NDEBUG  // Printing the pointers info
          Int p=1;
          PRLEVEL (p, ("%% curEl = %p ", curEl));

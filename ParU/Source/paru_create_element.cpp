@@ -1,7 +1,7 @@
 /** =========================================================================  /
  * =======================  paru_create_element  ============================  /
- * ==========================================================================  /
- * @brief Initializing an empty element
+ * ========================================================================== */
+/*! @brief Initializing an empty element
  *    if (Init) use calloc .i.e x = 0;
  *                     
  *                    V RRRRRRRRRRRRRR
@@ -38,7 +38,6 @@ paru_Element *paru_create_element (Int nrows, Int ncols,
     curEl->ncolsleft = curEl->ncols = ncols;
     curEl->rValid = -1;
     curEl->cValid = -1;
-    curEl->next = -1;
 
     curEl->rWork = NULL;
 

@@ -1,16 +1,12 @@
 /** =========================================================================  /
  * =======================  paru_update_rowDeg   ============================  /
  * ========================================================================== */
-
-#include "Parallel_LU.hpp"
-
 /*! @brief  growing current front if necessary and update the row degree of
  *   current front for current panel. 
- * 
- *  @author Aznaveh
  *
- *  @param  
+ *  @author Aznaveh
  */
+#include "Parallel_LU.hpp"
 
 void paru_update_rowDeg ( Int panel_num,  Int row_end, Int f, Int *next,
         std::set<Int> &stl_colSet, paru_matrix *paruMatInfo)

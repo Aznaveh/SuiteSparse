@@ -1,16 +1,13 @@
 /** =========================================================================  /
  * =======================  paru_dgemm ======================================  /
  * ========================================================================== */
-
-
-#include "Parallel_LU.hpp"
-                                                        
 /*!
  * @brief   Overwrite a vector of length n with its cumulitive sum of length
  *          n+1.  This is very similar to cumsum in SPQR
  * 
  * @author Aznaveh
  */
+#include "Parallel_LU.hpp"
 Int paru_cumsum (Int n, Int *X)
 {   // n is size, X is size n and in/out
     Int tot = 0;

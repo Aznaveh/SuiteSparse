@@ -1,13 +1,12 @@
 /** =========================================================================  /
  * =======================  paru_write  =====================================  /
  * ========================================================================== */
-
-#include "Parallel_LU.hpp"
-
 /*! @brief Writing the results into a file
  *    it must be called after ther result are computed
  *  @author Aznaveh
  */
+
+#include "Parallel_LU.hpp"
 void paru_write( paru_matrix *paruMatInfo, int scale, 
         char* id,  cholmod_common *cc)
 {

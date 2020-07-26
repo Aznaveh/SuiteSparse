@@ -1,8 +1,6 @@
 /** =========================================================================  /
  * =======================  paru_init_rel ===================================  /
  * ========================================================================== */
-
-#include "Parallel_LU.hpp"
 /*! @brief Initiazing element f's  time_stamp
  *          chekc all f's children and find the maximum time_stamp
  *          this time is checking for validation or invalidation of elements
@@ -11,8 +9,9 @@
  * @param paruMatInfo: pointer to matrix info
  *        f: front that is going to be initialized;
  *
+ * @author Aznaveh
  */
-
+#include "Parallel_LU.hpp"
 void paru_init_rel  (paru_matrix *paruMatInfo, Int f)
 {
     DEBUGLEVEL(0);

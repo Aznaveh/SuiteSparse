@@ -1,10 +1,12 @@
 /** =========================================================================  /
  * =======================  paru_numeric_assemble ===========================  /
  * ========================================================================== */
-/* @brief  assemble numbers in columns, rows or fully  
+/*! @brief  assemble numbers in columns, rows or fully  
  *          it is a gather scatter operation
+ *
  * @author Aznaveh
- **/
+ * 
+ */
 
 #include "Parallel_LU.hpp"
 

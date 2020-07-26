@@ -2,19 +2,17 @@
  * =======================  paru_front   ====================================  /
  * ========================================================================== */
 
-#include "Parallel_LU.hpp"
-
 /*! @brief Computing factorization of current front and doing the numerical
  * assembly that ancestors will assemble. Degree update will be used in this
  * version. Just like ./paru_assemble.cpp
- * 
- *  @author Aznaveh
- *
  *  
  *
  * @param  a list of tuples and the the tuple we want to add
  * @return 0 on sucess 
+ *
+ *  @author Aznaveh
  */
+#include "Parallel_LU.hpp"
 int paru_front ( paru_matrix *paruMatInfo, 
         /* RowCol list/tuples and LUsym handle */
         Int f, /* front need to be assembled */
@@ -734,6 +732,7 @@ int paru_front ( paru_matrix *paruMatInfo,
    { 
        curEl = elementList[eli] = paru_create_element (rowCount-fp,
                colCount, 0 ,cc); // allocating an un-initialized part of memory
+
        // While insided the DGEMM BETA == 0
        if ( curEl == NULL )
        {
@@ -743,7 +742,11 @@ int paru_front ( paru_matrix *paruMatInfo,
        }
        PRLEVEL (1, ("%% curEl =%p\n", curEl));
    }
-   curEl->next = next;
+
+   curEl->next = next;      //first immediate child
+   curEl->prev= -1;
+   curEl->lad= next;        //last immediate child
+
     // Initializing curEl global indices
     Int *el_colIndex = colIndex_pointer (curEl);
     for (Int i = 0; i < colCount; ++ i) 
