@@ -251,7 +251,9 @@ typedef struct
         cValid;     /* validity of relative column index */
     Int *rWork;     /* work space for current front; basically for sort */
 
-    Int next;       /* For the link list saving the current front children*/
+    Int next,       /* For the link list saving the current front children*/
+        prev,
+        lad;        /* last active descendent */
 
     /* followed in memory by:
        Int
@@ -456,5 +458,9 @@ void paru_update_rowDeg ( Int panel_num,  Int row_end,
 void paru_finalize (paru_matrix *paruMatInfo, Int f, Int start_fac, 
         cholmod_common *cc);
 Int paru_cumsum (Int n, Int *X);
+
+Int bin_srch_ind (Int *srt_lst, Int *ind_lst, Int l, Int r, Int num);
+Int bin_srch_col (Int *srt_lst, Int l, Int r, Int num);
+Int bin_srch (Int *srt_lst, Int l, Int r, Int num);
 
 #endif
