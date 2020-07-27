@@ -59,7 +59,8 @@ OBJ = \
 	paru_update_rowDeg.o\
 	paru_finalize.o\
 	paru_write.o\
-	paru_cumsum.o
+	paru_cumsum.o\
+	paru_bin_search.o
 
 $(OBJ): $(INC)
 
@@ -139,6 +140,10 @@ paru_finalize.o: ../Source/paru_finalize.cpp
 
 paru_cumsum.o: ../Source/paru_cumsum.cpp
 	$(C) -c $<
+
+paru_bin_search.o: ../Source/paru_bin_search.cpp
+	$(C) -c $<
+
 
 #-------------------------------------------------------------------------------
 
