@@ -42,12 +42,12 @@ extern "C"
 #endif
 
 //for printing information uncomment this; to activate assertions uncomment 
-//#undef NPR    //<<1>>
+#undef NPR    //<<1>>
 
 //from spqr.hpp
 //Aznaveh For MATLAB OUTPUT UNCOMMENT HERE
 // uncomment the following line to turn on debugging 
-//#undef NDEBUG  //<<2>>
+#undef NDEBUG  //<<2>>
 
 //uncomment if you want to count hardware flops
 //#define COUNT_FLOPS
@@ -251,9 +251,12 @@ typedef struct
         cValid;     /* validity of relative column index */
     Int *rWork;     /* work space for current front; basically for sort */
 
-    Int next,       /* For the link list saving the current front children*/
-        prev,
-        lad;        /* last active descendent */
+    Int next;       /* For the link list saving the current front children*/
+    /* prev,    //I am deciding to use a heap
+    // tail;  */
+    Int lnc;    // least numbered column which is active
+                // 0 <= lnc <= ncols
+
 
     /* followed in memory by:
        Int

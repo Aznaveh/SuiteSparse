@@ -309,6 +309,28 @@ void paru_finalize (paru_matrix *paruMatInfo, Int f, Int start_fac,
                     paru_free (1, tot_size, el, cc);
                     elementList[e] = NULL;
                 }
+                else 
+                {
+                 // updating least numbered column to point to an active column
+                    if (curColIndex <= el->lnc)
+                    {
+                        while(el_colIndex[el->lnc] < 0)
+                        {
+                            PRLEVEL (1, ("\n%%el->lnc= %ld ",el->lnc));
+                            PRLEVEL (1, ("el_colIndex[el->lnc]=%ld :\n",
+                                        el_colIndex[el->lnc]));
+                            el->lnc++;
+                        }
+                    }
+                    PRLEVEL (1, ("%%Final: curColIndex=%ld ",curColIndex));
+                    PRLEVEL (1, ("%%ncols=%ld ",el->ncols));
+                    PRLEVEL (1, (" el->lnc %ld ",el->lnc));
+                    PRLEVEL (1, (" el_colIndex[el->lnc]=%ld\n",
+                                el_colIndex[el->lnc]));
+                    ASSERT (el->lnc < el->ncols);
+                }
+
+
 
 
 #ifndef NDEBUG

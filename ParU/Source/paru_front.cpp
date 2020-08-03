@@ -19,7 +19,7 @@ int paru_front ( paru_matrix *paruMatInfo,
         cholmod_common *cc)
 {
 
-    DEBUGLEVEL(0);
+    DEBUGLEVEL(-1);
     /* 
      * -2 Print Nothing
      * -1 Just Matlab
@@ -113,6 +113,61 @@ int paru_front ( paru_matrix *paruMatInfo,
     Int panel_num = 0; 
     paruMatInfo->frowCount[f] = 0;
     Int rowCount= 0;
+
+
+    /*************** Making the link list of the immediate children ***********/
+#ifndef NDEBUG  
+    Int p = 1;
+#endif
+    Int * aChild = LUsym->aChild;
+    Int * aChildp = LUsym->aChildp;
+    Int *snM = LUsym->super2atree;
+
+//    curEl->next = aChild[aChildp[eli]];      //first immediate child
+//    curEl->prev= -1;
+//    curEl->lad= aChild[aChildp[eli+1]-1];        //last immediate child
+//    PRLEVEL (p, ("%% prev is %ld next is %ld\n", curEl->prev, curEl->next));
+
+    Int eli = snM [f]; 
+    Int prEl = eli;
+    
+//    paru_Element *chel;
+//    paru_Element *ladel;
+//    Int elidLadch;
+//    PRLEVEL (p, ("%% Making the list for front %ld with id %ld\n",f,eli));
+    Int i = 0;
+//    for (i = aChildp[eli]; i < aChildp[eli+1]-1; i++) 
+//    {
+//        PRLEVEL (p, ("%% HEERREE \n"));
+//        PRLEVEL (p, ("%% i = %ld and aChild[i]=%ld\n", i, aChild[i]));
+//        Int elidch = aChild[i];  // element id of the child
+//        PRLEVEL (p, ("%% elidch is %ld\n", elidch));
+//        chel = elementList [elidch]; // immediate child element
+//        ASSERT(chel != NULL);
+//        elidLadch = chel->lad;// element if of last active descendent child
+//        PRLEVEL (p, ("%% elidLadch is %ld\n", elidLadch));
+//        //last active descendent of curent child
+//        ladel = elementList[elidLadch]; 
+//        ASSERT(ladel!= NULL);
+//        ladel->next= aChild[i+1];
+//        chel->prev = prEl;
+//        PRLEVEL (p, ("%% prev is %ld lad is %ld\n", chel->prev, chel->lad));
+//        prEl = elidch; 
+//    }
+//    // last child it could be done inside the loop though it might be faster a
+//    // little bit like this
+//    chel = elementList [aChild[i+1]-1]; // immediate child element
+//    ladel = elementList[elidLadch]; 
+//    chel->prev = prEl;
+//    ladel->next = -1;
+//    PRLEVEL (p, ("%% prev is %ld lad is %ld\n", chel->prev, chel->lad));
+//
+#ifndef NDEBUG  
+    p = 1;
+#endif
+
+
+
     /**** 1 ******** finding set of rows in current front *********************/
     for (Int c = col1; c < col2; c++)
     {
@@ -237,7 +292,7 @@ int paru_front ( paru_matrix *paruMatInfo,
     ASSERT (panel_num == (Int) ceil( (double)fp/panel_width) );
 
 #ifndef NDEBUG /* Checking if pivotal rows are correct */
-    Int p = 1;
+    p = 1;
     PRLEVEL (p, ("%%There are %ld rows in this front: \n %%", rowCount));
     for (Int i = 0; i < rowCount; i++)
         PRLEVEL (p, (" %ld", frowList [i]));
@@ -387,6 +442,27 @@ int paru_front ( paru_matrix *paruMatInfo,
                 paru_free (1, tot_size, el, cc);
                 elementList[e] = NULL;
             }
+            else 
+            {
+                // updating least numbered column to point to an active column
+                if (curColIndex <= el->lnc)
+                {
+                    while(el_colIndex[el->lnc] < 0)
+                    {
+                        PRLEVEL (1, ("\n%%el->lnc= %ld ",el->lnc));
+                        PRLEVEL (1, ("el_colIndex[el->lnc]=%ld :\n",
+                                    el_colIndex[el->lnc]));
+                        el->lnc++;
+                    }
+                }
+                PRLEVEL (1, ("%%Final: curColIndex=%ld ",curColIndex));
+                PRLEVEL (1, ("%%ncols=%ld ",el->ncols));
+                PRLEVEL (1, (" el->lnc %ld ",el->lnc));
+                PRLEVEL (1, (" el_colIndex[el->lnc]=%ld\n",
+                            el_colIndex[el->lnc]));
+                ASSERT (el->lnc < el->ncols);
+            }
+
 
 
 #ifndef NDEBUG  // Printing the pivotal front
@@ -551,13 +627,13 @@ int paru_front ( paru_matrix *paruMatInfo,
     }
 
     paruMatInfo->fcolList[f] = fcolList;
- 
-    
+
+
     //hasing from fcolList indices to column index 
     std::unordered_map <Int, Int> colHash; 
 
     //fcolList copy from the stl_colSet
-    Int i = 0;
+    i = 0;
     for (it = stl_colSet.begin(); it != stl_colSet.end(); it++)
     {
         colHash.insert({*it , i});
@@ -638,8 +714,8 @@ int paru_front ( paru_matrix *paruMatInfo,
             PRLEVEL (1, ("%% element= %ld  nEl =%ld \n",e, nEl));
 
             //TODO: fix here 
- //           assemble_row (el_Num, uPart, mEl, nEl, fp, 
- //                   curRowIndex, curFsRowIndex, colRelIndex);
+            //           assemble_row (el_Num, uPart, mEl, nEl, fp, 
+            //                   curRowIndex, curFsRowIndex, colRelIndex);
 
             assemble_row_hash (el_Num, uPart, mEl, nEl, fp, 
                     curRowIndex, curFsRowIndex, colIndex, colHash);
@@ -685,67 +761,63 @@ int paru_front ( paru_matrix *paruMatInfo,
     paru_trsm(pivotalFront , uPart, fp, rowCount, colCount);
 
 #ifdef COUNT_FLOPS
-   paruMatInfo->flp_cnt_trsm += (double) (fp+1)*fp*colCount;
+    paruMatInfo->flp_cnt_trsm += (double) (fp+1)*fp*colCount;
 #ifndef NDEBUG  
-   p = 0;
-   PRLEVEL (p, ("\n%% FlopCount Trsm front %ld %ld ",fp, colCount  ));
-   PRLEVEL (p, ("cnt = %lf\n ",   paruMatInfo->flp_cnt_trsm ));
+    p = 0;
+    PRLEVEL (p, ("\n%% FlopCount Trsm front %ld %ld ",fp, colCount  ));
+    PRLEVEL (p, ("cnt = %lf\n ",   paruMatInfo->flp_cnt_trsm ));
 #endif
 #endif
 
 #ifndef NDEBUG  // Printing the  U part
-   p = -1;
-   PRLEVEL (p, ("%% rowCount=%ld;\n",rowCount));
-   PRLEVEL (p, ("%% U part After TRSM: %ld x %ld\n", fp, colCount));
+    p = -1;
+    PRLEVEL (p, ("%% rowCount=%ld;\n",rowCount));
+    PRLEVEL (p, ("%% U part After TRSM: %ld x %ld\n", fp, colCount));
 
-   PRLEVEL (p, ("Ucols{%ld} = [",f+1));
-   for (Int i = 0; i < colCount; i++)
-       PRLEVEL (p, ("%ld ", fcolList[i]+1));
-   PRLEVEL (p, ("];\n"));
-
-
-   PRLEVEL (p, ("Urows{%ld} = [",f+1));
-   for (Int i = 0; i < fp; i++)
-       PRLEVEL (p, ("%ld ",  frowList [i]+1));
-   PRLEVEL (p, ("];\n"));
+    PRLEVEL (p, ("Ucols{%ld} = [",f+1));
+    for (Int i = 0; i < colCount; i++)
+        PRLEVEL (p, ("%ld ", fcolList[i]+1));
+    PRLEVEL (p, ("];\n"));
 
 
-   PRLEVEL (p, ("Us{%ld} = [",f+1));
+    PRLEVEL (p, ("Urows{%ld} = [",f+1));
+    for (Int i = 0; i < fp; i++)
+        PRLEVEL (p, ("%ld ",  frowList [i]+1));
+    PRLEVEL (p, ("];\n"));
 
-   for (Int i = 0; i < fp; i++)
-   {
-       for (Int j = 0; j < colCount; j++)
-           PRLEVEL (p, (" %.16g ", uPart[j*fp+i]));
-       PRLEVEL (p, (";\n    "));
-   }
-   PRLEVEL (p, ("];\n"));
+
+    PRLEVEL (p, ("Us{%ld} = [",f+1));
+
+    for (Int i = 0; i < fp; i++)
+    {
+        for (Int j = 0; j < colCount; j++)
+            PRLEVEL (p, (" %.16g ", uPart[j*fp+i]));
+        PRLEVEL (p, (";\n    "));
+    }
+    PRLEVEL (p, ("];\n"));
 #endif
 
 
-   Int *snM = LUsym->super2atree;
-   Int eli = snM [f]; 
-   paru_Element *curEl;
-   PRLEVEL (1, ("%% rowCount=%ld, colCount=%ld, fp=%ld\n",
-               rowCount, colCount, fp));
-   PRLEVEL (1, ("%% curEl is %ld by %ld\n",rowCount-fp,colCount));
-   if (fp <= rowCount )
-   { 
-       curEl = elementList[eli] = paru_create_element (rowCount-fp,
-               colCount, 0 ,cc); // allocating an un-initialized part of memory
+    paru_Element *curEl;
+    PRLEVEL (1, ("%% rowCount=%ld, colCount=%ld, fp=%ld\n",
+                rowCount, colCount, fp));
+    PRLEVEL (1, ("%% curEl is %ld by %ld\n",rowCount-fp,colCount));
+    if (fp <= rowCount )
+    { 
+        curEl = elementList[eli] = paru_create_element (rowCount-fp,
+                colCount, 0 ,cc); // allocating an un-initialized part of memory
 
-       // While insided the DGEMM BETA == 0
-       if ( curEl == NULL )
-       {
-           printf ("%% Out of memory when tried to allocate current CB %ld",
-                   eli);
-           return 1;
-       }
-       PRLEVEL (1, ("%% curEl =%p\n", curEl));
-   }
+        // While insided the DGEMM BETA == 0
+        if ( curEl == NULL )
+        {
+            printf ("%% Out of memory when tried to allocate current CB %ld",
+                    eli);
+            return 1;
+        }
+        PRLEVEL (1, ("%% curEl =%p\n", curEl));
+    }
 
-   curEl->next = next;      //first immediate child
-   curEl->prev= -1;
-   curEl->lad= next;        //last immediate child
+
 
     // Initializing curEl global indices
     Int *el_colIndex = colIndex_pointer (curEl);
@@ -771,12 +843,12 @@ int paru_front ( paru_matrix *paruMatInfo,
     paruMatInfo->flp_cnt_dgemm += (double) 2*(rowCount -fp)*fp*colCount;
 
 #ifndef NDEBUG  
-        PRLEVEL (p, ("\n%% FlopCount Dgemm front %ld %ld %ld \n",rowCount -fp,
-                    fp, colCount  ));
-        PRLEVEL (p, ("%ld %ld %ld \n",rowCount -fp,
-                    fp, colCount  ));
- 
-        PRLEVEL (p, ("cnt = %lf\n ",   paruMatInfo->flp_cnt_dgemm ));
+    PRLEVEL (p, ("\n%% FlopCount Dgemm front %ld %ld %ld \n",rowCount -fp,
+                fp, colCount  ));
+    PRLEVEL (p, ("%ld %ld %ld \n",rowCount -fp,
+                fp, colCount  ));
+
+    PRLEVEL (p, ("cnt = %lf\n ",   paruMatInfo->flp_cnt_dgemm ));
 #endif
 #endif
 

@@ -353,9 +353,9 @@ paru_matrix *paru_init_rowFronts (
              return NULL;
          }
 
-         curEl->next = -1;
-         curEl->prev = -1;
-         curEl->lad = e;
+//         curEl->next = -1;
+//         curEl->prev = -1;
+//         curEl->tail= e;
 
 #ifndef NDEBUG  // Printing the pointers info
          Int p=1;

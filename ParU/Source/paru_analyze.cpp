@@ -1000,7 +1000,7 @@ paru_symbolic *paru_analyze
         PRLEVEL (p,("%% %ld...%ld npivotal=%ld\n", col1, col2, fp));
         PRLEVEL (p,("%% list of %ld children: ", Childp[f+1]-Childp[f]));
         for (Int i = Childp[f]; i <= Childp[f+1]-1; i++) 
-            PRLEVEL (p,("%ld ",Child[i]));
+            PRLEVEL (p,("%ld ", Child[i]));
         PRLEVEL (p,("\n"));
     }
 #endif 
