@@ -206,7 +206,7 @@ paru_matrix *paru_init_rowFronts (
 
      paruMatInfo->partial_Us = //Initialize with NULL
          (paru_fac*) paru_calloc (1, nf*sizeof(paru_fac), cc);
-     if (paruMatInfo->partial_Us== NULL)
+     if (paruMatInfo->partial_Us == NULL)
      {   //out of memory
          paru_freemat (&paruMatInfo, cc);
          printf("Out of memory: Us\n");
@@ -215,7 +215,7 @@ paru_matrix *paru_init_rowFronts (
 
      paruMatInfo->partial_LUs= //Initialize with NULL
          (paru_fac*) paru_calloc (1, nf*sizeof(paru_fac), cc);
-     if (paruMatInfo->partial_LUs== NULL)
+     if (paruMatInfo->partial_LUs == NULL)
      {   
          printf("Out of memory: LUs\n");
          return NULL;
@@ -224,12 +224,22 @@ paru_matrix *paru_init_rowFronts (
 
      paruMatInfo->time_stamp = 
          (Int*) paru_alloc (1, nf*sizeof(Int), cc);
-     if (paruMatInfo->time_stamp== NULL)
+     if (paruMatInfo->time_stamp == NULL)
      {   //out of memory
          paru_freemat (&paruMatInfo, cc);
          printf("Out of memory: time_stamp\n");
          return NULL;
      }
+
+     paruMatInfo->heapList =  (std::vector<Int>**) 
+         paru_calloc (1, (m+nf+1)*sizeof(std::vector<Int>*), cc);
+     if (paruMatInfo->heapList == NULL)
+     {   //out of memory
+         paru_freemat (&paruMatInfo, cc);
+         printf("Out of memory: heapList\n");
+         return NULL;
+     }
+
 
 
    //~~~~~~~~~~ scaling the A matrix
@@ -352,6 +362,10 @@ paru_matrix *paru_init_rowFronts (
              printf("Out of memory: curEl\n");
              return NULL;
          }
+         
+         std::vector<Int>* curHeap;
+         curHeap = paruMatInfo->heapList[e] = new std::vector<Int>;
+         curHeap->push_back(e);
 
 //         curEl->next = -1;
 //         curEl->prev = -1;

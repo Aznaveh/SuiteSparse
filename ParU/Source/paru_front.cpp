@@ -135,9 +135,11 @@ int paru_front ( paru_matrix *paruMatInfo,
 //    paru_Element *ladel;
 //    Int elidLadch;
 //    PRLEVEL (p, ("%% Making the list for front %ld with id %ld\n",f,eli));
+
+//TODO  add eli to th list wait until everything is done
     Int i = 0;
-//    for (i = aChildp[eli]; i < aChildp[eli+1]-1; i++) 
-//    {
+    for (i = aChildp[eli]; i <= aChildp[eli+1]-1; i++) 
+    {
 //        PRLEVEL (p, ("%% HEERREE \n"));
 //        PRLEVEL (p, ("%% i = %ld and aChild[i]=%ld\n", i, aChild[i]));
 //        Int elidch = aChild[i];  // element id of the child
@@ -153,7 +155,11 @@ int paru_front ( paru_matrix *paruMatInfo,
 //        chel->prev = prEl;
 //        PRLEVEL (p, ("%% prev is %ld lad is %ld\n", chel->prev, chel->lad));
 //        prEl = elidch; 
-//    }
+//        
+//
+//        TODO: add all the active elements of aChild[i] to the current list
+//        ?check to see if it is still active
+    }
 //    // last child it could be done inside the loop though it might be faster a
 //    // little bit like this
 //    chel = elementList [aChild[i+1]-1]; // immediate child element

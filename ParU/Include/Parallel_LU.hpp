@@ -15,6 +15,7 @@
 #include <iostream>
 #include <algorithm>
 #include <set>
+#include <vector>
 #include <unordered_map>
 
 extern "C"
@@ -364,7 +365,14 @@ typedef struct
     Int panel_width;                /* width of panel for dense factorizaiton*/
 
 
-    double *scale_row;
+    double *scale_row;              /* the array for row scaling */
+
+    //each active front owns and manage a heap list. The heap is based on the
+    //least numbered column. The active front Takes the pointer of the biggest
+    //child and release its other children after concatenating their list to its
+    //own. The list of heaps are initialized by nullptr
+    std::vector<Int>** heapList; /* size m+nf+1, initialized with nullptr  */
+
 
     // analysis information
     double my_time;
@@ -376,6 +384,7 @@ typedef struct
     double flp_cnt_trsm;
     double flp_cnt_dger;
 #endif
+
 
 }   paru_matrix;
 
