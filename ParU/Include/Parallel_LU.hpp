@@ -475,4 +475,6 @@ Int bin_srch_ind (Int *srt_lst, Int *ind_lst, Int l, Int r, Int num);
 Int bin_srch_col (Int *srt_lst, Int l, Int r, Int num);
 Int bin_srch (Int *srt_lst, Int l, Int r, Int num);
 
+void paru_make_heap(paru_matrix *paruMatInfo, Int f );
+
 #endif

@@ -19,7 +19,7 @@ int paru_front ( paru_matrix *paruMatInfo,
         cholmod_common *cc)
 {
 
-    DEBUGLEVEL(-1);
+    DEBUGLEVEL(-2);
     /* 
      * -2 Print Nothing
      * -1 Just Matlab
@@ -116,6 +116,7 @@ int paru_front ( paru_matrix *paruMatInfo,
 
 
     /*************** Making the link list of the immediate children ***********/
+    paru_make_heap(paruMatInfo, f);
 #ifndef NDEBUG  
     Int p = 1;
 #endif

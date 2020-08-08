@@ -233,6 +233,7 @@ paru_matrix *paru_init_rowFronts (
 
      paruMatInfo->heapList =  (std::vector<Int>**) 
          paru_calloc (1, (m+nf+1)*sizeof(std::vector<Int>*), cc);
+
      if (paruMatInfo->heapList == NULL)
      {   //out of memory
          paru_freemat (&paruMatInfo, cc);
