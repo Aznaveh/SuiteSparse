@@ -647,11 +647,15 @@ int paru_front ( paru_matrix *paruMatInfo,
         fcolList[i++] = *it;
     }
 
+    std::vector<Int>** heapList = paruMatInfo->heapList;
+    std::vector<Int>* curHeap = heapList[eli];
     // EXIT point HERE 
     if (colCount == 0)
     {  // there is no CB, Nothing to be done
         Work->rowMark +=  rowCount;
         paruMatInfo->fcolCount[f] = 0;
+        delete curHeap;
+        paruMatInfo->heapList[eli] = nullptr;
         PRLEVEL (1, ("%% pivotalFront =%p\n",pivotalFront));
         return 0;
     }
@@ -903,6 +907,21 @@ int paru_front ( paru_matrix *paruMatInfo,
         }
 
     }
+
+    //fixing the current heap
+    curHeap = heapList[eli];
+    ASSERT (curHeap != nullptr);
+#ifndef NDEBUG
+    for (Int k = 0; k < curHeap->size(); k++)
+    {
+        Int elid = (*curHeap)[k];
+        if (elementList[eli] == nullptr)
+            curHeap->erase(curHeap->begin()+k);
+    }
+
+#endif
+    curHeap->push_back(eli);
+
 
 #ifndef NDEBUG
     //Printing the contribution block after prior blocks assembly

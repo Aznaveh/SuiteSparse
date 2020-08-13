@@ -1144,6 +1144,7 @@ paru_symbolic *paru_analyze
     for (Int i = 0; i < ms+nf+1; i++) PRLEVEL (p,("%ld ", aChild[i]));
     PRLEVEL (p,("\n"));
 
+    p = -1;
     for(Int i = 0; i < ms+nf; i++)
     {
         PRLEVEL (p,("%% anode:%ld",i));
@@ -1151,6 +1152,7 @@ paru_symbolic *paru_analyze
             PRLEVEL (p,(" %ld,",aChild[c]));  
         PRLEVEL (p,("\n"));
     }
+    p = 1;
 
     PRLEVEL (p,("%% first: ")); 
     for (Int i = 0; i < ms+nf; i++) 
