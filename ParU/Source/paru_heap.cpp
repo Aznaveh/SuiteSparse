@@ -9,18 +9,6 @@
 #include "Parallel_LU.hpp"
 #define HEAP_ToL 10  //tolerance on how to 
 
-inline Int lnc_el(paru_Element **elementList, Int eli)
-{
-    if (elementList[eli] == NULL) 
-        return LONG_MAX;
-    else
-    {
-        Int *el_colIndex = (Int*)(elementList[eli]+1);
-        Int lnc_ind = elementList[eli]->lnc;
-        return el_colIndex[lnc_ind];
-    }
-};
-
 void paru_make_heap(paru_matrix *paruMatInfo, Int f )
 {
     DEBUGLEVEL(1);

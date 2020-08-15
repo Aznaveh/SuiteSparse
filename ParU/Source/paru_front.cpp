@@ -99,11 +99,11 @@ int paru_front ( paru_matrix *paruMatInfo,
     }
 #endif 
 
-
     std::set<Int>::iterator it;
 #ifndef NDEBUG
     std::set<Int> stl_rowSet;
 #endif 
+
     // Initializing relative index validation flag of current front
     paru_init_rel (paruMatInfo, f);
     Int time_f = paruMatInfo->time_stamp[f];
@@ -115,65 +115,11 @@ int paru_front ( paru_matrix *paruMatInfo,
     Int rowCount= 0;
 
 
-    /*************** Making the link list of the immediate children ***********/
+    /************ Making the heap from list of the immediate children ******/
     paru_make_heap(paruMatInfo, f);
-#ifndef NDEBUG  
-    Int p = 1;
-#endif
-    Int * aChild = LUsym->aChild;
-    Int * aChildp = LUsym->aChildp;
-    Int *snM = LUsym->super2atree;
-
-//    curEl->next = aChild[aChildp[eli]];      //first immediate child
-//    curEl->prev= -1;
-//    curEl->lad= aChild[aChildp[eli+1]-1];        //last immediate child
-//    PRLEVEL (p, ("%% prev is %ld next is %ld\n", curEl->prev, curEl->next));
-
-    Int eli = snM [f]; 
-    Int prEl = eli;
+    std::vector<Int> pivotal_elements;
     
-//    paru_Element *chel;
-//    paru_Element *ladel;
-//    Int elidLadch;
-//    PRLEVEL (p, ("%% Making the list for front %ld with id %ld\n",f,eli));
-
-//TODO  add eli to th list wait until everything is done
-    Int i = 0;
-    for (i = aChildp[eli]; i <= aChildp[eli+1]-1; i++) 
-    {
-//        PRLEVEL (p, ("%% HEERREE \n"));
-//        PRLEVEL (p, ("%% i = %ld and aChild[i]=%ld\n", i, aChild[i]));
-//        Int elidch = aChild[i];  // element id of the child
-//        PRLEVEL (p, ("%% elidch is %ld\n", elidch));
-//        chel = elementList [elidch]; // immediate child element
-//        ASSERT(chel != NULL);
-//        elidLadch = chel->lad;// element if of last active descendent child
-//        PRLEVEL (p, ("%% elidLadch is %ld\n", elidLadch));
-//        //last active descendent of curent child
-//        ladel = elementList[elidLadch]; 
-//        ASSERT(ladel!= NULL);
-//        ladel->next= aChild[i+1];
-//        chel->prev = prEl;
-//        PRLEVEL (p, ("%% prev is %ld lad is %ld\n", chel->prev, chel->lad));
-//        prEl = elidch; 
-//        
-//
-//        TODO: add all the active elements of aChild[i] to the current list
-//        ?check to see if it is still active
-    }
-//    // last child it could be done inside the loop though it might be faster a
-//    // little bit like this
-//    chel = elementList [aChild[i+1]-1]; // immediate child element
-//    ladel = elementList[elidLadch]; 
-//    chel->prev = prEl;
-//    ladel->next = -1;
-//    PRLEVEL (p, ("%% prev is %ld lad is %ld\n", chel->prev, chel->lad));
-//
-#ifndef NDEBUG  
-    p = 1;
-#endif
-
-
+    paru_pivotal (paruMatInfo, pivotal_elements, f);
 
     /**** 1 ******** finding set of rows in current front *********************/
     for (Int c = col1; c < col2; c++)
@@ -203,7 +149,6 @@ int paru_front ( paru_matrix *paruMatInfo,
             Int curColIndex = curTpl.f;
             PRLEVEL (1, ("%%e =%ld  curColIndex = %ld\n", e, curColIndex));
 
-            /*! TODO: Never negate e or f for now... keep it?	 */
             if(e < 0 || curColIndex < 0 ) continue;  //already deleted
 
             paru_Element *el = elementList[e];
@@ -213,7 +158,7 @@ int paru_front ( paru_matrix *paruMatInfo,
             Int *el_colIndex = (Int*)(el+1);
 
             PRLEVEL (1, ("%%point to col = %ld\n", el_colIndex[curColIndex]));
-            /*! TODO: Keep the tuple or delete it?	 */
+
             if (el_colIndex [curColIndex]< 0 ) continue; // already assembled
             ASSERT (el_colIndex[curColIndex] == c);
 
@@ -299,7 +244,7 @@ int paru_front ( paru_matrix *paruMatInfo,
     ASSERT (panel_num == (Int) ceil( (double)fp/panel_width) );
 
 #ifndef NDEBUG /* Checking if pivotal rows are correct */
-    p = 1;
+    Int p = 1;
     PRLEVEL (p, ("%%There are %ld rows in this front: \n %%", rowCount));
     for (Int i = 0; i < rowCount; i++)
         PRLEVEL (p, (" %ld", frowList [i]));
@@ -640,15 +585,18 @@ int paru_front ( paru_matrix *paruMatInfo,
     std::unordered_map <Int, Int> colHash; 
 
     //fcolList copy from the stl_colSet
-    i = 0;
+    Int i = 0;
     for (it = stl_colSet.begin(); it != stl_colSet.end(); it++)
     {
         colHash.insert({*it , i});
         fcolList[i++] = *it;
     }
-
+    
+    Int *snM = LUsym->super2atree;
+    Int eli = snM [f]; 
     std::vector<Int>** heapList = paruMatInfo->heapList;
     std::vector<Int>* curHeap = heapList[eli];
+
     // EXIT point HERE 
     if (colCount == 0)
     {  // there is no CB, Nothing to be done

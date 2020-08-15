@@ -45,6 +45,7 @@ C11 = -std=c++11
 OBJ = \
     paru_mem.o \
     paru_heap.o \
+    paru_pivotal.o \
     paru_analyze.o \
 	paru_init_rowFronts.o\
 	paru_tuples.o\
@@ -92,6 +93,9 @@ paru_mem.o: ../Source/paru_mem.cpp
 	$(C) -c $<
 
 paru_heap.o: ../Source/paru_heap.cpp
+	$(C) -c $<
+	
+paru_pivotal.o: ../Source/paru_pivotal.cpp
 	$(C) -c $<
 
 paru_analyze.o: ../Source/paru_analyze.cpp

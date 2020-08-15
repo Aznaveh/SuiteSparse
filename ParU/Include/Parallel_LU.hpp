@@ -298,6 +298,19 @@ inline double *numeric_pointer (paru_Element *curEl)
 
 inline Int flip (Int colInd){ return  - colInd -2; }
 
+inline Int lnc_el(paru_Element **elementList, Int eli)
+{ //return least numbered column of the element i (eli)
+    if (elementList[eli] == NULL) 
+        return LONG_MAX;
+    else
+    {
+        Int *el_colIndex = (Int*)(elementList[eli]+1);
+        Int lnc_ind = elementList[eli]->lnc;
+        return el_colIndex[lnc_ind];
+    }
+};
+
+
 typedef struct  
 {/*List of tuples */
 
@@ -476,5 +489,6 @@ Int bin_srch_col (Int *srt_lst, Int l, Int r, Int num);
 Int bin_srch (Int *srt_lst, Int l, Int r, Int num);
 
 void paru_make_heap(paru_matrix *paruMatInfo, Int f );
-
+void paru_pivotal (paru_matrix *paruMatInfo, 
+        std::vector<Int> &pivotal_elements, Int f);
 #endif
