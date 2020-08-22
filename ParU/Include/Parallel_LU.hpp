@@ -310,7 +310,6 @@ inline Int lnc_el(paru_Element **elementList, Int eli)
     }
 };
 
-
 typedef struct  
 {/*List of tuples */
 
@@ -327,7 +326,8 @@ typedef struct
 
     // gather scatter space for rows
     Int *rowSize;     // Initalized data structure, size of rows        
-    Int rowMark;      // rowSize[x] < rowMark
+    //Int rowMark;      // Work->rowSize[x] < rowMark[eli] for each front
+    Int *rowMark;      // size = m+nf
 
 
     Int *elRow;      // Initalized data structure, size m+nf 
@@ -490,5 +490,5 @@ Int bin_srch (Int *srt_lst, Int l, Int r, Int num);
 
 void paru_make_heap(paru_matrix *paruMatInfo, Int f );
 void paru_pivotal (paru_matrix *paruMatInfo, 
-        std::vector<Int> &pivotal_elements, Int f);
+        std::vector<Int> &pivotal_elements, Int *panel_row, Int f);
 #endif

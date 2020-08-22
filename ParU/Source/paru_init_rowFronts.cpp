@@ -79,6 +79,16 @@ paru_matrix *paru_init_rowFronts (
     memset (rowSize, -1, m*sizeof(Int));
     PRLEVEL (1, ("%% rowSize pointer=%p size=%ld \n", rowSize,m*sizeof(Int) ));
 
+    Int *rowMark= (Int*) paru_alloc (m+nf, sizeof (Int), cc);
+    if (rowMark== NULL)
+    {   //out of memory
+        printf ("Out of memory: Work\n");
+        return NULL;
+    }
+    PRLEVEL (1, ("%% rowMark pointer=%p size=%ld \n", rowMark, 
+                (m+nf)*sizeof(Int) ));
+
+
 
     Int *elRow = (Int*) paru_alloc (m+nf, sizeof (Int), cc);
     if (elRow == NULL)
@@ -109,7 +119,7 @@ paru_matrix *paru_init_rowFronts (
 
 
     Work->rowSize = rowSize;
-    Work->rowMark = 0;
+    Work->rowMark = rowMark;
 
 
     Work->elRow= elRow;
@@ -364,6 +374,8 @@ paru_matrix *paru_init_rowFronts (
              return NULL;
          }
          
+         rowMark[e] = 0;
+
          std::vector<Int>* curHeap;
          curHeap = paruMatInfo->heapList[e] = new std::vector<Int>;
          curHeap->push_back(e);

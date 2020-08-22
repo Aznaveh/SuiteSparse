@@ -215,9 +215,14 @@ void paru_update_rowDeg ( Int panel_num,  Int row_end, Int f, Int *next,
         curRowTupleList->numTuple = pdst;
         }
 
+    
+        Int *snM = LUsym->super2atree;
+        Int eli = snM [f]; 
+
         if (colCount == 0)
         {  // there is no CB, Nothing to be done
-            Work->rowMark +=  rowCount;
+            //Work->rowMark +=  rowCount;
+            Work->rowMark[eli]  +=  rowCount;
             return;
         }
 
@@ -239,32 +244,32 @@ void paru_update_rowDeg ( Int panel_num,  Int row_end, Int f, Int *next,
         ASSERT (colCount == stl_colSize );
 #endif 
 
-    // if the front did not grow, there is nothing else to do
-    if (stl_newColSet.size() == 0) 
-        return;
+        // if the front did not grow, there is nothing else to do
+        if (stl_newColSet.size() == 0) 
+            return;
 
-    paruMatInfo->fcolCount[f] = colCount;
+        paruMatInfo->fcolCount[f] = colCount;
 
 
-    /************* travers over new non pivotal columns ***********************/
-    /*               
-     *  Marking seen element with pMark or time_f; it would be fine with either
-     *  while there is no other column pass
-     *   
-     *                <----------fp--------->
-     *                                              stl_newColSet
-     *                                 stl_colSet     ^         ^         
-     *                                        \       |   HERE  |
-     *             F                           [QQQQQ|OOOOOOOOO|....
-     *              \  ____..._________...__ _____________________________...
-     * ^              |\      |     |       #  ^     |         | 
-     * |              | \     |     |       #  | old | added   | 
-     * |              |  \    |     |       #  | list|  columns|
-     * |              |___\...|_____|__...__#  |     |         |
-     * |   ^          |       |\* **|       #  fp  oooooooooooo|
-     * |   |          |       |**\**|       #  |   ooo El ooooo|
-     * | panel        |       |***\*|       #  |   oooooooooooo|
-     * | width        |       |***\*|       #  |               |
+        /************* travers over new non pivotal columns ***********************/
+        /*               
+         *  Marking seen element with pMark or time_f; it would be fine with either
+         *  while there is no other column pass
+         *   
+         *                <----------fp--------->
+         *                                              stl_newColSet
+         *                                 stl_colSet     ^         ^         
+         *                                        \       |   HERE  |
+         *             F                           [QQQQQ|OOOOOOOOO|....
+         *              \  ____..._________...__ _____________________________...
+         * ^              |\      |     |       #  ^     |         | 
+         * |              | \     |     |       #  | old | added   | 
+         * |              |  \    |     |       #  | list|  columns|
+         * |              |___\...|_____|__...__#  |     |         |
+         * |   ^          |       |\* **|       #  fp  oooooooooooo|
+         * |   |          |       |**\**|       #  |   ooo El ooooo|
+         * | panel        |       |***\*|       #  |   oooooooooooo|
+         * | width        |       |***\*|       #  |               |
      * |   |          |       |***\*|       #  |    00000000   |
      * |   v          |____...|________..._ #  |    000 El 0   |
      * |              |       |     |       #  v    00000000   |           ...
@@ -285,9 +290,7 @@ void paru_update_rowDeg ( Int panel_num,  Int row_end, Int f, Int *next,
      *                                             
      */
     tupleList *ColList = paruMatInfo->ColList;
-    Int *snM = LUsym->super2atree;
-    Int el_ind = snM [f]; 
-    Int *first = LUsym->first;
+   Int *first = LUsym->first;
 
     for (it = stl_newColSet.begin(); it != stl_newColSet.end(); it++)
     {
@@ -312,7 +315,7 @@ void paru_update_rowDeg ( Int panel_num,  Int row_end, Int f, Int *next,
             r2++;
 #endif
 
-            if ( e >= el_ind || e < first[el_ind])
+            if ( e >= eli || e < first[eli])
                 continue;
 #ifndef NDEBUG        
             if (p <= 0)

@@ -64,15 +64,20 @@ int paru_front ( paru_matrix *paruMatInfo,
         printf ("%% Out of memory when tried to allocate for panel_row%ld",f);
         return 1;
     }
- 
+
+    Int *snM = LUsym->super2atree;
+    Int eli = snM [f]; 
+
     Int *isRowInFront = Work->rowSize; 
-    Int rowMark = Work->rowMark;
+    Int *rowMarkp = Work->rowMark;
+    Int rowMark = rowMarkp[eli];
     PRLEVEL (-1, ("rowMark=%ld;\n", rowMark));
 
+    //TODO: it must change for parallel
     if (rowMark < 0) 
     {  // in rare case of overflow
         memset (isRowInFront, -1, m*sizeof(Int));
-        rowMark = Work->rowMark = 0;
+        rowMark =  rowMarkp[eli] = 0;
     }
 
 
@@ -112,14 +117,14 @@ int paru_front ( paru_matrix *paruMatInfo,
 
     Int panel_num = 0; 
     paruMatInfo->frowCount[f] = 0;
-    Int rowCount= 0;
+    Int rowCount = 0;
 
 
     /************ Making the heap from list of the immediate children ******/
     paru_make_heap(paruMatInfo, f);
     std::vector<Int> pivotal_elements;
-    
-    paru_pivotal (paruMatInfo, pivotal_elements, f);
+
+    paru_pivotal (paruMatInfo, pivotal_elements, panel_row , f);
 
     /**** 1 ******** finding set of rows in current front *********************/
     for (Int c = col1; c < col2; c++)
@@ -212,7 +217,7 @@ int paru_front ( paru_matrix *paruMatInfo,
                 if (p <= 0) paru_print_element (paruMatInfo, e);
                 stl_rowSet.insert (curRow);
                 PRLEVEL (1, ("%% %p ---> isRowInFront [%ld]=%ld\n", 
-                           isRowInFront+curRow, curRow, isRowInFront[curRow]));
+                            isRowInFront+curRow, curRow, isRowInFront[curRow]));
 #endif
 
                 if (isRowInFront[curRow] < rowMark )
@@ -345,7 +350,7 @@ int paru_front ( paru_matrix *paruMatInfo,
 
             //Int *el_colIndex = colIndex_pointer (el);
             Int *el_colIndex = (Int*)(el+1);
-            
+
             if (el_colIndex [curColIndex]< 0 ) continue;
 
             Int mEl = el->nrows;
@@ -381,7 +386,7 @@ int paru_front ( paru_matrix *paruMatInfo,
                     mEl, rowRelIndex);
 
             //FLIP(el_colIndex[curColIndex]); //marking column as assembled
-            
+
             //el_colIndex[curColIndex] = -1;
             el_colIndex[curColIndex] = flip (el_colIndex[curColIndex] );
 
@@ -591,16 +596,14 @@ int paru_front ( paru_matrix *paruMatInfo,
         colHash.insert({*it , i});
         fcolList[i++] = *it;
     }
-    
-    Int *snM = LUsym->super2atree;
-    Int eli = snM [f]; 
+
     std::vector<Int>** heapList = paruMatInfo->heapList;
     std::vector<Int>* curHeap = heapList[eli];
 
     // EXIT point HERE 
     if (colCount == 0)
     {  // there is no CB, Nothing to be done
-        Work->rowMark +=  rowCount;
+        //Work->rowMark +=  rowCount;
         paruMatInfo->fcolCount[f] = 0;
         delete curHeap;
         paruMatInfo->heapList[eli] = nullptr;
@@ -881,8 +884,9 @@ int paru_front ( paru_matrix *paruMatInfo,
 
 
 
-    Work->rowMark +=  rowCount;
-    rowMark = Work -> rowMark;
+    rowMarkp[eli] += rowCount;
+    rowMark = rowMarkp[eli];
+
 
     /* Trying to DEBUG */ 
     Work -> elCMark += colCount;

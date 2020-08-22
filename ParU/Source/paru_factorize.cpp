@@ -73,6 +73,7 @@ Int paru_panel_factorize (double *F, Int *frowList, Int m, Int n,
     //column jth of the panel
     for (Int j = j1; j < j2 ; j++)
     { 
+        //TODO: use the original diagonal value as a default
 
         PRLEVEL (1, ("%% j = %ld\n", j));
 

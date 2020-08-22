@@ -11,9 +11,9 @@
 
 void paru_make_heap(paru_matrix *paruMatInfo, Int f )
 {
-    DEBUGLEVEL(1);
+    DEBUGLEVEL(-1);
 #ifndef NDEBUG  
-    Int p = 1;
+    Int p = 0;
 #endif
 
     paru_symbolic *LUsym =  paruMatInfo->LUsym;
