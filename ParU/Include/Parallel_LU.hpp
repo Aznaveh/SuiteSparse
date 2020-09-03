@@ -489,6 +489,6 @@ Int bin_srch_col (Int *srt_lst, Int l, Int r, Int num);
 Int bin_srch (Int *srt_lst, Int l, Int r, Int num);
 
 void paru_make_heap(paru_matrix *paruMatInfo, Int f );
-void paru_pivotal (paru_matrix *paruMatInfo, 
-        std::vector<Int> &pivotal_elements, Int *panel_row, Int f);
+void paru_pivotal (paru_matrix *paruMatInfo,std::vector<Int> &pivotal_elements,
+        Int *panel_row, Int f, cholmod_common *cc);
 #endif

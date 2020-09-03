@@ -25,7 +25,7 @@ paru_matrix *paru_init_rowFronts (
         )
 {
 
-    DEBUGLEVEL(-2);
+    DEBUGLEVEL(0);
     if (!A->packed)
     {
         printf ("A is not packed; Wrong format \n");
@@ -79,7 +79,7 @@ paru_matrix *paru_init_rowFronts (
     memset (rowSize, -1, m*sizeof(Int));
     PRLEVEL (1, ("%% rowSize pointer=%p size=%ld \n", rowSize,m*sizeof(Int) ));
 
-    Int *rowMark= (Int*) paru_alloc (m+nf, sizeof (Int), cc);
+    Int *rowMark= (Int*) paru_alloc (m+nf+1, sizeof (Int), cc);
     if (rowMark== NULL)
     {   //out of memory
         printf ("Out of memory: Work\n");

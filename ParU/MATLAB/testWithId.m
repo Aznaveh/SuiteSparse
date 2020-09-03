@@ -24,11 +24,14 @@ if (size(dr) ~= 2 )
     A = B(p,p);
 
     [m n] = size (A);
-    if ( m== 1)
+    if ( m == 1)
         sprintf('not worth trying');
     end
 
+else
+    A = Aorig;
 end
+
 
 %max scaling
 A = spdiags (1./max (abs(A),[], 2), 0, size(A,1), size(A,2)) * A ;

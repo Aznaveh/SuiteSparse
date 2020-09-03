@@ -204,7 +204,11 @@ void paru_update_rel_ind_col (paru_matrix *paruMatInfo, Int f,
     for (Int i=0; i < len_cb ; i++)
     {
         Int global_ind = cb_el_Index[i];
-        if (global_ind < 0) continue;
+        if (global_ind < 0)
+        {
+            RelIndex [i] = -1;
+            continue;
+        }
         PRLEVEL (1, ("%% searching for: cb_index[%ld]=%ld\n",
                     i,  global_ind));
         Int found = bin_srch (fcolList, 0, len_el-1, global_ind);

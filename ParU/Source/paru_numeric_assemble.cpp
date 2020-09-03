@@ -81,7 +81,7 @@ void assemble_all (double *s, double *d,   //source and destination
         Int *relRowInd, Int *relColInd)
     //Source and destination are stored column based
 {
-    DEBUGLEVEL (0);
+    DEBUGLEVEL (1);
     Int ii = 0, jj = 0; // row/cols visited sofar
 
     if (snleft == 1 || sm == 1) 
@@ -90,12 +90,14 @@ void assemble_all (double *s, double *d,   //source and destination
         for (Int j = 0; j < sn; j++) 
         {
             Int rj = relColInd[j];
+            PRLEVEL (1, ("%% rj[%ld]=%ld", j, rj));
             if (rj  >= 0 )
             {  // If column is valid
                 jj++;
                 for (Int i = 0; i < sm; i++) 
                 {
                     Int ri =relRowInd[i] ;
+                    PRLEVEL (1, ("%% ri[%ld]=%ld", i, ri));
                     if (ri >= 0 )
                     {  // If row is valid
                         ii++;

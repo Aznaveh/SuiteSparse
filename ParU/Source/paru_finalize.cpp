@@ -12,7 +12,7 @@ void paru_finalize (paru_matrix *paruMatInfo, Int f, Int start_fac,
         cholmod_common *cc)
 {
 
-    DEBUGLEVEL(-2);
+    DEBUGLEVEL(0);
 #ifndef NDEBUG
     Int p = 1;
     // counters to check the status of tuples scanning
@@ -123,7 +123,7 @@ void paru_finalize (paru_matrix *paruMatInfo, Int f, Int start_fac,
         ASSERT (numTuple >= 0);
         paru_Tuple *listColTuples = curColTupleList->list;
 #ifndef NDEBUG            
-        p = 1;
+        p = 0;
 
         PRLEVEL (p, ("\n %%-------->  3rd: c =%ld  numTuple = %ld\n",
                     c, numTuple));
@@ -197,19 +197,25 @@ void paru_finalize (paru_matrix *paruMatInfo, Int f, Int start_fac,
                                 e));
                     paru_update_rel_ind_row (curFr, el, cc) ;
                     paru_update_rel_ind_col (paruMatInfo, f, curFr, el, cc) ;
-
-#ifndef NDEBUG            
-                    p = 1;
-                    PRLEVEL (p, ("%% Full assembly from: \n"));
-                    if (p <= 0 )
-                        paru_print_element (paruMatInfo, e);
-#endif
-
                     //Int *rowRelIndex = relRowInd (el);
                     Int *rowRelIndex = (Int*)(el+1) + 2*nEl +mEl;
-
                     //Int *colRelIndex = relColInd (el);
                     Int *colRelIndex = (Int*)(el+1) + mEl + nEl;
+
+#ifndef NDEBUG            
+                    p = 0;
+                    PRLEVEL (p, ("%% Full assembly from:"));
+                    if (p <= 0 )
+                        paru_print_element (paruMatInfo, e);
+                    PRLEVEL (p, ("%% rowRelIndex:\n%%"));
+                    for (int i=0 ; i< el->nrows; i++)
+                        PRLEVEL (p, (" %ld",rowRelIndex[i]));
+                    PRLEVEL (p, ("\n%% colRelIndex:\n%%"));
+                    for (int i=0 ; i< el->ncols; i++)
+                        PRLEVEL (p, (" %ld",colRelIndex[i]));
+                    PRLEVEL (p, ("\n"));
+
+#endif
 
 
                     assemble_all (el_Num, cur_Numeric, mEl, nEl, curFrNrows,
@@ -226,11 +232,11 @@ void paru_finalize (paru_matrix *paruMatInfo, Int f, Int start_fac,
                         child_FA++ ;
                     else
                         noChild_FA++ ;
-                    p = 1;
+                    p = 0;
                     if (p <= 0) 
                     {
                         
-                        PRLEVEL (p, ("\n%%After ALL:"));
+                        PRLEVEL (p, ("\n%%After all assembly of %ld:",e));
 
                         PRLEVEL (p, ("\n%%Source%ld:",e));
                         paru_print_element (paruMatInfo, e);
@@ -598,10 +604,10 @@ void paru_finalize (paru_matrix *paruMatInfo, Int f, Int start_fac,
     p = 1;
     //if(f == LUsym-> nf -2)
     PRLEVEL (p, ("%% child_FA=%ld noChild_FA=%ld"
-                "  child_colPA=%ld noChild_colPA=%ld\n" 
-                "  elRow_child_colPA=%ld elRow_noChild_colPA=%ld\n" 
-                "  child_rowPA=%ld noChild_rowPA=%ld\n" 
-                "  elRow_child_rowPA=%ld elRow_noChild_rowPA=%ld\n" ,
+                "  child_colPA=%ld noChild_colPA=%ld\n%%" 
+                "  elRow_child_colPA=%ld elRow_noChild_colPA=%ld\n%%" 
+                "  child_rowPA=%ld noChild_rowPA=%ld\n%%" 
+                "  elRow_child_rowPA=%ld elRow_noChild_rowPA=%ld\n%%" ,
                 child_FA, noChild_FA, child_colPA, noChild_colPA, 
                 elRow_child_colPA, elRow_noChild_colPA, 
                 child_rowPA, noChild_rowPA,

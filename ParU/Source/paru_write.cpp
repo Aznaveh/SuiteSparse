@@ -12,6 +12,7 @@ void paru_write( paru_matrix *paruMatInfo, int scale,
 {
 
     DEBUGLEVEL(0);
+    PRLEVEL (1, ("%% Start Writing\n"));
     paru_symbolic *LUsym = paruMatInfo-> LUsym;
     Int nf = LUsym->nf;
     
@@ -68,6 +69,7 @@ void paru_write( paru_matrix *paruMatInfo, int scale,
 
         fprintf (colfptr, "%%cols\n");
         fclose(colfptr);
+        PRLEVEL (1, ("%% column permutaion DONE\n"));
     }
     //--------------------
 
@@ -133,6 +135,7 @@ void paru_write( paru_matrix *paruMatInfo, int scale,
         }
         paru_free ( m, sizeof (Int), PofA, cc);
         fclose(rowfptr);
+        PRLEVEL (1, ("%% row permutaion DONE\n"));
     }
     //--------------------
 
@@ -260,9 +263,9 @@ void paru_write( paru_matrix *paruMatInfo, int scale,
             PRLEVEL (p, (" "));
             for (Int c = col1; c < col2; c++)
                 PRLEVEL (p, (" %.17g ", pivotalFront [(c-col1)*rowCount + r]));
-            PRLEVEL (p, (";\n  %% "));
+            PRLEVEL (p, (";\n%% "));
         }
-        PRLEVEL (p, (";\n"));
+        PRLEVEL (p, (";]\n"));
 #endif
 
         //Printing U part
@@ -276,14 +279,18 @@ void paru_write( paru_matrix *paruMatInfo, int scale,
 #ifndef NDEBUG  // Printing the  U part
         p = 1;
         PRLEVEL (p, ("\n"));
-        for (Int i = 0; i < fp; i++)
+        PRLEVEL (p, ("%% fp = %ld, colCount = %ld\n", fp, colCount));
+        if (colCount != 0)
         {
-            for (Int j = 0; j < colCount; j++)
-                PRLEVEL (p, (" %2.5lf\t", uPart[j*fp+i]));
-            PRLEVEL (p, (";\n  %% "));
-        }
+            for (Int i = 0; i < fp; i++)
+            {
+                for (Int j = 0; j < colCount; j++)
+                    PRLEVEL (p, (" %2.5lf\t", uPart[j*fp+i]));
+                PRLEVEL (p, (";\n  %% "));
+            }
 
-        PRLEVEL (p, ("\n"));
+            PRLEVEL (p, ("\n"));
+        }
 #endif
     }
 

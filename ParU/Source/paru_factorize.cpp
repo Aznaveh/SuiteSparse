@@ -37,7 +37,7 @@ Int paru_panel_factorize (double *F, Int *frowList, Int m, Int n,
 {
     // works like dgetf2f.f in netlib v3.0  here is a link:
     // https://github.com/xianyi/OpenBLAS/blob/develop/reference/dgetf2f.f
-    DEBUGLEVEL(-2);
+    DEBUGLEVEL(0);
     PRLEVEL (1, ("%% Inside panel factorization %ld \n",panel_num));
 
 
@@ -207,8 +207,9 @@ Int paru_panel_factorize (double *F, Int *frowList, Int m, Int n,
 
 #ifndef NDEBUG  // Printing dger input
             Int p = 1;
+            PRLEVEL (p, ("%% lda =%d ",  lda));
             PRLEVEL (p, ("%% M =%d ",  M));
-            PRLEVEL (p, ("N =%d \n %% x= ",  N));
+            PRLEVEL (p, ("N =%d \n %%",  N));
             for (Int i=0; i<M; i++)
                 PRLEVEL (p, (" %lf ",  X[i] ));
             PRLEVEL (p, ("\n %% y= %d",  N));

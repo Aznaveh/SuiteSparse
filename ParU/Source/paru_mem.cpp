@@ -278,7 +278,7 @@ std::vector<Int>** heapList = paruMatInfo->heapList;
     paru_free (1, (m+nf+1)*sizeof(paru_Element), elementList, cc);
     work_struct *Work = paruMatInfo->Work;
     paru_free (m, sizeof(Int), Work->rowSize, cc);
-    paru_free (m+nf, sizeof(Int), Work->rowMark, cc);
+    paru_free (m+nf+1, sizeof(Int), Work->rowMark, cc);
     paru_free (m+nf, sizeof(Int), Work->elRow, cc);
     paru_free (m+nf, sizeof(Int), Work->elCol, cc);
 
