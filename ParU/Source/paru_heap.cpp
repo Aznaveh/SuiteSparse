@@ -118,8 +118,8 @@ void paru_make_heap(paru_matrix *paruMatInfo, Int f )
         Int elid = (*elHeap)[i];
         if  (lnc_el(elementList, elid) > m)
         {
-            PRLEVEL (p, ("%% element %ld lnc is wrong lnc=%ld %%",elid));
-            PRLEVEL (p, (" lnc_ind = %ld\n", lnc_el(elementList, elid) ));
+            PRLEVEL (p, ("%% element %ld lnc is wrong ",elid));
+            PRLEVEL (p, (" lnc_ind = %ld", lnc_el(elementList, elid) ));
             paru_Element *curEl = elementList[elid];
             PRLEVEL (p, (" lnc = %ld\n", curEl->lnc) );
 
