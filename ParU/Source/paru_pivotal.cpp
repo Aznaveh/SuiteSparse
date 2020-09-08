@@ -16,7 +16,7 @@
 void paru_pivotal (paru_matrix *paruMatInfo, std::vector<Int> &pivotal_elements,
         Int *panel_row, Int f, cholmod_common *cc)
 {
-    DEBUGLEVEL(0);
+    DEBUGLEVEL(1);
     paru_symbolic *LUsym =  paruMatInfo->LUsym;
     Int *snM = LUsym->super2atree;
     std::vector<Int>** heapList = paruMatInfo->heapList;
@@ -36,26 +36,19 @@ void paru_pivotal (paru_matrix *paruMatInfo, std::vector<Int> &pivotal_elements,
 
     std::vector<Int>* elHeap = heapList[eli] ;
     paru_Element **elementList = paruMatInfo->elementList;
-    work_struct *Work =  paruMatInfo->Work;
-    Int *rowMarkp = Work->rowMark;
-    Int rowMark = 0;
-
+    
     Int m = paruMatInfo-> m;
 
     /*****  making the list of elements that contribute to pivotal columns ****/
     while ( lnc_el(elementList, elHeap->front()) < col2 && elHeap->size() > 0)
         // pop from the heap and put it in pivotal_elements
     {
-        Int front = elHeap->front(); 
-        PRLEVEL (p, ("%% front = %ld col1=%ld", front, col1));
+        Int frontEl = elHeap->front(); 
+        PRLEVEL (p, ("%% element = %ld col1=%ld", frontEl, col1));
         PRLEVEL (p, (" lnc_el = %ld \n", 
-                    lnc_el(elementList, front)));
-        ASSERT (lnc_el(elementList, front) >= col1);
+                    lnc_el(elementList, frontEl)));
+        ASSERT (lnc_el(elementList, frontEl) >= col1);
         PRLEVEL (p, ("%% elHeap->size= %ld \n", elHeap->size()));
-        // max(rowMark , fornt->rowMark)
-        Int f_rmark = rowMarkp[front];
-        rowMark = rowMark >  f_rmark ?  rowMark : f_rmark;
-        ASSERT(f_rmark <= rowMark);
 
         pivotal_elements.push_back(elHeap->front());
         std::pop_heap
@@ -63,6 +56,10 @@ void paru_pivotal (paru_matrix *paruMatInfo, std::vector<Int> &pivotal_elements,
              { return lnc_el(elementList,a) > lnc_el(elementList,b); }   );
         elHeap->pop_back();
     }
+
+    work_struct *Work =  paruMatInfo->Work;
+    Int *rowMarkp = Work->rowMark;
+    Int rowMark = rowMarkp[eli];
 
     Int *isRowInFront = Work->rowSize; 
     if ( ++rowMark < 0) 
@@ -153,6 +150,13 @@ void paru_pivotal (paru_matrix *paruMatInfo, std::vector<Int> &pivotal_elements,
             }
 
             ASSERT (rowCount <= m); 
+#ifndef NDEBUG 
+            if (rowCount != stl_rowSet.size())
+            {
+                PRLEVEL (1, ("%%curRow =%ld rowCount=%ld\n",curRow, rowCount));
+                PRLEVEL (1, ("%%stl_rowSet.size()=%ld \n", stl_rowSet.size()));
+            }
+#endif 
             ASSERT (rowCount == stl_rowSet.size());
         }
         panel_row [( lnc_el(elementList,e) - col1) / panel_width] = rowCount;
@@ -389,6 +393,7 @@ void paru_pivotal (paru_matrix *paruMatInfo, std::vector<Int> &pivotal_elements,
 #endif
 
     rowMarkp[eli] += rowCount;
+    PRLEVEL (1, ("%% rowMarkp[%ld] =%ld\n", eli, rowMarkp[eli]));
     return;
 }
 

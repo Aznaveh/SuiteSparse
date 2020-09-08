@@ -51,16 +51,16 @@ fprintf(ff,' myflop umfflop ratio\n results = [');
 %fprintf(ff,' myflop, umfflop, ratio\n');
 
 loop_cnt = 0;
-
+NNZMat = 4000;
 
 %for k = 1:100
 for k = 1:nmat
     id = fnew (k); 
     % some problem in these matrice
     if ( id == 2056 || id == 2034 || id == 1867 || id == 2842 || ...
-        id == 2843 ||    id == 2844 || id == 2845  ...
+        id == 2843 ||    id == 2844 || id == 2845   ...
         || id == 893) % || id == 823 ||...
-%        id == 2232 || id == 826  || id == 1212)  
+        %        id == 2232 || id == 826  || id == 1212)  
 
         continue;
     end
@@ -69,13 +69,15 @@ for k = 1:nmat
 
     Prob = ssget(id);
     Aorig = Prob.A;
+
+    if (nnz(Aorig) < NNZMat)
+            continue;
+    end
+ 
     [dp,dq,dr,ds,dcc,drr] = dmperm(Aorig);
     [m n] = size (Aorig);
 
-    if (nnz(Aorig) < 500)
-            continue;
-    end
-    A = Aorig;
+   A = Aorig;
 
     if (size(dr) ~= 2 )
         %continue 
@@ -101,7 +103,7 @@ for k = 1:nmat
     loop_cnt = loop_cnt + 1;
     id
 
-    if (loop_cnt > 30)
+    if (loop_cnt > 50 && nnz(A) < NNZMat)
         break;
     end
 
@@ -148,10 +150,10 @@ for k = 1:nmat
     myElaps = t_Info(1);
     fromCode_umf_Elaps = t_Info(2);
 
-%%    flp_cnt_dgemm = t_Info(3);
-%%    flp_cnt_trsm = t_Info(4);
-%%    flp_cnt_dger = t_Info(5);
-%%    hardware_flp_cnt = flp_cnt_dgemm + flp_cnt_trsm + flp_cnt_dger;
+    %%    flp_cnt_dgemm = t_Info(3);
+    %%    flp_cnt_trsm = t_Info(4);
+    %%    flp_cnt_dger = t_Info(5);
+    %%    hardware_flp_cnt = flp_cnt_dgemm + flp_cnt_trsm + flp_cnt_dger;
 
 
 
@@ -177,6 +179,14 @@ for k = 1:nmat
     myErr = lu_normest(sA(rowp,colp),L,U)/norm(A,1);
     %umfErr = lu_normest(D(:,p)\A(:,q),l,u);
     umfErr = lu_normest(p*(r\A)*q,l,u)/norm(A,1);
+
+    if(myErr <= 100*umfErr || myErr < err)
+        fprintf('Pass\n')
+    else
+         fprintf('Fail\n')
+         break;
+    end
+
 
     umfpnnz= nnz(l)+nnz(u) - m;
     mynnz = nnz(LU); %+ nnz(paddingZ);
@@ -230,7 +240,7 @@ fprintf(ff,'logratio = results (:,5) ;\n');
 fprintf(ff,'\n');
 
 fprintf(ff, ...
-    'noNanRatio = logratio(~any (isnan(logratio) | isinf(logratio),2),:); \n');
+'noNanRatio = logratio(~any (isnan(logratio) | isinf(logratio),2),:); \n');
 
 
 fprintf(ff,'myElaps = results (:,6) ;\n');

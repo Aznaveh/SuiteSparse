@@ -11,7 +11,7 @@
 
 void paru_make_heap(paru_matrix *paruMatInfo, Int f )
 {
-    DEBUGLEVEL(-1);
+    DEBUGLEVEL(0);
 #ifndef NDEBUG  
     Int p = 0;
 #endif
@@ -21,6 +21,7 @@ void paru_make_heap(paru_matrix *paruMatInfo, Int f )
     Int * aChildp = LUsym->aChildp;
     Int *snM = LUsym->super2atree;
     paru_Element **elementList = paruMatInfo->elementList;
+    Int m = paruMatInfo-> m;
 
     std::vector<Int>** heapList = paruMatInfo->heapList;
 
@@ -30,9 +31,16 @@ void paru_make_heap(paru_matrix *paruMatInfo, Int f )
     Int biggest_Child_id = -1;
     Int biggest_Child_size = -1;
     Int tot_size = 0; 
+    work_struct *Work =  paruMatInfo->Work;
+    Int *rowMarkp = Work->rowMark;
+    Int rowMark = 0;
     for (Int i = aChildp[eli]; i <= aChildp[eli+1]-1; i++) 
     {
         Int chelid = aChild[i];  // element id of the child
+        // max(rowMark , child->rowMark)
+        Int f_rmark = rowMarkp[chelid];
+        rowMark = rowMark >  f_rmark ?  rowMark : f_rmark;
+
         PRLEVEL (p, ("%% chelid = %ld\n", chelid));
         std::vector<Int>* curHeap = heapList[chelid];
         //ASSERT(curHeap != nullptr);
@@ -40,16 +48,6 @@ void paru_make_heap(paru_matrix *paruMatInfo, Int f )
         if (curHeap == nullptr) continue;
         Int cur_size = curHeap->size();
 
-#ifndef NDEBUG  
-        //        for (Int k = 0; k < cur_size; k++)
-        //        {
-        //        PRLEVEL (p, ("%% HEERRp\n"));
-        //            Int elid = (*curHeap)[k];
-        //            if (elementList[elid] == NULL)
-        //                curHeap->erase(curHeap->begin()+k);
-        //        }
-        //        cur_size = curHeap->size();
-#endif
         PRLEVEL (p, ("%% cur_size =  %ld\n",cur_size));
         tot_size += cur_size; 
         if (cur_size > biggest_Child_size)
@@ -58,6 +56,7 @@ void paru_make_heap(paru_matrix *paruMatInfo, Int f )
             biggest_Child_size = cur_size;
         }
     }
+    rowMarkp[eli] = rowMark;
     auto greater = [&elementList](Int a, Int b)
     { return lnc_el(elementList,a) > lnc_el(elementList,b); };
 
@@ -117,7 +116,19 @@ void paru_make_heap(paru_matrix *paruMatInfo, Int f )
     for(Int i = 0; i < elHeap->size(); i++)
     {
         Int elid = (*elHeap)[i];
-        PRLEVEL (p, (" %ld", lnc_el(elementList, elid) ));
+        if  (lnc_el(elementList, elid) > m)
+        {
+            PRLEVEL (p, ("%% element %ld lnc is wrong lnc=%ld %%",elid));
+            PRLEVEL (p, (" lnc_ind = %ld\n", lnc_el(elementList, elid) ));
+            paru_Element *curEl = elementList[elid];
+            PRLEVEL (p, (" lnc = %ld\n", curEl->lnc) );
+
+        }
+        if (elementList[elid] != NULL)
+            ASSERT (lnc_el(elementList, elid) <= m);
+
+        if (elid != NULL)
+            PRLEVEL (p, (" %ld", lnc_el(elementList, elid) ));
     }
     PRLEVEL (p, ("\n"));
 #endif

@@ -768,7 +768,9 @@ int paru_front ( paru_matrix *paruMatInfo,
 
 
     // Initializing curEl global indices
-    Int *el_colIndex = colIndex_pointer (curEl);
+    //Int *el_colIndex = colIndex_pointer (curEl);
+    Int *el_colIndex = (Int*)(curEl+1);
+    curEl->lnc = 0;
     for (Int i = 0; i < colCount; ++ i) 
         el_colIndex [i] = fcolList[i];
     Int *el_rowIndex = rowIndex_pointer (curEl);
@@ -858,6 +860,10 @@ int paru_front ( paru_matrix *paruMatInfo,
 
 #endif
     curHeap->push_back(eli);
+    std::push_heap(curHeap->begin(), curHeap->end(), 
+            [&elementList](Int a, Int b)
+            { return lnc_el(elementList,a) > lnc_el(elementList,b); });
+
     for(Int i=0 ; i < pivotal_elements.size(); i++)
     {
         Int e = pivotal_elements[i];
@@ -865,8 +871,8 @@ int paru_front ( paru_matrix *paruMatInfo,
         if (el == NULL) continue;
         curHeap->push_back(e);
         std::push_heap(curHeap->begin(), curHeap->end(), 
-         [&elementList](Int a, Int b)
-         { return lnc_el(elementList,a) > lnc_el(elementList,b); });
+                [&elementList](Int a, Int b)
+                { return lnc_el(elementList,a) > lnc_el(elementList,b); });
     }
 
 #ifndef NDEBUG
@@ -885,8 +891,8 @@ int paru_front ( paru_matrix *paruMatInfo,
 
     //TODO: wrong
 #ifndef NDEBUG /* chekcing isRowInFront to be zero */
-//    for (Int i = 0; i < m; i++)
-//        ASSERT ( isRowInFront [i] < rowMark);
+    //    for (Int i = 0; i < m; i++)
+    //        ASSERT ( isRowInFront [i] < rowMark);
 #endif
 
 
