@@ -16,7 +16,7 @@
 void paru_pivotal (paru_matrix *paruMatInfo, std::vector<Int> &pivotal_elements,
         Int *panel_row, Int f, cholmod_common *cc)
 {
-    DEBUGLEVEL(1);
+    DEBUGLEVEL(0);
     paru_symbolic *LUsym =  paruMatInfo->LUsym;
     Int *snM = LUsym->super2atree;
     std::vector<Int>** heapList = paruMatInfo->heapList;
@@ -25,7 +25,6 @@ void paru_pivotal (paru_matrix *paruMatInfo, std::vector<Int> &pivotal_elements,
 #ifndef NDEBUG
     Int p = 0;
     PRLEVEL (p, ("%% Pivotal assembly of front %ld (eli %ld)\n",f, eli));
-    p = 1;
 #endif 
 
 
@@ -38,6 +37,19 @@ void paru_pivotal (paru_matrix *paruMatInfo, std::vector<Int> &pivotal_elements,
     paru_Element **elementList = paruMatInfo->elementList;
     
     Int m = paruMatInfo-> m;
+#ifndef NDEBUG
+    p = 1;
+    PRLEVEL (p, ("%% Before making the pivotal vector:\n %%"));
+    PRLEVEL (p, ("%% element ids:\n %%"));
+    for(Int i = 0; i < elHeap->size(); i++)
+    {
+        Int elid = (*elHeap)[i];
+        PRLEVEL (p, (" %ld", elid));
+        PRLEVEL (p, (" (%ld) ", lnc_el(elementList, elid) ));
+    }
+    PRLEVEL (p, ("\n"));
+    Int priorEl_lnc = 0;
+#endif 
 
     /*****  making the list of elements that contribute to pivotal columns ****/
     while ( lnc_el(elementList, elHeap->front()) < col2 && elHeap->size() > 0)
@@ -55,6 +67,14 @@ void paru_pivotal (paru_matrix *paruMatInfo, std::vector<Int> &pivotal_elements,
             (elHeap->begin(), elHeap->end(),[&elementList](Int a, Int b)
              { return lnc_el(elementList,a) > lnc_el(elementList,b); }   );
         elHeap->pop_back();
+#ifndef NDEBUG
+        //ensure the vector is sorted based on first column
+        if ( lnc_el(elementList, frontEl) < priorEl_lnc )
+            PRLEVEL (p, ("%% cur= %ld prior=%ld\n", 
+                        lnc_el(elementList, frontEl), priorEl_lnc));
+        ASSERT ( lnc_el(elementList, frontEl) >= priorEl_lnc );
+        priorEl_lnc = lnc_el(elementList, frontEl);
+#endif 
     }
 
     work_struct *Work =  paruMatInfo->Work;
@@ -74,7 +94,7 @@ void paru_pivotal (paru_matrix *paruMatInfo, std::vector<Int> &pivotal_elements,
 
 #ifndef NDEBUG
     p = 1;
-    PRLEVEL (p, ("%% eli(%ld): ", eli));
+    PRLEVEL (p, ("%% pivotal columns eli(%ld): ", eli));
     for(Int i=0 ; i < pivotal_elements.size(); i++)
         PRLEVEL (p, ("%ld ", pivotal_elements[i]));
     PRLEVEL (p, ("\n"));

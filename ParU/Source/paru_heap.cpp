@@ -13,7 +13,7 @@ void paru_make_heap(paru_matrix *paruMatInfo, Int f )
 {
     DEBUGLEVEL(0);
 #ifndef NDEBUG  
-    Int p = 0;
+    Int p = 1;
 #endif
 
     paru_symbolic *LUsym =  paruMatInfo->LUsym;
@@ -68,6 +68,7 @@ void paru_make_heap(paru_matrix *paruMatInfo, Int f )
     std::vector<Int>* elHeap = heapList[eli] = heapList[biggest_Child_id];
     heapList[biggest_Child_id] = nullptr;
 
+    std::make_heap(elHeap->begin(), elHeap->end(), greater ); 
     //O(n) heapify of all children or O(klgn) add to the biggest child
     if ( biggest_Child_size > HEAP_ToL*(tot_size - biggest_Child_size) )
     { //klogn
@@ -82,8 +83,10 @@ void paru_make_heap(paru_matrix *paruMatInfo, Int f )
             {
                 Int elid = (*chHeap)[k];
                 if (elementList[elid] != NULL)
+                {
                     elHeap->push_back(elid);
-                std::push_heap(elHeap->begin(), elHeap->end(), greater);
+                    std::push_heap(elHeap->begin(), elHeap->end(), greater);
+                }
             }
             delete heapList[chelid];
             heapList[chelid] = nullptr;
@@ -112,21 +115,10 @@ void paru_make_heap(paru_matrix *paruMatInfo, Int f )
     for(Int i = 0; i < elHeap->size(); i++)
         PRLEVEL (p, (" %ld", (*elHeap)[i]));
     PRLEVEL (p, ("\n"));
-    PRLEVEL (p, ("%% Heap:\n %%"));
+    PRLEVEL (p, ("%% first cols:\n %%"));
     for(Int i = 0; i < elHeap->size(); i++)
     {
         Int elid = (*elHeap)[i];
-        if  (lnc_el(elementList, elid) > m)
-        {
-            PRLEVEL (p, ("%% element %ld lnc is wrong ",elid));
-            PRLEVEL (p, (" lnc_ind = %ld", lnc_el(elementList, elid) ));
-            paru_Element *curEl = elementList[elid];
-            PRLEVEL (p, (" lnc = %ld\n", curEl->lnc) );
-
-        }
-        if (elementList[elid] != NULL)
-            ASSERT (lnc_el(elementList, elid) <= m);
-
         if (elid != NULL)
             PRLEVEL (p, (" %ld", lnc_el(elementList, elid) ));
     }

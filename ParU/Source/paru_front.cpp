@@ -19,7 +19,7 @@ int paru_front ( paru_matrix *paruMatInfo,
         cholmod_common *cc)
 {
 
-    DEBUGLEVEL(1);
+    DEBUGLEVEL(0);
     /* 
      * -2 Print Nothing
      * -1 Just Matlab
@@ -860,9 +860,9 @@ int paru_front ( paru_matrix *paruMatInfo,
 
 #endif
     curHeap->push_back(eli);
-    std::push_heap(curHeap->begin(), curHeap->end(), 
-            [&elementList](Int a, Int b)
-            { return lnc_el(elementList,a) > lnc_el(elementList,b); });
+//    auto greater = [&elementList](Int a, Int b)
+//    { return lnc_el(elementList,a) > lnc_el(elementList,b); };
+//    std::push_heap(curHeap->begin(), curHeap->end(), greater);
 
     for(Int i=0 ; i < pivotal_elements.size(); i++)
     {
@@ -870,9 +870,7 @@ int paru_front ( paru_matrix *paruMatInfo,
         paru_Element *el = elementList[e];
         if (el == NULL) continue;
         curHeap->push_back(e);
-        std::push_heap(curHeap->begin(), curHeap->end(), 
-                [&elementList](Int a, Int b)
-                { return lnc_el(elementList,a) > lnc_el(elementList,b); });
+//        std::push_heap(curHeap->begin(), curHeap->end(), greater);
     }
 
 #ifndef NDEBUG
