@@ -123,5 +123,13 @@ void paru_make_heap(paru_matrix *paruMatInfo, Int f )
             PRLEVEL (p, (" %ld", lnc_el(elementList, elid) ));
     }
     PRLEVEL (p, ("\n"));
+    //chekcing the heap
+    for(Int i = elHeap->size()-1 ; i > 0; i--)
+    {
+        Int elid = (*elHeap)[i];
+        Int pelid = (*elHeap)[(i-1)/2]; //parent id
+        ASSERT ( lnc_el(elementList,pelid) <= lnc_el(elementList,elid));
+    }
+
 #endif
 }

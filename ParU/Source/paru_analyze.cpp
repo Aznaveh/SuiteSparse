@@ -174,7 +174,7 @@ paru_symbolic *paru_analyze
         // at the kth front. Any rows not eliminated in the kth
         // front maybe selected as pivot rows in the parent of k
         // (Front_1strow [k]) and so on up the tree.
-        // Aznaveh: I am not sure if I need to keep it
+        // Aznaveh: I am now using it at least for the rowMarks. 
 
         *Front_leftmostdesc, // size = n_col +1;  actual size = nfr+1
         // Aznaveh: I have a module computing leftmostdesc
@@ -350,11 +350,13 @@ paru_symbolic *paru_analyze
     PRLEVEL (1, ("\nPivot columns in each front, and parent of each front:\n"));
     Int k = 0;
 
+    p = 1;
     for (Int i = 0 ; i < nfr ; i++) 
     {
         Int fnpiv = Front_npivcol [i];
         PRLEVEL (p, ("Front %ld: parent front: %ld number of pivot cols: %ld\n",
                     i, Front_parent [i], fnpiv));
+        PRLEVEL (p, ("%% first row is %ld\n", Front_1strow[i]));
 
         for (Int j = 0 ; j < fnpiv ; j++) 
         {
@@ -364,6 +366,7 @@ paru_symbolic *paru_analyze
             k++;
         }
     }
+    p = 1;
 
     PRLEVEL (p, ("\nTotal number of pivot columns "
                 "in frontal matrices: %ld\n", k));
@@ -380,8 +383,8 @@ paru_symbolic *paru_analyze
 
     umfpack_dl_free_symbolic (&Symbolic);
 
-    paru_free ((n+1), sizeof (Int), Front_1strow, cc);
     paru_free ((n+1), sizeof (Int), Front_leftmostdesc, cc);
+    paru_free ((n+1), sizeof (Int), Front_1strow, cc);
 
     //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
@@ -399,6 +402,7 @@ paru_symbolic *paru_analyze
     LUsym->Chain_maxrows = Chain_maxrows;
     LUsym->Chain_maxcols = Chain_maxcols;
     LUsym->Qfill = Qinit;
+
 
     PRLEVEL (0, ("%% A  is  %ld x %ld \n",m, n ));
     PRLEVEL (-1, ("LU = zeros(%ld,%ld);\n",m, n ));
@@ -1115,15 +1119,17 @@ paru_symbolic *paru_analyze
 
 
 #ifndef NDEBUG
-    p = 1;
-    PRLEVEL (p,("%% super node mapping (snM): ")); 
+    p = 0;
+    PRLEVEL (p,("%% super node mapping ,snM (and rows): ")); 
     for (Int f = 0; f < nf; f++)
     {
         ASSERT (snM [f] != -1);
-        PRLEVEL (p,("%ld ",snM[f]));     
+        PRLEVEL (p,("%ld (%ld) ",snM[f], Sleft[Super[f]]));     
     }
+    PRLEVEL (p,("- (%ld) ", Sleft[Super[nf]]));     
     PRLEVEL (p,("\n"));
 
+    p = 1;
     PRLEVEL (p,("%% row mapping (rM): "));  
     for (Int i = 0; i < ms; i++)
     {

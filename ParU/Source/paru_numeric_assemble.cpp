@@ -81,7 +81,7 @@ void assemble_all (double *s, double *d,   //source and destination
         Int *relRowInd, Int *relColInd)
     //Source and destination are stored column based
 {
-    DEBUGLEVEL (1);
+    DEBUGLEVEL (0);
     Int ii = 0, jj = 0; // row/cols visited sofar
 
     if (snleft == 1 || sm == 1) 

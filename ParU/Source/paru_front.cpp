@@ -19,7 +19,7 @@ int paru_front ( paru_matrix *paruMatInfo,
         cholmod_common *cc)
 {
 
-    DEBUGLEVEL(0);
+    DEBUGLEVEL(-2);
     /* 
      * -2 Print Nothing
      * -1 Just Matlab
@@ -73,13 +73,6 @@ int paru_front ( paru_matrix *paruMatInfo,
     Int *isRowInFront = Work->rowSize; 
     Int *rowMarkp = Work->rowMark;
     Int rowMark = rowMarkp[eli];
-
-    //TODO: it must change for parallel
-    if (rowMark < 0) 
-    {  // in rare case of overflow
-        memset (isRowInFront, -1, m*sizeof(Int));
-        rowMark =  rowMarkp[eli] = 0;
-    }
 
 
     Int fm = LUsym->Fm[f];     /* Upper bound number of rows of F */ 
@@ -454,7 +447,7 @@ int paru_front ( paru_matrix *paruMatInfo,
 
     /**** 3 ********  factorizing the fully summed part of the matrix        ***
      *****  a set of pivot is found in this part that is crucial to assemble **/
-    PRLEVEL (-2, ("%% rowCount =%ld\n", rowCount));
+    PRLEVEL (1, ("%% rowCount =%ld\n", rowCount));
 
 #ifndef NDEBUG  // Printing the list of rows
     Int p = 1;
@@ -804,7 +797,7 @@ int paru_front ( paru_matrix *paruMatInfo,
 
 #ifndef NDEBUG
     //Printing the contribution block after dgemm
-    p = 0;
+    p = 1;
     PRLEVEL (p, ("\n%%After DGEMM:"));
     if (p <= 0)
         paru_print_element (paruMatInfo, eli);
@@ -851,18 +844,24 @@ int paru_front ( paru_matrix *paruMatInfo,
     curHeap = heapList[eli];
     ASSERT (curHeap != nullptr);
 #ifndef NDEBUG
-    for (Int k = 0; k < curHeap->size(); k++)
+    p = 2;
+    for(Int i = curHeap->size()-1 ; i > 0; i--)
     {
-        Int elid = (*curHeap)[k];
-        if (elementList[eli] == nullptr)
-            curHeap->erase(curHeap->begin()+k);
+        Int elid = (*curHeap)[i];
+        Int pelid = (*curHeap)[(i-1)/2]; //parent id
+        if( lnc_el(elementList,pelid) > lnc_el(elementList,elid))
+            PRLEVEL (p,("BEF %ld(%ld) ", elid, lnc_el(elementList, elid) ));
+            PRLEVEL (p,("BEF parent %ld(%ld)\n\n ",
+                        pelid, lnc_el(elementList, pelid) ));
+        //ASSERT ( lnc_el(elementList,pelid) <= lnc_el(elementList,elid));
     }
-
 #endif
+
+
     curHeap->push_back(eli);
-//    auto greater = [&elementList](Int a, Int b)
-//    { return lnc_el(elementList,a) > lnc_el(elementList,b); };
-//    std::push_heap(curHeap->begin(), curHeap->end(), greater);
+    auto greater = [&elementList](Int a, Int b)
+    { return lnc_el(elementList,a) > lnc_el(elementList,b); };
+    std::push_heap(curHeap->begin(), curHeap->end(), greater);
 
     for(Int i=0 ; i < pivotal_elements.size(); i++)
     {
@@ -870,15 +869,32 @@ int paru_front ( paru_matrix *paruMatInfo,
         paru_Element *el = elementList[e];
         if (el == NULL) continue;
         curHeap->push_back(e);
-//        std::push_heap(curHeap->begin(), curHeap->end(), greater);
+        std::push_heap(curHeap->begin(), curHeap->end(), greater);
     }
 
 #ifndef NDEBUG
     //Printing the contribution block after prior blocks assembly
-    p = 0;
+    p = 1;
     PRLEVEL (p, ("\n%%After prior blocks assembly:"));
     if (p <= 0)
         paru_print_element (paruMatInfo, eli);
+    //chekcing the heap
+    p = 2;
+    PRLEVEL (p, ("%%Heap after removing pivotal ones\n"));
+    for(Int i = 0; i < curHeap->size(); i++)
+    {
+        Int elid = (*curHeap)[i];
+        PRLEVEL (p, (" %ld(%ld) ", elid, lnc_el(elementList, elid) ));
+    }
+    PRLEVEL (p, ("\n"));
+    for(Int i = curHeap->size()-1 ; i > 0; i--)
+    {
+        Int elid = (*curHeap)[i];
+        Int pelid = (*curHeap)[(i-1)/2]; //parent id
+        if( lnc_el(elementList,pelid) > lnc_el(elementList,elid))
+            PRLEVEL (p, ("ATT %ld(%ld)\n\n ", elid, lnc_el(elementList, elid)));
+        //ASSERT ( lnc_el(elementList,pelid) <= lnc_el(elementList,elid));
+    }
 #endif
 
 
@@ -887,10 +903,11 @@ int paru_front ( paru_matrix *paruMatInfo,
     Work -> elRMark += colCount;
 
 
-    //TODO: wrong
 #ifndef NDEBUG /* chekcing isRowInFront to be zero */
-    //    for (Int i = 0; i < m; i++)
-    //        ASSERT ( isRowInFront [i] < rowMark);
+    rowMark = rowMarkp[eli];
+    Int *Sleft = LUsym->Sleft;
+    for (Int i = Sleft[col1]; i < Sleft[Super[f+1]]; i++)
+        ASSERT ( isRowInFront [i] < rowMark);
 #endif
 
 

@@ -23,7 +23,7 @@ void paru_pivotal (paru_matrix *paruMatInfo, std::vector<Int> &pivotal_elements,
     Int eli = snM [f]; 
 
 #ifndef NDEBUG
-    Int p = 0;
+    Int p = 1;
     PRLEVEL (p, ("%% Pivotal assembly of front %ld (eli %ld)\n",f, eli));
 #endif 
 
@@ -77,15 +77,31 @@ void paru_pivotal (paru_matrix *paruMatInfo, std::vector<Int> &pivotal_elements,
 #endif 
     }
 
+#ifndef NDEBUG
+    p = 1;
+    PRLEVEL (p, ("\n%%"));
+    //chekcing the heap
+    for(Int i = elHeap->size()-1 ; i > 0; i--)
+    {
+        Int elid = (*elHeap)[i];
+        Int pelid = (*elHeap)[(i-1)/2]; //parent id
+        ASSERT ( lnc_el(elementList,pelid) <= lnc_el(elementList,elid));
+    }
+#endif
+
+
     work_struct *Work =  paruMatInfo->Work;
     Int *rowMarkp = Work->rowMark;
     Int rowMark = rowMarkp[eli];
 
     Int *isRowInFront = Work->rowSize; 
     if ( ++rowMark < 0) 
-        //TODO: just look at the children
+        // just look at the children
     {  // in rare case of overflow
-        memset (isRowInFront, -1, m*sizeof(Int));
+        Int *Sleft = LUsym->Sleft;
+        // first column of current front until first column of next front
+        for (Int i = Sleft[col1]; i < Sleft[Super[f+1]]; i++)
+            isRowInFront[i] = -1;
         rowMark = rowMarkp[eli] = 1;
     }
     rowMarkp[eli] = rowMark;
@@ -206,7 +222,7 @@ void paru_pivotal (paru_matrix *paruMatInfo, std::vector<Int> &pivotal_elements,
         {
             pprow = panel_row[i];
         }
-        PRLEVEL (0, ("%ld ",panel_row[i]));
+        PRLEVEL (1, ("%ld ",panel_row[i]));
         ASSERT (panel_row[i] > 0);
         ASSERT (panel_row[i] <= m);
 
@@ -215,7 +231,7 @@ void paru_pivotal (paru_matrix *paruMatInfo, std::vector<Int> &pivotal_elements,
     paruMatInfo->frowCount[f] = rowCount;
 
 #ifndef NDEBUG /* Checking if pivotal rows are correct */
-    p = 0;
+    p = 1;
     PRLEVEL (p, ("%% panel_row: \n %%"));
     for (Int i = 0; i < num_panels; i++)
         PRLEVEL (p, ("%ld ",panel_row[i]));
@@ -323,7 +339,7 @@ void paru_pivotal (paru_matrix *paruMatInfo, std::vector<Int> &pivotal_elements,
 
 
 #ifndef NDEBUG // print the element which is going to be assembled from
-        Int p = 0;
+        Int p = 1;
         PRLEVEL (p, ("%% ASSEMBL element= %ld  mEl =%ld ",e, mEl));
         if (p <= 0)
             paru_print_element (paruMatInfo, e);
@@ -374,7 +390,7 @@ void paru_pivotal (paru_matrix *paruMatInfo, std::vector<Int> &pivotal_elements,
                     PRLEVEL (p, (" %2.5lf\t", pivotalFront [(c-col1)*rowCount + r]));
                 PRLEVEL (p, ("\n"));
             }
-            p = 0;
+            p = 1;
 #endif
 
 
@@ -383,11 +399,11 @@ void paru_pivotal (paru_matrix *paruMatInfo, std::vector<Int> &pivotal_elements,
         {
             el->lnc = cEl;
             ASSERT (cEl < nEl);
-            PRLEVEL (0, ("%%el->lnc= %ld ",el->lnc));
-            PRLEVEL (0, ("el_colIndex[el->lnc]=%ld :\n"
+            PRLEVEL (1, ("%%el->lnc= %ld ",el->lnc));
+            PRLEVEL (1, ("el_colIndex[el->lnc]=%ld :\n"
                         , el_colIndex[el->lnc]));
 #ifndef NDEBUG // print the element which has been assembled from
-            p = 0;
+            p = 1;
             PRLEVEL (p, ("%% ASSEMBLED element= %ld  mEl =%ld ",e, mEl));
             if (p <= 0)
                 paru_print_element (paruMatInfo, e);
@@ -397,7 +413,7 @@ void paru_pivotal (paru_matrix *paruMatInfo, std::vector<Int> &pivotal_elements,
     }
 
 #ifndef NDEBUG  // Printing the pivotal front
-    p = 0;
+    p = 1;
     PRLEVEL (p, ("%% After all the assemble\n"));
     PRLEVEL (p, ("%% x =  \t"));
     for (Int c = col1; c < col2; c++) 

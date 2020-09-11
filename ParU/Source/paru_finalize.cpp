@@ -123,7 +123,7 @@ void paru_finalize (paru_matrix *paruMatInfo, Int f, Int start_fac,
         ASSERT (numTuple >= 0);
         paru_Tuple *listColTuples = curColTupleList->list;
 #ifndef NDEBUG            
-        p = 0;
+        p = 1;
 
         PRLEVEL (p, ("\n %%-------->  3rd: c =%ld  numTuple = %ld\n",
                     c, numTuple));
@@ -203,7 +203,7 @@ void paru_finalize (paru_matrix *paruMatInfo, Int f, Int start_fac,
                     Int *colRelIndex = (Int*)(el+1) + mEl + nEl;
 
 #ifndef NDEBUG            
-                    p = 0;
+                    p = 1;
                     PRLEVEL (p, ("%% Full assembly from:"));
                     if (p <= 0 )
                         paru_print_element (paruMatInfo, e);
@@ -232,7 +232,7 @@ void paru_finalize (paru_matrix *paruMatInfo, Int f, Int start_fac,
                         child_FA++ ;
                     else
                         noChild_FA++ ;
-                    p = 0;
+                    p = 1;
                     if (p <= 0) 
                     {
                         

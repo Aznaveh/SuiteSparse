@@ -103,7 +103,11 @@ for k = 1:nmat
     loop_cnt = loop_cnt + 1;
     id
 
-    if (loop_cnt > 50 && nnz(A) < NNZMat)
+    if (nnz(A) < NNZMat)
+            continue;
+    end
+ 
+    if (loop_cnt > 100 )
         break;
     end
 
