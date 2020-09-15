@@ -103,10 +103,16 @@ int paru_front ( paru_matrix *paruMatInfo,
 
 
     /************ Making the heap from list of the immediate children ******/
+    PRLEVEL (1, ("%% Next: work on the heap \n"));
     paru_make_heap(paruMatInfo, f);
-    std::vector<Int> pivotal_elements;
+    PRLEVEL (1, ("%% Done: work on the heap \n"));
 
+    /********************** pivotal column assembly  **************************/
+    std::vector<Int> pivotal_elements;
+    PRLEVEL (1, ("%% Next: work on pivotal column assembly\n"));
     paru_pivotal (paruMatInfo, pivotal_elements, panel_row , f, cc);
+    PRLEVEL (1, ("%% Done: work on pivotal column assembly\n"));
+
     Int rowCount = paruMatInfo->frowCount[f];
 
 
@@ -673,6 +679,7 @@ int paru_front ( paru_matrix *paruMatInfo,
             { //free el
                 Int tot_size = sizeof(paru_Element) +
                     sizeof(Int)*(2*(mEl+nEl)) + sizeof(double)*nEl*mEl;
+                PRLEVEL (1, ("%%inside Front: Free %ld\n",e));
                 paru_free (1, tot_size, el, cc);
                 elementList[e] = NULL;
             }
@@ -755,7 +762,7 @@ int paru_front ( paru_matrix *paruMatInfo,
                     eli);
             return 1;
         }
-        PRLEVEL (1, ("%% curEl =%p\n", curEl));
+        PRLEVEL (1, ("%% Created ele %ld in curEl =%p\n", eli, curEl));
     }
 
 

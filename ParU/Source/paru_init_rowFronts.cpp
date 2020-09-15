@@ -243,6 +243,7 @@ paru_matrix *paru_init_rowFronts (
 
      paruMatInfo->heapList =  (std::vector<Int>**) 
          paru_calloc (1, (m+nf+1)*sizeof(std::vector<Int>*), cc);
+     std::vector<Int>** heapList = paruMatInfo->heapList;
 
      if (paruMatInfo->heapList == NULL)
      {   //out of memory
@@ -250,6 +251,9 @@ paru_matrix *paru_init_rowFronts (
          printf("Out of memory: heapList\n");
          return NULL;
      }
+
+//    for (Int eli = 0; eli < m+nf+1; eli++) 
+//        heapList[eli] = nullptr;
 
 
 
@@ -385,7 +389,7 @@ paru_matrix *paru_init_rowFronts (
 //         curEl->tail= e;
 
 #ifndef NDEBUG  // Printing the pointers info
-         Int p=1;
+         Int p=0;
          PRLEVEL (p, ("%% curEl = %p ", curEl));
          Int size= sizeof(paru_Element)+
              sizeof(Int)*(2*(nrows+ncols))+

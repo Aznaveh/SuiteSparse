@@ -1119,7 +1119,7 @@ paru_symbolic *paru_analyze
 
 
 #ifndef NDEBUG
-    p = 0;
+    p = 1;
     PRLEVEL (p,("%% super node mapping ,snM (and rows): ")); 
     for (Int f = 0; f < nf; f++)
     {
@@ -1150,7 +1150,7 @@ paru_symbolic *paru_analyze
     for (Int i = 0; i < ms+nf+1; i++) PRLEVEL (p,("%ld ", aChild[i]));
     PRLEVEL (p,("\n"));
 
-    p = -1;
+    p = 1;
     for(Int i = 0; i < ms+nf; i++)
     {
         if (aChildp[i] == aChildp[i+1]) continue;

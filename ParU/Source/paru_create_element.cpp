@@ -31,7 +31,7 @@ paru_Element *paru_create_element (Int nrows, Int ncols,
         curEl = (paru_Element*) paru_alloc(1, tot_size , cc);
     if (curEl == NULL) return NULL; // do not do error checking
 
-    PRLEVEL (1, ("%% with size of %ld in %p\n", tot_size, curEl));
+    PRLEVEL (1, (" with size of %ld in %p\n", tot_size, curEl));
     
     // Initializing current element
     curEl->nrowsleft = curEl->nrows = nrows;

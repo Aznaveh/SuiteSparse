@@ -204,7 +204,7 @@ void paru_freemat (paru_matrix **paruMatInfo_handle, cholmod_common *cc)
     }
 
 
-    PRLEVEL (1, ("%% freeing CB elements:\n"));
+    PRLEVEL (1, ("\n%% freeing CB elements:\n"));
     for(Int i = 0; i < nf ; i++)
     {        // freeing all other elements
         Int e = LUsym->super2atree[i];    //element number in augmented tree
@@ -247,6 +247,7 @@ void paru_freemat (paru_matrix **paruMatInfo_handle, cholmod_common *cc)
         }
     }
 
+    PRLEVEL (1, ("%% Done LUs\n"));
     paru_free(1, nf*sizeof(Int),paruMatInfo->frowCount, cc);
     paru_free(1, nf*sizeof(Int),paruMatInfo->fcolCount, cc);
 
@@ -261,8 +262,9 @@ void paru_freemat (paru_matrix **paruMatInfo_handle, cholmod_common *cc)
 #ifndef NDEBUG
 std::vector<Int>** heapList = paruMatInfo->heapList;
     //freeing memory of heaps.
-    for (Int eli = 0; eli < m+nf; eli++) 
+    for (Int eli = 0; eli < m+nf+1; eli++) 
     {
+        ASSERT(heapList[eli] == nullptr);
         if(heapList[eli] != nullptr)
         {
             
