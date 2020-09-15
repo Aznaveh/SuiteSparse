@@ -29,22 +29,24 @@ run:
 	./umfout < ../Matrix/b1_ss.mtx  	#7x7
 #	./umfout < ../Matrix/ParUTst/tmp.mtx
 
-VGFLAGS =  --leak-check=yes  --log-file="valgrindlogfile.log"\
-		   --track-origins=yes\
+VGFLAGS = --leak-check=yes  --log-file="valgrindlogfile.log"\
+		   --show-leak-kinds=all --track-origins=yes \
 		   #--show-leak-kinds=all
 
 			#comment leak-check=yes or full
 
 val:
 
-	valgrind	$(VGFLAGS)	./umfout < ../Matrix/ParUTst/tmp.mtx
+#	valgrind	$(VGFLAGS)	./umfout < ../Matrix/ParUTst/tmp.mtx
 #	valgrind	$(VGFLAGS)	./umfout < ../Matrix/west0067.mtx 
-#	valgrind	$(VGFLAGS)	./umfout < ../Matrix/b1_ss.mtx
+	valgrind	$(VGFLAGS)	./umfout < ../Matrix/b1_ss.mtx
 
 	
 debug:
+	(cd ../Lib; $(MAKE) purge; $(MAKE) DEBUG=yes)
+	(cd ../Demo;)
 	$(C) $(FLAG) -g umf_test.cpp -o umfout $(LIBS)
-	gdb ./umfout < ../Matrix/c32.mtx		#3x2 	 #OK
+#	gdb ./umfout < ../Matrix/c32.mtx		#3x2 	
 
 gprofile:
 	$(C) $(FLAG) -no-pie -O0 -g -pg umf_test.cpp -o gprof.o $(LIBS)

@@ -77,6 +77,14 @@ I = -I ../../UMFPACK/Source -I../../UMFPACK/Include -I ../../CHOLMOD/Include\
 
 FLAG = -Wno-write-strings 
 
+ifeq ($(DEBUG),yes)
+	#to compile with -g options use 'make DBUG=yes'
+	FLAG = -Wno-write-strings -g
+endif
+
+
+
+
 #C = $(CXX) $(CF) $(SPQR_CONFIG) $(CHOLMOD_CONFIG) $(CONFIG_PARTITION) $(I)
 C = $(CXX) $(CF)  $(CHOLMOD_CONFIG) $(CONFIG_PARTITION) $(I) $(FLAG) $(C11)
 #-------------------------------------------------------------------------------
