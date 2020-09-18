@@ -58,14 +58,15 @@ void paru_pivotal (paru_matrix *paruMatInfo, std::vector<Int> &pivotal_elements,
     {
         Int frontEl = elHeap->front(); 
         Int lncFel = lnc_el(elementList, frontEl);
-        if ( lncFel >= col2 )
-            break;
         PRLEVEL (p, ("%% element = %ld col1=%ld", frontEl, col1));
         PRLEVEL (p, (" lnc_el = %ld \n", lncFel));
         ASSERT (lncFel >= col1);
         PRLEVEL (p, ("%% elHeap->size= %ld \n", elHeap->size()));
 
-        pivotal_elements.push_back(frontEl);
+        if ( lncFel >= col2 ) break;
+
+        if (elementList[frontEl] != NULL) 
+            pivotal_elements.push_back(frontEl);
         std::pop_heap
             (elHeap->begin(), elHeap->end(),[&elementList](Int a, Int b)
              { return lnc_el(elementList,a) > lnc_el(elementList,b); }   );
@@ -129,7 +130,7 @@ void paru_pivotal (paru_matrix *paruMatInfo, std::vector<Int> &pivotal_elements,
     Int rowCount = 0;
 
     /*************** finding set of rows in current front *********************/
-    for(Int i=0 ; i < pivotal_elements.size(); i++)
+    for(Int i = 0 ; i < pivotal_elements.size(); i++)
     {
         Int e = pivotal_elements[i];
         paru_Element *el = elementList[e];
@@ -218,7 +219,7 @@ void paru_pivotal (paru_matrix *paruMatInfo, std::vector<Int> &pivotal_elements,
     {
         if (pprow > panel_row[i])
         {
-             panel_row[i] = pprow ;
+            panel_row[i] = pprow ;
         }
         else
         {
@@ -382,6 +383,7 @@ void paru_pivotal (paru_matrix *paruMatInfo, std::vector<Int> &pivotal_elements,
                 PRLEVEL (0, ("%% Free %ld  %p size %ld\n",e, el, tot_size));
                 paru_free (1, tot_size, el, cc);
                 elementList[e] = NULL;
+                break;
             }
 #ifndef NDEBUG  // Printing the pivotal front
             p = 2;
