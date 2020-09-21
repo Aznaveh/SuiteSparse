@@ -264,13 +264,14 @@ std::vector<Int>** heapList = paruMatInfo->heapList;
     //freeing memory of heaps.
     for (Int eli = 0; eli < m+nf+1; eli++) 
     {
-        ASSERT(heapList[eli] == nullptr);
         if(heapList[eli] != nullptr)
         {
-            
+            PRLEVEL (1, ("%% %ld has not been freed %p\n", 
+                        eli, heapList[eli]));
             delete heapList[eli];
             heapList[eli] = nullptr;
         }
+        ASSERT(heapList[eli] == nullptr);
     }
 #endif
     paru_free(1, (m+nf+1)*sizeof(std::vector<Int>**),

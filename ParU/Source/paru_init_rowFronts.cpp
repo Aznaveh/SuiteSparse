@@ -382,6 +382,7 @@ paru_matrix *paru_init_rowFronts (
 
          std::vector<Int>* curHeap;
          curHeap = paruMatInfo->heapList[e] = new std::vector<Int>;
+         PRLEVEL (1, ("%%Heap allocated %p id=%ld \n",curHeap, e ));
          curHeap->push_back(e);
 
 //         curEl->next = -1;

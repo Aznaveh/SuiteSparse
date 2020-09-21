@@ -274,13 +274,13 @@ void paru_pivotal (paru_matrix *paruMatInfo, std::vector<Int> &pivotal_elements,
     PRLEVEL (1, ("%% fm=%ld rowCount=%ld \n", fm, rowCount));
     ASSERT ( fm >= rowCount );
     //freeing extra space for rows
-    if (rowCount != fm)
-    {
-        Int sz = sizeof(Int)*fm; 
-        frowList =
-            (Int*) paru_realloc (rowCount, sizeof(Int), frowList, &sz, cc);
-        paruMatInfo ->frowList[f] = frowList;
-    }
+//    if (rowCount != fm)
+//    {
+//        Int sz = sizeof(Int)*fm; 
+//        frowList =
+//            (Int*) paru_realloc (rowCount, sizeof(Int), frowList, &sz, cc);
+//        paruMatInfo ->frowList[f] = frowList;
+//    }
 
     paru_fac *LUs =  paruMatInfo->partial_LUs;
     paruMatInfo->frowCount[f] = rowCount;
@@ -318,7 +318,7 @@ void paru_pivotal (paru_matrix *paruMatInfo, std::vector<Int> &pivotal_elements,
     for(Int i=0 ; i < pivotal_elements.size(); i++)
     {
 #ifndef NDEBUG 
-        Int p = 0;
+        Int p = 1;
 #endif
         Int e = pivotal_elements[i];
         paru_Element *el = elementList[e];
@@ -342,7 +342,7 @@ void paru_pivotal (paru_matrix *paruMatInfo, std::vector<Int> &pivotal_elements,
 
 
 #ifndef NDEBUG // print the element which is going to be assembled from
-        p = 0;
+        p = 1;
         PRLEVEL (p, ("%% ASSEMBL element= %ld  mEl =%ld ",e, mEl));
         if (p <= 0)
             paru_print_element (paruMatInfo, e);
@@ -380,7 +380,7 @@ void paru_pivotal (paru_matrix *paruMatInfo, std::vector<Int> &pivotal_elements,
             { //free el
                 Int tot_size = sizeof(paru_Element) +
                     sizeof(Int)*(2*(mEl+nEl)) + sizeof(double)*nEl*mEl;
-                PRLEVEL (0, ("%% Free %ld  %p size %ld\n",e, el, tot_size));
+                PRLEVEL (1, ("%% Free %ld  %p size %ld\n",e, el, tot_size));
                 paru_free (1, tot_size, el, cc);
                 elementList[e] = NULL;
                 break;

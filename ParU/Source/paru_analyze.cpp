@@ -408,7 +408,7 @@ paru_symbolic *paru_analyze
     PRLEVEL (-1, ("LU = zeros(%ld,%ld);\n",m, n ));
     PRLEVEL (-1, ("npivots =[]; \n" ));
     PRLEVEL (-1, ("S = zeros(%ld,%ld); %% n1 = %ld\n",m, n, n1 ));
-    PRLEVEL (0, ("%% nf=%ld\n",nf ));
+    PRLEVEL (1, ("%% nf=%ld\n",nf ));
     //
     /* ---------------------------------------------------------------------- */
     /*           Fixing Parent and computing Children datat structure         */
@@ -991,7 +991,7 @@ paru_symbolic *paru_analyze
 
 
 #ifndef NDEBUG
-    p = 1;
+    p = 0;
     /* print fronts*/
     for (Int f = 0; f < nf; f++)
     {
@@ -1007,6 +1007,7 @@ paru_symbolic *paru_analyze
             PRLEVEL (p,("%ld ", Child[i]));
         PRLEVEL (p,("\n"));
     }
+    p = 1;
 #endif 
     //submatrix is msxns
     Int ms = m-n1;  
@@ -1044,10 +1045,10 @@ paru_symbolic *paru_analyze
     Int lastChildFlag = 0;
     Int childpointer = 0;
 
-    for (Int f = 0; f < nf; f++) 
+   for (Int f = 0; f < nf; f++) 
     {
-        PRLEVEL (1,("%% Front %ld\n", f)) ;
-        PRLEVEL (1,("%% pivot columns [ %ld to %ld ] n: %ld \n",
+        PRLEVEL (p,("%% Front %ld\n", f)) ;
+        PRLEVEL (p,("%% pivot columns [ %ld to %ld ] n: %ld \n",
                     Super [f], Super [f+1]-1, ns)) ;
         ASSERT(Super[f+1] <= ns);
         Int numRow =Sleft[Super[f+1]]-Sleft[Super[f]] ;
@@ -1055,16 +1056,16 @@ paru_symbolic *paru_analyze
         Int numoforiginalChild=0;
         if (lastChildFlag)
         {  // the current node is the parent
-            PRLEVEL (1,("%% Childs of %ld: ",f)) ;
+            PRLEVEL (p,("%% Childs of %ld: ",f)) ;
             numoforiginalChild= Childp[f+1] - Childp[f];
 
             for (Int i = Childp[f]; i <= Childp[f+1]-1; i++) 
             {
-                PRLEVEL (1,("%ld ",Child[i]));
+                PRLEVEL (p,("%ld ",Child[i]));
                 Int c= Child [i];
                 ASSERT(snM[c] < ms+nf+1);
                 aParent[ snM[c]]=offset+numRow;
-                PRLEVEL (1, ("%% aParent[%ld] =%ld\n", 
+                PRLEVEL (p, ("%% aParent[%ld] =%ld\n", 
                             aParent[snM [c]], offset+numRow));
                 ASSERT(childpointer < ms+nf+1);
                 aChild[childpointer++] = snM[c];
@@ -1150,10 +1151,10 @@ paru_symbolic *paru_analyze
     for (Int i = 0; i < ms+nf+1; i++) PRLEVEL (p,("%ld ", aChild[i]));
     PRLEVEL (p,("\n"));
 
-    p = 1;
+    p = 0;
     for(Int i = 0; i < ms+nf; i++)
     {
-        if (aChildp[i] == aChildp[i+1]) continue;
+        //if (aChildp[i] == aChildp[i+1]) continue;
         PRLEVEL (p,("%% anode:%ld",i));
         for(Int c = aChildp[i]; c < aChildp[i+1]; c++)
             PRLEVEL (p,(" %ld,",aChild[c]));  

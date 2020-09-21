@@ -102,6 +102,7 @@ void paru_make_heap(paru_matrix *paruMatInfo, Int f )
             if (chHeap == nullptr) continue;
             //concatening the child and freeing the memory
             elHeap->insert(elHeap->end(), chHeap->begin(), chHeap->end()); 
+            PRLEVEL (1, ("%%Heap free %p id=%ld\n", heapList[chelid], chelid));
             delete heapList[chelid];
             heapList[chelid] = nullptr;
             //heapifying

@@ -19,9 +19,9 @@ int paru_front ( paru_matrix *paruMatInfo,
         cholmod_common *cc)
 {
 
-    DEBUGLEVEL(-2);
+    DEBUGLEVEL(0);
     /* 
-     * -2 Print Nothing
+     * 2 Print Nothing
      * -1 Just Matlab
      *  0 Detailed
      *  > 0 Everything
@@ -471,7 +471,7 @@ int paru_front ( paru_matrix *paruMatInfo,
 
     if (rowCount < fp)
     {
-        PRLEVEL (-2, ("%% %ldx%ld \n",rowCount, fp));
+        PRLEVEL (1, ("%% %ldx%ld \n",rowCount, fp));
         printf ("structural problem\n");
         paru_free ( num_panels, sizeof (Int), panel_row, cc);
         return 1;
@@ -590,10 +590,11 @@ int paru_front ( paru_matrix *paruMatInfo,
     std::vector<Int>* curHeap = heapList[eli];
 
     // EXIT point HERE 
-    if (colCount == 0)
+    if (colCount == 0 )
     {  // there is no CB, Nothing to be done
         //Work->rowMark +=  rowCount;
         paruMatInfo->fcolCount[f] = 0;
+        PRLEVEL (1, ("%%Heap freed inside front %p id=%ld\n",curHeap, eli ));
         delete curHeap;
         paruMatInfo->heapList[eli] = nullptr;
         PRLEVEL (1, ("%% pivotalFront =%p\n",pivotalFront));
@@ -750,7 +751,7 @@ int paru_front ( paru_matrix *paruMatInfo,
     PRLEVEL (1, ("%% rowCount=%ld, colCount=%ld, fp=%ld\n",
                 rowCount, colCount, fp));
     PRLEVEL (1, ("%% curEl is %ld by %ld\n",rowCount-fp,colCount));
-    if (fp <= rowCount )
+    if (fp < rowCount )
     { 
         curEl = elementList[eli] = paru_create_element (rowCount-fp,
                 colCount, 0 ,cc); // allocating an un-initialized part of memory
@@ -763,6 +764,15 @@ int paru_front ( paru_matrix *paruMatInfo,
             return 1;
         }
         PRLEVEL (1, ("%% Created ele %ld in curEl =%p\n", eli, curEl));
+    }
+    else //EXIT point
+    {   //NO rows for current contribution block
+        delete curHeap;
+        paruMatInfo->heapList[eli] = nullptr;
+        PRLEVEL (1, ("%%(2)Heap freed inside front %p id=%ld\n",
+                    curHeap, eli ));
+        PRLEVEL (1, ("%% pivotalFront =%p\n",pivotalFront));
+        return 0;
     }
 
 
@@ -881,7 +891,7 @@ int paru_front ( paru_matrix *paruMatInfo,
 
 #ifndef NDEBUG
     //Printing the contribution block after prior blocks assembly
-    p = 1;
+    p = 0;
     PRLEVEL (p, ("\n%%After prior blocks assembly:"));
     if (p <= 0)
         paru_print_element (paruMatInfo, eli);
