@@ -274,13 +274,13 @@ void paru_pivotal (paru_matrix *paruMatInfo, std::vector<Int> &pivotal_elements,
     PRLEVEL (1, ("%% fm=%ld rowCount=%ld \n", fm, rowCount));
     ASSERT ( fm >= rowCount );
     //freeing extra space for rows
-//    if (rowCount != fm)
-//    {
-//        Int sz = sizeof(Int)*fm; 
-//        frowList =
-//            (Int*) paru_realloc (rowCount, sizeof(Int), frowList, &sz, cc);
-//        paruMatInfo ->frowList[f] = frowList;
-//    }
+    if (rowCount != fm)
+    {
+        Int sz = sizeof(Int)*fm; 
+        frowList =
+            (Int*) paru_realloc (rowCount, sizeof(Int), frowList, &sz, cc);
+        paruMatInfo ->frowList[f] = frowList;
+    }
 
     paru_fac *LUs =  paruMatInfo->partial_LUs;
     paruMatInfo->frowCount[f] = rowCount;
