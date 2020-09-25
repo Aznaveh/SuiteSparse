@@ -385,9 +385,6 @@ paru_matrix *paru_init_rowFronts (
          PRLEVEL (1, ("%%Heap allocated %p id=%ld \n",curHeap, e ));
          curHeap->push_back(e);
 
-//         curEl->next = -1;
-//         curEl->prev = -1;
-//         curEl->tail= e;
 
 #ifndef NDEBUG  // Printing the pointers info
          Int p=0;

@@ -92,7 +92,7 @@ Int paru_panel_factorize (double *F, Int *frowList, Int m, Int n,
         { 
             PRLEVEL (1, ("%%i=%ld value= %2.4lf", i, F[j*m+i]));
             PRLEVEL (1, (" deg = %ld \n", row_degree_bound[frowList[i]]));
-            if (fabs (maxval) < fabs(F[j*m+i]))
+            if ( fabs (maxval) < fabs (F[j*m+i]))
             {
                 row_max = i; 
                 maxval = F[j*m + i];
@@ -351,7 +351,7 @@ Int paru_dgetrf (double *F, Int *frowList, Int lm, Int ln,
 }
 
 Int paru_factorize(double *F, Int *frowList, Int rowCount, Int f, 
-        Int *panel_row, Int *next, std::set<Int> &stl_colSet, 
+        Int *panel_row, std::set<Int> &stl_colSet, 
         paru_matrix *paruMatInfo)
 {
     DEBUGLEVEL (0);
@@ -389,7 +389,7 @@ Int paru_factorize(double *F, Int *frowList, Int rowCount, Int f,
 
        // This can be done parallel to the  next part
         if (paruMatInfo->LUsym->Cm[f] != 0) //if there is potential column left
-            paru_update_rowDeg ( panel_num, row_end, f, next, 
+            paru_update_rowDeg ( panel_num, row_end, f, 
                     stl_colSet, paruMatInfo);
 
         if ( j2 >= fp) //if it is the last panel

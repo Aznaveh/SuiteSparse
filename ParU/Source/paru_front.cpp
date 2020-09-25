@@ -159,7 +159,7 @@ int paru_front ( paru_matrix *paruMatInfo,
     LUs[f].m = rowCount;
     LUs[f].n = fp;
 
-    /**** 3 ********  factorizing the fully summed part of the matrix        ***
+    /***************  factorizing the fully summed part of the matrix        ***
      *****  a set of pivot is found in this part that is crucial to assemble **/
     PRLEVEL (1, ("%% rowCount =%ld\n", rowCount));
 
@@ -184,13 +184,12 @@ int paru_front ( paru_matrix *paruMatInfo,
         paru_free ( num_panels, sizeof (Int), panel_row, cc);
         return 1;
     }
-    Int next = -1;
 
     Int start_fac = paruMatInfo->time_stamp[f]; 
     PRLEVEL (1, ("%% start_fac= %ld\n",start_fac));
 
     Int fac = paru_factorize(pivotalFront, frowList, rowCount, f, panel_row, 
-            &next, stl_colSet, paruMatInfo);
+            stl_colSet, paruMatInfo);
     time_f = paruMatInfo->time_stamp[f]; 
     PRLEVEL (1, ("%%After factorization time_f = %ld\n",time_f));
 

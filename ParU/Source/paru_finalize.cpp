@@ -64,55 +64,6 @@ void paru_finalize (paru_matrix *paruMatInfo, Int f, Int start_fac,
     double *cur_Numeric = 
         (double*)((Int*)(curFr+1) + 2*colCount + 2*curFrNrows);
     /**************************************************************************/
-
-#ifndef NDEBUG
-#if 0
-    PRLEVEL (p, ("%%*** List of children of %ld\n%%", el_ind));
-    paru_Element *el = curFr;
-    Int next = curFr-> next;
-    while (next >= 0) 
-    {
-        el->next = -1; 
-        el = elementList[next];
-        PRLEVEL (p, (" %ld -", next));
-        ASSERT (elRow[next] == 0 && elCol [next] == 0);
-
-        Int mEl = el->nrows;
-        Int nEl = el->ncols;
-
-        paru_update_rel_ind_row (curFr, el, cc) ;
-        paru_update_rel_ind_col (paruMatInfo, f, curFr, el, cc) ;
-
-
-        Int *rowRelIndex = relRowInd (el);
-        Int *colRelIndex = relColInd (el);
-
-        Int *el_rowIndex = rowIndex_pointer (el);
-        Int *el_colIndex = colIndex_pointer (el);
-
-        double *el_Num = numeric_pointer (el);
-        assemble_all (el_Num, cur_Numeric,
-                el->nrows, el->ncols, curFrNrows,
-                rowRelIndex, colRelIndex);
-        // delete e
-        Int tot_size = sizeof(paru_Element) +
-            sizeof(Int)*(2*(mEl+nEl)) + sizeof(double)*nEl*mEl;
-        paru_free (1, tot_size, el, cc);
-        elementList[next] = NULL;
-        PRLEVEL (0, ("%% $$ NULLIFIED\n"));
-        elRow[next] = -1;
-        elCol[next] = -1;
-
-        next = elementList[next]->next;
-
-        continue;
-
-    }
-#endif
-#endif
-
-
-
     /****************************1st pass: assemble columns********************/
     tupleList *ColList = paruMatInfo->ColList;
     for (Int k = 0; k < colCount; k++)

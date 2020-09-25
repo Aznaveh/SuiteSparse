@@ -8,7 +8,7 @@
  */
 #include "Parallel_LU.hpp"
 
-void paru_update_rowDeg ( Int panel_num,  Int row_end, Int f, Int *next,
+void paru_update_rowDeg ( Int panel_num,  Int row_end, Int f, 
         std::set<Int> &stl_colSet, paru_matrix *paruMatInfo)
 {
 
@@ -18,7 +18,7 @@ void paru_update_rowDeg ( Int panel_num,  Int row_end, Int f, Int *next,
     static Int r1 = 0, r2 = 0, r3 = 0 ;
 #endif
     PRLEVEL (1, ("%%-------ROW degree update of panel %ld of front %ld \n", 
-             panel_num, f ));
+                panel_num, f ));
     Int panel_width = paruMatInfo->panel_width;
     paru_Element **elementList = paruMatInfo->elementList;
     work_struct *Work =  paruMatInfo->Work;
@@ -114,9 +114,9 @@ void paru_update_rowDeg ( Int panel_num,  Int row_end, Int f, Int *next,
         Int pdst = 0, psrc;
         for (psrc = 0; psrc < numTuple; psrc ++)
         {
-        //for (Int i = 0; i < numTuple; i++)
-        //{
-           // paru_Tuple curTpl = listRowTuples [i];
+            //for (Int i = 0; i < numTuple; i++)
+            //
+            // paru_Tuple curTpl = listRowTuples [i];
             paru_Tuple curTpl = listRowTuples [psrc];
 
             Int e = curTpl.e;
@@ -190,7 +190,7 @@ void paru_update_rowDeg ( Int panel_num,  Int row_end, Int f, Int *next,
 
                 if (curCol < 0 )  //already deleted
                     continue;
-                
+
                 if (curCol < col2 && curCol >= col1 )  /*is a pivotal col */ 
                     continue;
 
@@ -213,84 +213,84 @@ void paru_update_rowDeg ( Int panel_num,  Int row_end, Int f, Int *next,
         }
 
         curRowTupleList->numTuple = pdst;
-        }
+    }
 
-    
-        Int *snM = LUsym->super2atree;
-        Int eli = snM [f]; 
 
-        if (colCount == 0)
-        {  // there is no CB, Nothing to be done
-            //Work->rowMark +=  rowCount;
-            Work->rowMark[eli]  +=  rowCount;
-            return;
-        }
+    Int *snM = LUsym->super2atree;
+    Int eli = snM [f]; 
+
+    if (colCount == 0)
+    {  // there is no CB, Nothing to be done
+        //Work->rowMark +=  rowCount;
+        Work->rowMark[eli]  +=  rowCount;
+        return;
+    }
 
 #ifndef NDEBUG /* Checking if columns are correct */
-        p = 1;
-        PRLEVEL (p, ("%% There are %ld columns in this contribution block: \n",
-                    colCount));
-        PRLEVEL (p, ("\n"));
-        Int stl_colSize = stl_colSet.size();
+    p = 1;
+    PRLEVEL (p, ("%% There are %ld columns in this contribution block: \n",
+                colCount));
+    PRLEVEL (p, ("\n"));
+    Int stl_colSize = stl_colSet.size();
 
-        if (colCount != stl_colSize)
-        {
-            PRLEVEL (p, ("%% STL %ld:\n",stl_colSize));
-            for (it = stl_colSet.begin(); it != stl_colSet.end(); it++)
-                PRLEVEL (p, ("%%  %ld", *it));
-            PRLEVEL (p, ("\n%% My Set %ld:\n",colCount));
-            PRLEVEL (p, ("\n"));
-        }
-        ASSERT (colCount == stl_colSize );
+    if (colCount != stl_colSize)
+    {
+        PRLEVEL (p, ("%% STL %ld:\n",stl_colSize));
+        for (it = stl_colSet.begin(); it != stl_colSet.end(); it++)
+            PRLEVEL (p, ("%%  %ld", *it));
+        PRLEVEL (p, ("\n%% My Set %ld:\n",colCount));
+        PRLEVEL (p, ("\n"));
+    }
+    ASSERT (colCount == stl_colSize );
 #endif 
 
-        // if the front did not grow, there is nothing else to do
-        if (stl_newColSet.size() == 0) 
-            return;
+    // if the front did not grow, there is nothing else to do
+    if (stl_newColSet.size() == 0) 
+        return;
 
-        paruMatInfo->fcolCount[f] = colCount;
+    paruMatInfo->fcolCount[f] = colCount;
 
 
-        /************* travers over new non pivotal columns ***********************/
-        /*               
-         *  Marking seen element with pMark or time_f; it would be fine with either
-         *  while there is no other column pass
-         *   
-         *                <----------fp--------->
-         *                                              stl_newColSet
-         *                                 stl_colSet     ^         ^         
-         *                                        \       |   HERE  |
-         *             F                           [QQQQQ|OOOOOOOOO|....
-         *              \  ____..._________...__ _____________________________...
-         * ^              |\      |     |       #  ^     |         | 
-         * |              | \     |     |       #  | old | added   | 
-         * |              |  \    |     |       #  | list|  columns|
-         * |              |___\...|_____|__...__#  |     |         |
-         * |   ^          |       |\* **|       #  fp  oooooooooooo|
-         * |   |          |       |**\**|       #  |   ooo El ooooo|
-         * | panel        |       |***\*|       #  |   oooooooooooo|
-         * | width        |       |***\*|       #  |               |
-     * |   |          |       |***\*|       #  |    00000000   |
-     * |   v          |____...|________..._ #  |    000 El 0   |
-     * |              |       |     |       #  v    00000000   |           ...
-     * rowCount       |==================================================
-     * |              |       |     |       |     ooooooooooooooooo
-     * |              |       |     |       |     ooooooooooooooooo
-     * |              |       |row_end      |     oooo EL ooooooooo
-     * |              .       .      .      .     ooooooooooooooooo
-     * |              .       .      .      . 
-     * |              .       .      .      .      xxxxxxxxxx
-     * v              |___....______________|      xxx EL xxx        
-     *                                             xxxxxxxxxx
-     *                                             xxxxxxxxxx
-     *                                             
-     *                                         oooooooooooo    
-     *                                         ooo El ooooo
-     *                                         oooooooooooo    
-     *                                             
+    /********* travers over new non pivotal columns ***************************/
+    /*               
+     *  Marking seen element with pMark or time_f; it would be fine with 
+     *  either while there is no other column pass
+     *   
+     *            <----------fp--------->
+     *                                          stl_newColSet
+     *                             stl_colSet     ^         ^         
+     *                                    \       |   HERE  |
+     *         F                           [QQQQQ|OOOOOOOOO|....
+     *          \  ____..._________...__ _____________________________...
+     * ^          |\      |     |       #  ^     |         | 
+     * |          | \     |     |       #  | old | added   | 
+     * |          |  \    |     |       #  | list|  columns|
+     * |          |___\...|_____|__...__#  |     |         |
+     * |   ^      |       |\* **|       #  fp  oooooooooooo|
+     * |   |      |       |**\**|       #  |   ooo El ooooo|
+     * | panel    |       |***\*|       #  |   oooooooooooo|
+     * | width    |       |***\*|       #  |               |
+     * |   |      |       |***\*|       #  |    00000000   |
+     * |   v      |____...|________..._ #  |    000 El 0   |
+     * |          |       |     |       #  v    00000000   |           ...
+     * rowCount   |==================================================
+     * |          |       |     |       |     ooooooooooooooooo
+     * |          |       |     |       |     ooooooooooooooooo
+     * |          |       |row_end      |     oooo EL ooooooooo
+     * |          .       .      .      .     ooooooooooooooooo
+     * |          .       .      .      . 
+     * |          .       .      .      .      xxxxxxxxxx
+     * v          |___....______________|      xxx EL xxx        
+     *                                         xxxxxxxxxx
+     *                                         xxxxxxxxxx
+     *                                         
+     *                                     oooooooooooo    
+     *                                     ooo El ooooo
+     *                                     oooooooooooo    
+     *                                         
      */
     tupleList *ColList = paruMatInfo->ColList;
-   Int *first = LUsym->first;
+    Int *first = LUsym->first;
 
     for (it = stl_newColSet.begin(); it != stl_newColSet.end(); it++)
     {
@@ -336,7 +336,8 @@ void paru_update_rowDeg ( Int panel_num,  Int row_end, Int f, Int *next,
                 el->cValid =  time_f;
                 elCol [e] = el->ncolsleft - 1; //initiaze
                 PRLEVEL (1, ("%%cValid=%ld \n",el->cValid));
-                PRLEVEL (1, ("%%first time seen elCol[e]=%ld \n", elCol[e]));
+                PRLEVEL (1, ("%%first time seen elCol[e]=%ld \n", 
+                            elCol[e]));
             }
             else
             { 
@@ -359,7 +360,7 @@ void paru_update_rowDeg ( Int panel_num,  Int row_end, Int f, Int *next,
      *                         |     | stl_colSet 
      *                         |     |        \   Update here
      *             F           |     |         [QQQQQ|OOOOOOOOO|....
-     *              \  ____..._|_  ____...__ _____________________________...
+     *              \  ____..._|_  ____...__ ____________________________...
      * ^              |\      |     |       #  ^     |         | 
      * |              | \     |     |       #  | old | added   | 
      * |              |  \    |     |       #  | list|  columns|
@@ -370,10 +371,10 @@ void paru_update_rowDeg ( Int panel_num,  Int row_end, Int f, Int *next,
      * | width        |       |***\*|       #  |               |
      * |   |          |       |***\*|       #  |               |
      * |   v          |____...|________..._ #  |      vvvvvv   |
-     * |        j2--> |       |     |       #  v    00000000   |           ...
+     * |        j2--> |       |     |       #  v    00000000   |         ...
      * rowCount   H   |=============================00 El 00=============
-     * |          E   |       |     |       |       00000000   Update row degree
-     * |              |       |     |       |          vvvvvvvvv
+     * |          E   |       |     |       |       00000000  Update row 
+     * |              |       |     |       |          vvvvvvvvv    degree
      * |          R   |       |     |       |          xxxxxxxxxxxxxxxxxxxx
      * |          E   |       |row_end      |          xxxxxx El xxxxxxxxxx
      * | row_end----->.       .      .      .          xxxxxxxxxxxxxxxxxxxx
@@ -383,7 +384,7 @@ void paru_update_rowDeg ( Int panel_num,  Int row_end, Int f, Int *next,
      *                         
      */
     Int new_row_degree_bound_for_r;
- 
+
     for (Int k = j2; k < row_end; k++)
     {
         Int r = frowList [k];
@@ -436,9 +437,9 @@ void paru_update_rowDeg ( Int panel_num,  Int row_end, Int f, Int *next,
                 el->cValid =  time_f;
                 elCol [e] = el->ncolsleft ; //initiaze
             }
-            
+
             //TODO: change only if any thing remain
-             //if (elRow [e] == 0 && elCol [e] == 0)
+            //if (elRow [e] == 0 && elCol [e] == 0)
             if (elRow [e] == 0)
                 new_row_degree_bound_for_r += elCol [e] ;
             else
@@ -469,21 +470,6 @@ void paru_update_rowDeg ( Int panel_num,  Int row_end, Int f, Int *next,
 
                 PRLEVEL (1, ("%%seen before: elRow[e]=%ld \n", elRow[e]));
             }
-#if 0
-
-            if (elRow [e] == 0) 
-            {
-
-                PRLEVEL (1, ("%% elRow[%ld]=%ld \n",e,  elRow[e]));
-                if(elCol[e] == 0)
-                {
-                    // adding the element to the list of children
-                    el->next = *next;
-                    *next = e;
-                }
-            }
-#endif
-
 
         }
 
@@ -495,16 +481,17 @@ void paru_update_rowDeg ( Int panel_num,  Int row_end, Int f, Int *next,
         PRLEVEL (p, ("%%old_bound_updated =%ld \n",old_bound_updated));
         PRLEVEL (p, ("%%new_row_degree_bound_for_r=%ld \n",
                     new_row_degree_bound_for_r));
-        PRLEVEL (p, ("%%row_degroo_bound[%ld]=%ld \n",r, row_degree_bound[r]));
+        PRLEVEL (p, ("%%row_degroo_bound[%ld]=%ld \n",r, 
+                    row_degree_bound[r]));
 #endif
-        
+
         row_degree_bound [r] =  // min
             old_bound_updated < new_row_degree_bound_for_r ? 
             old_bound_updated : new_row_degree_bound_for_r;
-        }
+    }
 
-        paruMatInfo->time_stamp[f]+= 2; //making all the markings invalid again
-        PRLEVEL (1, ("%% Finalized counters r1=%ld r2=%ld r3=%ld sum=%ld\n", 
-                    r1, r2, r3, r1+r2+r3));
+    paruMatInfo->time_stamp[f]+= 2; //making all the markings invalid again
+    PRLEVEL (1, ("%% Finalized counters r1=%ld r2=%ld r3=%ld sum=%ld\n", 
+                r1, r2, r3, r1+r2+r3));
 
 }
