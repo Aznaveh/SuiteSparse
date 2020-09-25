@@ -9,7 +9,9 @@
 #include "Parallel_LU.hpp"
 
 void paru_update_rowDeg ( Int panel_num,  Int row_end, Int f, 
-        std::set<Int> &stl_colSet, paru_matrix *paruMatInfo)
+        std::set<Int> &stl_colSet, 
+        std::vector<Int> &pivotal_elements,
+        paru_matrix *paruMatInfo)
 {
 
     DEBUGLEVEL(0);

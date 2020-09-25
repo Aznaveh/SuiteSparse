@@ -433,7 +433,8 @@ int paru_front (paru_matrix *paruMatInfo, Int f, cholmod_common *cc);
 
 Int paru_dgetrf (double *F, Int *frowList, Int m, Int n, BLAS_INT *ipiv);
 Int paru_factorize(double *F, Int *frowList, Int lm, Int ln, Int *panel_row, 
-        std::set<Int> &stl_colSet, paru_matrix *paruMatInfo);
+        std::set<Int> &stl_colSet, std::vector<Int> &pivotal_elements,
+        paru_matrix *paruMatInfo);
 
 
 
@@ -474,8 +475,9 @@ void paru_update_rel_ind_col (paru_matrix *paruMatInfo, Int f,
 void paru_write( paru_matrix *paruMatInfo, int scale, 
         char *id, cholmod_common *cc);
         
-void paru_update_rowDeg ( Int panel_num,  Int row_end, 
-        Int f, std::set<Int> &stl_colSet, paru_matrix *paruMatInfo);
+void paru_update_rowDeg ( Int panel_num,  Int row_end, Int f, 
+        std::set<Int> &stl_colSet, std::vector<Int> &pivotal_elements,
+        paru_matrix *paruMatInfo);
 
 void paru_finalize (paru_matrix *paruMatInfo, Int f, Int start_fac, 
         cholmod_common *cc);

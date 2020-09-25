@@ -352,6 +352,7 @@ Int paru_dgetrf (double *F, Int *frowList, Int lm, Int ln,
 
 Int paru_factorize(double *F, Int *frowList, Int rowCount, Int f, 
         Int *panel_row, std::set<Int> &stl_colSet, 
+        std::vector<Int> &pivotal_elements,
         paru_matrix *paruMatInfo)
 {
     DEBUGLEVEL (0);
@@ -390,7 +391,7 @@ Int paru_factorize(double *F, Int *frowList, Int rowCount, Int f,
        // This can be done parallel to the  next part
         if (paruMatInfo->LUsym->Cm[f] != 0) //if there is potential column left
             paru_update_rowDeg ( panel_num, row_end, f, 
-                    stl_colSet, paruMatInfo);
+                    stl_colSet, pivotal_elements, paruMatInfo);
 
         if ( j2 >= fp) //if it is the last panel
             break;
