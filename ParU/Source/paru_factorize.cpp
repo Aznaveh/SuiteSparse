@@ -390,8 +390,8 @@ Int paru_factorize(double *F, Int *frowList, Int rowCount, Int f,
 
        // This can be done parallel to the  next part
         if (paruMatInfo->LUsym->Cm[f] != 0) //if there is potential column left
-            paru_update_rowDeg ( panel_num, row_end, f, 
-                    stl_colSet, pivotal_elements, paruMatInfo);
+            paru_update_rowDeg ( panel_num, row_end, f, stl_colSet, 
+                    pivotal_elements, paruMatInfo);
 
         if ( j2 >= fp) //if it is the last panel
             break;

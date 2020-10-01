@@ -1154,7 +1154,7 @@ paru_symbolic *paru_analyze
     p = 0;
     for(Int i = 0; i < ms+nf; i++)
     {
-        //if (aChildp[i] == aChildp[i+1]) continue;
+        if (aChildp[i] == aChildp[i+1]) continue;
         PRLEVEL (p,("%% anode:%ld",i));
         for(Int c = aChildp[i]; c < aChildp[i+1]; c++)
             PRLEVEL (p,(" %ld,",aChild[c]));  

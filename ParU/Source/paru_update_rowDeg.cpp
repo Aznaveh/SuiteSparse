@@ -52,7 +52,6 @@ void paru_update_rowDeg ( Int panel_num,  Int row_end, Int f,
     std::set<Int> stl_newColSet;  // the list of new columns
 
     /*************** finding set of non pivotal cols in current front *********/
-
     /*               
      *    Mark seen elements with pMark or time_f+1
      *        if Marked already added to the list
@@ -86,15 +85,8 @@ void paru_update_rowDeg ( Int panel_num,  Int row_end, Int f,
      * v              |___....______________|              
      *                         
      */
-
-
-
     Int n = paruMatInfo-> n;
-
-
     Int *frowList = paruMatInfo->frowList[f];
-
-
     std::set<Int>::iterator it;
 
     tupleList *RowList = paruMatInfo->RowList;
@@ -217,10 +209,8 @@ void paru_update_rowDeg ( Int panel_num,  Int row_end, Int f,
         curRowTupleList->numTuple = pdst;
     }
 
-
     Int *snM = LUsym->super2atree;
     Int eli = snM [f]; 
-
     if (colCount == 0)
     {  // there is no CB, Nothing to be done
         //Work->rowMark +=  rowCount;
@@ -251,6 +241,9 @@ void paru_update_rowDeg ( Int panel_num,  Int row_end, Int f,
         return;
 
     paruMatInfo->fcolCount[f] = colCount;
+    std::vector<Int>** heapList = paruMatInfo->heapList;
+    std::vector<Int>* curHeap = heapList[eli];
+
 
 
     /********* travers over new non pivotal columns ***************************/
@@ -348,6 +341,45 @@ void paru_update_rowDeg ( Int panel_num,  Int row_end, Int f,
             }
         }
     }
+
+#ifndef NDEBUG
+    p = -1;
+#endif
+
+    PRLEVEL (1, ("%%Inside pivotal_elements\n"));
+    for(Int i = 0 ; i < pivotal_elements.size(); i++)
+    {
+        Int e = pivotal_elements[i];
+        paru_Element *el = elementList[e];
+        //ASSERT ( el != NULL);
+        if (el == NULL)
+        { //TODO: opportunity to decrease the size of pivotal_elements
+            PRLEVEL (1,("%% eli = %ld, element= %ld  \n",eli, e));
+            continue;
+        }
+        // it can be eliminated fully
+        // both a pivotal column and pivotal row
+        if (el->rValid == pMark )
+        {
+            elCol[e] = elRow[e] = 0;
+            continue; 
+        }
+
+        //if (elRow[e] == 0)
+        {
+#ifndef NDEBUG        
+            if (p <= 0)
+                paru_print_element (paruMatInfo, e);
+#endif
+            Int intersect = paru_intersection (e, elementList, stl_newColSet);
+
+        }
+
+    }
+#ifndef NDEBUG
+    p = 1;
+#endif
+
 
 
     /********* travers over new non pivotal rows of current panel *************/

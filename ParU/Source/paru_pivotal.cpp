@@ -315,14 +315,16 @@ void paru_pivotal (paru_matrix *paruMatInfo, std::vector<Int> &pivotal_elements,
      * */
 
 
-    for(Int i=0 ; i < pivotal_elements.size(); i++)
+    Int ii = 0; // using for resizing pivotal_elements
+    for(Int i = 0 ; i < pivotal_elements.size(); i++)
     {
 #ifndef NDEBUG 
         Int p = 1;
 #endif
         Int e = pivotal_elements[i];
         paru_Element *el = elementList[e];
-        ASSERT(el != NULL);
+        //ASSERT(el != NULL);
+        if (el == NULL) continue;
         PRLEVEL (p, ("current element(%ld) %p", e, el ));
         PRLEVEL (p, ("lnc = %ld ",  el->lnc));
         PRLEVEL (p, ("col = %ld\n ", lnc_el(elementList, e) ));
@@ -342,7 +344,7 @@ void paru_pivotal (paru_matrix *paruMatInfo, std::vector<Int> &pivotal_elements,
 
 
 #ifndef NDEBUG // print the element which is going to be assembled from
-        p = 1;
+        p = 2;
         PRLEVEL (p, ("%% ASSEMBL element= %ld  mEl =%ld ",e, mEl));
         if (p <= 0)
             paru_print_element (paruMatInfo, e);
@@ -408,6 +410,7 @@ void paru_pivotal (paru_matrix *paruMatInfo, std::vector<Int> &pivotal_elements,
         if (elementList[e] != NULL )
         {
             el->lnc = cEl;
+            pivotal_elements [ii++] = pivotal_elements [i];
             ASSERT (cEl < nEl);
             PRLEVEL (1, ("%%el->lnc= %ld ",el->lnc));
             PRLEVEL (1, ("el_colIndex[el->lnc]=%ld :\n"
@@ -422,8 +425,21 @@ void paru_pivotal (paru_matrix *paruMatInfo, std::vector<Int> &pivotal_elements,
 
     }
 
-#ifndef NDEBUG  // Printing the pivotal front
+    if ( ii+1 < pivotal_elements.size())
+    {
+        PRLEVEL (1, ("%% pivotal size was %ld ", pivotal_elements.size()));
+        PRLEVEL (1, ("%% and now is %ld\n ", ii+1));
+        pivotal_elements.resize(ii+1);
+    }
+
+#ifndef NDEBUG
     p = 1;
+    PRLEVEL (p, ("%% pivotal columns eli(%ld) after resizing: ", eli));
+    for(Int i=0 ; i < pivotal_elements.size(); i++)
+        PRLEVEL (p, ("%ld ", pivotal_elements[i]));
+    PRLEVEL (p, ("\n"));
+
+    p = 2;
     PRLEVEL (p, ("%% After all the assemble\n"));
     PRLEVEL (p, ("%% x =  \t"));
     for (Int c = col1; c < col2; c++) 
