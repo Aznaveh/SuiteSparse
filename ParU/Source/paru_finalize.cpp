@@ -133,7 +133,7 @@ void paru_finalize (paru_matrix *paruMatInfo, Int f, Int start_fac,
             if (elRow [e] == 0) 
             {
 
-                ASSERT ( el->rValid > start_fac);
+                ASSERT ( el->rValid >= start_fac);
 
                 //all the columns are in CB
                 if (elCol[e] == 0 )

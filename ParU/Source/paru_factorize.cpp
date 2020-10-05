@@ -124,9 +124,9 @@ Int paru_panel_factorize (double *F, Int *frowList, Int m, Int n,
                 row_sp = i;
             }
 
-        PRLEVEL (1, ("%% piv value= %2.4lf row_deg=%ld\n", piv, row_deg_sp));
+        PRLEVEL (-1, ("%% piv value= %2.4lf row_deg=%ld\n", piv, row_deg_sp));
 
-       //swap rows
+        //swap rows
         PRLEVEL (1, ("%% Swaping rows j=%ld, spr=%ld\n", j, row_sp));
         swap_rows (F, frowList, m , n, j, row_sp);
 
@@ -220,10 +220,10 @@ Int paru_panel_factorize (double *F, Int *frowList, Int m, Int n,
 #endif
             BLAS_DGER(&M, &N, &alpha, X ,  &Incx, Y, &Incy , A, &lda);
 #ifdef COUNT_FLOPS
-    paruMatInfo->flp_cnt_dger += (double) 2*M*N;
+            paruMatInfo->flp_cnt_dger += (double) 2*M*N;
 #ifndef NDEBUG  
-        PRLEVEL (p, ("\n%% FlopCount Dger fac %d %d ",M, N));
-        PRLEVEL (p, ("cnt = %lf\n ",   paruMatInfo->flp_cnt_dger ));
+            PRLEVEL (p, ("\n%% FlopCount Dger fac %d %d ",M, N));
+            PRLEVEL (p, ("cnt = %lf\n ",   paruMatInfo->flp_cnt_dger ));
 #endif
 #endif
 
@@ -350,7 +350,7 @@ Int paru_dgetrf (double *F, Int *frowList, Int lm, Int ln,
     return 0;
 }
 
-Int paru_factorize(double *F, Int *frowList, Int rowCount, Int f, 
+Int paru_factorize(double *F, Int *frowList, Int rowCount, Int f, Int start_fac,
         Int *panel_row, std::set<Int> &stl_colSet, 
         std::vector<Int> &pivotal_elements,
         paru_matrix *paruMatInfo)
@@ -367,20 +367,20 @@ Int paru_factorize(double *F, Int *frowList, Int rowCount, Int f,
     {
 
 #ifndef NDEBUG  // Printing the pivotal front
-    Int p = 1;
-    PRLEVEL (p, ("%%Pivotal Front Before %ld\n",panel_num));
-    
-    for (Int r = 0; r < rowCount; r++)
-    {
-        PRLEVEL (p, ("%% %ld\t", frowList [r]));
-        for (Int c = 0; c < fp; c++)
+        Int p = 1;
+        PRLEVEL (p, ("%%Pivotal Front Before %ld\n",panel_num));
+
+        for (Int r = 0; r < rowCount; r++)
         {
-            PRLEVEL (p, (" %2.5lf\t", F[c*rowCount+ r]));
+            PRLEVEL (p, ("%% %ld\t", frowList [r]));
+            for (Int c = 0; c < fp; c++)
+            {
+                PRLEVEL (p, (" %2.5lf\t", F[c*rowCount+ r]));
+            }
+            PRLEVEL (p, ("\n"));
         }
-        PRLEVEL (p, ("\n"));
-    }
 #endif
- 
+
         Int row_end = panel_row [panel_num];
         Int j1 = panel_num*panel_width;
         Int j2 = (panel_num+1)*panel_width;
@@ -388,9 +388,9 @@ Int paru_factorize(double *F, Int *frowList, Int rowCount, Int f,
         paru_panel_factorize ( F, frowList, rowCount, fp, 
                 panel_width, panel_num, row_end, paruMatInfo);
 
-       // This can be done parallel to the  next part
+        // This can be done parallel to the  next part
         if (paruMatInfo->LUsym->Cm[f] != 0) //if there is potential column left
-            paru_update_rowDeg ( panel_num, row_end, f, stl_colSet, 
+            paru_update_rowDeg ( panel_num, row_end, f, start_fac, stl_colSet, 
                     pivotal_elements, paruMatInfo);
 
         if ( j2 >= fp) //if it is the last panel

@@ -8,7 +8,7 @@
  */
 #include "Parallel_LU.hpp"
 
-void paru_update_rowDeg ( Int panel_num,  Int row_end, Int f, 
+void paru_update_rowDeg ( Int panel_num,  Int row_end, Int f, Int start_fac,
         std::set<Int> &stl_colSet, 
         std::vector<Int> &pivotal_elements,
         paru_matrix *paruMatInfo)
@@ -34,9 +34,10 @@ void paru_update_rowDeg ( Int panel_num,  Int row_end, Int f,
     Int col2 = Super [f+1];
     Int fp = col2 - col1;   /* first fp columns are pivotal */ 
 
+    //TODO: I guess there is a logical problem with pMark after each call
     Int time_f = ++paruMatInfo->time_stamp[f]; //making all the markings invalid
     Int npMark = time_f; //Mark for non pivotal rows
-    Int pMark = npMark; pMark++;    //Mark for pivotal rows
+    Int pMark = start_fac; //pMark++;    //Mark for pivotal rows
 
     Int colCount = stl_colSet.size();
 
@@ -141,14 +142,15 @@ void paru_update_rowDeg ( Int panel_num,  Int row_end, Int f,
 
             if(el->rValid !=  pMark)
             {// an element never seen before
-                el->rValid = pMark;
 
                 PRLEVEL (1, ("%%first time seen elRow[%ld]=%ld \n"
                             , e, elRow[e]));
-                if (el->rValid != npMark)
+                if (el->rValid < pMark)
                     elRow [e] = el ->nrowsleft - 1; //initiaze
                 else
                     elRow [e]--; //already seen in a non pivotal row
+
+                el->rValid = pMark;
 
                 PRLEVEL (1, ("%%changed to elRow[%ld]=%ld \n", e, elRow[e]));
 #ifndef NDEBUG            
@@ -248,9 +250,7 @@ void paru_update_rowDeg ( Int panel_num,  Int row_end, Int f,
 
     /********* travers over new non pivotal columns ***************************/
     /*               
-     *  Marking seen element with pMark or time_f; it would be fine with 
-     *  either while there is no other column pass
-     *   
+     *  
      *            <----------fp--------->
      *                                          stl_newColSet
      *                             stl_colSet     ^         ^         
@@ -284,68 +284,68 @@ void paru_update_rowDeg ( Int panel_num,  Int row_end, Int f,
      *                                     oooooooooooo    
      *                                         
      */
-    tupleList *ColList = paruMatInfo->ColList;
-    Int *first = LUsym->first;
+//    tupleList *ColList = paruMatInfo->ColList;
+//    Int *first = LUsym->first;
+//
+//    for (it = stl_newColSet.begin(); it != stl_newColSet.end(); it++)
+//    {
+//        Int c = *it;
+//
+//        tupleList *curColTupleList = &ColList[c];
+//        Int numTuple = curColTupleList->numTuple;
+//        ASSERT (numTuple >= 0);
+//        paru_Tuple *listColTuples = curColTupleList->list;
+//#ifndef NDEBUG        
+//        p = 1;
+//        PRLEVEL (p, ("\n %%--------> 1st: c =%ld  numTuple = %ld\n", 
+//                    c, numTuple));
+//        if (p <= 0)
+//            paru_print_tupleList (ColList, c);
+//#endif
+//        for (Int i = 0; i < numTuple; i++)
+//        {
+//            paru_Tuple curTpl = listColTuples [i];
+//            Int e = curTpl.e;
+//#ifndef NDEBUG
+//            r2++;
+//#endif
+//
+//            if ( e >= eli || e < first[eli])
+//                continue;
+//#ifndef NDEBUG        
+//            if (p <= 0)
+//                paru_print_element (paruMatInfo, e);
+//#endif
+//            paru_Element *el = elementList[e];
+//            if (el == NULL) continue;
+//
+//            Int curColIndex = curTpl.f;
+//            //Int *el_colIndex = colIndex_pointer (el);
+//            Int *el_colIndex = (Int*)(el+1);
+//
+//            if (el_colIndex [curColIndex] < 0 )
+//                continue;  
+//
+//            if(el->cValid !=  time_f)
+//            {
+//                el->cValid =  time_f;
+//                elCol [e] = el->ncolsleft - 1; //initiaze
+//                PRLEVEL (1, ("%%cValid=%ld \n",el->cValid));
+//                PRLEVEL (1, ("%%first time seen elCol[e]=%ld \n", 
+//                            elCol[e]));
+//            }
+//            else
+//            { 
+//                elCol [e]--; 
+//                PRLEVEL (1, ("%%seen before: elCol[e]=%ld \n", elCol[e]));
+//            }
+//        }
+//    }
 
-    for (it = stl_newColSet.begin(); it != stl_newColSet.end(); it++)
-    {
-        Int c = *it;
-
-        tupleList *curColTupleList = &ColList[c];
-        Int numTuple = curColTupleList->numTuple;
-        ASSERT (numTuple >= 0);
-        paru_Tuple *listColTuples = curColTupleList->list;
-#ifndef NDEBUG        
-        p = 1;
-        PRLEVEL (p, ("\n %%--------> 1st: c =%ld  numTuple = %ld\n", 
-                    c, numTuple));
-        if (p <= 0)
-            paru_print_tupleList (ColList, c);
-#endif
-        for (Int i = 0; i < numTuple; i++)
-        {
-            paru_Tuple curTpl = listColTuples [i];
-            Int e = curTpl.e;
+////////////////////////////////////////////////////////////////////////////////
 #ifndef NDEBUG
-            r2++;
+    p = 1;
 #endif
-
-            if ( e >= eli || e < first[eli])
-                continue;
-#ifndef NDEBUG        
-            if (p <= 0)
-                paru_print_element (paruMatInfo, e);
-#endif
-            paru_Element *el = elementList[e];
-            if (el == NULL) continue;
-
-            Int curColIndex = curTpl.f;
-            //Int *el_colIndex = colIndex_pointer (el);
-            Int *el_colIndex = (Int*)(el+1);
-
-            if (el_colIndex [curColIndex] < 0 )
-                continue;  
-
-            if(el->cValid !=  time_f)
-            {
-                el->cValid =  time_f;
-                elCol [e] = el->ncolsleft - 1; //initiaze
-                PRLEVEL (1, ("%%cValid=%ld \n",el->cValid));
-                PRLEVEL (1, ("%%first time seen elCol[e]=%ld \n", 
-                            elCol[e]));
-            }
-            else
-            { 
-                elCol [e]--; 
-                PRLEVEL (1, ("%%seen before: elCol[e]=%ld \n", elCol[e]));
-            }
-        }
-    }
-
-#ifndef NDEBUG
-    p = -1;
-#endif
-
     PRLEVEL (1, ("%%Inside pivotal_elements\n"));
     for(Int i = 0 ; i < pivotal_elements.size(); i++)
     {
@@ -366,12 +366,17 @@ void paru_update_rowDeg ( Int panel_num,  Int row_end, Int f,
         }
 
         //if (elRow[e] == 0)
+        if (el->cValid != npMark) //Always
         {
+            ASSERT (el->cValid != npMark );
 #ifndef NDEBUG        
+            PRLEVEL (p,("%% element= %ld lnc=%ld colsleft=%ld \n", 
+                        e, el->lnc, el->ncolsleft ));
             if (p <= 0)
                 paru_print_element (paruMatInfo, e);
 #endif
             Int intersect = paru_intersection (e, elementList, stl_newColSet);
+            el->cValid = npMark;
 
         }
 
@@ -417,6 +422,204 @@ void paru_update_rowDeg ( Int panel_num,  Int row_end, Int f,
      * v              |___....______________|              
      *                         
      */
+//    Int new_row_degree_bound_for_r;
+//
+//    for (Int k = j2; k < row_end; k++)
+//    {
+//        Int r = frowList [k];
+//
+//        new_row_degree_bound_for_r = colCount;
+//
+//        tupleList *curRowTupleList = &RowList[r];
+//        Int numTuple = curRowTupleList->numTuple;
+//        ASSERT (numTuple >= 0);
+//        paru_Tuple *listRowTuples = curRowTupleList->list;
+//#ifndef NDEBUG        
+//        Int p = 1;
+//        PRLEVEL (p, ("\n %%--------> 2nd r =%ld  numTuple = %ld\n"
+//                    , r, numTuple));
+//        if (p <= 0)
+//            paru_print_tupleList (RowList, r);
+//#endif
+//        Int pdst = 0, psrc;
+//    
+//    if (npMark == pMark+1) //just once for each front
+//    {
+//
+//            paru_Tuple curTpl = listRowTuples [psrc];
+//            Int e = curTpl.e;
+//#ifndef NDEBUG
+//            r3++;
+//#endif
+//
+//
+//#ifndef NDEBUG        
+//            if (p <= 0)
+//                paru_print_element (paruMatInfo, e);
+//#endif
+//            Int curRowIndex = curTpl.f;
+//
+//            if(e < 0 || curRowIndex < 0) continue;
+//
+//            paru_Element *el = elementList[e];
+//            if (el == NULL) continue;
+//
+//            //Int *el_rowIndex = rowIndex_pointer (el);
+//            Int *el_rowIndex = (Int*)(el+1)+el->ncols;
+//
+//            if (el_rowIndex [curRowIndex] < 0 )
+//            {
+//                continue;  
+//            }
+//            listRowTuples [pdst++] = curTpl; //keeping the tuple
+//
+//            
+//            if(el->rValid == pMark)
+//            {  //already a pivot and wont change the row degree
+//                elRow [e]--;
+//                PRLEVEL (1, ("%% Pivotal elRow[%ld]=%ld \n",e, elRow[e]));
+//                continue;
+//            }
+//            
+////            if (npMark == pMark+1) //just once for each front
+////            {
+//                else if(el->rValid != npMark)
+//                {
+//                    el->rValid =  npMark;
+//                    elRow [e] = el ->nrowsleft - 1; //initiaze
+//                    PRLEVEL (1, ("%%rValid=%ld \n",el->rValid));
+//                    PRLEVEL (1, ("%%first time seen elRow[%ld]=%ld \n",
+//                                e, elRow[e]));
+//                }
+//                else
+//                { 
+//                    elRow [e]--;
+//                    PRLEVEL (1, ("%%seen before: elRow[e]=%ld \n", elRow[e]));
+//                }
+/////            }
+//
+//            if (elRow [e] != 0)
+//            {
+//                new_row_degree_bound_for_r += el->ncolsleft;
+//                continue;
+//            }
+//
+//            if(el->cValid  < pMark)
+//            { //firt time seeing this element in this front
+//                el->cValid = npMark;
+//                Int intsct = paru_intersection (e, elementList, stl_newColSet);
+//                elCol [e] = el->ncolsleft - intsct; //initiaze
+//            }
+//            else if(el->cValid  != npMark)
+//            { // it has been seen
+//                el->cValid = npMark;
+//                Int intsct = paru_intersection (e, elementList, stl_newColSet);
+//                elCol[e] -=   intsct;
+//            }
+//            new_row_degree_bound_for_r += elCol [e] ;
+//            //TODO: change only if any thing remain
+//            //if (elRow [e] == 0 && elCol [e] == 0)
+//            //if (elRow [e] == 0)
+//            //    new_row_degree_bound_for_r += elCol [e] ;
+//            //else
+//            //    new_row_degree_bound_for_r += el->ncolsleft ;
+//
+//
+//            PRLEVEL (1, ("%% pMark=%ld npMark=%ld \n",pMark, npMark));
+//
+//        }
+//
+//        curRowTupleList->numTuple = pdst;
+//        Int old_bound_updated = row_degree_bound [r] + colCount - 1 ;
+//
+//#ifndef NDEBUG
+//        p = -1;
+//        PRLEVEL (p, ("%%old_bound_updated =%ld \n",old_bound_updated));
+//        PRLEVEL (p, ("%%new_row_degree_bound_for_r=%ld \n",
+//                    new_row_degree_bound_for_r));
+//        PRLEVEL (p, ("%%row_degroo_bound[%ld]=%ld \n",r, 
+//                    row_degree_bound[r]));
+//        p = 1;
+//#endif
+//
+//        row_degree_bound [r] =  // min
+//            old_bound_updated < new_row_degree_bound_for_r ? 
+//            old_bound_updated : new_row_degree_bound_for_r;
+//    }
+
+
+
+////////////////////////////////////////////////////////////////////NEW VERSION
+////////////////////////////////////////////////////////////////////NEW VERSION
+////////////////////////////////////////////////////////////////////NEW VERSION
+    if (npMark == pMark+1) //just once for each front
+    {
+        PRLEVEL (-1, ("UPDATING elRow\n"));
+        for (Int k = j2; k < row_end; k++)
+        {
+            Int r = frowList [k];
+            tupleList *curRowTupleList = &RowList[r];
+            Int numTuple = curRowTupleList->numTuple;
+            ASSERT (numTuple >= 0);
+            paru_Tuple *listRowTuples = curRowTupleList->list;
+#ifndef NDEBUG        
+            Int p = 1;
+            PRLEVEL (p, ("\n %%----NEEWWWWWd r =%ld  numTuple = %ld\n"
+                        , r, numTuple));
+            if (p <= 0)
+                paru_print_tupleList (RowList, r);
+#endif
+            Int pdst = 0, psrc;
+            for (psrc = 0; psrc < numTuple; psrc ++)
+            {
+
+                paru_Tuple curTpl = listRowTuples [psrc];
+                Int e = curTpl.e;
+
+#ifndef NDEBUG        
+                if (p <= 0)
+                    paru_print_element (paruMatInfo, e);
+#endif
+                Int curRowIndex = curTpl.f;
+
+                if(e < 0 || curRowIndex < 0) continue;
+
+                paru_Element *el = elementList[e];
+                if (el == NULL) continue;
+
+                //Int *el_rowIndex = rowIndex_pointer (el);
+                Int *el_rowIndex = (Int*)(el+1)+el->ncols;
+
+                if (el_rowIndex [curRowIndex] < 0 )
+                {
+                    continue;  
+                }
+                listRowTuples [pdst++] = curTpl; //keeping the tuple
+
+                if(el->rValid == pMark)
+                {  //already a pivot and wont change the row degree
+                    elRow [e]--;
+                    PRLEVEL (1, ("%% Pivotal elRow[%ld]=%ld \n",e, elRow[e]));
+                }
+                else if(el->rValid != npMark)
+                {
+                    el->rValid =  npMark;
+                    elRow [e] = el ->nrowsleft - 1; //initiaze
+                    PRLEVEL (1, ("%%rValid=%ld \n",el->rValid));
+                    PRLEVEL (1, ("%%first time seen elRow[%ld]=%ld \n",
+                                e, elRow[e]));
+                }
+                else
+                {  //el->rValid == npMark //it has been seen in this stage
+                    elRow [e]--;
+                    PRLEVEL (1, ("%%seen before: elRow[e]=%ld \n", elRow[e]));
+                }
+            }
+
+            curRowTupleList->numTuple = pdst;
+        }
+    }
+
     Int new_row_degree_bound_for_r;
 
     for (Int k = j2; k < row_end; k++)
@@ -436,15 +639,12 @@ void paru_update_rowDeg ( Int panel_num,  Int row_end, Int f,
         if (p <= 0)
             paru_print_tupleList (RowList, r);
 #endif
-        Int pdst = 0, psrc;
-        for (psrc = 0; psrc < numTuple; psrc ++)
+
+        for (Int i = 0; i < numTuple; i++)
         {
 
-            paru_Tuple curTpl = listRowTuples [psrc];
+            paru_Tuple curTpl = listRowTuples [i];
             Int e = curTpl.e;
-#ifndef NDEBUG
-            r3++;
-#endif
 
 
 #ifndef NDEBUG        
@@ -453,61 +653,53 @@ void paru_update_rowDeg ( Int panel_num,  Int row_end, Int f,
 #endif
             Int curRowIndex = curTpl.f;
 
+            //TODO: this shouldn't happen in this phase
             if(e < 0 || curRowIndex < 0) continue;
 
             paru_Element *el = elementList[e];
             if (el == NULL) continue;
 
-            Int *el_rowIndex = rowIndex_pointer (el);
+            //Int *el_rowIndex = rowIndex_pointer (el);
+            Int *el_rowIndex = (Int*)(el+1)+el->ncols;
 
             if (el_rowIndex [curRowIndex] < 0 )
             {
                 continue;  
             }
-            listRowTuples [pdst++] = curTpl; //keeping the tuple
-
-            if(el->cValid !=  time_f)
-            {
-                el->cValid =  time_f;
-                elCol [e] = el->ncolsleft ; //initiaze
-            }
-
-            //TODO: change only if any thing remain
-            //if (elRow [e] == 0 && elCol [e] == 0)
-            if (elRow [e] == 0)
-                new_row_degree_bound_for_r += elCol [e] ;
-            else
-                new_row_degree_bound_for_r += el->ncolsleft ;
-
-
-            PRLEVEL (1, ("%% pMark=%ld npMark=%ld \n",pMark, npMark));
 
             if(el->rValid == pMark)
-            {  //already a pivot
-                //ASSERT (elRow[e] == 0); //TODO: something is wrong here
-                elRow [e]--;
+            {  //already a pivot and wont change the row degree
                 PRLEVEL (1, ("%% Pivotal elRow[%ld]=%ld \n",e, elRow[e]));
                 continue;
             }
 
-            if(el->rValid != npMark)
-            {
-                el->rValid =  npMark;
-                elRow [e] = el ->nrowsleft - 1; //initiaze
-                PRLEVEL (1, ("%%rValid=%ld \n",el->rValid));
-                PRLEVEL (1, ("%%first time seen elRow[%ld]=%ld \n",
-                            e, elRow[e]));
+            if (elRow [e] != 0)
+            { //use the upperbound
+                if (el->cValid < pMark) //never seen
+                    new_row_degree_bound_for_r += el->ncolsleft;
+                else  //tighter upperbound
+                    new_row_degree_bound_for_r += elCol[e];
+                continue;
             }
-            else
-            { 
-                elRow [e]--;
 
-                PRLEVEL (1, ("%%seen before: elRow[e]=%ld \n", elRow[e]));
+            if(el->cValid  < pMark)
+            { //first time seeing this element in this front
+                el->cValid = npMark;
+                Int intsct = paru_intersection (e, elementList, stl_newColSet);
+                elCol [e] = el->ncolsleft - intsct; //initiaze
             }
+            else if(el->cValid  != npMark)
+            { // it has been seen
+                el->cValid = npMark;
+                Int intsct = paru_intersection (e, elementList, stl_newColSet);
+                elCol[e] -=  intsct;
+            }
+            new_row_degree_bound_for_r += elCol [e] ;
+
+            PRLEVEL (1, ("%% pMark=%ld npMark=%ld \n",pMark, npMark));
 
         }
 
-        curRowTupleList->numTuple = pdst;
         Int old_bound_updated = row_degree_bound [r] + colCount - 1 ;
 
 #ifndef NDEBUG
@@ -523,6 +715,11 @@ void paru_update_rowDeg ( Int panel_num,  Int row_end, Int f,
             old_bound_updated < new_row_degree_bound_for_r ? 
             old_bound_updated : new_row_degree_bound_for_r;
     }
+    ////////ENDDDD//////////////////////////////////////////////////NEW VERSION
+    ///////ENDDDD///////////////////////////////////////////////////NEW VERSION
+    //////ENDDDD////////////////////////////////////////////////////NEW VERSION
+
+
 
     paruMatInfo->time_stamp[f]+= 2; //making all the markings invalid again
     PRLEVEL (1, ("%% Finalized counters r1=%ld r2=%ld r3=%ld sum=%ld\n", 
