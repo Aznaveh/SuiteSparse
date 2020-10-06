@@ -51,7 +51,7 @@ fprintf(ff,' myflop umfflop ratio\n results = [');
 %fprintf(ff,' myflop, umfflop, ratio\n');
 
 loop_cnt = 0;
-NNZMat = 4000;
+NNZMat = 100000;
 
 %for k = 1:100
 for k = 1:nmat
@@ -101,16 +101,16 @@ for k = 1:nmat
     end
 
     loop_cnt = loop_cnt + 1;
-    id
 
     if (nnz(A) < NNZMat)
             continue;
     end
  
-    if (loop_cnt > 100 )
-        break;
+    if (loop_cnt > 10 )
+        break
     end
 
+    id
     %max scaling
     A = spdiags (1./max (abs(A),[], 2), 0, size(A,1), size(A,2)) * A ;
     mmwrite('../Matrix/ParUTst/tmp.mtx', A);
@@ -188,7 +188,7 @@ for k = 1:nmat
         fprintf('Pass\n')
     else
          fprintf('Fail\n')
-         break;
+         %break;
     end
 
 
