@@ -442,9 +442,9 @@ void paru_update_rowDeg ( Int panel_num,  Int row_end, Int f, Int start_fac,
 //            paru_print_tupleList (RowList, r);
 //#endif
 //        Int pdst = 0, psrc;
-//    
-//    if (npMark == pMark+1) //just once for each front
-//    {
+//
+//        for (psrc = 0; psrc < numTuple; psrc ++)
+//        {
 //
 //            paru_Tuple curTpl = listRowTuples [psrc];
 //            Int e = curTpl.e;
@@ -473,17 +473,17 @@ void paru_update_rowDeg ( Int panel_num,  Int row_end, Int f, Int start_fac,
 //            }
 //            listRowTuples [pdst++] = curTpl; //keeping the tuple
 //
-//            
+//
 //            if(el->rValid == pMark)
 //            {  //already a pivot and wont change the row degree
 //                elRow [e]--;
 //                PRLEVEL (1, ("%% Pivotal elRow[%ld]=%ld \n",e, elRow[e]));
 //                continue;
 //            }
-//            
-////            if (npMark == pMark+1) //just once for each front
-////            {
-//                else if(el->rValid != npMark)
+//
+//            if (npMark == pMark+1) //just once for each front
+//            {
+//                if(el->rValid != npMark)
 //                {
 //                    el->rValid =  npMark;
 //                    elRow [e] = el ->nrowsleft - 1; //initiaze
@@ -496,11 +496,14 @@ void paru_update_rowDeg ( Int panel_num,  Int row_end, Int f, Int start_fac,
 //                    elRow [e]--;
 //                    PRLEVEL (1, ("%%seen before: elRow[e]=%ld \n", elRow[e]));
 //                }
-/////            }
+//            }
 //
 //            if (elRow [e] != 0)
 //            {
-//                new_row_degree_bound_for_r += el->ncolsleft;
+//                if (el->cValid < pMark) //never seen
+//                    new_row_degree_bound_for_r += el->ncolsleft;
+//                else  //tighter upperbound
+//                    new_row_degree_bound_for_r += elCol[e];
 //                continue;
 //            }
 //
@@ -691,8 +694,12 @@ void paru_update_rowDeg ( Int panel_num,  Int row_end, Int f, Int start_fac,
             else if(el->cValid  != npMark)
             { // it has been seen
                 el->cValid = npMark;
-                Int intsct = paru_intersection (e, elementList, stl_newColSet);
-                elCol[e] -=  intsct;
+                Int intsct; 
+                if (elCol[e] != 0)
+                {
+                    intsct = paru_intersection (e, elementList, stl_newColSet);
+                    elCol[e] -=  intsct;
+                }
             }
             new_row_degree_bound_for_r += elCol [e] ;
 

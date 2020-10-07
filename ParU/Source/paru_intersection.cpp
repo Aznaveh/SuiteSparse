@@ -88,31 +88,24 @@ int paru_intersection ( Int e, paru_Element **elementList,
         PRLEVEL (p, ("%%Merge style\n"));
         it = stl_newColSet.begin(); 
         Int c = el->lnc;
-        Int col = (el_colIndex[c]<0)? 
-            flip(el_colIndex[c]) : el_colIndex[c];
         while (it != stl_newColSet.end() && c < nEl)
         { 
-            if (*it < col)
+            while (el_colIndex[c] < 0) ++c; //skip dead columns
+            if (c >= nEl)
+                break;
+
+            if (*it < el_colIndex[c])
                 it++;
-            else if ( col < *it)
-            { 
+            else if (  el_colIndex[c] < *it)
                 c++; 
-                col = (el_colIndex[c]<0)? 
-                    flip(el_colIndex[c]) : el_colIndex[c];
-            }
             else
                 // *it == col
             { 
-                if ( el_colIndex[c] == col) 
-                {
-                    intersection++; 
-                    PRLEVEL (p, ("%%3: c=%ld ", c));
-                    PRLEVEL (p, ("%%col= %ld", col));
-                    PRLEVEL (p, ("%%intersection=%ld\n", intersection));
-                }
+                intersection++; 
+                PRLEVEL (p, ("%%3: c=%ld ", c));
+                PRLEVEL (p, ("%%col= %ld", el_colIndex[c]));
+                PRLEVEL (p, ("%%intersection=%ld\n", intersection));
                 it++; c++; 
-                col = (el_colIndex[c]<0)? 
-                    flip(el_colIndex[c]) : el_colIndex[c];
             };
         }
     }
