@@ -12,7 +12,7 @@
 int paru_intersection ( Int e, paru_Element **elementList, 
         std::set<Int> &stl_newColSet)
 {
-    DEBUGLEVEL(1);
+    DEBUGLEVEL(0);
 #ifndef NDEBUG        
     Int p = 1;
     PRLEVEL (p, ("%%stl_newColSet:\n%%"));
@@ -90,7 +90,7 @@ int paru_intersection ( Int e, paru_Element **elementList,
         Int c = el->lnc;
         while (it != stl_newColSet.end() && c < nEl)
         { 
-            while (el_colIndex[c] < 0) ++c; //skip dead columns
+            while (el_colIndex[c] < 0 && c < nEl) ++c; //skip dead columns
             if (c >= nEl)
                 break;
 

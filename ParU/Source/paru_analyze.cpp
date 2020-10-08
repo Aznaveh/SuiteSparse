@@ -57,7 +57,7 @@ paru_symbolic *paru_analyze
  cholmod_common *cc )
 {   
 
-    DEBUGLEVEL(0);
+    DEBUGLEVEL(-2);
     paru_symbolic *LUsym;
 
     LUsym = (paru_symbolic*) paru_alloc (1, sizeof(paru_symbolic), cc);
@@ -991,7 +991,8 @@ paru_symbolic *paru_analyze
 
 
 #ifndef NDEBUG
-    p = 0;
+    p = 1;
+    //HERE
     /* print fronts*/
     for (Int f = 0; f < nf; f++)
     {
@@ -1151,7 +1152,8 @@ paru_symbolic *paru_analyze
     for (Int i = 0; i < ms+nf+1; i++) PRLEVEL (p,("%ld ", aChild[i]));
     PRLEVEL (p,("\n"));
 
-    p = 0;
+    //HERE
+    p = 1;
     for(Int i = 0; i < ms+nf; i++)
     {
         if (aChildp[i] == aChildp[i+1]) continue;

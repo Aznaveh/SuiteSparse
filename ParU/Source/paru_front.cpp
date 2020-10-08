@@ -19,9 +19,9 @@ int paru_front ( paru_matrix *paruMatInfo,
         cholmod_common *cc)
 {
 
-    DEBUGLEVEL(0);
+    DEBUGLEVEL(-1);
     /* 
-     * 2 Print Nothing
+     * -2 Print Nothing
      * -1 Just Matlab
      *  0 Detailed
      *  > 0 Everything
@@ -387,7 +387,7 @@ int paru_front ( paru_matrix *paruMatInfo,
             { //free el
                 Int tot_size = sizeof(paru_Element) +
                     sizeof(Int)*(2*(mEl+nEl)) + sizeof(double)*nEl*mEl;
-                PRLEVEL (1, ("%%inside Front: Free %ld\n",e));
+                PRLEVEL (-1, ("%%inside Front: Free %ld\n",e));
                 paru_free (1, tot_size, el, cc);
                 elementList[e] = NULL;
             }
@@ -532,7 +532,8 @@ int paru_front ( paru_matrix *paruMatInfo,
 
     paruMatInfo->time_stamp[f]++; //invalidating all the marks
     PRLEVEL (-1, ("\n%%||||  Start Finalize %ld ||||\n", f));
-    paru_finalize (paruMatInfo,  f, start_fac, cc);
+    //paru_finalize (paruMatInfo,  f, start_fac, cc);
+    paru_prior_assemble ( f, start_fac, pivotal_elements, paruMatInfo, cc);
     PRLEVEL (-1, ("\n%%||||  Finish Finalize %ld ||||\n", f));
 
 

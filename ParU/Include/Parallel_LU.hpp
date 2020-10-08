@@ -495,4 +495,10 @@ void paru_pivotal (paru_matrix *paruMatInfo,std::vector<Int> &pivotal_elements,
 int paru_intersection ( Int e, paru_Element **elementList, 
         std::set<Int> &stl_colSet);
 
+void paru_prior_assemble ( Int f, Int start_fac,  
+        std::vector<Int> &pivotal_elements,
+        paru_matrix *paruMatInfo,
+        cholmod_common *cc);
+
+
 #endif

@@ -124,7 +124,7 @@ Int paru_panel_factorize (double *F, Int *frowList, Int m, Int n,
                 row_sp = i;
             }
 
-        PRLEVEL (-1, ("%% piv value= %2.4lf row_deg=%ld\n", piv, row_deg_sp));
+        PRLEVEL (1, ("%% piv value= %2.4lf row_deg=%ld\n", piv, row_deg_sp));
 
         //swap rows
         PRLEVEL (1, ("%% Swaping rows j=%ld, spr=%ld\n", j, row_sp));

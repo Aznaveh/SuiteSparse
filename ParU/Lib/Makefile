@@ -63,7 +63,8 @@ OBJ = \
 	paru_write.o\
 	paru_cumsum.o\
 	paru_intersection.o\
-	paru_bin_search.o
+	paru_bin_search.o\
+	paru_prior_assemble.o
 
 $(OBJ): $(INC)
 
@@ -164,6 +165,8 @@ paru_intersection.o: ../Source/paru_intersection.cpp
 paru_bin_search.o: ../Source/paru_bin_search.cpp
 	$(C) -c $<
 
+paru_prior_assemble.o:  ../Source/paru_prior_assemble.cpp
+	$(C) -c $<
 
 #-------------------------------------------------------------------------------
 
