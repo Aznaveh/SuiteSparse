@@ -14,6 +14,10 @@ void paru_prior_assemble ( Int f, Int start_fac,
         cholmod_common *cc)
 {
     DEBUGLEVEL(1);
+#ifndef NDEBUG  
+    Int p = 1;
+#endif
+
 
     work_struct *Work =  paruMatInfo->Work;
     Int *elRow = Work -> elRow; 
@@ -64,7 +68,6 @@ void paru_prior_assemble ( Int f, Int start_fac,
             // it can be eliminated fully
             // both a pivotal column and pivotal row
         {//TODO asselmble all and delete from the pivotal_elements
-
             paru_update_rel_ind_row (curEl, el, cc) ;
             paru_update_rel_ind_col (paruMatInfo, f, curEl, el, cc) ;
 
@@ -113,21 +116,45 @@ void paru_prior_assemble ( Int f, Int start_fac,
     std::vector<Int>** heapList = paruMatInfo->heapList;
     std::vector<Int>* curHeap = heapList[eli];
 
-//    for(Int i = curHeap->size()-1; i > 0 ; i--)
-//    {
-//        Int e = (*curHeap)[i];
-//        paru_Element *el = elementList[e];
-//
-//        if (el->rValid >= pMark && elRow[e] == 0)
-//        { // all the rows are inside current fron
-//            if (el->cValid >= pMark &&elCol[e] < el->ncolsleft)
-//            {//asslemble all and delete from the heap
-//                paru_update_rel_ind_row (curEl, el, cc) ;
-//            }
-//        }
-//    }
-//
+    auto greater = [&elementList](Int a, Int b)
+    { return lac_el(elementList,a) > lac_el(elementList,b); };
+
+
+    for(Int i = curHeap->size()-1; i > 0 ; i--)
+    {
+        Int e = (*curHeap)[i];
+        paru_Element *el = elementList[e];
+
+        if ( el == NULL) 
+        { //delete el from the heap
+            PRLEVEL (1, ("%% Heap: deleting  %ld\n", e));
+            std::pop_heap(curHeap->begin()+i, curHeap->end(), greater);
+            curHeap->pop_back();
+            continue;
+        }
+
+        if (el->rValid >= pMark && elRow[e] == 0)
+        { // all the rows are inside current fron
+            // assembling several columns
+            if (el->cValid >= pMark &&elCol[e] < el->ncolsleft)
+            {//asslemble all and delete from the heap
+                paru_update_rel_ind_row (curEl, el, cc) ;
+                //TODO: use exactly this withoug pop
+                //std::pop_heap(elHeap->begin()+i, elHeap->end(), greater);
+            }
+        }
+    }
+
+#ifndef NDEBUG  
+    //chekcing the heap
+    for(Int i = curHeap->size()-1 ; i > 0; i--)
+    {
+        Int elid = (*curHeap)[i];
+        Int pelid = (*curHeap)[(i-1)/2]; //parent id
+        ASSERT ( lac_el(elementList,pelid) <= lac_el(elementList,elid));
+    }
+
+#endif
 
 
 }
-

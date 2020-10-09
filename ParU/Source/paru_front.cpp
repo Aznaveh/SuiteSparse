@@ -285,14 +285,6 @@ int paru_front ( paru_matrix *paruMatInfo,
     //hasing from fcolList indices to column index 
     std::unordered_map <Int, Int> colHash; 
 
-    //fcolList copy from the stl_colSet
-    Int i = 0;
-    for (it = stl_colSet.begin(); it != stl_colSet.end(); it++)
-    {
-        colHash.insert({*it , i});
-        fcolList[i++] = *it;
-    }
-
     std::vector<Int>** heapList = paruMatInfo->heapList;
     std::vector<Int>* curHeap = heapList[eli];
 
@@ -306,6 +298,15 @@ int paru_front ( paru_matrix *paruMatInfo,
         paruMatInfo->heapList[eli] = nullptr;
         PRLEVEL (1, ("%% pivotalFront =%p\n",pivotalFront));
         return 0;
+    }
+
+    //TODO: WRONG: why do I add a hash to a SET???!!
+    //fcolList copy from the stl_colSet
+    Int i = 0;
+    for (it = stl_colSet.begin(); it != stl_colSet.end(); it++)
+    {
+        colHash.insert({*it , i});
+        fcolList[i++] = *it;
     }
 
 
@@ -487,7 +488,7 @@ int paru_front ( paru_matrix *paruMatInfo,
     // Initializing curEl global indices
     //Int *el_colIndex = colIndex_pointer (curEl);
     Int *el_colIndex = (Int*)(curEl+1);
-    curEl->lnc = 0;
+    curEl->lac = 0;
     for (Int i = 0; i < colCount; ++ i) 
         el_colIndex [i] = fcolList[i];
     Int *el_rowIndex = rowIndex_pointer (curEl);
@@ -574,18 +575,18 @@ int paru_front ( paru_matrix *paruMatInfo,
     {
         Int elid = (*curHeap)[i];
         Int pelid = (*curHeap)[(i-1)/2]; //parent id
-        if( lnc_el(elementList,pelid) > lnc_el(elementList,elid))
-            PRLEVEL (p,("BEF %ld(%ld) ", elid, lnc_el(elementList, elid) ));
+        if( lac_el(elementList,pelid) > lac_el(elementList,elid))
+            PRLEVEL (p,("BEF %ld(%ld) ", elid, lac_el(elementList, elid) ));
             PRLEVEL (p,("BEF parent %ld(%ld)\n\n ",
-                        pelid, lnc_el(elementList, pelid) ));
-        //ASSERT ( lnc_el(elementList,pelid) <= lnc_el(elementList,elid));
+                        pelid, lac_el(elementList, pelid) ));
+        //ASSERT ( lac_el(elementList,pelid) <= lac_el(elementList,elid));
     }
 #endif
 
 
     curHeap->push_back(eli);
     auto greater = [&elementList](Int a, Int b)
-    { return lnc_el(elementList,a) > lnc_el(elementList,b); };
+    { return lac_el(elementList,a) > lac_el(elementList,b); };
     std::push_heap(curHeap->begin(), curHeap->end(), greater);
 
     for(Int i=0 ; i < pivotal_elements.size(); i++)
@@ -609,16 +610,16 @@ int paru_front ( paru_matrix *paruMatInfo,
     for(Int i = 0; i < curHeap->size(); i++)
     {
         Int elid = (*curHeap)[i];
-        PRLEVEL (p, (" %ld(%ld) ", elid, lnc_el(elementList, elid) ));
+        PRLEVEL (p, (" %ld(%ld) ", elid, lac_el(elementList, elid) ));
     }
     PRLEVEL (p, ("\n"));
     for(Int i = curHeap->size()-1 ; i > 0; i--)
     {
         Int elid = (*curHeap)[i];
         Int pelid = (*curHeap)[(i-1)/2]; //parent id
-        if( lnc_el(elementList,pelid) > lnc_el(elementList,elid))
-            PRLEVEL (p, ("ATT %ld(%ld)\n\n ", elid, lnc_el(elementList, elid)));
-        //ASSERT ( lnc_el(elementList,pelid) <= lnc_el(elementList,elid));
+        if( lac_el(elementList,pelid) > lac_el(elementList,elid))
+            PRLEVEL (p, ("ATT %ld(%ld)\n\n ", elid, lac_el(elementList, elid)));
+        //ASSERT ( lac_el(elementList,pelid) <= lac_el(elementList,elid));
     }
 #endif
 

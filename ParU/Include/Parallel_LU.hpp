@@ -43,12 +43,12 @@ extern "C"
 #endif
 
 //for printing information uncomment this; to activate assertions uncomment 
-//#undef NPR    //<<1>>
+#undef NPR    //<<1>>
 
 //from spqr.hpp
 //Aznaveh For MATLAB OUTPUT UNCOMMENT HERE
 // uncomment the following line to turn on debugging 
-//#undef NDEBUG  //<<2>>
+#undef NDEBUG  //<<2>>
 
 //uncomment if you want to count hardware flops
 //#define COUNT_FLOPS
@@ -252,8 +252,8 @@ typedef struct
         cValid;     /* validity of relative column index */
     Int *rWork;     /* work space for current front; basically for sort */
 
-    Int lnc;    // least numbered column which is active
-                // 0 <= lnc <= ncols
+    Int lac;    // least active column which is active
+                // 0 <= lac <= ncols
 
 
     /* followed in memory by:
@@ -295,15 +295,15 @@ inline double *numeric_pointer (paru_Element *curEl)
 
 inline Int flip (Int colInd){ return  - colInd -2; }
 
-inline Int lnc_el(paru_Element **elementList, Int eli)
+inline Int lac_el(paru_Element **elementList, Int eli)
 { //return least numbered column of the element i (eli)
     if (elementList[eli] == NULL) 
         return LONG_MAX;
     else
     {
         Int *el_colIndex = (Int*)(elementList[eli]+1);
-        Int lnc_ind = elementList[eli]->lnc;
-        return el_colIndex[lnc_ind];
+        Int lac_ind = elementList[eli]->lac;
+        return el_colIndex[lac_ind];
     }
 };
 

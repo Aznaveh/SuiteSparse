@@ -7,7 +7,7 @@
  * 
  */
 #include "Parallel_LU.hpp"
-#define HEAP_ToL 10  //tolerance on how to 
+#define HEAP_ToL 8  //tolerance on how to 
 
 void paru_make_heap(paru_matrix *paruMatInfo, Int f )
 {
@@ -35,7 +35,7 @@ void paru_make_heap(paru_matrix *paruMatInfo, Int f )
     Int *rowMarkp = Work->rowMark;
     Int rowMark = 0;
     for (Int i = aChildp[eli]; i <= aChildp[eli+1]-1; i++) 
-    {
+    { //finding the largest child
         Int chelid = aChild[i];  // element id of the child
         // max(rowMark , child->rowMark)
         Int f_rmark = rowMarkp[chelid];
@@ -58,7 +58,7 @@ void paru_make_heap(paru_matrix *paruMatInfo, Int f )
     }
     rowMarkp[eli] = rowMark;
     auto greater = [&elementList](Int a, Int b)
-    { return lnc_el(elementList,a) > lnc_el(elementList,b); };
+    { return lac_el(elementList,a) > lac_el(elementList,b); };
 
     PRLEVEL (p, ("%% tot_size =  %ld\n", tot_size ));
     PRLEVEL (p+1, ("%% biggest_Child_id = %ld\n", biggest_Child_id));
@@ -68,7 +68,9 @@ void paru_make_heap(paru_matrix *paruMatInfo, Int f )
     std::vector<Int>* elHeap = heapList[eli] = heapList[biggest_Child_id];
     heapList[biggest_Child_id] = nullptr;
 
+    //TODO: this line should be deleted after prior is corrected
     std::make_heap(elHeap->begin(), elHeap->end(), greater ); 
+
     //O(n) heapify of all children or O(klgn) add to the biggest child
     if ( biggest_Child_size > HEAP_ToL*(tot_size - biggest_Child_size) )
     { //klogn
@@ -107,7 +109,6 @@ void paru_make_heap(paru_matrix *paruMatInfo, Int f )
             heapList[chelid] = nullptr;
             //heapifying
             std::make_heap(elHeap->begin(), elHeap->end(), greater ); 
-
         }
     }
 
@@ -121,15 +122,15 @@ void paru_make_heap(paru_matrix *paruMatInfo, Int f )
     {
         Int elid = (*elHeap)[i];
         if (elid != NULL)
-            PRLEVEL (p, (" %ld", lnc_el(elementList, elid) ));
+            PRLEVEL (p, (" %ld", lac_el(elementList, elid) ));
     }
     PRLEVEL (p, ("\n"));
-    //chekcing the heap
+    //chekcing the heap or I could use is_heap
     for(Int i = elHeap->size()-1 ; i > 0; i--)
     {
         Int elid = (*elHeap)[i];
         Int pelid = (*elHeap)[(i-1)/2]; //parent id
-        ASSERT ( lnc_el(elementList,pelid) <= lnc_el(elementList,elid));
+        ASSERT ( lac_el(elementList,pelid) <= lac_el(elementList,elid));
     }
 
 #endif

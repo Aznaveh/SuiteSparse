@@ -34,10 +34,8 @@ void paru_update_rowDeg ( Int panel_num,  Int row_end, Int f, Int start_fac,
     Int col2 = Super [f+1];
     Int fp = col2 - col1;   /* first fp columns are pivotal */ 
 
-    //TODO: I guess there is a logical problem with pMark after each call
-    Int time_f = ++paruMatInfo->time_stamp[f]; //making all the markings invalid
-    Int npMark = time_f; //Mark for non pivotal rows
-    Int pMark = start_fac; //pMark++;    //Mark for pivotal rows
+    Int npMark = ++paruMatInfo->time_stamp[f]; //making all the markings invalid
+    Int pMark = start_fac; //Mark for pivotal rows
 
     Int colCount = stl_colSet.size();
 
@@ -54,7 +52,7 @@ void paru_update_rowDeg ( Int panel_num,  Int row_end, Int f, Int start_fac,
 
     /*************** finding set of non pivotal cols in current front *********/
     /*               
-     *    Mark seen elements with pMark or time_f+1
+     *    Mark seen elements with pMark 
      *        if Marked already added to the list
      *        else all columns are added to the current front
      *
@@ -143,13 +141,13 @@ void paru_update_rowDeg ( Int panel_num,  Int row_end, Int f, Int start_fac,
             if(el->rValid !=  pMark)
             {// an element never seen before
 
-                PRLEVEL (1, ("%%first time seen elRow[%ld]=%ld \n"
+                PRLEVEL (1, ("%%P: first time seen elRow[%ld]=%ld \n"
                             , e, elRow[e]));
-                if (el->rValid < pMark)
+                PRLEVEL (1, ("%%pMark=%ld  npMark= %ld\n",pMark, npMark));
+ 
+                //if (el->rValid < pMark)
+                if (npMark == pMark+1 ) 
                     elRow [e] = el ->nrowsleft - 1; //initiaze
-                else
-                    elRow [e]--; //already seen in a non pivotal row
-
                 el->rValid = pMark;
 
                 PRLEVEL (1, ("%%changed to elRow[%ld]=%ld \n", e, elRow[e]));
@@ -157,15 +155,14 @@ void paru_update_rowDeg ( Int panel_num,  Int row_end, Int f, Int start_fac,
                 if (el->rValid >  pMark)
                     PRLEVEL (1, ("%%pMark=%ld  rVal= %ld\n", 
                                 pMark, el->rValid));
-                ASSERT(el->rValid <= pMark);
                 if ( elCol [e] >= Work -> elCMark )
                     PRLEVEL (1, ("%% element %ld can be eaten wholly\n",e));
                 //And the rest of e is in U part 
 #endif
             }
-            else 
+            else  // el->rValid == pMark
             {  //already added to pivotal rows
-                elRow [e]--;
+                if (npMark == pMark+1) elRow [e]--;
                 PRLEVEL (1, ("%%already seen elRow[%ld]=%ld \n",e, elRow[e]));
                 continue;
             }
@@ -304,23 +301,15 @@ void paru_update_rowDeg ( Int panel_num,  Int row_end, Int f, Int start_fac,
         // keeping other elements inside the list
         pivotal_elements [ii++] = pivotal_elements [i];
 
-        if (el->rValid == pMark )
-        {// it can be eliminated fully
-        // both a pivotal column and pivotal row
-            continue; 
-        }
-
-
-        ASSERT (el->cValid != npMark );
 #ifndef NDEBUG        
-        PRLEVEL (p,("%% pivotal element= %ld lnc=%ld colsleft=%ld \n", 
-                    e, el->lnc, el->ncolsleft ));
+        PRLEVEL (p,("%% pivotal element= %ld lac=%ld colsleft=%ld \n", 
+                    e, el->lac, el->ncolsleft ));
         if (p <= 0)
             paru_print_element (paruMatInfo, e);
 #endif
         Int intsct = paru_intersection (e, elementList, stl_newColSet);
         if(el->cValid  < pMark)
-        { //firt time seeing this element in this front
+        { //first time seeing this element in this front
             elCol [e] = el->ncolsleft - intsct; //initiaze
         }
         else if(el->cValid  != npMark)
@@ -332,47 +321,47 @@ void paru_update_rowDeg ( Int panel_num,  Int row_end, Int f, Int start_fac,
     }
 
 #ifndef NDEBUG
-p = 1;
+    p = 1;
 #endif
 
 
 
-/********* travers over new non pivotal rows of current front *****************
- *          and update the number of rows can be seen in each element. 
- *
- *                <----------fp--------->
- *                        j1     j2
- *                         ^     ^
- *                         |     | stl_colSet 
- *                         |     |        \       stl_newColSet
- *             F           |     |         [QQQQQ|OOOOOOOOO|....
- *              \  ____..._|_  ____...__ ____________________________...
- * ^              |\      |     |       #  ^     |         | 
- * |              | \     |     |       #  | old | added   | 
- * |              |  \    |     |       #  | list|  columns|
- * |              |___\...|_____|__...__#  |     |         |
- * |   ^          |       |\* **|       #  fp              |
- * |   |          |       |**\**|       #  |               |
- * | panel        |       |***\*|       #  |               |
- * | width        |       |***\*|       #  |               |
- * |   |          |       |***\*|       #  |               |
- * |   v          |____...|________..._ #  |      vvvvvv   |
- * |        j2--> |       |     |       #  v    00000000   |         ...
- * rowCount       |=============================00 El 00=============
- * |              |       |     |       |       00000000  
- * |              |       |     |       |          vvvvvvvvv 
- * |          H   |       |     |       |          xxxxxxxxxxxxxxxxxxxx
- * |          E   |       |row_end      |          xxxxxx El xxxxxxxxxx
- * |          R   .       .      .      .          xxxxxxxxxxxxxxxxxxxx
- * |          E   .       .      .      . 
- * |              .       .      .      . 
- * v  rowCount--->|___....______________|              
- *                         
- */
+    /****** travers over new non pivotal rows of current front *****************
+     *          and update the number of rows can be seen in each element. 
+     *
+     *                <----------fp--------->
+     *                        j1     j2
+     *                         ^     ^
+     *                         |     | stl_colSet 
+     *                         |     |        \       stl_newColSet
+     *             F           |     |         [QQQQQ|OOOOOOOOO|....
+     *              \  ____..._|_  ____...__ ____________________________...
+     * ^              |\      |     |       #  ^     |         | 
+     * |              | \     |     |       #  | old | added   | 
+     * |              |  \    |     |       #  | list|  columns|
+     * |              |___\...|_____|__...__#  |     |         |
+     * |   ^          |       |\* **|       #  fp              |
+     * |   |          |       |**\**|       #  |               |
+     * | panel        |       |***\*|       #  |               |
+     * | width        |       |***\*|       #  |               |
+     * |   |          |       |***\*|       #  |               |
+     * |   v          |____...|________..._ #  |      vvvvvv   |
+     * |        j2--> |       |     |       #  v    00000000   |         ...
+     * rowCount       |=============================00 El 00=============
+     * |              |       |     |       |       00000000  
+     * |              |       |     |       |          vvvvvvvvv 
+     * |          H   |       |     |       |          xxxxxxxxxxxxxxxxxxxx
+     * |          E   |       |row_end      |          xxxxxx El xxxxxxxxxx
+     * |          R   .       .      .      .          xxxxxxxxxxxxxxxxxxxx
+     * |          E   .       .      .      . 
+     * |              .       .      .      . 
+     * v  rowCount--->|___....______________|              
+     *                         
+     */
 
     if (npMark == pMark+1) //just once for each front 
     {                      // in the first time calling this function
-        PRLEVEL (-1, ("UPDATING elRow\n"));
+        PRLEVEL (1, ("UPDATING elRow\n"));
         for (Int k = j2; k < rowCount; k++)
         {
             Int r = frowList [k];
@@ -408,10 +397,8 @@ p = 1;
                 //Int *el_rowIndex = rowIndex_pointer (el);
                 Int *el_rowIndex = (Int*)(el+1)+el->ncols;
 
-                if (el_rowIndex [curRowIndex] < 0 )
-                {
-                    continue;  
-                }
+                if (el_rowIndex [curRowIndex] < 0 ) continue;  
+
                 listRowTuples [pdst++] = curTpl; //keeping the tuple
 
                 if(el->rValid == pMark)
@@ -424,7 +411,7 @@ p = 1;
                     el->rValid =  npMark;
                     elRow [e] = el ->nrowsleft - 1; //initiaze
                     PRLEVEL (1, ("%%rValid=%ld \n",el->rValid));
-                    PRLEVEL (1, ("%%first time seen elRow[%ld]=%ld \n",
+                    PRLEVEL (1, ("%%NP: first time seen elRow[%ld]=%ld \n",
                                 e, elRow[e]));
                 }
                 else
@@ -438,41 +425,41 @@ p = 1;
         }
     }
 
-/********* travers over new non pivotal rows of current panel *****************
- *          and update the row degree. Once at the begining it updates elRow and
- *          then if elRow == 0 it compute the intersection. It might have been
- *          computed or we might need to compute it now. However if it is
- *          computed now it would be mark not to recompute
- *
- *                <----------fp--------->
- *                        j1     j2
- *                         ^     ^
- *                         |     | stl_colSet 
- *                         |     |        \       stl_newColSet 
- *             F           |     |         [QQQQQ|OOOOOOOOO|....
- *              \  ____..._|_  ____...__ ____________________________...
- * ^              |\      |     |       #  ^     |         | 
- * |              | \     |     |       #  | old | added   | 
- * |              |  \    |     |       #  | list|  columns|
- * |              |___\...|_____|__...__#  |     |         |
- * |   ^          |       |\* **|       #  fp              |
- * |   |          |       |**\**|       #  |               |
- * | panel        |       |***\*|       #  |               |
- * | width        |       |***\*|       #  |               |
- * |   |          |       |***\*|       #  |               |
- * |   v          |____...|________..._ #  |      vvvvvv   |
- * |        j2--> |       |     |       #  v    00000000   |         ...
- * rowCount   H   |=============================00 El 00=============
- * |          E   |       |     |       |       00000000  
- * |          R   |       |     |       |          vvvvvvvvv 
- * |          E   |       |     |       |          xxxxxxxxxxxxxxxxxxxx
- * |  row_end --->|       |row_end      |          xxxxxx El xxxxxxxxxx
- * |              .       .      .      .          xxxxxxxxxxxxxxxxxxxx
- * |              .       .      .      . 
- * |              .       .      .      . 
- * v  rowCount--->|___....______________|              
- *                         
- */
+    /**** Travers over new non pivotal rows of current panel 
+     *    and update the row degree. Once at the begining it updates elRow and
+     *    then if elRow == 0 it compute the intersection. It might have been
+     *    computed or we might need to compute it now. However if it is
+     *    computed now it would be mark not to recompute
+     *
+     *                <----------fp--------->
+     *                        j1     j2
+     *                         ^     ^
+     *                         |     | stl_colSet 
+     *                         |     |        \       stl_newColSet 
+     *             F           |     |         [QQQQQ|OOOOOOOOO|....
+     *              \  ____..._|_  ____...__ ____________________________...
+     * ^              |\      |     |       #  ^     |         | 
+     * |              | \     |     |       #  | old | added   | 
+     * |              |  \    |     |       #  | list|  columns|
+     * |              |___\...|_____|__...__#  |     |         |
+     * |   ^          |       |\* **|       #  fp              |
+     * |   |          |       |**\**|       #  |               |
+     * | panel        |       |***\*|       #  |               |
+     * | width        |       |***\*|       #  |               |
+     * |   |          |       |***\*|       #  |               |
+     * |   v          |____...|________..._ #  |      vvvvvv   |
+     * |        j2--> |       |     |       #  v    00000000   |         ...
+     * rowCount   H   |=============================00 El 00=============
+     * |          E   |       |     |       |       00000000  
+     * |          R   |       |     |       |          vvvvvvvvv 
+     * |          E   |       |     |       |          xxxxxxxxxxxxxxxxxxxx
+     * |  row_end --->|       |row_end      |          xxxxxx El xxxxxxxxxx
+     * |              .       .      .      .          xxxxxxxxxxxxxxxxxxxx
+     * |              .       .      .      . 
+     * |              .       .      .      . 
+     * v  rowCount--->|___....______________|              
+     *                         
+     */
 
 
     Int new_row_degree_bound_for_r;
@@ -495,12 +482,11 @@ p = 1;
             paru_print_tupleList (RowList, r);
 #endif
 
-        for (Int i = 0; i < numTuple; i++)
+        Int pdst = 0, psrc;
+        for (psrc = 0; psrc < numTuple; psrc ++)
         {
-
-            paru_Tuple curTpl = listRowTuples [i];
+            paru_Tuple curTpl = listRowTuples [psrc];
             Int e = curTpl.e;
-
 
 #ifndef NDEBUG        
             if (p <= 0)
@@ -508,19 +494,16 @@ p = 1;
 #endif
             Int curRowIndex = curTpl.f;
 
-            //TODO: this shouldn't happen in this phase
-            if(e < 0 || curRowIndex < 0) continue;
-
             paru_Element *el = elementList[e];
+            ASSERT (el != NULL);
             if (el == NULL) continue;
 
             //Int *el_rowIndex = rowIndex_pointer (el);
             Int *el_rowIndex = (Int*)(el+1)+el->ncols;
 
-            if (el_rowIndex [curRowIndex] < 0 )
-            {
-                continue;  
-            }
+            if (el_rowIndex [curRowIndex] < 0 ) continue;  
+
+            listRowTuples [pdst++] = curTpl; //keeping the tuple
 
             if(el->rValid == pMark)
             {  //already a pivot and wont change the row degree
@@ -558,6 +541,7 @@ p = 1;
             PRLEVEL (1, ("%% pMark=%ld npMark=%ld \n",pMark, npMark));
 
         }
+        curRowTupleList->numTuple = pdst;
 
         Int old_bound_updated = row_degree_bound [r] + colCount - 1 ;
 

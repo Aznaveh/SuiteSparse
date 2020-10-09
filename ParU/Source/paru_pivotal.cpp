@@ -46,10 +46,10 @@ void paru_pivotal (paru_matrix *paruMatInfo, std::vector<Int> &pivotal_elements,
     {
         Int elid = (*elHeap)[i];
         PRLEVEL (p, (" %ld", elid));
-        PRLEVEL (p, (" (%ld) ", lnc_el(elementList, elid) ));
+        PRLEVEL (p, (" (%ld) ", lac_el(elementList, elid) ));
     }
     PRLEVEL (p, ("\n"));
-    Int priorEl_lnc = 0;
+    Int priorEl_lac = 0;
 #endif 
 
     /*****  making the list of elements that contribute to pivotal columns ****/
@@ -57,26 +57,26 @@ void paru_pivotal (paru_matrix *paruMatInfo, std::vector<Int> &pivotal_elements,
     // pop from the heap and put it in pivotal_elements
     {
         Int frontEl = elHeap->front(); 
-        Int lncFel = lnc_el(elementList, frontEl);
+        Int lacFel = lac_el(elementList, frontEl);
         PRLEVEL (p, ("%% element = %ld col1=%ld", frontEl, col1));
-        PRLEVEL (p, (" lnc_el = %ld \n", lncFel));
-        ASSERT (lncFel >= col1);
+        PRLEVEL (p, (" lac_el = %ld \n", lacFel));
+        ASSERT (lacFel >= col1);
         PRLEVEL (p, ("%% elHeap->size= %ld \n", elHeap->size()));
 
-        if ( lncFel >= col2 ) break;
+        if ( lacFel >= col2 ) break;
 
         if (elementList[frontEl] != NULL) 
             pivotal_elements.push_back(frontEl);
         std::pop_heap
             (elHeap->begin(), elHeap->end(),[&elementList](Int a, Int b)
-             { return lnc_el(elementList,a) > lnc_el(elementList,b); }   );
+             { return lac_el(elementList,a) > lac_el(elementList,b); }   );
         elHeap->pop_back();
 #ifndef NDEBUG
         //ensure the vector is sorted based on first column
-        if ( lncFel < priorEl_lnc )
-            PRLEVEL (p, ("%% cur= %ld prior=%ld\n", lncFel, priorEl_lnc));
-        ASSERT ( lncFel >= priorEl_lnc );
-        priorEl_lnc = lncFel;
+        if ( lacFel < priorEl_lac )
+            PRLEVEL (p, ("%% cur= %ld prior=%ld\n", lacFel, priorEl_lac));
+        ASSERT ( lacFel >= priorEl_lac );
+        priorEl_lac = lacFel;
 #endif 
     }
 
@@ -88,7 +88,7 @@ void paru_pivotal (paru_matrix *paruMatInfo, std::vector<Int> &pivotal_elements,
         {
             Int elid = (*elHeap)[i];
             Int pelid = (*elHeap)[(i-1)/2]; //parent id
-            ASSERT ( lnc_el(elementList,pelid) <= lnc_el(elementList,elid));
+            ASSERT ( lac_el(elementList,pelid) <= lac_el(elementList,elid));
         }
     }
 #endif
@@ -137,8 +137,8 @@ void paru_pivotal (paru_matrix *paruMatInfo, std::vector<Int> &pivotal_elements,
         ASSERT (el != NULL);
 
         PRLEVEL (p, ("current element(%ld) ", e ));
-        PRLEVEL (p, ("lnc = %ld ",  el->lnc));
-        PRLEVEL (p, ("lnc_col = %ld\n ", lnc_el(elementList, e) ));
+        PRLEVEL (p, ("lac = %ld ",  el->lac));
+        PRLEVEL (p, ("lac_col = %ld\n ", lac_el(elementList, e) ));
 
         Int mEl = el->nrows;
         Int nEl = el->ncols;
@@ -197,14 +197,14 @@ void paru_pivotal (paru_matrix *paruMatInfo, std::vector<Int> &pivotal_elements,
 #endif 
             ASSERT (rowCount == stl_rowSet.size());
         }
-        panel_row [( lnc_el(elementList,e) - col1) / panel_width] = rowCount;
+        panel_row [( lac_el(elementList,e) - col1) / panel_width] = rowCount;
 #ifndef NDEBUG 
         p = 1;
         PRLEVEL (p, ("%%rowCount=%ld", rowCount));
-        PRLEVEL (p, (" lnc=%ld", lnc_el(elementList,e)));
-        ASSERT (( lnc_el(elementList,e) - col1) / panel_width < num_panels);
+        PRLEVEL (p, (" lac=%ld", lac_el(elementList,e)));
+        ASSERT (( lac_el(elementList,e) - col1) / panel_width < num_panels);
         PRLEVEL (p, (" ind.=%ld\n", 
-                    (lnc_el(elementList,e) - col1) / panel_width));
+                    (lac_el(elementList,e) - col1) / panel_width));
 #endif 
     }
 
@@ -326,8 +326,8 @@ void paru_pivotal (paru_matrix *paruMatInfo, std::vector<Int> &pivotal_elements,
         //ASSERT(el != NULL);
         if (el == NULL) continue;
         PRLEVEL (p, ("current element(%ld) %p", e, el ));
-        PRLEVEL (p, ("lnc = %ld ",  el->lnc));
-        PRLEVEL (p, ("col = %ld\n ", lnc_el(elementList, e) ));
+        PRLEVEL (p, ("lac = %ld ",  el->lac));
+        PRLEVEL (p, ("col = %ld\n ", lac_el(elementList, e) ));
 
 
         //Int *el_colIndex = colIndex_pointer (el);
@@ -350,7 +350,7 @@ void paru_pivotal (paru_matrix *paruMatInfo, std::vector<Int> &pivotal_elements,
             paru_print_element (paruMatInfo, e);
 #endif
 
-        Int cEl = el->lnc;
+        Int cEl = el->lac;
 
         PRLEVEL (p, ("%% cEl =%ld \n", cEl));
         for ( ; cEl < nEl ; cEl++)
@@ -409,12 +409,12 @@ void paru_pivotal (paru_matrix *paruMatInfo, std::vector<Int> &pivotal_elements,
         }
         if (elementList[e] != NULL )
         {
-            el->lnc = cEl;
+            el->lac = cEl;
             pivotal_elements [ii++] = pivotal_elements [i];
             ASSERT (cEl < nEl);
-            PRLEVEL (1, ("%%el->lnc= %ld ",el->lnc));
-            PRLEVEL (1, ("el_colIndex[el->lnc]=%ld :\n"
-                        , el_colIndex[el->lnc]));
+            PRLEVEL (1, ("%%el->lac= %ld ",el->lac));
+            PRLEVEL (1, ("el_colIndex[el->lac]=%ld :\n"
+                        , el_colIndex[el->lac]));
 #ifndef NDEBUG // print the element which has been assembled from
             p = 2;
             PRLEVEL (p, ("%% ASSEMBLED element= %ld  mEl =%ld ",e, mEl));

@@ -51,7 +51,7 @@ int paru_intersection ( Int e, paru_Element **elementList,
                 it != stl_newColSet.end(); it++)
         {
             Int c = *it;
-            Int col = bin_srch_col (el_colIndex, el->lnc, nEl, c);
+            Int col = bin_srch_col (el_colIndex, el->lac, nEl, c);
             PRLEVEL (p, ("%%intersection=%ld", intersection));
             PRLEVEL (p, ("%%after bsearch for c=%ld col=%ld \n",c, col ));
             if ( col != -1 && el_colIndex[col] == c) 
@@ -69,7 +69,7 @@ int paru_intersection ( Int e, paru_Element **elementList,
         //  else if stl_newColSet >> el
         //      binary search each of elements in el in stl_newColSet 
         //      log(stl_newColSet.size())*nEl
-        for (Int c = el->lnc; c < nEl; c++)
+        for (Int c = el->lac; c < nEl; c++)
         {
             Int col = el_colIndex[c];
             if (col < 0) continue;
@@ -87,7 +87,7 @@ int paru_intersection ( Int e, paru_Element **elementList,
         
         PRLEVEL (p, ("%%Merge style\n"));
         it = stl_newColSet.begin(); 
-        Int c = el->lnc;
+        Int c = el->lac;
         while (it != stl_newColSet.end() && c < nEl)
         { 
             while (el_colIndex[c] < 0 && c < nEl) ++c; //skip dead columns
