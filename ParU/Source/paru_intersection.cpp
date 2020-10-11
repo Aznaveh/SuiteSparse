@@ -33,22 +33,21 @@ int paru_intersection ( Int e, paru_Element **elementList,
     //find the intersection between columns of e and 
     Int intersection = 0;
     // conditions for early stop
-    if (el_colIndex[0]  > *stl_newColSet.end())
+    if (el_colIndex[el->lac]  > *stl_newColSet.end())
         return 0;
-    if (*stl_newColSet.begin() > el_colIndex[nEl-1])
+    if (el_colIndex[nEl-1] > 0 && *stl_newColSet.begin() > el_colIndex[nEl-1])
         return 0;
 
     PRLEVEL (p, ("%% newColSet.size = %ld\n",stl_newColSet.size() ));
     PRLEVEL (p, ("%% nEl = %ld\n",nEl));
     std::set<Int>::iterator it;
-    if (C*stl_newColSet.size() < nEl )
+    if (C*stl_newColSet.size() < nEl-el->lac )
         // if size el >> stl_newColSet 
         //   binary search each of elements in stl_newColSet in el
         //   log(nEl)*stl_newColSet.size()
     {
         PRLEVEL (p, ("%%el >> stl_newColSet\n"));
-        for (it = stl_newColSet.begin(); 
-                it != stl_newColSet.end(); it++)
+        for (it = stl_newColSet.begin(); it != stl_newColSet.end(); it++)
         {
             Int c = *it;
             Int col = bin_srch_col (el_colIndex, el->lac, nEl, c);
@@ -61,34 +60,34 @@ int paru_intersection ( Int e, paru_Element **elementList,
                 PRLEVEL (p, ("%%intersection=%ld\n", intersection));
             };
         }
-
     }
-    else if (stl_newColSet.size() > C*nEl )
-    {
+    else if (stl_newColSet.size() > C*(nEl-el->lac) )
+    {   //  else if stl_newColSet >> el
         PRLEVEL (p, ("%%el << stl_newColSet\n"));
-        //  else if stl_newColSet >> el
         //      binary search each of elements in el in stl_newColSet 
         //      log(stl_newColSet.size())*nEl
+        Int ncolsseen = el->ncolsleft;
         for (Int c = el->lac; c < nEl; c++)
         {
             Int col = el_colIndex[c];
             if (col < 0) continue;
+            ncolsseen--;
             if ( stl_newColSet.find(col) != stl_newColSet.end() )
             {
                 intersection++; 
                 PRLEVEL (p, ("%%2: col=%ld ", col));
                 PRLEVEL (p, ("%%intersection=%ld\n", intersection));
             };
+            if (ncolsseen == 0) return intersection;
         }
     }
     else
     { //Merge style m+n
-        
-        
         PRLEVEL (p, ("%%Merge style\n"));
         it = stl_newColSet.begin(); 
         Int c = el->lac;
-        while (it != stl_newColSet.end() && c < nEl)
+        Int ncolsseen = el->ncolsleft;
+        while (it != stl_newColSet.end() && ncolsseen > 0)
         { 
             while (el_colIndex[c] < 0 && c < nEl) ++c; //skip dead columns
             if (c >= nEl)
@@ -97,7 +96,10 @@ int paru_intersection ( Int e, paru_Element **elementList,
             if (*it < el_colIndex[c])
                 it++;
             else if (  el_colIndex[c] < *it)
+            {
                 c++; 
+                ncolsseen--;
+            }
             else
                 // *it == col
             { 
@@ -106,6 +108,7 @@ int paru_intersection ( Int e, paru_Element **elementList,
                 PRLEVEL (p, ("%%col= %ld", el_colIndex[c]));
                 PRLEVEL (p, ("%%intersection=%ld\n", intersection));
                 it++; c++; 
+                ncolsseen--;
             };
         }
     }
