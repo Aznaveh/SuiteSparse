@@ -34,8 +34,8 @@ void paru_update_rowDeg ( Int panel_num,  Int row_end, Int f, Int start_fac,
     Int col2 = Super [f+1];
     Int fp = col2 - col1;   /* first fp columns are pivotal */ 
 
-    Int npMark = ++paruMatInfo->time_stamp[f]; //making all the markings invalid
     Int pMark = start_fac; //Mark for pivotal rows
+    Int npMark = ++paruMatInfo->time_stamp[f]; //making all the markings invalid
 
     Int colCount = stl_colSet.size();
 

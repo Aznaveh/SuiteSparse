@@ -285,6 +285,8 @@ std::vector<Int>** heapList = paruMatInfo->heapList;
     paru_free (m+nf, sizeof(Int), Work->elRow, cc);
     paru_free (m+nf, sizeof(Int), Work->elCol, cc);
 
+    paru_free (m+nf, sizeof(Int), paruMatInfo->lacList, cc);
+
 
     paru_free (m, sizeof (Int), paruMatInfo->scale_row, cc) ;
     paru_free (m, sizeof(Int), paruMatInfo->row_degree_bound, cc);

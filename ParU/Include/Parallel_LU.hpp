@@ -374,6 +374,9 @@ typedef struct
     Int *row_degree_bound;          /* row degree size number of rows */
     Int panel_width;                /* width of panel for dense factorizaiton*/
 
+    Int *lacList;          /* sieze m+nf least active column of each element 
+                              el_colIndex[el->lac]  == lacList [e]
+                              number of element*/
 
     double *scale_row;              /* the array for row scaling */
 
@@ -489,7 +492,7 @@ Int bin_srch_ind (Int *srt_lst, Int *ind_lst, Int l, Int r, Int num);
 Int bin_srch_col (Int *srt_lst, Int l, Int r, Int num);
 Int bin_srch (Int *srt_lst, Int l, Int r, Int num);
 
-void paru_make_heap(paru_matrix *paruMatInfo, Int f );
+void paru_make_heap (Int f, paru_matrix *paruMatInfo );
 void paru_pivotal (paru_matrix *paruMatInfo,std::vector<Int> &pivotal_elements,
         Int *panel_row, Int f, cholmod_common *cc);
 int paru_intersection ( Int e, paru_Element **elementList, 

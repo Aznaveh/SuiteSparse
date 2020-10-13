@@ -38,6 +38,7 @@ void paru_pivotal (paru_matrix *paruMatInfo, std::vector<Int> &pivotal_elements,
     paru_Element **elementList = paruMatInfo->elementList;
     
     Int m = paruMatInfo-> m;
+    Int *lacList = paruMatInfo->lacList;
 #ifndef NDEBUG
     p = 1;
     PRLEVEL (p, ("%% Before making the pivotal vector:\n %%"));
@@ -46,7 +47,7 @@ void paru_pivotal (paru_matrix *paruMatInfo, std::vector<Int> &pivotal_elements,
     {
         Int elid = (*elHeap)[i];
         PRLEVEL (p, (" %ld", elid));
-        PRLEVEL (p, (" (%ld) ", lac_el(elementList, elid) ));
+        PRLEVEL (p, (" (%ld) ", lacList[elid] ));
     }
     PRLEVEL (p, ("\n"));
     Int priorEl_lac = 0;
@@ -57,7 +58,7 @@ void paru_pivotal (paru_matrix *paruMatInfo, std::vector<Int> &pivotal_elements,
     // pop from the heap and put it in pivotal_elements
     {
         Int frontEl = elHeap->front(); 
-        Int lacFel = lac_el(elementList, frontEl);
+        Int lacFel = lacList[frontEl];
         PRLEVEL (p, ("%% element = %ld col1=%ld", frontEl, col1));
         PRLEVEL (p, (" lac_el = %ld \n", lacFel));
         ASSERT (lacFel >= col1);
@@ -68,8 +69,8 @@ void paru_pivotal (paru_matrix *paruMatInfo, std::vector<Int> &pivotal_elements,
         if (elementList[frontEl] != NULL) 
             pivotal_elements.push_back(frontEl);
         std::pop_heap
-            (elHeap->begin(), elHeap->end(),[&elementList](Int a, Int b)
-             { return lac_el(elementList,a) > lac_el(elementList,b); }   );
+            (elHeap->begin(), elHeap->end(),
+             [&lacList](Int a, Int b) { return lacList[a] > lacList[b]; } );
         elHeap->pop_back();
 #ifndef NDEBUG
         //ensure the vector is sorted based on first column
@@ -88,7 +89,7 @@ void paru_pivotal (paru_matrix *paruMatInfo, std::vector<Int> &pivotal_elements,
         {
             Int elid = (*elHeap)[i];
             Int pelid = (*elHeap)[(i-1)/2]; //parent id
-            ASSERT ( lac_el(elementList,pelid) <= lac_el(elementList,elid));
+            ASSERT ( lacList[pelid] <= lacList[elid]);
         }
     }
 #endif
@@ -138,7 +139,7 @@ void paru_pivotal (paru_matrix *paruMatInfo, std::vector<Int> &pivotal_elements,
 
         PRLEVEL (p, ("current element(%ld) ", e ));
         PRLEVEL (p, ("lac = %ld ",  el->lac));
-        PRLEVEL (p, ("lac_col = %ld\n ", lac_el(elementList, e) ));
+        PRLEVEL (p, ("lac_col = %ld\n ", lacList[e] ));
 
         Int mEl = el->nrows;
         Int nEl = el->ncols;
@@ -197,14 +198,13 @@ void paru_pivotal (paru_matrix *paruMatInfo, std::vector<Int> &pivotal_elements,
 #endif 
             ASSERT (rowCount == stl_rowSet.size());
         }
-        panel_row [( lac_el(elementList,e) - col1) / panel_width] = rowCount;
+        panel_row [( lacList[e] - col1) / panel_width] = rowCount;
 #ifndef NDEBUG 
         p = 1;
         PRLEVEL (p, ("%%rowCount=%ld", rowCount));
-        PRLEVEL (p, (" lac=%ld", lac_el(elementList,e)));
-        ASSERT (( lac_el(elementList,e) - col1) / panel_width < num_panels);
-        PRLEVEL (p, (" ind.=%ld\n", 
-                    (lac_el(elementList,e) - col1) / panel_width));
+        PRLEVEL (p, (" lac=%ld", lacList[e] ) );
+        ASSERT (( lacList[e] - col1) / panel_width < num_panels);
+        PRLEVEL (p, (" ind.=%ld\n", (lacList[e] - col1) / panel_width));
 #endif 
     }
 
@@ -327,7 +327,7 @@ void paru_pivotal (paru_matrix *paruMatInfo, std::vector<Int> &pivotal_elements,
         if (el == NULL) continue;
         PRLEVEL (p, ("current element(%ld) %p", e, el ));
         PRLEVEL (p, ("lac = %ld ",  el->lac));
-        PRLEVEL (p, ("col = %ld\n ", lac_el(elementList, e) ));
+        PRLEVEL (p, ("col = %ld\n ", lacList[e] ));
 
 
         //Int *el_colIndex = colIndex_pointer (el);
@@ -410,6 +410,7 @@ void paru_pivotal (paru_matrix *paruMatInfo, std::vector<Int> &pivotal_elements,
         if (elementList[e] != NULL )
         {
             el->lac = cEl;
+            lacList[e] = lac_el(elementList, e);
             pivotal_elements [ii++] = pivotal_elements [i];
             ASSERT (cEl < nEl);
             PRLEVEL (1, ("%%el->lac= %ld ",el->lac));

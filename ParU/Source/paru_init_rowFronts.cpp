@@ -110,6 +110,7 @@ paru_matrix *paru_init_rowFronts (
 
 
 
+ 
     work_struct *Work= (work_struct*) paru_alloc (1, sizeof (work_struct), cc);
     if (Work == NULL)
     {   //out of memory
@@ -129,6 +130,16 @@ paru_matrix *paru_init_rowFronts (
 
     PRLEVEL (1, ("%% Work =%p\n ", Work));
     paruMatInfo->Work = Work;
+
+    Int *lacList =  (Int*) paru_alloc (m+nf, sizeof (Int), cc);
+    if (lacList == NULL)
+    {   //out of memory
+        paru_freemat (&paruMatInfo, cc);
+        printf ("Out of memory: lacList\n");
+        return NULL;
+    }
+
+    paruMatInfo->lacList = lacList;
 
 #ifdef COUNT_FLOPS
     //flop count info init
@@ -448,6 +459,7 @@ paru_matrix *paru_init_rowFronts (
              }
          }
          el_colrowIndex[j++] = row;  //initializing element row index 
+         paruMatInfo->lacList [e] = lac_el (elementList, e);
      }
 
      PRLEVEL (0, ("];\n") );

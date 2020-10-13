@@ -104,7 +104,7 @@ int paru_front ( paru_matrix *paruMatInfo,
 
     /************ Making the heap from list of the immediate children ******/
     PRLEVEL (1, ("%% Next: work on the heap \n"));
-    paru_make_heap(paruMatInfo, f);
+    paru_make_heap(f, paruMatInfo);
     PRLEVEL (1, ("%% Done: work on the heap \n"));
 
     /********************** pivotal column assembly  **************************/
@@ -380,11 +380,11 @@ int paru_front ( paru_matrix *paruMatInfo,
                     curRowIndex, curFsRowIndex, colIndex, colHash);
 
 
-            //FLIP(el_rowIndex[curRowIndex]); //marking column as assembled
+            //FLIP(el_rowIndex[curRowIndex]); //marking row assembled
             el_rowIndex[curRowIndex] = -1;
             rowRelIndex [curRowIndex] = -1;
             el->nrowsleft--;  
-            if (el->nrowsleft == 0)
+            if (el->nrowsleft == 0) 
             { //free el
                 Int tot_size = sizeof(paru_Element) +
                     sizeof(Int)*(2*(mEl+nEl)) + sizeof(double)*nEl*mEl;
@@ -489,6 +489,8 @@ int paru_front ( paru_matrix *paruMatInfo,
     //Int *el_colIndex = colIndex_pointer (curEl);
     Int *el_colIndex = (Int*)(curEl+1);
     curEl->lac = 0;
+    Int *lacList = paruMatInfo->lacList;
+    lacList[eli] = fcolList[0];
     for (Int i = 0; i < colCount; ++ i) 
         el_colIndex [i] = fcolList[i];
     Int *el_rowIndex = rowIndex_pointer (curEl);
@@ -575,18 +577,16 @@ int paru_front ( paru_matrix *paruMatInfo,
     {
         Int elid = (*curHeap)[i];
         Int pelid = (*curHeap)[(i-1)/2]; //parent id
-        if( lac_el(elementList,pelid) > lac_el(elementList,elid))
-            PRLEVEL (p,("BEF %ld(%ld) ", elid, lac_el(elementList, elid) ));
-            PRLEVEL (p,("BEF parent %ld(%ld)\n\n ",
-                        pelid, lac_el(elementList, pelid) ));
-        //ASSERT ( lac_el(elementList,pelid) <= lac_el(elementList,elid));
+        if( lacList[pelid] > lacList[elid])
+            PRLEVEL (p,("BEF %ld(%ld) ", elid, lacList[elid] ));
+            PRLEVEL (p,("BEF parent %ld(%ld)\n\n ", pelid, lacList[pelid] ));
+        //ASSERT ( lacList[pelid] <= lacList[elid]);
     }
 #endif
 
 
     curHeap->push_back(eli);
-    auto greater = [&elementList](Int a, Int b)
-    { return lac_el(elementList,a) > lac_el(elementList,b); };
+    auto greater = [&lacList](Int a, Int b){ return lacList[a] > lacList[b]; };
     std::push_heap(curHeap->begin(), curHeap->end(), greater);
 
     for(Int i=0 ; i < pivotal_elements.size(); i++)
@@ -610,16 +610,16 @@ int paru_front ( paru_matrix *paruMatInfo,
     for(Int i = 0; i < curHeap->size(); i++)
     {
         Int elid = (*curHeap)[i];
-        PRLEVEL (p, (" %ld(%ld) ", elid, lac_el(elementList, elid) ));
+        PRLEVEL (p, (" %ld(%ld) ", elid, lacList[elid] ));
     }
     PRLEVEL (p, ("\n"));
     for(Int i = curHeap->size()-1 ; i > 0; i--)
     {
         Int elid = (*curHeap)[i];
         Int pelid = (*curHeap)[(i-1)/2]; //parent id
-        if( lac_el(elementList,pelid) > lac_el(elementList,elid))
-            PRLEVEL (p, ("ATT %ld(%ld)\n\n ", elid, lac_el(elementList, elid)));
-        //ASSERT ( lac_el(elementList,pelid) <= lac_el(elementList,elid));
+        if( lacList[pelid] > lacList[elid])
+            PRLEVEL (p, ("ATT %ld(%ld)\n\n ", elid, lacList[elid]));
+        //ASSERT ( lacList[pelid] <= lacList[elid]);
     }
 #endif
 

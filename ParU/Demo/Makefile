@@ -38,8 +38,8 @@ VGFLAGS = --leak-check=yes  --log-file="valgrindlogfile.log"\
 val:
 
 #	valgrind	$(VGFLAGS)	./umfout < ../Matrix/ParUTst/tmp.mtx
-#	valgrind	$(VGFLAGS)	./umfout < ../Matrix/west0067.mtx 
-	valgrind	$(VGFLAGS)	./umfout < ../Matrix/b1_ss.mtx
+	valgrind	$(VGFLAGS)	./umfout < ../Matrix/west0067.mtx 
+#	valgrind	$(VGFLAGS)	./umfout < ../Matrix/b1_ss.mtx
 
 	
 debug:
@@ -48,8 +48,8 @@ debug:
 	$(C) $(FLAG) -g umf_test.cpp -o umfout $(LIBS)
 #	gdb ./umfout < ../Matrix/c32.mtx		#3x2 	
 
-gprofile:
-	$(C) $(FLAG) -no-pie -O0 -g -pg umf_test.cpp -o gprof.o $(LIBS)
+prof:
+	$(C) $(FLAG) -no-pie -O0  -pg umf_test.cpp -o gprof.o $(LIBS)
 	./gprof.o < ../Matrix/west0067.mtx 
 	gprof gprof.o > analysis.txt
 
