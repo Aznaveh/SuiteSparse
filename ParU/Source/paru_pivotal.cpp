@@ -114,13 +114,14 @@ void paru_pivotal (paru_matrix *paruMatInfo, std::vector<Int> &pivotal_elements,
 
 
 #ifndef NDEBUG
-    p = 1;
+    p = 0;
     PRLEVEL (p, ("%% pivotal columns eli(%ld): ", eli));
     for(Int i=0 ; i < pivotal_elements.size(); i++)
         PRLEVEL (p, ("%ld ", pivotal_elements[i]));
     PRLEVEL (p, ("\n"));
     std::set<Int> stl_rowSet;
     std::set<Int>::iterator it;
+    p = 1;
 #endif 
     Int panel_width = paruMatInfo->panel_width;
     Int fp = col2 - col1;   /* first fp columns are pivotal */ 
@@ -426,15 +427,18 @@ void paru_pivotal (paru_matrix *paruMatInfo, std::vector<Int> &pivotal_elements,
 
     }
 
-    if ( ii+1 < pivotal_elements.size())
+#ifndef NDEBUG
+    p = 0;
+#endif
+    if ( ii < pivotal_elements.size())
     {
-        PRLEVEL (1, ("%% pivotal size was %ld ", pivotal_elements.size()));
-        PRLEVEL (1, ("%% and now is %ld\n ", ii+1));
-        pivotal_elements.resize(ii+1);
+        PRLEVEL (p, ("%% pivotal size was %ld ", pivotal_elements.size()));
+        PRLEVEL (p, ("%% and now is %ld\n ", ii));
+        pivotal_elements.resize(ii);
     }
 
 #ifndef NDEBUG
-    p = 1;
+    p = 0;
     PRLEVEL (p, ("%% pivotal columns eli(%ld) after resizing: ", eli));
     for(Int i=0 ; i < pivotal_elements.size(); i++)
         PRLEVEL (p, ("%ld ", pivotal_elements[i]));

@@ -11,8 +11,9 @@
 void perc_down (Int i, Int *lacList, std::vector<Int> &heap)
     // ith position should go down into the tree to find its proper position
 {
-    DEBUGLEVEL(0);
-    while (2*i+1 <= heap.size() )
+    DEBUGLEVEL(1);
+    PRLEVEL (0, ("%%haepsize = %ld\n", heap.size() ));
+    while (2*i+1 < heap.size() )
     {
         Int child1 = 2*i+1; // left
         Int child2 = 2*i+2; // right
@@ -64,12 +65,13 @@ void remove_heap (Int i, Int *lacList, std::vector<Int> &heap)
     // lacList contatine keys of the min heap
     // i index /heap[i] element/ lacList[heap[i]] key/
 {
-    DEBUGLEVEL(0);
+    DEBUGLEVEL(1);
+    PRLEVEL (0, ("%%Removing %ld\n", i));
     Int e = heap [i] = heap.back();
     PRLEVEL (1, (" %ld-%ld(%ld)\n", i, e, lacList [e]));
-    Int p = (i-1)/2;
-    Int parEl = heap [p];  //parent element
-    PRLEVEL (1, ("%ld-", p));
+    Int par = (i-1)/2;
+    Int parEl = heap [par];  //parent element
+    PRLEVEL (1, ("%ld-", par));
     PRLEVEL (1, ("%ld(%ld)\n", parEl, lacList [parEl]));
     if ( i == 0 || lacList [parEl] < lacList [e] )
     {
@@ -84,15 +86,16 @@ void remove_heap (Int i, Int *lacList, std::vector<Int> &heap)
         {
             //swap
             heap [i] = parEl;
-            heap [p] = e;
-            i = p;
-            p = (i-1)/2;
-            parEl = heap [p];  //parent element
+            heap [par] = e;
+            i = par;
+            par = (i-1)/2;
+            parEl = heap [par];  //parent element
             e = heap [i]; 
         }
     }
     heap.pop_back();
 #ifndef NDEBUG  
+    Int p = 0;
     //chekcing the heap
     for(Int i = heap.size()-1 ; i > 0; i--)
     {
@@ -203,11 +206,11 @@ void paru_prior_assemble ( Int f, Int start_fac,
         pivotal_elements [ii++] = pivotal_elements [i];
     }
 
-    if ( ii+1 < pivotal_elements.size())
+    if ( ii < pivotal_elements.size())
     {
         PRLEVEL (p, ("%% Prior: size was %ld ", pivotal_elements.size()));
-        PRLEVEL (p, (" and now is %ld\n ", ii+1));
-        pivotal_elements.resize(ii+1);
+        PRLEVEL (p, (" and now is %ld\n ", ii));
+        pivotal_elements.resize(ii);
     }
 
 
@@ -237,77 +240,82 @@ void paru_prior_assemble ( Int f, Int start_fac,
 #endif
 
 
-    if ( curHeap->size() == 0 ) return;
+    //if ( curHeap->size() == 0 ) return;
+    if ( curHeap->empty() ) return;
 
     auto greater = [&lacList](Int a, Int b) {return lacList[a] > lacList[b]; };
 
     // chekc the root
-    if ( elementList [ (*curHeap)[0] ] == NULL )
-//    {
-//        std::pop_heap (curHeap->begin(), curHeap->end(), greater );
-//        curHeap->pop_back();
-//    }
-//    for(Int i = curHeap->size()-1; i > 0 ; i--)
-//    {
-//        Int e = (*curHeap)[i];
-//        paru_Element *el = elementList[e];
-//
-//        if ( el == NULL) 
-//        { //delete el from the heap
-//            remove_heap (i, lacList, (*curHeap));
-//#ifndef NDEBUG  
-//            PRLEVEL (p, ("%% Intermediate heap %ld deleted:\n %%", e))
-//            for(Int k = 0 ; k < curHeap->size(); k++)
-//            {
-//                Int ee = (*curHeap)[k];
-//                paru_Element *ell = elementList[ee];
-//                PRLEVEL (p, ("%ld-%ld", k, ee));
-//                if (ell != NULL)
-//                {PRLEVEL (p, ("(%ld) ", lacList[ee] ));}
-//                else
-//                { PRLEVEL (p, ("(*%ld) ", lacList[ee] ));}
-//            }
-//            PRLEVEL (p, ("\n"));
-//#endif
-//            continue;
-//        }
-//
-//        //if (el->rValid >= pMark && elRow[e] == 0)
-//        //{ // all the rows are inside current fron
-//        //    // assembling several columns
-//        //    if (el->cValid >= pMark &&elCol[e] < el->ncolsleft)
-//        //    {//asslemble all and delete from the heap
-//        //        paru_update_rel_ind_row (curEl, el, cc) ;
-//        //        //TODO: use exactly this withoug pop
-//        //        //std::pop_heap(elHeap->begin()+i, elHeap->end(), greater);
-//        //    }
-//        //}
-//    }
+    while ( elementList [ (*curHeap)[0] ] == NULL && curHeap->size() > 0 )
+    {
+        std::pop_heap (curHeap->begin(), curHeap->end(), greater );
+        curHeap->pop_back();
+    }
+
+    //if ( curHeap->size() == 0 ) return;
+    if ( curHeap->empty() ) return;
+
+    for(Int i = curHeap->size()-1; i > 0 ; i--)
+    {
+        Int e = (*curHeap)[i];
+        paru_Element *el = elementList[e];
+
+        if ( el == NULL) 
+        { //delete el from the heap
+            remove_heap (i, lacList, (*curHeap));
+#ifndef NDEBUG  
+            PRLEVEL (p, ("%% Intermediate heap %ld deleted:\n %%", e))
+            for(Int k = 0 ; k < curHeap->size(); k++)
+            {
+                Int ee = (*curHeap)[k];
+                paru_Element *ell = elementList[ee];
+                PRLEVEL (p, ("%ld-%ld", k, ee));
+                if (ell != NULL)
+                {PRLEVEL (p, ("(%ld) ", lacList[ee] ));}
+                else
+                { PRLEVEL (p, ("(*%ld) ", lacList[ee] ));}
+            }
+            PRLEVEL (p, ("\n"));
+#endif
+            continue;
+        }
+
+        //if (el->rValid >= pMark && elRow[e] == 0)
+        //{ // all the rows are inside current fron
+        //    // assembling several columns
+        //    if (el->cValid >= pMark &&elCol[e] < el->ncolsleft)
+        //    {//asslemble all and delete from the heap
+        //        paru_update_rel_ind_row (curEl, el, cc) ;
+        //        //TODO: use exactly this withoug pop
+        //        //std::pop_heap(elHeap->begin()+i, elHeap->end(), greater);
+        //    }
+        //}
+    }
 
     ////////////////////LOOKING AT HEAP AS A LIST //////////////////////////////
-        ii = 0;
-        for(Int i = 0 ; i < curHeap->size(); i++)
-        {
-            Int e = (*curHeap)[i];
-            paru_Element *el = elementList[e];
-    
-            if ( el == NULL )
-            {
-                continue;
-            }
-            (*curHeap)[ii++] = (*curHeap)[i];
-        }
-    
-        if ( ii+1 < curHeap->size())
-        {
-            PRLEVEL (p, ("%% Prior: size was %ld ", curHeap->size()));
-            PRLEVEL (p, (" and now is %ld\n ", ii+1));
-            curHeap->resize(ii+1);
-        }
-
-
-   ///TODO: this line should be deleted after prior is corrected
-    std::make_heap(curHeap->begin(), curHeap->end(), greater ); 
+//        ii = 0;
+//        for(Int i = 0 ; i < curHeap->size(); i++)
+//        {
+//            Int e = (*curHeap)[i];
+//            paru_Element *el = elementList[e];
+//    
+//            if ( el == NULL )
+//            {
+//                continue;
+//            }
+//            (*curHeap)[ii++] = (*curHeap)[i];
+//        }
+//    
+//        if ( ii < curHeap->size())
+//        {
+//            PRLEVEL (p, ("%% Prior: size was %ld ", curHeap->size()));
+//            PRLEVEL (p, (" and now is %ld\n ", ii));
+//            curHeap->resize(ii);
+//        }
+//
+//
+//   ///TODO: this line should be deleted after prior is corrected
+//    std::make_heap(curHeap->begin(), curHeap->end(), greater ); 
 
 
 #ifndef NDEBUG  

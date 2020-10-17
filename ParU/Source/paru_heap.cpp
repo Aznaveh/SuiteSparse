@@ -13,7 +13,7 @@ void paru_make_heap (Int f, paru_matrix *paruMatInfo)
 {
     DEBUGLEVEL(0);
 #ifndef NDEBUG  
-    Int p = 1;
+    Int p = 0;
 #endif
 
     paru_symbolic *LUsym =  paruMatInfo->LUsym;
@@ -55,6 +55,13 @@ void paru_make_heap (Int f, paru_matrix *paruMatInfo)
             biggest_Child_id = chelid;
             biggest_Child_size = cur_size;
         }
+#ifndef NDEBUG  
+    PRLEVEL (p, ("%% element ids:\n %%"));
+    for(Int i = 0; i < curHeap->size(); i++)
+        PRLEVEL (p, (" %ld", (*curHeap)[i]));
+    PRLEVEL (p, ("\n"));
+#endif
+ 
     }
     rowMarkp[eli] = rowMark;
 
@@ -111,7 +118,9 @@ void paru_make_heap (Int f, paru_matrix *paruMatInfo)
     }
 
 #ifndef NDEBUG  
-    PRLEVEL (p, ("%% element ids:\n %%"));
+    p = 0;
+
+    PRLEVEL (p, ("%% Current element ids:\n %%"));
     for(Int i = 0; i < elHeap->size(); i++)
         PRLEVEL (p, (" %ld", (*elHeap)[i]));
     PRLEVEL (p, ("\n"));

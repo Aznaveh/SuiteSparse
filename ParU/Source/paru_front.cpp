@@ -582,21 +582,25 @@ int paru_front ( paru_matrix *paruMatInfo,
             PRLEVEL (p,("BEF parent %ld(%ld)\n\n ", pelid, lacList[pelid] ));
         //ASSERT ( lacList[pelid] <= lacList[elid]);
     }
+    p = -1;
 #endif
 
 
     curHeap->push_back(eli);
     auto greater = [&lacList](Int a, Int b){ return lacList[a] > lacList[b]; };
     std::push_heap(curHeap->begin(), curHeap->end(), greater);
+    PRLEVEL (p, ("%% %ld pushed ",eli));
 
-    for(Int i=0 ; i < pivotal_elements.size(); i++)
+    for(Int i = 0 ; i < pivotal_elements.size(); i++)
     {
         Int e = pivotal_elements[i];
         paru_Element *el = elementList[e];
         if (el == NULL) continue;
+        PRLEVEL (p, ("%ld  ",e));
         curHeap->push_back(e);
         std::push_heap(curHeap->begin(), curHeap->end(), greater);
     }
+    PRLEVEL (p, ("\n"));
 
 #ifndef NDEBUG
     //Printing the contribution block after prior blocks assembly
@@ -605,7 +609,7 @@ int paru_front ( paru_matrix *paruMatInfo,
     if (p <= 0)
         paru_print_element (paruMatInfo, eli);
     //chekcing the heap
-    p = 2;
+    p = 0;
     PRLEVEL (p, ("%%Heap after removing pivotal ones\n"));
     for(Int i = 0; i < curHeap->size(); i++)
     {
