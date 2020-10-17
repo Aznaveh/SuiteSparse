@@ -11,8 +11,8 @@
 void perc_down (Int i, Int *lacList, std::vector<Int> &heap)
     // ith position should go down into the tree to find its proper position
 {
-    DEBUGLEVEL(1);
-    PRLEVEL (0, ("%%haepsize = %ld\n", heap.size() ));
+    DEBUGLEVEL(0);
+    PRLEVEL (1, ("%%haepsize = %ld\n", heap.size() ));
     while (2*i+1 < heap.size() )
     {
         Int child1 = 2*i+1; // left
@@ -65,8 +65,8 @@ void remove_heap (Int i, Int *lacList, std::vector<Int> &heap)
     // lacList contatine keys of the min heap
     // i index /heap[i] element/ lacList[heap[i]] key/
 {
-    DEBUGLEVEL(1);
-    PRLEVEL (0, ("%%Removing %ld\n", i));
+    DEBUGLEVEL(0);
+    PRLEVEL (1, ("%%Removing %ld\n", i));
     Int e = heap [i] = heap.back();
     PRLEVEL (1, (" %ld-%ld(%ld)\n", i, e, lacList [e]));
     Int par = (i-1)/2;
@@ -219,7 +219,7 @@ void paru_prior_assemble ( Int f, Int start_fac,
     std::vector<Int>* curHeap = heapList[eli];
 
 #ifndef NDEBUG  
-    p = 0;
+    p = 1;
 #endif
 
 
@@ -278,6 +278,37 @@ void paru_prior_assemble ( Int f, Int start_fac,
             PRLEVEL (p, ("\n"));
 #endif
             continue;
+        }
+
+        if (elRow [e] == 0 && elCol [e] == 0 && el->rValid >= pMark)
+        {
+            PRLEVEL (-1, ("%% Inside the heap %ld deleted:\n %%", e))
+            paru_update_rel_ind_row (curEl, el, cc) ;
+            paru_update_rel_ind_col (paruMatInfo, f, curEl, el, cc) ;
+
+            Int nEl = el->ncols;
+            Int mEl = el->nrows;
+
+            //Int *rowRelIndex = relRowInd (el);
+            Int *rowRelIndex = (Int*)(el+1) + 2*nEl +mEl;
+            //Int *colRelIndex = relColInd (el);
+            Int *colRelIndex = (Int*)(el+1) + mEl + nEl;
+
+            //double *el_Num = numeric_pointer (el);
+            double *el_Num = (double*)((Int*)(el+1) + 2*nEl+ 2*mEl);
+
+            assemble_all (el_Num, cur_Numeric, mEl, nEl, curElNrows,
+                    el->nrowsleft, el->ncolsleft, rowRelIndex, 
+                    colRelIndex);
+            // delete e
+            Int tot_size = sizeof(paru_Element) +
+                sizeof(Int)*(2*(mEl+nEl)) + sizeof(double)*nEl*mEl;
+            paru_free (1, tot_size, el, cc);
+            PRLEVEL (p, ("%%Prior assembly Free %ld  %p size %ld\n",
+                        e, el, tot_size));
+            elementList[e] = NULL;
+            remove_heap (i, lacList, (*curHeap));
+            continue; 
         }
 
         //if (el->rValid >= pMark && elRow[e] == 0)
@@ -347,6 +378,11 @@ void paru_prior_assemble ( Int f, Int start_fac,
     }
 
 #endif
+
+    // free the sorting space if allocated
+    paru_free ( 2*curElNrows, sizeof(Int), curEl->rWork, cc); 
+    curEl->rWork = NULL;
+
 
 
 }
