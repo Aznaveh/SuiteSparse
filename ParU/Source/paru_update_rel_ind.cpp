@@ -185,7 +185,8 @@ void paru_update_rel_ind_row (paru_Element *el, paru_Element *cb_el,
 void paru_update_rel_ind_col (paru_matrix *paruMatInfo, Int f, 
         paru_Element *el, paru_Element *cb_el, cholmod_common *cc) 
 {
-    DEBUGLEVEL(0);
+    DEBUGLEVEL(1);
+    PRLEVEL (1, ("%%update relative in %ld\n", f));
 
     //Int *el_Index = colIndex_pointer (el); //col global index of destination
     Int *el_Index = (Int*)(el+1); //col global index of destination
@@ -200,8 +201,12 @@ void paru_update_rel_ind_col (paru_matrix *paruMatInfo, Int f,
     
 
     Int *fcolList = paruMatInfo->fcolList[f] ;
+    PRLEVEL (1, ("%%lac of cb %ld\n", cb_el->lac));
 
-    for (Int i=0; i < len_cb ; i++)
+    //TODO change assemble all and assemble col
+    for (Int i = 0 ; i < cb_el->lac; i++)
+            RelIndex [i] = -1;
+    for (Int i = cb_el->lac; i < len_cb ; i++)
     {
         Int global_ind = cb_el_Index[i];
         if (global_ind < 0)
@@ -215,4 +220,6 @@ void paru_update_rel_ind_col (paru_matrix *paruMatInfo, Int f,
         RelIndex [i] = found;
         ASSERT (found != -1);
     }
+    
+    PRLEVEL (1, ("%%update relative in %ld finished\n", f));
 }

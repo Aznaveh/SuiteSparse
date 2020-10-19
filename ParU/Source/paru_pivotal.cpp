@@ -114,7 +114,7 @@ void paru_pivotal (paru_matrix *paruMatInfo, std::vector<Int> &pivotal_elements,
 
 
 #ifndef NDEBUG
-    p = 0;
+    p = 1;
     PRLEVEL (p, ("%% pivotal columns eli(%ld): ", eli));
     for(Int i=0 ; i < pivotal_elements.size(); i++)
         PRLEVEL (p, ("%ld ", pivotal_elements[i]));
@@ -383,7 +383,7 @@ void paru_pivotal (paru_matrix *paruMatInfo, std::vector<Int> &pivotal_elements,
             { //free el
                 Int tot_size = sizeof(paru_Element) +
                     sizeof(Int)*(2*(mEl+nEl)) + sizeof(double)*nEl*mEl;
-                PRLEVEL (-1, ("%% Free %ld  %p size %ld\n",e, el, tot_size));
+                PRLEVEL (1, ("%% Free %ld  %p size %ld\n",e, el, tot_size));
                 paru_free (1, tot_size, el, cc);
                 elementList[e] = NULL;
                 break;
@@ -428,7 +428,7 @@ void paru_pivotal (paru_matrix *paruMatInfo, std::vector<Int> &pivotal_elements,
     }
 
 #ifndef NDEBUG
-    p = 0;
+    p = 1;
 #endif
     if ( ii < pivotal_elements.size())
     {
@@ -438,7 +438,7 @@ void paru_pivotal (paru_matrix *paruMatInfo, std::vector<Int> &pivotal_elements,
     }
 
 #ifndef NDEBUG
-    p = 0;
+    p = 1;
     PRLEVEL (p, ("%% pivotal columns eli(%ld) after resizing: ", eli));
     for(Int i=0 ; i < pivotal_elements.size(); i++)
         PRLEVEL (p, ("%ld ", pivotal_elements[i]));

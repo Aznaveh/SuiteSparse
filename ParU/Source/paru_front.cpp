@@ -282,9 +282,6 @@ int paru_front ( paru_matrix *paruMatInfo,
     paruMatInfo->fcolList[f] = fcolList;
 
 
-    //hasing from fcolList indices to column index 
-    std::unordered_map <Int, Int> colHash; 
-
     std::vector<Int>** heapList = paruMatInfo->heapList;
     std::vector<Int>* curHeap = heapList[eli];
 
@@ -300,8 +297,9 @@ int paru_front ( paru_matrix *paruMatInfo,
         return 0;
     }
 
-    //TODO: WRONG: why do I add a hash to a SET???!!
     //fcolList copy from the stl_colSet
+    //hasing from fcolList indices to column index 
+    std::unordered_map <Int, Int> colHash; 
     Int i = 0;
     for (it = stl_colSet.begin(); it != stl_colSet.end(); it++)
     {
@@ -483,6 +481,13 @@ int paru_front ( paru_matrix *paruMatInfo,
         return 0;
     }
 
+    //hasing from frowList indices to row index 
+    std::unordered_map <Int, Int> rowHash; 
+    i = 0;
+    for (Int it = fp; it < rowCount ; it++)
+    {
+        rowHash.insert({frowList[it], i++});
+    }
 
 
     // Initializing curEl global indices
@@ -536,7 +541,8 @@ int paru_front ( paru_matrix *paruMatInfo,
     paruMatInfo->time_stamp[f]++; //invalidating all the marks
     PRLEVEL (-1, ("\n%%||||  Start Finalize %ld ||||\n", f));
     //paru_finalize (paruMatInfo,  f, start_fac, cc);
-    paru_prior_assemble ( f, start_fac, pivotal_elements, paruMatInfo, cc);
+    paru_prior_assemble ( f, start_fac, pivotal_elements, 
+            rowHash, colHash, paruMatInfo, cc);
     PRLEVEL (-1, ("\n%%||||  Finish Finalize %ld ||||\n", f));
 
 
@@ -604,7 +610,7 @@ int paru_front ( paru_matrix *paruMatInfo,
 
 #ifndef NDEBUG
     //Printing the contribution block after prior blocks assembly
-    p = 0;
+    p = 1;
     PRLEVEL (p, ("\n%%After prior blocks assembly:"));
     if (p <= 0)
         paru_print_element (paruMatInfo, eli);

@@ -141,8 +141,7 @@ void assemble_all (double *s, double *d,   //source and destination
                     {  // If row is valid
 
                         ASSERT (ii < smleft);
-                        tempRel[ii] = i;
-                        ii++;
+                        tempRel[ii++] = i;
 
                         PRLEVEL (1, ("%% i=%ld, j=%ld ri=%ld ii=%ld"
                                     "first col\n", i, j,  ri,ii));

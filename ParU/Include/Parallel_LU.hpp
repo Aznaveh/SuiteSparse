@@ -43,12 +43,12 @@ extern "C"
 #endif
 
 //for printing information uncomment this; to activate assertions uncomment 
-//#undef NPR    //<<1>>
+#undef NPR    //<<1>>
 
 //from spqr.hpp
 //Aznaveh For MATLAB OUTPUT UNCOMMENT HERE
 // uncomment the following line to turn on debugging 
-//#undef NDEBUG  //<<2>>
+#undef NDEBUG  //<<2>>
 
 //uncomment if you want to count hardware flops
 //#define COUNT_FLOPS
@@ -492,14 +492,22 @@ Int bin_srch_ind (Int *srt_lst, Int *ind_lst, Int l, Int r, Int num);
 Int bin_srch_col (Int *srt_lst, Int l, Int r, Int num);
 Int bin_srch (Int *srt_lst, Int l, Int r, Int num);
 
+//heap related
 void paru_make_heap (Int f, paru_matrix *paruMatInfo );
+void perc_down (Int i, Int *lacList, std::vector<Int> &heap);
+void remove_heap (Int i, Int *lacList, std::vector<Int> &heap);
+
+
 void paru_pivotal (paru_matrix *paruMatInfo,std::vector<Int> &pivotal_elements,
         Int *panel_row, Int f, cholmod_common *cc);
+
 int paru_intersection ( Int e, paru_Element **elementList, 
         std::set<Int> &stl_colSet);
 
 void paru_prior_assemble ( Int f, Int start_fac,  
         std::vector<Int> &pivotal_elements,
+        std::unordered_map <Int, Int> rowHash, 
+        std::unordered_map <Int, Int> colHash, 
         paru_matrix *paruMatInfo,
         cholmod_common *cc);
 

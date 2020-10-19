@@ -495,7 +495,7 @@ void paru_update_rowDeg ( Int panel_num,  Int row_end, Int f, Int start_fac,
             Int curRowIndex = curTpl.f;
 
             paru_Element *el = elementList[e];
-            ASSERT (el != NULL);
+            // ASSERT (el != NULL);
             if (el == NULL) continue;
 
             //Int *el_rowIndex = rowIndex_pointer (el);
