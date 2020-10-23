@@ -371,8 +371,9 @@ void paru_pivotal (paru_matrix *paruMatInfo, std::vector<Int> &pivotal_elements,
             //double *el_Num = numeric_pointer (el);
             double *el_Num = (double*)((Int*)(el+1) + 2*nEl+ 2*mEl);
 
+            //TODO I cannot reuse the relative index because of the pivoting
+            //changes everyting
             //assemble cEl
-
             assemble_col (el_Num +cEl*mEl,
                     pivotalFront+colIndexF*rowCount,
                     mEl, rowRelIndex);

@@ -481,15 +481,6 @@ int paru_front ( paru_matrix *paruMatInfo,
         return 0;
     }
 
-    //hasing from frowList indices to row index 
-    std::unordered_map <Int, Int> rowHash; 
-    i = 0;
-    for (Int it = fp; it < rowCount ; it++)
-    {
-        rowHash.insert({frowList[it], i++});
-    }
-
-
     // Initializing curEl global indices
     //Int *el_colIndex = colIndex_pointer (curEl);
     Int *el_colIndex = (Int*)(curEl+1);
@@ -502,7 +493,13 @@ int paru_front ( paru_matrix *paruMatInfo,
     for (Int i = fp; i < rowCount; ++ i) 
     {
         Int locIndx = i-fp; 
-        el_rowIndex [locIndx] = frowList[i];
+        Int curRow = frowList [i];
+        el_rowIndex [locIndx] = curRow;
+        //Updating isRowInFront after the pivoting
+        //attention it is the old rowMark not the updated rowMarkp + eli
+        //If I decide to add rowMark I should change paru_pivotal
+        //TODO decide about adding rowMark here later // + rowMark ; 
+        isRowInFront [curRow] = locIndx ;
         PRLEVEL (1, ("%% el_rowIndex [%ld] =%ld\n",
                     locIndx, el_rowIndex [locIndx]));
     }
@@ -541,8 +538,8 @@ int paru_front ( paru_matrix *paruMatInfo,
     paruMatInfo->time_stamp[f]++; //invalidating all the marks
     PRLEVEL (-1, ("\n%%||||  Start Finalize %ld ||||\n", f));
     //paru_finalize (paruMatInfo,  f, start_fac, cc);
-    paru_prior_assemble ( f, start_fac, pivotal_elements, 
-            rowHash, colHash, paruMatInfo, cc);
+    paru_prior_assemble ( f, start_fac, 
+            pivotal_elements, colHash, paruMatInfo, cc);
     PRLEVEL (-1, ("\n%%||||  Finish Finalize %ld ||||\n", f));
 
 

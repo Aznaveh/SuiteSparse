@@ -10,7 +10,8 @@
 
 #include "Parallel_LU.hpp"
 
-void assemble_col (const double *sC, double *dC,   //source col and destination col
+void assemble_col (const double *sC,  //source col and destination col
+        double *dC,
         Int m, const Int *relRowInd)
 {
     DEBUGLEVEL (0);

@@ -137,6 +137,9 @@ void paru_make_heap (Int f, paru_matrix *paruMatInfo)
     Int biggest_Child_size = -1;
     Int tot_size = 0; 
     work_struct *Work =  paruMatInfo->Work;
+    //TODO updating rowMark should go to pivotal update out of here
+    // Put a part of this into pivotal and a part into heap for after prior
+    // block assembly
     Int *rowMarkp = Work->rowMark;
     Int rowMark = 0;
     for (Int i = aChildp[eli]; i <= aChildp[eli+1]-1; i++) 

@@ -10,7 +10,6 @@
 
 void paru_prior_assemble ( Int f, Int start_fac,  
         std::vector<Int> &pivotal_elements,
-        std::unordered_map <Int, Int> rowHash, 
         std::unordered_map <Int, Int> colHash, 
         paru_matrix *paruMatInfo,
         cholmod_common *cc)
@@ -54,6 +53,7 @@ void paru_prior_assemble ( Int f, Int start_fac,
     PRLEVEL (p, ("%%Inside prior\n"));
     PRLEVEL (p, ("%% pivotal size is %ld ", pivotal_elements.size()));
     Int ii = 0;
+    //TODO the relative indecis are valid
     for(Int i = 0 ; i < pivotal_elements.size(); i++)
     {
         Int e = pivotal_elements[i];
@@ -86,9 +86,11 @@ void paru_prior_assemble ( Int f, Int start_fac,
             double *el_Num = (double*)((Int*)(el+1) + 2*nEl+ 2*mEl);
 
             PRLEVEL (p, ("%%assembling %ld in %ld\n", e, el_ind));
-            assemble_all (el_Num, cur_Numeric, mEl, nEl, curElNrows,
-                    el->nrowsleft, el->ncolsleft, rowRelIndex, 
-                    colRelIndex);
+            PRLEVEL (p, ("%% size %ld x %ld\n", mEl, nEl));
+            paru_eliminate (e, f, colHash, paruMatInfo);
+//            assemble_all (el_Num, cur_Numeric, mEl, nEl, curElNrows,
+//                    el->nrowsleft, el->ncolsleft, rowRelIndex, 
+//                    colRelIndex);
             PRLEVEL (p, ("%%assembling %ld in %ld done\n", e, el_ind));
             // delete e
             Int tot_size = sizeof(paru_Element) +
