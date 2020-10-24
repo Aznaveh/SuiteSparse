@@ -13,7 +13,7 @@
  * @author Aznaveh
  * */
 
-
+//TODO: I can romove this file totally
 void inline swap_key(Int *srt_lst,Int *ind_lst, Int i, Int j )
 {
     Int tmp = srt_lst[i]; srt_lst[i] = srt_lst[j]; srt_lst[j] = tmp;
@@ -90,97 +90,6 @@ void paru_sort (Int *srt_lst, Int *ind_lst, Int len)
 #endif
 }
 
-
-void paru_update_rel_ind_row (paru_Element *el, paru_Element *cb_el, 
-        cholmod_common *cc) 
-{
-    DEBUGLEVEL(0);
-
-    //row relative index update
-    //Int *el_Index = rowIndex_pointer (el);
-    Int nEl = el->ncols;
-    Int len_el = el->nrows;
-    Int *el_Index = (Int*)(el+1)+nEl; // row global index of destination
-    //Int *cb_el_Index = rowIndex_pointer (cb_el);
-    Int nCbEl = cb_el->ncols;
-    Int len_cb = cb_el->nrows;
-    Int *cb_el_Index = (Int*)(cb_el+1)+nCbEl; // row global index of source
-    // relative rowcol index of source to be updated
-    //Int *RelIndex = relRowInd (cb_el);
-    Int *RelIndex = (Int*)(cb_el+1)+ 2*nCbEl + len_cb; 
-    Int *Work = el->rWork;
-
-
-    if (len_cb*len_el < (len_cb+len_el)*log2(len_el) && Work == NULL )
-    {
-        //do a linear search if not sorted already and it is not  worth it
-        PRLEVEL (1, ("%% Linear search\n"));
-        for (Int i=0; i < len_cb ; i++)
-        {
-            Int global_ind = cb_el_Index[i];
-            if (global_ind < 0) continue;
-            PRLEVEL (1, ("%% searching for: cb_index[%ld]=%ld\n",
-                        i,  global_ind));
-#ifndef NDEBUG
-            Int found = -1;
-#endif
-            //linear search for global_ind in contribution block
-            for(Int i2 =0; i2 < len_el ; i2++)
-                if (global_ind == el_Index[i2])
-                {
-                    RelIndex[i]=i2;
-#ifndef NDEBUG
-                    PRLEVEL (1, ("%%\t found in %ld\n", i2));
-                    found = 1;
-#endif
-                    continue;
-                }
-#ifndef NDEBUG
-            if(found != 1)
-                PRLEVEL (0, ("%%t Not found in %ld \n",global_ind));
-            ASSERT (found == 1);
-
-#endif
-        }
-    } 
-    else
-    {
-
-
-        PRLEVEL (1, ("%% Sort and Binary search\n"));
-        if (Work == NULL )
-        {  //Not sorted so far
-            Work= (Int*) paru_alloc (2*len_el, sizeof(Int), cc);
-            el->rWork = Work;
-
-            Int *srt_lst = Work;      // list of relative indices; keys of sort   
-            Int *ind_lst = Work + len_el; //list of indices 
-
-            for (Int i=0; i < len_el ; i++)
-            {  //initialize the lists
-                srt_lst[i] = el_Index [i];
-                ind_lst[i] = i;
-            }
-            paru_sort (srt_lst, ind_lst, len_el);
-        }
-
-        ASSERT (Work != NULL );
-        Int *srt_lst = Work;      // list of relative indices; keys of sort   
-        Int *ind_lst = Work + len_el; //list of indices 
-
-        for (Int i=0; i < len_cb ; i++)
-        {
-            Int global_ind = cb_el_Index[i];
-            if (global_ind < 0) continue;
-            PRLEVEL (1, ("%% searching for: cb_index[%ld]=%ld\n",
-                        i,  global_ind));
-            Int found = bin_srch_ind 
-                (srt_lst, ind_lst, 0, len_el-1, global_ind);
-            RelIndex [i] = found;
-            ASSERT (found != -1);
-        }
-    }
-}
 
 void paru_update_rel_ind_col (paru_matrix *paruMatInfo, Int f, 
         paru_Element *el, paru_Element *cb_el, cholmod_common *cc) 

@@ -57,9 +57,7 @@ OBJ = \
 	paru_dgemm.o\
 	paru_print.o\
 	paru_init_rel.o\
-	paru_update_rel_ind.o\
 	paru_update_rowDeg.o\
-	paru_finalize.o\
 	paru_write.o\
 	paru_cumsum.o\
 	paru_intersection.o\
@@ -145,16 +143,10 @@ paru_print.o: ../Source/paru_print.cpp
 paru_init_rel.o: ../Source/paru_init_rel.cpp
 	$(C) -c $<
 
-paru_update_rel_ind.o: ../Source/paru_update_rel_ind.cpp
-	$(C) -c $<
-
 paru_write.o: ../Source/paru_write.cpp
 	$(C) -c $<
 
 paru_update_rowDeg.o: ../Source/paru_update_rowDeg.cpp
-	$(C) -c $<
-
-paru_finalize.o: ../Source/paru_finalize.cpp
 	$(C) -c $<
 
 paru_cumsum.o: ../Source/paru_cumsum.cpp

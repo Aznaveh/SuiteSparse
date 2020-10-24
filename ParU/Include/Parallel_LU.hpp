@@ -250,7 +250,6 @@ typedef struct
         ncols,		/* number of columns */
         rValid,     /* validity of relative row index */
         cValid;     /* validity of relative column index */
-    Int *rWork;     /* work space for current front; basically for sort */
 
     Int lac;    // least active column which is active
                 // 0 <= lac <= ncols
@@ -469,11 +468,8 @@ void paru_print_element (paru_matrix *paruMatInfo, Int e);
 void paru_print_tupleList (tupleList *listSet, Int index);
 void paru_init_rel (paru_matrix *paruMatInfo, Int f);
 
-void paru_update_rel_ind_row (paru_Element *el, paru_Element *cb_el, 
-        cholmod_common *cc );
 void paru_update_rel_ind_col (paru_matrix *paruMatInfo, Int f, 
         paru_Element *el, paru_Element *cb_el, cholmod_common *cc );
-
 
 
 void paru_write( paru_matrix *paruMatInfo, int scale, 
@@ -484,8 +480,7 @@ void paru_update_rowDeg ( Int panel_num,  Int row_end,
         std::vector<Int> &pivotal_elements,
         paru_matrix *paruMatInfo);
 
-void paru_finalize (paru_matrix *paruMatInfo, Int f, Int start_fac, 
-        cholmod_common *cc);
+
 Int paru_cumsum (Int n, Int *X);
 
 Int bin_srch_ind (Int *srt_lst, Int *ind_lst, Int l, Int r, Int num);

@@ -70,9 +70,9 @@ void paru_prior_assemble ( Int f, Int start_fac,
             // it can be eliminated fully
             // both a pivotal column and pivotal row
         {//TODO asselmble all and delete from the pivotal_elements
-            paru_update_rel_ind_row (curEl, el, cc) ;
+            //paru_update_rel_ind_row (curEl, el, cc) ;
             PRLEVEL (p, ("%%pivotal element rel col update %ld \n", e));
-            paru_update_rel_ind_col (paruMatInfo, f, curEl, el, cc) ;
+            //paru_update_rel_ind_col (paruMatInfo, f, curEl, el, cc) ;
 
             Int nEl = el->ncols;
             Int mEl = el->nrows;
@@ -187,9 +187,9 @@ void paru_prior_assemble ( Int f, Int start_fac,
         if (elRow [e] == 0 && elCol [e] == 0 && el->rValid >= pMark)
         {
             PRLEVEL (-1, ("%% Inside the heap %ld deleted:\n %%", e))
-            paru_update_rel_ind_row (curEl, el, cc) ;
+            //paru_update_rel_ind_row (curEl, el, cc) ;
             PRLEVEL (p, ("%%heap element rel col update %ld \n", e));
-            paru_update_rel_ind_col (paruMatInfo, f, curEl, el, cc) ;
+            //paru_update_rel_ind_col (paruMatInfo, f, curEl, el, cc) ;
 
             Int nEl = el->ncols;
             Int mEl = el->nrows;
@@ -202,9 +202,10 @@ void paru_prior_assemble ( Int f, Int start_fac,
             //double *el_Num = numeric_pointer (el);
             double *el_Num = (double*)((Int*)(el+1) + 2*nEl+ 2*mEl);
 
-            assemble_all (el_Num, cur_Numeric, mEl, nEl, curElNrows,
-                    el->nrowsleft, el->ncolsleft, rowRelIndex, 
-                    colRelIndex);
+            paru_eliminate (e, f, colHash, paruMatInfo);
+//            assemble_all (el_Num, cur_Numeric, mEl, nEl, curElNrows,
+//                    el->nrowsleft, el->ncolsleft, rowRelIndex, 
+//                    colRelIndex);
             // delete e
             Int tot_size = sizeof(paru_Element) +
                 sizeof(Int)*(2*(mEl+nEl)) + sizeof(double)*nEl*mEl;
@@ -284,7 +285,4 @@ void paru_prior_assemble ( Int f, Int start_fac,
 
 #endif
 
-    // free the sorting space if allocated
-    paru_free ( 2*curElNrows, sizeof(Int), curEl->rWork, cc); 
-    curEl->rWork = NULL;
 }

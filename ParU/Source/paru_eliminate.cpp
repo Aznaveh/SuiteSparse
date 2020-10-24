@@ -1,13 +1,12 @@
 /** =========================================================================  /
  *  ======================  paru_eliminate ==================================  /
  *  ========================================================================= */
-/*! @brief  finding the  columns of prior element and eliminate it to the
- * current front 
+/*! @brief  finding the  columns of prior element and fully eliminate it and add
+ * it to the current front 
  *
  *  @author Aznaveh
  */
 #include "Parallel_LU.hpp"
-#define C 4
 
 void paru_eliminate ( Int e, Int f, 
         std::unordered_map <Int, Int> colHash, 
@@ -19,21 +18,20 @@ void paru_eliminate ( Int e, Int f,
     Int p = 1;
 #endif
 
-
-    //TODO bring the col list
     paru_symbolic *LUsym =  paruMatInfo->LUsym;
     Int *snM = LUsym->super2atree;
     Int eli = snM [f]; 
 
 
     paru_Element **elementList = paruMatInfo->elementList;
-    paru_Element *el = elementList[e];
 
+    paru_Element *el = elementList[e];
     paru_Element *curEl = elementList[eli];
 
     Int nEl = el->ncols;
     Int mEl = el->nrows;
  
+    //Int *el_colIndex = colIndex_pointer (el);
     Int *el_colIndex = (Int*)(el+1);
 
     //Int *rowRelIndex = relRowInd (el);
@@ -45,6 +43,7 @@ void paru_eliminate ( Int e, Int f,
     //double *el_Num = numeric_pointer (el);
     double *el_Num = (double*)((Int*)(el+1) + 2*nEl+ 2*mEl);
     // current elemnt numerical pointer
+    //double *el_Num = numeric_pointer (curEl);
     double *curEl_Num = (double*)((Int*)
             (curEl+1) + 2*curEl->nrowsleft+ 2*curEl->ncolsleft);
 
@@ -63,37 +62,55 @@ void paru_eliminate ( Int e, Int f,
     PRLEVEL (p, ("%% newColSet.size = %ld\n", colCount ));
     PRLEVEL (p, ("%% nEl = %ld\n",nEl));
 
-//    if ( el->ncolsleft == 1)
-//    {
-//        PRLEVEL (p, ("%% 1 col left\n %%"));
-//        //TODO linear time go throuh el->lac and assemble it and done
-//        double *sC = el_Num + el->lac*mEl; //source column pointer
-//        Int colind = el_colIndex [el->lac];
-//        ASSERT (colind != LONG_MAX);
-//        ASSERT (colind >= 0);
-//        double *dC = curEl_Num + colHash [colind]*curEl->nrows;
-//        Int nrowsSeen = el->nrowsleft;
-//        for (Int i = 0; i < mEl ; i++) 
-//        {
-//            Int rowIndex = el_rowIndex[i];
-//            Int ri = isRowInFront [ri];
-//            if (ri >= 0 )
-//            {
-//                PRLEVEL (1, ("%% sC [%ld] =%2.5lf \n", i, sC [i]));
-//                PRLEVEL (1, ("%% dC [%ld] =%2.5lf \n", i, dC [ri]));
-//                dC [ri ] += sC[i];
-//                PRLEVEL (1, ("%% dC [%ld] =%2.5lf \n", i, dC [ri]));
-//                if (-- nrowsSeen == 0)
-//                    break;
-//            }
-//        }
-//        PRLEVEL (1, ("\n"));
-//    }
-//    else
+    if ( el->ncolsleft == 1)
+    {
+        PRLEVEL (p, ("%% 1 col left\n %%"));
+        double *sC = el_Num + mEl*el->lac; //source column pointer
+        Int colInd = el_colIndex [el->lac];
+        PRLEVEL (1, ("%% colInd =%ld \n", colInd));
+        ASSERT (colInd >= 0);
+        double *dC = curEl_Num + colHash [colInd]*curEl->nrows;
+        PRLEVEL (1, ("%% colHash = %ld \n", colHash [colInd] ));
+        Int nrowsSeen = el->nrowsleft;
+        for (Int i = 0; i < mEl ; i++) 
+        {
+            Int rowInd = el_rowIndex[i];
+            PRLEVEL (1, ("%% rowInd =%ld \n", rowInd));
+            if (rowInd >= 0 )
+            {
+                Int ri = isRowInFront [rowInd];
+                PRLEVEL (1, ("%% ri = %ld \n", ri));
+                PRLEVEL (1, ("%% sC [%ld] =%2.5lf \n", i, sC [i]));
+                PRLEVEL (1, ("%% dC [%ld] =%2.5lf \n", ri, dC [ri]));
+                dC [ri ] += sC[i];
+                PRLEVEL (1, ("%% dC [%ld] =%2.5lf \n", i, dC [ri]));
+                if (-- nrowsSeen == 0) break;
+            }
+        }
+
+    }
+    else
     {
         PRLEVEL (p, ("%% more than 1 col left\n %%"));
+
+        // save the structure of the rows once at first
+        Int tempRow[el->nrowsleft]; //C99 
+        Int ii = 0;
+        for (Int i = 0; i < mEl ; i++) 
+        {
+            Int rowInd = el_rowIndex[i];
+            PRLEVEL (1, ("%% rowInd =%ld \n", rowInd));
+            if (rowInd >= 0 )
+            {
+                tempRow[ii++] = i;
+                if (ii == el->nrowsleft) break;
+            }
+        }
+
+
         for (Int j = el->lac; j < nEl ; j++) 
         {
+
             PRLEVEL (1, ("%% j =%ld \n", j));
             double *sC = el_Num + mEl*j; //source column pointer
             Int colInd = el_colIndex [j];
@@ -101,22 +118,21 @@ void paru_eliminate ( Int e, Int f,
             if (colInd < 0) continue;
             double *dC = curEl_Num + colHash [colInd]*curEl->nrows;
             PRLEVEL (1, ("%% colHash = %ld \n", colHash [colInd] ));
-            Int nrowsSeen = el->nrowsleft;
-            for (Int i = 0; i < mEl ; i++) 
+
+            for (Int ii = 0; ii < el->nrowsleft; ii++) 
             {
+                Int i = tempRow[ii];
                 Int rowInd = el_rowIndex[i];
-                PRLEVEL (1, ("%% rowInd =%ld \n", rowInd));
-                if (rowInd >= 0 )
-                {
-                    Int ri = isRowInFront [rowInd];
-                    PRLEVEL (1, ("%% ri = %ld \n", ri));
-                    PRLEVEL (1, ("%% sC [%ld] =%2.5lf \n", i, sC [i]));
-                    PRLEVEL (1, ("%% dC [%ld] =%2.5lf \n", ri, dC [ri]));
-                    dC [ri ] += sC[i];
-                    PRLEVEL (1, ("%% dC [%ld] =%2.5lf \n", i, dC [ri]));
-                    if (-- nrowsSeen == 0) break;
-                }
+                Int ri = isRowInFront [rowInd];
+                
+                PRLEVEL (1, ("%% ri = %ld \n", ri));
+                PRLEVEL (1, ("%% sC [%ld] =%2.5lf \n", i, sC [i]));
+                PRLEVEL (1, ("%% dC [%ld] =%2.5lf \n", ri, dC [ri]));
+                dC [ri ] += sC[i];
+                PRLEVEL (1, ("%% dC [%ld] =%2.5lf \n", i, dC [ri]));
+
             }
+
             if (-- el->ncolsleft == 0) break;
             PRLEVEL (1, ("\n"));
         }
