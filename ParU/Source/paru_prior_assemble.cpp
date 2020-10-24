@@ -40,12 +40,7 @@ void paru_prior_assemble ( Int f, Int start_fac,
     Int rowCount= curElNrows + fp;
 
 
-
     Int colCount = curEl->ncols;
-    // double *cur_Numeric = numeric_pointer (curFr);
-    double *cur_Numeric = 
-        (double*)((Int*)(curEl+1) + 2*colCount + 2*curElNrows);
-
     Int *fcolList = paruMatInfo->fcolList[f] ;
 
     Int pMark = start_fac;
@@ -69,36 +64,12 @@ void paru_prior_assemble ( Int f, Int start_fac,
         if (el->rValid == pMark || elCol[e] == 0)
             // it can be eliminated fully
             // both a pivotal column and pivotal row
-        {//TODO asselmble all and delete from the pivotal_elements
-            //paru_update_rel_ind_row (curEl, el, cc) ;
+        {
             PRLEVEL (p, ("%%pivotal element rel col update %ld \n", e));
-            //paru_update_rel_ind_col (paruMatInfo, f, curEl, el, cc) ;
-
-            Int nEl = el->ncols;
-            Int mEl = el->nrows;
-
-            //Int *rowRelIndex = relRowInd (el);
-            Int *rowRelIndex = (Int*)(el+1) + 2*nEl +mEl;
-            //Int *colRelIndex = relColInd (el);
-            Int *colRelIndex = (Int*)(el+1) + mEl + nEl;
-
-            //double *el_Num = numeric_pointer (el);
-            double *el_Num = (double*)((Int*)(el+1) + 2*nEl+ 2*mEl);
-
             PRLEVEL (p, ("%%assembling %ld in %ld\n", e, el_ind));
             PRLEVEL (p, ("%% size %ld x %ld\n", mEl, nEl));
-            paru_eliminate (e, f, colHash, paruMatInfo);
-//            assemble_all (el_Num, cur_Numeric, mEl, nEl, curElNrows,
-//                    el->nrowsleft, el->ncolsleft, rowRelIndex, 
-//                    colRelIndex);
+            paru_eliminate (e, f, colHash, paruMatInfo, cc);
             PRLEVEL (p, ("%%assembling %ld in %ld done\n", e, el_ind));
-            // delete e
-            Int tot_size = sizeof(paru_Element) +
-                sizeof(Int)*(2*(mEl+nEl)) + sizeof(double)*nEl*mEl;
-            paru_free (1, tot_size, el, cc);
-            PRLEVEL (p, ("%%Prior assembly Free %ld  %p size %ld\n",
-                        e, el, tot_size));
-            elementList[e] = NULL;
             continue; 
         }
 
@@ -187,32 +158,8 @@ void paru_prior_assemble ( Int f, Int start_fac,
         if (elRow [e] == 0 && elCol [e] == 0 && el->rValid >= pMark)
         {
             PRLEVEL (-1, ("%% Inside the heap %ld deleted:\n %%", e))
-            //paru_update_rel_ind_row (curEl, el, cc) ;
             PRLEVEL (p, ("%%heap element rel col update %ld \n", e));
-            //paru_update_rel_ind_col (paruMatInfo, f, curEl, el, cc) ;
-
-            Int nEl = el->ncols;
-            Int mEl = el->nrows;
-
-            //Int *rowRelIndex = relRowInd (el);
-            Int *rowRelIndex = (Int*)(el+1) + 2*nEl +mEl;
-            //Int *colRelIndex = relColInd (el);
-            Int *colRelIndex = (Int*)(el+1) + mEl + nEl;
-
-            //double *el_Num = numeric_pointer (el);
-            double *el_Num = (double*)((Int*)(el+1) + 2*nEl+ 2*mEl);
-
-            paru_eliminate (e, f, colHash, paruMatInfo);
-//            assemble_all (el_Num, cur_Numeric, mEl, nEl, curElNrows,
-//                    el->nrowsleft, el->ncolsleft, rowRelIndex, 
-//                    colRelIndex);
-            // delete e
-            Int tot_size = sizeof(paru_Element) +
-                sizeof(Int)*(2*(mEl+nEl)) + sizeof(double)*nEl*mEl;
-            paru_free (1, tot_size, el, cc);
-            PRLEVEL (p, ("%%Prior assembly Free %ld  %p size %ld\n",
-                        e, el, tot_size));
-            elementList[e] = NULL;
+            paru_eliminate (e, f, colHash, paruMatInfo, cc);
             remove_heap (i, lacList, (*curHeap));
             continue; 
         }

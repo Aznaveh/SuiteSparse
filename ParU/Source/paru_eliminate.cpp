@@ -10,7 +10,8 @@
 
 void paru_eliminate ( Int e, Int f, 
         std::unordered_map <Int, Int> colHash, 
-        paru_matrix *paruMatInfo)
+        paru_matrix *paruMatInfo,
+        cholmod_common *cc)
 
 {
     DEBUGLEVEL(1);
@@ -137,4 +138,11 @@ void paru_eliminate ( Int e, Int f,
             PRLEVEL (1, ("\n"));
         }
     }
+
+    Int tot_size = sizeof(paru_Element) +
+        sizeof(Int)*(2*(mEl+nEl)) + sizeof(double)*nEl*mEl;
+    paru_free (1, tot_size, el, cc);
+    PRLEVEL (p, ("%%Eliminate assembly Free %ld  %p size %ld\n",
+                e, el, tot_size));
+    elementList[e] = NULL;
 }
