@@ -32,72 +32,63 @@ void paru_pivotal (paru_matrix *paruMatInfo, std::vector<Int> &pivotal_elements,
     Int *Super = LUsym->Super;
     Int col1 = Super [f];       /* fornt F has columns col1:col2-1 */
     Int col2 = Super [f+1];
-
+    Int *aChild = LUsym->aChild;
+    Int *aChildp = LUsym->aChildp;
+ 
 
     std::vector<Int>* elHeap = heapList[eli] ;
     paru_Element **elementList = paruMatInfo->elementList;
     
     Int m = paruMatInfo-> m;
     Int *lacList = paruMatInfo->lacList;
-#ifndef NDEBUG
-    p = 1;
-    PRLEVEL (p, ("%% Before making the pivotal vector:\n %%"));
-    PRLEVEL (p, ("%% element ids:\n %%"));
-    for(Int i = 0; i < elHeap->size(); i++)
-    {
-        Int elid = (*elHeap)[i];
-        PRLEVEL (p, (" %ld", elid));
-        PRLEVEL (p, (" (%ld) ", lacList[elid] ));
-    }
-    PRLEVEL (p, ("\n"));
-    Int priorEl_lac = 0;
-#endif 
-
-    /*****  making the list of elements that contribute to pivotal columns ****/
-    while (elHeap->size() > 0) 
-    // pop from the heap and put it in pivotal_elements
-    {
-        Int frontEl = elHeap->front(); 
-        Int lacFel = lacList[frontEl];
-        PRLEVEL (p, ("%% element = %ld col1=%ld", frontEl, col1));
-        PRLEVEL (p, (" lac_el = %ld \n", lacFel));
-        ASSERT (lacFel >= col1);
-        PRLEVEL (p, ("%% elHeap->size= %ld \n", elHeap->size()));
-
-        if ( lacFel >= col2 ) break;
-
-        if (elementList[frontEl] != NULL) 
-            pivotal_elements.push_back(frontEl);
-        std::pop_heap
-            (elHeap->begin(), elHeap->end(),
-             [&lacList](Int a, Int b) { return lacList[a] > lacList[b]; } );
-        elHeap->pop_back();
-#ifndef NDEBUG
-        //ensure the vector is sorted based on first column
-        if ( lacFel < priorEl_lac )
-            PRLEVEL (p, ("%% cur= %ld prior=%ld\n", lacFel, priorEl_lac));
-        ASSERT ( lacFel >= priorEl_lac );
-        priorEl_lac = lacFel;
-#endif 
-    }
-
-#ifndef NDEBUG
-    //chekcing the heap
-    if (elHeap->size() > 0 )
-    {
-        for(Int i = elHeap->size()-1 ; i > 0; i--)
-        {
-            Int elid = (*elHeap)[i];
-            Int pelid = (*elHeap)[(i-1)/2]; //parent id
-            ASSERT ( lacList[pelid] <= lacList[elid]);
-        }
-    }
-#endif
-
 
     work_struct *Work =  paruMatInfo->Work;
     Int *rowMarkp = Work->rowMark;
-    Int rowMark = rowMarkp[eli];
+    Int rowMark = 0;
+
+
+
+    /*****  making the list of elements that contribute to pivotal columns ****/
+    for (Int i = aChildp[eli]; i <= aChildp[eli+1]-1; i++) 
+    { 
+  
+        Int chelid = aChild[i];  // element id of the child
+        // max(rowMark , child->rowMark)
+        Int f_rmark = rowMarkp[chelid];
+        rowMark = rowMark >  f_rmark ?  rowMark : f_rmark;
+
+        PRLEVEL (p, ("%% chelid = %ld\n", chelid));
+        std::vector<Int>* curHeap = heapList[chelid];
+
+        if (curHeap == nullptr) continue;
+
+        while (curHeap->size() > 0) 
+            // pop from the heap and put it in pivotal_elements
+        {
+            Int frontEl = curHeap->front(); 
+            Int lacFel = lacList[frontEl];
+            PRLEVEL (p, ("%% element = %ld col1=%ld", frontEl, col1));
+            PRLEVEL (p, (" lac_el = %ld \n", lacFel));
+            ASSERT (lacFel >= col1);
+            PRLEVEL (p, ("%% curHeap->size= %ld \n", curHeap->size()));
+
+            if ( lacFel >= col2 ) break;
+
+            if (elementList[frontEl] != NULL) 
+                pivotal_elements.push_back(frontEl);
+            std::pop_heap
+                (curHeap->begin(), curHeap->end(),
+                 [&lacList](Int a, Int b) { return lacList[a] > lacList[b]; } );
+            curHeap->pop_back();
+        }
+        if ( curHeap->empty() ) 
+        {
+            delete heapList[chelid];
+            heapList[chelid] = nullptr;
+        }
+    }
+
+    rowMarkp[eli] = rowMark;
 
     Int *isRowInFront = Work->rowSize; 
     if ( ++rowMark < 0) 

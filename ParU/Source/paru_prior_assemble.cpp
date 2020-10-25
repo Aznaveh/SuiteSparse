@@ -67,7 +67,7 @@ void paru_prior_assemble ( Int f, Int start_fac,
         {
             PRLEVEL (p, ("%%pivotal element rel col update %ld \n", e));
             PRLEVEL (p, ("%%assembling %ld in %ld\n", e, el_ind));
-            PRLEVEL (p, ("%% size %ld x %ld\n", mEl, nEl));
+            PRLEVEL (p, ("%% size %ld x %ld\n", el->nrows, el->ncols));
             paru_eliminate (e, f, colHash, paruMatInfo, cc);
             PRLEVEL (p, ("%%assembling %ld in %ld done\n", e, el_ind));
             continue; 
@@ -88,10 +88,18 @@ void paru_prior_assemble ( Int f, Int start_fac,
         pivotal_elements.resize(ii);
     }
 
+   /************ Making the heap from list of the immediate children ******/
+ //   PRLEVEL (1, ("%% Next: work on the heap \n"));
+    paru_make_heap(f, pivotal_elements, paruMatInfo);
+ //   PRLEVEL (1, ("%% Done: work on the heap \n"));
+
+
 
     Int eli = snM [f]; 
     std::vector<Int>** heapList = paruMatInfo->heapList;
     std::vector<Int>* curHeap = heapList[eli];
+
+    if ( curHeap->empty() ) return;
 
 #ifndef NDEBUG  
     p = 1;
@@ -115,66 +123,67 @@ void paru_prior_assemble ( Int f, Int start_fac,
 #endif
 
 
-    //if ( curHeap->size() == 0 ) return;
-    if ( curHeap->empty() ) return;
 
     auto greater = [&lacList](Int a, Int b) {return lacList[a] > lacList[b]; };
 
-    // chekc the root
-    while ( elementList [ (*curHeap)[0] ] == NULL && curHeap->size() > 0 )
-    {
-        std::pop_heap (curHeap->begin(), curHeap->end(), greater );
-        curHeap->pop_back();
-    }
+    // check the root
+ //   while ( elementList [ (*curHeap)[0] ] == NULL && curHeap->size() > 0 )
+ //   {
+ //       std::pop_heap (curHeap->begin(), curHeap->end(), greater );
+ //       curHeap->pop_back();
+ //   }
 
-    //if ( curHeap->size() == 0 ) return;
     if ( curHeap->empty() ) return;
 
-    for(Int i = curHeap->size()-1; i > 0 ; i--)
-    {
-        Int e = (*curHeap)[i];
-        paru_Element *el = elementList[e];
 
-        if ( el == NULL) 
-        { //delete el from the heap
-            remove_heap (i, lacList, (*curHeap));
-#ifndef NDEBUG  
-            PRLEVEL (p, ("%% Intermediate heap %ld deleted:\n %%", e))
-            for(Int k = 0 ; k < curHeap->size(); k++)
-            {
-                Int ee = (*curHeap)[k];
-                paru_Element *ell = elementList[ee];
-                PRLEVEL (p, ("%ld-%ld", k, ee));
-                if (ell != NULL)
-                {PRLEVEL (p, ("(%ld) ", lacList[ee] ));}
-                else
-                { PRLEVEL (p, ("(*%ld) ", lacList[ee] ));}
-            }
-            PRLEVEL (p, ("\n"));
-#endif
-            continue;
-        }
+//    for(Int i = curHeap->size()-1; i > 0 ; i--)
+//    {
+//        Int e = (*curHeap)[i];
+//        paru_Element *el = elementList[e];
+//
+//        if ( el == NULL) 
+//        { //delete el from the heap
+//            remove_heap (i, lacList, (*curHeap));
+//#ifndef NDEBUG  
+//            PRLEVEL (p, ("%% Intermediate heap %ld deleted:\n %%", e))
+//            for(Int k = 0 ; k < curHeap->size(); k++)
+//            {
+//                Int ee = (*curHeap)[k];
+//                paru_Element *ell = elementList[ee];
+//                PRLEVEL (p, ("%ld-%ld", k, ee));
+//                if (ell != NULL)
+//                {PRLEVEL (p, ("(%ld) ", lacList[ee] ));}
+//                else
+//                { PRLEVEL (p, ("(*%ld) ", lacList[ee] ));}
+//            }
+//            PRLEVEL (p, ("\n"));
+//#endif
+//            continue;
+//        }
+//
+//        if (elRow [e] == 0 && elCol [e] == 0 && el->rValid >= pMark)
+//        {
+//            PRLEVEL (-1, ("%% Inside the heap %ld deleted:\n %%", e))
+//            PRLEVEL (p, ("%%heap element rel col update %ld \n", e));
+//            paru_eliminate (e, f, colHash, paruMatInfo, cc);
+//            remove_heap (i, lacList, (*curHeap));
+//            continue; 
+//        }
+//
+//        //if (el->rValid >= pMark && elRow[e] == 0)
+//        //{ // all the rows are inside current fron
+//        //    // assembling several columns
+//        //    if (el->cValid >= pMark &&elCol[e] < el->ncolsleft)
+//        //    {//asslemble all and delete from the heap
+//        //        paru_update_rel_ind_row (curEl, el, cc) ;
+//        //        //TODO: use exactly this withoug pop
+//        //        //std::pop_heap(elHeap->begin()+i, elHeap->end(), greater);
+//        //    }
+//        //}
+//    }
+//
 
-        if (elRow [e] == 0 && elCol [e] == 0 && el->rValid >= pMark)
-        {
-            PRLEVEL (-1, ("%% Inside the heap %ld deleted:\n %%", e))
-            PRLEVEL (p, ("%%heap element rel col update %ld \n", e));
-            paru_eliminate (e, f, colHash, paruMatInfo, cc);
-            remove_heap (i, lacList, (*curHeap));
-            continue; 
-        }
 
-        //if (el->rValid >= pMark && elRow[e] == 0)
-        //{ // all the rows are inside current fron
-        //    // assembling several columns
-        //    if (el->cValid >= pMark &&elCol[e] < el->ncolsleft)
-        //    {//asslemble all and delete from the heap
-        //        paru_update_rel_ind_row (curEl, el, cc) ;
-        //        //TODO: use exactly this withoug pop
-        //        //std::pop_heap(elHeap->begin()+i, elHeap->end(), greater);
-        //    }
-        //}
-    }
 
     ////////////////////LOOKING AT HEAP AS A LIST //////////////////////////////
 //        ii = 0;

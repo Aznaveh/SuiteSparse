@@ -114,16 +114,17 @@ void remove_heap (Int i, Int *lacList, std::vector<Int> &heap)
 }
 
 
-void paru_make_heap (Int f, paru_matrix *paruMatInfo)
+void paru_make_heap (Int f, std::vector<Int> &pivotal_elements, 
+        paru_matrix *paruMatInfo)
 {
-    DEBUGLEVEL(0);
+    DEBUGLEVEL(1);
 #ifndef NDEBUG  
     Int p = 1;
 #endif
 
     paru_symbolic *LUsym =  paruMatInfo->LUsym;
-    Int * aChild = LUsym->aChild;
-    Int * aChildp = LUsym->aChildp;
+    Int *aChild = LUsym->aChild;
+    Int *aChildp = LUsym->aChildp;
     Int *snM = LUsym->super2atree;
     paru_Element **elementList = paruMatInfo->elementList;
     Int m = paruMatInfo-> m;
@@ -140,18 +141,12 @@ void paru_make_heap (Int f, paru_matrix *paruMatInfo)
     //TODO updating rowMark should go to pivotal update out of here
     // Put a part of this into pivotal and a part into heap for after prior
     // block assembly
-    Int *rowMarkp = Work->rowMark;
-    Int rowMark = 0;
     for (Int i = aChildp[eli]; i <= aChildp[eli+1]-1; i++) 
     { //finding the largest child
         Int chelid = aChild[i];  // element id of the child
-        // max(rowMark , child->rowMark)
-        Int f_rmark = rowMarkp[chelid];
-        rowMark = rowMark >  f_rmark ?  rowMark : f_rmark;
 
         PRLEVEL (p, ("%% chelid = %ld\n", chelid));
         std::vector<Int>* curHeap = heapList[chelid];
-        //ASSERT(curHeap != nullptr);
         PRLEVEL (p, ("%% curHeap= %p\n", curHeap));
         if (curHeap == nullptr) continue;
         Int cur_size = curHeap->size();
@@ -171,8 +166,6 @@ void paru_make_heap (Int f, paru_matrix *paruMatInfo)
 #endif
  
     }
-    rowMarkp[eli] = rowMark;
-
     Int *lacList = paruMatInfo -> lacList;
     auto greater = [&lacList](Int a, Int b){ return lacList[a] > lacList[b]; };
 
@@ -180,73 +173,98 @@ void paru_make_heap (Int f, paru_matrix *paruMatInfo)
     PRLEVEL (p+1, ("%% biggest_Child_id = %ld\n", biggest_Child_id));
     PRLEVEL (p, ("%% biggest_Child_size = %ld\n", biggest_Child_size));
 
-    //shallow copy of the biggest child
-    std::vector<Int>* elHeap = heapList[eli] = heapList[biggest_Child_id];
-    heapList[biggest_Child_id] = nullptr;
+    if (biggest_Child_id != -1) //everything already freed
+    {
 
-    //O(n) heapify of all children or O(klgn) add to the biggest child
-    if ( biggest_Child_size > HEAP_ToL*(tot_size - biggest_Child_size) )
-    { //klogn
-        PRLEVEL (p, ("%% klogn algorhtm\n"));
-        for (Int i = aChildp[eli]; i <= aChildp[eli+1]-1; i++) 
-        {   
-            Int chelid = aChild[i];  // element id of the child
-            std::vector<Int>*  chHeap = heapList[chelid];
-            if (chHeap == nullptr) continue;
-            //concatening the child and freeing the memory
-            for (Int k = 0; k < chHeap->size(); k++)
-            {
-                Int elid = (*chHeap)[k];
-                if (elementList[elid] != NULL)
+        //shallow copy of the biggest child
+        std::vector<Int>* elHeap = heapList[eli] = heapList[biggest_Child_id];
+        heapList[biggest_Child_id] = nullptr;
+
+        //O(n) heapify of all children or O(klgn) add to the biggest child
+        if ( biggest_Child_size > HEAP_ToL*(tot_size - biggest_Child_size) )
+        { //klogn
+            PRLEVEL (p, ("%% klogn algorhtm\n"));
+            for (Int i = aChildp[eli]; i <= aChildp[eli+1]-1; i++) 
+            {   
+                Int chelid = aChild[i];  // element id of the child
+                std::vector<Int>*  chHeap = heapList[chelid];
+                if (chHeap == nullptr) continue;
+                //concatening the child and freeing the memory
+                for (Int k = 0; k < chHeap->size(); k++)
                 {
-                    elHeap->push_back(elid);
-                    std::push_heap(elHeap->begin(), elHeap->end(), greater);
+                    Int elid = (*chHeap)[k];
+                    if (elementList[elid] != NULL)
+                    {
+                        elHeap->push_back(elid);
+                        std::push_heap(elHeap->begin(), elHeap->end(), greater);
+                    }
                 }
+                delete heapList[chelid];
+                heapList[chelid] = nullptr;
             }
-            delete heapList[chelid];
-            heapList[chelid] = nullptr;
         }
+        else
+        {  //heapify
+            PRLEVEL (p, ("%%heapify with the size %ld\n", tot_size));
+            for (Int i = aChildp[eli]; i <= aChildp[eli+1]-1; i++) 
+            {
+                Int chelid = aChild[i];  // element id of the child
+                std::vector<Int>* chHeap = heapList[chelid];
+                if (chHeap == nullptr) continue;
+                //concatening the child and freeing the memory
+                elHeap->insert(elHeap->end(), chHeap->begin(), chHeap->end()); 
+                PRLEVEL (1, ("%%Heap free %p id=%ld\n", heapList[chelid], chelid));
+                delete heapList[chelid];
+                heapList[chelid] = nullptr;
+                //heapifying
+                std::make_heap(elHeap->begin(), elHeap->end(), greater ); 
+            }
+        }
+
     }
     else
-    {  //heapify
-        PRLEVEL (p, ("%%heapify with the size %ld\n", tot_size));
-        for (Int i = aChildp[eli]; i <= aChildp[eli+1]-1; i++) 
-        {
-            Int chelid = aChild[i];  // element id of the child
-            std::vector<Int>* chHeap = heapList[chelid];
-            if (chHeap == nullptr) continue;
-            //concatening the child and freeing the memory
-            elHeap->insert(elHeap->end(), chHeap->begin(), chHeap->end()); 
-            PRLEVEL (1, ("%%Heap free %p id=%ld\n", heapList[chelid], chelid));
-            delete heapList[chelid];
-            heapList[chelid] = nullptr;
-            //heapifying
-            std::make_heap(elHeap->begin(), elHeap->end(), greater ); 
-        }
+    {
+        //TODO to see if we can put currentheap null
+        std::vector<Int>* elHeap = heapList[eli]  = new std::vector<Int>;
     }
 
-#ifndef NDEBUG  
-    p = 1;
 
-    PRLEVEL (p, ("%% Current element ids:\n %%"));
-    for(Int i = 0; i < elHeap->size(); i++)
-        PRLEVEL (p, (" %ld", (*elHeap)[i]));
-    PRLEVEL (p, ("\n"));
-    PRLEVEL (p, ("%% first cols:\n %%"));
-    for(Int i = 0; i < elHeap->size(); i++)
+    //fixing the current heap
+    std::vector<Int>* curHeap = heapList[eli];
+    ASSERT (curHeap != nullptr);
+
+    curHeap->push_back(eli);
+    std::push_heap(curHeap->begin(), curHeap->end(), greater);
+    PRLEVEL (p, ("%% %ld pushed ",eli));
+
+    for(Int i = 0 ; i < pivotal_elements.size(); i++)
     {
-        Int elid = (*elHeap)[i];
-        if (elid != NULL)
-            PRLEVEL (p, (" %ld", lacList[elid] ));
+        Int e = pivotal_elements[i];
+        paru_Element *el = elementList[e];
+        if (el == NULL) continue;
+        PRLEVEL (p, ("%ld  ",e));
+        curHeap->push_back(e);
+        std::push_heap(curHeap->begin(), curHeap->end(), greater);
+    }
+
+    PRLEVEL (p, ("After everything eli %ld has %ld elements\n", 
+             eli, curHeap->size() ));
+
+#ifndef NDEBUG
+    PRLEVEL (p, ("%%Heap after making it(size = %ld) \n", curHeap->size() ));
+    for(Int i = 0; i < curHeap->size(); i++)
+    {
+        Int elid = (*curHeap)[i];
+        PRLEVEL (p, (" %ld(%ld) ", elid, lacList[elid] ));
     }
     PRLEVEL (p, ("\n"));
-    //chekcing the heap or I could use is_heap
-    for(Int i = elHeap->size()-1 ; i > 0; i--)
+    for(Int i = curHeap->size()-1 ; i > 0; i--)
     {
-        Int elid = (*elHeap)[i];
-        Int pelid = (*elHeap)[(i-1)/2]; //parent id
+        Int elid = (*curHeap)[i];
+        Int pelid = (*curHeap)[(i-1)/2]; //parent id
+        if( lacList[pelid] > lacList[elid])
+            PRLEVEL (p, ("ATT %ld(%ld)\n\n ", elid, lacList[elid]));
         ASSERT ( lacList[pelid] <= lacList[elid]);
     }
-
 #endif
 }

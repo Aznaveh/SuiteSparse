@@ -155,9 +155,6 @@ void paru_update_rowDeg ( Int panel_num,  Int row_end, Int f, Int start_fac,
                 if (el->rValid >  pMark)
                     PRLEVEL (1, ("%%pMark=%ld  rVal= %ld\n", 
                                 pMark, el->rValid));
-                if ( elCol [e] >= Work -> elCMark )
-                    PRLEVEL (1, ("%% element %ld can be eaten wholly\n",e));
-                //And the rest of e is in U part 
 #endif
             }
             else  // el->rValid == pMark

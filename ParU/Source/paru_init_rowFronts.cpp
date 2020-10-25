@@ -124,9 +124,7 @@ paru_matrix *paru_init_rowFronts (
 
 
     Work->elRow= elRow;
-    Work->elRMark= 0;
     Work->elCol= elCol;
-    Work->elCMark= 0;
 
     PRLEVEL (1, ("%% Work =%p\n ", Work));
     paruMatInfo->Work = Work;

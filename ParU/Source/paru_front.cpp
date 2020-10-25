@@ -19,7 +19,7 @@ int paru_front ( paru_matrix *paruMatInfo,
         cholmod_common *cc)
 {
 
-    DEBUGLEVEL(-1);
+    DEBUGLEVEL(0);
     /* 
      * -2 Print Nothing
      * -1 Just Matlab
@@ -103,9 +103,9 @@ int paru_front ( paru_matrix *paruMatInfo,
 
 
     /************ Making the heap from list of the immediate children ******/
-    PRLEVEL (1, ("%% Next: work on the heap \n"));
-    paru_make_heap(f, paruMatInfo);
-    PRLEVEL (1, ("%% Done: work on the heap \n"));
+ //   PRLEVEL (1, ("%% Next: work on the heap \n"));
+ //   paru_make_heap(f, paruMatInfo);
+ //   PRLEVEL (1, ("%% Done: work on the heap \n"));
 
     /********************** pivotal column assembly  **************************/
     /***************  assembling the pivotal part of the front ****************/
@@ -370,9 +370,6 @@ int paru_front ( paru_matrix *paruMatInfo,
             double *el_Num =  (double*)((Int*) (el+1) + 2*nEl + 2*mEl); 
             PRLEVEL (1, ("%% element= %ld  nEl =%ld \n",e, nEl));
 
-            //TODO: fix here 
-            //           assemble_row (el_Num, uPart, mEl, nEl, fp, 
-            //                   curRowIndex, curFsRowIndex, colRelIndex);
 
             assemble_row_hash (el_Num, uPart, mEl, nEl, fp, 
                     curRowIndex, curFsRowIndex, colIndex, colHash);
@@ -571,72 +568,8 @@ int paru_front ( paru_matrix *paruMatInfo,
 
     }
 
-    //fixing the current heap
-    curHeap = heapList[eli];
-    ASSERT (curHeap != nullptr);
-#ifndef NDEBUG
-    p = 2;
-    for(Int i = curHeap->size()-1 ; i > 0; i--)
-    {
-        Int elid = (*curHeap)[i];
-        Int pelid = (*curHeap)[(i-1)/2]; //parent id
-        if( lacList[pelid] > lacList[elid])
-            PRLEVEL (p,("BEF %ld(%ld) ", elid, lacList[elid] ));
-            PRLEVEL (p,("BEF parent %ld(%ld)\n\n ", pelid, lacList[pelid] ));
-        //ASSERT ( lacList[pelid] <= lacList[elid]);
-    }
-    p = -1;
-#endif
 
-
-    curHeap->push_back(eli);
-    auto greater = [&lacList](Int a, Int b){ return lacList[a] > lacList[b]; };
-    std::push_heap(curHeap->begin(), curHeap->end(), greater);
-    PRLEVEL (p, ("%% %ld pushed ",eli));
-
-    for(Int i = 0 ; i < pivotal_elements.size(); i++)
-    {
-        Int e = pivotal_elements[i];
-        paru_Element *el = elementList[e];
-        if (el == NULL) continue;
-        PRLEVEL (p, ("%ld  ",e));
-        curHeap->push_back(e);
-        std::push_heap(curHeap->begin(), curHeap->end(), greater);
-    }
-    PRLEVEL (p, ("\n"));
-
-#ifndef NDEBUG
-    //Printing the contribution block after prior blocks assembly
-    p = 1;
-    PRLEVEL (p, ("\n%%After prior blocks assembly:"));
-    if (p <= 0)
-        paru_print_element (paruMatInfo, eli);
-    //chekcing the heap
-    p = 0;
-    PRLEVEL (p, ("%%Heap after removing pivotal ones\n"));
-    for(Int i = 0; i < curHeap->size(); i++)
-    {
-        Int elid = (*curHeap)[i];
-        PRLEVEL (p, (" %ld(%ld) ", elid, lacList[elid] ));
-    }
-    PRLEVEL (p, ("\n"));
-    for(Int i = curHeap->size()-1 ; i > 0; i--)
-    {
-        Int elid = (*curHeap)[i];
-        Int pelid = (*curHeap)[(i-1)/2]; //parent id
-        if( lacList[pelid] > lacList[elid])
-            PRLEVEL (p, ("ATT %ld(%ld)\n\n ", elid, lacList[elid]));
-        //ASSERT ( lacList[pelid] <= lacList[elid]);
-    }
-#endif
-
-
-    /* Trying to DEBUG */ 
-    Work -> elCMark += colCount;
-    Work -> elRMark += colCount;
-
-
-#ifndef NDEBUG /* chekcing isRowInFront to be zero */
+#ifndef NDEBUG /* chekcing if isRowInFront is correct */
     rowMark = rowMarkp[eli];
     Int *Sleft = LUsym->Sleft;
     for (Int i = Sleft[col1]; i < Sleft[Super[f+1]]; i++)

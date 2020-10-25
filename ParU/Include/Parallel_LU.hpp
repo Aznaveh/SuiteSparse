@@ -327,9 +327,7 @@ typedef struct
 
 
     Int *elRow;      // Initalized data structure, size m+nf 
-    Int elRMark;
     Int *elCol;      // Initalized data structure, size m+nf 
-    Int elCMark;
 
 }   work_struct;
 
@@ -488,12 +486,15 @@ Int bin_srch_col (Int *srt_lst, Int l, Int r, Int num);
 Int bin_srch (Int *srt_lst, Int l, Int r, Int num);
 
 //heap related
-void paru_make_heap (Int f, paru_matrix *paruMatInfo );
+void paru_make_heap (Int f, 
+        std::vector<Int> &pivotal_elements,
+        paru_matrix *paruMatInfo );
 void perc_down (Int i, Int *lacList, std::vector<Int> &heap);
 void remove_heap (Int i, Int *lacList, std::vector<Int> &heap);
 
 
-void paru_pivotal (paru_matrix *paruMatInfo,std::vector<Int> &pivotal_elements,
+void paru_pivotal (paru_matrix *paruMatInfo,
+        std::vector<Int> &pivotal_elements,
         Int *panel_row, Int f, cholmod_common *cc);
 
 int paru_intersection ( Int e, paru_Element **elementList, 
