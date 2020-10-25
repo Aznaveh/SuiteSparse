@@ -45,6 +45,7 @@ void paru_prior_assemble ( Int f, Int start_fac,
 
     Int pMark = start_fac;
 
+
     PRLEVEL (p, ("%%Inside prior\n"));
     PRLEVEL (p, ("%% pivotal size is %ld ", pivotal_elements.size()));
     Int ii = 0;
@@ -89,9 +90,9 @@ void paru_prior_assemble ( Int f, Int start_fac,
     }
 
    /************ Making the heap from list of the immediate children ******/
- //   PRLEVEL (1, ("%% Next: work on the heap \n"));
+    PRLEVEL (1, ("%% Next: work on the heap \n"));
     paru_make_heap(f, pivotal_elements, paruMatInfo);
- //   PRLEVEL (1, ("%% Done: work on the heap \n"));
+    PRLEVEL (1, ("%% Done: work on the heap \n"));
 
 
 
@@ -207,25 +208,9 @@ void paru_prior_assemble ( Int f, Int start_fac,
 //        }
 //
 //
-//   ///TODO: this line should be deleted after prior is corrected
-//    std::make_heap(curHeap->begin(), curHeap->end(), greater ); 
 
 
 #ifndef NDEBUG  
-    PRLEVEL (p, ("%% After assembly current heap:\n %%"));
-    for(Int k = 0 ; k < curHeap->size(); k++)
-    {
-        Int ee = (*curHeap)[k];
-        paru_Element *ell = elementList[ee];
-        PRLEVEL (p, ("%ld-%ld", k, ee));
-        if (ell != NULL)
-        {PRLEVEL (p, ("(%ld) ", lacList[ee] ));}
-        else
-        { PRLEVEL (p, ("(*%ld) ", lacList[ee] ));}
-
-    }
-    PRLEVEL (p, ("\n"));
-
     //chekcing the heap
     for(Int i = curHeap->size()-1 ; i > 0; i--)
     {

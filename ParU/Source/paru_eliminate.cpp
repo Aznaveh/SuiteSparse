@@ -14,7 +14,7 @@ void paru_eliminate ( Int e, Int f,
         cholmod_common *cc)
 
 {
-    DEBUGLEVEL(1);
+    DEBUGLEVEL(0);
 #ifndef NDEBUG  
     Int p = 1;
 #endif

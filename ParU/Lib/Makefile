@@ -83,6 +83,11 @@ ifeq ($(DEBUG),yes)
 	FLAG = -Wno-write-strings -g
 endif
 
+ifeq ($(PROF),yes)
+	#to compile with -g options use 'make DBUG=yes'
+	FLAG = -Wno-write-strings -pg
+endif
+
 
 
 
