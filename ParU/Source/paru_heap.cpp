@@ -249,7 +249,9 @@ void paru_make_heap (Int f, std::vector<Int> &pivotal_elements,
                     pivotal_elements.size()) );
         std::vector<Int>* curHeap = heapList[eli]  = new std::vector<Int>;
         //deep copy
-        *curHeap = pivotal_elements;
+        //*curHeap = pivotal_elements;
+        //swap provides a shallow copy
+        std::swap(*curHeap, pivotal_elements);
         curHeap->push_back(eli);
         std::make_heap(curHeap->begin(), curHeap->end(), greater ); 
     }

@@ -49,7 +49,7 @@ void paru_prior_assemble ( Int f, Int start_fac,
     PRLEVEL (p, ("%%Inside prior\n"));
     PRLEVEL (p, ("%% pivotal size is %ld ", pivotal_elements.size()));
     Int ii = 0;
-    //TODO the relative indecis are valid
+
     for(Int i = 0 ; i < pivotal_elements.size(); i++)
     {
         Int e = pivotal_elements[i];
@@ -62,6 +62,7 @@ void paru_prior_assemble ( Int f, Int start_fac,
         }
         PRLEVEL (p, ("%%elRow[%ld]=%ld \n",e, elRow[e]));
         ASSERT (elRow[e] == 0);
+
         if (el->rValid == pMark || elCol[e] == 0)
             // it can be eliminated fully
             // both a pivotal column and pivotal row
@@ -69,7 +70,7 @@ void paru_prior_assemble ( Int f, Int start_fac,
             PRLEVEL (p, ("%%pivotal element rel col update %ld \n", e));
             PRLEVEL (p, ("%%assembling %ld in %ld\n", e, el_ind));
             PRLEVEL (p, ("%% size %ld x %ld\n", el->nrows, el->ncols));
-            paru_eliminate (e, f, colHash, paruMatInfo, cc);
+            paru_eliminate_all (e, f, colHash, paruMatInfo, cc);
             PRLEVEL (p, ("%%assembling %ld in %ld done\n", e, el_ind));
             continue; 
         }
@@ -166,7 +167,7 @@ void paru_prior_assemble ( Int f, Int start_fac,
 //        {
 //            PRLEVEL (-1, ("%% Inside the heap %ld deleted:\n %%", e))
 //            PRLEVEL (p, ("%%heap element rel col update %ld \n", e));
-//            paru_eliminate (e, f, colHash, paruMatInfo, cc);
+//            paru_eliminate_all (e, f, colHash, paruMatInfo, cc);
 //            remove_heap (i, lacList, (*curHeap));
 //            continue; 
 //        }

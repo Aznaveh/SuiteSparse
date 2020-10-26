@@ -8,7 +8,7 @@
  */
 #include "Parallel_LU.hpp"
 
-void paru_eliminate ( Int e, Int f, 
+void paru_eliminate_all ( Int e, Int f, 
         std::unordered_map <Int, Int> colHash, 
         paru_matrix *paruMatInfo,
         cholmod_common *cc)
