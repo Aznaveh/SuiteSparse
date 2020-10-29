@@ -85,7 +85,7 @@ endif
 
 ifeq ($(PROF),yes)
 	#to compile with -g options use 'make DBUG=yes'
-	FLAG = -Wno-write-strings -pg
+	FLAG = -Wno-write-strings  -pg 
 endif
 
 

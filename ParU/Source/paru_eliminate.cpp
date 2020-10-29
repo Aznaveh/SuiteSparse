@@ -213,8 +213,8 @@ void paru_eliminate_cols ( Int e, Int f,
     paru_fac *Us =  paruMatInfo->partial_Us;
     Int colCount = Us[f].n;
 
-    ASSERT (el_colIndex[el->lac]  <= fcolList[colCount-1] );
-    ASSERT (el_colIndex[nEl-1] <= 0 || fcolList[0] <= el_colIndex[nEl-1]);
+//    ASSERT (el_colIndex[el->lac]  <= fcolList[colCount-1] );
+//    ASSERT (el_colIndex[nEl-1] <= 0 || fcolList[0] <= el_colIndex[nEl-1]);
 
 
     Int tempRow[el->nrowsleft]; //C99 

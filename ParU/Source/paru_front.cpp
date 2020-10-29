@@ -131,8 +131,9 @@ int paru_front ( paru_matrix *paruMatInfo,
      * */
 
     std::vector<Int> pivotal_elements;
+    heaps_info hi;
     PRLEVEL (1, ("%% Next: work on pivotal column assembly\n"));
-    paru_pivotal (paruMatInfo, pivotal_elements, panel_row , f, cc);
+    paru_pivotal (pivotal_elements, panel_row , f, hi, paruMatInfo, cc);
     PRLEVEL (1, ("%% Done: work on pivotal column assembly\n"));
 
     Int rowCount = paruMatInfo->frowCount[f];
@@ -536,7 +537,7 @@ int paru_front ( paru_matrix *paruMatInfo,
     PRLEVEL (-1, ("\n%%||||  Start Finalize %ld ||||\n", f));
     //paru_finalize (paruMatInfo,  f, start_fac, cc);
     paru_prior_assemble ( f, start_fac, 
-            pivotal_elements, colHash, paruMatInfo, cc);
+            pivotal_elements, colHash, hi, paruMatInfo, cc);
     PRLEVEL (-1, ("\n%%||||  Finish Finalize %ld ||||\n", f));
 
 

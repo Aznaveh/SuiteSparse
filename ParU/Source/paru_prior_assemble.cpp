@@ -11,10 +11,11 @@
 void paru_prior_assemble ( Int f, Int start_fac,  
         std::vector<Int> &pivotal_elements,
         std::unordered_map <Int, Int> colHash, 
+        heaps_info &hi,
         paru_matrix *paruMatInfo,
         cholmod_common *cc)
 {
-    DEBUGLEVEL(1);
+    DEBUGLEVEL(0);
 #ifndef NDEBUG  
     Int p = 1;
 #endif
@@ -90,7 +91,7 @@ void paru_prior_assemble ( Int f, Int start_fac,
 
     /************ Making the heap from list of the immediate children ******/
     PRLEVEL (1, ("%% Next: work on the heap \n"));
-    paru_make_heap(f, pivotal_elements, paruMatInfo);
+    paru_make_heap(f, pivotal_elements, hi, paruMatInfo);
     PRLEVEL (1, ("%% Done: work on the heap \n"));
 
 

@@ -269,6 +269,12 @@ typedef struct
 
 } paru_Element ; // contribution block
 
+typedef struct
+{
+    Int sum_size,
+        biggest_Child_size,
+        biggest_Child_id;
+} heaps_info;
 inline Int *colIndex_pointer (paru_Element *curEl)
 {    return (Int*)(curEl+1);}
 // Never ever use these functions prior to initializing ncols and nrows
@@ -488,14 +494,15 @@ Int bin_srch (Int *srt_lst, Int l, Int r, Int num);
 //heap related
 void paru_make_heap (Int f, 
         std::vector<Int> &pivotal_elements,
+        heaps_info &hi,
         paru_matrix *paruMatInfo );
 void perc_down (Int i, Int *lacList, std::vector<Int> &heap);
 void remove_heap (Int i, Int *lacList, std::vector<Int> &heap);
 
 
-void paru_pivotal (paru_matrix *paruMatInfo,
-        std::vector<Int> &pivotal_elements,
-        Int *panel_row, Int f, cholmod_common *cc);
+void paru_pivotal ( std::vector<Int> &pivotal_elements,
+        Int *panel_row, Int f, heaps_info &hi,
+        paru_matrix *paruMatInfo, cholmod_common *cc);
 
 int paru_intersection ( Int e, paru_Element **elementList, 
         std::set<Int> &stl_colSet);
@@ -503,6 +510,7 @@ int paru_intersection ( Int e, paru_Element **elementList,
 void paru_prior_assemble ( Int f, Int start_fac,  
         std::vector<Int> &pivotal_elements,
         std::unordered_map <Int, Int> colHash, 
+        heaps_info &hi,
         paru_matrix *paruMatInfo,
         cholmod_common *cc);
 

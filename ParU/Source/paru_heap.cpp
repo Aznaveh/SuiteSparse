@@ -7,7 +7,6 @@
  * 
  */
 #include "Parallel_LU.hpp"
-#define HEAP_ToL 8  //tolerance on when to decide heapify or just add one by one
 
 void perc_down (Int i, Int *lacList, std::vector<Int> &heap)
     // ith position go down into the tree to find its proper position
@@ -115,6 +114,7 @@ void remove_heap (Int i, Int *lacList, std::vector<Int> &heap)
 
 
 void paru_make_heap (Int f, std::vector<Int> &pivotal_elements, 
+        heaps_info &hi,
         paru_matrix *paruMatInfo)
 {
     DEBUGLEVEL(1);
@@ -139,31 +139,11 @@ void paru_make_heap (Int f, std::vector<Int> &pivotal_elements,
     Int tot_size = 0; 
     work_struct *Work =  paruMatInfo->Work;
 
-    for (Int i = aChildp[eli]; i <= aChildp[eli+1]-1; i++) 
-    { //finding the largest child
-        Int chelid = aChild[i];  // element id of the child
+   
+    biggest_Child_id = hi.biggest_Child_id;
+    biggest_Child_size = hi.biggest_Child_size;
+    tot_size = hi.sum_size;
 
-        PRLEVEL (p+1, ("%% chelid = %ld\n", chelid));
-        std::vector<Int>* curHeap = heapList[chelid];
-        PRLEVEL (p+1, ("%% curHeap= %p\n", curHeap));
-        if (curHeap == nullptr) continue;
-        Int cur_size = curHeap->size();
-
-        PRLEVEL (p+1, ("%% cur_size =  %ld\n",cur_size));
-        tot_size += cur_size; 
-        if (cur_size > biggest_Child_size)
-        {
-            biggest_Child_id = chelid;
-            biggest_Child_size = cur_size;
-        }
-#ifndef NDEBUG  
-        PRLEVEL (p+1, ("%% element ids:\n %%"));
-        for(Int i = 0; i < curHeap->size(); i++)
-            PRLEVEL (p+1, (" %ld", (*curHeap)[i]));
-        PRLEVEL (p+1, ("\n"));
-#endif
-
-    }
 
     Int *lacList = paruMatInfo -> lacList;
     auto greater = [&lacList](Int a, Int b){ return lacList[a] > lacList[b]; };
@@ -182,7 +162,8 @@ void paru_make_heap (Int f, std::vector<Int> &pivotal_elements,
         heapList[biggest_Child_id] = nullptr;
 
         //O(n) heapify of all children or O(klgn) add to the biggest child
-        if ( biggest_Child_size > HEAP_ToL*size_of_rest )
+        if ( log2(biggest_Child_size) > 
+                (biggest_Child_size/(size_of_rest+1))+1 )
         { //klogn
             PRLEVEL (p-1, ("%% klogn algorhtm\n"));
             for (Int i = aChildp[eli]; i <= aChildp[eli+1]-1; i++) 

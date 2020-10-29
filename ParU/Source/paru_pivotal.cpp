@@ -13,8 +13,9 @@
  */
 #include "Parallel_LU.hpp"
 
-void paru_pivotal (paru_matrix *paruMatInfo, std::vector<Int> &pivotal_elements,
-        Int *panel_row, Int f, cholmod_common *cc)
+void paru_pivotal ( std::vector<Int> &pivotal_elements,
+        Int *panel_row, Int f, heaps_info &hi,
+        paru_matrix *paruMatInfo, cholmod_common *cc)
 {
     DEBUGLEVEL(0);
     paru_symbolic *LUsym =  paruMatInfo->LUsym;
@@ -49,6 +50,15 @@ void paru_pivotal (paru_matrix *paruMatInfo, std::vector<Int> &pivotal_elements,
 
 
     /*****  making the list of elements that contribute to pivotal columns ****/
+    Int biggest_Child_id = -1;
+    Int biggest_Child_size = -1;
+    Int tot_size = 0; 
+
+#ifndef NDEBUG
+    p = 1;
+#endif
+
+ 
     for (Int i = aChildp[eli]; i <= aChildp[eli+1]-1; i++) 
     { 
   
@@ -81,12 +91,42 @@ void paru_pivotal (paru_matrix *paruMatInfo, std::vector<Int> &pivotal_elements,
                  [&lacList](Int a, Int b) { return lacList[a] > lacList[b]; } );
             curHeap->pop_back();
         }
+
         if ( curHeap->empty() ) 
         {
             delete heapList[chelid];
             heapList[chelid] = nullptr;
         }
+        else
+        {
+            //IMPORTANT: type conversion is necessary
+            Int cur_size = curHeap->size();
+            PRLEVEL (p, ("%% curHeap->size= *%ld \n", curHeap->size()));
+            PRLEVEL (p , ("%% biggest_Child_size = %ld \n",
+                biggest_Child_size));
+            tot_size += curHeap->size();
+            if (cur_size > biggest_Child_size )
+            {
+                PRLEVEL 
+                    (p , ("%% biggest_Child_id = %ld \n", biggest_Child_id));
+                biggest_Child_id = chelid;
+                biggest_Child_size = cur_size;
+            }
+        }
     }
+
+    hi.sum_size = tot_size;
+    hi.biggest_Child_id = biggest_Child_id;
+    hi. biggest_Child_size = biggest_Child_size;
+
+    PRLEVEL (p , ("%%Inside pivot tot_size= %ld \n", hi.sum_size));
+    PRLEVEL (p , ("%% biggest_Child_id = %ld \n", hi.biggest_Child_id));
+    PRLEVEL (p , ("%% hi.biggest_Child_size = %ld \n", hi.biggest_Child_size));
+
+#ifndef NDEBUG
+    p = 1;
+#endif
+
 
     rowMarkp[eli] = rowMark;
 
