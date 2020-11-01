@@ -10,11 +10,12 @@
 
 void paru_eliminate_all ( Int e, Int f, 
         std::unordered_map <Int, Int> colHash, 
+        std::vector <Int> colHas, 
         paru_matrix *paruMatInfo,
         cholmod_common *cc)
 
 {
-    DEBUGLEVEL(0);
+    DEBUGLEVEL(1);
 #ifndef NDEBUG  
     Int p = 1;
 #endif
@@ -71,8 +72,18 @@ void paru_eliminate_all ( Int e, Int f,
         Int colInd = el_colIndex [el->lac];
         PRLEVEL (1, ("%% colInd =%ld \n", colInd));
         ASSERT (colInd >= 0);
-        double *dC = curEl_Num + colHash [colInd]*curEl->nrows;
-        PRLEVEL (1, ("%% colHash = %ld \n", colHash [colInd] ));
+        //double *dC = curEl_Num + colHash [colInd]*curEl->nrows;
+        Int findcolind = paru_find_hash (colInd, colHas, fcolList);
+#ifndef NDEBUG  
+        if (findcolind != colHash [colInd] )
+        {
+            PRLEVEL (-1, ("%% colHash = %ld \n", colHash [colInd] ));
+            PRLEVEL (-1, ("%% myHash= %ld \n", findcolind ));
+        }
+#endif
+        ASSERT (findcolind == colHash [colInd]) ;
+        double *dC = curEl_Num + findcolind*curEl->nrows;
+        //PRLEVEL (1, ("%% colHash = %ld \n", colHash [colInd] ));
         Int nrowsSeen = el->nrowsleft;
         for (Int i = 0; i < mEl ; i++) 
         {
@@ -118,15 +129,27 @@ void paru_eliminate_all ( Int e, Int f,
             Int colInd = el_colIndex [j];
             PRLEVEL (1, ("%% colInd =%ld \n", colInd));
             if (colInd < 0) continue;
-            double *dC = curEl_Num + colHash [colInd]*curEl->nrows;
-            PRLEVEL (1, ("%% colHash = %ld \n", colHash [colInd] ));
+            //double *dC = curEl_Num + colHash [colInd]*curEl->nrows;
+            Int findcolind = paru_find_hash (colInd, colHas, fcolList);
+
+#ifndef NDEBUG  
+            if (findcolind != colHash [colInd] )
+            {
+                PRLEVEL (-1, ("%% colHash = %ld \n", colHash [colInd] ));
+                PRLEVEL (-1, ("%% myHash= %ld \n", findcolind ));
+            }
+#endif
+
+            ASSERT (findcolind == colHash [colInd]) ;
+            double *dC = curEl_Num + findcolind*curEl->nrows;
+            //PRLEVEL (1, ("%% colHash = %ld \n", colHash [colInd] ));
 
             for (Int ii = 0; ii < el->nrowsleft; ii++) 
             {
                 Int i = tempRow[ii];
                 Int rowInd = el_rowIndex[i];
                 Int ri = isRowInFront [rowInd];
-                
+
                 PRLEVEL (1, ("%% ri = %ld \n", ri));
                 PRLEVEL (1, ("%% sC [%ld] =%2.5lf \n", i, sC [i]));
                 PRLEVEL (1, ("%% dC [%ld] =%2.5lf \n", ri, dC [ri]));
@@ -159,7 +182,7 @@ void paru_eliminate_cols ( Int e, Int f,
 
 {
 
-    DEBUGLEVEL(0);
+    DEBUGLEVEL(1);
 #ifndef NDEBUG  
     Int p = 1;
     Int c = 0; //number of columns assembled

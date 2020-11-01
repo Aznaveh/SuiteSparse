@@ -36,6 +36,7 @@ void assemble_row (const double *sM, double *dM,//source and destination matrix
         const Int *relColInd) 
     //Source and destination are stored column based
 {
+    //TODO get some info from el not to start from first col
     DEBUGLEVEL (0);
     for (Int j = 0; j < sn; j++) 
     {

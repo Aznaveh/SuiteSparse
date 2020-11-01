@@ -45,6 +45,7 @@ C11 = -std=c++11
 OBJ = \
     paru_mem.o \
     paru_heap.o \
+    paru_hash.o \
     paru_pivotal.o \
     paru_analyze.o \
 	paru_init_rowFronts.o\
@@ -58,6 +59,7 @@ OBJ = \
 	paru_print.o\
 	paru_init_rel.o\
 	paru_update_rowDeg.o\
+	paru_update_rel_ind.o\
 	paru_write.o\
 	paru_cumsum.o\
 	paru_intersection.o\
@@ -108,6 +110,9 @@ paru_mem.o: ../Source/paru_mem.cpp
 
 paru_heap.o: ../Source/paru_heap.cpp
 	$(C) -c $<
+
+paru_hash.o: ../Source/paru_hash.cpp
+	$(C) -c $<
 	
 paru_pivotal.o: ../Source/paru_pivotal.cpp
 	$(C) -c $<
@@ -153,6 +158,10 @@ paru_write.o: ../Source/paru_write.cpp
 
 paru_update_rowDeg.o: ../Source/paru_update_rowDeg.cpp
 	$(C) -c $<
+
+paru_update_rel_ind.o: ../Source/paru_update_rel_ind.cpp
+	$(C) -c $<
+
 
 paru_cumsum.o: ../Source/paru_cumsum.cpp
 	$(C) -c $<

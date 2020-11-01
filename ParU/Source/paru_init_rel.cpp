@@ -12,7 +12,7 @@
  * @author Aznaveh
  */
 #include "Parallel_LU.hpp"
-void paru_init_rel  (paru_matrix *paruMatInfo, Int f)
+void paru_init_rel  (Int f, paru_matrix *paruMatInfo )
 {
     DEBUGLEVEL(0);
     paru_symbolic *LUsym =  paruMatInfo->LUsym;

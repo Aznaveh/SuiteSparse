@@ -91,44 +91,49 @@ void paru_sort (Int *srt_lst, Int *ind_lst, Int len)
 }
 
 
-void paru_update_rel_ind_col (paru_matrix *paruMatInfo, Int f, 
-        paru_Element *el, paru_Element *cb_el, cholmod_common *cc) 
+void paru_update_rel_ind_col ( Int f, Int e, paru_matrix *paruMatInfo) 
 {
+    // updating relative column index 
+    // it might be for curent element or for the Upart therefore we might even
+    // dont have the curEl
     DEBUGLEVEL(1);
     PRLEVEL (1, ("%%update relative in %ld\n", f));
 
+    paru_Element **elementList = paruMatInfo->elementList;
+    paru_Element *el = elementList[e];
+
     //Int *el_Index = colIndex_pointer (el); //col global index of destination
     Int *el_Index = (Int*)(el+1); //col global index of destination
-    //Int *cb_el_Index = colIndex_pointer (cb_el); //col global index of source
-    Int *cb_el_Index = (Int*)(cb_el+1); //col global index of source
-    Int len_cb = cb_el->ncols;
-    Int mCbEl= cb_el->nrows;
-    // relative col index of source to be updated
-    //Int *RelIndex = relColInd (cb_el); 
-    Int *RelIndex = (Int*)(cb_el+1)+ len_cb + mCbEl;
-    Int len_el = el->ncols;
+
+    Int nEl = el->ncols;
+    Int mEl = el->nrows;
     
+    // Int *colRelIndex = relColInd (paru_Element *el);
+    Int *colRelIndex = (Int*)(el+1) + mEl+ nEl;
 
     Int *fcolList = paruMatInfo->fcolList[f] ;
-    PRLEVEL (1, ("%%lac of cb %ld\n", cb_el->lac));
+    paru_fac *Us =  paruMatInfo->partial_Us;
+    Int colCount = Us[f].n;
 
-    //TODO change assemble all and assemble col
-    for (Int i = 0 ; i < cb_el->lac; i++)
-            RelIndex [i] = -1;
-    for (Int i = cb_el->lac; i < len_cb ; i++)
+    //TODO be sure not to need in assemble_row
+        for (Int i = 0 ; i < el->lac; i++)
+                colRelIndex [i] = -1;
+
+    for (Int i = el->lac; i < nEl; i++)
     {
-        Int global_ind = cb_el_Index[i];
+        Int global_ind = el_Index[i];
         if (global_ind < 0)
         {
-            RelIndex [i] = -1;
+            colRelIndex [i] = -1;
             continue;
         }
         PRLEVEL (1, ("%% searching for: cb_index[%ld]=%ld\n",
                     i,  global_ind));
-        Int found = bin_srch (fcolList, 0, len_el-1, global_ind);
-        RelIndex [i] = found;
+        Int found = bin_srch (fcolList, 0, colCount, global_ind);
+        colRelIndex [i] = found;
         ASSERT (found != -1);
     }
-    
+
     PRLEVEL (1, ("%%update relative in %ld finished\n", f));
+    //TODO: update the rVal of el
 }

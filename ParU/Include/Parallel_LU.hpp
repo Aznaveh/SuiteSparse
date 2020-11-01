@@ -470,10 +470,9 @@ void paru_fourPass (paru_matrix *paruMatInfo,  Int f, Int fp,
 
 void paru_print_element (paru_matrix *paruMatInfo, Int e);
 void paru_print_tupleList (tupleList *listSet, Int index);
-void paru_init_rel (paru_matrix *paruMatInfo, Int f);
+void paru_init_rel (Int f, paru_matrix *paruMatInfo);
 
-void paru_update_rel_ind_col (paru_matrix *paruMatInfo, Int f, 
-        paru_Element *el, paru_Element *cb_el, cholmod_common *cc );
+void paru_update_rel_ind_col ( Int f, Int e, paru_matrix *paruMatInfo);
 
 
 void paru_write( paru_matrix *paruMatInfo, int scale, 
@@ -491,14 +490,6 @@ Int bin_srch_ind (Int *srt_lst, Int *ind_lst, Int l, Int r, Int num);
 Int bin_srch_col (Int *srt_lst, Int l, Int r, Int num);
 Int bin_srch (Int *srt_lst, Int l, Int r, Int num);
 
-//heap related
-void paru_make_heap (Int f, 
-        std::vector<Int> &pivotal_elements,
-        heaps_info &hi,
-        paru_matrix *paruMatInfo );
-void perc_down (Int i, Int *lacList, std::vector<Int> &heap);
-void remove_heap (Int i, Int *lacList, std::vector<Int> &heap);
-
 
 void paru_pivotal ( std::vector<Int> &pivotal_elements,
         Int *panel_row, Int f, heaps_info &hi,
@@ -510,12 +501,14 @@ int paru_intersection ( Int e, paru_Element **elementList,
 void paru_prior_assemble ( Int f, Int start_fac,  
         std::vector<Int> &pivotal_elements,
         std::unordered_map <Int, Int> colHash, 
+        std::vector<Int> colHas, 
         heaps_info &hi,
         paru_matrix *paruMatInfo,
         cholmod_common *cc);
 
 void paru_eliminate_all ( Int e, Int f, 
         std::unordered_map <Int, Int> colHash, 
+        std::vector <Int> colHas, 
         paru_matrix *paruMatInfo,
         cholmod_common *cc);
 
@@ -524,6 +517,17 @@ void paru_eliminate_cols ( Int e, Int f,
         paru_matrix *paruMatInfo,
         cholmod_common *cc);
 
+//heap related
+void paru_make_heap (Int f, 
+        std::vector<Int> &pivotal_elements,
+        heaps_info &hi,
+        paru_matrix *paruMatInfo );
+void perc_down (Int i, Int *lacList, std::vector<Int> &heap);
+void remove_heap (Int i, Int *lacList, std::vector<Int> &heap);
 
 
+
+//hash related
+void paru_insert_hash(Int key, Int value, std::vector<Int> &colHash);
+Int paru_find_hash (Int key, std::vector<Int> &colHash, Int *fcolList);
 #endif

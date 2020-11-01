@@ -92,7 +92,7 @@ int paru_front ( paru_matrix *paruMatInfo,
 #endif 
 
     // Initializing relative index validation flag of current front
-    paru_init_rel (paruMatInfo, f);
+    paru_init_rel (f, paruMatInfo);
     Int time_f = paruMatInfo->time_stamp[f];
 
     PRLEVEL (0, ("%% Begin of Front %ld time_f = %ld\n", f, time_f));
@@ -300,14 +300,22 @@ int paru_front ( paru_matrix *paruMatInfo,
 
     //fcolList copy from the stl_colSet
     //hasing from fcolList indices to column index 
-    std::unordered_map <Int, Int> colHash; 
+    std::unordered_map <Int, Int> colHash (colCount); 
+    std::vector<Int> colHas(colCount,-1);
     Int i = 0;
     for (it = stl_colSet.begin(); it != stl_colSet.end(); it++)
     {
         colHash.insert({*it , i});
+        paru_insert_hash (*it, i, colHas);
         fcolList[i++] = *it;
     }
-
+#ifndef NDEBUG  
+    p = 0;
+    PRLEVEL (p, ("%%"));
+    for (auto i:colHas)
+        PRLEVEL (p, (" %ld ", i));
+    PRLEVEL (p, ("\n"));
+#endif
 
     /**** 5 ** assemble U part         Row by Row                          ****/ 
 
@@ -374,6 +382,16 @@ int paru_front ( paru_matrix *paruMatInfo,
 
             assemble_row_hash (el_Num, uPart, mEl, nEl, fp, 
                     curRowIndex, curFsRowIndex, colIndex, colHash);
+
+            //TODO if (not updatated)
+//                paru_update_rel_ind_col ( f, e, paruMatInfo) ;
+//
+//            assemble_row (el_Num, uPart, 
+//                    mEl, nEl, fp, curRowIndex, curFsRowIndex, 
+//                    colRelIndex);
+
+
+            
 
 
             //FLIP(el_rowIndex[curRowIndex]); //marking row assembled
@@ -537,7 +555,7 @@ int paru_front ( paru_matrix *paruMatInfo,
     PRLEVEL (-1, ("\n%%||||  Start Finalize %ld ||||\n", f));
     //paru_finalize (paruMatInfo,  f, start_fac, cc);
     paru_prior_assemble ( f, start_fac, 
-            pivotal_elements, colHash, hi, paruMatInfo, cc);
+            pivotal_elements, colHash, colHas, hi, paruMatInfo, cc);
     PRLEVEL (-1, ("\n%%||||  Finish Finalize %ld ||||\n", f));
 
 
