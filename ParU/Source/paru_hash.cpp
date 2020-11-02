@@ -49,20 +49,39 @@ void paru_insert_hash(Int key, Int value, std::vector<Int> &colHash)
 
 Int paru_find_hash (Int key, std::vector<Int> &colHash, Int *fcolList)
 {
-    DEBUGLEVEL(1);
+    DEBUGLEVEL(0);
 #ifndef NDEBUG  
     Int p = 0;
+    PRLEVEL (p, ("%% find for hash key=%ld \n", key));
 #endif
     Int size = colHash.size();
     Int index = key % size;
     Int value = colHash [index];
     Int loop_cnt = 0;
-    while (  value != -1 && fcolList [value] != key && loop_cnt <= size )
+    while (  value != -1 && fcolList [value] != key  )
     {
-        loop_cnt++;
+        PRLEVEL (p, ("%% index =%ld \n", index ));
+        //if( loop_cnt++ > log2(size) )
+        if( loop_cnt++ > size )
+        { // take a long time in the hash; 
+          //  guarantees that find takes at most log time
+            PRLEVEL (p, ("%% binary search for hash\n"));
+            value = bin_srch (fcolList, 0, size, key);
+            break;
+        }
+
+        //++index %=  size;
         index = (index+1) % size;
         value = colHash [index];
     }
+#ifndef NDEBUG  
+    p = 0;
+    PRLEVEL (p, ("%%"));
+    for (auto i:colHash)
+        PRLEVEL (p, (" %ld ", i));
+    PRLEVEL (p, ("\n"));
+    PRLEVEL (p, ("%% value is =%ld \n", value));
+#endif
     return value;
 }
 

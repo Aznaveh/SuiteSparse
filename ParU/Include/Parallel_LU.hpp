@@ -513,7 +513,7 @@ void paru_eliminate_all ( Int e, Int f,
         cholmod_common *cc);
 
 void paru_eliminate_cols ( Int e, Int f, 
-        std::unordered_map <Int, Int> colHash, 
+        std::vector<Int> colHash, 
         paru_matrix *paruMatInfo,
         cholmod_common *cc);
 

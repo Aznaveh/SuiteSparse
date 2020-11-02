@@ -77,7 +77,7 @@ void paru_prior_assemble ( Int f, Int start_fac,
         }
 
         PRLEVEL (p, ("%%assembling %ld in %ld\n", e, el_ind));
-        paru_eliminate_cols (e, f, colHash, paruMatInfo, cc);
+        paru_eliminate_cols (e, f, colHas, paruMatInfo, cc);
         PRLEVEL (p, ("%%partial col assembly%ld in %ld done\n", e, el_ind));
         if (elementList[e] == NULL) continue;
         pivotal_elements [ii++] = pivotal_elements [i];
