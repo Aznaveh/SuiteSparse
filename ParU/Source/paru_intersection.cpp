@@ -50,7 +50,7 @@ int paru_intersection ( Int e, paru_Element **elementList,
         for (it = stl_newColSet.begin(); it != stl_newColSet.end(); it++)
         {
             Int c = *it;
-            Int col = bin_srch_col (el_colIndex, el->lac, nEl, c);
+            Int col = bin_srch_col (el_colIndex, el->lac, nEl-1, c);
             PRLEVEL (p, ("%%intersection=%ld", intersection));
             PRLEVEL (p, ("%%after bsearch for c=%ld col=%ld \n",c, col ));
             if ( col != -1 && el_colIndex[col] == c) 

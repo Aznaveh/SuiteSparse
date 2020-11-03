@@ -70,7 +70,7 @@ for k = 1:nmat
     Prob = ssget(id);
     Aorig = Prob.A;
 
-    if (nnz(Aorig) < NNZMat)
+    if (nnz(Aorig) > NNZMat)
             continue;
     end
  
@@ -102,11 +102,11 @@ for k = 1:nmat
 
     loop_cnt = loop_cnt + 1;
 
-    if (nnz(A) < NNZMat)
+    if (nnz(A) > NNZMat)
             continue;
     end
  
-    if (loop_cnt > 10 )
+    if (loop_cnt > 80 )
         break
     end
 
@@ -188,7 +188,7 @@ for k = 1:nmat
         fprintf('Pass\n')
     else
          fprintf('Fail\n')
-         %break;
+         break;
     end
 
 

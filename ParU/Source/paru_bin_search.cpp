@@ -3,50 +3,44 @@
  * ========================================================================== */
 /*!
  * @brief binary search in different contexts
+ * IMPORTANT it includes r 
  *
  * @author Aznaveh
  *  */
 #include "Parallel_LU.hpp"
-#define LEN 32
+#define LEN 8
 
-Int bin_srch_ind  (Int *srt_lst, Int *ind_lst, Int l, Int r, Int num)
-    // when the original list is not sorted and we also have to send the index
-    // used for the row
-{
-    if ( r >= l) 
-    {
-        Int mid = l + (r-l)/2;
-        if (srt_lst[mid] == num)
-            return ind_lst[mid];
-
-        if (srt_lst[mid] >  num)
-            return bin_srch_ind (srt_lst, ind_lst, l, mid-1, num);
-        return bin_srch_ind (srt_lst, ind_lst, mid+1, r,  num);
-    }
-    return (-1);
-}
 
 Int bin_srch (Int *srt_lst, Int l, Int r, Int num)
     // a simple binary search for when we know all the indices are available
-    // TODO: add linear search for small cases
 {
+    DEBUGLEVEL(0);
+    PRLEVEL (1, ("%% BINSearch %ld,%ld for %ld\n", l,r, num));
     if ( r >= l + LEN) 
     {
-        Int mid = l + (r-l)/2;
+        Int mid = l +  (r-l)/2;
+        PRLEVEL (0, ("%% mid is %ld\n", mid));
         if (srt_lst[mid] == num)
             return mid;
 
         if (srt_lst[mid] >  num)
-            return bin_srch_col (srt_lst, l, mid-1, num);
-        return bin_srch_col (srt_lst, mid+1, r,  num);
+        {
+
+            PRLEVEL (1, ("%% 1 New %ld,%ld \n", l, mid-1));
+            return bin_srch (srt_lst, l, mid-1, num);
+        }
+        PRLEVEL (1, ("%% 2 New %ld,%ld \n", mid+1, r));
+        return bin_srch (srt_lst, mid+1, r,  num);
     }
-    if ( r >= l ) 
+
+    if ( r >= l) 
     {
-        for (Int i = l; i < r; r++)
+        for (Int i = l; i <= r; i++)
             if ( srt_lst [i] == num )
                 return i;
     }
-    return (-1);
+
+   return (-1);
 }
 
 Int bin_srch_col (Int *srt_lst, Int l, Int r, Int num)
@@ -64,9 +58,10 @@ Int bin_srch_col (Int *srt_lst, Int l, Int r, Int num)
             return bin_srch_col (srt_lst, l, mid-1, num);
         return bin_srch_col (srt_lst, mid+1, r,  num);
     }
+
     if ( r >= l) 
     {
-        for (Int i = l; i < r; r++)
+        for (Int i = l; i <= r; i++)
             if ( srt_lst [i] == num )
                 return i;
     }

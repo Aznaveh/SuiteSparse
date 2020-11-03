@@ -55,18 +55,19 @@ Int paru_find_hash (Int key, std::vector<Int> &colHash, Int *fcolList)
     PRLEVEL (p, ("%% find for hash key=%ld \n", key));
 #endif
     Int size = colHash.size();
+
     Int index = key % size;
     Int value = colHash [index];
     Int loop_cnt = 0;
     while (  value != -1 && fcolList [value] != key  )
     {
         PRLEVEL (p, ("%% index =%ld \n", index ));
-        //if( loop_cnt++ > log2(size) )
-        if( loop_cnt++ > size )
+        if( loop_cnt++ > log2(size) )
+        //if( loop_cnt++ > (size) )
         { // take a long time in the hash; 
           //  guarantees that find takes at most log time
             PRLEVEL (p, ("%% binary search for hash\n"));
-            value = bin_srch (fcolList, 0, size, key);
+            value = bin_srch (fcolList, 0, size-1, key);
             break;
         }
 
@@ -81,7 +82,9 @@ Int paru_find_hash (Int key, std::vector<Int> &colHash, Int *fcolList)
         PRLEVEL (p, (" %ld ", i));
     PRLEVEL (p, ("\n"));
     PRLEVEL (p, ("%% value is =%ld \n", value));
+    Int bsRes = bin_srch (fcolList, 0, size-1, key);
+    PRLEVEL (p, ("%% binSearch=%ld \n", bsRes));
+    ASSERT (bin_srch (fcolList, 0, size-1, key) == value );
 #endif
     return value;
 }
-

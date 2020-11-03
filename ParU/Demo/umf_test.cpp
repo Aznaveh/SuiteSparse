@@ -97,7 +97,7 @@ int main (int argc, char **argv)
     double my_time = omp_get_wtime() - my_start_time;
     paruMatInfo->my_time = my_time;
 
-    matlab_finalize(nf); //if use matlab generated code
+    //matlab_finalize(nf); //if use matlab generated code
  
     //~~~~~~~~~~~~~~~~~~~End computation~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
