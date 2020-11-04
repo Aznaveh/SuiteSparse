@@ -51,28 +51,57 @@ void assemble_row (const double *sM, double *dM,//source and destination matrix
     }
 }
 
-void assemble_row_hash (const double *sM, double *dM,//source and destination matrix 
-        Int sm, Int sn,    // dimension of source matrix
-        Int dm,     // dimension of destination matrix
-        Int sR, Int dR,     //source row and destination row
-        const Int *colInd, //Col indext
-        std::unordered_map <Int, Int> colHash)
-    //Source and destination are stored column based
+
+void assemble_row_toU (Int e, Int f, Int sR, Int dR, 
+        std::vector <Int> colHash, 
+        paru_matrix *paruMatInfo) 
 {
+
     DEBUGLEVEL (0);
-    for (Int j = 0; j < sn; j++) 
+
+    paru_Element **elementList = paruMatInfo->elementList;
+    paru_Element *el = elementList[e];
+
+    if (el->rValid != paruMatInfo->time_stamp[f] )
+        //if not updatated
+        paru_update_rel_ind_col ( e, f, colHash, paruMatInfo) ;
+
+    paru_fac *Us =  paruMatInfo->partial_Us;
+    double *uPart = Us[f].p ; //uPart
+
+    Int nEl = el->ncols;
+    Int mEl = el->nrows;
+
+
+    paru_fac *LUs =  paruMatInfo->partial_LUs;
+    Int fp = LUs[f].n; 
+
+    //Int *el_colIndex = colIndex_pointer (curEl);
+    Int *el_colIndex = (Int*)(el+1);
+
+    // Int *colRelIndex = relColInd (paru_Element *el);
+    Int *colRelIndex = (Int*)(el+1) + mEl+ nEl;
+
+    //double *el_Num = numeric_pointer (el);
+    double *sM = (double*)((Int*)(el+1) + 2*nEl+ 2*mEl);
+
+    Int ncolsSeen = el->ncolsleft;
+    for (Int j = el->lac; j < nEl; j++) 
     {
-        Int colIndj = colInd[j];
-        Int rj = colHash [colIndj];
-        PRLEVEL (1, ("%% j=%ld colInd[j]=%ld rj =%ld \n", j, colInd[j], rj ));
-        if ( colIndj >= 0 )
+        Int rj =colRelIndex[j] ;
+        if ( el_colIndex[j] >= 0 )
         {  // If still valid
-            PRLEVEL (1, ("%% sM [%ld] =%2.5lf \n", sm*j+sR, sM [sm*j+sR] ));
-            PRLEVEL (1, ("%% dM [%ld] =%2.5lf \n", rj*dm+dR, dM [rj*dm+dR]));
-            dM [rj*dm + dR] += sM [sm*j + sR];
-            PRLEVEL (1, ("%% dM [%ld] =%2.5lf \n", rj*dm+dR, dM [rj*dm+dR]));
+            ncolsSeen--;
+            PRLEVEL (1, ("%% sM [%ld] =%2.5lf \n", mEl*j+sR, sM [mEl*j+sR] ));
+            PRLEVEL (1, ("%% uPart [%ld] =%2.5lf \n", 
+                        rj*fp+dR, uPart [rj*fp+dR]));
+            uPart [rj*fp+ dR] += sM [mEl*j + sR];
+            PRLEVEL (1, ("%% uPart [%ld] =%2.5lf \n", 
+                        rj*fp+dR, uPart [rj*fp+dR]));
+            if (ncolsSeen == 0) break;
         }
     }
+
 }
 
 

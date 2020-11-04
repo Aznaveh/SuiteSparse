@@ -91,7 +91,9 @@ void paru_sort (Int *srt_lst, Int *ind_lst, Int len)
 }
 
 
-void paru_update_rel_ind_col ( Int f, Int e, paru_matrix *paruMatInfo) 
+void paru_update_rel_ind_col ( Int e, Int f,  
+        std::vector <Int> colHash, 
+        paru_matrix *paruMatInfo) 
 {
     // updating relative column index 
     // it might be for curent element or for the Upart therefore we might even
@@ -107,7 +109,7 @@ void paru_update_rel_ind_col ( Int f, Int e, paru_matrix *paruMatInfo)
 
     Int nEl = el->ncols;
     Int mEl = el->nrows;
-    
+
     // Int *colRelIndex = relColInd (paru_Element *el);
     Int *colRelIndex = (Int*)(el+1) + mEl+ nEl;
 
@@ -115,25 +117,29 @@ void paru_update_rel_ind_col ( Int f, Int e, paru_matrix *paruMatInfo)
     paru_fac *Us =  paruMatInfo->partial_Us;
     Int colCount = Us[f].n;
 
-    //TODO be sure not to need in assemble_row
-        for (Int i = 0 ; i < el->lac; i++)
-                colRelIndex [i] = -1;
+    //TODO be sure not to need this in assemble_row
+    for (Int i = 0 ; i < el->lac; i++)
+        colRelIndex [i] = -1;
 
     for (Int i = el->lac; i < nEl; i++)
     {
-        Int global_ind = el_Index[i];
-        if (global_ind < 0)
+        Int colInd = el_Index[i];
+        if ( colInd < 0)
         {
             colRelIndex [i] = -1;
             continue;
         }
         PRLEVEL (1, ("%% searching for: cb_index[%ld]=%ld\n",
-                    i,  global_ind));
-        Int found = bin_srch (fcolList, 0, colCount, global_ind);
+                    i,  colInd));
+        //Int found = bin_srch (fcolList, 0, colCount, colInd);
+        Int found = paru_find_hash (colInd, colHash, fcolList);
         colRelIndex [i] = found;
         ASSERT (found != -1);
     }
 
     PRLEVEL (1, ("%%update relative in %ld finished\n", f));
-    //TODO: update the rVal of el
+
+    //update the rVal of el
+    el->rValid = paruMatInfo->time_stamp[f];
+    
 }

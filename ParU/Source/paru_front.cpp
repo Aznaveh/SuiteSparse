@@ -191,7 +191,7 @@ int paru_front ( paru_matrix *paruMatInfo,
 
     Int fac = paru_factorize(pivotalFront, frowList, rowCount, f, start_fac,
             panel_row, stl_colSet, pivotal_elements, paruMatInfo);
-    time_f = paruMatInfo->time_stamp[f]; 
+    time_f = ++paruMatInfo->time_stamp[f]; 
     PRLEVEL (1, ("%%After factorization time_f = %ld\n",time_f));
 
     /* To this point fully summed part of the front is computed and L and U    /  
@@ -300,19 +300,17 @@ int paru_front ( paru_matrix *paruMatInfo,
 
     //fcolList copy from the stl_colSet
     //hasing from fcolList indices to column index 
-    std::unordered_map <Int, Int> colHash (colCount); 
-    std::vector<Int> colHas(colCount,-1);
+    std::vector<Int> colHash(colCount,-1);
     Int i = 0;
     for (it = stl_colSet.begin(); it != stl_colSet.end(); it++)
     {
-        colHash.insert({*it , i});
-        paru_insert_hash (*it, i, colHas);
+        paru_insert_hash (*it, i, colHash);
         fcolList[i++] = *it;
     }
 #ifndef NDEBUG  
     p = 0;
     PRLEVEL (p, ("%%"));
-    for (auto i:colHas)
+    for (auto i:colHash)
         PRLEVEL (p, (" %ld ", i));
     PRLEVEL (p, ("\n"));
 #endif
@@ -334,6 +332,7 @@ int paru_front ( paru_matrix *paruMatInfo,
     ASSERT (Us[f].p == NULL);
     Us[f].p = uPart;
 
+    // use current mark for updating pivotal rows relative indices
 
     tupleList *RowList = paruMatInfo->RowList;
     for (Int i = 0; i < fp; i++)
@@ -380,19 +379,8 @@ int paru_front ( paru_matrix *paruMatInfo,
             PRLEVEL (1, ("%% element= %ld  nEl =%ld \n",e, nEl));
 
 
-            assemble_row_hash (el_Num, uPart, mEl, nEl, fp, 
-                    curRowIndex, curFsRowIndex, colIndex, colHash);
-
-            //TODO if (not updatated)
-//                paru_update_rel_ind_col ( f, e, paruMatInfo) ;
-//
-//            assemble_row (el_Num, uPart, 
-//                    mEl, nEl, fp, curRowIndex, curFsRowIndex, 
-//                    colRelIndex);
-
-
-            
-
+            assemble_row_toU (e, f, curRowIndex, curFsRowIndex, colHash, 
+                    paruMatInfo);
 
             //FLIP(el_rowIndex[curRowIndex]); //marking row assembled
             el_rowIndex[curRowIndex] = -1;
@@ -551,11 +539,11 @@ int paru_front ( paru_matrix *paruMatInfo,
 
     /**** 7 **** Count number of rows and columsn of prior CBs to asslemble ***/ 
 
-    paruMatInfo->time_stamp[f]++; //invalidating all the marks
+    //paruMatInfo->time_stamp[f]++; //invalidating all the marks
     PRLEVEL (-1, ("\n%%||||  Start Finalize %ld ||||\n", f));
     //paru_finalize (paruMatInfo,  f, start_fac, cc);
     paru_prior_assemble ( f, start_fac, 
-            pivotal_elements, colHash, colHas, hi, paruMatInfo, cc);
+            pivotal_elements, colHash, hi, paruMatInfo, cc);
     PRLEVEL (-1, ("\n%%||||  Finish Finalize %ld ||||\n", f));
 
 

@@ -9,12 +9,13 @@
 #include "Parallel_LU.hpp"
 
 void paru_eliminate_all ( Int e, Int f, 
-        std::unordered_map <Int, Int> colHash, 
-        std::vector <Int> colHas, 
+        std::vector <Int> colHash, 
         paru_matrix *paruMatInfo,
         cholmod_common *cc)
 
 {
+    //TODO: I don't use to need the hash for it at all
+    //it is probably updated
     DEBUGLEVEL(1);
 #ifndef NDEBUG  
     Int p = 1;
@@ -72,18 +73,8 @@ void paru_eliminate_all ( Int e, Int f,
         Int colInd = el_colIndex [el->lac];
         PRLEVEL (1, ("%% colInd =%ld \n", colInd));
         ASSERT (colInd >= 0);
-        //double *dC = curEl_Num + colHash [colInd]*curEl->nrows;
-        Int fcolcolind = paru_find_hash (colInd, colHas, fcolList);
-#ifndef NDEBUG  
-        if (fcolcolind != colHash [colInd] )
-        {
-            PRLEVEL (-1, ("%% colHash = %ld \n", colHash [colInd] ));
-            PRLEVEL (-1, ("%% myHash= %ld \n", fcolcolind ));
-        }
-        ASSERT (fcolcolind == colHash [colInd]) ;
-#endif
+        Int fcolcolind = paru_find_hash (colInd, colHash, fcolList);
         double *dC = curEl_Num + fcolcolind*curEl->nrows;
-        //PRLEVEL (1, ("%% colHash = %ld \n", colHash [colInd] ));
         Int nrowsSeen = el->nrowsleft;
         for (Int i = 0; i < mEl ; i++) 
         {
@@ -129,20 +120,9 @@ void paru_eliminate_all ( Int e, Int f,
             Int colInd = el_colIndex [j];
             PRLEVEL (1, ("%% colInd =%ld \n", colInd));
             if (colInd < 0) continue;
-            //double *dC = curEl_Num + colHash [colInd]*curEl->nrows;
-            Int fcolcolind = paru_find_hash (colInd, colHas, fcolList);
+            Int fcolcolind = paru_find_hash (colInd, colHash, fcolList);
 
-#ifndef NDEBUG  
-            if (fcolcolind != colHash [colInd] )
-            {
-                PRLEVEL (-1, ("%% colHash = %ld \n", colHash [colInd] ));
-                PRLEVEL (-1, ("%% myHash= %ld \n", fcolcolind ));
-            }
-#endif
-
-            ASSERT (fcolcolind == colHash [colInd]) ;
             double *dC = curEl_Num + fcolcolind*curEl->nrows;
-            //PRLEVEL (1, ("%% colHash = %ld \n", colHash [colInd] ));
 
             for (Int ii = 0; ii < el->nrowsleft; ii++) 
             {
@@ -176,7 +156,7 @@ void paru_eliminate_all ( Int e, Int f,
 // fit
 
 void paru_eliminate_cols ( Int e, Int f, 
-        std::vector <Int> colHas, 
+        std::vector <Int> colHash, 
         paru_matrix *paruMatInfo,
         cholmod_common *cc)
 
@@ -246,9 +226,8 @@ void paru_eliminate_cols ( Int e, Int f,
 
 
     //TOLL FREE zone
-    while (paru_find_hash (el_colIndex[el->lac], colHas, fcolList)!= -1 )
+    while (paru_find_hash (el_colIndex[el->lac], colHash, fcolList)!= -1 )
     {
-        //ASSERT (colHash.find(el_colIndex[el->lac])!= colHash.end() );
         PRLEVEL (p, ("%% Toll free\n"));
         if (tempRow_ready == 0 )
         {
@@ -268,7 +247,7 @@ void paru_eliminate_cols ( Int e, Int f,
         }
 
         Int colInd = el_colIndex [el->lac];
-        Int fcolcolind = paru_find_hash (colInd, colHas, fcolList);
+        Int fcolcolind = paru_find_hash (colInd, colHash, fcolList);
 
         PRLEVEL (1, ("%% el->lac =%ld \n", el->lac));
         double *sC = el_Num + mEl*el->lac; //source column pointer
@@ -331,7 +310,7 @@ void paru_eliminate_cols ( Int e, Int f,
         Int colInd = el_colIndex [j];
         PRLEVEL (1, ("%% colInd =%ld \n", colInd));
         if (colInd < 0) continue;
-        Int fcolcolind = paru_find_hash (colInd, colHas, fcolList);
+        Int fcolcolind = paru_find_hash (colInd, colHash, fcolList);
         if (fcolcolind == -1 )
         {// not found
             continue;

@@ -10,8 +10,7 @@
 
 void paru_prior_assemble ( Int f, Int start_fac,  
         std::vector<Int> &pivotal_elements,
-        std::unordered_map <Int, Int> colHash, 
-        std::vector<Int> colHas, 
+        std::vector<Int> colHash, 
         heaps_info &hi,
         paru_matrix *paruMatInfo,
         cholmod_common *cc)
@@ -71,13 +70,13 @@ void paru_prior_assemble ( Int f, Int start_fac,
         {
             PRLEVEL (p, ("%%assembling %ld in %ld\n", e, el_ind));
             PRLEVEL (p, ("%% size %ld x %ld\n", el->nrows, el->ncols));
-            paru_eliminate_all (e, f, colHash, colHas, paruMatInfo, cc);
+            paru_eliminate_all (e, f, colHash, paruMatInfo, cc);
             PRLEVEL (p, ("%%assembling %ld in %ld done\n", e, el_ind));
             continue; 
         }
 
         PRLEVEL (p, ("%%assembling %ld in %ld\n", e, el_ind));
-        paru_eliminate_cols (e, f, colHas, paruMatInfo, cc);
+        paru_eliminate_cols (e, f, colHash, paruMatInfo, cc);
         PRLEVEL (p, ("%%partial col assembly%ld in %ld done\n", e, el_ind));
         if (elementList[e] == NULL) continue;
         pivotal_elements [ii++] = pivotal_elements [i];
