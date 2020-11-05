@@ -19,7 +19,7 @@ Int bin_srch (Int *srt_lst, Int l, Int r, Int num)
     if ( r >= l + LEN) 
     {
         Int mid = l +  (r-l)/2;
-        PRLEVEL (0, ("%% mid is %ld\n", mid));
+        PRLEVEL (1, ("%% mid is %ld\n", mid));
         if (srt_lst[mid] == num)
             return mid;
 

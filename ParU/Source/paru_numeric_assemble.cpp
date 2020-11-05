@@ -62,7 +62,7 @@ void assemble_row_toU (Int e, Int f, Int sR, Int dR,
     paru_Element **elementList = paruMatInfo->elementList;
     paru_Element *el = elementList[e];
 
-    if (el->rValid != paruMatInfo->time_stamp[f] )
+    if (el->cValid != paruMatInfo->time_stamp[f] )
         //if not updatated
         paru_update_rel_ind_col ( e, f, colHash, paruMatInfo) ;
 

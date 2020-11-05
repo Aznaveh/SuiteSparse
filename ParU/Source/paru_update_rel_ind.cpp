@@ -98,7 +98,7 @@ void paru_update_rel_ind_col ( Int e, Int f,
     // updating relative column index 
     // it might be for curent element or for the Upart therefore we might even
     // dont have the curEl
-    DEBUGLEVEL(1);
+    DEBUGLEVEL(0);
     PRLEVEL (1, ("%%update relative in %ld\n", f));
 
     paru_Element **elementList = paruMatInfo->elementList;
@@ -139,7 +139,7 @@ void paru_update_rel_ind_col ( Int e, Int f,
 
     PRLEVEL (1, ("%%update relative in %ld finished\n", f));
 
-    //update the rVal of el
-    el->rValid = paruMatInfo->time_stamp[f];
+    //update the cVal of el
+    el->cValid = paruMatInfo->time_stamp[f];
     
 }

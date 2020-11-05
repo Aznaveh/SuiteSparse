@@ -19,7 +19,7 @@ void paru_insert_hash(Int key, Int value, std::vector<Int> &colHash)
     DEBUGLEVEL(0);
 
 #ifndef NDEBUG  
-    Int p = 0;
+    Int p = 1;
     Int loop_cnt = 0;
     PRLEVEL (p, ("%% Insert hash key=%ld value=%ld ", key, value ));
     PRLEVEL (p, ("size=%ld \n", colHash.size() ));
@@ -39,7 +39,7 @@ void paru_insert_hash(Int key, Int value, std::vector<Int> &colHash)
     colHash[index] = value;
 
 #ifndef NDEBUG  
-    p = 2;
+    p = 1;
     PRLEVEL (p, ("%%"));
     for (auto i:colHash)
         PRLEVEL (p, (" %ld ", i));
@@ -51,7 +51,7 @@ Int paru_find_hash (Int key, std::vector<Int> &colHash, Int *fcolList)
 {
     DEBUGLEVEL(0);
 #ifndef NDEBUG  
-    Int p = 0;
+    Int p = 1;
     PRLEVEL (p, ("%% find for hash key=%ld \n", key));
 #endif
     Int size = colHash.size();
@@ -76,7 +76,7 @@ Int paru_find_hash (Int key, std::vector<Int> &colHash, Int *fcolList)
         value = colHash [index];
     }
 #ifndef NDEBUG  
-    p = 0;
+    p = 1;
     PRLEVEL (p, ("%%"));
     for (auto i:colHash)
         PRLEVEL (p, (" %ld ", i));

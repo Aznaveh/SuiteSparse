@@ -14,8 +14,6 @@ void paru_eliminate_all ( Int e, Int f,
         cholmod_common *cc)
 
 {
-    //TODO: I don't use to need the hash for it at all
-    //it is probably updated
     DEBUGLEVEL(1);
 #ifndef NDEBUG  
     Int p = 1;
@@ -40,6 +38,12 @@ void paru_eliminate_all ( Int e, Int f,
 
     //Int *rowRelIndex = relRowInd (el);
     Int *rowRelIndex = (Int*)(el+1) + 2*nEl +mEl;
+
+    if (el->cValid != paruMatInfo->time_stamp[f] )
+        paru_update_rel_ind_col ( e, f, colHash, paruMatInfo) ;
+
+    // Int *colRelIndex = relColInd (paru_Element *el);
+    Int *colRelIndex = (Int*)(el+1) + mEl+ nEl;
 
     //Int *el_rowIndex = rowIndex_pointer (el);
     Int *el_rowIndex = (Int*) (el+1) + nEl; 
@@ -73,7 +77,8 @@ void paru_eliminate_all ( Int e, Int f,
         Int colInd = el_colIndex [el->lac];
         PRLEVEL (1, ("%% colInd =%ld \n", colInd));
         ASSERT (colInd >= 0);
-        Int fcolcolind = paru_find_hash (colInd, colHash, fcolList);
+        // Int fcolcolind = paru_find_hash (colInd, colHash, fcolList);
+        Int fcolcolind = colRelIndex [el->lac];
         double *dC = curEl_Num + fcolcolind*curEl->nrows;
         Int nrowsSeen = el->nrowsleft;
         for (Int i = 0; i < mEl ; i++) 
@@ -120,7 +125,8 @@ void paru_eliminate_all ( Int e, Int f,
             Int colInd = el_colIndex [j];
             PRLEVEL (1, ("%% colInd =%ld \n", colInd));
             if (colInd < 0) continue;
-            Int fcolcolind = paru_find_hash (colInd, colHash, fcolList);
+            //Int fcolcolind = paru_find_hash (colInd, colHash, fcolList);
+            Int fcolcolind = colRelIndex [j];
 
             double *dC = curEl_Num + fcolcolind*curEl->nrows;
 
@@ -162,7 +168,7 @@ void paru_eliminate_cols ( Int e, Int f,
 
 {
 
-    DEBUGLEVEL(1);
+    DEBUGLEVEL(0);
 #ifndef NDEBUG  
     Int p = 1;
     Int c = 0; //number of columns assembled
@@ -173,7 +179,7 @@ void paru_eliminate_cols ( Int e, Int f,
 
     PRLEVEL (p, ("%% Eliminat some cols of %ld in %ld\n", e, eli));
 #ifndef NDEBUG
-    p = 0;
+    p = 1;
 
     PRLEVEL (p, ("%% %ld :\n", eli));
     if (p <= 0) paru_print_element (paruMatInfo, eli);
