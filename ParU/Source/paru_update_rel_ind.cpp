@@ -118,8 +118,8 @@ void paru_update_rel_ind_col ( Int e, Int f,
     Int colCount = Us[f].n;
 
     //TODO be sure not to need this in assemble_row
-    for (Int i = 0 ; i < el->lac; i++)
-        colRelIndex [i] = -1;
+//    for (Int i = 0 ; i < el->lac; i++)
+//        colRelIndex [i] = -1;
 
     for (Int i = el->lac; i < nEl; i++)
     {
