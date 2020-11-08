@@ -134,7 +134,6 @@ void paru_prior_assemble ( Int f, Int start_fac,
     //       curHeap->pop_back();
     //   }
 
-    if ( curHeap->empty() ) return;
 
 
     //    for(Int i = curHeap->size()-1; i > 0 ; i--)

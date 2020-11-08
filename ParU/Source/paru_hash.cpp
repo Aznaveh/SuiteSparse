@@ -6,6 +6,7 @@
  * 
  * insert: 
  *   gets key and value and put it into the already initailzed table with -1 
+ *   simple linear probing 
  * find:
  *   find for the key and check if it has the correct value
  *
@@ -29,7 +30,7 @@ void paru_insert_hash(Int key, Int value, std::vector<Int> &colHash)
     Int  index = key % size;  //hash function
     PRLEVEL (p, ("index =%ld \n", index ));
     while ( colHash[index] != -1 )
-    {
+    { //finding an empty spot
 #ifndef NDEBUG  
     loop_cnt++;
 #endif

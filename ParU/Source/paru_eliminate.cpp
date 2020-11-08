@@ -37,7 +37,7 @@ void paru_eliminate_all ( Int e, Int f,
     Int *el_colIndex = (Int*)(el+1);
 
     //Int *rowRelIndex = relRowInd (el);
-    Int *rowRelIndex = (Int*)(el+1) + 2*nEl +mEl;
+    //Int *rowRelIndex = (Int*)(el+1) + 2*nEl +mEl;
 
     if (el->cValid != paruMatInfo->time_stamp[f] )
         paru_update_rel_ind_col ( e, f, colHash, paruMatInfo) ;
@@ -201,7 +201,7 @@ void paru_eliminate_cols ( Int e, Int f,
     Int *el_colIndex = (Int*)(el+1);
 
     //Int *rowRelIndex = relRowInd (el);
-    Int *rowRelIndex = (Int*)(el+1) + 2*nEl +mEl;
+    //Int *rowRelIndex = (Int*)(el+1) + 2*nEl +mEl;
 
     //Int *el_rowIndex = rowIndex_pointer (el);
     Int *el_rowIndex = (Int*) (el+1) + nEl; 
