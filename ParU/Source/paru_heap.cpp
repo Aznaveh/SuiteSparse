@@ -113,9 +113,40 @@ void remove_heap (Int i, Int *lacList, std::vector<Int> &heap)
 }
 
 
-void paru_make_heap (Int f, std::vector<Int> &pivotal_elements, 
+void paru_check_prior_element ( Int e, Int f, Int start_fac,
+        std::vector<Int> colHash, 
+        paru_matrix *paruMatInfo,
+        cholmod_common *cc)
+    // check if e can be assembeld into f
+{
+    work_struct *Work =  paruMatInfo->Work;
+    Int *elRow = Work -> elRow; 
+    Int *elCol = Work -> elCol;
+
+    paru_Element **elementList = paruMatInfo->elementList;
+
+    paru_symbolic *LUsym =  paruMatInfo->LUsym;
+    Int *snM = LUsym->super2atree;
+    Int eli = snM [f]; 
+
+    paru_Element *el = elementList[e];
+    if (elRow [e] == 0 && el->rValid > start_fac)
+    { // all the rows are inside he current front; maybe assemble some cols
+        paru_eliminate_cols (e, f, colHash, paruMatInfo, cc);
+        return;
+    }
+
+    ///if ( (elCol [e] == 0 && el->cValid > start_fac) || el->cValid = current )
+    // { // all the cols are inside he current front; maybe assemble some rows
+    //   
+    //   }
+}
+void paru_make_heap (Int f, Int start_fac, 
+        std::vector<Int> &pivotal_elements, 
         heaps_info &hi,
-        paru_matrix *paruMatInfo)
+        std::vector<Int> colHash, 
+        paru_matrix *paruMatInfo,
+        cholmod_common *cc)
 {
     DEBUGLEVEL(1);
 #ifndef NDEBUG  
@@ -137,9 +168,8 @@ void paru_make_heap (Int f, std::vector<Int> &pivotal_elements,
     Int biggest_Child_id = -1;
     Int biggest_Child_size = -1;
     Int tot_size = 0; 
-    work_struct *Work =  paruMatInfo->Work;
 
-   
+
     biggest_Child_id = hi.biggest_Child_id;
     biggest_Child_size = hi.biggest_Child_size;
     tot_size = hi.sum_size;
@@ -174,12 +204,17 @@ void paru_make_heap (Int f, std::vector<Int> &pivotal_elements,
                 //concatening the child and freeing the memory
                 for (Int k = 0; k < chHeap->size(); k++)
                 {
-                    Int elid = (*chHeap)[k];
-                    if (elementList[elid] != NULL)
+                    Int e = (*chHeap)[k];
+                    if (elementList[e] != NULL)
                     {
-                        curHeap->push_back(elid);
-                        std::push_heap(curHeap->begin(), curHeap->end(), 
-                                greater);
+                        paru_check_prior_element (e, f, start_fac, colHash, 
+                                paruMatInfo, cc);
+                        if (elementList[e] != NULL ) 
+                        {
+                            curHeap->push_back(e);
+                            std::push_heap(curHeap->begin(), curHeap->end(), 
+                                    greater);
+                        }
                     }
                 }
                 delete heapList[chelid];
@@ -191,7 +226,7 @@ void paru_make_heap (Int f, std::vector<Int> &pivotal_elements,
             {
                 Int e = pivotal_elements[i];
                 paru_Element *el = elementList[e];
-                if (el == NULL) continue;
+                ASSERT (el != NULL);
                 PRLEVEL (p, ("%ld  ",e));
                 curHeap->push_back(e);
                 std::push_heap(curHeap->begin(), curHeap->end(), greater);
@@ -210,7 +245,20 @@ void paru_make_heap (Int f, std::vector<Int> &pivotal_elements,
                 std::vector<Int>* chHeap = heapList[chelid];
                 if (chHeap == nullptr) continue;
                 //concatening the child and freeing the memory
-                curHeap->insert(curHeap->end(), chHeap->begin(), chHeap->end()); 
+
+                //curHeap->insert(curHeap->end(), 
+                //      chHeap->begin(), chHeap->end()); 
+                for (Int k = 0; k < chHeap->size(); k++)
+                {
+                    Int e = (*chHeap)[k];
+                    if (elementList[e] != NULL ) 
+                    {
+                        paru_check_prior_element (e, f, start_fac, colHash, 
+                                paruMatInfo, cc);
+                        if (elementList[e] != NULL ) 
+                            curHeap->push_back(e);
+                    }
+                }
                 PRLEVEL (1, ("%%Heap free %p id=%ld\n", 
                             heapList[chelid], chelid));
                 delete heapList[chelid];

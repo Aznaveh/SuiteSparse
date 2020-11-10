@@ -518,10 +518,12 @@ void paru_eliminate_cols ( Int e, Int f,
         cholmod_common *cc);
 
 //heap related
-void paru_make_heap (Int f, 
+void paru_make_heap (Int f, Int start_fac,
         std::vector<Int> &pivotal_elements,
         heaps_info &hi,
-        paru_matrix *paruMatInfo );
+        std::vector<Int> colHash, 
+        paru_matrix *paruMatInfo,
+        cholmod_common *cc);
 void perc_down (Int i, Int *lacList, std::vector<Int> &heap);
 void remove_heap (Int i, Int *lacList, std::vector<Int> &heap);
 

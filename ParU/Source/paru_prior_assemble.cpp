@@ -91,7 +91,8 @@ void paru_prior_assemble ( Int f, Int start_fac,
 
     /************ Making the heap from list of the immediate children ******/
     PRLEVEL (1, ("%% Next: work on the heap \n"));
-    paru_make_heap(f, pivotal_elements, hi, paruMatInfo);
+    paru_make_heap (f, start_fac, pivotal_elements, hi, 
+            colHash, paruMatInfo, cc);
     PRLEVEL (1, ("%% Done: work on the heap \n"));
 
 
