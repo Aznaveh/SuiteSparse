@@ -19,7 +19,7 @@ int paru_front ( paru_matrix *paruMatInfo,
         cholmod_common *cc)
 {
 
-    DEBUGLEVEL(0);
+    DEBUGLEVEL(-1);
     /* 
      * -2 Print Nothing
      * -1 Just Matlab
@@ -494,6 +494,7 @@ int paru_front ( paru_matrix *paruMatInfo,
     for (Int i = 0; i < colCount; ++ i) 
         el_colIndex [i] = fcolList[i];
     Int *el_rowIndex = rowIndex_pointer (curEl);
+    rowMark = rowMarkp[eli];
     for (Int i = fp; i < rowCount; ++ i) 
     {
         Int locIndx = i-fp; 
@@ -577,10 +578,10 @@ int paru_front ( paru_matrix *paruMatInfo,
 
 
 #ifndef NDEBUG /* chekcing if isRowInFront is correct */
-    rowMark = rowMarkp[eli];
+    rowMark = rowMarkp[eli] ;
     Int *Sleft = LUsym->Sleft;
-    for (Int i = Sleft[col1]; i < Sleft[Super[f+1]]; i++)
-        ASSERT ( isRowInFront [i] < rowMark);
+//    for (Int i = Sleft[col1]; i < Sleft[Super[f+1]]; i++)
+//        ASSERT ( isRowInFront [i] < rowMark);
 #endif
 
 

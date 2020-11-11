@@ -14,7 +14,7 @@ void paru_eliminate_all ( Int e, Int f,
         cholmod_common *cc)
 
 {
-    DEBUGLEVEL(1);
+    DEBUGLEVEL(0);
 #ifndef NDEBUG  
     Int p = 1;
 #endif
@@ -53,12 +53,10 @@ void paru_eliminate_all ( Int e, Int f,
     // current elemnt numerical pointer
     //double *el_Num = numeric_pointer (curEl);
     double *curEl_Num = (double*)((Int*)
-            (curEl+1) + 2*curEl->nrowsleft+ 2*curEl->ncolsleft);
+            (curEl+1) + 2*curEl->nrows+ 2*curEl->ncols);
 
     work_struct *Work =  paruMatInfo->Work;
     Int *isRowInFront = Work->rowSize; 
-    Int *rowMarkp = Work->rowMark;
-    Int rowMark = rowMarkp[eli];
 
     Int *fcolList = paruMatInfo->fcolList[f];
     paru_fac *Us =  paruMatInfo->partial_Us;
@@ -87,7 +85,7 @@ void paru_eliminate_all ( Int e, Int f,
             PRLEVEL (1, ("%% rowInd =%ld \n", rowInd));
             if (rowInd >= 0 )
             {
-                Int ri = isRowInFront [rowInd];
+                Int ri = isRowInFront [rowInd]; 
                 PRLEVEL (1, ("%% ri = %ld \n", ri));
                 PRLEVEL (1, ("%% sC [%ld] =%2.5lf \n", i, sC [i]));
                 PRLEVEL (1, ("%% dC [%ld] =%2.5lf \n", ri, dC [ri]));
@@ -134,7 +132,7 @@ void paru_eliminate_all ( Int e, Int f,
             {
                 Int i = tempRow[ii];
                 Int rowInd = el_rowIndex[i];
-                Int ri = isRowInFront [rowInd];
+                Int ri = isRowInFront [rowInd]; 
 
                 PRLEVEL (1, ("%% ri = %ld \n", ri));
                 PRLEVEL (1, ("%% sC [%ld] =%2.5lf \n", i, sC [i]));
@@ -211,20 +209,14 @@ void paru_eliminate_cols ( Int e, Int f,
     // current elemnt numerical pointer
     //double *el_Num = numeric_pointer (curEl);
     double *curEl_Num = (double*)((Int*)
-            (curEl+1) + 2*curEl->nrowsleft+ 2*curEl->ncolsleft);
+            (curEl+1) + 2*curEl->nrows+ 2*curEl->ncols);
 
     work_struct *Work =  paruMatInfo->Work;
     Int *isRowInFront = Work->rowSize; 
-    Int *rowMarkp = Work->rowMark;
-    Int rowMark = rowMarkp[eli];
 
     Int *fcolList = paruMatInfo->fcolList[f];
     paru_fac *Us =  paruMatInfo->partial_Us;
     Int colCount = Us[f].n;
-
-    //    ASSERT (el_colIndex[el->lac]  <= fcolList[colCount-1] );
-    //    ASSERT (el_colIndex[nEl-1] <= 0 || fcolList[0] <= el_colIndex[nEl-1]);
-
 
     Int tempRow[el->nrowsleft]; //C99 
     Int tempRow_ready = 0;
@@ -353,6 +345,197 @@ void paru_eliminate_cols ( Int e, Int f,
             sizeof(Int)*(2*(mEl+nEl)) + sizeof(double)*nEl*mEl;
         paru_free (1, tot_size, el, cc);
         PRLEVEL (p, ("%%Some cols Free ALL %ld  %p size %ld\n",
+                    e, el, tot_size));
+        elementList[e] = NULL;
+    }
+}
+
+void paru_eliminate_rows ( Int e, Int f, 
+        std::vector <Int> colHash, 
+        paru_matrix *paruMatInfo,
+        cholmod_common *cc)
+
+{
+    DEBUGLEVEL(1);
+#ifndef NDEBUG  
+    Int p = 1;
+#endif
+
+    paru_symbolic *LUsym =  paruMatInfo->LUsym;
+    Int *snM = LUsym->super2atree;
+    Int eli = snM [f]; 
+
+    PRLEVEL (p, ("%% Eliminat some rows of %ld in %ld\n", e, eli));
+#ifndef NDEBUG
+    p = 0;
+
+    PRLEVEL (p, ("%% %ld :\n", eli));
+    if (p <= 0) paru_print_element (paruMatInfo, eli);
+
+    PRLEVEL (p, ("%% %ld :\n", e));
+    if (p <= 0) paru_print_element (paruMatInfo, e);
+#endif
+
+    paru_Element **elementList = paruMatInfo->elementList;
+
+    paru_Element *el = elementList[e];
+    paru_Element *curEl = elementList[eli];
+
+    Int nEl = el->ncols;
+    Int mEl = el->nrows;
+
+    //Int *el_colIndex = colIndex_pointer (el);
+    Int *el_colIndex = (Int*)(el+1);
+
+    //Int *rowRelIndex = relRowInd (el);
+    //Int *rowRelIndex = (Int*)(el+1) + 2*nEl +mEl;
+
+    // Int *colRelIndex = relColInd (paru_Element *el);
+    Int *colRelIndex = (Int*)(el+1) + mEl+ nEl;
+
+ 
+    //Int *el_rowIndex = rowIndex_pointer (el);
+    Int *el_rowIndex = (Int*) (el+1) + nEl; 
+
+    //Int *el_rowIndex = rowIndex_pointer (curEl);
+    Int *curEl_rowIndex = (Int*) (curEl+1) + curEl->ncols; 
+
+
+    //double *el_Num = numeric_pointer (el);
+    double *el_Num = (double*)((Int*)(el+1) + 2*nEl+ 2*mEl);
+    // current elemnt numerical pointer
+    //double *el_Num = numeric_pointer (curEl);
+    double *curEl_Num = (double*)((Int*)(curEl+1) + 
+            2*curEl->nrows+ 2*curEl->ncols);
+
+    work_struct *Work =  paruMatInfo->Work;
+    Int *isRowInFront = Work->rowSize; 
+
+
+    std::vector <Int> tempRow;
+
+    //searching for rows
+    Int i = 0;
+    Int nrowsSeen = el->nrowsleft;
+    //Toll free zone
+    PRLEVEL (1, ("%% Toll free\n"));
+    while (i < mEl  && nrowsSeen >0 )
+    {
+        for (; el_rowIndex [i] < 0; i++);
+        nrowsSeen--;
+
+        Int rowInd = isRowInFront [i];
+        if (rowInd > 0 && rowInd < curEl->nrows)
+        {
+            // coompare their global indices
+            if (curEl_rowIndex[rowInd] == el_rowIndex [i])
+            {
+                PRLEVEL (1, ("%% rowInd =%ld \n", rowInd));
+                PRLEVEL (1, ("%% curEl_rowIndex[rowInd] =%ld \n",
+                            curEl_rowIndex[rowInd] ));
+                PRLEVEL (1, ("%% i =%ld \n", i));
+                PRLEVEL (1, ("%% el_rowIndex[i] =%ld \n", el_rowIndex[i]));
+                tempRow.push_back (i);
+            }
+            else
+                break;
+        }
+        i++;
+    }
+
+    PRLEVEL (1, ("%% TollED \n"));
+    Int toll = 8; //number of times it continue when do not find anything
+    //Toll zone
+    while (i < mEl  && nrowsSeen >0 && toll > 0)
+    {
+        for (; el_rowIndex [i] < 0; i++);
+        nrowsSeen--;
+
+        Int rowInd = isRowInFront [i];
+        if (rowInd > 0 && rowInd < curEl->nrows)
+        {
+            // coompare their global indices
+            if (curEl_rowIndex[rowInd] == el_rowIndex [i])
+            {
+                PRLEVEL (1, ("%% rowInd =%ld \n", rowInd));
+                PRLEVEL (1, ("%% curEl_rowIndex[rowInd] =%ld \n",
+                            curEl_rowIndex[rowInd] ));
+                PRLEVEL (1, ("%% i =%ld \n", i));
+                PRLEVEL (1, ("%% el_rowIndex[i] =%ld \n", el_rowIndex[i]));
+ 
+                tempRow.push_back (i);
+                toll++;
+            }
+            else
+                toll--;
+        }
+        i++;
+    }
+
+    PRLEVEL (p, ("%% %ld rows has been found: \n%%", tempRow.size() ));
+    if (tempRow.empty() )
+        return;
+#ifndef NDEBUG
+        for (Int ii = 0; ii < tempRow.size(); ii++) 
+            PRLEVEL (p, ("%ld ", tempRow[ii]) );
+        PRLEVEL (p, ("\n ") );
+#endif 
+
+
+    
+    if (el->cValid != paruMatInfo->time_stamp[f] )
+        paru_update_rel_ind_col ( e, f, colHash, paruMatInfo) ;
+
+    Int ncolsSeen = nEl;
+
+    for (Int j = el->lac; j < nEl ; j++) 
+    {
+
+        PRLEVEL (1, ("%% j =%ld \n", j));
+        double *sC = el_Num + mEl*j; //source column pointer
+        Int colInd = el_colIndex [j];
+        PRLEVEL (1, ("%% colInd =%ld \n", colInd));
+        if (colInd < 0) continue;
+        ncolsSeen--;
+        //Int fcolcolind = paru_find_hash (colInd, colHash, fcolList);
+        Int fcolcolind = colRelIndex [j];
+
+        double *dC = curEl_Num + fcolcolind*curEl->nrows;
+
+        for (Int ii = 0; ii < tempRow.size(); ii++) 
+        {
+            Int i = tempRow[ii];
+            Int rowInd = el_rowIndex[i];
+            Int ri = isRowInFront [rowInd]; 
+
+            PRLEVEL (2, ("%% ri = %ld \n", ri));
+            PRLEVEL (2, ("%% sC [%ld] =%2.5lf \n", i, sC [i]));
+            PRLEVEL (2, ("%% dC [%ld] =%2.5lf \n", ri, dC [ri]));
+            dC [ri ] += sC[i];
+            PRLEVEL (2, ("%% dC [%ld] =%2.5lf \n", i, dC [ri]));
+
+        }
+
+        if (ncolsSeen == 0)
+            break;
+        PRLEVEL (1, ("\n"));
+    }
+
+
+    //invalidating assembled rows
+    for (Int ii = 0; ii < tempRow.size(); ii++) 
+    {
+        Int i = tempRow[ii];
+        el_rowIndex[i] == -1;
+    }
+
+    el->nrowsleft -= tempRow.size();
+    if (el->nrowsleft == 0)
+    {
+        Int tot_size = sizeof(paru_Element) +
+            sizeof(Int)*(2*(mEl+nEl)) + sizeof(double)*nEl*mEl;
+        paru_free (1, tot_size, el, cc);
+        PRLEVEL (p, ("%%Some rows Free ALL %ld  %p size %ld\n",
                     e, el, tot_size));
         elementList[e] = NULL;
     }
