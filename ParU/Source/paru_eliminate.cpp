@@ -366,15 +366,6 @@ void paru_eliminate_rows ( Int e, Int f,
     Int eli = snM [f]; 
 
     PRLEVEL (p, ("%% Eliminat some rows of %ld in %ld\n", e, eli));
-#ifndef NDEBUG
-    p = 0;
-
-    PRLEVEL (p, ("%% %ld :\n", eli));
-    if (p <= 0) paru_print_element (paruMatInfo, eli);
-
-    PRLEVEL (p, ("%% %ld :\n", e));
-    if (p <= 0) paru_print_element (paruMatInfo, e);
-#endif
 
     paru_Element **elementList = paruMatInfo->elementList;
 
@@ -388,7 +379,7 @@ void paru_eliminate_rows ( Int e, Int f,
     Int *el_colIndex = (Int*)(el+1);
 
     //Int *rowRelIndex = relRowInd (el);
-    //Int *rowRelIndex = (Int*)(el+1) + 2*nEl +mEl;
+    Int *rowRelIndex = (Int*)(el+1) + 2*nEl +mEl;
 
     // Int *colRelIndex = relColInd (paru_Element *el);
     Int *colRelIndex = (Int*)(el+1) + mEl+ nEl;
@@ -446,7 +437,8 @@ void paru_eliminate_rows ( Int e, Int f,
     PRLEVEL (1, ("%% TollED \n"));
     Int toll = 8; //number of times it continue when do not find anything
     //Toll zone
-    while (i < mEl  && nrowsSeen >0 && toll > 0)
+    //while (i < mEl  && nrowsSeen >0 && toll > 0)
+    while (i < mEl  && nrowsSeen >0 )
     {
         for (; el_rowIndex [i] < 0; i++);
         nrowsSeen--;
@@ -472,17 +464,24 @@ void paru_eliminate_rows ( Int e, Int f,
         i++;
     }
 
-    PRLEVEL (p, ("%% %ld rows has been found: \n%%", tempRow.size() ));
     if (tempRow.empty() )
         return;
+
+    PRLEVEL (p, ("%% %ld rows has been found: \n%%", tempRow.size() ));
 #ifndef NDEBUG
-        for (Int ii = 0; ii < tempRow.size(); ii++) 
-            PRLEVEL (p, ("%ld ", tempRow[ii]) );
-        PRLEVEL (p, ("\n ") );
+    for (Int ii = 0; ii < tempRow.size(); ii++) 
+        PRLEVEL (p, ("%ld ", tempRow[ii]) );
+    PRLEVEL (p, ("\n ") );
 #endif 
+#ifndef NDEBUG
+    p = 0;
+    PRLEVEL (p, ("%% Before eliminiatine some rows %ld :\n", eli));
+    if (p <= 0) paru_print_element (paruMatInfo, eli);
 
+    PRLEVEL (p, ("%% %ld :\n", e));
+    if (p <= 0) paru_print_element (paruMatInfo, e);
+#endif
 
-    
     if (el->cValid != paruMatInfo->time_stamp[f] )
         paru_update_rel_ind_col ( e, f, colHash, paruMatInfo) ;
 
@@ -500,6 +499,7 @@ void paru_eliminate_rows ( Int e, Int f,
         //Int fcolcolind = paru_find_hash (colInd, colHash, fcolList);
         Int fcolcolind = colRelIndex [j];
 
+        PRLEVEL (1, ("%% fcolcolind=%ld \n", fcolcolind));
         double *dC = curEl_Num + fcolcolind*curEl->nrows;
 
         for (Int ii = 0; ii < tempRow.size(); ii++) 
@@ -508,11 +508,11 @@ void paru_eliminate_rows ( Int e, Int f,
             Int rowInd = el_rowIndex[i];
             Int ri = isRowInFront [rowInd]; 
 
-            PRLEVEL (2, ("%% ri = %ld \n", ri));
-            PRLEVEL (2, ("%% sC [%ld] =%2.5lf \n", i, sC [i]));
-            PRLEVEL (2, ("%% dC [%ld] =%2.5lf \n", ri, dC [ri]));
+            PRLEVEL (1, ("%% ri = %ld \n", ri));
+            PRLEVEL (1, ("%% sC [%ld] =%2.5lf \n", i, sC [i]));
+            PRLEVEL (1, ("%% dC [%ld] =%2.5lf \n", ri, dC [ri]));
             dC [ri ] += sC[i];
-            PRLEVEL (2, ("%% dC [%ld] =%2.5lf \n", i, dC [ri]));
+            PRLEVEL (1, ("%% dC [%ld] =%2.5lf \n", ri, dC [ri]));
 
         }
 
@@ -526,7 +526,8 @@ void paru_eliminate_rows ( Int e, Int f,
     for (Int ii = 0; ii < tempRow.size(); ii++) 
     {
         Int i = tempRow[ii];
-        el_rowIndex[i] == -1;
+        el_rowIndex[i] = -1;
+        rowRelIndex[i] = -1;
     }
 
     el->nrowsleft -= tempRow.size();
@@ -539,4 +540,14 @@ void paru_eliminate_rows ( Int e, Int f,
                     e, el, tot_size));
         elementList[e] = NULL;
     }
+#ifndef NDEBUG
+    p = 0;
+    PRLEVEL (p, ("%% After Eliminate some rows %ld :\n", eli));
+    if (p <= 0) paru_print_element (paruMatInfo, eli);
+
+    PRLEVEL (p, ("%% %ld :\n", e));
+    if (p <= 0) paru_print_element (paruMatInfo, e);
+#endif
+
+
 }

@@ -32,8 +32,9 @@ void paru_check_prior_element ( Int e, Int f, Int start_fac,
         return;
     }
 
-    if ( (elCol [e] == 0 && el->cValid > start_fac) || 
-            el->cValid == paruMatInfo->time_stamp[f])
+//    if ( (elCol [e] == 0 && el->cValid > start_fac) || 
+//            el->cValid == paruMatInfo->time_stamp[f])
+    if (el->rValid == start_fac || el->cValid == paruMatInfo->time_stamp[f])
     { // all the cols are inside he current front; maybe assemble some rows
         paru_eliminate_rows (e, f, colHash, paruMatInfo, cc);
     }
