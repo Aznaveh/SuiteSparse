@@ -434,11 +434,17 @@ void paru_eliminate_rows ( Int e, Int f,
         i++;
     }
 
+#ifndef NDEBUG
+    if (tempRow.size() > 0)
+        PRLEVEL (p, ("%% Toll free zone: %ld rows has been found: \n%%"
+                , tempRow.size() ));
+#endif
+
     PRLEVEL (1, ("%% TollED \n"));
     Int toll = 8; //number of times it continue when do not find anything
     //Toll zone
-    //while (i < mEl  && nrowsSeen >0 && toll > 0)
-    while (i < mEl  && nrowsSeen >0 )
+    while (i < mEl  && nrowsSeen >0 && toll > 0)
+    //while (i < mEl  && nrowsSeen >0 )
     {
         for (; el_rowIndex [i] < 0; i++);
         nrowsSeen--;
@@ -467,7 +473,8 @@ void paru_eliminate_rows ( Int e, Int f,
     if (tempRow.empty() )
         return;
 
-    PRLEVEL (p, ("%% %ld rows has been found: \n%%", tempRow.size() ));
+    PRLEVEL (p, ("%% %ld rows has been found, toll %ld\n%%", 
+                tempRow.size(), toll ));
 #ifndef NDEBUG
     for (Int ii = 0; ii < tempRow.size(); ii++) 
         PRLEVEL (p, ("%ld ", tempRow[ii]) );
