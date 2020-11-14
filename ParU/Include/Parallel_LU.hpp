@@ -357,7 +357,7 @@ typedef struct
     Int m, n;               /* size of the sumbatrix that is factorized */
     paru_symbolic *LUsym;
     tupleList *RowList;     /* size n of dynamic list */
-    tupleList *ColList;     /* size m of dynamic list */
+    //tupleList *ColList;     /* size m of dynamic list */
     paru_Element **elementList;  /* pointers to all elements, size = m+nf+1 */
     work_struct *Work;             
 

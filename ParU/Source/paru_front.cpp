@@ -54,7 +54,7 @@ int paru_front ( paru_matrix *paruMatInfo,
     ASSERT (fp > 0 );
 
     /* computing number of rows, set union */
-    tupleList *ColList = paruMatInfo->ColList;
+    //tupleList *ColList = paruMatInfo->ColList;
 
     Int panel_width = paruMatInfo->panel_width;
     Int num_panels = (Int) ceil( (double)fp/panel_width);
@@ -551,17 +551,17 @@ int paru_front ( paru_matrix *paruMatInfo,
     ////////////////////////////////////////////////////////////////////////////
 
     // adding tuples for current front
-    for (Int i = 0; i < colCount; ++ i) 
-    {
-        paru_Tuple colTuple;
-        colTuple.e = eli;
-        colTuple.f = i;
-        if (paru_add_colTuple (ColList, fcolList[i], colTuple, cc) )
-        {
-            printf("%% Out of memory: add_colTuple \n");
-            return 1;
-        }
-    }
+//    for (Int i = 0; i < colCount; ++ i) 
+//    {
+//        paru_Tuple colTuple;
+//        colTuple.e = eli;
+//        colTuple.f = i;
+//        if (paru_add_colTuple (ColList, fcolList[i], colTuple, cc) )
+//        {
+//            printf("%% Out of memory: add_colTuple \n");
+//            return 1;
+//        }
+//    }
     for (Int i = fp; i < rowCount; ++ i) 
     {
         Int locIndx = i-fp; 

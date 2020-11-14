@@ -36,9 +36,9 @@ void paru_write( paru_matrix *paruMatInfo, int scale,
 
     //char dpath[] = "./";
     //it works in most cases!!
-    //char dpath[] = "./Res/";
+    char dpath[] = "./Res/";
     //I have to use this one when I am calling from MATLAB
-    char dpath[] = "/home/grads/a/aznaveh/SuiteSparse/ParU/Demo/Res/";
+    //char dpath[] = "/home/grads/a/aznaveh/SuiteSparse/ParU/Demo/Res/";
     // used to work on Parasol systems
     //char dpath[] = "/users/aznaveh/SuiteSparse/ParU/Demo/Res/";
 

@@ -148,27 +148,27 @@ void paru_freemat (paru_matrix **paruMatInfo_handle, cholmod_common *cc)
 
     tupleList *RowList = paruMatInfo->RowList;
     PRLEVEL (1, ("%% RowList =%p\n", RowList));
-    tupleList *ColList = paruMatInfo->ColList;
-    PRLEVEL (1, ("%% ColList =%p\n", ColList));
+//    tupleList *ColList = paruMatInfo->ColList;
+//    PRLEVEL (1, ("%% ColList =%p\n", ColList));
 
 
     paru_symbolic *LUsym = paruMatInfo-> LUsym;
     Int nf = LUsym->nf;
 
-    // free tuple lists 
-    for (Int col = 0; col < n; col++) 
-    {
-        Int len = ColList [col].len;
-        // ASSERT (len < m);  // it is a wrong assertion but there is a good
-        //  point
-
-#ifndef NDEBUG
-        if (len > m+nf )
-            PRLEVEL (1, ("%% too much space used for %ld\n",col););
-#endif
-        paru_free (len , sizeof (paru_Tuple), ColList[col].list, cc);
-    }
-    paru_free (1, n*sizeof(tupleList), ColList, cc);
+//    // free tuple lists 
+//    for (Int col = 0; col < n; col++) 
+//    {
+//        Int len = ColList [col].len;
+//        // ASSERT (len < m);  // it is a wrong assertion but there is a good
+//        //  point
+//
+//#ifndef NDEBUG
+//        if (len > m+nf )
+//            PRLEVEL (1, ("%% too much space used for %ld\n",col););
+//#endif
+//        paru_free (len , sizeof (paru_Tuple), ColList[col].list, cc);
+//    }
+//    paru_free (1, n*sizeof(tupleList), ColList, cc);
 
     for (Int row = 0; row < m; row++) 
     {

@@ -169,15 +169,15 @@ paru_matrix *paru_init_rowFronts (
 
     PRLEVEL (1, ("%% $RowList =%p\n", RowList));
 
-    tupleList *ColList= paruMatInfo->ColList =
-        (tupleList*) paru_alloc (1, n*sizeof(tupleList), cc);
-    if (ColList== NULL)
-    {   //out of memory
-        paru_freemat (&paruMatInfo, cc);
-        printf("Out of memory: ColList\n");
-        return NULL;
-    }
-    PRLEVEL (1, ("%% $ColList =%p\n", ColList));
+//    tupleList *ColList= paruMatInfo->ColList =
+//        (tupleList*) paru_alloc (1, n*sizeof(tupleList), cc);
+//    if (ColList== NULL)
+//    {   //out of memory
+//        paru_freemat (&paruMatInfo, cc);
+//        printf("Out of memory: ColList\n");
+//        return NULL;
+//    }
+//    PRLEVEL (1, ("%% $ColList =%p\n", ColList));
 
     paru_Element **elementList; 
     elementList = paruMatInfo->elementList = // Initialize with NULL
@@ -350,16 +350,16 @@ paru_matrix *paru_init_rowFronts (
 
          PRLEVEL (2, ("%% ncols[%ld]=%ld\n",col,ncols));
 
-         ColList[col].numTuple = 0;
-         ColList[col].len = slackCol*ncols;
-         ColList[col].list = 
-             (paru_Tuple*) paru_alloc (slackCol*ncols, sizeof(paru_Tuple), cc);
-         if (ColList[col].list == NULL)
-         {   //out of memory
-             paru_freemat (&paruMatInfo, cc);
-             printf("Out of memory: ColList[col].list\n");
-             return NULL;
-         }
+//         ColList[col].numTuple = 0;
+//         ColList[col].len = slackCol*ncols;
+//         ColList[col].list = 
+//             (paru_Tuple*) paru_alloc (slackCol*ncols, sizeof(paru_Tuple), cc);
+//         if (ColList[col].list == NULL)
+//         {   //out of memory
+//             paru_freemat (&paruMatInfo, cc);
+//             printf("Out of memory: ColList[col].list\n");
+//             return NULL;
+//         }
      }
 
      PRLEVEL (0, ("InMatrix=[\n") ); //MATLAB matrix, 
@@ -449,12 +449,12 @@ paru_matrix *paru_init_rowFronts (
              PRLEVEL (0, ("%ld,%ld, %.16lf;\n", row+1,Sj[p]+1, Sx[p]) );
 
 
-             if (paru_add_colTuple (ColList, Sj [p], colTuple, cc) )
-             {
-                 paru_freemat (&paruMatInfo, cc);
-                 printf("Out of memory: add_colTuple \n");
-                 return NULL;
-             }
+//             if (paru_add_colTuple (ColList, Sj [p], colTuple, cc) )
+//             {
+//                 paru_freemat (&paruMatInfo, cc);
+//                 printf("Out of memory: add_colTuple \n");
+//                 return NULL;
+//             }
          }
          el_colrowIndex[j++] = row;  //initializing element row index 
          paruMatInfo->lacList [e] = lac_el (elementList, e);
