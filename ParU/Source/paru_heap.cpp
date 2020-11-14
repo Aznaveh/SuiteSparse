@@ -46,7 +46,7 @@ void paru_make_heap (Int f, Int start_fac,
         paru_matrix *paruMatInfo,
         cholmod_common *cc)
 {
-    DEBUGLEVEL(1);
+    DEBUGLEVEL(0);
 #ifndef NDEBUG  
     Int p = 1;
 #endif

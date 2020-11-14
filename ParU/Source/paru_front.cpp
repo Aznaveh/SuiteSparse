@@ -19,7 +19,7 @@ int paru_front ( paru_matrix *paruMatInfo,
         cholmod_common *cc)
 {
 
-    DEBUGLEVEL(-2);
+    DEBUGLEVEL(-1);
     /* 
      * -2 Print Nothing
      * -1 Just Matlab
@@ -54,7 +54,6 @@ int paru_front ( paru_matrix *paruMatInfo,
     ASSERT (fp > 0 );
 
     /* computing number of rows, set union */
-    //tupleList *ColList = paruMatInfo->ColList;
 
     Int panel_width = paruMatInfo->panel_width;
     Int num_panels = (Int) ceil( (double)fp/panel_width);
@@ -390,7 +389,7 @@ int paru_front ( paru_matrix *paruMatInfo,
             { //free el
                 Int tot_size = sizeof(paru_Element) +
                     sizeof(Int)*(2*(mEl+nEl)) + sizeof(double)*nEl*mEl;
-                PRLEVEL (-1, ("%%inside Front: Free %ld\n",e));
+                PRLEVEL (1, ("%%inside Front: Free %ld\n",e));
                 paru_free (1, tot_size, el, cc);
                 elementList[e] = NULL;
             }
@@ -550,18 +549,6 @@ int paru_front ( paru_matrix *paruMatInfo,
 
     ////////////////////////////////////////////////////////////////////////////
 
-    // adding tuples for current front
-//    for (Int i = 0; i < colCount; ++ i) 
-//    {
-//        paru_Tuple colTuple;
-//        colTuple.e = eli;
-//        colTuple.f = i;
-//        if (paru_add_colTuple (ColList, fcolList[i], colTuple, cc) )
-//        {
-//            printf("%% Out of memory: add_colTuple \n");
-//            return 1;
-//        }
-//    }
     for (Int i = fp; i < rowCount; ++ i) 
     {
         Int locIndx = i-fp; 

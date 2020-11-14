@@ -48,30 +48,3 @@ Int paru_add_rowTuple (
     }
     return 0;
 }
-
-//Int paru_add_colTuple (tupleList *ColList, Int col, 
-//        paru_Tuple T, cholmod_common *cc)  
-//{
-//    DEBUGLEVEL(0);
-//    PRLEVEL (1, ("%% col=%ld, (%ld,%ld)\n", col, T.e, T.f));
-//    tupleList *cur = &ColList [col];
-//    PRLEVEL (1, ("%% cur->numTuple =%ld\n", cur->numTuple));
-//    if (cur->len > cur->numTuple)
-//        cur->list [cur->numTuple++] = T;
-//    else
-//    {
-//        PRLEVEL (1, ("%% Col paru_Tuple reallocating space\n"));
-//        Int newLen = cur->len*2 + 1;
-//        paru_Tuple *newList = 
-//            (paru_Tuple*) paru_alloc (newLen, sizeof(paru_Tuple), cc);
-//        if (newList == NULL)    // Error in allocating memory
-//            return 1;
-//        for (Int i = 0; i < cur->numTuple; ++i) //copy old to new
-//            newList [i] = cur->list [i];
-//        paru_free (cur->len, sizeof(paru_Tuple), cur->list, cc); 
-//        cur->len = newLen;
-//        cur->list = newList;
-//        cur->list [cur->numTuple++] = T;
-//    }
-//    return 0;
-//}

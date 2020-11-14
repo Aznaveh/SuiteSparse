@@ -29,28 +29,6 @@ void assemble_col (const double *sC,  //source col and destination col
     }
     PRLEVEL (1, ("\n"));
 }
-void assemble_row (const double *sM, double *dM,//source and destination matrix 
-        Int sm, Int sn,    // dimension of source matrix
-        Int dm,     // dimension of destination matrix
-        Int sR, Int dR,     //source row and destination row
-        const Int *relColInd) 
-    //Source and destination are stored column based
-{
-    //TODO get some info from el not to start from first col
-    DEBUGLEVEL (0);
-    for (Int j = 0; j < sn; j++) 
-    {
-        Int rj =relColInd[j] ;
-        if ( rj >= 0 )
-        {  // If still valid
-            PRLEVEL (1, ("%% sM [%ld] =%2.5lf \n", sm*j+sR, sM [sm*j+sR] ));
-            PRLEVEL (1, ("%% dM [%ld] =%2.5lf \n", rj*dm+dR, dM [rj*dm+dR]));
-            dM [rj*dm + dR] += sM [sm*j + sR];
-            PRLEVEL (1, ("%% dM [%ld] =%2.5lf \n", rj*dm+dR, dM [rj*dm+dR]));
-        }
-    }
-}
-
 
 void assemble_row_toU (Int e, Int f, Int sR, Int dR, 
         std::vector <Int> colHash, 

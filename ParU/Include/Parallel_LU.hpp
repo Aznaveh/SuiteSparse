@@ -5,18 +5,17 @@
 #ifndef PARU_H
 #define PARU_H
 
-#include <stdlib.h>
-#include <math.h>
-#include <float.h>
-#include <stdio.h>
-#include <cstring>
+// These libraries are included probably in Suitesparse config
+//#include <stdlib.h>
+//#include <math.h>
+//#include <float.h>
+//#include <stdio.h>
+//#include <cstring>
 
 //To be able to use set
-#include <iostream>
 #include <algorithm>
 #include <set>
 #include <vector>
-#include <unordered_map>
 
 extern "C"
 {
@@ -357,7 +356,7 @@ typedef struct
     Int m, n;               /* size of the sumbatrix that is factorized */
     paru_symbolic *LUsym;
     tupleList *RowList;     /* size n of dynamic list */
-    //tupleList *ColList;     /* size m of dynamic list */
+
     paru_Element **elementList;  /* pointers to all elements, size = m+nf+1 */
     work_struct *Work;             
 
@@ -426,10 +425,6 @@ void paru_freemat(paru_matrix **paruMatInfo_handle, cholmod_common *cc);
 /* add tuple functions defintions */
 Int paru_add_rowTuple (tupleList *RowList, Int row, paru_Tuple T, 
         cholmod_common *cc);
-Int paru_add_colTuple (tupleList *ColList, Int col, 
-        paru_Tuple T, cholmod_common *cc);
-Int paru_remove_colTuple(tupleList *ColList, Int col, Int t);
-Int paru_remove_rowTuple(tupleList *RowList, Int row, Int t);
 
 // older version does not include row degree update after each panel
 //void paru_assemble(paru_matrix *paruMatInfo, Int f, cholmod_common *cc);
@@ -449,8 +444,6 @@ paru_Element *paru_create_element (Int nrows, Int ncols,
         Int init, cholmod_common *cc);
 void assemble_col (const double *sR, double *dR, Int m, const Int *relRowInd);
 
-void assemble_row (const double *sM, double *dM, Int sm, Int sn, Int dm, 
-  Int sR, Int dR, const Int *relColInd);
 
 void assemble_row_toU (Int e, Int f, Int sR, Int dR, 
         std::vector <Int> colHash, 
@@ -461,9 +454,6 @@ Int paru_trsm(double *pF, double *uPart, Int fp, Int rowCount, Int colCount);
 Int paru_dgemm(double *pF, double *uPart, double *el, Int fp, 
         Int rowCount, Int colCount);
 
-// I am not using it like this anymore
-void paru_fourPass (paru_matrix *paruMatInfo,  Int f, Int fp, 
-        cholmod_common *cc);
 
 void paru_print_element (paru_matrix *paruMatInfo, Int e);
 void paru_print_tupleList (tupleList *listSet, Int index);
@@ -485,7 +475,6 @@ void paru_update_rowDeg ( Int panel_num,  Int row_end,
 
 Int paru_cumsum (Int n, Int *X);
 
-Int bin_srch_ind (Int *srt_lst, Int *ind_lst, Int l, Int r, Int num);
 Int bin_srch_col (Int *srt_lst, Int l, Int r, Int num);
 Int bin_srch (Int *srt_lst, Int l, Int r, Int num);
 
@@ -527,10 +516,6 @@ void paru_make_heap (Int f, Int start_fac,
         std::vector<Int> colHash, 
         paru_matrix *paruMatInfo,
         cholmod_common *cc);
-void perc_down (Int i, Int *lacList, std::vector<Int> &heap);
-void remove_heap (Int i, Int *lacList, std::vector<Int> &heap);
-
-
 
 //hash related
 void paru_insert_hash(Int key, Int value, std::vector<Int> &colHash);
