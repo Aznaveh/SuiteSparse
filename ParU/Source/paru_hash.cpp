@@ -17,26 +17,26 @@
 
 void paru_insert_hash(Int key, Int value, std::vector<Int> &colHash)
 {
-    DEBUGLEVEL(0);
+    DEBUGLEVEL(1);
 
 #ifndef NDEBUG  
     Int p = 1;
-    Int loop_cnt = 0;
     PRLEVEL (p, ("%% Insert hash key=%ld value=%ld ", key, value ));
     PRLEVEL (p, ("size=%ld \n", colHash.size() ));
 #endif
+    Int loop_cnt = 0;
 
     Int size = colHash.size();
     Int  index = key % size;  //hash function
     PRLEVEL (p, ("index =%ld \n", index ));
-    while ( colHash[index] != -1 )
+    while ( colHash[index] != -1  )
     { //finding an empty spot
-#ifndef NDEBUG  
-    loop_cnt++;
-#endif
+        loop_cnt++;
+        if( loop_cnt > log2(size) )
+            return; //without inserting inside the hash
         index = (index+1) % size;
     }
-    ASSERT (loop_cnt <= size);
+
     colHash[index] = value;
 
 #ifndef NDEBUG  
@@ -50,7 +50,7 @@ void paru_insert_hash(Int key, Int value, std::vector<Int> &colHash)
 
 Int paru_find_hash (Int key, std::vector<Int> &colHash, Int *fcolList)
 {
-    DEBUGLEVEL(0);
+    DEBUGLEVEL(1);
 #ifndef NDEBUG  
     Int p = 1;
     PRLEVEL (p, ("%% find for hash key=%ld \n", key));
@@ -60,13 +60,14 @@ Int paru_find_hash (Int key, std::vector<Int> &colHash, Int *fcolList)
     Int index = key % size;
     Int value = colHash [index];
     Int loop_cnt = 0;
-    while (  value != -1 && fcolList [value] != key  )
+    //while (  value != -1 && fcolList [value] != key  )
+    while (  fcolList [value] != key  )
     {
         PRLEVEL (p, ("%% index =%ld \n", index ));
         if( loop_cnt++ > log2(size) )
-        //if( loop_cnt++ > (size) )
+            //if( loop_cnt++ > (size) )
         { // take a long time in the hash; 
-          //  guarantees that find takes at most log time
+            //  guarantees that find takes at most log time
             PRLEVEL (p, ("%% binary search for hash\n"));
             value = bin_srch (fcolList, 0, size-1, key);
             break;
@@ -85,7 +86,7 @@ Int paru_find_hash (Int key, std::vector<Int> &colHash, Int *fcolList)
     PRLEVEL (p, ("%% value is =%ld \n", value));
     Int bsRes = bin_srch (fcolList, 0, size-1, key);
     PRLEVEL (p, ("%% binSearch=%ld \n", bsRes));
-    ASSERT (bin_srch (fcolList, 0, size-1, key) == value );
+    //ASSERT (bin_srch (fcolList, 0, size-1, key) == value );
 #endif
     return value;
 }
