@@ -17,7 +17,7 @@
 
 void paru_insert_hash(Int key, Int value, std::vector<Int> &colHash)
 {
-    DEBUGLEVEL(1);
+    DEBUGLEVEL(0);
 
 #ifndef NDEBUG  
     Int p = 1;
@@ -50,7 +50,7 @@ void paru_insert_hash(Int key, Int value, std::vector<Int> &colHash)
 
 Int paru_find_hash (Int key, std::vector<Int> &colHash, Int *fcolList)
 {
-    DEBUGLEVEL(1);
+    DEBUGLEVEL(0);
 #ifndef NDEBUG  
     Int p = 1;
     PRLEVEL (p, ("%% find for hash key=%ld \n", key));
@@ -60,12 +60,10 @@ Int paru_find_hash (Int key, std::vector<Int> &colHash, Int *fcolList)
     Int index = key % size;
     Int value = colHash [index];
     Int loop_cnt = 0;
-    //while (  value != -1 && fcolList [value] != key  )
     while (  fcolList [value] != key  )
     {
         PRLEVEL (p, ("%% index =%ld \n", index ));
         if( loop_cnt++ > log2(size) )
-            //if( loop_cnt++ > (size) )
         { // take a long time in the hash; 
             //  guarantees that find takes at most log time
             PRLEVEL (p, ("%% binary search for hash\n"));
