@@ -19,7 +19,7 @@ int paru_front ( paru_matrix *paruMatInfo,
         cholmod_common *cc)
 {
 
-    DEBUGLEVEL(-1);
+    DEBUGLEVEL(-2);
     /* 
      * -2 Print Nothing
      * -1 Just Matlab
@@ -502,7 +502,6 @@ int paru_front ( paru_matrix *paruMatInfo,
         //Updating isRowInFront after the pivoting
         //attention it is the old rowMark not the updated rowMarkp + eli
         //If I decide to add rowMark I should change paru_pivotal
-        //TODO decide about adding rowMark here later // + rowMark ; 
         isRowInFront [curRow] = locIndx ;
         PRLEVEL (1, ("%% el_rowIndex [%ld] =%ld\n",
                     locIndx, el_rowIndex [locIndx]));
@@ -530,7 +529,7 @@ int paru_front ( paru_matrix *paruMatInfo,
 
 #ifndef NDEBUG
     //Printing the contribution block after dgemm
-    p = 0;
+    p = 1;
     PRLEVEL (p, ("\n%%After DGEMM:"));
     if (p <= 0)
         paru_print_element (paruMatInfo, eli);

@@ -12,11 +12,6 @@
  *
  * @author Aznaveh
  */
-/*! TODO: Cap number of tuples to maximum number of elements; 
- *      How to do this? 
- *      The maximum number is a constant based on the input
- *      matrix. should I send it as an argument to the function or there is a
- *      better way of doing this*/
 Int paru_add_rowTuple (
         tupleList *RowList, 
         Int row, 

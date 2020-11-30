@@ -241,7 +241,6 @@ void paru_freemat (paru_matrix **paruMatInfo_handle, cholmod_common *cc)
     paru_free(1, nf*sizeof(paru_fac),LUs, cc);
     paru_free(1, nf*sizeof(paru_fac),Us, cc);
     paru_free(1, nf*sizeof(Int),paruMatInfo->time_stamp, cc);
-    //TODO: at least for debug free each heap before next line
     // in practice each parent should deal with the memory for the children
 #ifndef NDEBUG
 std::vector<Int>** heapList = paruMatInfo->heapList;

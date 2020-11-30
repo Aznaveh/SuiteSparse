@@ -201,7 +201,7 @@ paru_symbolic *paru_analyze
     // and NULL otherwise
 
     double status,   // Info [UMFPACK_STATUS] 
-    Info[UMFPACK_INFO],// Contains statistics about the symbolic analysis
+    Info [UMFPACK_INFO],// Contains statistics about the symbolic analysis
     
     Control [UMFPACK_CONTROL]; // it is set in umfpack_dl_defaults and
                                // is used in umfpack_dl_symbolic; if
@@ -224,7 +224,7 @@ paru_symbolic *paru_analyze
 
 #ifndef NDEBUG
     /* print the control parameters */
-    Int p = 0;
+    Int p = 1;
     if (p <= 0)  umfpack_dl_report_control (Control) ;
 #endif
 
@@ -253,8 +253,8 @@ paru_symbolic *paru_analyze
         return NULL;
     }
 
-    Int cs1 = Info[UMFPACK_COL_SINGLETONS];
-    Int rs1 = Info[UMFPACK_ROW_SINGLETONS];
+    Int cs1 = Info [UMFPACK_COL_SINGLETONS];
+    Int rs1 = Info [UMFPACK_ROW_SINGLETONS];
 
     /* ---------------------------------------------------------------------- */
     /* startegy UMFPACK used*/ 
@@ -262,6 +262,9 @@ paru_symbolic *paru_analyze
 
 
     Int strategy = Info [UMFPACK_STRATEGY_USED] ;
+
+#ifndef NDEBUG
+    p = 0;
     if (strategy == UMFPACK_STRATEGY_SYMMETRIC)
     {
         PRLEVEL (p, ("\nstrategy used:  symmetric\n"));
@@ -318,6 +321,7 @@ paru_symbolic *paru_analyze
             PRLEVEL (p, ("ordering used: not computed\n"));
         }
     }
+#endif
 
 #ifndef NDEBUG
     p = 1;

@@ -93,7 +93,7 @@ void paru_make_heap (Int f, Int start_fac,
         if ( log2(biggest_Child_size) > 
                 (biggest_Child_size/(size_of_rest+1))+1 )
         { //klogn
-            PRLEVEL (p-1, ("%% klogn algorhtm\n"));
+            PRLEVEL (p, ("%% klogn algorhtm\n"));
             for (Int i = aChildp[eli]; i <= aChildp[eli+1]-1; i++) 
             {   
                 Int chelid = aChild[i];  // element id of the child
@@ -135,7 +135,7 @@ void paru_make_heap (Int f, Int start_fac,
         }
         else
         {  //heapify
-            PRLEVEL (p-1, ("%%heapify with the size %ld\n", tot_size));
+            PRLEVEL (p, ("%%heapify with the size %ld\n", tot_size));
             std::vector<Int>* curHeap = heapList[eli];  
             for (Int i = aChildp[eli]; i <= aChildp[eli+1]-1; i++) 
             {

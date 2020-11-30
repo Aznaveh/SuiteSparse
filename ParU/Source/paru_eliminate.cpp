@@ -356,7 +356,7 @@ void paru_eliminate_rows ( Int e, Int f,
         cholmod_common *cc)
 
 {
-    DEBUGLEVEL(1);
+    DEBUGLEVEL(0);
 #ifndef NDEBUG  
     Int p = 1;
 #endif
@@ -481,7 +481,7 @@ void paru_eliminate_rows ( Int e, Int f,
     PRLEVEL (p, ("\n ") );
 #endif 
 #ifndef NDEBUG
-    p = 0;
+    p = 1;
     PRLEVEL (p, ("%% Before eliminiatine some rows %ld :\n", eli));
     if (p <= 0) paru_print_element (paruMatInfo, eli);
 
@@ -548,13 +548,11 @@ void paru_eliminate_rows ( Int e, Int f,
         elementList[e] = NULL;
     }
 #ifndef NDEBUG
-    p = 0;
+    p = 1;
     PRLEVEL (p, ("%% After Eliminate some rows %ld :\n", eli));
     if (p <= 0) paru_print_element (paruMatInfo, eli);
 
     PRLEVEL (p, ("%% %ld :\n", e));
     if (p <= 0) paru_print_element (paruMatInfo, e);
 #endif
-
-
 }

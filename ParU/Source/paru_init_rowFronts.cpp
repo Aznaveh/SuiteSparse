@@ -441,5 +441,6 @@ paru_matrix *paru_init_rowFronts (
      // Free here or if not wil be freed in paru_mem anyway
      paru_free (snz, sizeof (double), Sx , cc) ;
      paru_free (snz, sizeof (Int), Sj, cc);
+     LUsym->Sx = NULL; LUsym->Sj = NULL;
      return paruMatInfo;
 }
