@@ -406,7 +406,7 @@ paru_matrix *paru_init_rowFronts (
              return NULL;
          }
 
-         //Allocating elements, and updating column tuple list
+         //Allocating elements
          Int *el_colrowIndex = colIndex_pointer (curEl); 
          double *el_colrowNum = numeric_pointer (curEl);
 
@@ -416,11 +416,6 @@ paru_matrix *paru_init_rowFronts (
          Int j = 0;  //Index inside an element
          for ( Int p = Sp [row]; p < Sp [row+1]; p++)
          {
-             // adding column tuple
-             paru_Tuple colTuple;
-             colTuple.e = e;
-             colTuple.f = j;
-
              el_colrowIndex[j] = Sj[p];
              el_colrowNum[j++] =   Sx[p];
              PRLEVEL (1, ("Sj[%ld] =%ld Sx[%ld]=%lf\n", p, Sj[p], p, Sx[p] ));

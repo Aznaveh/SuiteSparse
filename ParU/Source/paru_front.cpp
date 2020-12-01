@@ -556,7 +556,7 @@ int paru_front ( paru_matrix *paruMatInfo,
         rowTuple.f = locIndx;
         if (paru_add_rowTuple (RowList, frowList[i], rowTuple, cc) )
         {
-            printf("%% Out of memory: add_colTuple \n");
+            printf("%% Out of memory: add_rowTuple \n");
             return 1; 
         }
 

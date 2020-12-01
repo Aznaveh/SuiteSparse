@@ -96,6 +96,7 @@ Int paru_panel_factorize (double *F, Int *frowList, Int m, Int n,
             {
                 row_max = i; 
                 maxval = F[j*m + i];
+                //TODO: find the original digonla entry
             }
         }
 
