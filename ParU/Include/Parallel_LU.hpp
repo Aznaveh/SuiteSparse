@@ -136,12 +136,19 @@ typedef struct
     // S=A(P,Q) in increasing order of leftmost column
     // index.  Pinv [i] = k if row i of A is row k of S.
 
+    Int *Pinit; // size m, row permutation. 
+    // UMFPACK computes it and I compute Pinv out of it. 
+    // I need it in several places so I decided to keep it
+
     Int *Sleft ;    // size n-n1+2.  The list of rows of S whose
     // leftmost column index is j is given by
     // Sleft [j] ... Sleft [j+1]-1.  This can be empty (that is, Sleft
     // [j] can equal Sleft [j+1]).  Sleft [n] is the number of
     // non-empty rows of S, and Sleft [n+1] == m.  That is, Sleft [n]
     // ... Sleft [n+1]-1 gives the empty rows of S, if any.
+
+    Int strategy; // for this package it is important if the strategy is 
+    //symmetric or if it is unsymmetric
 
     // -------------------------------------------------------------------------
     // frontal matrices: pattern and tree
@@ -433,8 +440,8 @@ int paru_front (paru_matrix *paruMatInfo, Int f, cholmod_common *cc);
 
 
 Int paru_dgetrf (double *F, Int *frowList, Int m, Int n, BLAS_INT *ipiv);
-Int paru_factorize(double *F, Int *frowList, Int lm, Int ln, Int start_fac,
-        Int *panel_row, std::set<Int> &stl_colSet, 
+Int paru_factorize(Int f, Int start_fac, Int *panel_row, 
+        std::set<Int> &stl_colSet, 
         std::vector<Int> &pivotal_elements,
         paru_matrix *paruMatInfo);
 
