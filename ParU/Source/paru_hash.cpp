@@ -60,9 +60,12 @@ Int paru_find_hash (Int key, std::vector<Int> &colHash, Int *fcolList)
     Int index = key % size;
     Int value = colHash [index];
     Int loop_cnt = 0;
-    while (  fcolList [value] != key  )
+
+    while (  value == -1 || fcolList [value] != key  )
     {
+        index = (index+1) % size;
         PRLEVEL (p, ("%% index =%ld \n", index ));
+        value = colHash [index];
         if( loop_cnt++ > log2(size) )
         { // take a long time in the hash; 
             //  guarantees that find takes at most log time
@@ -70,10 +73,6 @@ Int paru_find_hash (Int key, std::vector<Int> &colHash, Int *fcolList)
             value = bin_srch (fcolList, 0, size-1, key);
             break;
         }
-
-        //++index %=  size;
-        index = (index+1) % size;
-        value = colHash [index];
     }
 #ifndef NDEBUG  
     p = 1;
