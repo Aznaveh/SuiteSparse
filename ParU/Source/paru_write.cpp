@@ -15,7 +15,7 @@ void paru_write( paru_matrix *paruMatInfo, int scale,
     PRLEVEL (1, ("%% Start Writing\n"));
     paru_symbolic *LUsym = paruMatInfo-> LUsym;
     Int nf = LUsym->nf;
-    
+
     Int m = LUsym->m;
     Int n = LUsym->n;
     Int n1 = LUsym->n1; // row+col singletons
@@ -73,17 +73,17 @@ void paru_write( paru_matrix *paruMatInfo, int scale,
     //--------------------computing and  writing row permutation to a file
 
     //some working memory that is freed in this function 
-    Int *oldRofS = NULL; Int *PofA = NULL; Int *newRofS = NULL;    
+    Int *oldRofS = NULL; 
+    Int *newRofS = NULL;    
+    Int *Pinit = LUsym->Pinit;
 
     oldRofS = (Int*) paru_alloc ( m, sizeof (Int), cc); // S -> LU P
-    PofA = (Int*) paru_alloc ( m, sizeof (Int), cc);    // P direct of A 
     newRofS = (Int*) paru_alloc ( m, sizeof (Int), cc); //Pinv of S
 
-    if (oldRofS == NULL || PofA == NULL || newRofS == NULL)
+    if (oldRofS == NULL || newRofS == NULL)
     {
         printf ("memory problem for writing into files\n");
         paru_free  ( m, sizeof (Int), oldRofS, cc);
-        paru_free ( m, sizeof (Int), PofA, cc);
         paru_free ( m, sizeof (Int), newRofS, cc);
         return;
     }
@@ -104,17 +104,11 @@ void paru_write( paru_matrix *paruMatInfo, int scale,
         }
         fprintf (rowfptr, "%%rows\n"); 
 
-        for(Int k = 0; k < m ; k++)
-        { //direct permutation from Pinv
-            PofA[Pinv[k]] = k;       // actually I have it now with UMFPACK
-                                     // but didn't save it
-        }
-
         Int ip = 0; //number of rows seen so far
         for (Int k = 0; k < n1 ; k++)
-         //first singletons
-            fprintf (rowfptr, "%ld\n", PofA[k] );
-        
+            //first singletons
+            fprintf (rowfptr, "%ld\n", Pinit[k] );
+
         for(Int f = 0; f < nf ; f++)
         {  // rows for each front 
             Int col1 = Super [f];     
@@ -126,11 +120,10 @@ void paru_write( paru_matrix *paruMatInfo, int scale,
             for (Int k = 0; k < fp ; k++)
             {
                 oldRofS[ip++] = frowList[k];   // computing permutation for S
-                                               // P[k] = i 
-                fprintf (rowfptr, "%ld\n", PofA[frowList[k]] );
+                // P[k] = i 
+                fprintf (rowfptr, "%ld\n", Pinit[frowList[k]] );
             }
         }
-        paru_free ( m, sizeof (Int), PofA, cc);
         fclose(rowfptr);
         PRLEVEL (1, ("%% row permutaion DONE\n"));
     }
@@ -139,7 +132,7 @@ void paru_write( paru_matrix *paruMatInfo, int scale,
 
     //-------- computing the direct permutation of S
     for(Int k = 0; k < m-n1 ; k++)
-     // Inv permutation for S Pinv[i] = k;
+        // Inv permutation for S Pinv[i] = k;
         newRofS[oldRofS[k]] = k;
 
     //--------------------

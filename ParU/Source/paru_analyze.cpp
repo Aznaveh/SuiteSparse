@@ -79,7 +79,7 @@ paru_symbolic *paru_analyze
     // not to free an uninitialized space
     LUsym->Chain_start = LUsym->Chain_maxrows = LUsym->Chain_maxcols = NULL;
     LUsym->Parent = LUsym->Super = LUsym->Child = LUsym->Childp = NULL;
-    LUsym->Qfill = LUsym->Pinv = NULL;
+    LUsym->Qfill = LUsym->Pinv = LUsym->Pinit = NULL;
     LUsym->Sp = LUsym->Sj = LUsym->Sleft= NULL; LUsym->Sx = NULL;
     LUsym->Fm= LUsym->Cm= LUsym->Rj= LUsym->Rp= NULL;
     LUsym->aParent = LUsym->aChildp = LUsym->aChild = LUsym->row2atree = NULL;
@@ -974,7 +974,8 @@ paru_symbolic *paru_analyze
     PRLEVEL (p, ("\n"));
 #endif
 
-    paru_free ((m+1), sizeof (Int), Pinit, cc);
+    //PofA
+    LUsym->Pinit = Pinit;
     ///////////////////////////////////////////////////////////////
 #ifndef NDEBUG
     p = 1;

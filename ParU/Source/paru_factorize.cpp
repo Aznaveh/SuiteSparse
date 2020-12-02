@@ -31,7 +31,7 @@ void swap_rows(double *F, Int *frowList, Int m, Int n, Int r1, Int r2)
         swap(F[j*m+r1],F[j*m+r2]);
 }
 
-Int paru_panel_factorize (double *F, Int *frowList, Int m, Int n, 
+Int paru_panel_factorize (Int f, Int m, Int n, 
         const Int panel_width, Int panel_num, Int row_end, 
         paru_matrix *paruMatInfo) 
 {
@@ -39,7 +39,6 @@ Int paru_panel_factorize (double *F, Int *frowList, Int m, Int n,
     // https://github.com/xianyi/OpenBLAS/blob/develop/reference/dgetf2f.f
     DEBUGLEVEL(0);
     PRLEVEL (1, ("%% Inside panel factorization %ld \n",panel_num));
-
 
     Int *row_degree_bound = paruMatInfo->row_degree_bound;
     Int j1 = panel_num*panel_width; // panel starting column
@@ -56,6 +55,11 @@ Int paru_panel_factorize (double *F, Int *frowList, Int m, Int n,
 
     ASSERT ( row_end >= j2);
 
+
+   Int *frowList = paruMatInfo->frowList[f];
+   paru_fac *LUs =  paruMatInfo->partial_LUs;
+   double *F = LUs[f].p;
+
 #ifndef NDEBUG  // Printing the panel
     Int num_col_panel =  j2 - j1 ;
     Int p = 1;
@@ -69,7 +73,13 @@ Int paru_panel_factorize (double *F, Int *frowList, Int m, Int n,
         PRLEVEL (p, ("\n"));
     }
 #endif
- 
+    Int *Super = paruMatInfo->LUsym->Super;
+    Int col1 = Super [f];       /* fornt F has columns col1:col2-1 */
+    paru_symbolic *LUsym = paruMatInfo-> LUsym;
+    Int *Qfill =  LUsym->Qfill;
+    Int *Pinv =  LUsym->Pinv;  
+
+
     //column jth of the panel
     for (Int j = j1; j < j2 ; j++)
     { 
@@ -82,22 +92,39 @@ Int paru_panel_factorize (double *F, Int *frowList, Int m, Int n,
 #ifndef NDEBUG  
         Int row_deg_max = row_degree_bound[frowList[row_max]];
 #endif
-
         double maxval = F[ j*m + row_max ];
         PRLEVEL (1, ("%% before search max value= %2.4lf row_deg = %ld\n",
                     maxval, row_deg_max));
 
+        double diag_val;
+
+
+        Int origCol = Qfill ? Qfill[j+col1] : j+col1;
+        Int row_diag = (origCol == Pinv[frowList[j]]) ? j+col1 : -1;
+        PRLEVEL (-1, ("%%curCol=%ld origCol= %ld row_diag=%ld\n",
+                    j+col1, origCol, row_diag));
+
+        PRLEVEL (-1, ("%%##j=%ld value= %2.4lf\n", j, F[j*m+j]));
         //find max
         for (Int i = j+1 ; i < row_end; i++)
         { 
-            PRLEVEL (1, ("%%i=%ld value= %2.4lf", i, F[j*m+i]));
+            PRLEVEL (-1, ("%%i=%ld value= %2.4lf", i, F[j*m+i]));
             PRLEVEL (1, (" deg = %ld \n", row_degree_bound[frowList[i]]));
             if ( fabs (maxval) < fabs (F[j*m+i]))
             {
                 row_max = i; 
                 maxval = F[j*m + i];
-                //TODO: find the original digonla entry
             }
+            //TODO: find the original digonla entry
+            //frowList[i] is the row of S 
+            //if (frowList[i] == Qfill[j+col1]
+            //it seems that I shoud use Pinit instead of Pinv
+            Int origRow = Pinv [frowList[i]];
+            PRLEVEL (-1, ("%%curRow=%ld origRow= %ld\n", 
+                        frowList[i], origRow));
+            if (origRow == origCol)
+                PRLEVEL (-1, ("%%Found it %2.4lf\n",  F[j*m + i]));
+
         }
 
 #ifndef NDEBUG  
@@ -105,10 +132,10 @@ Int paru_panel_factorize (double *F, Int *frowList, Int m, Int n,
 #endif
 
         PRLEVEL (1, ("%% max value= %2.4lf\n", maxval));
-        
+
         if (maxval == 0)  //no pivot found
             continue;
- 
+
         //initialzing pivot as max numeric value
         Int row_sp = row_max;
         Int row_deg_sp= row_degree_bound[frowList[row_max]];
@@ -351,7 +378,7 @@ Int paru_dgetrf (double *F, Int *frowList, Int lm, Int ln,
     return 0;
 }
 
-Int paru_factorize(double *F, Int *frowList, Int rowCount, Int f, Int start_fac,
+Int paru_factorize(Int f, Int start_fac,
         Int *panel_row, std::set<Int> &stl_colSet, 
         std::vector<Int> &pivotal_elements,
         paru_matrix *paruMatInfo)
@@ -362,6 +389,12 @@ Int paru_factorize(double *F, Int *frowList, Int rowCount, Int f, Int start_fac,
     Int col1 = Super [f];       /* fornt F has columns col1:col2-1 */
     Int col2 = Super [f+1];
     Int fp = col2 - col1;   /* first fp columns are pivotal */ 
+
+    Int *frowList = paruMatInfo->frowList[f];
+    paru_fac *LUs =  paruMatInfo->partial_LUs;
+    Int rowCount = paruMatInfo->frowCount[f];
+    double *F = LUs[f].p;
+
 
     Int panel_width = paruMatInfo->panel_width;
     for(Int panel_num = 0; ; panel_num++)
@@ -386,8 +419,8 @@ Int paru_factorize(double *F, Int *frowList, Int rowCount, Int f, Int start_fac,
         Int j1 = panel_num*panel_width;
         Int j2 = (panel_num+1)*panel_width;
         // factorize current panel
-        paru_panel_factorize ( F, frowList, rowCount, fp, 
-                panel_width, panel_num, row_end, paruMatInfo);
+        paru_panel_factorize ( f, rowCount, fp,  panel_width, panel_num, 
+                row_end, paruMatInfo);
 
         // This can be done parallel to the  next part
         if (paruMatInfo->LUsym->Cm[f] != 0) //if there is potential column left

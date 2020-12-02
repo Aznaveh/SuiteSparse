@@ -188,7 +188,7 @@ int paru_front ( paru_matrix *paruMatInfo,
     Int start_fac = paruMatInfo->time_stamp[f]; 
     PRLEVEL (1, ("%% start_fac= %ld\n",start_fac));
 
-    Int fac = paru_factorize(pivotalFront, frowList, rowCount, f, start_fac,
+    Int fac = paru_factorize(f, start_fac,
             panel_row, stl_colSet, pivotal_elements, paruMatInfo);
     time_f = ++paruMatInfo->time_stamp[f]; 
     PRLEVEL (1, ("%%After factorization time_f = %ld\n",time_f));
