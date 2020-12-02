@@ -262,6 +262,7 @@ paru_symbolic *paru_analyze
 
 
     Int strategy = Info [UMFPACK_STRATEGY_USED] ;
+    LUsym->strategy = strategy;
 
 #ifndef NDEBUG
     p = 0;

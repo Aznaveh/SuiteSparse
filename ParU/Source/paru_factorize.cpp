@@ -77,7 +77,7 @@ Int paru_panel_factorize (Int f, Int m, Int n,
     Int col1 = Super [f];       /* fornt F has columns col1:col2-1 */
     paru_symbolic *LUsym = paruMatInfo-> LUsym;
     Int *Qfill =  LUsym->Qfill;
-    Int *Pinv =  LUsym->Pinv;  
+    Int *Pinit =  LUsym->Pinit;  
 
 
     //column jth of the panel
@@ -96,34 +96,32 @@ Int paru_panel_factorize (Int f, Int m, Int n,
         PRLEVEL (1, ("%% before search max value= %2.4lf row_deg = %ld\n",
                     maxval, row_deg_max));
 
-        double diag_val;
-
-
         Int origCol = Qfill ? Qfill[j+col1] : j+col1;
-        Int row_diag = (origCol == Pinv[frowList[j]]) ? j+col1 : -1;
-        PRLEVEL (-1, ("%%curCol=%ld origCol= %ld row_diag=%ld\n",
+        Int row_diag = (origCol == Pinit [frowList[j]]) ? j : -1;
+        double diag_val = maxval; //initialization
+        PRLEVEL (1, ("%%curCol=%ld origCol= %ld row_diag=%ld\n",
                     j+col1, origCol, row_diag));
 
-        PRLEVEL (-1, ("%%##j=%ld value= %2.4lf\n", j, F[j*m+j]));
+        PRLEVEL (1, ("%%##j=%ld value= %2.4lf\n", j, F[j*m+j]));
         //find max
         for (Int i = j+1 ; i < row_end; i++)
         { 
-            PRLEVEL (-1, ("%%i=%ld value= %2.4lf", i, F[j*m+i]));
+            PRLEVEL (1, ("%%i=%ld value= %2.4lf", i, F[j*m+i]));
             PRLEVEL (1, (" deg = %ld \n", row_degree_bound[frowList[i]]));
             if ( fabs (maxval) < fabs (F[j*m+i]))
             {
                 row_max = i; 
                 maxval = F[j*m + i];
             }
-            //TODO: find the original digonla entry
-            //frowList[i] is the row of S 
-            //if (frowList[i] == Qfill[j+col1]
-            //it seems that I shoud use Pinit instead of Pinv
-            Int origRow = Pinv [frowList[i]];
-            PRLEVEL (-1, ("%%curRow=%ld origRow= %ld\n", 
+            Int origRow = Pinit [frowList[i]];
+            PRLEVEL (1, ("%%curRow=%ld origRow= %ld\n", 
                         frowList[i], origRow));
             if (origRow == origCol)
-                PRLEVEL (-1, ("%%Found it %2.4lf\n",  F[j*m + i]));
+            {
+                PRLEVEL (1, ("%%Found it %2.4lf\n",  F[j*m + i]));
+                row_diag = i;
+                diag_val = F[j*m+i];
+            }
 
         }
 
@@ -151,12 +149,26 @@ Int paru_panel_factorize (Int f, Int m, Int n,
                 row_deg_sp = row_degree_bound[frowList[i]];
                 row_sp = i;
             }
+        Int row_piv = row_sp;
 
         PRLEVEL (1, ("%% piv value= %2.4lf row_deg=%ld\n", piv, row_deg_sp));
 
+        if (LUsym->strategy == UMFPACK_STRATEGY_SYMMETRIC)
+        {
+            if (row_diag != -1)
+                if ( fabs(TOLER*TOLER*maxval) < fabs(diag_val) )
+                {
+                    piv = diag_val;
+                    row_piv = row_diag;
+                    PRLEVEL (1, ("%% symmetric pivot piv value= %2.4lf"
+                                " row_piv=%ld\n", piv, row_piv));
+                }
+
+        }
+
         //swap rows
         PRLEVEL (1, ("%% Swaping rows j=%ld, spr=%ld\n", j, row_sp));
-        swap_rows (F, frowList, m , n, j, row_sp);
+        swap_rows (F, frowList, m , n, j, row_piv);
 
 #ifndef NDEBUG  // Printing the pivotal front
         p = 1;
