@@ -1,4 +1,4 @@
-clear
+clear // it might be deleted
 
 index = ssget ;
 
@@ -51,16 +51,14 @@ fprintf(ff,' myflop umfflop ratio\n results = [');
 %fprintf(ff,' myflop, umfflop, ratio\n');
 
 loop_cnt = 0;
-NNZMat = 100000;
+NNZMat = 100;
 
 %for k = 1:100
 for k = 1:nmat
     id = fnew (k); 
     % some problem in these matrice
     if ( id == 2056 || id == 2034 || id == 1867 || id == 2842 || ...
-        id == 2843 ||    id == 2844 || id == 2845   ...
-        || id == 893) % || id == 823 ||...
-        %        id == 2232 || id == 826  || id == 1212)  
+        id == 2843 ||    id == 2844 || id == 2845 || id == 1396)  
 
         continue;
     end
@@ -70,7 +68,7 @@ for k = 1:nmat
     Prob = ssget(id);
     Aorig = Prob.A;
 
-    if (nnz(Aorig) > NNZMat)
+    if (nnz(Aorig) < NNZMat)
             continue;
     end
  
@@ -102,11 +100,11 @@ for k = 1:nmat
 
     loop_cnt = loop_cnt + 1;
 
-    if (nnz(A) > NNZMat)
+    if (nnz(A) < NNZMat)
             continue;
     end
  
-    if (loop_cnt > 80 )
+    if (loop_cnt > 50 )
         break
     end
 
@@ -274,4 +272,5 @@ fprintf(ff,'loglog (intensity,  nzratio, ''o'', ''MarkerSize'', 10) ;\n');
 fprintf(ff,'subplot (1,3,3) ;\n');
 fprintf(ff,'loglog (intensity,  flratio, ''o'', ''MarkerSize'', 10) ;\n');
 
+fprintf(ff,'%loglog (intensity,  logratio, ''o'', ''MarkerSize'', 10) ;\n');
 fclose (ff) ;
