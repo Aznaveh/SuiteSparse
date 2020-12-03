@@ -135,23 +135,9 @@ Int paru_panel_factorize (Int f, Int m, Int n,
             continue;
 
         //initialzing pivot as max numeric value
-        Int row_sp = row_max;
-        Int row_deg_sp= row_degree_bound[frowList[row_max]];
         double piv= maxval;
-
-
-        //find sparsest between accepteble ones
-        for (Int i = j; i < row_end; i++) 
-            if ( fabs(TOLER*maxval) < fabs(F[j*m+i]) &&  
-                    row_degree_bound[frowList[i]] < row_deg_sp)
-            {// numerically acceptalbe and sparser
-                piv = F[j*m+i];
-                row_deg_sp = row_degree_bound[frowList[i]];
-                row_sp = i;
-            }
-        Int row_piv = row_sp;
-
-        PRLEVEL (1, ("%% piv value= %2.4lf row_deg=%ld\n", piv, row_deg_sp));
+        Int row_piv = row_max;
+        Int chose_diag = 0;
 
         if (LUsym->strategy == UMFPACK_STRATEGY_SYMMETRIC)
         {
@@ -162,9 +148,29 @@ Int paru_panel_factorize (Int f, Int m, Int n,
                     row_piv = row_diag;
                     PRLEVEL (1, ("%% symmetric pivot piv value= %2.4lf"
                                 " row_piv=%ld\n", piv, row_piv));
+                    chose_diag = 1;
                 }
 
         }
+
+        // find sparsest between accepteble ones
+        // if not symmetric or the diagonal is not good enough
+        Int row_deg_sp= row_degree_bound[frowList[row_max]];
+        if ( chose_diag == 0)
+        {
+            Int row_sp = row_max;
+            for (Int i = j; i < row_end; i++) 
+                if ( fabs(TOLER*maxval) < fabs(F[j*m+i]) &&  
+                        row_degree_bound[frowList[i]] < row_deg_sp)
+                {// numerically acceptalbe and sparser
+                    piv = F[j*m+i];
+                    row_deg_sp = row_degree_bound[frowList[i]];
+                    row_sp = i;
+                }
+            row_piv = row_sp;
+        }
+
+        PRLEVEL (1, ("%% piv value= %2.4lf row_deg=%ld\n", piv, row_deg_sp));
 
         //swap rows
         PRLEVEL (1, ("%% Swaping rows j=%ld, spr=%ld\n", j, row_sp));
