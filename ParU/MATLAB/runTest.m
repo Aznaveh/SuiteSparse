@@ -6,7 +6,8 @@ f = find (index.nrows == index.ncols & ...
 index.sprank == index.ncols & ...
 ~index.posdef & ...
 index.isReal & ~index.isGraph  & ...
-index.pattern_symmetry <= .6 ) ;
+index.numerical_symmetry <= .9 ) ;
+%index.pattern_symmetry <= .6 ) ;
 
 [ignore, i] = sort (index.nnz (f) + index.nzero (f)) ;
 
@@ -58,7 +59,8 @@ for k = 1:nmat
     id = fnew (k); 
     % some problem in these matrice
     if ( id == 2056 || id == 2034 || id == 1867 || id == 2842 || ...
-        id == 2843 ||    id == 2844 || id == 2845 || id == 1396)  
+        id == 2843 ||    id == 2844 || id == 2845 || id == 1396 || ...
+        id == 1404 || id == 1297 || id == 788)  
 
         continue;
     end

@@ -173,12 +173,12 @@ Int paru_panel_factorize (Int f, Int m, Int n,
         PRLEVEL (1, ("%% piv value= %2.4lf row_deg=%ld\n", piv, row_deg_sp));
 
         //swap rows
-        PRLEVEL (1, ("%% Swaping rows j=%ld, spr=%ld\n", j, row_sp));
+        PRLEVEL (1, ("%% Swaping rows j=%ld, row_piv=%ld\n", j, row_piv));
         swap_rows (F, frowList, m , n, j, row_piv);
 
 #ifndef NDEBUG  // Printing the pivotal front
         p = 1;
-        if (row_sp != row_max)
+        if (row_piv != row_max)
             PRLEVEL (p, ("%% \n"));
         PRLEVEL (p, ("%% After Swaping\n"));
         PRLEVEL (p, (" ;\n"));
