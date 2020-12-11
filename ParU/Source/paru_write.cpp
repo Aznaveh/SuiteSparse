@@ -58,13 +58,14 @@ void paru_write( paru_matrix *paruMatInfo, int scale,
             printf ("Error in making %s to write the results!\n", fname);
             return;
         }
+        fprintf (colfptr, "%%cols\n"); 
+
         for (Int col = 0 ; col < n ; col++)
         {    // for each column of A(:,Qfill)
             Int j = Qfill ? Qfill [col] : col ; // col of S is column j of A
             fprintf (colfptr, "%ld\n", j );
         }
 
-        fprintf (colfptr, "%%cols\n");
         fclose(colfptr);
         PRLEVEL (1, ("%% column permutaion DONE\n"));
     }
