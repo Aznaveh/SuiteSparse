@@ -1,7 +1,8 @@
-ids = [ 313 2015];
+%ids = [ 313 2015];
 ids = [1867 2034 2056 2842 2843 2844 2845];
 ff = fopen ('groupRes.m', 'w') ;
 err = 1e-5;
+s= 0;
 
 %%matlab format
 fprintf(ff,'%% id nnzA myErr umfErr logratio' );
@@ -45,7 +46,7 @@ for k = 1:size(ids,2)
     intel = sprintf('. /home/grads/a/aznaveh/intel/bin/compilervars.sh intel64;');
     intel = sprintf('. /opt/intel/compilers_and_libraries/linux/bin/compilervars.sh intel64;');
     str = sprintf ('../Demo/umfout %d < ../Matrix/ParUTst/tmp.mtx', id );
-    %str = strcat(intel, str);
+    str = strcat(intel, str);
     system(str);
 
 

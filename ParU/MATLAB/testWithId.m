@@ -41,7 +41,7 @@ mmwrite('../Matrix/ParUTst/tmp.mtx', A);
 intel = sprintf('. /home/grads/a/aznaveh/intel/bin/compilervars.sh intel64;');
 intel = sprintf('. /opt/intel/compilers_and_libraries/linux/bin/compilervars.sh intel64;');
 str = sprintf ('../Demo/umfout %d %d< ../Matrix/ParUTst/tmp.mtx', id, s);
-%str = strcat(intel, str);
+str = strcat(intel, str);
 
 system(str);
 

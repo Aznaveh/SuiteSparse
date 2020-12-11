@@ -53,7 +53,6 @@ fprintf(ff,' myflop umfflop ratio\n results = [');
 
 loop_cnt = 0;
 NNZMat = 100;
-
 %for k = 1:100
 for k = 1:nmat
     id = fnew (k); 
@@ -61,7 +60,6 @@ for k = 1:nmat
     if ( id == 2056 || id == 2034 || id == 1867 || id == 2842 || ...
         id == 2843 ||    id == 2844 || id == 2845 || id == 1396 || ...
         id == 1404 || id == 1297 || id == 788)  
-
         continue;
     end
     group = index.Group {id} ;
@@ -106,7 +104,7 @@ for k = 1:nmat
             continue;
     end
  
-    if (loop_cnt > 50 )
+    if (loop_cnt > 1280 )
         break
     end
 
@@ -117,7 +115,7 @@ for k = 1:nmat
     intel = sprintf('. /home/grads/a/aznaveh/intel/bin/compilervars.sh intel64;');
     intel = sprintf('. /opt/intel/compilers_and_libraries/linux/bin/compilervars.sh intel64;');
     str = sprintf ('../Demo/umfout %d < ../Matrix/ParUTst/tmp.mtx', id );
-    %str = strcat(intel, str);
+    str = strcat(intel, str);
     system(str);
 
 

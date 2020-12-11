@@ -46,7 +46,6 @@ debug:
 	(cd ../Lib; $(MAKE) purge; $(MAKE) DEBUG=yes)
 	(cd ../Demo;)
 	$(C) $(FLAG) -g umf_test.cpp -o umfout $(LIBS)
-#	gdb ./umfout < ../Matrix/c32.mtx		#3x2 	
 
 prof:
 	(cd ../Lib; $(MAKE) purge; $(MAKE) PROF=yes)
