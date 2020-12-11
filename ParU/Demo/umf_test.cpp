@@ -105,7 +105,7 @@ int main (int argc, char **argv)
     //~~~~~~~~~~~~~~~~~~~Calling umfpack~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     
     
-#if 0
+#if 1
     double umf_start_time = omp_get_wtime();
     double status,   // Info [UMFPACK_STATUS] 
     Info[UMFPACK_INFO],// Contains statistics about the symbolic analysis
@@ -151,7 +151,7 @@ int main (int argc, char **argv)
 #endif
 
     // Writing results to a file
-    //if ( NoProblem ) paru_write(paruMatInfo, scale,  argv[1], cc);
+    if ( NoProblem ) paru_write(paruMatInfo, scale,  argv[1], cc);
 
     //~~~~~~~~~~~~~~~~~~~Free Everything~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     cholmod_l_free_sparse (&A, cc);
