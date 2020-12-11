@@ -60,7 +60,7 @@ for k = 1:nmat
     if ( id == 2056 || id == 2034 || id == 1867 || id == 2842 || ...
         id == 2843 ||    id == 2844 || id == 2845 || id == 1396 || ...
         id == 1404 || id == 1297 || id == 788)  
-        continue;
+       continue;
     end
     group = index.Group {id} ;
     name = index.Name {id} ;
