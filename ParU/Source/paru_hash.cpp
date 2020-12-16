@@ -26,7 +26,7 @@ void paru_insert_hash(Int key, Int value, std::vector<Int> &colHash)
 #endif
     Int loop_cnt = 0;
 
-    Int size = colHash.size();
+    Int size = colHash.size()-1;
     Int  index = key % size;  //hash function
     PRLEVEL (p, ("index =%ld \n", index ));
     while ( colHash[index] != -1  )
@@ -50,12 +50,18 @@ void paru_insert_hash(Int key, Int value, std::vector<Int> &colHash)
 
 Int paru_find_hash (Int key, std::vector<Int> &colHash, Int *fcolList)
 {
-    DEBUGLEVEL(0);
+    DEBUGLEVEL(1);
 #ifndef NDEBUG  
     Int p = 1;
     PRLEVEL (p, ("%% find for hash key=%ld \n", key));
 #endif
-    Int size = colHash.size();
+    //lookup table
+    if (colHash.back() == 1 )
+    {
+        PRLEVEL (p, ("%% LOOKUP key =%ld colHash=%ld \n", key, colHash [key]));
+        return colHash [key];
+    }
+    Int size = colHash.size()-1;
 
     Int index = key % size;
     Int value = colHash [index];
