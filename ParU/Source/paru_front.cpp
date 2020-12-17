@@ -300,10 +300,15 @@ int paru_front ( paru_matrix *paruMatInfo,
     //fcolList copy from the stl_colSet
     //hasing from fcolList indices to column index 
     // the last elment of the hash shows if it is a lookup table
-    Int hash_size = (colCount*2 > LUsym->n )? LUsym->n+1 : colCount+1;
-    std::vector<Int> colHash(hash_size,-1);
+    //Int hash_size = (colCount*2 > LUsym->n )? LUsym->n : colCount;
+    Int hash_size =  ( (Int) 2) << 
+        ((Int) floor (log2 ( (double) colCount )) + 1) ;
+    PRLEVEL (-2, ("%% 1Front hash_size=%ld\n",hash_size));
+    hash_size = (hash_size > LUsym->n )? LUsym->n : hash_size;
+    PRLEVEL (-2, ("%% 2Front hash_size=%ld\n",hash_size));
+    std::vector<Int> colHash(hash_size+1,-1);
     Int i = 0;
-    if (colCount*2 > LUsym->n)
+    if (hash_size == LUsym->n)
     {
         PRLEVEL (p, 
                 ("%% colHash LOOKUP size = %ld LU %ld\n", hash_size, LUsym->n));
@@ -312,20 +317,24 @@ int paru_front ( paru_matrix *paruMatInfo,
             colHash [*it] = i;
             fcolList[i++] = *it;
         }
-
-        colHash[hash_size-1] = 1;
     }
     else 
     {
-        PRLEVEL (p, ("%% colHash HASH\n"));
+        // hash_bits is a bit mask to compute the result modulo the hash table 
+        // size, which is always a power of 2.
+        //
+
+        PRLEVEL (p, ("%% colHash HASH hash_size=%ld\n",hash_size));
+        PRLEVEL (p, ("%% colCount=%ld\n",colCount));
         for (it = stl_colSet.begin(); it != stl_colSet.end(); it++)
         {
             paru_insert_hash (*it, i, colHash);
             fcolList[i++] = *it;
         }
+        colHash[hash_size] = colCount ;
     }
 #ifndef NDEBUG  
-    p = -2;
+    p = 1;
     PRLEVEL (p, ("%% colHash %%"));
     for (auto i:colHash)
         PRLEVEL (p, (" %ld ", i));
