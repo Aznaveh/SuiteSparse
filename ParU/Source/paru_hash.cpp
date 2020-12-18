@@ -14,7 +14,8 @@
  *  @author Aznaveh
  */
 #include "Parallel_LU.hpp"
-#define HASH_FACTOR 107 
+// key*257 & mask
+#define HASH_FUNCTION(key) (( (key << 8) + (key) ) & (hash_bits))
 
 void paru_insert_hash(Int key, Int value, std::vector<Int> &colHash)
 {
@@ -31,23 +32,9 @@ void paru_insert_hash(Int key, Int value, std::vector<Int> &colHash)
 
 #endif
 
-//     old version sometimes doesn't insert in hash
-//    Int loop_cnt = 0;
-//    Int size = colHash.size()-1;
-//    Int  index = key % size;  //hash function
-//    PRLEVEL (p, ("index =%ld \n", index ));
-//    while ( colHash[index] != -1  )
-//    { //finding an empty spot
-//        loop_cnt++;
-//        if( loop_cnt > log2(size) )
-//            return; //without even inserting inside the hash
-//        index = (index+1) % size;
-//    }
-//    colHash[index] = value;
-
-    // newer version
     Int hash_bits = colHash.size() - 2;
-    Int index = (key * HASH_FACTOR) & hash_bits;
+    Int index = HASH_FUNCTION (key);
+
     Int loop_cnt = 0;
     while ( colHash [index] != -1 )
     { //finding an empty spot
@@ -78,7 +65,6 @@ Int paru_find_hash (Int key, std::vector<Int> &colHash, Int *fcolList)
     Int p = 1;
     PRLEVEL (p, ("%% find for hash key=%ld \n", key));
 #endif
-    Int hash_bits = colHash.size() - 2;
     //lookup table
     if (colHash.back() == -1 )
     {
@@ -86,28 +72,8 @@ Int paru_find_hash (Int key, std::vector<Int> &colHash, Int *fcolList)
         return colHash [key];
     }
 
-//    old version
-//    Int size = colHash.size()-1;
-//    Int index = key % size;
-//    Int value = colHash [index];
-//    Int loop_cnt = 0;
-//
-//    while (  value == -1 || fcolList [value] != key  )
-//    {
-//        index = (index+1) % size;
-//        PRLEVEL (p, ("%% index =%ld \n", index ));
-//        value = colHash [index];
-//        if( loop_cnt++ > log2(size) )
-//        { // take a long time in the hash; 
-//            //  guarantees that find takes at most log time
-//            PRLEVEL (p, ("%% binary search for hash\n"));
-//            value = bin_srch (fcolList, 0, size-1, key);
-//            break;
-//        }
-//    }
-
-
-    Int index = (key * HASH_FACTOR) & hash_bits;
+    Int hash_bits = colHash.size() - 2;
+    Int index = HASH_FUNCTION (key);
     Int value = colHash [index];
     Int loop_cnt = 0;
     Int size = colHash.back();
