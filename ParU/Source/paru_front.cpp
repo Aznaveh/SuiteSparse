@@ -19,7 +19,7 @@ int paru_front ( paru_matrix *paruMatInfo,
         cholmod_common *cc)
 {
 
-    DEBUGLEVEL(-1);
+    DEBUGLEVEL(-2);
     /* 
      * -2 Print Nothing
      * -1 Just Matlab
@@ -303,9 +303,9 @@ int paru_front ( paru_matrix *paruMatInfo,
     //Int hash_size = (colCount*2 > LUsym->n )? LUsym->n : colCount;
     Int hash_size =  ( (Int) 2) << 
         ((Int) floor (log2 ( (double) colCount )) + 1) ;
-    PRLEVEL (-2, ("%% 1Front hash_size=%ld\n",hash_size));
+    PRLEVEL (1, ("%% 1Front hash_size=%ld\n",hash_size));
     hash_size = (hash_size > LUsym->n )? LUsym->n : hash_size;
-    PRLEVEL (-2, ("%% 2Front hash_size=%ld\n",hash_size));
+    PRLEVEL (1, ("%% 2Front hash_size=%ld\n",hash_size));
     std::vector<Int> colHash(hash_size+1,-1);
     Int i = 0;
     if (hash_size == LUsym->n)

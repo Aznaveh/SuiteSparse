@@ -19,7 +19,7 @@
 
 void paru_insert_hash(Int key, Int value, std::vector<Int> &colHash)
 {
-    DEBUGLEVEL(1);
+    DEBUGLEVEL(0);
 
 #ifndef NDEBUG  
     Int p = 1;
@@ -60,7 +60,7 @@ void paru_insert_hash(Int key, Int value, std::vector<Int> &colHash)
 
 Int paru_find_hash (Int key, std::vector<Int> &colHash, Int *fcolList)
 {
-    DEBUGLEVEL(1);
+    DEBUGLEVEL(0);
 #ifndef NDEBUG  
     Int p = 1;
     PRLEVEL (p, ("%% find for hash key=%ld \n", key));
