@@ -534,6 +534,7 @@ paru_symbolic *paru_analyze
     for(Int k = 0; k <= nf ; k++)
         PRLEVEL (p, ("  %ld", Parent[k]));
     PRLEVEL (p, ("\n"));
+    p = -1;
 #endif
 
 
@@ -557,25 +558,35 @@ paru_symbolic *paru_analyze
     { //finding representative for each front
         Int repr = f;
         //amalgamate till number of pivot columns is small
+        PRLEVEL (p, ("%% repr = %ld Parent =%ld\n",  repr, Parent[repr]));
+        PRLEVEL (p, ("%%size of Potential pivot= %ld\n", 
+                    Super[Parent[repr]+1] - Super[f] ));
         while ( Super[Parent[repr]+1] - Super[f] < threshold 
                 && Parent[repr] != -1) 
         {
             repr = Parent [repr];
-            PRLEVEL (1, ("%%Middle stage f= %ld repr = %ld\n",  f, repr));
-            PRLEVEL (1, ("%%number of pivot cols= %ld\n",
+            PRLEVEL (p, ("%%Middle stage f= %ld repr = %ld\n",  f, repr));
+            PRLEVEL (p, ("%%number of pivot cols= %ld\n",
                         Super[repr+1] - Super[f]));
+            PRLEVEL (p, ("%%number of pivot cols if Parent collapsed= %ld\n",
+                        Super[Parent[repr]+1] - Super[f]));
+
         }
 
-        PRLEVEL (1, ("%% newF = %ld for:\n",  newF));
+        PRLEVEL (p, ("%% newF = %ld for:\n",  newF));
         for (Int k = f; k <= repr; k++)
         {
-            PRLEVEL (1, ("%%  %ld ",  k));
+            PRLEVEL (p, ("%%  %ld ",  k));
             fmap[k] = newF;
         }
-        PRLEVEL (1, ("%%repr = %ld\n",repr));
+        PRLEVEL (p, ("%%repr = %ld\n",repr));
         newF++;
         f = repr;
     }
+    
+#ifndef NDEBUG
+    p = 1;
+#endif
 
     Int newNf = newF; // new size of number of fronts
     fmap [nf] = -1;
