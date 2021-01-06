@@ -46,6 +46,7 @@ int main (int argc, char **argv)
 
     //~~~~~~~~~~~~~~~~~~~Starting computation~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+    double my_start_time = omp_get_wtime();
     LUsym = paru_analyze (A, cc);
     if (LUsym == NULL) 
     {
@@ -55,7 +56,6 @@ int main (int argc, char **argv)
     }
 
 
-    double my_start_time = omp_get_wtime();
     int scale = 0;
     if (argc == 3)
     {
