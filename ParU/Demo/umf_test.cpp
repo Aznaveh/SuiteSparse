@@ -16,7 +16,7 @@ int main (int argc, char **argv)
     cholmod_common Common, *cc;
     cholmod_sparse *A;
     int mtype;
-    paru_symbolic *LUsym;
+    paru_symbolic *LUsym = NULL;
 
 
     //~~~~~~~~~Reading the input matrix and test if the format is OK~~~~~~~~~~~~
@@ -46,6 +46,11 @@ int main (int argc, char **argv)
 
     //~~~~~~~~~~~~~~~~~~~Starting computation~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+    int scale = 0;
+    Int NoProblem = 0;
+    paru_matrix *paruMatInfo = NULL;
+
+#if 0
     double my_start_time = omp_get_wtime();
     LUsym = paru_analyze (A, cc);
     if (LUsym == NULL) 
@@ -56,7 +61,6 @@ int main (int argc, char **argv)
     }
 
 
-    int scale = 0;
     if (argc == 3)
     {
         scale = atoi(argv[2]);
@@ -65,8 +69,8 @@ int main (int argc, char **argv)
             PRLEVEL (1, ("The input matrix will be scaled\n"));
         }
     }
-        
-    paru_matrix *paruMatInfo = paru_init_rowFronts (A, scale, LUsym, cc);
+
+    paruMatInfo = paru_init_rowFronts (A, scale, LUsym, cc);
     if (paruMatInfo == NULL) 
     {
         paru_freesym (&LUsym,cc);
@@ -81,7 +85,7 @@ int main (int argc, char **argv)
     Int nf = paruMatInfo->LUsym->nf;
     //printf ("number of fronts: %ld\n",nf);
 
-    Int NoProblem = 1;
+    NoProblem = 1;
 
 
     //nf = (nf > 10) ? 10 : nf;
@@ -98,13 +102,14 @@ int main (int argc, char **argv)
     paruMatInfo->my_time = my_time;
 
     //matlab_finalize(nf); //if use matlab generated code
- 
+#endif
+
     //~~~~~~~~~~~~~~~~~~~End computation~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
     //~~~~~~~~~~~~~~~~~~~Calling umfpack~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    
-    
+
+
 #if 1
     double umf_start_time = omp_get_wtime();
     double status,   // Info [UMFPACK_STATUS] 
@@ -134,19 +139,20 @@ int main (int argc, char **argv)
         exit(0);
     }
     status = umfpack_dl_numeric (Ap, Ai, Ax, Symbolic, &Numeric,
-	Control, Info) ;
+            Control, Info) ;
     if (status < 0)
     {
-	umfpack_dl_report_info (Control, Info) ;
-	umfpack_dl_report_status (Control, status) ;
-	printf ("umfpack_dl_numeric failed\n") ;
+        umfpack_dl_report_info (Control, Info) ;
+        umfpack_dl_report_status (Control, status) ;
+        printf ("umfpack_dl_numeric failed\n") ;
     }
 
     double umf_time = omp_get_wtime() - umf_start_time;
     umfpack_dl_free_symbolic (&Symbolic) ;
     umfpack_dl_free_numeric (&Numeric) ;
 
-    paruMatInfo->umf_time = umf_time;
+    if (paruMatInfo != NULL) 
+        paruMatInfo->umf_time = umf_time;
 
 #endif
 
