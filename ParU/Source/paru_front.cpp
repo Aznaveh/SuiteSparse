@@ -19,7 +19,7 @@ int paru_front ( paru_matrix *paruMatInfo,
         cholmod_common *cc)
 {
 
-    DEBUGLEVEL(-2);
+    DEBUGLEVEL(-1);
     /* 
      * -2 Print Nothing
      * -1 Just Matlab
@@ -59,13 +59,7 @@ int paru_front ( paru_matrix *paruMatInfo,
     Int num_panels = (Int) ceil( (double)fp/panel_width);
     // panel_row shows number of rows in each panel. Needs to be initialized in
     // my new algorithm
-    Int *panel_row = (Int*) paru_calloc ( num_panels , sizeof (Int), cc);
-    if (panel_row == NULL )
-    {
-        printf ("%% Out of memory when tried to allocate for panel_row%ld",f);
-        return 1;
-    }
-
+    Int panel_row[num_panels] = {0};
     Int *snM = LUsym->super2atree;
     Int eli = snM [f]; 
 
@@ -80,7 +74,6 @@ int paru_front ( paru_matrix *paruMatInfo,
     if (frowList == NULL )
     {
         printf ("%% Out of memory when tried to allocate for frowList %ld",f);
-        paru_free ( num_panels, sizeof (Int), panel_row, cc);
         return 1;
     }
     paruMatInfo->frowList[f] = frowList;
@@ -181,7 +174,6 @@ int paru_front ( paru_matrix *paruMatInfo,
     {
         PRLEVEL (1, ("%% %ldx%ld \n",rowCount, fp));
         printf ("structural problem\n");
-        paru_free ( num_panels, sizeof (Int), panel_row, cc);
         return 1;
     }
 
@@ -198,7 +190,6 @@ int paru_front ( paru_matrix *paruMatInfo,
      *  the rest of the matrix and doing TRSM and GEMM,                       */
 
     PRLEVEL (0, ("%% num_panels = %ld\n", num_panels));
-    paru_free (num_panels, sizeof (Int), panel_row, cc);
     PRLEVEL (0, ("%% After free num_panels = %ld\n", num_panels));
 
     if (fac < 0)
