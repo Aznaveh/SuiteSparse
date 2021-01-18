@@ -460,6 +460,8 @@ GLOBAL Int UMF_analyze
 	    {
 		break ;
 	    }
+        /* Aznaveh */
+        if (j2-j+1 > 1024) break ;
 	}
 
 	/* the loop above terminated with j2 at the first non-supernode */

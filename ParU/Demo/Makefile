@@ -83,3 +83,6 @@ clean:
 az:
 	(cd ..; $(MAKE) )
 	(cd Demo; $(MAKE) run )
+rev:
+	$(foreach var,$(.VARIABLES),$(info $(var) = $($(var)))) #print all var
+	#@echo "$(BLAS)" #print some val

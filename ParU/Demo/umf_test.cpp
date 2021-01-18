@@ -50,7 +50,7 @@ int main (int argc, char **argv)
     Int NoProblem = 0;
     paru_matrix *paruMatInfo = NULL;
 
-#if 0
+#if 1
     double my_start_time = omp_get_wtime();
     LUsym = paru_analyze (A, cc);
     if (LUsym == NULL) 
