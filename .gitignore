@@ -26,6 +26,7 @@ gmon.out
 *.lot
 *.dll 
 *.dSYM
+*.fig
 my_*.out
 *.gcda
 *.gcno
