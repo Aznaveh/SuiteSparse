@@ -1,5 +1,3 @@
-clear // it might be deleted
-
 index = ssget ;
 
 f = find (index.nrows == index.ncols & ...
@@ -52,7 +50,7 @@ fprintf(ff,' myflop umfflop ratio\n results = [');
 %fprintf(ff,' myflop, umfflop, ratio\n');
 
 loop_cnt = 0;
-NNZMat = 100;
+NNZMat = 10000;
 
 for k = 1:nmat
 %for k = 469:nmat
@@ -62,7 +60,7 @@ for k = 1:nmat
         id == 2843 ||    id == 2844 || id == 2845 || id == 1396 || ...
         id == 1397 || ... %ordering failed
        id == 1404 || id == 1297 || id == 788 || id == 1373 || id == 2265 || ...
-       id == 2267 || id == 2649 || id == 2847 || id == 2337)  
+       id == 2267 || id == 2649 || id == 2847 || id == 2337 || id == 2841)  
 
         continue;
     end
@@ -108,7 +106,7 @@ for k = 1:nmat
             continue;
     end
  
-    if (loop_cnt > 1280 )
+    if (loop_cnt > 80 )
         break
     end
 
@@ -116,10 +114,10 @@ for k = 1:nmat
     %max scaling
     A = spdiags (1./max (abs(A),[], 2), 0, size(A,1), size(A,2)) * A ;
     mmwrite('../Matrix/ParUTst/tmp.mtx', A);
-    intel = sprintf('. /home/grads/a/aznaveh/intel/bin/compilervars.sh intel64;');
-    intel = sprintf('. /opt/intel/compilers_and_libraries/linux/bin/compilervars.sh intel64;');
+%    intel = sprintf('. /home/grads/a/aznaveh/intel/bin/compilervars.sh intel64;');
+%    intel = sprintf('. /opt/intel/compilers_and_libraries/linux/bin/compilervars.sh intel64;');
     str = sprintf ('../Demo/umfout %d < ../Matrix/ParUTst/tmp.mtx', id );
-    str = strcat(intel, str);
+    %str = strcat(intel, str);
     system(str);
 
 
