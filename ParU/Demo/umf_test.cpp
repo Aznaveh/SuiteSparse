@@ -7,7 +7,6 @@
  * */
 #include "Parallel_LU.hpp"
 #include "matlab_finalize.h"
-#include <omp.h>
 
 int main (int argc, char **argv)
 {
