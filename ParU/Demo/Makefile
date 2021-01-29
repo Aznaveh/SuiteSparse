@@ -47,19 +47,26 @@ debug:
 	(cd ../Demo;)
 	$(C) $(FLAG) -g umf_test.cpp -o umfout $(LIBS)
 
-prof:
+gprof:
 	(cd ../Lib; $(MAKE) purge; $(MAKE) PROF=yes)
 	$(C) $(FLAG) -no-pie -O0  -pg umf_test.cpp -o gprof.o $(LIBS)
-	./gprof.o < ../Matrix/ParUTst/tmp.mt
-	gprof gprof.o > analysis.txt
+	./gprof.o < ../Matrix/ParUTst/tmp.mtx
+	gprof gprof.o gmon.out > analysis.txt
 
 
-vprofile:
+cchg:
+	(cd ../Lib; $(MAKE) purge; $(MAKE) DEBUG=yes)
+	(cd ../Demo;)
+	$(C) $(FLAG) -g umf_test.cpp -o gumfout $(LIBS)
+	valgrind	--tool=cachegrind -v ./gumfout < ../Matrix/ParUTst/tmp.mtx
+	
+cllg:
+	(cd ../Lib; $(MAKE) purge; $(MAKE) DEBUG=yes)
+	(cd ../Demo;)
+	$(C) $(FLAG) -g umf_test.cpp -o gumfout $(LIBS)
+	valgrind	--tool=callgrind -v ./gumfout < ../Matrix/ParUTst/tmp.mtx
 
-	$(C) $(FLAG) -g umf_test.cpp -o vprof $(LIBS)
-#	valgrind	--tool=callgrind -v ./vprof< ../Matrix/west0067.mtx
-#	valgrind	--tool=callgrind -v ./vprof< ../Matrix/cage5.mtx
-#	valgrind	--tool=callgrind -v ./vprof< ../Matrix/ParUTst/tmp.mtx
+
 
 tcov:
 	#$(C) $(FLAG) -Wall -fprofile-arcs -ftest-coverage umf_test.cpp -o tcov $(LIBS)
