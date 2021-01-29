@@ -61,7 +61,9 @@ int paru_front ( paru_matrix *paruMatInfo,
     // my new algorithm
     //Int panel_row[num_panels] = {0}; // Intel compiler doesn't support this
     Int panel_row[num_panels];
-    memset(panel_row,0,num_panels);
+    for (Int i = 0; i < num_panels; i++)
+        panel_row[i]=0;
+    //memset(panel_row,0,num_panels);
     Int *snM = LUsym->super2atree;
     Int eli = snM [f]; 
 
