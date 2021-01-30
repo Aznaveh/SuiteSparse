@@ -87,7 +87,7 @@ endif
 
 ifeq ($(PROF),yes)
 	#to compile with -g options use 'make DBUG=yes'
-	FLAG = -Wno-write-strings  -pg 
+	FLAG = -Wno-write-strings -no-pie  -pg 
 endif
 
 
@@ -188,7 +188,7 @@ $(INSTALL_LIB)/$(SO_TARGET): $(OBJ)
 	@mkdir -p $(INSTALL_LIB)
 	@mkdir -p $(INSTALL_INCLUDE)
 	@mkdir -p $(INSTALL_DOC)
-	$(CXX) $(SO_OPTS) $^ -o $@ $(LDLIBS)
+	$(C) $(SO_OPTS) $^ -o $@ $(LDLIBS)
 	( cd $(INSTALL_LIB) ; ln -sf $(SO_TARGET) $(SO_PLAIN) )
 	( cd $(INSTALL_LIB) ; ln -sf $(SO_TARGET) $(SO_MAIN) )
 	$(CP) ../Include/Parallel_LU.hpp $(INSTALL_INCLUDE)
