@@ -42,11 +42,13 @@ val:
 #	valgrind	$(VGFLAGS)	./umfout < ../Matrix/b1_ss.mtx
 
 	
+	#compling everything with -g
 debug:
 	(cd ../Lib; $(MAKE) purge; $(MAKE) DEBUG=yes)
 	(cd ../Demo;)
 	$(C) $(FLAG) -g umf_test.cpp -o umfout $(LIBS)
 
+	#compling everything with -pg
 gprof:
 	(cd ../Lib; $(MAKE) purge; $(MAKE) PROF=yes)
 	$(C) $(FLAG) -no-pie -O0  -pg umf_test.cpp -o gprof.o $(LIBS)
@@ -54,16 +56,10 @@ gprof:
 	gprof gprof.o gmon.out > analysis.txt
 
 
-cchg:
-	(cd ../Lib; $(MAKE) purge; $(MAKE) DEBUG=yes)
-	(cd ../Demo;)
-	$(C) $(FLAG) -g umf_test.cpp -o gumfout $(LIBS)
+cchg: debug
 	valgrind	--tool=cachegrind -v ./gumfout < ../Matrix/ParUTst/tmp.mtx
 	
-cllg:
-	(cd ../Lib; $(MAKE) purge; $(MAKE) DEBUG=yes)
-	(cd ../Demo;)
-	$(C) $(FLAG) -g umf_test.cpp -o gumfout $(LIBS)
+cllg: debug
 	valgrind	--tool=callgrind -v ./gumfout < ../Matrix/ParUTst/tmp.mtx
 
 
@@ -83,6 +79,8 @@ distclean: clean
 	- $(RM) paneltest
 	- $(RM) *.dot pfile tfile
 	- $(RM) -r $(PURGE)
+	- $(RM) test 
+	- $(RM) gumfout 
 
 clean:
 	- $(RM) -r $(CLEAN)
@@ -93,3 +91,6 @@ az:
 rev:
 	$(foreach var,$(.VARIABLES),$(info $(var) = $($(var)))) #print all var
 	#@echo "$(BLAS)" #print some val
+
+test:
+	$(C) $(FLAG) $(C11) blas_test.cpp -o test $(LIBS)
