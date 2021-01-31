@@ -53,7 +53,7 @@ GLOBAL void UMF_blas3_update
     /* Aznaveh */
     printf ("%ld  %lf ",1, 0.0);
     printf ("%ld %ld %ld", m, n, k);
-    printf ("%ld %ld %ld", d, dc, d);
+    printf ("%ld %ld %ld\n", d, dc, d);
 #ifndef NDEBUG
     DEBUG5 (("DO RANK-NB UPDATE of frontal:\n")) ;
     DEBUG5 (("DGEMM : "ID" "ID" "ID"\n", k, m, n)) ;
