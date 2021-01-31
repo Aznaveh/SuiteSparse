@@ -22,6 +22,8 @@ int main () {
     while (getline (InputFile, oneLine)) {
         std::stringstream ss(oneLine);
 
+        int tmp; double dtmp;
+        ss >> tmp; ss>>dtmp;
         int m,n,k,lda,ldb,ldc;
         ss >> m;     max = max > m ? max: m;
         ss >> n;     max = max > n ? max: n;
@@ -51,6 +53,9 @@ int main () {
     while (getline (InputFile, oneLine)) {
         std::stringstream ss(oneLine);
 
+        int tmp; double dtmp;
+        ss >> tmp; ss>>dtmp;
+ 
         BLAS_INT m,n,k,lda,ldb,ldc;
         ss >> m;     
         ss >> n;    
