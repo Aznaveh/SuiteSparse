@@ -50,7 +50,11 @@ GLOBAL void UMF_blas3_update
     U = Work->Fublock ;	    /* ldu is fnc_curr, stored by rows */
     LU = Work->Flublock ;   /* nb-by-nb */
 
-   // printf ("%ld %ld %ld\n", m, n, k);
+    /* Aznaveh */
+    / * */
+    printf ("%ld %ld %ld", m, n, k);
+    printf ("%ld %ld %ld", ldl, ldc, ldu);
+    / * */
 #ifndef NDEBUG
     DEBUG5 (("DO RANK-NB UPDATE of frontal:\n")) ;
     DEBUG5 (("DGEMM : "ID" "ID" "ID"\n", k, m, n)) ;
