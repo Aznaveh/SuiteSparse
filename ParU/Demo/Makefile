@@ -79,7 +79,7 @@ distclean: clean
 	- $(RM) paneltest
 	- $(RM) *.dot pfile tfile
 	- $(RM) -r $(PURGE)
-	- $(RM) test 
+	- $(RM) test* 
 	- $(RM) gumfout 
 
 clean:
@@ -93,4 +93,7 @@ rev:
 	#@echo "$(BLAS)" #print some val
 
 test:
-	$(C) $(FLAG) $(C11) blas_test.cpp -o test $(LIBS)
+	#$(C) $(FLAG) $(C11) blas_test.cpp -o test $(LIBS)
+	$(C) $(FLAG) $(C11) blas_NoLoopAlloc.cpp -o test0 $(LIBS)
+	$(C) $(FLAG) $(C11) blas_1LoopAlloc.cpp -o test1 $(LIBS)
+	$(C) $(FLAG) $(C11) blas_3LoopAlloc.cpp -o test3 $(LIBS)
