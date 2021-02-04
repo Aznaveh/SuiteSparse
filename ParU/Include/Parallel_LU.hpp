@@ -17,6 +17,8 @@
 #include <set>
 #include <vector>
 
+#include <malloc.h>
+
 #include <omp.h>
 
 
@@ -53,7 +55,7 @@ extern "C"
 //#undef NDEBUG  //<<2>>
 
 //uncomment if you want to count hardware flops
-#define COUNT_FLOPS
+//#define COUNT_FLOPS
 
 // defined somewhere else
 #ifdef ASSERT
