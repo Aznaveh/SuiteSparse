@@ -48,6 +48,9 @@ paru_matrix *paru_init_rowFronts (
     }
 
 
+    mallopt (M_MMAP_MAX, 0) ;           // disable mmap; it's too slow
+    mallopt (M_TRIM_THRESHOLD, -1) ;    // disable sbrk trimming
+    mallopt (M_TOP_PAD, 16*1024*1024) ; // increase padding to speedup malloc
 
 
     Int m, n, nf;  

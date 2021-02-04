@@ -3,11 +3,17 @@
 #include <string>
 #include <sstream>
 #include <omp.h>
+#include <malloc.h>
 
 #include "Parallel_LU.hpp"
 
-int main () {
+int main () 
+{
 
+    mallopt (M_MMAP_MAX, 0) ;           // disable mmap; it's too slow
+    mallopt (M_TRIM_THRESHOLD, -1) ;    // disable sbrk trimming
+    mallopt (M_TOP_PAD, 16*1024*1024) ; // increase padding to speedup malloc
+    
     // Create a text string, which is used to output the text file
     std::string oneLine;
 
@@ -48,16 +54,18 @@ int main () {
 
     double my_start_time = omp_get_wtime();
 
-//    double *C = new double[max*max];
-//    double *A = new double[max*max];
-//    double *B = new double[max*max];
+    //    double *A = new double[max*max];
+    //    double *B = new double[max*max];
 
-    double *C = (double*) malloc (max*max*sizeof(double));
-    double *A = (double*) malloc (max*max*sizeof(double));
-    double *B = (double*) malloc (max*max*sizeof(double));
 
     // Use a while loop together with the getline() function to read the file line by line
-    while (getline (InputFile, oneLine)) {
+    while (getline (InputFile, oneLine)) 
+    {
+        double *C = (double*) malloc (max*max*sizeof(double));
+        double *A = (double*) malloc (max*max*sizeof(double));
+        double *B = (double*) malloc (max*max*sizeof(double));
+
+
         std::stringstream ss(oneLine);
 
 
@@ -75,14 +83,15 @@ int main () {
         BLAS_DGEMM ("N" ,"N" , &m, &n, &k, &alpha, A, &lda, B, &ldb, &beta, C, &ldc);
         ++i;
         flops += m*n*k;
-        }
+        free(C);
+        free(A);
+        free(B);
+
+
+
+    }
     //    delete [] A;
     //    delete [] B;
-    //    delete [] C;
-
-    free(A);
-    free(B);
-    free(C);
 
     std::cout << "nol=" << i <<" flops = " << flops << std::endl;
 

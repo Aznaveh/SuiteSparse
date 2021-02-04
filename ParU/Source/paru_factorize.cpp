@@ -582,13 +582,13 @@ Int paru_factorize(Int f, Int start_fac,
 #endif
 
 
-            double start_time = omp_get_wtime();
+            //double start_time = omp_get_wtime();
             BLAS_DGEMM ("N", "N", &M, &N, &K, &alpha, A, &lda, B, &ldb, 
                     &beta, C, &ldc);
-            double tot_time = omp_get_wtime() - start_time;
-            printf ("%ld  %lf ",f, tot_time);
-            printf ("%d %d %d ",M ,N, K);
-            printf ("%d %d %d\n ",lda ,ldb, ldc);
+            //double tot_time = omp_get_wtime() - start_time;
+            //printf ("%ld  %lf ",f, tot_time);
+            //printf ("%d %d %d ",M ,N, K);
+            //printf ("%d %d %d\n ",lda ,ldb, ldc);
 #ifdef COUNT_FLOPS
             paruMatInfo->flp_cnt_dgemm += (double) 2*M*N*K;
 #ifndef NDEBUG  

@@ -30,8 +30,7 @@ run:
 #	./umfout < ../Matrix/ParUTst/tmp.mtx
 
 VGFLAGS = --leak-check=yes  --log-file="valgrindlogfile.log"\
-		   --show-leak-kinds=all --track-origins=yes \
-		   #--show-leak-kinds=all
+		   --show-leak-kinds=all --track-origins=yes 
 
 			#comment leak-check=yes or full
 
@@ -93,7 +92,12 @@ rev:
 	#@echo "$(BLAS)" #print some val
 
 test:
-	#$(C) $(FLAG) $(C11) blas_test.cpp -o test $(LIBS)
-	$(C) $(FLAG) $(C11) blas_NoLoopAlloc.cpp -o test0 $(LIBS)
-	$(C) $(FLAG) $(C11) blas_1LoopAlloc.cpp -o test1 $(LIBS)
-	$(C) $(FLAG) $(C11) blas_3LoopAlloc.cpp -o test3 $(LIBS)
+	$(C) $(FLAG) $(C11) -g blas_test.cpp -o test $(LIBS)
+#	$(C) $(FLAG) $(C11) blas_NoLoopAlloc.cpp -o test0 $(LIBS)
+#	$(C) $(FLAG) $(C11) blas_1LoopAlloc.cpp -o test1 $(LIBS)
+#	$(C) $(FLAG) $(C11) blas_3LoopAlloc.cpp -o test3 $(LIBS)
+valtest:
+	valgrind --leak-check=yes  --log-file="valgrindlogfile.log"\
+		   --show-leak-kinds=all --track-origins=yes ./test	
+
+
