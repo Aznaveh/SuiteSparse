@@ -290,6 +290,17 @@ void paru_pivotal ( std::vector<Int> &pivotal_elements,
     ASSERT (rowCount == stl_rowSize );
 #endif 
 
+    Int fm = LUsym->Fm[f];     /* Upper bound number of rows of F */ 
+    ASSERT ( fm >= rowCount );
+    //freeing extra space for rows
+    if (rowCount != fm)
+    {
+        Int sz = sizeof(Int)*fm; 
+        frowList =
+            (Int*) paru_realloc (rowCount, sizeof(Int), frowList, &sz, cc);
+        paruMatInfo ->frowList[f] = frowList;
+    }
+
     double *pivotalFront = 
         (double*) paru_calloc (rowCount*fp, sizeof (double), cc);
 
@@ -301,19 +312,12 @@ void paru_pivotal ( std::vector<Int> &pivotal_elements,
         return;
     }
 
-    PRLEVEL (1, ("%% pivotalFront =%p \n", pivotalFront));
-    Int fm = LUsym->Fm[f];     /* Upper bound number of rows of F */ 
-    PRLEVEL (1, ("%% fm=%ld rowCount=%ld \n", fm, rowCount));
-    ASSERT ( fm >= rowCount );
-    //freeing extra space for rows
-    if (rowCount != fm)
-    {
-        Int sz = sizeof(Int)*fm; 
-        frowList =
-            (Int*) paru_realloc (rowCount, sizeof(Int), frowList, &sz, cc);
-        paruMatInfo ->frowList[f] = frowList;
-    }
-
+#ifndef NDEBUG  
+    if (fm != rowCount) 
+        PRLEVEL (-1, ("%% fm=%ld rowCount=%ld ", fm, rowCount));
+    PRLEVEL (-1, ("%% pivotalFront = %p size=%ld\n", pivotalFront, 
+                rowCount*fp));
+#endif
     paru_fac *LUs =  paruMatInfo->partial_LUs;
     paruMatInfo->frowCount[f] = rowCount;
 

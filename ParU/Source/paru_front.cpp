@@ -19,7 +19,7 @@ int paru_front ( paru_matrix *paruMatInfo,
         cholmod_common *cc)
 {
 
-    DEBUGLEVEL(-1);
+    DEBUGLEVEL(-2);
     /* 
      * -2 Print Nothing
      * -1 Just Matlab
@@ -99,9 +99,6 @@ int paru_front ( paru_matrix *paruMatInfo,
 
 
     /************ Making the heap from list of the immediate children ******/
- //   PRLEVEL (1, ("%% Next: work on the heap \n"));
- //   paru_make_heap(f, paruMatInfo);
- //   PRLEVEL (1, ("%% Done: work on the heap \n"));
 
     /********************** pivotal column assembly  **************************/
     /***************  assembling the pivotal part of the front ****************/
@@ -346,6 +343,12 @@ int paru_front ( paru_matrix *paruMatInfo,
         return 1;
     }
 
+#ifndef NDEBUG  
+    if (fn != colCount) 
+        PRLEVEL (-3, ("%% fn=%ld colCount=%ld ", fn, colCount));
+    PRLEVEL (-3, ("%% uPart = %p size=%ld\n", uPart, colCount*fp));
+#endif
+ 
     paru_fac *Us =  paruMatInfo->partial_Us;
     Us[f].m = fp;
     Us[f].n = colCount;

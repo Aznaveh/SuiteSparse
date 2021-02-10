@@ -534,7 +534,7 @@ paru_symbolic *paru_analyze
     for(Int k = 0; k <= nf ; k++)
         PRLEVEL (p, ("  %ld", Parent[k]));
     PRLEVEL (p, ("\n"));
-    p = -1;
+    p = 1;
 #endif
 
 
@@ -733,7 +733,7 @@ paru_symbolic *paru_analyze
 
     //////////////////////end of relaxed amalgamation/////////////////////////
 
-    //Making Children list
+    //Making Children list and computing the bound sizes
     Int *Childp = (Int *) paru_calloc ((nf+2), sizeof (Int), cc);
     LUsym->Childp =  Childp;
     if (Childp== NULL)
@@ -745,13 +745,26 @@ paru_symbolic *paru_analyze
         return NULL;  
     }
 
+    Int Us_bound_size = 0;
+    Int LUs_bound_size = 0;
     for (Int f = 0; f < nf; f++)
-    {
+    {    
+        Int col1 = Super[f]; 
+        Int col2 = Super[f+1]; 
+        Int fp = Super[f+1]-Super[f];
+        Int fm = LUsym->Fm[f];
+        Int fn = LUsym->Cm[f];     /* Upper bound number of cols of F */ 
+        Us_bound_size += fp*fn; 
+        LUs_bound_size += fp*fm;
         if (Parent [f] > 0)
             Childp[Parent[f]+1]++;
     }
     paru_cumsum (nf+2, Childp);
+    LUsym->Us_bound_size = Us_bound_size;
+    LUsym->LUs_bound_size = LUs_bound_size;
 #ifndef NDEBUG
+    PRLEVEL (-1, ("%%-Us_bound_size = %ld LUs_bound_size = %ld\n",
+                Us_bound_size, LUs_bound_size));
     p = 1;
     PRLEVEL (p, ("%%%%-Chidlp-----"));
     for (Int f = 0; f < nf+2; f++)
@@ -1076,8 +1089,6 @@ paru_symbolic *paru_analyze
     /* print fronts*/
     for (Int f = 0; f < nf; f++)
     {
-        //       Int fm = LUsym->Fm[f];
-        //       Int fn = LUsym->Rp[f+1]-LUsym->Rp[f];
         Int col1 = Super[f]; 
         Int col2 = Super[f+1]; 
         Int fp = Super[f+1]-Super[f];

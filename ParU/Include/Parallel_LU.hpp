@@ -47,12 +47,12 @@ extern "C"
 #endif
 
 //for printing information uncomment this; to activate assertions uncomment 
-//#undef NPR    //<<1>>
+#undef NPR    //<<1>>
 
 //from spqr.hpp
 //Aznaveh For MATLAB OUTPUT UNCOMMENT HERE
 // uncomment the following line to turn on debugging 
-//#undef NDEBUG  //<<2>>
+#undef NDEBUG  //<<2>>
 
 //uncomment if you want to count hardware flops
 //#define COUNT_FLOPS
@@ -233,6 +233,8 @@ typedef struct
     // factorizes the frontal matrix chain. Since the
     // symbolic factorization only provides 
 
+    Int Us_bound_size; // Upper bound on size of all Us, sum all fp*fn
+    Int LUs_bound_size;// Upper bound on size of all LUs, sum all fp*fm
 } paru_symbolic;
 
 // =============================================================================
