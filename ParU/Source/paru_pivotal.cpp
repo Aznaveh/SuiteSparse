@@ -312,11 +312,17 @@ void paru_pivotal ( std::vector<Int> &pivotal_elements,
         return;
     }
 
+    paruMatInfo->actuall_alloc_LUs += rowCount*fp;
 #ifndef NDEBUG  
+    p = -1;
     if (fm != rowCount) 
-        PRLEVEL (-1, ("%% fm=%ld rowCount=%ld ", fm, rowCount));
-    PRLEVEL (-1, ("%% pivotalFront = %p size=%ld\n", pivotalFront, 
+        PRLEVEL (p, ("%% fm=%ld rowCount=%ld ", fm, rowCount));
+    PRLEVEL (p, ("%% LUs=%ld ", paruMatInfo->actuall_alloc_LUs));
+    PRLEVEL (p, ("%% pivotalFront = %p size=%ld", pivotalFront, 
                 rowCount*fp));
+    PRLEVEL (p, ("%% MEM=%ld \n", 
+                paruMatInfo->actuall_alloc_LUs+paruMatInfo->actuall_alloc_Us));
+    p = 1;
 #endif
     paru_fac *LUs =  paruMatInfo->partial_LUs;
     paruMatInfo->frowCount[f] = rowCount;

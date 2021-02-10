@@ -61,6 +61,8 @@ paru_matrix *paru_init_rowFronts (
     n = paruMatInfo->n = LUsym->n - LUsym->n1; 
     nf =  LUsym->nf; 
     paruMatInfo->panel_width = 32;
+    paruMatInfo->actuall_alloc_Us = 0;
+    paruMatInfo->actuall_alloc_LUs = 0;
 
     Int *row_degree_bound = (Int*) paru_alloc (m, sizeof (Int), cc);
     if (row_degree_bound == NULL)

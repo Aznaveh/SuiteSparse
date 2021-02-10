@@ -342,13 +342,19 @@ int paru_front ( paru_matrix *paruMatInfo,
         printf ("%% Out of memory when tried to allocate for U part %ld",f);
         return 1;
     }
+    paruMatInfo->actuall_alloc_Us += colCount*fp;
 
 #ifndef NDEBUG  
+    p = -3;
     if (fn != colCount) 
-        PRLEVEL (-3, ("%% fn=%ld colCount=%ld ", fn, colCount));
-    PRLEVEL (-3, ("%% uPart = %p size=%ld\n", uPart, colCount*fp));
+        PRLEVEL (p, ("%% fn=%ld colCount=%ld ", fn, colCount));
+    PRLEVEL (p, ("%% Us=%ld ", paruMatInfo->actuall_alloc_Us));
+    PRLEVEL (p, ("%% uPart = %p size=%ld", uPart, colCount*fp));
+    PRLEVEL (p, ("%% MEM=%ld \n", 
+                paruMatInfo->actuall_alloc_LUs+paruMatInfo->actuall_alloc_Us));
+    p = 1;
 #endif
- 
+
     paru_fac *Us =  paruMatInfo->partial_Us;
     Us[f].m = fp;
     Us[f].n = colCount;
@@ -536,12 +542,12 @@ int paru_front ( paru_matrix *paruMatInfo,
     double *el_numbers = (double*)
         ((Int*)(curEl+1) + 2*colCount + 2*(rowCount-fp));
 
-   //double start_time = omp_get_wtime();
-   paru_dgemm(pivotalFront, uPart, el_numbers, fp, rowCount, colCount);
-   //double tot_time = omp_get_wtime() - start_time;
-   //printf ("%ld  %lf ",f, tot_time);
-   //printf ("%ld %ld %ld ",rowCount-fp, colCount, fp);
-   //printf ("%ld %ld %ld \n",rowCount, fp, rowCount-fp);
+    //double start_time = omp_get_wtime();
+    paru_dgemm(pivotalFront, uPart, el_numbers, fp, rowCount, colCount);
+    //double tot_time = omp_get_wtime() - start_time;
+    //printf ("%ld  %lf ",f, tot_time);
+    //printf ("%ld %ld %ld ",rowCount-fp, colCount, fp);
+    //printf ("%ld %ld %ld \n",rowCount, fp, rowCount-fp);
 
 #ifdef COUNT_FLOPS
     paruMatInfo->flp_cnt_dgemm += (double) 2*(rowCount -fp)*fp*colCount;

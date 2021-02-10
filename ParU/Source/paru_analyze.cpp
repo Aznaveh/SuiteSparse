@@ -763,8 +763,8 @@ paru_symbolic *paru_analyze
     LUsym->Us_bound_size = Us_bound_size;
     LUsym->LUs_bound_size = LUs_bound_size;
 #ifndef NDEBUG
-    PRLEVEL (-1, ("%%-Us_bound_size = %ld LUs_bound_size = %ld\n",
-                Us_bound_size, LUs_bound_size));
+    PRLEVEL (-1, ("%%-Us_bound_size = %ld LUs_bound_size = %ld sum = %ld\n",
+                Us_bound_size, LUs_bound_size, Us_bound_size + LUs_bound_size));
     p = 1;
     PRLEVEL (p, ("%%%%-Chidlp-----"));
     for (Int f = 0; f < nf+2; f++)

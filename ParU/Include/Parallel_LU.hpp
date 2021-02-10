@@ -386,6 +386,9 @@ typedef struct
     paru_fac *partial_Us;   /* size nf   size(Us)= fp*colCount[f]    */
     paru_fac *partial_LUs;  /* size nf   size(LUs)= rowCount[f]*fp   */
 
+    Int actuall_alloc_LUs;  /* actual memory allocated for LUs*/
+    Int actuall_alloc_Us;   /* actual memory allocated for Us*/
+
 
     Int *row_degree_bound;          /* row degree size number of rows */
     Int panel_width;                /* width of panel for dense factorizaiton*/
