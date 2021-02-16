@@ -1,6 +1,5 @@
 /** =========================================================================  /
- * =======================  paru_pivotal ====================================  /
- * ========================================================================== */
+ * =======================  paru_pivotal ====================================  / ========================================================================== */
 
 /*! @brief 
  *  adding the list of pivotal elements from the heap, computing the list of
@@ -314,14 +313,19 @@ void paru_pivotal ( std::vector<Int> &pivotal_elements,
 
     paruMatInfo->actuall_alloc_LUs += rowCount*fp;
 #ifndef NDEBUG  
+    if (f == LUsym->nf -1)
+    {
     p = -1;
+    }
+ 
     if (fm != rowCount) 
         PRLEVEL (p, ("%% fm=%ld rowCount=%ld ", fm, rowCount));
     PRLEVEL (p, ("%% LUs=%ld ", paruMatInfo->actuall_alloc_LUs));
     PRLEVEL (p, ("%% pivotalFront = %p size=%ld", pivotalFront, 
                 rowCount*fp));
-    PRLEVEL (p, ("%% MEM=%ld \n", 
-                paruMatInfo->actuall_alloc_LUs+paruMatInfo->actuall_alloc_Us));
+    Int upp = LUsym->Us_bound_size  + LUsym->LUs_bound_size;
+    Int act = paruMatInfo->actuall_alloc_LUs+paruMatInfo->actuall_alloc_Us;
+    PRLEVEL (p, ("%% MEM=%ld percent=%lf%%\n", act, 100.0*act/upp));
     p = 1;
 #endif
     paru_fac *LUs =  paruMatInfo->partial_LUs;

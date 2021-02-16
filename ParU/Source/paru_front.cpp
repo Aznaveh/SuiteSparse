@@ -345,13 +345,17 @@ int paru_front ( paru_matrix *paruMatInfo,
     paruMatInfo->actuall_alloc_Us += colCount*fp;
 
 #ifndef NDEBUG  
+    if (f == LUsym->nf -1)
+    {
     p = -3;
+    }
     if (fn != colCount) 
         PRLEVEL (p, ("%% fn=%ld colCount=%ld ", fn, colCount));
     PRLEVEL (p, ("%% Us=%ld ", paruMatInfo->actuall_alloc_Us));
     PRLEVEL (p, ("%% uPart = %p size=%ld", uPart, colCount*fp));
-    PRLEVEL (p, ("%% MEM=%ld \n", 
-                paruMatInfo->actuall_alloc_LUs+paruMatInfo->actuall_alloc_Us));
+    Int upp = LUsym->Us_bound_size  + LUsym->LUs_bound_size;
+    Int act = paruMatInfo->actuall_alloc_LUs+paruMatInfo->actuall_alloc_Us;
+    PRLEVEL (p, ("%% MEM=%ld percent=%lf%%\n", act, 100.0*act/upp));
     p = 1;
 #endif
 
