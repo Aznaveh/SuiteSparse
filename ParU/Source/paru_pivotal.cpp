@@ -291,14 +291,34 @@ void paru_pivotal ( std::vector<Int> &pivotal_elements,
 
     Int fm = LUsym->Fm[f];     /* Upper bound number of rows of F */ 
     ASSERT ( fm >= rowCount );
+
+
+    // realloc version is not good for my memory management neither the parallel
+    // computation
     //freeing extra space for rows
-    if (rowCount != fm)
+    //if (rowCount != fm)
+    //{
+    //    Int sz = sizeof(Int)*fm; 
+    //    frowList =
+    //        (Int*) paru_realloc (rowCount, sizeof(Int), frowList, &sz, cc);
+    //    paruMatInfo ->frowList[f] = frowList;
+    //}
+
+    //new version
+    // TODO: it should be from the stack
+    Int * frowList_temp = (Int *) paru_alloc (rowCount, sizeof(Int), cc);
+    if (frowList_temp == NULL )
     {
-        Int sz = sizeof(Int)*fm; 
-        frowList =
-            (Int*) paru_realloc (rowCount, sizeof(Int), frowList, &sz, cc);
-        paruMatInfo ->frowList[f] = frowList;
+        printf ("%% Out of memory when tried to allocate for frowList %ld",f);
+        //TODO: manage return
+        return ;
     }
+    memcpy (frowList_temp, frowList, rowCount*sizeof(Int));
+    paru_free ( fm, sizeof (Int), frowList, cc);
+    frowList = frowList_temp;
+    paruMatInfo ->frowList[f] = frowList;
+
+
 
     double *pivotalFront = 
         (double*) paru_calloc (rowCount*fp, sizeof (double), cc);
