@@ -306,7 +306,8 @@ void paru_pivotal ( std::vector<Int> &pivotal_elements,
 
     //new version
     // TODO: it should be from the stack
-    Int * frowList_temp = (Int *) paru_stack_calloc (rowCount, sizeof(Int), cc);
+    Int * frowList_temp = (Int *) paru_stack_calloc (rowCount, sizeof(Int), 
+                paruMatInfo, cc);
     if (frowList_temp == NULL )
     {
         printf ("%% Out of memory when tried to allocate for frowList %ld",f);
@@ -321,7 +322,8 @@ void paru_pivotal ( std::vector<Int> &pivotal_elements,
 
 
     double *pivotalFront = 
-        (double*) paru_stack_calloc (rowCount*fp, sizeof (double), cc);
+        (double*) paru_stack_calloc (rowCount*fp, sizeof (double),
+                paruMatInfo, cc);
 
     if (pivotalFront == NULL )
     {

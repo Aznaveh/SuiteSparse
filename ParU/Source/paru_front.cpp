@@ -262,7 +262,8 @@ int paru_front ( paru_matrix *paruMatInfo,
     {
         PRLEVEL (1, ("%% fp=%ld fn=%ld \n", fp, fn));
         fcolList = 
-            (Int*) paru_stack_calloc (stl_colSet.size(), sizeof (Int), cc);
+            (Int*) paru_stack_calloc (stl_colSet.size(), sizeof (Int), 
+                    paruMatInfo, cc);
 
         if (fcolList == NULL)
         {
@@ -337,7 +338,8 @@ int paru_front ( paru_matrix *paruMatInfo,
     /**** 5 ** assemble U part         Row by Row                          ****/ 
 
     double *uPart = 
-        (double*) paru_stack_calloc (fp*colCount, sizeof (double), cc);
+        (double*) paru_stack_calloc (fp*colCount, sizeof (double),
+                paruMatInfo, cc);
     if ( uPart == NULL )
     {
         printf ("%% Out of memory when tried to allocate for U part %ld",f);

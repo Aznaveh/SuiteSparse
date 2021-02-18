@@ -353,12 +353,12 @@ typedef struct
 }   work_struct;
 
 typedef struct  
-{/*dense factorized part pointer*/
-    Int size,   // allocated memory for the index
-        count,  // number of indices that are in the sturcture
-        upperBound; // upperBound on the size  count <= size <= upperBound  
-    Int **listp;      // pointer to the pointer to the data structure 
-} paru_Index; 
+{
+    Int size,   
+        remaining;  
+    void *mem;   
+    void *avail;
+} stack_mem_info; 
 
 
 typedef struct  
@@ -416,6 +416,8 @@ typedef struct
     double my_time;
     double umf_time;
 
+    stack_mem_info stack_mem;
+
 #ifdef COUNT_FLOPS
     //flop count info
     double flp_cnt_dgemm;
@@ -427,9 +429,6 @@ typedef struct
 }   paru_matrix;
 
 
-// works with spqr
-//paru_symbolic *paru_sym_analyse ( cholmod_sparse *A, cholmod_common *cc) ;
-// works with umfpack
 paru_symbolic *paru_analyze ( cholmod_sparse *A, cholmod_common *cc) ;
 
 paru_matrix *paru_init_rowFronts 
@@ -438,7 +437,8 @@ paru_matrix *paru_init_rowFronts
 /* Wrappers for managing memory */
 void *paru_alloc(Int n, Int size, cholmod_common *cc);
 void *paru_calloc(Int n, Int size, cholmod_common *cc);
-void *paru_stack_calloc(Int n, Int size, cholmod_common *cc);
+void *paru_stack_calloc(Int n, Int size, 
+        paru_matrix *paruMatInfo, cholmod_common *cc);
 void *paru_realloc(Int newsize, Int size_Entry,
         void *oldP, Int *size, cholmod_common *cc);
 
@@ -450,9 +450,6 @@ void paru_freemat(paru_matrix **paruMatInfo_handle, cholmod_common *cc);
 Int paru_add_rowTuple (tupleList *RowList, Int row, paru_Tuple T, 
         cholmod_common *cc);
 
-// older version does not include row degree update after each panel
-//void paru_assemble(paru_matrix *paruMatInfo, Int f, cholmod_common *cc);
-//newer version
 int paru_front (paru_matrix *paruMatInfo, Int f, cholmod_common *cc);
 
 

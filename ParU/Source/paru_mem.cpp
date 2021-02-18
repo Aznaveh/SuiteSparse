@@ -35,17 +35,51 @@ void *paru_calloc(Int n, Int size, cholmod_common *cc)
     return p;
 }
 
-void *paru_stack_calloc(Int n, Int size, cholmod_common *cc)
+void *paru_stack_calloc (Int n, Int size,  paru_matrix *paruMatInfo, 
+        cholmod_common *cc)
 {
-    DEBUGLEVEL(0);
-    //#ifndef NDEBUG
+    DEBUGLEVEL(1);
+    PRLEVEL (1, ("%% STACK ALLOC n= %ld size= %ld\n", n, size));
     static Int calloc_count =0;
     calloc_count += n*size ;
-    //#endif
-    void *p= cholmod_l_calloc (n,size,cc);       
+    void *p = NULL;
+    if (paruMatInfo->stack_mem.mem == NULL)
+    {
+        paru_symbolic *LUsym = paruMatInfo->LUsym;
+        Int Us_bound_size = LUsym->Us_bound_size;
+        Int LUs_bound_size = LUsym->LUs_bound_size;
+        Int double_size = LUs_bound_size + Us_bound_size;
+        Int row_Int_bound =  LUsym->row_Int_bound;
+        Int col_Int_bound =  LUsym->col_Int_bound;
+        Int int_size = row_Int_bound + col_Int_bound;
+        Int upperBoundSize = 
+            double_size * sizeof(double) + int_size * sizeof(Int);;
+        PRLEVEL (1, ("%% ALLOC upper = %ld\n", upperBoundSize));
+        p = cholmod_l_calloc (upperBoundSize, 1, cc);
+        paruMatInfo->stack_mem.mem = p;
+        paruMatInfo->stack_mem.avail = p;
+        paruMatInfo->stack_mem.remaining = upperBoundSize;
+        paruMatInfo->stack_mem.size = upperBoundSize;
+    }
+
+    Int remaining = paruMatInfo->stack_mem.remaining;
+    void *avail = paruMatInfo->stack_mem.avail;
+    remaining -= n*size;
+    PRLEVEL (1, ("%% ALLOC remaining= %ld \n", remaining));
+    if (paruMatInfo->stack_mem.mem == NULL || remaining < 0)
+    {
+        printf ("Memory allocation problem!\n");
+        return NULL;
+    }
+ 
+    paruMatInfo->stack_mem.remaining = remaining;
+    //TODO  the pointer computation should be checked
+    void *new_avail = avail + n*size + 1;
+    paruMatInfo->stack_mem.avail = new_avail;
+
     PRLEVEL (1, ("%% callocated %ld in %p total= %ld\n", 
-                n*size, p, calloc_count ));
-    return p;
+                n*size, avail, calloc_count ));
+    return avail;
 }
 void *paru_realloc(
         Int newsize,    // requested size
@@ -223,40 +257,51 @@ void paru_freemat (paru_matrix **paruMatInfo_handle, cholmod_common *cc)
     for(Int i = 0; i < nf ; i++)
     {  
 
-        paru_free (paruMatInfo->frowCount[i], 
-                sizeof(Int), paruMatInfo->frowList[i], cc);
+       // paru_free (paruMatInfo->frowCount[i], 
+       //         sizeof(Int), paruMatInfo->frowList[i], cc);
 
-        paru_free (paruMatInfo->fcolCount[i], 
-                sizeof(Int), paruMatInfo->fcolList[i], cc);
+       // paru_free (paruMatInfo->fcolCount[i], 
+       //         sizeof(Int), paruMatInfo->fcolList[i], cc);
 
 
-        PRLEVEL (1, ("%% Freeing Us=%p\n", Us[i].p));
-        if(Us[i].p != NULL)
-        {
-            Int m = Us[i].m; Int n = Us[i].n;
-            paru_free (m*n, sizeof (double), Us[i].p, cc);
-        }
-        PRLEVEL (1, ("%% Freeing LUs=%p\n", LUs[i].p));
-        if(LUs[i].p != NULL)
-        {
-            Int m = LUs[i].m; Int n = LUs[i].n;
-            paru_free (m*n, sizeof (double), LUs[i].p, cc);
-        }
+        //PRLEVEL (1, ("%% Freeing Us=%p\n", Us[i].p));
+        //if(Us[i].p != NULL)
+        //{
+        //    Int m = Us[i].m; Int n = Us[i].n;
+        //    paru_free (m*n, sizeof (double), Us[i].p, cc);
+        //}
+        //PRLEVEL (1, ("%% Freeing LUs=%p\n", LUs[i].p));
+        //if(LUs[i].p != NULL)
+        //{
+        //    Int m = LUs[i].m; Int n = LUs[i].n;
+        //    paru_free (m*n, sizeof (double), LUs[i].p, cc);
+        //}
     }
 
     PRLEVEL (1, ("%% Done LUs\n"));
     paru_free(1, nf*sizeof(Int),paruMatInfo->frowCount, cc);
     paru_free(1, nf*sizeof(Int),paruMatInfo->fcolCount, cc);
 
-    paru_free(1, nf*sizeof(Int*),paruMatInfo->frowList, cc);
-    paru_free(1, nf*sizeof(Int*),paruMatInfo->fcolList, cc);
+    //paru_free(1, nf*sizeof(Int*),paruMatInfo->frowList, cc);
+    //paru_free(1, nf*sizeof(Int*),paruMatInfo->fcolList, cc);
 
-    paru_free(1, nf*sizeof(paru_fac),LUs, cc);
-    paru_free(1, nf*sizeof(paru_fac),Us, cc);
+    paru_free(1, nf*sizeof(paru_fac), LUs, cc);
+    paru_free(1, nf*sizeof(paru_fac), Us, cc);
+
+    Int Us_bound_size = LUsym->Us_bound_size;
+    Int LUs_bound_size = LUsym->LUs_bound_size;
+    Int row_Int_bound =  LUsym->row_Int_bound;
+    Int col_Int_bound =  LUsym->col_Int_bound;
+    Int upperBoundSize = Us_bound_size + LUs_bound_size + row_Int_bound 
+        + col_Int_bound;
+
+    //TODO the sizeof(double) and sizeof(Int) should be the same for accurate
+    paru_free(upperBoundSize, sizeof(double),paruMatInfo->stack_mem.mem,cc);
+
     paru_free(1, nf*sizeof(Int),paruMatInfo->time_stamp, cc);
     // in practice each parent should deal with the memory for the children
 #ifndef NDEBUG
-std::vector<Int>** heapList = paruMatInfo->heapList;
+    std::vector<Int>** heapList = paruMatInfo->heapList;
     //freeing memory of heaps.
     for (Int eli = 0; eli < m+nf+1; eli++) 
     {
@@ -271,7 +316,7 @@ std::vector<Int>** heapList = paruMatInfo->heapList;
     }
 #endif
     paru_free(1, (m+nf+1)*sizeof(std::vector<Int>**),
-        paruMatInfo->heapList, cc);
+            paruMatInfo->heapList, cc);
 
 
     paru_free (1, (m+nf+1)*sizeof(paru_Element), elementList, cc);
