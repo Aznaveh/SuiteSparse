@@ -35,6 +35,18 @@ void *paru_calloc(Int n, Int size, cholmod_common *cc)
     return p;
 }
 
+void *paru_stack_calloc(Int n, Int size, cholmod_common *cc)
+{
+    DEBUGLEVEL(0);
+    //#ifndef NDEBUG
+    static Int calloc_count =0;
+    calloc_count += n*size ;
+    //#endif
+    void *p= cholmod_l_calloc (n,size,cc);       
+    PRLEVEL (1, ("%% callocated %ld in %p total= %ld\n", 
+                n*size, p, calloc_count ));
+    return p;
+}
 void *paru_realloc(
         Int newsize,    // requested size
         Int size_Entry, // size of each Entry

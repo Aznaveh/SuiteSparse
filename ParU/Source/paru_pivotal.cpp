@@ -306,7 +306,7 @@ void paru_pivotal ( std::vector<Int> &pivotal_elements,
 
     //new version
     // TODO: it should be from the stack
-    Int * frowList_temp = (Int *) paru_alloc (rowCount, sizeof(Int), cc);
+    Int * frowList_temp = (Int *) paru_stack_calloc (rowCount, sizeof(Int), cc);
     if (frowList_temp == NULL )
     {
         printf ("%% Out of memory when tried to allocate for frowList %ld",f);
@@ -321,7 +321,7 @@ void paru_pivotal ( std::vector<Int> &pivotal_elements,
 
 
     double *pivotalFront = 
-        (double*) paru_calloc (rowCount*fp, sizeof (double), cc);
+        (double*) paru_stack_calloc (rowCount*fp, sizeof (double), cc);
 
     if (pivotalFront == NULL )
     {
@@ -331,8 +331,9 @@ void paru_pivotal ( std::vector<Int> &pivotal_elements,
         return;
     }
 
-    paruMatInfo->actuall_alloc_LUs += rowCount*fp;
 #ifndef NDEBUG  
+    paruMatInfo->actual_alloc_LUs += rowCount*fp;
+    paruMatInfo->actual_alloc_row_int+= rowCount;
     if (f == LUsym->nf -1)
     {
     p = -1;
@@ -340,11 +341,14 @@ void paru_pivotal ( std::vector<Int> &pivotal_elements,
  
     if (fm != rowCount) 
         PRLEVEL (p, ("%% fm=%ld rowCount=%ld ", fm, rowCount));
-    PRLEVEL (p, ("%% LUs=%ld ", paruMatInfo->actuall_alloc_LUs));
+    PRLEVEL (p, ("%% LUs=%ld ", paruMatInfo->actual_alloc_LUs));
     PRLEVEL (p, ("%% pivotalFront = %p size=%ld", pivotalFront, 
                 rowCount*fp));
-    Int upp = LUsym->Us_bound_size  + LUsym->LUs_bound_size;
-    Int act = paruMatInfo->actuall_alloc_LUs+paruMatInfo->actuall_alloc_Us;
+    Int act = paruMatInfo->actual_alloc_LUs+paruMatInfo->actual_alloc_Us
+        +paruMatInfo->actual_alloc_row_int;
+    Int upp = LUsym->Us_bound_size  + LUsym->LUs_bound_size
+        + LUsym->row_Int_bound + LUsym->col_Int_bound;
+    PRLEVEL (p, ("%% MEM=%ld percent=%lf%%", act, 100.0*act/upp));
     PRLEVEL (p, ("%% MEM=%ld percent=%lf%%\n", act, 100.0*act/upp));
     p = 1;
 #endif

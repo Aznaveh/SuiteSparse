@@ -235,6 +235,8 @@ typedef struct
 
     Int Us_bound_size; // Upper bound on size of all Us, sum all fp*fn
     Int LUs_bound_size;// Upper bound on size of all LUs, sum all fp*fm
+    Int row_Int_bound;// Upper bound on size of all ints for rows
+    Int col_Int_bound;// Upper bound on size of all ints for cols
 } paru_symbolic;
 
 // =============================================================================
@@ -386,8 +388,12 @@ typedef struct
     paru_fac *partial_Us;   /* size nf   size(Us)= fp*colCount[f]    */
     paru_fac *partial_LUs;  /* size nf   size(LUs)= rowCount[f]*fp   */
 
-    Int actuall_alloc_LUs;  /* actual memory allocated for LUs*/
-    Int actuall_alloc_Us;   /* actual memory allocated for Us*/
+#ifndef NDEBUG
+    Int actual_alloc_LUs;  /* actual memory allocated for LUs*/
+    Int actual_alloc_Us;   /* actual memory allocated for Us*/
+    Int actual_alloc_row_int;   /* actual memory allocated for rows*/
+    Int actual_alloc_col_int;   /* actual memory allocated for cols*/
+#endif 
 
 
     Int *row_degree_bound;          /* row degree size number of rows */
@@ -432,6 +438,7 @@ paru_matrix *paru_init_rowFronts
 /* Wrappers for managing memory */
 void *paru_alloc(Int n, Int size, cholmod_common *cc);
 void *paru_calloc(Int n, Int size, cholmod_common *cc);
+void *paru_stack_calloc(Int n, Int size, cholmod_common *cc);
 void *paru_realloc(Int newsize, Int size_Entry,
         void *oldP, Int *size, cholmod_common *cc);
 

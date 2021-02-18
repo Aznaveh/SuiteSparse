@@ -261,7 +261,8 @@ int paru_front ( paru_matrix *paruMatInfo,
     if (fn != 0) 
     {
         PRLEVEL (1, ("%% fp=%ld fn=%ld \n", fp, fn));
-        fcolList = (Int*) paru_alloc (stl_colSet.size(), sizeof (Int), cc);
+        fcolList = 
+            (Int*) paru_stack_calloc (stl_colSet.size(), sizeof (Int), cc);
 
         if (fcolList == NULL)
         {
@@ -336,25 +337,29 @@ int paru_front ( paru_matrix *paruMatInfo,
     /**** 5 ** assemble U part         Row by Row                          ****/ 
 
     double *uPart = 
-        (double*) paru_calloc (fp*colCount, sizeof (double), cc);
+        (double*) paru_stack_calloc (fp*colCount, sizeof (double), cc);
     if ( uPart == NULL )
     {
         printf ("%% Out of memory when tried to allocate for U part %ld",f);
         return 1;
     }
-    paruMatInfo->actuall_alloc_Us += colCount*fp;
 
 #ifndef NDEBUG  
+    paruMatInfo->actual_alloc_Us += colCount*fp;
+    paruMatInfo->actual_alloc_col_int += colCount;
     if (f == LUsym->nf -1)
     {
     p = -3;
     }
     if (fn != colCount) 
         PRLEVEL (p, ("%% fn=%ld colCount=%ld ", fn, colCount));
-    PRLEVEL (p, ("%% Us=%ld ", paruMatInfo->actuall_alloc_Us));
+    PRLEVEL (p, ("%% Us=%ld ", paruMatInfo->actual_alloc_Us));
     PRLEVEL (p, ("%% uPart = %p size=%ld", uPart, colCount*fp));
-    Int upp = LUsym->Us_bound_size  + LUsym->LUs_bound_size;
-    Int act = paruMatInfo->actuall_alloc_LUs+paruMatInfo->actuall_alloc_Us;
+    Int upp = LUsym->Us_bound_size  + LUsym->LUs_bound_size
+        + LUsym->row_Int_bound + LUsym->col_Int_bound;
+    Int act = paruMatInfo->actual_alloc_LUs+paruMatInfo->actual_alloc_Us
+        + paruMatInfo->actual_alloc_col_int;
+
     PRLEVEL (p, ("%% MEM=%ld percent=%lf%%\n", act, 100.0*act/upp));
     p = 1;
 #endif
