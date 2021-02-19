@@ -282,21 +282,22 @@ void paru_freemat (paru_matrix **paruMatInfo_handle, cholmod_common *cc)
     paru_free(1, nf*sizeof(Int),paruMatInfo->frowCount, cc);
     paru_free(1, nf*sizeof(Int),paruMatInfo->fcolCount, cc);
 
-    //paru_free(1, nf*sizeof(Int*),paruMatInfo->frowList, cc);
-    //paru_free(1, nf*sizeof(Int*),paruMatInfo->fcolList, cc);
+    paru_free(1, nf*sizeof(Int*),paruMatInfo->frowList, cc);
+    paru_free(1, nf*sizeof(Int*),paruMatInfo->fcolList, cc);
 
     paru_free(1, nf*sizeof(paru_fac), LUs, cc);
     paru_free(1, nf*sizeof(paru_fac), Us, cc);
 
     Int Us_bound_size = LUsym->Us_bound_size;
     Int LUs_bound_size = LUsym->LUs_bound_size;
+    Int double_size = LUs_bound_size + Us_bound_size;
     Int row_Int_bound =  LUsym->row_Int_bound;
     Int col_Int_bound =  LUsym->col_Int_bound;
-    Int upperBoundSize = Us_bound_size + LUs_bound_size + row_Int_bound 
-        + col_Int_bound;
+    Int int_size = row_Int_bound + col_Int_bound;
+    Int upperBoundSize = 
+            double_size * sizeof(double) + int_size * sizeof(Int);;
 
-    //TODO the sizeof(double) and sizeof(Int) should be the same for accurate
-    paru_free(upperBoundSize, sizeof(double),paruMatInfo->stack_mem.mem,cc);
+    paru_free(upperBoundSize, 1 ,paruMatInfo->stack_mem.mem,cc);
 
     paru_free(1, nf*sizeof(Int),paruMatInfo->time_stamp, cc);
     // in practice each parent should deal with the memory for the children
