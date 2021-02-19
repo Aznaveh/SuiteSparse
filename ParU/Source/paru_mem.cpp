@@ -9,7 +9,7 @@
  */
 #include "Parallel_LU.hpp"
 
-void *paru_alloc (Int n, Int size, cholmod_common *cc)
+void *paru_alloc (size_t n, size_t size, cholmod_common *cc)
 {
     DEBUGLEVEL(0);
     //#ifndef NDEBUG
@@ -22,7 +22,7 @@ void *paru_alloc (Int n, Int size, cholmod_common *cc)
     return p;
 }
 
-void *paru_calloc(Int n, Int size, cholmod_common *cc)
+void *paru_calloc (size_t n, size_t size, cholmod_common *cc)
 {
     DEBUGLEVEL(0);
     //#ifndef NDEBUG
@@ -35,7 +35,7 @@ void *paru_calloc(Int n, Int size, cholmod_common *cc)
     return p;
 }
 
-void *paru_stack_calloc (Int n, Int size,  paru_matrix *paruMatInfo, 
+void *paru_stack_calloc (size_t n, size_t size,  paru_matrix *paruMatInfo, 
         cholmod_common *cc)
 {
     DEBUGLEVEL(1);
@@ -52,8 +52,8 @@ void *paru_stack_calloc (Int n, Int size,  paru_matrix *paruMatInfo,
         Int row_Int_bound =  LUsym->row_Int_bound;
         Int col_Int_bound =  LUsym->col_Int_bound;
         Int int_size = row_Int_bound + col_Int_bound;
-        Int upperBoundSize = 
-            double_size * sizeof(double) + int_size * sizeof(Int);;
+        size_t upperBoundSize = 
+            double_size * sizeof(double) + int_size * sizeof(Int);
         PRLEVEL (1, ("%% ALLOC upper = %ld\n", upperBoundSize));
         p = cholmod_l_calloc (upperBoundSize, 1, cc);
         paruMatInfo->stack_mem.mem = p;
@@ -72,9 +72,9 @@ void *paru_stack_calloc (Int n, Int size,  paru_matrix *paruMatInfo,
         return NULL;
     }
  
-    paruMatInfo->stack_mem.remaining = remaining;
-    //TODO  the pointer computation should be checked
-    void *new_avail = avail + n*size + 1;
+    paruMatInfo->stack_mem.remaining = (size_t) remaining;
+    //void *new_avail = (void*) ( (size_t *)avail + n*size + 1);
+    void *new_avail = (void*) ( (char *)avail + n*size );
     paruMatInfo->stack_mem.avail = new_avail;
 
     PRLEVEL (1, ("%% callocated %ld in %p total= %ld\n", 
@@ -295,8 +295,9 @@ void paru_freemat (paru_matrix **paruMatInfo_handle, cholmod_common *cc)
     Int col_Int_bound =  LUsym->col_Int_bound;
     Int int_size = row_Int_bound + col_Int_bound;
     Int upperBoundSize = 
-            double_size * sizeof(double) + int_size * sizeof(Int);;
-
+            double_size * sizeof(double) + int_size * sizeof(Int);
+    PRLEVEL (-1, ("%% FREE upperBoundSize =%ld \n", upperBoundSize ));
+ 
     paru_free(upperBoundSize, 1 ,paruMatInfo->stack_mem.mem,cc);
 
     paru_free(1, nf*sizeof(Int),paruMatInfo->time_stamp, cc);
