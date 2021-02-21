@@ -354,10 +354,12 @@ typedef struct
 
 typedef struct  
 {
-    Int size,   
-        remaining;  
-    void *mem;   
-    void *avail;
+    size_t size0,    //size of first bank
+           cur_size, // size of current bank
+        remaining;   // remaining space of current bank
+    Int cur;         // points to current bank
+    void *mem_bank[64];   
+    void *avail;     // pointer to available space in current bank
 } stack_mem_info; 
 
 
@@ -435,9 +437,9 @@ paru_matrix *paru_init_rowFronts
 (cholmod_sparse *A, int scale, paru_symbolic *LUsym,   cholmod_common *cc);
 
 /* Wrappers for managing memory */
-void *paru_alloc(Int n, Int size, cholmod_common *cc);
-void *paru_calloc(Int n, Int size, cholmod_common *cc);
-void *paru_stack_calloc(Int n, Int size, 
+void *paru_alloc (size_t n, size_t  size, cholmod_common *cc);
+void *paru_calloc (size_t n, size_t size, cholmod_common *cc);
+void *paru_stack_calloc(size_t n, size_t size, 
         paru_matrix *paruMatInfo, cholmod_common *cc);
 void *paru_realloc(Int newsize, Int size_Entry,
         void *oldP, Int *size, cholmod_common *cc);

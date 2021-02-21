@@ -38,12 +38,12 @@ void *paru_calloc (size_t n, size_t size, cholmod_common *cc)
 void *paru_stack_calloc (size_t n, size_t size,  paru_matrix *paruMatInfo, 
         cholmod_common *cc)
 {
-    DEBUGLEVEL(1);
+    DEBUGLEVEL(0);
     PRLEVEL (1, ("%% STACK ALLOC n= %ld size= %ld\n", n, size));
     static Int calloc_count =0;
     calloc_count += n*size ;
     void *p = NULL;
-    if (paruMatInfo->stack_mem.mem == NULL)
+    if (paruMatInfo->stack_mem.mem_bank[0] == NULL)
     {
         paru_symbolic *LUsym = paruMatInfo->LUsym;
         Int Us_bound_size = LUsym->Us_bound_size;
@@ -56,17 +56,17 @@ void *paru_stack_calloc (size_t n, size_t size,  paru_matrix *paruMatInfo,
             double_size * sizeof(double) + int_size * sizeof(Int);
         PRLEVEL (1, ("%% ALLOC upper = %ld\n", upperBoundSize));
         p = cholmod_l_calloc (upperBoundSize, 1, cc);
-        paruMatInfo->stack_mem.mem = p;
+        paruMatInfo->stack_mem.mem_bank[0] = p;
         paruMatInfo->stack_mem.avail = p;
         paruMatInfo->stack_mem.remaining = upperBoundSize;
-        paruMatInfo->stack_mem.size = upperBoundSize;
+        paruMatInfo->stack_mem.size0 = upperBoundSize;
     }
 
     Int remaining = paruMatInfo->stack_mem.remaining;
     void *avail = paruMatInfo->stack_mem.avail;
     remaining -= n*size;
     PRLEVEL (1, ("%% ALLOC remaining= %ld \n", remaining));
-    if (paruMatInfo->stack_mem.mem == NULL || remaining < 0)
+    if (paruMatInfo->stack_mem.mem_bank[0] == NULL || remaining < 0)
     {
         printf ("Memory allocation problem!\n");
         return NULL;
@@ -296,9 +296,15 @@ void paru_freemat (paru_matrix **paruMatInfo_handle, cholmod_common *cc)
     Int int_size = row_Int_bound + col_Int_bound;
     Int upperBoundSize = 
             double_size * sizeof(double) + int_size * sizeof(Int);
-    PRLEVEL (-1, ("%% FREE upperBoundSize =%ld \n", upperBoundSize ));
+    PRLEVEL (1, ("%% FREE upperBoundSize =%ld \n", upperBoundSize ));
  
-    paru_free(upperBoundSize, 1 ,paruMatInfo->stack_mem.mem,cc);
+    
+    for (Int i = 0 ; i < 64; i++)
+    {
+        if (paruMatInfo->stack_mem.mem_bank[i] == NULL)
+            break;
+        paru_free(upperBoundSize, 1 ,paruMatInfo->stack_mem.mem_bank[i],cc);
+    }
 
     paru_free(1, nf*sizeof(Int),paruMatInfo->time_stamp, cc);
     // in practice each parent should deal with the memory for the children
