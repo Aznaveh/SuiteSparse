@@ -62,11 +62,8 @@ paru_matrix *paru_init_rowFronts (
     nf =  LUsym->nf; 
     paruMatInfo->panel_width = 32;
 
-    paruMatInfo->stack_mem.size0=0;
     paruMatInfo->stack_mem.remaining = 0;
-    memset(paruMatInfo->stack_mem.mem_bank, NULL, 64);
-//    for (Int i = 0 ; i < 64; i++)
-//        paruMatInfo->stack_mem.mem_bank[i] = NULL;
+    memset(paruMatInfo->stack_mem.mem_bank, NULL, 64*sizeof(void*));
     paruMatInfo->stack_mem.avail = NULL;
     
 #ifndef NDEBUG  

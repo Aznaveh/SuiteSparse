@@ -354,8 +354,7 @@ typedef struct
 
 typedef struct  
 {
-    size_t size0,    //size of first bank
-           cur_size, // size of current bank
+    size_t size_bank[64],    //size of each bank
         remaining;   // remaining space of current bank
     Int cur;         // points to current bank
     void *mem_bank[64];   
