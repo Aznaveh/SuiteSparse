@@ -47,12 +47,12 @@ extern "C"
 #endif
 
 //for printing information uncomment this; to activate assertions uncomment 
-#undef NPR    //<<1>>
+//#undef NPR    //<<1>>
 
 //from spqr.hpp
 //Aznaveh For MATLAB OUTPUT UNCOMMENT HERE
 // uncomment the following line to turn on debugging 
-#undef NDEBUG  //<<2>>
+//#undef NDEBUG  //<<2>>
 
 //uncomment if you want to count hardware flops
 //#define COUNT_FLOPS
@@ -455,7 +455,8 @@ int paru_front (paru_matrix *paruMatInfo, Int f, cholmod_common *cc);
 
 
 Int paru_dgetrf (double *F, Int *frowList, Int m, Int n, BLAS_INT *ipiv);
-Int paru_factorize(Int f, Int start_fac, Int *panel_row, 
+Int paru_factorize(Int f, Int start_fac, 
+        std::vector<Int> &panel_row,
         std::set<Int> &stl_colSet, 
         std::vector<Int> &pivotal_elements,
         paru_matrix *paruMatInfo);
@@ -502,7 +503,8 @@ Int bin_srch (Int *srt_lst, Int l, Int r, Int num);
 
 
 void paru_pivotal ( std::vector<Int> &pivotal_elements,
-        Int *panel_row, Int f, heaps_info &hi,
+        std::vector<Int> &panel_row,
+        Int f, heaps_info &hi,
         paru_matrix *paruMatInfo, cholmod_common *cc);
 
 int paru_intersection ( Int e, paru_Element **elementList, 

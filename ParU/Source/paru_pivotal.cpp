@@ -13,7 +13,8 @@
 #include "Parallel_LU.hpp"
 
 void paru_pivotal ( std::vector<Int> &pivotal_elements,
-        Int *panel_row, Int f, heaps_info &hi,
+        std::vector<Int> &panel_row,
+        Int f, heaps_info &hi,
         paru_matrix *paruMatInfo, cholmod_common *cc)
 {
     DEBUGLEVEL(0);
@@ -329,7 +330,7 @@ void paru_pivotal ( std::vector<Int> &pivotal_elements,
     {
         printf ("%% Out of memory when tried to allocate for pivotal part %ld",
                 f);
-        paru_free ( num_panels, sizeof (Int), panel_row, cc);
+        //paru_free ( num_panels, sizeof (Int), panel_row, cc);
         return;
     }
 

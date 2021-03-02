@@ -57,13 +57,11 @@ int paru_front ( paru_matrix *paruMatInfo,
 
     Int panel_width = paruMatInfo->panel_width;
     Int num_panels = (Int) ceil( (double)fp/panel_width);
-    // panel_row shows number of rows in each panel. Needs to be initialized in
-    // my new algorithm
-    //Int panel_row[num_panels] = {0}; // Intel compiler doesn't support this
-    Int panel_row[num_panels];
-    //for (Int i = 0; i < num_panels; i++)
-    // panel_row[i]=0;
-    memset(panel_row, 0, num_panels*sizeof(Int) );
+
+    // panel_row shows number of rows in each panel. 
+    // Needs to be initialized in my new algorithm
+    std::vector<Int> panel_row(num_panels,0);
+
     Int *snM = LUsym->super2atree;
     Int eli = snM [f]; 
 
