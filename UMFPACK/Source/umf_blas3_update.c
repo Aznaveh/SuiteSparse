@@ -131,9 +131,11 @@ GLOBAL void UMF_blas3_update
 	/* C = C - L*U' (U is stored by rows, not columns) */
 
     /* Aznaveh */
+    /*
     printf ("%ld  %lf ",1, 0.0);
     printf ("%ld %ld %ld ", m, n, k);
     printf ("%ld %ld %ld\n", d, dc, d);
+    */
 
 
 #ifndef NBLAS
