@@ -65,15 +65,21 @@ int main ()
     //std::pmr::monotonic_buffer_resource mono_pool;
     //std::pmr::synchronized_pool_resource pool(&mono_pool); 
     
-    std::pmr::synchronized_pool_resource pool; 
+    char * mr = new char[22000];
+    std::pmr::pool_options opts;
+    opts.max_blocks_per_chunk = 1<<5;
+    opts.largest_required_pool_block = 1<<10;
+    
+    std::pmr::synchronized_pool_resource pool(opts); 
+    //std::pmr::polymorphic_allocator<char *> pool; 
     double my_start_time = omp_get_wtime();
 
     // double *A = new double[max*max];
     // double *B = new double[max*max];
 
-    double *A = (double*) malloc (max*max*sizeof(double));
-    double *B = (double*) malloc (max*max*sizeof(double));
-    double *C = (double*) malloc (max*max*sizeof(double));
+    //double *A = (double*) malloc (max*max*sizeof(double));
+    //double *B = (double*) malloc (max*max*sizeof(double));
+    //double *C = (double*) malloc (max*max*sizeof(double));
 
 
 
@@ -81,7 +87,7 @@ int main ()
     // Use a while loop together with the getline() 
     // function to read the file line by line
     tot_time = 0;
-    while (getline (InputFile, oneLine) && i<10 ) 
+    while (getline (InputFile, oneLine) ) 
     {
         std::stringstream ss(oneLine);
 
@@ -105,9 +111,9 @@ int main ()
         //double *B = (double*) malloc (ldb*n*sizeof(double));
         //double *C = (double*) malloc (ldc*n*sizeof(double));
 
-        //double *A = (double*) pool.allocate(lda*k*sizeof(double),8);
-        //double *B = (double*) pool.allocate(ldb*n*sizeof(double),8);
-        double *C = (double*) pool.allocate(ldc*n*sizeof(double),8);
+        double *A = (double*) pool.allocate(lda*k*sizeof(double),8);
+        double *B = (double*) pool.allocate(ldb*n*sizeof(double),8);
+        double *C = (double*) pool.allocate(ldc*n*sizeof(double));
 
        // std::cout<< "m = " << m;
        // std::cout<< " n = " << n;
@@ -124,17 +130,19 @@ int main ()
         ++i;
         flops += m*n*k;
 
-        //pool.deallocate( (void *) A, lda*k*sizeof(double), 8);
-        //pool.deallocate( (void *) B, ldb*n*sizeof(double), 8);
+        pool.deallocate( (void *) A, lda*k*sizeof(double), 8);
+        pool.deallocate( (void *) B, ldb*n*sizeof(double), 8);
         pool.deallocate( (void *) C, ldc*n*sizeof(double), 8);
+        
+        
         
         //free(A);
         //free(B);
         //free(C);
     }
 
-    free(A);
-    free(B);
+    //free(A);
+    //free(B);
     //free(C);
 
     double my_time = omp_get_wtime() - my_start_time;

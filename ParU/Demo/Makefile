@@ -21,6 +21,7 @@ FLAG = -Wno-write-strings
 #-O0 -fsanitize=address -g
 C11 = -std=c++11
 C17 = -std=c++17
+C20 = -std=c++20
 
 all:
 	$(C) $(FLAG) $(C11) umf_test.cpp -o umfout $(LIBS)
