@@ -12,9 +12,9 @@
 int main () 
 {
 
-   // mallopt (M_MMAP_MAX, 0) ;           // disable mmap; it's too slow
-   // mallopt (M_TRIM_THRESHOLD, -1) ;    // disable sbrk trimming
-   // mallopt (M_TOP_PAD, 16*1024*1024) ; // increase padding to speedup malloc
+    //mallopt (M_MMAP_MAX, 0) ;           // disable mmap; it's too slow
+    //mallopt (M_TRIM_THRESHOLD, -1) ;    // disable sbrk trimming
+    //mallopt (M_TOP_PAD, 16*1024*1024) ; // increase padding to speedup malloc
     
     // Create a text string, which is used to output the text file
     std::string oneLine;
@@ -26,6 +26,7 @@ int main ()
     ///// Finding the max
     long max = 0;
     int i = 0;
+    double tot_time = 0.0;
     // Use a while loop together with the getline()
     // function to read the file line by line
     while (getline (InputFile, oneLine)) {
@@ -33,6 +34,7 @@ int main ()
 
         int tmp; double dtmp;
         ss >> tmp; ss>>dtmp;
+        tot_time += dtmp;
         int m,n,k,lda,ldb,ldc;
         ss >> m;     max = max > m ? max: m;
         ss >> n;     max = max > n ? max: n;
@@ -42,10 +44,12 @@ int main ()
         //ss >> ldc;    max = max > ldc ? max: ldc;
         i++;
     }
-    std::cout << "nol=" <<i;
+    std::cout << "nol=" <<i << " tot_time="  << tot_time;
     // Close the file
     InputFile.close();
     std::cout << std::endl << "max matrix size = " << max*max << std::endl;
+
+    std::cout << "max_align=" << alignof(std::max_align_t) <<std::endl; 
 
     double alpha = -1;
     double beta= 0; 
@@ -56,28 +60,35 @@ int main ()
     i = 0;
 
     //std::pmr::pool_options::largest_required_pool_block = 40000000;
-    // std::pmr::synchronized_pool_resource pool;
+    //std::pmr::monotonic_buffer_resource pool;
 
+    //std::pmr::monotonic_buffer_resource mono_pool;
+    //std::pmr::synchronized_pool_resource pool(&mono_pool); 
+    
+    std::pmr::synchronized_pool_resource pool; 
     double my_start_time = omp_get_wtime();
 
     // double *A = new double[max*max];
     // double *B = new double[max*max];
 
-    //double *A = (double*) malloc (max*max*sizeof(double));
-    //double *B = (double*) malloc (max*max*sizeof(double));
+    double *A = (double*) malloc (max*max*sizeof(double));
+    double *B = (double*) malloc (max*max*sizeof(double));
+    double *C = (double*) malloc (max*max*sizeof(double));
 
 
 
 
     // Use a while loop together with the getline() 
     // function to read the file line by line
-    while (getline (InputFile, oneLine) ) 
+    tot_time = 0;
+    while (getline (InputFile, oneLine) && i<10 ) 
     {
         std::stringstream ss(oneLine);
 
 
         int tmp; double dtmp;
         ss >> tmp; ss>>dtmp;
+        tot_time += dtmp;
 
         BLAS_INT m,n,k,lda,ldb,ldc;
         ss >> m;     
@@ -90,13 +101,13 @@ int main ()
         if (m*n*k == 0) 
             continue;
         
-        double *A = (double*) malloc (lda*k*sizeof(double));
-        double *B = (double*) malloc (k*ldc*sizeof(double));
-        double *C = (double*) malloc (lda*n*sizeof(double));
+        //double *A = (double*) malloc (lda*k*sizeof(double));
+        //double *B = (double*) malloc (ldb*n*sizeof(double));
+        //double *C = (double*) malloc (ldc*n*sizeof(double));
 
-        //double *A = (double*) pool.allocate(m*k*sizeof(double),8);
-        //double *B = (double*) pool.allocate(k*n*sizeof(double),8);
-        //double *C = (double*) pool.allocate(m*n*sizeof(double),8);
+        //double *A = (double*) pool.allocate(lda*k*sizeof(double),8);
+        //double *B = (double*) pool.allocate(ldb*n*sizeof(double),8);
+        double *C = (double*) pool.allocate(ldc*n*sizeof(double),8);
 
        // std::cout<< "m = " << m;
        // std::cout<< " n = " << n;
@@ -113,17 +124,23 @@ int main ()
         ++i;
         flops += m*n*k;
 
-        //pool.deallocate( (void *) A, m*k*sizeof(double), 8);
-        //pool.deallocate( (void *) B, k*n*sizeof(double), 8);
-        //pool.deallocate( (void *) C, m*n*sizeof(double), 8);
+        //pool.deallocate( (void *) A, lda*k*sizeof(double), 8);
+        //pool.deallocate( (void *) B, ldb*n*sizeof(double), 8);
+        pool.deallocate( (void *) C, ldc*n*sizeof(double), 8);
         
-        free(A);
-        free(B);
-        free(C);
+        //free(A);
+        //free(B);
+        //free(C);
     }
+
+    free(A);
+    free(B);
+    //free(C);
+
     double my_time = omp_get_wtime() - my_start_time;
 
-    std::cout << "nol=" << i <<" flops = " << flops << std::endl;
+    std::cout << "nol=" << i <<" flops = " << flops;
+    std::cout << " tot_time="  << tot_time<< std::endl;
     std::cout  << my_time << std::endl;
 
     // Close the file

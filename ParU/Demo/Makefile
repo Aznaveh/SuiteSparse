@@ -20,6 +20,7 @@ LIBS = $(CLIB) $(FLIB) $(TBB) $(GPULIB)
 FLAG = -Wno-write-strings 
 #-O0 -fsanitize=address -g
 C11 = -std=c++11
+C17 = -std=c++17
 
 all:
 	$(C) $(FLAG) $(C11) umf_test.cpp -o umfout $(LIBS)
@@ -91,8 +92,10 @@ rev:
 	$(foreach var,$(.VARIABLES),$(info $(var) = $($(var)))) #print all var
 	#@echo "$(BLAS)" #print some val
 
+.PHONY: test
 test:
-	$(C) $(FLAG) $(C11) -g blas_test.cpp -o test $(LIBS)
+	- rm test
+	$(C) $(FLAG) $(C17) -g blas_test.cpp -o test $(LIBS)
 #	$(C) $(FLAG) $(C11) blas_NoLoopAlloc.cpp -o test0 $(LIBS)
 #	$(C) $(FLAG) $(C11) blas_1LoopAlloc.cpp -o test1 $(LIBS)
 #	$(C) $(FLAG) $(C11) blas_3LoopAlloc.cpp -o test3 $(LIBS)
