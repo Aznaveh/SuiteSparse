@@ -10,7 +10,7 @@
 
 
 void paru_check_prior_element ( Int e, Int f, Int start_fac,
-        std::vector<Int> colHash, 
+        std::vector<Int> &colHash, 
         paru_matrix *paruMatInfo,
         cholmod_common *cc)
     // check if e can be assembeld into f
@@ -42,7 +42,7 @@ void paru_check_prior_element ( Int e, Int f, Int start_fac,
 void paru_make_heap (Int f, Int start_fac, 
         std::vector<Int> &pivotal_elements, 
         heaps_info &hi,
-        std::vector<Int> colHash, 
+        std::vector<Int> &colHash, 
         paru_matrix *paruMatInfo,
         cholmod_common *cc)
 {
