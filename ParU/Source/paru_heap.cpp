@@ -10,7 +10,7 @@
 
 
 void paru_check_prior_element ( Int e, Int f, Int start_fac,
-        std::vector<Int> &colHash, 
+        std::pmr::vector<Int> &colHash, 
         paru_matrix *paruMatInfo,
         cholmod_common *cc)
     // check if e can be assembeld into f
@@ -40,9 +40,9 @@ void paru_check_prior_element ( Int e, Int f, Int start_fac,
     }
 }
 void paru_make_heap (Int f, Int start_fac, 
-        std::vector<Int> &pivotal_elements, 
+        std::pmr::vector<Int> &pivotal_elements, 
         heaps_info &hi,
-        std::vector<Int> &colHash, 
+        std::pmr::vector<Int> &colHash, 
         paru_matrix *paruMatInfo,
         cholmod_common *cc)
 {
@@ -58,7 +58,7 @@ void paru_make_heap (Int f, Int start_fac,
     paru_Element **elementList = paruMatInfo->elementList;
     Int m = paruMatInfo-> m;
 
-    std::vector<Int>** heapList = paruMatInfo->heapList;
+    std::pmr::vector<Int>** heapList = paruMatInfo->heapList;
 
     Int eli = snM [f]; 
 
@@ -86,7 +86,8 @@ void paru_make_heap (Int f, Int start_fac,
         //There are still elements remained in the heaps
     {
         //shallow copy of the biggest child
-        std::vector<Int>* curHeap = heapList[eli] = heapList[biggest_Child_id];
+        std::pmr::vector<Int>* curHeap = heapList[eli] = 
+            heapList[biggest_Child_id];
         heapList[biggest_Child_id] = nullptr;
 
         //O(n) heapify of all children or O(klgn) add to the biggest child
@@ -97,7 +98,7 @@ void paru_make_heap (Int f, Int start_fac,
             for (Int i = aChildp[eli]; i <= aChildp[eli+1]-1; i++) 
             {   
                 Int chelid = aChild[i];  // element id of the child
-                std::vector<Int>*  chHeap = heapList[chelid];
+                std::pmr::vector<Int>*  chHeap = heapList[chelid];
                 if (chHeap == nullptr) continue;
                 //concatening the child and freeing the memory
                 for (Int k = 0; k < chHeap->size(); k++)
@@ -136,11 +137,11 @@ void paru_make_heap (Int f, Int start_fac,
         else
         {  //heapify
             PRLEVEL (p, ("%%heapify with the size %ld\n", tot_size));
-            std::vector<Int>* curHeap = heapList[eli];  
+            std::pmr::vector<Int>* curHeap = heapList[eli];  
             for (Int i = aChildp[eli]; i <= aChildp[eli+1]-1; i++) 
             {
                 Int chelid = aChild[i];  // element id of the child
-                std::vector<Int>* chHeap = heapList[chelid];
+                std::pmr::vector<Int>* chHeap = heapList[chelid];
                 if (chHeap == nullptr) continue;
                 //concatening the child and freeing the memory
 
@@ -174,7 +175,8 @@ void paru_make_heap (Int f, Int start_fac,
     {
         PRLEVEL (p, ("Nothing in the heap. size of pivotal %ld \n", 
                     pivotal_elements.size()) );
-        std::vector<Int>* curHeap = heapList[eli]  = new std::vector<Int>;
+        std::pmr::vector<Int>* curHeap = heapList[eli]  = 
+            new std::pmr::vector<Int>;
         //deep copy
         //*curHeap = pivotal_elements;
         //swap provides a shallow copy
@@ -184,7 +186,7 @@ void paru_make_heap (Int f, Int start_fac,
     }
 
 #ifndef NDEBUG
-    std::vector<Int>* curHeap = heapList[eli];
+    std::pmr::vector<Int>* curHeap = heapList[eli];
     PRLEVEL (p, ("After everything eli %ld has %ld elements\n", 
                 eli, curHeap->size() ));
     PRLEVEL (p, ("%%Heap after making it(size = %ld) \n", curHeap->size() ));

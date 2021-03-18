@@ -16,6 +16,7 @@
 #include <algorithm>
 #include <set>
 #include <vector>
+#include <memory_resource>
 
 #include <malloc.h>
 
@@ -410,7 +411,7 @@ typedef struct
     //least numbered column. The active front Takes the pointer of the biggest
     //child and release its other children after concatenating their list to its
     //own. The list of heaps are initialized by nullptr
-    std::vector<Int>** heapList; /* size m+nf+1, initialized with nullptr  */
+    std::pmr::vector<Int>** heapList; /* size m+nf+1, initialized with nullptr  */
 
 
     // analysis information
@@ -456,9 +457,9 @@ int paru_front (paru_matrix *paruMatInfo, Int f, cholmod_common *cc);
 
 Int paru_dgetrf (double *F, Int *frowList, Int m, Int n, BLAS_INT *ipiv);
 Int paru_factorize(Int f, Int start_fac, 
-        std::vector<Int> &panel_row,
-        std::set<Int> &stl_colSet, 
-        std::vector<Int> &pivotal_elements,
+        std::pmr::vector<Int> &panel_row,
+        std::pmr::set<Int> &stl_colSet, 
+        std::pmr::vector<Int> &pivotal_elements,
         paru_matrix *paruMatInfo);
 
 
@@ -469,7 +470,7 @@ void assemble_col (const double *sR, double *dR, Int m, const Int *relRowInd);
 
 
 void assemble_row_toU (Int e, Int f, Int sR, Int dR, 
-        std::vector <Int> &colHash, 
+        std::pmr::vector <Int> &colHash, 
         paru_matrix *paruMatInfo) ;
 
 
@@ -483,7 +484,7 @@ void paru_print_tupleList (tupleList *listSet, Int index);
 void paru_init_rel (Int f, paru_matrix *paruMatInfo);
 
 void paru_update_rel_ind_col ( Int e, Int f, 
-        std::vector <Int> &colHash, 
+        std::pmr::vector <Int> &colHash, 
         paru_matrix *paruMatInfo);
 
 
@@ -491,8 +492,8 @@ void paru_write( paru_matrix *paruMatInfo, int scale,
         char *id, cholmod_common *cc);
         
 void paru_update_rowDeg ( Int panel_num,  Int row_end, 
-        Int f, Int start_fac, std::set<Int> &stl_colSet, 
-        std::vector<Int> &pivotal_elements,
+        Int f, Int start_fac, std::pmr::set<Int> &stl_colSet, 
+        std::pmr::vector<Int> &pivotal_elements,
         paru_matrix *paruMatInfo);
 
 
@@ -502,46 +503,46 @@ Int bin_srch_col (Int *srt_lst, Int l, Int r, Int num);
 Int bin_srch (Int *srt_lst, Int l, Int r, Int num);
 
 
-void paru_pivotal ( std::vector<Int> &pivotal_elements,
-        std::vector<Int> &panel_row,
+void paru_pivotal ( std::pmr::vector<Int> &pivotal_elements,
+        std::pmr::vector<Int> &panel_row,
         Int f, heaps_info &hi,
         paru_matrix *paruMatInfo, cholmod_common *cc);
 
 int paru_intersection ( Int e, paru_Element **elementList, 
-        std::set<Int> &stl_colSet);
+        std::pmr::set<Int> &stl_colSet);
 
 void paru_prior_assemble ( Int f, Int start_fac,  
-        std::vector<Int> &pivotal_elements,
-        std::vector<Int> &colHash, 
+        std::pmr::vector<Int> &pivotal_elements,
+        std::pmr::vector<Int> &colHash, 
         heaps_info &hi,
         paru_matrix *paruMatInfo,
         cholmod_common *cc);
 
 void paru_eliminate_all ( Int e, Int f, 
-        std::vector <Int> &colHash, 
+        std::pmr::vector <Int> &colHash, 
         paru_matrix *paruMatInfo,
         cholmod_common *cc);
 
 void paru_eliminate_cols ( Int e, Int f, 
-        std::vector<Int> &colHash, 
+        std::pmr::vector<Int> &colHash, 
         paru_matrix *paruMatInfo,
         cholmod_common *cc);
 
 void paru_eliminate_rows ( Int e, Int f, 
-        std::vector<Int> &colHash, 
+        std::pmr::vector<Int> &colHash, 
         paru_matrix *paruMatInfo,
         cholmod_common *cc);
 
 
 //heap related
 void paru_make_heap (Int f, Int start_fac,
-        std::vector<Int> &pivotal_elements,
+        std::pmr::vector<Int> &pivotal_elements,
         heaps_info &hi,
-        std::vector<Int> &colHash, 
+        std::pmr::vector<Int> &colHash, 
         paru_matrix *paruMatInfo,
         cholmod_common *cc);
 
 //hash related
-void paru_insert_hash(Int key, Int value, std::vector<Int> &colHash);
-Int paru_find_hash (Int key, std::vector<Int> &colHash, Int *fcolList);
+void paru_insert_hash(Int key, Int value, std::pmr::vector<Int> &colHash);
+Int paru_find_hash (Int key, std::pmr::vector<Int> &colHash, Int *fcolList);
 #endif

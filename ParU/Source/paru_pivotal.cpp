@@ -150,8 +150,8 @@ void paru_pivotal ( std::pmr::vector<Int> &pivotal_elements,
     for(Int i=0 ; i < pivotal_elements.size(); i++)
         PRLEVEL (p, ("%ld ", pivotal_elements[i]));
     PRLEVEL (p, ("\n"));
-    std::set<Int> stl_rowSet;
-    std::set<Int>::iterator it;
+    std::pmr::set<Int> stl_rowSet;
+    std::pmr::set<Int>::iterator it;
     p = 1;
 #endif 
     Int panel_width = paruMatInfo->panel_width;

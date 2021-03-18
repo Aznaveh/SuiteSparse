@@ -9,8 +9,8 @@
 #include "Parallel_LU.hpp"
 
 void paru_prior_assemble ( Int f, Int start_fac,  
-        std::vector<Int> &pivotal_elements,
-        std::vector<Int> &colHash, 
+        std::pmr::vector<Int> &pivotal_elements,
+        std::pmr::vector<Int> &colHash, 
         heaps_info &hi,
         paru_matrix *paruMatInfo,
         cholmod_common *cc)
@@ -100,8 +100,8 @@ void paru_prior_assemble ( Int f, Int start_fac,
 
 
     Int eli = snM [f]; 
-    std::vector<Int>** heapList = paruMatInfo->heapList;
-    std::vector<Int>* curHeap = heapList[eli];
+    std::pmr::vector<Int>** heapList = paruMatInfo->heapList;
+    std::pmr::vector<Int>* curHeap = heapList[eli];
 
     if ( curHeap->empty() ) return;
 

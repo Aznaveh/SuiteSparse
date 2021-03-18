@@ -11,7 +11,7 @@
 
 
 void paru_update_rel_ind_col ( Int e, Int f,  
-        std::vector <Int> &colHash, 
+        std::pmr::vector <Int> &colHash, 
         paru_matrix *paruMatInfo) 
 {
     // updating relative column index 

@@ -86,7 +86,7 @@ void paru_update_rowDeg ( Int panel_num,  Int row_end, Int f, Int start_fac,
      */
     Int n = paruMatInfo-> n;
     Int *frowList = paruMatInfo->frowList[f];
-    std::set<Int>::iterator it;
+    std::pmr::set<Int>::iterator it;
 
     tupleList *RowList = paruMatInfo->RowList;
     for (Int i = j1; i < j2; i++)

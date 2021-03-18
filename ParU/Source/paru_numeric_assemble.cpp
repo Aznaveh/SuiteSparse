@@ -31,7 +31,7 @@ void assemble_col (const double *sC,  //source col and destination col
 }
 
 void assemble_row_toU (Int e, Int f, Int sR, Int dR, 
-        std::vector <Int> &colHash, 
+        std::pmr::vector <Int> &colHash, 
         paru_matrix *paruMatInfo) 
 {
 
