@@ -111,7 +111,7 @@ SUITESPARSE_VERSION = 5.5.0
     # use the $(CC), $(CXX), and $(F77) compilers, use 'make AUTOCC=no'
 
 	#Aznaveh use yes or no for icpc 
-    AUTOCC ?= yes
+    AUTOCC ?= no
 
     ifneq ($(AUTOCC),no)
         ifneq ($(shell which icc 2>/dev/null),)
@@ -163,7 +163,7 @@ SUITESPARSE_VERSION = 5.5.0
 
     # LAPACK ?= -llapack
 	# Aznaveh: uncomment here to use openblas
-    # BLAS ?= -lopenblas
+     BLAS ?= -lopenblas
 
     ifndef BLAS
         ifdef MKLROOT

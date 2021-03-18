@@ -10,7 +10,7 @@
 
 void paru_prior_assemble ( Int f, Int start_fac,  
         std::vector<Int> &pivotal_elements,
-        std::vector<Int> colHash, 
+        std::vector<Int> &colHash, 
         heaps_info &hi,
         paru_matrix *paruMatInfo,
         cholmod_common *cc)

@@ -9,7 +9,7 @@
 #include "Parallel_LU.hpp"
 
 void paru_eliminate_all ( Int e, Int f, 
-        std::vector <Int> colHash, 
+        std::vector <Int> &colHash, 
         paru_matrix *paruMatInfo,
         cholmod_common *cc)
 
@@ -160,7 +160,7 @@ void paru_eliminate_all ( Int e, Int f,
 // fit
 
 void paru_eliminate_cols ( Int e, Int f, 
-        std::vector <Int> colHash, 
+        std::vector <Int> &colHash, 
         paru_matrix *paruMatInfo,
         cholmod_common *cc)
 
@@ -351,7 +351,7 @@ void paru_eliminate_cols ( Int e, Int f,
 }
 
 void paru_eliminate_rows ( Int e, Int f, 
-        std::vector <Int> colHash, 
+        std::vector <Int> &colHash, 
         paru_matrix *paruMatInfo,
         cholmod_common *cc)
 

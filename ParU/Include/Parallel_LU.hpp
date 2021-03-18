@@ -469,7 +469,7 @@ void assemble_col (const double *sR, double *dR, Int m, const Int *relRowInd);
 
 
 void assemble_row_toU (Int e, Int f, Int sR, Int dR, 
-        std::vector <Int> colHash, 
+        std::vector <Int> &colHash, 
         paru_matrix *paruMatInfo) ;
 
 
@@ -483,7 +483,7 @@ void paru_print_tupleList (tupleList *listSet, Int index);
 void paru_init_rel (Int f, paru_matrix *paruMatInfo);
 
 void paru_update_rel_ind_col ( Int e, Int f, 
-        std::vector <Int> colHash, 
+        std::vector <Int> &colHash, 
         paru_matrix *paruMatInfo);
 
 
@@ -512,23 +512,23 @@ int paru_intersection ( Int e, paru_Element **elementList,
 
 void paru_prior_assemble ( Int f, Int start_fac,  
         std::vector<Int> &pivotal_elements,
-        std::vector<Int> colHash, 
+        std::vector<Int> &colHash, 
         heaps_info &hi,
         paru_matrix *paruMatInfo,
         cholmod_common *cc);
 
 void paru_eliminate_all ( Int e, Int f, 
-        std::vector <Int> colHash, 
+        std::vector <Int> &colHash, 
         paru_matrix *paruMatInfo,
         cholmod_common *cc);
 
 void paru_eliminate_cols ( Int e, Int f, 
-        std::vector<Int> colHash, 
+        std::vector<Int> &colHash, 
         paru_matrix *paruMatInfo,
         cholmod_common *cc);
 
 void paru_eliminate_rows ( Int e, Int f, 
-        std::vector<Int> colHash, 
+        std::vector<Int> &colHash, 
         paru_matrix *paruMatInfo,
         cholmod_common *cc);
 
@@ -537,7 +537,7 @@ void paru_eliminate_rows ( Int e, Int f,
 void paru_make_heap (Int f, Int start_fac,
         std::vector<Int> &pivotal_elements,
         heaps_info &hi,
-        std::vector<Int> colHash, 
+        std::vector<Int> &colHash, 
         paru_matrix *paruMatInfo,
         cholmod_common *cc);
 
