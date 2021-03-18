@@ -5,7 +5,7 @@
 #include <omp.h>
 #include <malloc.h>
 
-#include <memory_resource>
+//#include <memory_resource>
 
 #include "Parallel_LU.hpp"
 
@@ -59,26 +59,27 @@ int main ()
     InputFile.open("filename.txt");
     i = 0;
 
-    //std::pmr::pool_options::largest_required_pool_block = 40000000;
-    //std::pmr::monotonic_buffer_resource pool;
+   
+    //std::pmr::pool_options opts;
+    //opts.max_blocks_per_chunk = 1<<6;
+    //opts.largest_required_pool_block = 1<<11;
+    //std::pmr::synchronized_pool_resource pool(opts); 
+    //
+    //std::pmr::synchronized_pool_resource pool; 
 
-    //std::pmr::monotonic_buffer_resource mono_pool;
-    //std::pmr::synchronized_pool_resource pool(&mono_pool); 
-    
-    char * mr = new char[22000];
-    std::pmr::pool_options opts;
-    opts.max_blocks_per_chunk = 1<<5;
-    opts.largest_required_pool_block = 1<<10;
-    
-    std::pmr::synchronized_pool_resource pool(opts); 
-    //std::pmr::polymorphic_allocator<char *> pool; 
+    std::pmr::monotonic_buffer_resource upstream{max*max*sizeof(double)};
+    std::pmr::unsynchronized_pool_resource pool{&upstream};
+    //std::pmr::polymorphic_allocator<> pool{ &mr };
+
+    //std::pmr::polymorphic_allocator<double> pa;
+
     double my_start_time = omp_get_wtime();
 
     // double *A = new double[max*max];
     // double *B = new double[max*max];
 
-    //double *A = (double*) malloc (max*max*sizeof(double));
-    //double *B = (double*) malloc (max*max*sizeof(double));
+    double *A = (double*) malloc (max*max*sizeof(double));
+    double *B = (double*) malloc (max*max*sizeof(double));
     //double *C = (double*) malloc (max*max*sizeof(double));
 
 
@@ -87,7 +88,7 @@ int main ()
     // Use a while loop together with the getline() 
     // function to read the file line by line
     tot_time = 0;
-    while (getline (InputFile, oneLine) ) 
+    while (getline (InputFile, oneLine) && i < 10000 ) 
     {
         std::stringstream ss(oneLine);
 
@@ -106,33 +107,39 @@ int main ()
 
         if (m*n*k == 0) 
             continue;
-        
+
         //double *A = (double*) malloc (lda*k*sizeof(double));
         //double *B = (double*) malloc (ldb*n*sizeof(double));
         //double *C = (double*) malloc (ldc*n*sizeof(double));
 
-        double *A = (double*) pool.allocate(lda*k*sizeof(double),8);
-        double *B = (double*) pool.allocate(ldb*n*sizeof(double),8);
+        //double *A = (double*) pool.allocate(lda*k*sizeof(double),8);
+        //double *B = (double*) pool.allocate(ldb*n*sizeof(double),8);
         double *C = (double*) pool.allocate(ldc*n*sizeof(double));
 
-       // std::cout<< "m = " << m;
-       // std::cout<< " n = " << n;
-       // std::cout<< " k = " << k; 
-       // std::cout<< " lda = " << lda;
-       // std::cout<< " ldb = " << ldb;
-       // std::cout<< " ldc = " << ldc << std::endl;;
+        //double *C = (double*) pa.allocate(ldc*n*sizeof(double));
 
-        //m= 144; n=3; k = 13;
-        // C = A*B
-        // 
+        // std::cout<< "m = " << m;
+        // std::cout<< " n = " << n;
+        // std::cout<< " k = " << k; 
+        // std::cout<< " lda = " << lda;
+        // std::cout<< " ldb = " << ldb;
+        // std::cout<< " ldc = " << ldc << std::endl;;
+
+
+        memset(A, 1.0, m*k);
+        memset(B, 1.0, k*n);
+        //memset(C, 1.0, m*n);
+
         BLAS_DGEMM ("N" ,"N" , &m, &n, &k, &alpha, A, &lda, B,
                 &ldb, &beta, C, &ldc);
         ++i;
         flops += m*n*k;
 
-        pool.deallocate( (void *) A, lda*k*sizeof(double), 8);
-        pool.deallocate( (void *) B, ldb*n*sizeof(double), 8);
-        pool.deallocate( (void *) C, ldc*n*sizeof(double), 8);
+       // pool.deallocate( (void *) A, lda*k*sizeof(double), 8);
+       // pool.deallocate( (void *) B, ldb*n*sizeof(double), 8);
+       pool.deallocate( (void *) C, ldc*n*sizeof(double), 8);
+
+       //pa.deallocate(  C, ldc*n*sizeof(double), 8);
         
         
         
@@ -141,8 +148,8 @@ int main ()
         //free(C);
     }
 
-    //free(A);
-    //free(B);
+    free(A);
+    free(B);
     //free(C);
 
     double my_time = omp_get_wtime() - my_start_time;
