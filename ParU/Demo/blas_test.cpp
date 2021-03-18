@@ -65,10 +65,10 @@ int main ()
     //opts.largest_required_pool_block = 1<<11;
     //std::pmr::synchronized_pool_resource pool(opts); 
     //
-    //std::pmr::synchronized_pool_resource pool; 
+    std::pmr::synchronized_pool_resource pool; 
 
-    std::pmr::monotonic_buffer_resource upstream{max*max*sizeof(double)};
-    std::pmr::unsynchronized_pool_resource pool{&upstream};
+    //std::pmr::monotonic_buffer_resource upstream{max*max*sizeof(double)};
+    //std::pmr::unsynchronized_pool_resource pool{&upstream};
     //std::pmr::polymorphic_allocator<> pool{ &mr };
 
     //std::pmr::polymorphic_allocator<double> pa;
