@@ -397,9 +397,9 @@ Int paru_dgetrf (double *F, Int *frowList, Int lm, Int ln,
 }
 
 Int paru_factorize(Int f, Int start_fac,
-        std::vector<Int> &panel_row,
-        std::set<Int> &stl_colSet, 
-        std::vector<Int> &pivotal_elements,
+        std::pmr::vector<Int> &panel_row,
+        std::pmr::set<Int> &stl_colSet, 
+        std::pmr::vector<Int> &pivotal_elements,
         paru_matrix *paruMatInfo)
 {
     DEBUGLEVEL (0);

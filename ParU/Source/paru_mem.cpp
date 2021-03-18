@@ -358,7 +358,7 @@ void paru_freemat (paru_matrix **paruMatInfo_handle, cholmod_common *cc)
     paru_free(1, nf*sizeof(Int),paruMatInfo->time_stamp, cc);
     // in practice each parent should deal with the memory for the children
 #ifndef NDEBUG
-    std::vector<Int>** heapList = paruMatInfo->heapList;
+    std::pmr::vector<Int>** heapList = paruMatInfo->heapList;
     //freeing memory of heaps.
     for (Int eli = 0; eli < m+nf+1; eli++) 
     {
@@ -372,7 +372,7 @@ void paru_freemat (paru_matrix **paruMatInfo_handle, cholmod_common *cc)
         ASSERT(heapList[eli] == nullptr);
     }
 #endif
-    paru_free(1, (m+nf+1)*sizeof(std::vector<Int>**),
+    paru_free(1, (m+nf+1)*sizeof(std::pmr::vector<Int>**),
             paruMatInfo->heapList, cc);
 
 

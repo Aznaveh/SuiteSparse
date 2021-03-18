@@ -254,9 +254,9 @@ paru_matrix *paru_init_rowFronts (
          return NULL;
      }
 
-     paruMatInfo->heapList =  (std::vector<Int>**) 
-         paru_calloc (1, (m+nf+1)*sizeof(std::vector<Int>*), cc);
-     std::vector<Int>** heapList = paruMatInfo->heapList;
+     paruMatInfo->heapList =  (std::pmr::vector<Int>**) 
+         paru_calloc (1, (m+nf+1)*sizeof(std::pmr::vector<Int>*), cc);
+     std::pmr::vector<Int>** heapList = paruMatInfo->heapList;
 
      if (paruMatInfo->heapList == NULL)
      {   //out of memory
@@ -382,8 +382,9 @@ paru_matrix *paru_init_rowFronts (
          
          rowMark[e] = 0;
 
-         std::vector<Int>* curHeap;
-         curHeap = paruMatInfo->heapList[e] = new std::vector<Int>;
+         std::pmr::vector<Int>* curHeap;
+         //TODO 
+         curHeap = paruMatInfo->heapList[e] = new std::pmr::vector<Int>;
          PRLEVEL (1, ("%%Heap allocated %p id=%ld \n",curHeap, e ));
          curHeap->push_back(e);
 

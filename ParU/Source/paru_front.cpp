@@ -60,7 +60,7 @@ int paru_front ( paru_matrix *paruMatInfo,
 
     // panel_row shows number of rows in each panel. 
     // Needs to be initialized in my new algorithm
-    std::vector<Int> panel_row(num_panels,0);
+    std::pmr::vector<Int> panel_row(num_panels,0);
 
     Int *snM = LUsym->super2atree;
     Int eli = snM [f]; 
@@ -121,7 +121,7 @@ int paru_front ( paru_matrix *paruMatInfo,
      *                          3   17 | X  Y  .  .  . 
      * */
 
-    std::vector<Int> pivotal_elements;
+    std::pmr::vector<Int> pivotal_elements;
     heaps_info hi;
     PRLEVEL (1, ("%% Next: work on pivotal column assembly\n"));
     paru_pivotal (pivotal_elements, panel_row , f, hi, paruMatInfo, cc);
@@ -165,7 +165,7 @@ int paru_front ( paru_matrix *paruMatInfo,
 #endif
 
     Int fn = LUsym->Cm[f];     /* Upper bound number of cols of F */ 
-    std::set<Int> stl_colSet;  /* used in this scope */
+    std::pmr::set<Int> stl_colSet;  /* used in this scope */
 
 
 
@@ -274,8 +274,8 @@ int paru_front ( paru_matrix *paruMatInfo,
     paruMatInfo->fcolList[f] = fcolList;
 
 
-    std::vector<Int>** heapList = paruMatInfo->heapList;
-    std::vector<Int>* curHeap = heapList[eli];
+    std::pmr::vector<Int>** heapList = paruMatInfo->heapList;
+    std::pmr::vector<Int>* curHeap = heapList[eli];
 
     // EXIT point HERE 
     if (colCount == 0 )
@@ -298,7 +298,7 @@ int paru_front ( paru_matrix *paruMatInfo,
     PRLEVEL (1, ("%% 1Front hash_size=%ld\n",hash_size));
     hash_size = (hash_size > LUsym->n )? LUsym->n : hash_size;
     PRLEVEL (1, ("%% 2Front hash_size=%ld\n",hash_size));
-    std::vector<Int> colHash(hash_size+1,-1);
+    std::pmr::vector<Int> colHash(hash_size+1,-1);
     Int i = 0;
     if (hash_size == LUsym->n)
     {

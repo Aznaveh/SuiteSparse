@@ -17,7 +17,7 @@
 // key*257 & mask
 #define HASH_FUNCTION(key) (( (key << 8) + (key) ) & (hash_bits))
 
-void paru_insert_hash(Int key, Int value, std::vector<Int> &colHash)
+void paru_insert_hash(Int key, Int value, std::pmr::vector<Int> &colHash)
 {
     DEBUGLEVEL(0);
 
@@ -58,7 +58,7 @@ void paru_insert_hash(Int key, Int value, std::vector<Int> &colHash)
 #endif
 }
 
-Int paru_find_hash (Int key, std::vector<Int> &colHash, Int *fcolList)
+Int paru_find_hash (Int key, std::pmr::vector<Int> &colHash, Int *fcolList)
 {
     DEBUGLEVEL(0);
 #ifndef NDEBUG  

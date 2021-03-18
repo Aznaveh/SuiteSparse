@@ -9,8 +9,8 @@
 #include "Parallel_LU.hpp"
 
 void paru_update_rowDeg ( Int panel_num,  Int row_end, Int f, Int start_fac,
-        std::set<Int> &stl_colSet, 
-        std::vector<Int> &pivotal_elements,
+        std::pmr::set<Int> &stl_colSet, 
+        std::pmr::vector<Int> &pivotal_elements,
         paru_matrix *paruMatInfo)
 {
 
@@ -48,7 +48,7 @@ void paru_update_rowDeg ( Int panel_num,  Int row_end, Int f, Int start_fac,
     Int *row_degree_bound = paruMatInfo->row_degree_bound;
 
 
-    std::set<Int> stl_newColSet;  // the list of new columns
+    std::pmr::set<Int> stl_newColSet;  // the list of new columns
 
     /*************** finding set of non pivotal cols in current front *********/
     /*               
@@ -237,8 +237,8 @@ void paru_update_rowDeg ( Int panel_num,  Int row_end, Int f, Int start_fac,
         return;
 
     paruMatInfo->fcolCount[f] = colCount;
-    std::vector<Int>** heapList = paruMatInfo->heapList;
-    std::vector<Int>* curHeap = heapList[eli];
+    std::pmr::vector<Int>** heapList = paruMatInfo->heapList;
+    std::pmr::vector<Int>* curHeap = heapList[eli];
 
 
 

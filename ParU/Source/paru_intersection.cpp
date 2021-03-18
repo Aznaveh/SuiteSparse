@@ -10,7 +10,7 @@
 #define C 4
 
 int paru_intersection ( Int e, paru_Element **elementList, 
-        std::set<Int> &stl_newColSet)
+        std::pmr::set<Int> &stl_newColSet)
 {
     DEBUGLEVEL(0);
 #ifndef NDEBUG        

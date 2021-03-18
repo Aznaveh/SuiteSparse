@@ -12,15 +12,15 @@
  */
 #include "Parallel_LU.hpp"
 
-void paru_pivotal ( std::vector<Int> &pivotal_elements,
-        std::vector<Int> &panel_row,
+void paru_pivotal ( std::pmr::vector<Int> &pivotal_elements,
+        std::pmr::vector<Int> &panel_row,
         Int f, heaps_info &hi,
         paru_matrix *paruMatInfo, cholmod_common *cc)
 {
     DEBUGLEVEL(0);
     paru_symbolic *LUsym =  paruMatInfo->LUsym;
     Int *snM = LUsym->super2atree;
-    std::vector<Int>** heapList = paruMatInfo->heapList;
+    std::pmr::vector<Int>** heapList = paruMatInfo->heapList;
     Int eli = snM [f]; 
 
 #ifndef NDEBUG
@@ -37,7 +37,7 @@ void paru_pivotal ( std::vector<Int> &pivotal_elements,
     Int *aChildp = LUsym->aChildp;
  
 
-    std::vector<Int>* elHeap = heapList[eli] ;
+    std::pmr::vector<Int>* elHeap = heapList[eli] ;
     paru_Element **elementList = paruMatInfo->elementList;
     
     Int m = paruMatInfo-> m;
@@ -68,7 +68,7 @@ void paru_pivotal ( std::vector<Int> &pivotal_elements,
         rowMark = rowMark >  f_rmark ?  rowMark : f_rmark;
 
         PRLEVEL (p, ("%% chelid = %ld\n", chelid));
-        std::vector<Int>* curHeap = heapList[chelid];
+        std::pmr::vector<Int>* curHeap = heapList[chelid];
 
         if (curHeap == nullptr) continue;
 

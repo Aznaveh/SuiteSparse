@@ -24,7 +24,7 @@ C17 = -std=c++17
 C20 = -std=c++20
 
 all:
-	$(C) $(FLAG) $(C11) umf_test.cpp -o umfout $(LIBS)
+	$(C) $(FLAG) $(C17) umf_test.cpp -o umfout $(LIBS)
 
 
 run:

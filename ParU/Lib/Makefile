@@ -41,6 +41,7 @@ clean:
 INC = ../Include/Parallel_LU.hpp
 
 C11 = -std=c++11
+C17 = -std=c++17
 
 OBJ = \
     paru_mem.o \
@@ -94,7 +95,7 @@ endif
 
 
 #C = $(CXX) $(CF) $(SPQR_CONFIG) $(CHOLMOD_CONFIG) $(CONFIG_PARTITION) $(I)
-C = $(CXX) $(CF)  $(CHOLMOD_CONFIG) $(CONFIG_PARTITION) $(I) $(FLAG) $(C11)
+C = $(CXX) $(CF)  $(CHOLMOD_CONFIG) $(CONFIG_PARTITION) $(I) $(FLAG) $(C17)
 #-------------------------------------------------------------------------------
 
 static: $(AR_TARGET)

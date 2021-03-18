@@ -50,7 +50,7 @@ fprintf(ff,' myflop umfflop ratio\n results = [');
 %fprintf(ff,' myflop, umfflop, ratio\n');
 
 loop_cnt = 0;
-NNZMat = 10000;
+NNZMat = 100;
 
 for k = 1:nmat
 %for k = 469:nmat
@@ -106,7 +106,7 @@ for k = 1:nmat
             continue;
     end
  
-    if (loop_cnt > 80 )
+    if (loop_cnt > 180 )
         break
     end
 
