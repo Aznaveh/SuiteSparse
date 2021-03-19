@@ -454,7 +454,7 @@ void paru_pivotal ( std::pmr::vector<Int> &pivotal_elements,
             el->ncolsleft--;     
             if (el->ncolsleft == 0)
             { //free el
-                paru_free_el ( e, elementList, cc);
+                paru_free_el ( e, paruMatInfo, cc);
                 break;
             }
 #ifndef NDEBUG  // Printing the pivotal front

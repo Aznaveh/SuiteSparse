@@ -147,7 +147,7 @@ void paru_eliminate_all ( Int e, Int f,
         }
     }
 
-    paru_free_el ( e, elementList, cc);
+    paru_free_el ( e, paruMatInfo, cc);
 }
 
 // try to find columns and assemble them to current front. After the first
@@ -336,7 +336,7 @@ void paru_eliminate_cols ( Int e, Int f,
 
     if (el->ncolsleft == 0 )
     {
-        paru_free_el ( e, elementList, cc);
+        paru_free_el ( e, paruMatInfo, cc);
     }
 }
 
@@ -530,7 +530,7 @@ void paru_eliminate_rows ( Int e, Int f,
     el->nrowsleft -= tempRow.size();
     if (el->nrowsleft == 0)
     {
-        paru_free_el ( e, elementList, cc);
+        paru_free_el ( e, paruMatInfo, cc);
     }
 #ifndef NDEBUG
     p = 1;

@@ -226,10 +226,12 @@ void paru_freesym (paru_symbolic **LUsym_handle,
 
     *LUsym_handle = NULL;
 }
-void paru_free_el (Int e, paru_Element **elementList,  cholmod_common *cc)
+void paru_free_el (Int e,  paru_matrix *paruMatInfo,  cholmod_common *cc)
     /* fee element e from elementList */
 {
     DEBUGLEVEL(0); 
+    paru_Element **elementList; 
+    elementList = paruMatInfo->elementList;
     paru_Element *el = elementList[e];
     if (el == NULL) return;
     Int nrows = el->nrows,
@@ -288,7 +290,7 @@ void paru_freemat (paru_matrix **paruMatInfo_handle, cholmod_common *cc)
         }
         Int e = LUsym->row2atree[i];    //element number in augmented tree
         PRLEVEL (1, ("%% e =%ld\t", e));
-        paru_free_el ( e, elementList, cc);
+        paru_free_el ( e, paruMatInfo, cc);
     }
 
 
@@ -296,7 +298,7 @@ void paru_freemat (paru_matrix **paruMatInfo_handle, cholmod_common *cc)
     for(Int i = 0; i < nf ; i++)
     {        // freeing all other elements
         Int e = LUsym->super2atree[i];    //element number in augmented tree
-        paru_free_el ( e, elementList, cc);
+        paru_free_el ( e, paruMatInfo, cc);
     }
 
     //free the answer

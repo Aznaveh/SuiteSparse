@@ -427,7 +427,7 @@ int paru_front ( paru_matrix *paruMatInfo,
             el->nrowsleft--;  
             if (el->nrowsleft == 0) 
             { 
-                paru_free_el ( e, elementList, cc);
+                paru_free_el ( e, paruMatInfo, cc);
             }
         }
     }
