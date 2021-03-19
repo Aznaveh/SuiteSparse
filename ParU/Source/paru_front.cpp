@@ -426,12 +426,8 @@ int paru_front ( paru_matrix *paruMatInfo,
             rowRelIndex [curRowIndex] = -1;
             el->nrowsleft--;  
             if (el->nrowsleft == 0) 
-            { //free el
-                Int tot_size = sizeof(paru_Element) +
-                    sizeof(Int)*(2*(mEl+nEl)) + sizeof(double)*nEl*mEl;
-                PRLEVEL (1, ("%%inside Front: Free %ld\n",e));
-                paru_free (1, tot_size, el, cc);
-                elementList[e] = NULL;
+            { 
+                paru_free_el ( e, elementList, cc);
             }
         }
     }

@@ -454,11 +454,7 @@ void paru_pivotal ( std::pmr::vector<Int> &pivotal_elements,
             el->ncolsleft--;     
             if (el->ncolsleft == 0)
             { //free el
-                Int tot_size = sizeof(paru_Element) +
-                    sizeof(Int)*(2*(mEl+nEl)) + sizeof(double)*nEl*mEl;
-                PRLEVEL (1, ("%% Free %ld  %p size %ld\n",e, el, tot_size));
-                paru_free (1, tot_size, el, cc);
-                elementList[e] = NULL;
+                paru_free_el ( e, elementList, cc);
                 break;
             }
 #ifndef NDEBUG  // Printing the pivotal front

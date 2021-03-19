@@ -226,6 +226,22 @@ void paru_freesym (paru_symbolic **LUsym_handle,
 
     *LUsym_handle = NULL;
 }
+void paru_free_el (Int e, paru_Element **elementList,  cholmod_common *cc)
+    /* fee element e from elementList */
+{
+    DEBUGLEVEL(0); 
+    paru_Element *el = elementList[e];
+    if (el == NULL) return;
+    Int nrows = el->nrows,
+        ncols = el->ncols;
+    PRLEVEL (1, ("%%Free the element e =%ld\t", e));
+    PRLEVEL (1, ("%% nrows =%ld ", nrows));
+    PRLEVEL (1, ("%% ncols =%ld\n", ncols));
+    Int tot_size = sizeof(paru_Element)+sizeof(Int)*(2*(nrows+ncols))+
+        sizeof(double)*nrows*ncols;
+    paru_free (1, tot_size, el, cc);
+    elementList[e] = NULL;
+}
 
 /*! It uses LUsym, Do not free LUsym before*/
 void paru_freemat (paru_matrix **paruMatInfo_handle, cholmod_common *cc)
@@ -272,14 +288,7 @@ void paru_freemat (paru_matrix **paruMatInfo_handle, cholmod_common *cc)
         }
         Int e = LUsym->row2atree[i];    //element number in augmented tree
         PRLEVEL (1, ("%% e =%ld\t", e));
-        paru_Element *curEl = elementList[e];
-        if (curEl == NULL) continue;
-        Int nrows = curEl->nrows,
-            ncols = curEl->ncols;
-        PRLEVEL (1, ("%% nrows =%ld ", nrows));
-        PRLEVEL (1, ("%% ncols =%ld\n", ncols));
-        paru_free (1, sizeof(paru_Element)+sizeof(Int)*(2*(nrows+ncols)+2)+
-                sizeof(double)*nrows*ncols, curEl, cc);
+        paru_free_el ( e, elementList, cc);
     }
 
 
@@ -287,44 +296,12 @@ void paru_freemat (paru_matrix **paruMatInfo_handle, cholmod_common *cc)
     for(Int i = 0; i < nf ; i++)
     {        // freeing all other elements
         Int e = LUsym->super2atree[i];    //element number in augmented tree
-        PRLEVEL (1, ("%% e =%ld\t", e));
-        paru_Element *curEl = elementList[e];
-        if (curEl == NULL) continue; /* CB not used */
-        Int nrows = curEl->nrows,
-            ncols = curEl->ncols;
-        Int tot_size = sizeof(paru_Element)+sizeof(Int)*(2*(nrows+ncols))+
-            sizeof(double)*nrows*ncols;
-        PRLEVEL (1, ("%% nrows =%ld ", nrows));
-        PRLEVEL (1, ("%% ncols =%ld tot_size=%ld\n", ncols, tot_size));
-        paru_free (1, tot_size, curEl, cc);
+        paru_free_el ( e, elementList, cc);
     }
 
     //free the answer
     paru_fac *LUs =  paruMatInfo->partial_LUs;
     paru_fac *Us =  paruMatInfo->partial_Us;
-    for(Int i = 0; i < nf ; i++)
-    {  
-
-       // paru_free (paruMatInfo->frowCount[i], 
-       //         sizeof(Int), paruMatInfo->frowList[i], cc);
-
-       // paru_free (paruMatInfo->fcolCount[i], 
-       //         sizeof(Int), paruMatInfo->fcolList[i], cc);
-
-
-        //PRLEVEL (1, ("%% Freeing Us=%p\n", Us[i].p));
-        //if(Us[i].p != NULL)
-        //{
-        //    Int m = Us[i].m; Int n = Us[i].n;
-        //    paru_free (m*n, sizeof (double), Us[i].p, cc);
-        //}
-        //PRLEVEL (1, ("%% Freeing LUs=%p\n", LUs[i].p));
-        //if(LUs[i].p != NULL)
-        //{
-        //    Int m = LUs[i].m; Int n = LUs[i].n;
-        //    paru_free (m*n, sizeof (double), LUs[i].p, cc);
-        //}
-    }
 
     PRLEVEL (1, ("%% Done LUs\n"));
     paru_free(1, nf*sizeof(Int),paruMatInfo->frowCount, cc);
@@ -343,10 +320,10 @@ void paru_freemat (paru_matrix **paruMatInfo_handle, cholmod_common *cc)
     Int col_Int_bound =  LUsym->col_Int_bound;
     Int int_size = row_Int_bound + col_Int_bound;
     Int upperBoundSize = 
-            double_size * sizeof(double) + int_size * sizeof(Int);
+        double_size * sizeof(double) + int_size * sizeof(Int);
     PRLEVEL (1, ("%% FREE upperBoundSize =%ld \n", upperBoundSize ));
- 
-    
+
+
     for (Int i = 0 ; i < 64; i++)
     {
         if (paruMatInfo->stack_mem.mem_bank[i] == NULL)
