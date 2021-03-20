@@ -60,6 +60,9 @@ int paru_front ( paru_matrix *paruMatInfo,
 
     // panel_row shows number of rows in each panel. 
     // Needs to be initialized in my new algorithm
+
+    std::pmr::synchronized_pool_resource &pool = *paruMatInfo->pool_p;
+    //std::pmr::vector<Int> panel_row{&pool}(num_panels,0);
     std::pmr::vector<Int> panel_row(num_panels,0);
 
     Int *snM = LUsym->super2atree;
@@ -121,7 +124,7 @@ int paru_front ( paru_matrix *paruMatInfo,
      *                          3   17 | X  Y  .  .  . 
      * */
 
-    std::pmr::vector<Int> pivotal_elements;
+    std::pmr::vector<Int> pivotal_elements{&pool};
     heaps_info hi;
     PRLEVEL (1, ("%% Next: work on pivotal column assembly\n"));
     paru_pivotal (pivotal_elements, panel_row , f, hi, paruMatInfo, cc);

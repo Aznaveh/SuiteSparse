@@ -66,6 +66,17 @@ paru_matrix *paru_init_rowFronts (
     memset(paruMatInfo->stack_mem.mem_bank, NULL, 64*sizeof(void*));
     paruMatInfo->stack_mem.avail = NULL;
     
+    std::pmr::pool_options opts;
+    opts.max_blocks_per_chunk = 1<<6;
+    opts.largest_required_pool_block = 1<<11;
+    std::pmr::synchronized_pool_resource *pool_p= 
+        new std::pmr::synchronized_pool_resource(opts); 
+    
+    paruMatInfo-> pool_p = pool_p;
+    //std::swap(paruMatInfo->pool, pool);
+
+    
+
 #ifndef NDEBUG  
     paruMatInfo->actual_alloc_Us = 0;
     paruMatInfo->actual_alloc_LUs = 0;

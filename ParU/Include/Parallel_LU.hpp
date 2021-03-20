@@ -291,6 +291,7 @@ typedef struct
         biggest_Child_size,
         biggest_Child_id;
 } heaps_info;
+
 inline Int *colIndex_pointer (paru_Element *curEl)
 {    return (Int*)(curEl+1);}
 // Never ever use these functions prior to initializing ncols and nrows
@@ -427,6 +428,7 @@ typedef struct
     double flp_cnt_dger;
 #endif
 
+    std::pmr::synchronized_pool_resource *pool_p;
 
 }   paru_matrix;
 
