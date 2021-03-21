@@ -48,7 +48,8 @@ void paru_update_rowDeg ( Int panel_num,  Int row_end, Int f, Int start_fac,
     Int *row_degree_bound = paruMatInfo->row_degree_bound;
 
 
-    std::pmr::set<Int> stl_newColSet;  // the list of new columns
+    std::pmr::synchronized_pool_resource &pool = *paruMatInfo->pool_p;
+    std::pmr::set<Int> stl_newColSet{&pool};  // the list of new columns
 
     /*************** finding set of non pivotal cols in current front *********/
     /*               

@@ -62,8 +62,7 @@ int paru_front ( paru_matrix *paruMatInfo,
     // Needs to be initialized in my new algorithm
 
     std::pmr::synchronized_pool_resource &pool = *paruMatInfo->pool_p;
-    //std::pmr::vector<Int> panel_row{&pool}(num_panels,0);
-    std::pmr::vector<Int> panel_row(num_panels,0);
+    std::pmr::vector<Int> panel_row(num_panels, 0, &pool);
 
     Int *snM = LUsym->super2atree;
     Int eli = snM [f]; 
@@ -168,7 +167,7 @@ int paru_front ( paru_matrix *paruMatInfo,
 #endif
 
     Int fn = LUsym->Cm[f];     /* Upper bound number of cols of F */ 
-    std::pmr::set<Int> stl_colSet;  /* used in this scope */
+    std::pmr::set<Int> stl_colSet{&pool};  /* used in this scope */
 
 
 
@@ -301,7 +300,7 @@ int paru_front ( paru_matrix *paruMatInfo,
     PRLEVEL (1, ("%% 1Front hash_size=%ld\n",hash_size));
     hash_size = (hash_size > LUsym->n )? LUsym->n : hash_size;
     PRLEVEL (1, ("%% 2Front hash_size=%ld\n",hash_size));
-    std::pmr::vector<Int> colHash(hash_size+1,-1);
+    std::pmr::vector<Int> colHash(hash_size+1,-1, &pool);
     Int i = 0;
     if (hash_size == LUsym->n)
     {

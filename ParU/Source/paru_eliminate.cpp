@@ -393,7 +393,8 @@ void paru_eliminate_rows ( Int e, Int f,
     Int *isRowInFront = Work->rowSize; 
 
 
-    std::pmr::vector <Int> tempRow;
+    std::pmr::synchronized_pool_resource &pool = *paruMatInfo->pool_p;
+    std::pmr::vector<Int> tempRow{&pool};
 
     //searching for rows
     Int i = 0;
