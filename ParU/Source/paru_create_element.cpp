@@ -17,7 +17,7 @@
  *  */
 #include "Parallel_LU.hpp"
 paru_Element *paru_create_element (Int nrows, Int ncols, 
-        Int init, cholmod_common *cc)
+        Int init, paru_matrix *paruMatInfo, cholmod_common *cc)
 {
     DEBUGLEVEL(0);
 

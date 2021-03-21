@@ -501,7 +501,8 @@ int paru_front ( paru_matrix *paruMatInfo,
     if (fp < rowCount )
     { 
         curEl = elementList[eli] = paru_create_element (rowCount-fp,
-                colCount, 0 ,cc); // allocating an un-initialized part of memory
+                colCount, 0,  // allocating an un-initialized part of memory
+                paruMatInfo, cc);
 
         // While insided the DGEMM BETA == 0
         if ( curEl == NULL )

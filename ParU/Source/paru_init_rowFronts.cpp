@@ -383,7 +383,7 @@ paru_matrix *paru_init_rowFronts (
          row_degree_bound [row] = ncols; //Initialzing row degree
 
          paru_Element *curEl = elementList[e] = 
-             paru_create_element (nrows, ncols,0 ,cc);
+             paru_create_element (nrows, ncols, 0, paruMatInfo, cc);
          if (curEl == NULL)
          {   //out of memory
              paru_freemat (&paruMatInfo, cc);

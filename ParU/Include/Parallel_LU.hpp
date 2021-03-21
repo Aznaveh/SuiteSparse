@@ -468,7 +468,7 @@ Int paru_factorize(Int f, Int start_fac,
 
 
 paru_Element *paru_create_element (Int nrows, Int ncols, 
-        Int init, cholmod_common *cc);
+        Int init, paru_matrix *paruMatInfo, cholmod_common *cc);
 void assemble_col (const double *sR, double *dR, Int m, const Int *relRowInd);
 
 
