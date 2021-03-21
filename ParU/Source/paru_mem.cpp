@@ -234,6 +234,7 @@ void paru_free_el (Int e,  paru_matrix *paruMatInfo,  cholmod_common *cc)
     elementList = paruMatInfo->elementList;
     paru_Element *el = elementList[e];
     if (el == NULL) return;
+
     Int nrows = el->nrows,
         ncols = el->ncols;
     PRLEVEL (1, ("%%Free the element e =%ld\t", e));
@@ -241,7 +242,10 @@ void paru_free_el (Int e,  paru_matrix *paruMatInfo,  cholmod_common *cc)
     PRLEVEL (1, ("%% ncols =%ld\n", ncols));
     Int tot_size = sizeof(paru_Element)+sizeof(Int)*(2*(nrows+ncols))+
         sizeof(double)*nrows*ncols;
-    paru_free (1, tot_size, el, cc);
+    
+    std::pmr::synchronized_pool_resource &pool = *paruMatInfo->pool_p;
+    pool.deallocate( (void *) el, tot_size, 8);
+    //paru_free (1, tot_size, el, cc);
     elementList[e] = NULL;
 }
 

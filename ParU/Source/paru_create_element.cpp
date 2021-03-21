@@ -25,10 +25,17 @@ paru_Element *paru_create_element (Int nrows, Int ncols,
     paru_Element *curEl;
     Int tot_size = sizeof(paru_Element)+ sizeof(Int)*(2*(nrows+ncols))+
                 sizeof(double)*nrows*ncols;
+
+    std::pmr::synchronized_pool_resource &pool = *paruMatInfo->pool_p;
+
+    curEl = (paru_Element*) pool.allocate (tot_size, 8);
+    /*
     if (init)
         curEl = (paru_Element*) paru_calloc(1, tot_size , cc);
     else
         curEl = (paru_Element*) paru_alloc(1, tot_size , cc);
+    */
+
     if (curEl == NULL) return NULL; // do not do error checking
 
     PRLEVEL (1, (" with size of %ld in %p\n", tot_size, curEl));
