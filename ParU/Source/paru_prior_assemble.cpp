@@ -100,8 +100,8 @@ void paru_prior_assemble ( Int f, Int start_fac,
 
 
     Int eli = snM [f]; 
-    std::pmr::vector<Int>** heapList = paruMatInfo->heapList;
-    std::pmr::vector<Int>* curHeap = heapList[eli];
+    std::vector<Int>** heapList = paruMatInfo->heapList;
+    std::vector<Int>* curHeap = heapList[eli];
 
     if ( curHeap->empty() ) return;
 

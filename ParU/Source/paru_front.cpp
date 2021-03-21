@@ -277,8 +277,8 @@ int paru_front ( paru_matrix *paruMatInfo,
     paruMatInfo->fcolList[f] = fcolList;
 
 
-    std::pmr::vector<Int>** heapList = paruMatInfo->heapList;
-    std::pmr::vector<Int>* curHeap = heapList[eli];
+    std::vector<Int>** heapList = paruMatInfo->heapList;
+    std::vector<Int>* curHeap = heapList[eli];
 
     // EXIT point HERE 
     if (colCount == 0 )

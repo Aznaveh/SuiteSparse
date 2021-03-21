@@ -237,8 +237,6 @@ void paru_update_rowDeg ( Int panel_num,  Int row_end, Int f, Int start_fac,
         return;
 
     paruMatInfo->fcolCount[f] = colCount;
-    std::pmr::vector<Int>** heapList = paruMatInfo->heapList;
-    std::pmr::vector<Int>* curHeap = heapList[eli];
 
 
 

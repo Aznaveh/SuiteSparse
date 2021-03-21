@@ -20,7 +20,7 @@ void paru_pivotal ( std::pmr::vector<Int> &pivotal_elements,
     DEBUGLEVEL(0);
     paru_symbolic *LUsym =  paruMatInfo->LUsym;
     Int *snM = LUsym->super2atree;
-    std::pmr::vector<Int>** heapList = paruMatInfo->heapList;
+    std::vector<Int>** heapList = paruMatInfo->heapList;
     Int eli = snM [f]; 
 
 #ifndef NDEBUG
@@ -37,7 +37,7 @@ void paru_pivotal ( std::pmr::vector<Int> &pivotal_elements,
     Int *aChildp = LUsym->aChildp;
  
 
-    std::pmr::vector<Int>* elHeap = heapList[eli] ;
+    std::vector<Int>* elHeap = heapList[eli] ;
     paru_Element **elementList = paruMatInfo->elementList;
     
     Int m = paruMatInfo-> m;
@@ -68,7 +68,7 @@ void paru_pivotal ( std::pmr::vector<Int> &pivotal_elements,
         rowMark = rowMark >  f_rmark ?  rowMark : f_rmark;
 
         PRLEVEL (p, ("%% chelid = %ld\n", chelid));
-        std::pmr::vector<Int>* curHeap = heapList[chelid];
+        std::vector<Int>* curHeap = heapList[chelid];
 
         if (curHeap == nullptr) continue;
 

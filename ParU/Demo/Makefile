@@ -47,7 +47,7 @@ val:
 debug:
 	(cd ../Lib; $(MAKE) purge; $(MAKE) DEBUG=yes)
 	(cd ../Demo;)
-	$(C) $(FLAG) -g umf_test.cpp -o umfout $(LIBS)
+	$(C) $(FLAG)  $(C17) -g umf_test.cpp -o umfout $(LIBS)
 
 	#compling everything with -pg
 gprof:

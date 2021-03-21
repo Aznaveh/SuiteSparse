@@ -412,7 +412,7 @@ typedef struct
     //least numbered column. The active front Takes the pointer of the biggest
     //child and release its other children after concatenating their list to its
     //own. The list of heaps are initialized by nullptr
-    std::pmr::vector<Int>** heapList; /* size m+nf+1, initialized with nullptr  */
+    std::vector<Int>** heapList; /* size m+nf+1, initialized with nullptr  */
 
 
     // analysis information

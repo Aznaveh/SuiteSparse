@@ -334,6 +334,12 @@ void paru_freemat (paru_matrix **paruMatInfo_handle, cholmod_common *cc)
                 paruMatInfo->stack_mem.mem_bank[i],cc);
     }
 
+    
+    // freeing pool
+    std::pmr::synchronized_pool_resource &pool = *paruMatInfo->pool_p;
+    pool.release();
+    delete paruMatInfo-> pool_p;
+
     paru_free(1, nf*sizeof(Int),paruMatInfo->time_stamp, cc);
     // in practice each parent should deal with the memory for the children
 #ifndef NDEBUG

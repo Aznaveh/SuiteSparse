@@ -48,9 +48,9 @@ paru_matrix *paru_init_rowFronts (
     }
 
 
-    mallopt (M_MMAP_MAX, 0) ;           // disable mmap; it's too slow
-    mallopt (M_TRIM_THRESHOLD, -1) ;    // disable sbrk trimming
-    mallopt (M_TOP_PAD, 16*1024*1024) ; // increase padding to speedup malloc
+    //mallopt (M_MMAP_MAX, 0) ;           // disable mmap; it's too slow
+    //mallopt (M_TRIM_THRESHOLD, -1) ;    // disable sbrk trimming
+    //mallopt (M_TOP_PAD, 16*1024*1024) ; // increase padding to speedup malloc
 
 
     Int m, n, nf;  
@@ -265,9 +265,9 @@ paru_matrix *paru_init_rowFronts (
          return NULL;
      }
 
-     paruMatInfo->heapList =  (std::pmr::vector<Int>**) 
-         paru_calloc (1, (m+nf+1)*sizeof(std::pmr::vector<Int>*), cc);
-     std::pmr::vector<Int>** heapList = paruMatInfo->heapList;
+     paruMatInfo->heapList =  (std::vector<Int>**) 
+         paru_calloc (1, (m+nf+1)*sizeof(std::vector<Int>*), cc);
+     std::vector<Int>** heapList = paruMatInfo->heapList;
 
      if (paruMatInfo->heapList == NULL)
      {   //out of memory
@@ -393,9 +393,9 @@ paru_matrix *paru_init_rowFronts (
          
          rowMark[e] = 0;
 
-         std::pmr::vector<Int>* curHeap;
-         //TODO 
-         curHeap = paruMatInfo->heapList[e] = new std::pmr::vector<Int>;
+         std::vector<Int>* curHeap;
+         //TODO  I am not sure if it is a correct way of allocating pmr vec
+         curHeap = paruMatInfo->heapList[e] = new std::vector<Int>;
          PRLEVEL (1, ("%%Heap allocated %p id=%ld \n",curHeap, e ));
          curHeap->push_back(e);
 
