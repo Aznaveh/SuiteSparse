@@ -58,10 +58,15 @@ gprof:
 
 
 cchg: debug
-	valgrind	--tool=cachegrind -v ./gumfout < ../Matrix/ParUTst/tmp.mtx
+	valgrind	--tool=cachegrind -v ./umfout < ../Matrix/ParUTst/tmp.mtx
 	
 cllg: debug
-	valgrind	--tool=callgrind -v ./gumfout < ../Matrix/ParUTst/tmp.mtx
+	valgrind	--tool=callgrind -v ./umfout < ../Matrix/ParUTst/tmp.mtx
+
+mssf: debug
+	valgrind	--tool=massif --log-file="valgrindlogfile.log"\
+		./umfout < ../Matrix/ParUTst/tmp.mtx
+
 
 
 
