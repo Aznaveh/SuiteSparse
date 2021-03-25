@@ -16,10 +16,6 @@ void paru_prior_assemble ( Int f, Int start_fac,
         cholmod_common *cc)
 {
     DEBUGLEVEL(0);
-#ifndef NDEBUG  
-    Int p = 1;
-#endif
-
 
     work_struct *Work =  paruMatInfo->Work;
     Int *elRow = Work -> elRow; 
@@ -31,9 +27,13 @@ void paru_prior_assemble ( Int f, Int start_fac,
 
     Int pMark = start_fac;
 
-
+#ifndef NDEBUG  
+    Int p = 1;
+    Int el_ind = snM [f]; 
     PRLEVEL (p, ("%%Inside prior\n"));
     PRLEVEL (p, ("%% pivotal size is %ld ", pivotal_elements.size()));
+
+#endif
     Int ii = 0;
 
     for(Int i = 0 ; i < (Int) pivotal_elements.size(); i++)

@@ -478,7 +478,7 @@ void paru_eliminate_rows ( Int e, Int f,
     PRLEVEL (p, ("%% %ld rows has been found, toll %ld\n%%", 
                 tempRow.size(), toll ));
 #ifndef NDEBUG
-    for (Int ii = 0; ii < tempRow.size(); ii++) 
+    for (Int ii = 0; ii < (Int) tempRow.size(); ii++) 
         PRLEVEL (p, ("%ld ", tempRow[ii]) );
     PRLEVEL (p, ("\n ") );
 #endif 
