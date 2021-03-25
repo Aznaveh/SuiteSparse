@@ -409,7 +409,6 @@ Int paru_factorize(Int f, Int start_fac,
     Int col2 = Super [f+1];
     Int fp = col2 - col1;   /* first fp columns are pivotal */ 
 
-    Int *frowList = paruMatInfo->frowList[f];
     paru_fac *LUs =  paruMatInfo->partial_LUs;
     Int rowCount = paruMatInfo->frowCount[f];
     double *F = LUs[f].p;
@@ -420,6 +419,7 @@ Int paru_factorize(Int f, Int start_fac,
     {
 
 #ifndef NDEBUG  // Printing the pivotal front
+        Int *frowList = paruMatInfo->frowList[f];
         Int p = 1;
         PRLEVEL (p, ("%%Pivotal Front Before %ld\n",panel_num));
 

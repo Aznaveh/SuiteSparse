@@ -24,7 +24,7 @@ void paru_pivotal ( std::vector<Int> &pivotal_elements,
     Int eli = snM [f]; 
 
 #ifndef NDEBUG
-
+    Int m = paruMatInfo-> m;
     Int p = 1;
     PRLEVEL (p, ("%% Pivotal assembly of front %ld (eli %ld)\n",f, eli));
 #endif 
@@ -37,10 +37,8 @@ void paru_pivotal ( std::vector<Int> &pivotal_elements,
     Int *aChildp = LUsym->aChildp;
  
 
-    std::vector<Int>* elHeap = heapList[eli] ;
     paru_Element **elementList = paruMatInfo->elementList;
     
-    Int m = paruMatInfo-> m;
     Int *lacList = paruMatInfo->lacList;
 
     work_struct *Work =  paruMatInfo->Work;
@@ -147,7 +145,7 @@ void paru_pivotal ( std::vector<Int> &pivotal_elements,
 #ifndef NDEBUG
     p = 1;
     PRLEVEL (p, ("%% pivotal columns eli(%ld): ", eli));
-    for(Int i=0 ; i < pivotal_elements.size(); i++)
+    for(Int i=0 ; i < (Int) pivotal_elements.size(); i++)
         PRLEVEL (p, ("%ld ", pivotal_elements[i]));
     PRLEVEL (p, ("\n"));
     std::set<Int> stl_rowSet;
@@ -163,7 +161,7 @@ void paru_pivotal ( std::vector<Int> &pivotal_elements,
     Int rowCount = 0;
 
     /*************** finding set of rows in current front *********************/
-    for(Int i = 0 ; i < pivotal_elements.size(); i++)
+    for(Int i = 0 ; i < (Int) pivotal_elements.size(); i++)
     {
         Int e = pivotal_elements[i];
         paru_Element *el = elementList[e];
@@ -190,7 +188,6 @@ void paru_pivotal ( std::vector<Int> &pivotal_elements,
             Int curRow = el_rowIndex [rEl]; 
             PRLEVEL (1, ("%% curRow =%ld rEl=%ld\n", curRow, rEl));
             if (curRow < 0 ) continue; // that row has already deleted
-            ASSERT (curRow < m ) ;
 #ifndef NDEBUG
             Int p = 1;
             if (p <= 0) paru_print_element (paruMatInfo, e);
@@ -222,13 +219,13 @@ void paru_pivotal ( std::vector<Int> &pivotal_elements,
 
             ASSERT (rowCount <= m); 
 #ifndef NDEBUG 
-            if (rowCount != stl_rowSet.size())
+            if (rowCount != (Int) stl_rowSet.size())
             {
                 PRLEVEL (1, ("%%curRow =%ld rowCount=%ld\n",curRow, rowCount));
                 PRLEVEL (1, ("%%stl_rowSet.size()=%ld \n", stl_rowSet.size()));
             }
 #endif 
-            ASSERT (rowCount == stl_rowSet.size());
+            ASSERT (rowCount == (Int) stl_rowSet.size());
         }
         panel_row [( lacList[e] - col1) / panel_width] = rowCount;
 #ifndef NDEBUG 
@@ -260,7 +257,6 @@ void paru_pivotal ( std::vector<Int> &pivotal_elements,
         PRLEVEL (1, ("%ld ",panel_row[i]));
         ASSERT (panel_row[i] > 0);
         ASSERT (panel_row[i] <= m);
-
     }
 
     paruMatInfo->frowCount[f] = rowCount;
@@ -389,7 +385,7 @@ void paru_pivotal ( std::vector<Int> &pivotal_elements,
 
 
     Int ii = 0; // using for resizing pivotal_elements
-    for(Int i = 0 ; i < pivotal_elements.size(); i++)
+    for(Int i = 0 ; i < (Int) pivotal_elements.size(); i++)
     {
 #ifndef NDEBUG 
         Int p = 1;
@@ -409,8 +405,6 @@ void paru_pivotal ( std::vector<Int> &pivotal_elements,
         Int mEl = el->nrows;
         Int nEl = el->ncols;
 
-        //Int *el_rowIndex = rowIndex_pointer (el); 
-        Int *el_rowIndex = (Int*)(el+1)+nEl; 
 
         //Int *rowRelIndex = relRowInd (el);
         Int *rowRelIndex = (Int*)(el+1)+ 2*nEl + mEl;
@@ -503,7 +497,7 @@ void paru_pivotal ( std::vector<Int> &pivotal_elements,
 #ifndef NDEBUG
     p = 1;
 #endif
-    if ( ii < pivotal_elements.size())
+    if ( ii < (Int) pivotal_elements.size())
     {
         PRLEVEL (p, ("%% pivotal size was %ld ", pivotal_elements.size()));
         PRLEVEL (p, ("%% and now is %ld\n ", ii));
@@ -513,7 +507,7 @@ void paru_pivotal ( std::vector<Int> &pivotal_elements,
 #ifndef NDEBUG
     p = 1;
     PRLEVEL (p, ("%% pivotal columns eli(%ld) after resizing: ", eli));
-    for(Int i=0 ; i < pivotal_elements.size(); i++)
+    for(Int i=0 ; i < (Int) pivotal_elements.size(); i++)
         PRLEVEL (p, ("%ld ", pivotal_elements[i]));
     PRLEVEL (p, ("\n"));
 

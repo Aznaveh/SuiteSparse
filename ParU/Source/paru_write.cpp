@@ -20,7 +20,7 @@ void paru_write( paru_matrix *paruMatInfo, int scale,
     Int n = LUsym->n;
     Int n1 = LUsym->n1; // row+col singletons
 
-    Int *Pinv =  LUsym->Pinv;  
+    //Int *Pinv =  LUsym->Pinv;  
     Int *Qfill =  LUsym->Qfill;
 
     paru_fac *LUs =  paruMatInfo->partial_LUs;

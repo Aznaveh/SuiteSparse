@@ -751,8 +751,6 @@ paru_symbolic *paru_analyze
     Int col_Int_bound = 0;
     for (Int f = 0; f < nf; f++)
     {    
-        Int col1 = Super[f]; 
-        Int col2 = Super[f+1]; 
         Int fp = Super[f+1]-Super[f];
         Int fm = LUsym->Fm[f];
         Int fn = LUsym->Cm[f];     /* Upper bound number of cols of F */ 

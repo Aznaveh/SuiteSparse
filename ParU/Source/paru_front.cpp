@@ -27,7 +27,6 @@ int paru_front ( paru_matrix *paruMatInfo,
      *  > 0 Everything
      */
     paru_symbolic *LUsym =  paruMatInfo->LUsym;
-    Int m = paruMatInfo-> m;
     Int *Super = LUsym->Super;
     /* ---------------------------------------------------------------------- */
     /* get the front F  */
@@ -43,11 +42,6 @@ int paru_front ( paru_matrix *paruMatInfo,
 
     paru_Element **elementList = paruMatInfo->elementList;
     work_struct *Work =  paruMatInfo->Work;
-
-    // Int elRMark = Work -> elRMark;
-    // Int elCMark = Work -> elCMark;
-
-    Int *elCol = Work -> elCol;
 
     PRLEVEL (1, ("%% fp=%ld pivotal columns:clo1=%ld...col2=%ld\n", 
                 fp, col1, col2-1));
@@ -66,9 +60,6 @@ int paru_front ( paru_matrix *paruMatInfo,
     Int eli = snM [f]; 
 
     Int *isRowInFront = Work->rowSize; 
-    Int *rowMarkp = Work->rowMark;
-    Int rowMark = rowMarkp[eli];
-
 
     Int fm = LUsym->Fm[f];     /* Upper bound number of rows of F */ 
     PRLEVEL (1, ("%% the size of fm is %ld\n",fm));
@@ -87,9 +78,11 @@ int paru_front ( paru_matrix *paruMatInfo,
 
     // Initializing relative index validation flag of current front
     paru_init_rel (f, paruMatInfo);
-    Int time_f = paruMatInfo->time_stamp[f];
 
+#ifndef NDEBUG
+    Int time_f = paruMatInfo->time_stamp[f];
     PRLEVEL (0, ("%% Begin of Front %ld time_f = %ld\n", f, time_f));
+#endif 
 
     //Int panel_num = 0; 
     paruMatInfo->frowCount[f] = 0;
@@ -132,7 +125,10 @@ int paru_front ( paru_matrix *paruMatInfo,
 
 
 #ifndef NDEBUG /* chekcing first part of Work to be zero */
-    rowMark = rowMarkp[eli];
+    Int *rowMarkp = Work->rowMark;
+    Int rowMark = rowMarkp[eli];
+    Int m = paruMatInfo-> m;
+
     PRLEVEL (1, ("%% rowMark=%ld;\n", rowMark));
     for (Int i = 0; i < m; i++)
     {  
@@ -140,7 +136,6 @@ int paru_front ( paru_matrix *paruMatInfo,
             PRLEVEL (1, ("%%rowMark = %ld, isRowInFront[%ld] = %ld\n", 
                         rowMark ,i,
                         isRowInFront [i]));
-        //ASSERT ( isRowInFront [i] < rowMark);
     }
 #endif 
 
@@ -181,8 +176,12 @@ int paru_front ( paru_matrix *paruMatInfo,
 
     Int fac = paru_factorize(f, start_fac,
             panel_row, stl_colSet, pivotal_elements, paruMatInfo);
-    time_f = ++paruMatInfo->time_stamp[f]; 
+    ++paruMatInfo->time_stamp[f]; 
+
+#ifndef NDEBUG  
+    time_f = paruMatInfo->time_stamp[f];
     PRLEVEL (1, ("%%After factorization time_f = %ld\n",time_f));
+#endif
 
     /* To this point fully summed part of the front is computed and L and U    /  
      *  The next part is to find columns of nonfully summed then rows
@@ -280,7 +279,6 @@ int paru_front ( paru_matrix *paruMatInfo,
     // EXIT point HERE 
     if (colCount == 0 )
     {  // there is no CB, Nothing to be done
-        //Work->rowMark +=  rowCount;
         paruMatInfo->fcolCount[f] = 0;
         PRLEVEL (1, ("%%Heap freed inside front %p id=%ld\n",curHeap, eli ));
         delete curHeap;
@@ -403,18 +401,11 @@ int paru_front ( paru_matrix *paruMatInfo,
             //Int *rowRelIndex = relRowInd (el);
             Int *rowRelIndex = (Int*) (el+1) + 2*nEl + mEl; 
 
-            //Int *colRelIndex = relColInd (el);
-            Int *colRelIndex =  (Int*)(el+1)+ nEl + mEl;
-            Int *colIndex = (Int*)(el+1);
-
-
             PRLEVEL (1, ("%% curFsRowIndex =%ld\n", curFsRowIndex));
             ASSERT (el_rowIndex[curRowIndex] == curFsRow);
             ASSERT (curRowIndex < mEl);
             PRLEVEL (1, ("%% curColIndex =%ld\n", curRowIndex));
 
-            //double *el_Num = numeric_pointer (el);
-            double *el_Num =  (double*)((Int*) (el+1) + 2*nEl + 2*mEl); 
             PRLEVEL (1, ("%% element= %ld  nEl =%ld \n",e, nEl));
 
 
@@ -533,7 +524,6 @@ int paru_front ( paru_matrix *paruMatInfo,
     for (Int i = 0; i < colCount; ++ i) 
         el_colIndex [i] = fcolList[i];
     Int *el_rowIndex = rowIndex_pointer (curEl);
-    rowMark = rowMarkp[eli];
     for (Int i = fp; i < rowCount; ++ i) 
     {
         Int locIndx = i-fp; 
@@ -609,7 +599,7 @@ int paru_front ( paru_matrix *paruMatInfo,
 
 #ifndef NDEBUG /* chekcing if isRowInFront is correct */
     rowMark = rowMarkp[eli] ;
-    Int *Sleft = LUsym->Sleft;
+    // Int *Sleft = LUsym->Sleft;
     //    for (Int i = Sleft[col1]; i < Sleft[Super[f+1]]; i++)
     //        ASSERT ( isRowInFront [i] < rowMark);
 #endif

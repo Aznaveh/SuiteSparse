@@ -17,6 +17,7 @@ void paru_update_rowDeg ( Int panel_num,  Int row_end, Int f, Int start_fac,
     DEBUGLEVEL(0);
 #ifndef NDEBUG
     Int p = 1;
+    Int n = paruMatInfo-> n;
     static Int r1 = 0, r2 = 0, r3 = 0 ;
 #endif
     PRLEVEL (1, ("%%-------ROW degree update of panel %ld of front %ld \n", 
@@ -84,7 +85,6 @@ void paru_update_rowDeg ( Int panel_num,  Int row_end, Int f, Int start_fac,
      * v              |___....______________|              
      *                         
      */
-    Int n = paruMatInfo-> n;
     Int *frowList = paruMatInfo->frowList[f];
     std::set<Int>::iterator it;
 
@@ -167,9 +167,6 @@ void paru_update_rowDeg ( Int panel_num,  Int row_end, Int f, Int start_fac,
             //Int *el_colIndex = colIndex_pointer (el);
             Int *el_colIndex = (Int*)(el+1);
 
-            //Int *colRelIndex = relColInd (el);
-            Int *colRelIndex = (Int*)(el+1) + mEl + nEl;
-
 
             PRLEVEL (1, ("%% element= %ld  nEl =%ld \n",e, nEl));
             for (Int cEl = 0; cEl < nEl; cEl++)
@@ -237,10 +234,6 @@ void paru_update_rowDeg ( Int panel_num,  Int row_end, Int f, Int start_fac,
         return;
 
     paruMatInfo->fcolCount[f] = colCount;
-    std::vector<Int>** heapList = paruMatInfo->heapList;
-    std::vector<Int>* curHeap = heapList[eli];
-
-
 
     /**** only travers over elements that contribute to pivotal columns *******/
     /*         to find their intersection      
@@ -286,7 +279,7 @@ void paru_update_rowDeg ( Int panel_num,  Int row_end, Int f, Int start_fac,
 #endif
     PRLEVEL (1, ("%%Inside pivotal_elements\n"));
     Int ii = 0;
-    for(Int i = 0 ; i < pivotal_elements.size(); i++)
+    for(Int i = 0 ; i < (Int) pivotal_elements.size(); i++)
     {
         Int e = pivotal_elements[i];
         paru_Element *el = elementList[e];

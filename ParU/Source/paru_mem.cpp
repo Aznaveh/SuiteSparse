@@ -239,7 +239,7 @@ void paru_freemat (paru_matrix **paruMatInfo_handle, cholmod_common *cc)
     paruMatInfo = *paruMatInfo_handle;
 
     Int m = paruMatInfo->m;       // m and n is different than LUsym
-    Int n = paruMatInfo->n;       // Here there are submatrix size 
+    //Int n = paruMatInfo->n;       // Here there are submatrix size 
 
     tupleList *RowList = paruMatInfo->RowList;
     PRLEVEL (1, ("%% RowList =%p\n", RowList));
@@ -336,6 +336,7 @@ void paru_freemat (paru_matrix **paruMatInfo_handle, cholmod_common *cc)
     paru_free(1, nf*sizeof(paru_fac), LUs, cc);
     paru_free(1, nf*sizeof(paru_fac), Us, cc);
 
+#ifndef NDEBUG
     Int Us_bound_size = LUsym->Us_bound_size;
     Int LUs_bound_size = LUsym->LUs_bound_size;
     Int double_size = LUs_bound_size + Us_bound_size;
@@ -345,6 +346,7 @@ void paru_freemat (paru_matrix **paruMatInfo_handle, cholmod_common *cc)
     Int upperBoundSize = 
             double_size * sizeof(double) + int_size * sizeof(Int);
     PRLEVEL (1, ("%% FREE upperBoundSize =%ld \n", upperBoundSize ));
+#endif
  
     
     for (Int i = 0 ; i < 64; i++)

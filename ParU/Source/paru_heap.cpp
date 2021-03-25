@@ -17,13 +17,8 @@ void paru_check_prior_element ( Int e, Int f, Int start_fac,
 {
     work_struct *Work =  paruMatInfo->Work;
     Int *elRow = Work -> elRow; 
-    Int *elCol = Work -> elCol;
 
     paru_Element **elementList = paruMatInfo->elementList;
-
-    paru_symbolic *LUsym =  paruMatInfo->LUsym;
-    Int *snM = LUsym->super2atree;
-    Int eli = snM [f]; 
 
     paru_Element *el = elementList[e];
     if (elRow [e] == 0 && el->rValid > start_fac)
@@ -56,7 +51,7 @@ void paru_make_heap (Int f, Int start_fac,
     Int *aChildp = LUsym->aChildp;
     Int *snM = LUsym->super2atree;
     paru_Element **elementList = paruMatInfo->elementList;
-    Int m = paruMatInfo-> m;
+    //Int m = paruMatInfo-> m;
 
     std::vector<Int>** heapList = paruMatInfo->heapList;
 
@@ -100,7 +95,7 @@ void paru_make_heap (Int f, Int start_fac,
                 std::vector<Int>*  chHeap = heapList[chelid];
                 if (chHeap == nullptr) continue;
                 //concatening the child and freeing the memory
-                for (Int k = 0; k < chHeap->size(); k++)
+                for (Int k = 0; k < (Int) chHeap->size(); k++)
                 {
                     Int e = (*chHeap)[k];
                     if (elementList[e] != NULL)
@@ -120,11 +115,13 @@ void paru_make_heap (Int f, Int start_fac,
             }
 
 
-            for(Int i = 0 ; i < pivotal_elements.size(); i++)
+            for(Int i = 0 ; i < (Int) pivotal_elements.size(); i++)
             {
                 Int e = pivotal_elements[i];
+#ifndef NDEBUG  
                 paru_Element *el = elementList[e];
                 ASSERT (el != NULL);
+#endif
                 PRLEVEL (p, ("%ld  ",e));
                 curHeap->push_back(e);
                 std::push_heap(curHeap->begin(), curHeap->end(), greater);
@@ -146,7 +143,7 @@ void paru_make_heap (Int f, Int start_fac,
 
                 //curHeap->insert(curHeap->end(), 
                 //      chHeap->begin(), chHeap->end()); 
-                for (Int k = 0; k < chHeap->size(); k++)
+                for (Int k = 0; k < (Int) chHeap->size(); k++)
                 {
                     Int e = (*chHeap)[k];
                     if (elementList[e] != NULL ) 
@@ -188,7 +185,7 @@ void paru_make_heap (Int f, Int start_fac,
     PRLEVEL (p, ("After everything eli %ld has %ld elements\n", 
                 eli, curHeap->size() ));
     PRLEVEL (p, ("%%Heap after making it(size = %ld) \n", curHeap->size() ));
-    for(Int i = 0; i < curHeap->size(); i++)
+    for(Int i = 0; i < (Int) curHeap->size(); i++)
     {
         Int elid = (*curHeap)[i];
         PRLEVEL (p, (" %ld(%ld) ", elid, lacList[elid] ));

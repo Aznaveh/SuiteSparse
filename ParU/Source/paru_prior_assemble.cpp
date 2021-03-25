@@ -29,21 +29,6 @@ void paru_prior_assemble ( Int f, Int start_fac,
     paru_symbolic *LUsym =  paruMatInfo->LUsym;
     Int *snM = LUsym->super2atree;
 
-    Int el_ind = snM [f]; 
-    paru_Element *curEl = elementList[el_ind]; 
-
-    Int *Super = LUsym->Super;
-    Int col1 = Super [f];     
-    Int col2 = Super [f+1];
-    Int fp = col2-col1;
-
-    Int curElNrows = curEl->nrows;
-    Int rowCount= curElNrows + fp;
-
-
-    Int colCount = curEl->ncols;
-    Int *fcolList = paruMatInfo->fcolList[f] ;
-
     Int pMark = start_fac;
 
 
@@ -51,7 +36,7 @@ void paru_prior_assemble ( Int f, Int start_fac,
     PRLEVEL (p, ("%% pivotal size is %ld ", pivotal_elements.size()));
     Int ii = 0;
 
-    for(Int i = 0 ; i < pivotal_elements.size(); i++)
+    for(Int i = 0 ; i < (Int) pivotal_elements.size(); i++)
     {
         Int e = pivotal_elements[i];
         paru_Element *el = elementList[e];
@@ -84,7 +69,7 @@ void paru_prior_assemble ( Int f, Int start_fac,
         pivotal_elements [ii++] = pivotal_elements [i];
     }
 
-    if ( ii < pivotal_elements.size())
+    if ( ii < (Int) pivotal_elements.size())
     {
         PRLEVEL (p, ("%% Prior: size was %ld ", pivotal_elements.size()));
         PRLEVEL (p, (" and now is %ld\n ", ii));
@@ -110,8 +95,8 @@ void paru_prior_assemble ( Int f, Int start_fac,
 #endif
 
 
-    Int *lacList = paruMatInfo->lacList;
 #ifndef NDEBUG  
+    Int *lacList = paruMatInfo->lacList;
     PRLEVEL (p, ("%% current heap:\n %%"));
     for(Int k = 0 ; k < curHeap->size(); k++)
     {

@@ -33,9 +33,6 @@ void paru_update_rel_ind_col ( Int e, Int f,
     Int *colRelIndex = (Int*)(el+1) + mEl+ nEl;
 
     Int *fcolList = paruMatInfo->fcolList[f] ;
-    paru_fac *Us =  paruMatInfo->partial_Us;
-    Int colCount = Us[f].n;
-
 
     for (Int i = el->lac; i < nEl; i++)
     {

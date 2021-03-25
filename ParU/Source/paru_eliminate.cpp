@@ -58,12 +58,14 @@ void paru_eliminate_all ( Int e, Int f,
     work_struct *Work =  paruMatInfo->Work;
     Int *isRowInFront = Work->rowSize; 
 
-    Int *fcolList = paruMatInfo->fcolList[f];
-    paru_fac *Us =  paruMatInfo->partial_Us;
-    Int colCount = Us[f].n;
 
+#ifndef NDEBUG  
+    paru_fac *Us =  paruMatInfo->partial_Us;
+    Int *fcolList = paruMatInfo->fcolList[f];
+    Int colCount = Us[f].n;
     ASSERT (el_colIndex[el->lac]  <= fcolList[colCount-1] );
     ASSERT (el_colIndex[nEl-1] <= 0 || fcolList[0] <= el_colIndex[nEl-1]);
+#endif
 
     PRLEVEL (p, ("%% newColSet.size = %ld\n", colCount ));
     PRLEVEL (p, ("%% nEl = %ld\n",nEl));
@@ -72,10 +74,12 @@ void paru_eliminate_all ( Int e, Int f,
     {
         PRLEVEL (p, ("%% 1 col left\n %%"));
         double *sC = el_Num + mEl*el->lac; //source column pointer
+#ifndef NDEBUG  
         Int colInd = el_colIndex [el->lac];
         PRLEVEL (1, ("%% colInd =%ld \n", colInd));
         ASSERT (colInd >= 0);
         // Int fcolcolind = paru_find_hash (colInd, colHash, fcolList);
+#endif
         Int fcolcolind = colRelIndex [el->lac];
         double *dC = curEl_Num + fcolcolind*curEl->nrows;
         Int nrowsSeen = el->nrowsleft;
@@ -215,8 +219,6 @@ void paru_eliminate_cols ( Int e, Int f,
     Int *isRowInFront = Work->rowSize; 
 
     Int *fcolList = paruMatInfo->fcolList[f];
-    paru_fac *Us =  paruMatInfo->partial_Us;
-    Int colCount = Us[f].n;
 
     Int tempRow[el->nrowsleft]; //C99 
     Int tempRow_ready = 0;
@@ -509,7 +511,7 @@ void paru_eliminate_rows ( Int e, Int f,
         PRLEVEL (1, ("%% fcolcolind=%ld \n", fcolcolind));
         double *dC = curEl_Num + fcolcolind*curEl->nrows;
 
-        for (Int ii = 0; ii < tempRow.size(); ii++) 
+        for (Int ii = 0; ii < (Int) tempRow.size(); ii++) 
         {
             Int i = tempRow[ii];
             Int rowInd = el_rowIndex[i];
@@ -530,7 +532,7 @@ void paru_eliminate_rows ( Int e, Int f,
 
 
     //invalidating assembled rows
-    for (Int ii = 0; ii < tempRow.size(); ii++) 
+    for (Int ii = 0; ii < (Int) tempRow.size(); ii++) 
     {
         Int i = tempRow[ii];
         el_rowIndex[i] = -1;

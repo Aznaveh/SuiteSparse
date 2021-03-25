@@ -258,16 +258,12 @@ paru_matrix *paru_init_rowFronts (
          paru_calloc (1, (m+nf+1)*sizeof(std::vector<Int>*), cc);
      std::vector<Int>** heapList = paruMatInfo->heapList;
 
-     if (paruMatInfo->heapList == NULL)
+     if (heapList == NULL)
      {   //out of memory
          paru_freemat (&paruMatInfo, cc);
          printf("Out of memory: heapList\n");
          return NULL;
      }
-
-//    for (Int eli = 0; eli < m+nf+1; eli++) 
-//        heapList[eli] = nullptr;
-
 
 
    //~~~~~~~~~~ scaling the A matrix
@@ -314,13 +310,11 @@ paru_matrix *paru_init_rowFronts (
      /// ------------------------------------------------------------------------
      // create S = A (p,q)', or S=A(p,q) if S is considered to be in row-form
      // -------------------------------------------------------------------------
-     Int *Qfill = LUsym->Qfill;
      Int snz = LUsym->snz; 
      double *Sx = LUsym->Sx;
      Int *Sp = LUsym->Sp;
      Int *Sj= LUsym->Sj;
 
-     Int *Ap = (Int*) A->p;
 #ifndef NDEBUG
      Int p = 1;
      PRLEVEL (p, ("\n%% Insid init row fronts\n"));
@@ -339,27 +333,10 @@ paru_matrix *paru_init_rowFronts (
 
      //constants for initialzing lists
      Int slackRow = 2;
-     Int slackCol = 2;
-
-     /* allocating column list must happend beforehand
-      *  I need number of column members of S
-      *  while S is row based and column permutation did nt change 
-      *  I am using A so 
-      */
-     for (Int col = 0 ; col < n ; col++)
-     {     //allocating Column list tuple 
-         Int j = Qfill ? Qfill [col] : col ;  // col of S is column j of A
-         Int ncols = Ap[j+1]-Ap[j];
-
-         PRLEVEL (2, ("%% ncols[%ld]=%ld\n",col,ncols));
-
-     }
 
      PRLEVEL (0, ("InMatrix=[\n") ); //MATLAB matrix, 
+
      //Activating comments after this parts will break the matlab input matrix
-
-
-
      // allocating row tuples, elements and updating column tuples
      for(Int row = 0; row < m ; row++)
      {  
