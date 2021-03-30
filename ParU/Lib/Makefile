@@ -78,7 +78,7 @@ $(OBJ): $(INC)
 I = -I ../../UMFPACK/Source -I../../UMFPACK/Include -I ../../CHOLMOD/Include\
 	-I ../../AMD/Include  -I ../../SuiteSparse_config -I../Include
 
-FLAG = -Wno-write-strings 
+FLAG = -Wno-write-strings   -Wall -Werror -Wnull-dereference
 
 ifeq ($(DEBUG),yes)
 	#to compile with -g options use 'make DBUG=yes'
