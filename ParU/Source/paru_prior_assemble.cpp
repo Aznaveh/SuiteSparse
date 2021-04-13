@@ -18,7 +18,6 @@ void paru_prior_assemble ( Int f, Int start_fac,
     DEBUGLEVEL(0);
 
     work_struct *Work =  paruMatInfo->Work;
-    Int *elRow = Work -> elRow; 
     Int *elCol = Work -> elCol;
 
     paru_Element **elementList = paruMatInfo->elementList;
@@ -29,6 +28,7 @@ void paru_prior_assemble ( Int f, Int start_fac,
 
 #ifndef NDEBUG  
     Int p = 1;
+    Int *elRow = Work -> elRow; 
     Int el_ind = snM [f]; 
     PRLEVEL (p, ("%%Inside prior\n"));
     PRLEVEL (p, ("%% pivotal size is %ld ", pivotal_elements.size()));
@@ -46,10 +46,12 @@ void paru_prior_assemble ( Int f, Int start_fac,
             PRLEVEL (p, ("%% element= %ld is NULL ii=%ld \n",e, ii));
             continue;
         }
+#ifndef NDEBUG  
         PRLEVEL (p, ("%%elRow[%ld]=%ld \n",e, elRow[e]));
         if (elRow[e] != 0)
             PRLEVEL (-1, ("%%elRow[%ld]=%ld \n",e, elRow[e]));
         ASSERT (elRow[e] == 0);
+#endif
 
         if (el->rValid == pMark || elCol[e] == 0)
             // it can be eliminated fully

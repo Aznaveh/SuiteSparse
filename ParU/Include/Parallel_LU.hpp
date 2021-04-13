@@ -325,7 +325,7 @@ inline Int lac_el(paru_Element **elementList, Int eli)
         Int lac_ind = elementList[eli]->lac;
         return el_colIndex[lac_ind];
     }
-};
+}
 
 typedef struct  
 {/*List of tuples */

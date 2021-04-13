@@ -163,7 +163,7 @@ void paru_free (Int n, Int size, void *p,  cholmod_common *cc)
     if(p != NULL)
         cholmod_l_free (n,   size, p, cc);
     else 
-        PRLEVEL (1, ("%% freeing a NULL pointer  \n" ));
+    { PRLEVEL (1, ("%% freeing a NULL pointer  \n" )); }
 }
 
 void paru_freesym (paru_symbolic **LUsym_handle,

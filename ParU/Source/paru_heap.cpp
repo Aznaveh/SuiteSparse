@@ -133,7 +133,6 @@ void paru_make_heap (Int f, Int start_fac,
         else
         {  //heapify
             PRLEVEL (p, ("%%heapify with the size %ld\n", tot_size));
-            std::vector<Int>* curHeap = heapList[eli];  
             for (Int i = aChildp[eli]; i <= aChildp[eli+1]-1; i++) 
             {
                 Int chelid = aChild[i];  // element id of the child
