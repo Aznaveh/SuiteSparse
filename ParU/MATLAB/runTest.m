@@ -38,10 +38,13 @@ ff = fopen ('myRes.m', 'w') ;
 % Headers
 
 %%matlab format
-fprintf(ff,'%% id nnzA myErr umfErr logratio' );
-fprintf(ff,' myElaps umfElaps ratio');
-fprintf(ff,' mynnz umfnnz ratio');
-fprintf(ff,' myflop umfflop ratio\n results = [');
+fprintf(ff,'%% id nnzA ' );
+%fprintf(ff,'myErr umfErr logratio' );
+%fprintf(ff,' myElaps umfElaps ratio');
+%fprintf(ff,' mynnz umfnnz ratio');
+fprintf(ff,' myflop umfflop ratio');
+fprintf(ff,' hardwareflop ratio/myflop');  %if COUNT_FLOP
+fprintf(ff,' \n results = [');
 
 %%csv format
 %fprintf(ff,'id, nnzA, myErr, umfErr, logratio,' );
@@ -100,13 +103,14 @@ for k = 1:nmat
         end
     end
 
-    loop_cnt = loop_cnt + 1;
 
     if (nnz(A) < NNZMat)
             continue;
     end
+
+    loop_cnt = loop_cnt + 1;
  
-    if (loop_cnt > 80 )
+    if (loop_cnt > 500 )
         break
     end
 
@@ -154,10 +158,10 @@ for k = 1:nmat
     myElaps = t_Info(1);
     fromCode_umf_Elaps = t_Info(2);
 
-    %%    flp_cnt_dgemm = t_Info(3);
-    %%    flp_cnt_trsm = t_Info(4);
-    %%    flp_cnt_dger = t_Info(5);
-    %%    hardware_flp_cnt = flp_cnt_dgemm + flp_cnt_trsm + flp_cnt_dger;
+    flp_cnt_dgemm = t_Info(3);
+    flp_cnt_trsm = t_Info(4);
+    flp_cnt_dger = t_Info(5);
+    hardware_flp_cnt = flp_cnt_dgemm + flp_cnt_trsm + flp_cnt_dger;
 
 
 
@@ -202,13 +206,13 @@ for k = 1:nmat
     umfflop = luflop(l,u);
 
     %%matlab format
-    fprintf(ff,'%d %d %g %g %g', id, nnz(A), myErr, umfErr, ...
-    log10(myErr/umfErr));
-    fprintf(ff,' %g %g %g', myElaps, umfElaps, myElaps/umfElaps);
-    fprintf(ff,' %g %g %g', mynnz , umfpnnz, mynnz/umfpnnz );
+    fprintf(ff,'%d %d ', id, nnz(A));
+    %fprintf(ff,'%g %g %g', myErr, umfErr, log10(myErr/umfErr));
+    %fprintf(ff,' %g %g %g', myElaps, umfElaps, myElaps/umfElaps);
+    %fprintf(ff,' %g %g %g', mynnz , umfpnnz, mynnz/umfpnnz );
     fprintf(ff,' %g %g %g', myflop, umfflop, myflop/umfflop);
 
-    %% fprintf(ff,' %g ', hardware_flp_cnt);
+    fprintf(ff,' %g %g ', hardware_flp_cnt, hardware_flp_cnt/myflop);
     fprintf(ff,' \n');
 
     %%csv format
