@@ -151,12 +151,7 @@ void paru_eliminate_all ( Int e, Int f,
         }
     }
 
-    Int tot_size = sizeof(paru_Element) +
-        sizeof(Int)*(2*(mEl+nEl)) + sizeof(double)*nEl*mEl;
-    paru_free (1, tot_size, el, cc);
-    PRLEVEL (p, ("%%Eliminate assembly Free %ld  %p size %ld\n",
-                e, el, tot_size));
-    elementList[e] = NULL;
+    paru_free_el (e, elementList, cc);
 }
 
 // try to find columns and assemble them to current front. After the first
@@ -343,12 +338,7 @@ void paru_eliminate_cols ( Int e, Int f,
 
     if (el->ncolsleft == 0 )
     {
-        Int tot_size = sizeof(paru_Element) +
-            sizeof(Int)*(2*(mEl+nEl)) + sizeof(double)*nEl*mEl;
-        paru_free (1, tot_size, el, cc);
-        PRLEVEL (p, ("%%Some cols Free ALL %ld  %p size %ld\n",
-                    e, el, tot_size));
-        elementList[e] = NULL;
+        paru_free_el (e, elementList, cc);
     }
 }
 
@@ -542,12 +532,7 @@ void paru_eliminate_rows ( Int e, Int f,
     el->nrowsleft -= tempRow.size();
     if (el->nrowsleft == 0)
     {
-        Int tot_size = sizeof(paru_Element) +
-            sizeof(Int)*(2*(mEl+nEl)) + sizeof(double)*nEl*mEl;
-        paru_free (1, tot_size, el, cc);
-        PRLEVEL (p, ("%%Some rows Free ALL %ld  %p size %ld\n",
-                    e, el, tot_size));
-        elementList[e] = NULL;
+        paru_free_el (e, elementList, cc);
     }
 #ifndef NDEBUG
     p = 1;

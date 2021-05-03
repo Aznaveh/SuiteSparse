@@ -435,6 +435,7 @@ void *paru_realloc(Int newsize, Int size_Entry, void *oldP, Int *size,
                    cholmod_common *cc);
 
 void paru_free(Int n, Int size, void *p, cholmod_common *cc);
+void paru_free_el(Int e, paru_Element **elementList, cholmod_common *cc);
 void paru_freesym(paru_symbolic **LUsym_handle, cholmod_common *cc);
 void paru_freemat(paru_matrix **paruMatInfo_handle, cholmod_common *cc);
 

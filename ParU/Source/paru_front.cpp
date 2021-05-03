@@ -399,13 +399,8 @@ int paru_front(paru_matrix *paruMatInfo,
             rowRelIndex[curRowIndex] = -1;
             el->nrowsleft--;
             if (el->nrowsleft == 0)
-            {  // free el
-                Int tot_size = sizeof(paru_Element) +
-                               sizeof(Int) * (2 * (mEl + nEl)) +
-                               sizeof(double) * nEl * mEl;
-                PRLEVEL(1, ("%%inside Front: Free %ld\n", e));
-                paru_free(1, tot_size, el, cc);
-                elementList[e] = NULL;
+            {
+                paru_free_el(e, elementList, cc);
             }
         }
     }
@@ -530,7 +525,7 @@ int paru_front(paru_matrix *paruMatInfo,
             for (Int kk = fp; kk < rowCount; kk++)
             {
                 if (uPart[fp * jj + ii] != 0 &&
-                    pivotalFront[rowCount * ii + kk ] != 0)
+                    pivotalFront[rowCount * ii + kk] != 0)
                     paruMatInfo->flp_cnt_real_dgemm += 2.0;
             }
 
@@ -539,7 +534,7 @@ int paru_front(paru_matrix *paruMatInfo,
     PRLEVEL(p, ("%ld %ld %ld \n", rowCount - fp, fp, colCount));
 
     PRLEVEL(p, ("cnt = %lf\n ", paruMatInfo->flp_cnt_dgemm));
-    ASSERT (paruMatInfo->flp_cnt_real_dgemm <= paruMatInfo->flp_cnt_dgemm );
+    ASSERT(paruMatInfo->flp_cnt_real_dgemm <= paruMatInfo->flp_cnt_dgemm);
 #endif
 
 #ifndef NDEBUG
