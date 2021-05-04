@@ -25,10 +25,17 @@ paru_Element *paru_create_element (Int nrows, Int ncols,
     paru_Element *curEl;
     Int tot_size = sizeof(paru_Element)+ sizeof(Int)*(2*(nrows+ncols))+
                 sizeof(double)*nrows*ncols;
+    size_t ignore ;
     if (init)
-        curEl = (paru_Element*) paru_calloc(1, tot_size , cc);
+    {
+//      curEl = (paru_Element*) paru_calloc(1, tot_size , cc);  // FIXME
+        curEl = (paru_Element*) GB_calloc_memory (1, tot_size , &ignore) ;
+    }
     else
-        curEl = (paru_Element*) paru_alloc(1, tot_size , cc);
+    {
+//      curEl = (paru_Element*) paru_alloc(1, tot_size , cc);   // FIXME
+        curEl = (paru_Element*) GB_malloc_memory (1, tot_size , &ignore) ;
+    }
     if (curEl == NULL) return NULL; // do not do error checking
 
     PRLEVEL (1, (" with size of %ld in %p\n", tot_size, curEl));
@@ -38,6 +45,7 @@ paru_Element *paru_create_element (Int nrows, Int ncols,
     curEl->ncolsleft = curEl->ncols = ncols;
     curEl->rValid = -1;
     curEl->cValid = -1;
+    curEl->size_allocated = ignore ;
 
     curEl->lac = 0;
 

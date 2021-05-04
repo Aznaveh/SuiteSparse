@@ -184,8 +184,8 @@ void paru_freesym(paru_symbolic **LUsym_handle,
     // Int anz = LUsym->anz;
     Int snz = LUsym->snz;
     Int rjsize = LUsym->rjsize;
-    PRLEVEL(1, ("%% In free sym: m=%ld n=%ld\n nf=%ld\
-                LUsym->anz=%ld rjsize=%ld\n",
+    PRLEVEL(1, ("%% In free sym: m=%ld n=%ld\n nf=%ld "
+                "LUsym->anz=%ld rjsize=%ld\n",
                 m, n, nf, LUsym->anz, rjsize));
 
     paru_free(nf + 1, sizeof(Int), LUsym->Parent, cc);
@@ -236,7 +236,15 @@ void paru_free_el(Int e, paru_Element **elementList, cholmod_common *cc)
     PRLEVEL(1, ("%% ncols =%ld\n", ncols));
     Int tot_size = sizeof(paru_Element) + sizeof(Int) * (2 * (nrows + ncols)) +
                    sizeof(double) * nrows * ncols;
-    paru_free(1, tot_size, el, cc);
+    // TODO use GB_dealloc_memory and the free_pool
+    // paru_free(1, tot_size, el, cc);
+//  GB_free_memory ((void **) &el, tot_size /* FIXME: wrong size */) ;
+
+    size_t size_allocated = el->size_allocated ;
+    printf ("freeing element, tot_size %ld allocated %ld\n", tot_size,
+        size_allocated) ;
+    GB_dealloc_memory ((void **) &el, size_allocated) ;
+
     elementList[e] = NULL;
 }
 
@@ -354,4 +362,5 @@ void paru_freemat(paru_matrix **paruMatInfo_handle, cholmod_common *cc)
     paru_free(1, sizeof(work_struct), paruMatInfo->Work, cc);
     paru_free(1, sizeof(paru_matrix), paruMatInfo, cc);
     *paruMatInfo_handle = NULL;
+    GB_free_pool_finalize ( ) ;
 }

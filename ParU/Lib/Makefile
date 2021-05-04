@@ -38,9 +38,10 @@ distclean: clean
 clean:
 	- $(RM) -r $(CLEAN)
 
-INC = ../Include/Parallel_LU.hpp
+INC = ../Include/Parallel_LU.hpp ../Include/GB_stuff.h
 
 C11 = -std=c++11
+CC11 = -std=c11
 
 OBJ = \
     paru_mem.o \
@@ -65,7 +66,14 @@ OBJ = \
 	paru_intersection.o\
 	paru_bin_search.o\
 	paru_eliminate.o\
-	paru_prior_assemble.o
+	paru_prior_assemble.o \
+        GB_calloc_memory.o \
+        GB_dealloc_memory.o \
+        GB_free_memory.o \
+        GB_free_pool_finalize.o \
+        GB_Global.o \
+        GB_malloc_memory.o \
+        GB_size_t_multiply.o
 
 $(OBJ): $(INC)
 
@@ -92,9 +100,9 @@ endif
 
 
 
-
 #C = $(CXX) $(CF) $(SPQR_CONFIG) $(CHOLMOD_CONFIG) $(CONFIG_PARTITION) $(I)
 C = $(CXX) $(CF)  $(CHOLMOD_CONFIG) $(CONFIG_PARTITION) $(I) $(FLAG) $(C11)
+C2 = $(CC) $(CF)  $(CHOLMOD_CONFIG) $(CONFIG_PARTITION) $(I) $(FLAG) $(CC11)
 #-------------------------------------------------------------------------------
 
 static: $(AR_TARGET)
@@ -104,6 +112,27 @@ $(AR_TARGET): $(OBJ)
 	- $(RANLIB) $@
 
 #-------------------------------------------------------------------------------
+
+GB_calloc_memory.o: ../Source/GB_calloc_memory.c
+	$(C2) -c $<
+
+GB_dealloc_memory.o: ../Source/GB_dealloc_memory.c
+	$(C2) -c $<
+
+GB_free_memory.o: ../Source/GB_free_memory.c
+	$(C2) -c $<
+
+GB_free_pool_finalize.o: ../Source/GB_free_pool_finalize.c
+	$(C2) -c $<
+
+GB_Global.o: ../Source/GB_Global.c
+	$(C2) -c $<
+
+GB_malloc_memory.o: ../Source/GB_malloc_memory.c
+	$(C2) -c $<
+
+GB_size_t_multiply.o: ../Source/GB_size_t_multiply.c
+	$(C2) -c $<
 
 paru_mem.o: ../Source/paru_mem.cpp
 	$(C) -c $<

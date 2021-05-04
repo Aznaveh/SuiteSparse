@@ -27,6 +27,7 @@ extern "C"
 #include "cholmod.h"
 #include "cholmod_blas.h"
 #include "umf_internal.h"
+#include "GB_stuff.h"
 }
 
 // -----------------------------------------------------------------------------
@@ -266,6 +267,7 @@ typedef struct
     Int lac;  // least active column which is active
               // 0 <= lac <= ncols
 
+    size_t size_allocated ;
     /* followed in memory by:
        Int
        col [0..ncols-1],	column indices of this element
