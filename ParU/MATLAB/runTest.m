@@ -39,11 +39,11 @@ ff = fopen ('myRes.m', 'w') ;
 
 %%matlab format
 fprintf(ff,'%% id nnzA ' );
-%fprintf(ff,'myErr umfErr logratio' );
-%fprintf(ff,' myElaps umfElaps ratio');
-%fprintf(ff,' mynnz umfnnz ratio');
+fprintf(ff,'myErr umfErr logratio' );
+fprintf(ff,' myElaps umfElaps ratio');
+fprintf(ff,' mynnz umfnnz ratio');
 fprintf(ff,' myflop umfflop ratio');
-fprintf(ff,' hardwareflop ratio/myflop');  %if COUNT_FLOP
+%fprintf(ff,' hardwareflop ratio/myflop');  %if COUNT_FLOP
 fprintf(ff,' \n results = [');
 
 %%csv format
