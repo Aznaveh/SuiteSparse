@@ -3,10 +3,10 @@
  * ========================================================================== */
 /*! @brief Initializing an empty element
  *    if (Init) use calloc .i.e x = 0;
- *                     
+ *
  *                    V RRRRRRRRRRRRRR
  *                      IIIIIIIIIIIIII            I = global index
- *                  V                             r = relative index 
+ *                  V                             r = relative index
  *                  R I  xxxxxxxxxxxxxx           V = row/col valid bit
  *                  R I  xxxxxxxxxxxxxx            if V == f it is valid for
  *                  R I  xxxxxxxxxxxxxx             current front
@@ -16,40 +16,39 @@
  * @author Aznaveh
  *  */
 #include "Parallel_LU.hpp"
-paru_Element *paru_create_element (Int nrows, Int ncols, 
-        Int init, cholmod_common *cc)
+paru_Element *paru_create_element(Int nrows, Int ncols, Int init,
+                                  cholmod_common *cc)
 {
     DEBUGLEVEL(0);
 
-    PRLEVEL (1, ("%% creating %ldx%ld element ", nrows, ncols));
+    PRLEVEL(1, ("%% creating %ldx%ld element ", nrows, ncols));
     paru_Element *curEl;
-    Int tot_size = sizeof(paru_Element)+ sizeof(Int)*(2*(nrows+ncols))+
-                sizeof(double)*nrows*ncols;
-    size_t ignore ;
+    Int tot_size = sizeof(paru_Element) + sizeof(Int) * (2 * (nrows + ncols)) +
+                   sizeof(double) * nrows * ncols;
+    size_t size_allocated;
     if (init)
     {
-//      curEl = (paru_Element*) paru_calloc(1, tot_size , cc);  // FIXME
-        curEl = (paru_Element*) GB_calloc_memory (1, tot_size , &ignore) ;
+        //curEl = (paru_Element*) paru_calloc(1, tot_size , cc);
+        curEl = (paru_Element *)GB_calloc_memory(1, tot_size, &size_allocated);
     }
     else
     {
-//      curEl = (paru_Element*) paru_alloc(1, tot_size , cc);   // FIXME
-        curEl = (paru_Element*) GB_malloc_memory (1, tot_size , &ignore) ;
+        //      curEl = (paru_Element*) paru_alloc(1, tot_size , cc);
+        curEl = (paru_Element *)GB_malloc_memory(1, tot_size, &size_allocated);
     }
-    if (curEl == NULL) return NULL; // do not do error checking
+    if (curEl == NULL) return NULL;  // do not do error checking
 
-    PRLEVEL (1, (" with size of %ld in %p\n", tot_size, curEl));
-    
+    PRLEVEL(1, (" with size of %ld in %p\n", tot_size, curEl));
+
     // Initializing current element
     curEl->nrowsleft = curEl->nrows = nrows;
     curEl->ncolsleft = curEl->ncols = ncols;
     curEl->rValid = -1;
     curEl->cValid = -1;
-    curEl->size_allocated = ignore ;
+    curEl->size_allocated = size_allocated;
 
     curEl->lac = 0;
 
     return curEl;
 }
-
 
