@@ -100,27 +100,28 @@ GB_Global_struct GB_Global =
         // maximum total size = about 52 MB
         // by default, no blocks larger than 512 KB are kept in the free_pool
 
-        0,      // size 2^20 = 1 MB
-        0,      // size 2^21
-        0,      // size 2^22
-        0,      // size 2^23
-        0,      // size 2^24
-        0,      // size 2^25
-        0,      // size 2^26
-        0,      // size 2^27
-        0,      // size 2^28
-        0,      // size 2^29
+        //Aznaveh: increasing the default
+        8,      // size 2^20 = 1 MB
+        8,      // size 2^21
+        8,      // size 2^22
+        8,      // size 2^23
+        8,      // size 2^24
+        8,      // size 2^25
+        8,      // size 2^26
+        8,      // size 2^27
+        8,      // size 2^28
+        8,      // size 2^29
 
-        0,      // size 2^30 (1 GB)
-        0,      // size 2^31
-        0,      // size 2^32
-        0,      // size 2^33
-        0,      // size 2^34
-        0,      // size 2^35
-        0,      // size 2^36
-        0,      // size 2^37
-        0,      // size 2^38
-        0,      // size 2^39
+        4,      // size 2^30 (1 GB)
+        4,      // size 2^31
+        4,      // size 2^32
+        4,      // size 2^33
+        4,      // size 2^34
+        4,      // size 2^35
+        4,      // size 2^36
+        4,      // size 2^37
+        4,      // size 2^38
+        4,      // size 2^39
 
         // These larger sizes are of course unlikely to appear, but adding all
         // 64 possibilities means that the free_pool does not need to check an
@@ -395,7 +396,7 @@ void *GB_Global_free_pool_get (int k)
         #ifndef NDEBUG
         GB_Global_free_pool_check (p, k, "get") ;
         #endif
-        // GB_Global_free_pool_dump (2) ; printf ("\ndid get\n\n") ;
+        GB_Global_free_pool_dump (2) ; // printf ("\ndid get\n\n") ;
     }
     return (p) ;
 }
@@ -421,7 +422,7 @@ bool GB_Global_free_pool_put (void *p, int k)
             GB_Global.free_pool [k] = p ;
         }
     }
-    // GB_Global_free_pool_dump (2) ; printf ("\ndid put\n\n") ;
+    GB_Global_free_pool_dump (2) ; // printf ("\ndid put\n\n") ;
     return (returned_to_pool) ;
 }
 

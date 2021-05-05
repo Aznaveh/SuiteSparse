@@ -25,7 +25,7 @@ static inline void *GB_malloc_helper
     void *p = NULL ;
 
     // determine the next higher power of 2
-    size_t size_requested = (*size) ;
+    // size_t size_requested = (*size) ;
     (*size) = GB_IMAX (*size, 8) ;
     int k = GB_CEIL_LOG2 (*size) ;
 
@@ -35,7 +35,7 @@ static inline void *GB_malloc_helper
         // round up the size to the nearest power of two
         (*size) = ((size_t) 1) << k ;
         p = GB_Global_free_pool_get (k) ;
-        if (p != NULL) printf ("malloc from pool: %p %ld\n", p, *size) ;
+        // if (p != NULL) printf ("malloc from pool: %p %ld\n", p, *size) ;
     }
 
     if (p == NULL)
@@ -45,7 +45,7 @@ static inline void *GB_malloc_helper
         #ifndef NDEBUG
         GB_Global_memtable_add (p, *size) ;
         #endif
-        printf ("hard malloc %p %ld %ld\n", p, size_requested, *size) ;
+        // printf ("hard malloc %p %ld %ld\n", p, size_requested, *size) ;
     }
     GB_Global_free_pool_dump (2) ; GB_Global_memtable_dump ( ) ;
 

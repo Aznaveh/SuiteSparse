@@ -50,7 +50,7 @@ static inline void *GB_calloc_helper
         #endif
         // memset is required if the block comes from malloc
         do_memset = (p != NULL) ;
-        printf ("hard calloc %p %ld %ld\n", p, size_requested, *size) ;
+        // printf ("hard calloc %p %ld %ld\n", p, size_requested, *size) ;
     }
 
     GB_Global_free_pool_dump (2) ; GB_Global_memtable_dump ( ) ;

@@ -8,7 +8,7 @@
 #endif
 
 // turn on debugging
-#undef NDEBUG
+//#undef NDEBUG
 
 // defined somewhere else
 #ifdef ASSERT

@@ -28,7 +28,7 @@ paru_Element *paru_create_element(Int nrows, Int ncols, Int init,
     size_t size_allocated;
     if (init)
     {
-        //curEl = (paru_Element*) paru_calloc(1, tot_size , cc);
+        // curEl = (paru_Element*) paru_calloc(1, tot_size , cc);
         curEl = (paru_Element *)GB_calloc_memory(1, tot_size, &size_allocated);
     }
     else

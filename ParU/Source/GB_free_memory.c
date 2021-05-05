@@ -26,8 +26,8 @@ void GB_free_memory         // free memory, bypassing the free_pool
 
     if (p != NULL && (*p) != NULL)
     { 
-        printf ("\nhard free %p %ld %ld\n", *p, size_allocated,
-            GB_Global_memtable_size (*p)) ;
+        // printf ("\nhard free %p %ld %ld\n", *p, size_allocated,
+        //    GB_Global_memtable_size (*p)) ;
         ASSERT (size_allocated == GB_Global_memtable_size (*p)) ;
 
         SuiteSparse_free (*p) ;
