@@ -304,6 +304,7 @@ paru_matrix *paru_init_rowFronts(
 
     // constants for initialzing lists
     Int slackRow = 2;
+    GB_Global_free_pool_init (2);
 
     PRLEVEL(0, ("InMatrix=[\n"));  // MATLAB matrix,
 

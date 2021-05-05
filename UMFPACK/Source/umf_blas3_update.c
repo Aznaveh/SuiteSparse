@@ -38,6 +38,7 @@ GLOBAL void UMF_blas3_update
 	return ;
     }
 
+    //Aznaveh count flops here
     m = Work->fnrows ;
     n = Work->fncols ;
 

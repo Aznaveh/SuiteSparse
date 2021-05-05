@@ -101,27 +101,27 @@ GB_Global_struct GB_Global =
         // by default, no blocks larger than 512 KB are kept in the free_pool
 
         //Aznaveh: increasing the default
-        8,      // size 2^20 = 1 MB
-        8,      // size 2^21
-        8,      // size 2^22
-        8,      // size 2^23
-        8,      // size 2^24
-        8,      // size 2^25
-        8,      // size 2^26
-        8,      // size 2^27
-        8,      // size 2^28
-        8,      // size 2^29
+        0,      // size 2^20 = 1 MB
+        0,      // size 2^21
+        0,      // size 2^22
+        0,      // size 2^23
+        0,      // size 2^24
+        0,      // size 2^25
+        0,      // size 2^26
+        0,      // size 2^27
+        0,      // size 2^28
+        0,      // size 2^29
 
-        4,      // size 2^30 (1 GB)
-        4,      // size 2^31
-        4,      // size 2^32
-        4,      // size 2^33
-        4,      // size 2^34
-        4,      // size 2^35
-        4,      // size 2^36
-        4,      // size 2^37
-        4,      // size 2^38
-        4,      // size 2^39
+        0,      // size 2^30 (1 GB)
+        0,      // size 2^31
+        0,      // size 2^32
+        0,      // size 2^33
+        0,      // size 2^34
+        0,      // size 2^35
+        0,      // size 2^36
+        0,      // size 2^37
+        0,      // size 2^38
+        0,      // size 2^39
 
         // These larger sizes are of course unlikely to appear, but adding all
         // 64 possibilities means that the free_pool does not need to check an
@@ -341,6 +341,13 @@ void GB_Global_free_pool_init (bool clear)
                 GB_Global.free_pool_nblocks [k] = 0 ;
             }
         }
+
+        int64_t n = 16384 ;
+        for (int k = 0 ; k < 64 ; k++)
+        {
+            GB_Global.free_pool_limit [k] = n ;
+        }
+        #if 0
         // set the default free_pool_limit
         for (int k = 0 ; k < 64 ; k++)
         {
@@ -356,6 +363,13 @@ void GB_Global_free_pool_init (bool clear)
             n = n/2 ;
             GB_Global.free_pool_limit [k] = n ;
         }
+        //Aznaveh
+        for (int k = 20 ; k < 64 ; k++)
+        {
+            n = n/2 ;
+            GB_Global.free_pool_limit [k] = n ;
+        }
+        #endif
     }
 }
 
@@ -373,7 +387,7 @@ static inline void GB_Global_free_pool_check (void *p, int k, char *where)
 #endif
 
 // free_pool_get: get a block from the free_pool, or return NULL if none
-GB_PUBLIC
+    GB_PUBLIC
 void *GB_Global_free_pool_get (int k)
 {
     void *p = NULL ;
@@ -402,7 +416,7 @@ void *GB_Global_free_pool_get (int k)
 }
 
 // free_pool_put: put a block in the free_pool, unless it is full
-GB_PUBLIC
+    GB_PUBLIC
 bool GB_Global_free_pool_put (void *p, int k)
 { 
     #ifndef NDEBUG
