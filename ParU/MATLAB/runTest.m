@@ -110,7 +110,7 @@ for k = 1:nmat
 
     loop_cnt = loop_cnt + 1;
  
-    if (loop_cnt > 50 )
+    if (loop_cnt > 50)
         break
     end
 
@@ -271,12 +271,20 @@ fprintf(ff,'intensity = umfflop ./ umfnnz ;\n');
 fprintf(ff,'figure(1);\n');
 fprintf(ff,'subplot (1,3,1) ;\n');
 fprintf(ff,'loglog (intensity,  tratio, ''o'', ''MarkerSize'', 10) ;\n');
+fprintf(ff,'ylabel (''time ratio'') \n');
+fprintf(ff,'xlabel (''intensity'') \n');
 
 fprintf(ff,'subplot (1,3,2) ;\n');
 fprintf(ff,'loglog (intensity,  nzratio, ''o'', ''MarkerSize'', 10) ;\n');
+fprintf(ff,'ylabel (''nnz ratio'') \n');
+fprintf(ff,'xlabel (''intensity'') \n');
+
 
 fprintf(ff,'subplot (1,3,3) ;\n');
 fprintf(ff,'loglog (intensity,  flratio, ''o'', ''MarkerSize'', 10) ;\n');
+fprintf(ff,'ylabel (''flops ratio'') \n');
+fprintf(ff,'xlabel (''intensity'') \n');
 
-fprintf(ff,'%loglog (intensity,  logratio, ''o'', ''MarkerSize'', 10) ;\n');
+
+
 fclose (ff) ;
