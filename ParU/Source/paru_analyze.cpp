@@ -268,58 +268,58 @@ paru_symbolic *paru_analyze
     p = 0;
     if (strategy == UMFPACK_STRATEGY_SYMMETRIC)
     {
-        PRLEVEL (p, ("\nstrategy used:  symmetric\n"));
+        PRLEVEL (p, ("\n%% strategy used:  symmetric\n"));
         if (Info [UMFPACK_ORDERING_USED] == UMFPACK_ORDERING_AMD)
         {
-            PRLEVEL (p, ("ordering used:  amd on A+A'\n"));
+            PRLEVEL (p, ("%% ordering used:  amd on A+A'\n"));
         }
         else if (Info [UMFPACK_ORDERING_USED] == UMFPACK_ORDERING_GIVEN)
         {
-            PRLEVEL (p, ("ordering used: user perm.\n"));
+            PRLEVEL (p, ("%% ordering used: user perm.\n"));
         }
         else if (Info [UMFPACK_ORDERING_USED] == UMFPACK_ORDERING_USER)
         {
-            PRLEVEL (p, ("ordering used:  user function\n"));
+            PRLEVEL (p, ("%% ordering used:  user function\n"));
         }
         else if (Info [UMFPACK_ORDERING_USED] == UMFPACK_ORDERING_NONE)
         {
-            PRLEVEL (p, ("ordering used: none\n"));
+            PRLEVEL (p, ("%% ordering used: none\n"));
         }
         else if (Info [UMFPACK_ORDERING_USED] == UMFPACK_ORDERING_METIS)
         {
-            PRLEVEL (p, ("ordering used: metis on A+A'\n"));
+            PRLEVEL (p, ("%% ordering used: metis on A+A'\n"));
         }
         else
         {
-            PRLEVEL (p, ("ordering used: not computed\n"));
+            PRLEVEL (p, ("%% ordering used: not computed\n"));
         }
     }
     else
     {
-        PRLEVEL (p, ("\nstrategy used:unsymmetric\n"));
+        PRLEVEL (p, ("\n%% strategy used:unsymmetric\n"));
         if (Info [UMFPACK_ORDERING_USED] == UMFPACK_ORDERING_AMD)
         {
-            PRLEVEL (p, ("ordering used: colamd on A\n"));
+            PRLEVEL (p, ("%% ordering used: colamd on A\n"));
         }
         else if (Info [UMFPACK_ORDERING_USED] == UMFPACK_ORDERING_GIVEN)
         {
-            PRLEVEL (p, ("ordering used: user perm.\n"));
+            PRLEVEL (p, ("%% ordering used: user perm.\n"));
         }
         else if (Info [UMFPACK_ORDERING_USED] == UMFPACK_ORDERING_USER)
         {
-            PRLEVEL (p, ("ordering used: user function\n"));
+            PRLEVEL (p, ("%% ordering used: user function\n"));
         }
         else if (Info [UMFPACK_ORDERING_USED] == UMFPACK_ORDERING_NONE)
         {
-            PRLEVEL (p, ("ordering used: none\n"));
+            PRLEVEL (p, ("%% ordering used: none\n"));
         }
         else if (Info [UMFPACK_ORDERING_USED] == UMFPACK_ORDERING_METIS)
         {
-            PRLEVEL (p, ("ordering used: metis on A'A\n"));
+            PRLEVEL (p, ("%% ordering used: metis on A'A\n"));
         }
         else
         {
-            PRLEVEL (p, ("ordering used: not computed\n"));
+            PRLEVEL (p, ("%% ordering used: not computed\n"));
         }
     }
 #endif
