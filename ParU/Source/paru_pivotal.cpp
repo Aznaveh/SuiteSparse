@@ -490,7 +490,7 @@ void paru_pivotal(std::vector<Int> &pivotal_elements,
             PRLEVEL(p, (" %2.5lf\t", pivotalFront[(c - col1) * rowCount + r]));
         PRLEVEL(p, ("\n"));
     }
-    PRLEVEL(p, (" ] \n"));
+    PRLEVEL(p, (" ]; \n"));
     p = -1;
  
 #endif
