@@ -471,7 +471,7 @@ void paru_pivotal(std::vector<Int> &pivotal_elements,
     PRLEVEL(p, ("\n"));
 
     p = 2;
-    PRLEVEL(p, ("%% After all the assemble\n"));
+    PRLEVEL(p, ("%% After all the assemble %ld\n", f));
     PRLEVEL(p, ("%% x =  \t"));
     for (Int c = col1; c < col2; c++) PRLEVEL(p, ("%ld\t\t", c));
     PRLEVEL(p, (" ;\n"));
@@ -482,6 +482,17 @@ void paru_pivotal(std::vector<Int> &pivotal_elements,
             PRLEVEL(p, (" %2.5lf\t", pivotalFront[(c - col1) * rowCount + r]));
         PRLEVEL(p, ("\n"));
     }
+    p = -2;
+    PRLEVEL(p, ("x%ld = [ \t", f));
+    for (Int r = 0; r < rowCount; r++)
+    {
+        for (Int c = col1; c < col2; c++)
+            PRLEVEL(p, (" %2.5lf\t", pivotalFront[(c - col1) * rowCount + r]));
+        PRLEVEL(p, ("\n"));
+    }
+    PRLEVEL(p, (" ] \n"));
+    p = -1;
+ 
 #endif
 
     rowMarkp[eli] += rowCount;
