@@ -235,9 +235,9 @@ void paru_free_el(Int e, paru_Element **elementList, cholmod_common *cc)
         PRLEVEL(1, ("%%Free the element e =%ld\t", e));
         PRLEVEL(1, ("%% nrows =%ld ", nrows));
         PRLEVEL(1, ("%% ncols =%ld\n", ncols));
-     Int tot_size = sizeof(paru_Element) + sizeof(Int) * (2 * (nrows + ncols))
-     +
-                   sizeof(double) * nrows * ncols;
+     //Int tot_size = sizeof(paru_Element) + sizeof(Int) * (2 * (nrows + ncols))
+     //+
+     //              sizeof(double) * nrows * ncols;
 #endif
     // TODO use GB_dealloc_memory and the free_pool
     // paru_free(1, tot_size, el, cc);
