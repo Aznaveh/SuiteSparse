@@ -767,7 +767,7 @@ paru_symbolic *paru_analyze
     LUsym->row_Int_bound = row_Int_bound;
     LUsym->col_Int_bound = col_Int_bound;
 #ifndef NDEBUG
-    p = -1;
+    p = 1;
     PRLEVEL (p, ("%%row_Int_bound=%ld, col_Int_bound=%ld", 
                 row_Int_bound,col_Int_bound));
     PRLEVEL (p, ("%%-Us_bound_size = %ld LUs_bound_size = %ld sum = %ld\n",
