@@ -313,10 +313,10 @@ void paru_pivotal(std::vector<Int> &pivotal_elements,
 #ifndef NDEBUG
     paruMatInfo->actual_alloc_LUs += rowCount * fp;
     paruMatInfo->actual_alloc_row_int += rowCount;
-    if (f == LUsym->nf - 1)
-    {
-        p = -1;
-    }
+   // if (f == LUsym->nf - 1)
+   // {
+   //     p = -1;
+   // }
 
     if (fm != rowCount) PRLEVEL(p, ("%% fm=%ld rowCount=%ld ", fm, rowCount));
     PRLEVEL(p, ("%% LUs=%ld ", paruMatInfo->actual_alloc_LUs));
