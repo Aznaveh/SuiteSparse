@@ -57,7 +57,7 @@ Int paru_panel_factorize(Int f, Int m, Int n, const Int panel_width,
     PRLEVEL(1, ("%% j1= %ld j2 =%ld \n", j1, j2));
     PRLEVEL(1, ("%% row_end= %ld\n", row_end));
 
-    ASSERT(row_end >= j2);
+    // ASSERT(row_end >= j2);
 
     Int *frowList = paruMatInfo->frowList[f];
     paru_fac *LUs = paruMatInfo->partial_LUs;
@@ -130,8 +130,11 @@ Int paru_panel_factorize(Int f, Int m, Int n, const Int panel_width,
 
         PRLEVEL(1, ("%% max value= %2.4lf\n", maxval));
 
-        if (maxval == 0)  // no pivot found
+        if (maxval == 0)
+        {
+            PRLEVEL(-1, ("%% NO pivot found in %ld\n", f));
             continue;
+        }
 
         // initialzing pivot as max numeric value
         double piv = maxval;

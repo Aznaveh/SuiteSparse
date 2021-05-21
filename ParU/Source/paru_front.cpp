@@ -18,7 +18,7 @@ int paru_front(paru_matrix *paruMatInfo,
                Int f, /* front need to be assembled */
                cholmod_common *cc)
 {
-    DEBUGLEVEL(-2);
+    DEBUGLEVEL(1);
     /*
      * -2 Print Nothing
      * -1 Just Matlab
@@ -158,7 +158,7 @@ int paru_front(paru_matrix *paruMatInfo,
     {
         PRLEVEL(1, ("%% %ldx%ld \n", rowCount, fp));
         printf("structural problem\n");
-        return 1;
+        // return 1;
     }
 
     Int start_fac = paruMatInfo->time_stamp[f];

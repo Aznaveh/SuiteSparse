@@ -50,7 +50,7 @@ void paru_prior_assemble ( Int f, Int start_fac,
         PRLEVEL (p, ("%%elRow[%ld]=%ld \n",e, elRow[e]));
         if (elRow[e] != 0)
             PRLEVEL (-1, ("%%elRow[%ld]=%ld \n",e, elRow[e]));
-        ASSERT (elRow[e] == 0);
+        // ASSERT (elRow[e] == 0);
 #endif
 
         if (el->rValid == pMark || elCol[e] == 0)

@@ -17,7 +17,7 @@ void paru_pivotal(std::vector<Int> &pivotal_elements,
                   std::vector<Int> &panel_row, Int f, heaps_info &hi,
                   paru_matrix *paruMatInfo, cholmod_common *cc)
 {
-    DEBUGLEVEL(0);
+    DEBUGLEVEL(1);
     paru_symbolic *LUsym = paruMatInfo->LUsym;
     Int *snM = LUsym->super2atree;
     std::vector<Int> **heapList = paruMatInfo->heapList;
@@ -163,11 +163,16 @@ void paru_pivotal(std::vector<Int> &pivotal_elements,
         Int mEl = el->nrows;
         Int nEl = el->ncols;
 
+        //Int *el_colIndex = colIndex_pointer (curEl);
+        Int *el_colIndex = (Int*)(el+1);
+
         // Int *el_rowIndex = rowIndex_pointer (el);
         Int *el_rowIndex = (Int *)(el + 1) + nEl;
 
         // Int *rowRelIndex = relRowInd (el);
         Int *rowRelIndex = (Int *)(el + 1) + 2 * nEl + mEl;
+
+
 
         PRLEVEL(1, ("%% rowMark=%ld;\n", rowMark));
 
@@ -176,6 +181,32 @@ void paru_pivotal(std::vector<Int> &pivotal_elements,
             Int curRow = el_rowIndex[rEl];
             PRLEVEL(1, ("%% curRow =%ld rEl=%ld\n", curRow, rEl));
             if (curRow < 0) continue;  // that row has already deleted
+            #if 1
+            //FIXME
+            //look at the pivotal columns and check if there is any nonzeros
+            //if there is none I can skip adding this row
+            bool nz_found = false;
+            for (Int cEl = el->lac; cEl < nEl; cEl++)
+            {
+                if (el_colIndex[cEl] < 0)  // already assembled somewhere
+                    continue;
+                if (el_colIndex[cEl] >= col2) break;
+
+                //double *el_Num = numeric_pointer (el);
+                double *el_Num= (double*)((Int*)(el+1) + 2*nEl+ 2*mEl);
+                if (el_Num [cEl*mEl+rEl] != 0.0)
+                {
+                    nz_found = true;
+                    break;
+                }
+            }
+            if (!nz_found)
+            { 
+                PRLEVEL(1, ("%% Found a row with all zeroes!! "
+                            "curRow =%ld el=%ld\n", curRow, e));
+                continue;
+            }
+            #endif
 #ifndef NDEBUG
             Int p = 1;
             if (p <= 0) paru_print_element(paruMatInfo, e);
@@ -490,7 +521,7 @@ void paru_pivotal(std::vector<Int> &pivotal_elements,
             PRLEVEL(p, (" %2.5lf\t", pivotalFront[(c - col1) * rowCount + r]));
         PRLEVEL(p, ("\n"));
     }
-    PRLEVEL(p, (" ]; \n"));
+    PRLEVEL(p, (" ]; %% %ld*%ld\n", rowCount,fp));
     p = -1;
  
 #endif
