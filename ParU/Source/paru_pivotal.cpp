@@ -163,9 +163,6 @@ void paru_pivotal(std::vector<Int> &pivotal_elements,
         Int mEl = el->nrows;
         Int nEl = el->ncols;
 
-        // Int *el_colIndex = colIndex_pointer (curEl);
-        Int *el_colIndex = (Int *)(el + 1);
-
         // Int *el_rowIndex = rowIndex_pointer (el);
         Int *el_rowIndex = (Int *)(el + 1) + nEl;
 
@@ -174,7 +171,7 @@ void paru_pivotal(std::vector<Int> &pivotal_elements,
 
         PRLEVEL(1, ("%% rowMark=%ld;\n", rowMark));
 
-        el->nz_pc = 1; // initializing ; assuming there is some nz in the
+        el->nz_pc = 1;  // initializing ; assuming there is some nz in the
 
         for (Int rEl = 0; rEl < mEl; rEl++)
         {
@@ -185,7 +182,7 @@ void paru_pivotal(std::vector<Int> &pivotal_elements,
 #ifndef NDEBUG
             Int p = 1;
             if (p <= 0) paru_print_element(paruMatInfo, e);
-//            stl_rowSet.insert(curRow);
+            //            stl_rowSet.insert(curRow);
             PRLEVEL(1, ("%% %p ---> isRowInFront [%ld]=%ld\n",
                         isRowInFront + curRow, curRow, isRowInFront[curRow]));
 #endif
@@ -193,8 +190,12 @@ void paru_pivotal(std::vector<Int> &pivotal_elements,
             if (isRowInFront[curRow] < rowMark)
             {  // first time seeing curRow
 #if 1
+
+                // Int *el_colIndex = colIndex_pointer (curEl);
+                Int *el_colIndex = (Int *)(el + 1);
+
                 // FIXME
-               // checkikng if the numerical values are hard zero
+                // checkikng if the numerical values are hard zero
                 // look at the pivotal columns and check if there is any
                 // nonzeros if there is none I can skip adding this row
                 bool nz_found = false;
@@ -220,8 +221,11 @@ void paru_pivotal(std::vector<Int> &pivotal_elements,
                                 "curRow =%ld el=%ld\n",
                                 curRow, e));
 
-                    p = -1;
+                    rowRelIndex[rEl] = -1;
+#ifndef NDEBUG
+                    Int p = -1;
                     if (p <= 0) paru_print_element(paruMatInfo, e);
+#endif
                     continue;
                 }
 #endif

@@ -84,13 +84,16 @@ Int paru_panel_factorize(Int f, Int m, Int n, const Int panel_width,
     // column jth of the panel
     for (Int j = j1; j < j2; j++)
     {
-        // TODO: use the original diagonal value as a default
+
+        //for fat fronts
+        if (j >= row_end) break;
 
         PRLEVEL(1, ("%% j = %ld\n", j));
 
         // Initializing maximum element in the column
         Int row_max = j;
 #ifndef NDEBUG
+        // FIXME a problem here
         Int row_deg_max = row_degree_bound[frowList[row_max]];
 #endif
         double maxval = F[j * m + row_max];
@@ -182,7 +185,7 @@ Int paru_panel_factorize(Int f, Int m, Int n, const Int panel_width,
         p = 1;
         if (row_piv != row_max) PRLEVEL(p, ("%% \n"));
         PRLEVEL(p, ("%% After Swaping\n"));
-        PRLEVEL(p, (" ;\n"));
+        PRLEVEL(p, (" \n"));
         for (Int r = 0; r < row_end; r++)
         {
             PRLEVEL(p, ("%% %ld\t", frowList[r]));
@@ -200,9 +203,9 @@ Int paru_panel_factorize(Int f, Int m, Int n, const Int panel_width,
             for (Int i = j + 1; i < row_end; i++)
             {
                 PRLEVEL(1,
-                        ("%%i=%ld before cal value= %2.4lf", i, F[j * m + i]));
+                        ("%%i=%ld value= %2.4lf", i, F[j * m + i]));
                 F[j * m + i] /= piv;
-                PRLEVEL(1, (" after dscal value= %2.4lf\n", F[j * m + i]));
+                PRLEVEL(1, (" -> %2.4lf\n", F[j * m + i]));
             }
         }
 
@@ -274,10 +277,10 @@ Int paru_panel_factorize(Int f, Int m, Int n, const Int panel_width,
 #ifndef NDEBUG  // Printing the pivotal front
         Int p = 1;
         PRLEVEL(p, ("%% After dger\n"));
-        for (Int r = j1; r < row_end; r++)
+        for (Int r = j; r < row_end; r++)
         {
             PRLEVEL(p, ("%% %ld\t", frowList[r]));
-            for (Int c = j1; c < j2; c++)
+            for (Int c = j; c < j2; c++)
                 PRLEVEL(p, (" %2.5lf\t", F[c * m + r]));
             PRLEVEL(p, ("\n"));
         }

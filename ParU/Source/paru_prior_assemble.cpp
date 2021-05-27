@@ -95,7 +95,7 @@ void paru_prior_assemble(Int f, Int start_fac,
 #ifndef NDEBUG
     Int *lacList = paruMatInfo->lacList;
     PRLEVEL(p, ("%% current heap:\n %%"));
-    for (Int k = 0; k < curHeap->size(); k++)
+    for (Int k = 0; k < (Int) curHeap->size(); k++)
     {
         Int ee = (*curHeap)[k];
         paru_Element *ell = elementList[ee];
