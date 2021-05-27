@@ -86,7 +86,7 @@ $(OBJ): $(INC)
 I = -I ../../UMFPACK/Source -I../../UMFPACK/Include -I ../../CHOLMOD/Include\
 	-I ../../AMD/Include  -I ../../SuiteSparse_config -I../Include
 
-FLAG = -Wno-write-strings   -Wall -Werror  -Wnull-dereference -Wl,--verbose\
+FLAG = -Wno-write-strings   -Wall #-Werror  -Wnull-dereference -Wl,--verbose\
        #  -Wextra  -Wpedantic -Wshadow -Wnon-virtual-dtor #development
 
 

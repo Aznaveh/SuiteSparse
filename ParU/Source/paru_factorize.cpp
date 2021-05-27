@@ -44,7 +44,7 @@ Int paru_panel_factorize(Int f, Int m, Int n, const Int panel_width,
 {
     // works like dgetf2f.f in netlib v3.0  here is a link:
     // https://github.com/xianyi/OpenBLAS/blob/develop/reference/dgetf2f.f
-    DEBUGLEVEL(0);
+    DEBUGLEVEL(1);
     PRLEVEL(1, ("%% Inside panel factorization %ld \n", panel_num));
 
     Int *row_degree_bound = paruMatInfo->row_degree_bound;
@@ -254,8 +254,9 @@ Int paru_panel_factorize(Int f, Int m, Int n, const Int panel_width,
             PRLEVEL(p, ("%% lda =%d ", lda));
             PRLEVEL(p, ("%% M =%d ", M));
             PRLEVEL(p, ("N =%d \n %%", N));
+            PRLEVEL(p, ("%% x= (%d)", N));
             for (Int i = 0; i < M; i++) PRLEVEL(p, (" %lf ", X[i]));
-            PRLEVEL(p, ("\n %% y= %d", N));
+            PRLEVEL(p, ("\n %% y= (%d)", N));
             for (Int j = 0; j < N; j++) PRLEVEL(p, (" %lf ", Y[j * m]));
             PRLEVEL(p, ("\n"));
 
@@ -271,7 +272,7 @@ Int paru_panel_factorize(Int f, Int m, Int n, const Int panel_width,
         }
 
 #ifndef NDEBUG  // Printing the pivotal front
-        Int p = 2;
+        Int p = 1;
         PRLEVEL(p, ("%% After dger\n"));
         for (Int r = j1; r < row_end; r++)
         {
@@ -286,6 +287,7 @@ Int paru_panel_factorize(Int f, Int m, Int n, const Int panel_width,
 }
 
 // LU solve; I am not using it anymore-- I have my own dense lu solver
+#if 0
 Int paru_dgetrf(double *F, Int *frowList, Int lm, Int ln, BLAS_INT *ipiv)
 {
     DEBUGLEVEL(0);
@@ -376,12 +378,13 @@ Int paru_dgetrf(double *F, Int *frowList, Int lm, Int ln, BLAS_INT *ipiv)
     }
     return 0;
 }
+#endif
 
 Int paru_factorize(Int f, Int start_fac, std::vector<Int> &panel_row,
                    std::set<Int> &stl_colSet,
                    std::vector<Int> &pivotal_elements, paru_matrix *paruMatInfo)
 {
-    DEBUGLEVEL(0);
+    DEBUGLEVEL(1);
 
     Int *Super = paruMatInfo->LUsym->Super;
     Int col1 = Super[f]; /* fornt F has columns col1:col2-1 */

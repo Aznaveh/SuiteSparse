@@ -44,12 +44,12 @@ extern "C"
 #endif
 
 // for printing information uncomment this; to activate assertions uncomment
-//#undef NPR    //<<1>>
+#undef NPR    //<<1>>
 
 // from spqr.hpp
 // Aznaveh For MATLAB OUTPUT UNCOMMENT HERE
 // uncomment the following line to turn on debugging
-//#undef NDEBUG  //<<2>>
+#undef NDEBUG  //<<2>>
 
 // uncomment if you want to count hardware flops
 //#define COUNT_FLOPS
@@ -257,16 +257,18 @@ typedef struct
 
     Int
 
-        nrowsleft, /* number of rows remaining */
-        ncolsleft, /* number of columns remaining */
-        nrows,     /* number of rows */
-        ncols,     /* number of columns */
-        rValid,    /* validity of relative row index */
-        cValid;    /* validity of relative column index */
+        nrowsleft, // number of rows remaining
+        ncolsleft, // number of columns remaining
+        nrows,     // number of rows
+        ncols,     // number of columns
+        rValid,    // validity of relative row index
+        cValid;    // validity of relative column index
 
     Int lac;  // least active column which is active
               // 0 <= lac <= ncols
 
+    Int nz_pc;     // 0 if there is only zeros in 'current' pivotal columns
+                   // 1 other wize
     size_t size_allocated ;
     /* followed in memory by:
        Int
