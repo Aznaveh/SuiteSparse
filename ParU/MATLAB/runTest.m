@@ -63,8 +63,7 @@ for k = 1:nmat
         id == 2843 ||    id == 2844 || id == 2845 || id == 1396 || ...
         id == 1397 || ... %ordering failed
        id == 1404 || id == 1297 || id == 788 || id == 1373 || id == 2265 || ...
-       id == 274 ||  id == 273 || id ==141 || ...%newer tests
-      % id == 334 || id == 158
+       id == 274 ||  id == 273 || id == 174 || id == 2015 || id == 2104 || ...%newer tests singular??
        id == 2267 || id == 2649 || id == 2847 || id == 2337 || id == 2841)  
 
         continue;
@@ -75,7 +74,7 @@ for k = 1:nmat
     Prob = ssget(id);
     Aorig = Prob.A;
 
-    if (nnz(Aorig) < NNZMat)
+    if (nnz(Aorig) > NNZMat)
             continue;
     end
  
@@ -106,13 +105,13 @@ for k = 1:nmat
     end
 
 
-    if (nnz(A) < NNZMat)
+    if (nnz(A) > NNZMat)
             continue;
     end
 
     loop_cnt = loop_cnt + 1;
  
-    if (loop_cnt > 50)
+    if (loop_cnt > 1150)
         break
     end
 

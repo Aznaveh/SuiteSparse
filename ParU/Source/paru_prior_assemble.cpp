@@ -13,7 +13,7 @@ void paru_prior_assemble(Int f, Int start_fac,
                          std::vector<Int> &colHash, heaps_info &hi,
                          paru_matrix *paruMatInfo, cholmod_common *cc)
 {
-    DEBUGLEVEL(0);
+    DEBUGLEVEL(1);
 
     work_struct *Work = paruMatInfo->Work;
     Int *elCol = Work->elCol;
@@ -51,22 +51,27 @@ void paru_prior_assemble(Int f, Int start_fac,
 #endif
 
         // TODO: fix for the CBs with pivotal rows only zero
-        if ( (el->rValid == pMark || elCol[e] == 0) && el->nz_pc == 1)
-        // it can be eliminated fully
-        // both a pivotal column and pivotal row
+        if (el->nzr_pc == 0)  // if all the rows are available in current front
         {
-            PRLEVEL(p, ("%%assembling %ld in %ld\n", e, el_ind));
-            PRLEVEL(p, ("%% size %ld x %ld\n", el->nrows, el->ncols));
-            paru_eliminate_all(e, f, colHash, paruMatInfo, cc);
-            PRLEVEL(p, ("%%assembling %ld in %ld done\n", e, el_ind));
-            continue;
-        }
+            if (el->rValid == pMark || elCol[e] == 0)
+            // it can be eliminated fully
+            // both a pivotal column and pivotal row
+            {
+                PRLEVEL(p, ("%%assembling %ld in %ld\n", e, el_ind));
+                PRLEVEL(p, ("%% size %ld x %ld\n", el->nrows, el->ncols));
+                paru_eliminate_all(e, f, colHash, paruMatInfo, cc);
+                PRLEVEL(p, ("%%assembling %ld in %ld done\n", e, el_ind));
+                continue;
+            }
 
-        PRLEVEL(p, ("%%assembling %ld in %ld\n", e, el_ind));
-        paru_eliminate_cols(e, f, colHash, paruMatInfo, cc);
-        PRLEVEL(p, ("%%partial col assembly%ld in %ld done\n", e, el_ind));
-        if (elementList[e] == NULL) continue;
-        pivotal_elements[ii++] = pivotal_elements[i];
+            PRLEVEL(p, ("%%assembling %ld in %ld\n", e, el_ind));
+            paru_eliminate_cols(e, f, colHash, paruMatInfo, cc);
+            PRLEVEL(p, ("%%partial col assembly%ld in %ld done\n", e, el_ind));
+            if (elementList[e] == NULL) continue;
+       }
+        //keeping current element
+        pivotal_elements[ii++] = pivotal_elements[i]; 
+
     }
 
     if (ii < (Int)pivotal_elements.size())
@@ -76,10 +81,11 @@ void paru_prior_assemble(Int f, Int start_fac,
         pivotal_elements.resize(ii);
     }
 
-    /************ Making the heap from list of the immediate children ******/
+    /************ Making the heap from list of the immediate children
+     * ******/
     PRLEVEL(1, ("%% Next: work on the heap \n"));
     paru_make_heap(f, start_fac, pivotal_elements, hi, colHash, paruMatInfo,
-                   cc);
+            cc);
     PRLEVEL(1, ("%% Done: work on the heap \n"));
 
     Int eli = snM[f];
@@ -95,7 +101,7 @@ void paru_prior_assemble(Int f, Int start_fac,
 #ifndef NDEBUG
     Int *lacList = paruMatInfo->lacList;
     PRLEVEL(p, ("%% current heap:\n %%"));
-    for (Int k = 0; k < (Int) curHeap->size(); k++)
+    for (Int k = 0; k < (Int)curHeap->size(); k++)
     {
         Int ee = (*curHeap)[k];
         paru_Element *ell = elementList[ee];

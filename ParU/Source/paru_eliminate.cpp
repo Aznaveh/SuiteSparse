@@ -165,7 +165,7 @@ void paru_eliminate_cols ( Int e, Int f,
 
 {
 
-    DEBUGLEVEL(0);
+    DEBUGLEVEL(1);
 #ifndef NDEBUG  
     Int p = 1;
     Int c = 0; //number of columns assembled
@@ -176,7 +176,7 @@ void paru_eliminate_cols ( Int e, Int f,
 
     PRLEVEL (p, ("%% Eliminat some cols of %ld in %ld\n", e, eli));
 #ifndef NDEBUG
-    p = 1;
+    p = -1;
 
     PRLEVEL (p, ("%% %ld :\n", eli));
     if (p <= 0) paru_print_element (paruMatInfo, eli);

@@ -44,7 +44,7 @@ Int paru_panel_factorize(Int f, Int m, Int n, const Int panel_width,
 {
     // works like dgetf2f.f in netlib v3.0  here is a link:
     // https://github.com/xianyi/OpenBLAS/blob/develop/reference/dgetf2f.f
-    DEBUGLEVEL(1);
+    DEBUGLEVEL(0);
     PRLEVEL(1, ("%% Inside panel factorization %ld \n", panel_num));
 
     Int *row_degree_bound = paruMatInfo->row_degree_bound;
@@ -387,7 +387,7 @@ Int paru_factorize(Int f, Int start_fac, std::vector<Int> &panel_row,
                    std::set<Int> &stl_colSet,
                    std::vector<Int> &pivotal_elements, paru_matrix *paruMatInfo)
 {
-    DEBUGLEVEL(1);
+    DEBUGLEVEL(0);
 
     Int *Super = paruMatInfo->LUsym->Super;
     Int col1 = Super[f]; /* fornt F has columns col1:col2-1 */

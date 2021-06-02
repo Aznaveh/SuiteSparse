@@ -17,7 +17,7 @@ void paru_pivotal(std::vector<Int> &pivotal_elements,
                   std::vector<Int> &panel_row, Int f, heaps_info &hi,
                   paru_matrix *paruMatInfo, cholmod_common *cc)
 {
-    DEBUGLEVEL(0);
+    DEBUGLEVEL(1);
     paru_symbolic *LUsym = paruMatInfo->LUsym;
     Int *snM = LUsym->super2atree;
     std::vector<Int> **heapList = paruMatInfo->heapList;
@@ -148,6 +148,7 @@ void paru_pivotal(std::vector<Int> &pivotal_elements,
 
     Int *frowList = paruMatInfo->frowList[f];
     Int rowCount = 0;
+    Int zero_piv_rows = 0;
 
     /*************** finding set of rows in current front *********************/
     for (Int i = 0; i < (Int)pivotal_elements.size(); i++)
@@ -159,6 +160,10 @@ void paru_pivotal(std::vector<Int> &pivotal_elements,
         PRLEVEL(p, ("current element(%ld) ", e));
         PRLEVEL(p, ("lac = %ld ", el->lac));
         PRLEVEL(p, ("lac_col = %ld\n ", lacList[e]));
+#ifndef NDEBUG
+        Int p = -1;
+        if (p <= 0) paru_print_element(paruMatInfo, e);
+#endif
 
         Int mEl = el->nrows;
         Int nEl = el->ncols;
@@ -171,7 +176,7 @@ void paru_pivotal(std::vector<Int> &pivotal_elements,
 
         PRLEVEL(1, ("%% rowMark=%ld;\n", rowMark));
 
-        el->nz_pc = 1;  // initializing ; assuming there is some nz in the
+        el->nzr_pc = 0;  // initializing ; number of zero rows 
 
         for (Int rEl = 0; rEl < mEl; rEl++)
         {
@@ -180,8 +185,6 @@ void paru_pivotal(std::vector<Int> &pivotal_elements,
             if (curRow < 0) continue;  // that row has already deleted
 
 #ifndef NDEBUG
-            Int p = 1;
-            if (p <= 0) paru_print_element(paruMatInfo, e);
             //            stl_rowSet.insert(curRow);
             PRLEVEL(1, ("%% %p ---> isRowInFront [%ld]=%ld\n",
                         isRowInFront + curRow, curRow, isRowInFront[curRow]));
@@ -216,16 +219,18 @@ void paru_pivotal(std::vector<Int> &pivotal_elements,
                 }
                 if (!nz_found)
                 {
-                    el->nz_pc = 0;
+                    el->nzr_pc++;
                     PRLEVEL(1, ("%% Found a row with all zeroes!! "
                                 "curRow =%ld el=%ld\n",
                                 curRow, e));
 
+                    zero_piv_rows++;
                     rowRelIndex[rEl] = -1;
 #ifndef NDEBUG
                     Int p = -1;
                     if (p <= 0) paru_print_element(paruMatInfo, e);
 #endif
+                    // Not adding the row
                     continue;
                 }
 #endif
@@ -270,6 +275,29 @@ void paru_pivotal(std::vector<Int> &pivotal_elements,
 #endif
     }
 
+    if (rowCount < fp)
+    {
+#ifndef NDEBUG
+        p = -2;
+        // there is a structural problem
+        PRLEVEL(p,
+                ("%%STRUCTURAL PROBLEM! rowCount=%ld, fp =%ld", rowCount, fp));
+#endif
+        if (rowCount + zero_piv_rows > fp)
+        {
+            PRLEVEL(p,
+                    (" it can be solved by adding %ld zeros", zero_piv_rows));
+        }
+        else
+        {
+            PRLEVEL(p, (" it wil FAIL"));
+        }
+#ifndef NDEBUG
+        PRLEVEL(p, ("\n"));
+        p=1;
+#endif
+    }
+
     // make sure that all panel_row is correctly initialized
     PRLEVEL(p, ("%% num_panels: %ld \n ", num_panels));
     PRLEVEL(p, ("%% panel_row: \n %%"));
@@ -299,8 +327,8 @@ void paru_pivotal(std::vector<Int> &pivotal_elements,
     for (Int i = 0; i < num_panels; i++) PRLEVEL(p, ("%ld ", panel_row[i]));
     PRLEVEL(p, ("\n"));
     PRLEVEL(p, ("%%There are %ld rows x %ld columns %ld - %ld "
-                "in this front: \n %%",
-                rowCount, fp, col1, col2));
+                "in front %ld with %ld zero rows: \n %%",
+                rowCount, fp, col1, col2, f, zero_piv_rows));
     for (Int i = 0; i < rowCount; i++) PRLEVEL(p, (" %ld", frowList[i]));
     PRLEVEL(p, ("\n"));
     Int stl_rowSize = stl_rowSet.size();
@@ -346,12 +374,12 @@ void paru_pivotal(std::vector<Int> &pivotal_elements,
     paruMatInfo->frowList[f] = frowList;
 
     double *pivotalFront = (double *)paru_stack_calloc(
-        rowCount * fp, sizeof(double), paruMatInfo, cc);
+            rowCount * fp, sizeof(double), paruMatInfo, cc);
 
     if (pivotalFront == NULL)
     {
         printf("%% Out of memory when tried to allocate for pivotal part %ld",
-               f);
+                f);
         // paru_free ( num_panels, sizeof (Int), panel_row, cc);
         return;
     }
@@ -368,9 +396,9 @@ void paru_pivotal(std::vector<Int> &pivotal_elements,
     PRLEVEL(p, ("%% LUs=%ld ", paruMatInfo->actual_alloc_LUs));
     PRLEVEL(p, ("%% pivotalFront = %p size=%ld", pivotalFront, rowCount * fp));
     Int act = paruMatInfo->actual_alloc_LUs + paruMatInfo->actual_alloc_Us +
-              paruMatInfo->actual_alloc_row_int;
+        paruMatInfo->actual_alloc_row_int;
     Int upp = LUsym->Us_bound_size + LUsym->LUs_bound_size +
-              LUsym->row_Int_bound + LUsym->col_Int_bound;
+        LUsym->row_Int_bound + LUsym->col_Int_bound;
     PRLEVEL(p, ("%% MEM=%ld percent=%lf%%", act, 100.0 * act / upp));
     PRLEVEL(p, ("%% MEM=%ld percent=%lf%%\n", act, 100.0 * act / upp));
     p = 1;
@@ -457,7 +485,7 @@ void paru_pivotal(std::vector<Int> &pivotal_elements,
             // changes everyting
             // assemble cEl
             assemble_col(el_Num + cEl * mEl,
-                         pivotalFront + colIndexF * rowCount, mEl, rowRelIndex);
+                    pivotalFront + colIndexF * rowCount, mEl, rowRelIndex);
 
             el_colIndex[cEl] = flip(el_colIndex[cEl]);
             el->ncolsleft--;
@@ -517,7 +545,7 @@ void paru_pivotal(std::vector<Int> &pivotal_elements,
     PRLEVEL(p, ("\n"));
 
     p = -2;
-    PRLEVEL(p, ("%% After all the assemble %ld\n", f));
+    PRLEVEL(p, ("%% After all the assemble %ld, z=%ld\n", f, zero_piv_rows));
     PRLEVEL(p, ("%% x =  \t"));
     for (Int c = col1; c < col2; c++) PRLEVEL(p, ("%ld\t\t", c));
     PRLEVEL(p, (" ;\n"));

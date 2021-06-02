@@ -44,12 +44,12 @@ extern "C"
 #endif
 
 // for printing information uncomment this; to activate assertions uncomment
-#undef NPR    //<<1>>
+//#undef NPR    //<<1>>
 
 // from spqr.hpp
 // Aznaveh For MATLAB OUTPUT UNCOMMENT HERE
 // uncomment the following line to turn on debugging
-#undef NDEBUG  //<<2>>
+//#undef NDEBUG  //<<2>>
 
 // uncomment if you want to count hardware flops
 //#define COUNT_FLOPS
@@ -267,8 +267,8 @@ typedef struct
     Int lac;  // least active column which is active
               // 0 <= lac <= ncols
 
-    Int nz_pc;     // 0 if there is only zeros in 'current' pivotal columns
-                   // 1 other wize
+    Int nzr_pc;     // number of zero rows in pivotal column of current front
+
     size_t size_allocated ;
     /* followed in memory by:
        Int
