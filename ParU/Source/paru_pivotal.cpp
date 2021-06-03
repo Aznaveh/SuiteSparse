@@ -17,7 +17,7 @@ void paru_pivotal(std::vector<Int> &pivotal_elements,
                   std::vector<Int> &panel_row, Int f, heaps_info &hi,
                   paru_matrix *paruMatInfo, cholmod_common *cc)
 {
-    DEBUGLEVEL(1);
+    DEBUGLEVEL(0);
     paru_symbolic *LUsym = paruMatInfo->LUsym;
     Int *snM = LUsym->super2atree;
     std::vector<Int> **heapList = paruMatInfo->heapList;
@@ -161,7 +161,7 @@ void paru_pivotal(std::vector<Int> &pivotal_elements,
         PRLEVEL(p, ("lac = %ld ", el->lac));
         PRLEVEL(p, ("lac_col = %ld\n ", lacList[e]));
 #ifndef NDEBUG
-        Int p = -1;
+        Int p = 1;
         if (p <= 0) paru_print_element(paruMatInfo, e);
 #endif
 
@@ -227,7 +227,7 @@ void paru_pivotal(std::vector<Int> &pivotal_elements,
                     zero_piv_rows++;
                     rowRelIndex[rEl] = -1;
 #ifndef NDEBUG
-                    Int p = -1;
+                    Int p = 1;
                     if (p <= 0) paru_print_element(paruMatInfo, e);
 #endif
                     // Not adding the row
@@ -544,7 +544,7 @@ void paru_pivotal(std::vector<Int> &pivotal_elements,
         PRLEVEL(p, ("%ld ", pivotal_elements[i]));
     PRLEVEL(p, ("\n"));
 
-    p = -2;
+    p = 2;
     PRLEVEL(p, ("%% After all the assemble %ld, z=%ld\n", f, zero_piv_rows));
     PRLEVEL(p, ("%% x =  \t"));
     for (Int c = col1; c < col2; c++) PRLEVEL(p, ("%ld\t\t", c));

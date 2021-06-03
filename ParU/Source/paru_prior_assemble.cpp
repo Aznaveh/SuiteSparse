@@ -13,7 +13,7 @@ void paru_prior_assemble(Int f, Int start_fac,
                          std::vector<Int> &colHash, heaps_info &hi,
                          paru_matrix *paruMatInfo, cholmod_common *cc)
 {
-    DEBUGLEVEL(1);
+    DEBUGLEVEL(0);
 
     work_struct *Work = paruMatInfo->Work;
     Int *elCol = Work->elCol;

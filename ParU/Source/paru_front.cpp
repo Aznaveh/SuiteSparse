@@ -576,9 +576,9 @@ int paru_front(paru_matrix *paruMatInfo,
     //        ASSERT ( isRowInFront [i] < rowMark);
 #endif
 
-    PRLEVEL(1, ("%%rowCount =%ld\n", rowCount));
-    PRLEVEL(1, ("%%colCount =%ld\n", colCount));
-    PRLEVEL(-1, ("fp =%ld;\n", fp));
+    PRLEVEL(1, ("%%rowCount =%ld  ", rowCount));
+    PRLEVEL(1, ("colCount =%ld", colCount));
+    PRLEVEL(1, ("fp =%ld;\n", fp));
     PRLEVEL(1, ("%%~~~~~~~Assemble Front %ld finished\n", f));
     return 0;
 }

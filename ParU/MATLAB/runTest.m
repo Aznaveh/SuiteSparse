@@ -74,7 +74,7 @@ for k = 1:nmat
     Prob = ssget(id);
     Aorig = Prob.A;
 
-    if (nnz(Aorig) > NNZMat)
+    if (nnz(Aorig) < NNZMat)
             continue;
     end
  
@@ -105,13 +105,13 @@ for k = 1:nmat
     end
 
 
-    if (nnz(A) > NNZMat)
+    if (nnz(A) < NNZMat)
             continue;
     end
 
     loop_cnt = loop_cnt + 1;
  
-    if (loop_cnt > 1150)
+    if (loop_cnt > 2150)
         break
     end
 
