@@ -10,29 +10,31 @@ fprintf(ff,' myflop umfflop ratio');
 %fprintf(ff,' hardwareflop ratio/myflop');  %if COUNT_FLOP
 fprintf(ff,' \n results = [');
 
-for n = 2:32
+for n = 2:512
     %generating the matrix
-    %A = meshsparse(meshnd(n,n));
+    A = meshsparse(meshnd(n,n));
     %or 
     n
-    A = meshsparse(meshnd(n,n,n));
+    %A = meshsparse(meshnd(n,n,n));
     spy(A);
     [m nn] = size (A);
-    pause(1)
+    pause(1e-9)
 
     %writing the matrix and run my code
     mmwrite('../Matrix/ParUTst/tmp.mtx', A);
+    my_path = '../Demo/Res/';
+
 
 
 
     str = sprintf ('../Demo/umfout %d < ../Matrix/ParUTst/tmp.mtx', n );
     info_name = sprintf ('%d_info.txt',n);
-    infofullname = strcat(path, info_name);
+    infofullname = strcat(my_path, info_name);
 
 
     for i=1:5
-        %intel = sprintf('. /opt/intel/compilers_and_libraries/linux/bin/compilervars.sh intel64;');
-        %str = strcat(intel, str);
+        intel = sprintf('. /opt/intel/compilers_and_libraries/linux/bin/compilervars.sh intel64;');
+        str = strcat(intel, str);
         system(str);
         t_Info = load (infofullname);
         a_myElaps(i) = t_Info(1);
@@ -47,23 +49,31 @@ for n = 2:32
     fromCode_umf_Elaps = mean(a_fromCode_umf_Elaps);
 
 
-    % Loading the results into Matlab
-    path = '../Demo/Res/';
+
+    %one time test
+    % intel = sprintf('. /opt/intel/compilers_and_libraries/linux/bin/compilervars.sh intel64;');
+    % str = strcat(intel, str);
+    % system(str);
+    % t_Info = load (infofullname);
+    % myElaps = t_Info(1);
+    % fromCode_umf_Elaps = t_Info(2);
+
+
 
     row_name = sprintf ('%d_row.txt',n);
-    rowfullname = strcat(path, row_name);
+    rowfullname = strcat(my_path, row_name);
     rowp = load (rowfullname);
     rowp = rowp+1;
 
 
     col_name = sprintf ('%d_col.txt',n);
-    colfullname = strcat(path, col_name);
+    colfullname = strcat(my_path, col_name);
     colp = load (colfullname);
     colp = colp+1;
 
 
     LU_name = sprintf ('%d_LU.txt',n);
-    LUfullname = strcat(path, LU_name);
+    LUfullname = strcat(my_path, LU_name);
 
 
     %reading the output
@@ -113,10 +123,10 @@ for n = 2:32
     %fprintf(ff,' %g %g ', hardware_flp_cnt, hardware_flp_cnt/myflop);
     fprintf(ff,' \n');
     % cleaning the files because of the memory problem
-    str = ['rm  ' path LU_name];    system(str);
-    str = ['rm  ' path col_name];    system(str);
-    str = ['rm  ' path row_name];    system(str);
-    str = ['rm  ' path info_name];    system(str);
+    str = ['rm  ' my_path LU_name];    system(str);
+    str = ['rm  ' my_path col_name];    system(str);
+    str = ['rm  ' my_path row_name];    system(str);
+    str = ['rm  ' my_path info_name];    system(str);
 end
 
 fprintf(ff,'];\n\n');
