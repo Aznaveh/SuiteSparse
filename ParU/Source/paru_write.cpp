@@ -199,7 +199,25 @@ void paru_write(paru_matrix *paruMatInfo, int scale, char *id,
         Int col1 = Super[f];
         Int col2 = Super[f + 1];
         Int fp = col2 - col1;
-        nnz += fp * (rowCount + colCount);
+        // nnz += fp * (rowCount + colCount);
+
+        double *pivotalFront = LUs[f].p;
+        double *uPart = Us[f].p;
+        for (Int j = col1; j < col2; j++)
+        {
+            for (Int i = 0; i < rowCount; i++)
+            {
+                if (pivotalFront[(j - col1) * rowCount + i] != 0.0) nnz++;
+            }
+        }
+
+        for (Int j = 0; j < colCount; j++)
+            for (Int i = 0; i < fp; i++)
+            {
+                {
+                    if (uPart[fp * j + i] != 0.0) nnz++;
+                }
+            }
     }
     nnz += LUsym->anz - LUsym->snz;  // adding singletons
 
@@ -227,9 +245,10 @@ void paru_write(paru_matrix *paruMatInfo, int scale, char *id,
         for (Int j = col1; j < col2; j++)
             for (Int i = 0; i < rowCount; i++)
             {
-                fprintf(LUfptr, "%ld  %ld %.17g\n",
-                        newRofS[frowList[i]] + n1 + 1, j + n1 + 1,
-                        pivotalFront[(j - col1) * rowCount + i]);
+                if (pivotalFront[(j - col1) * rowCount + i] != 0.0)
+                    fprintf(LUfptr, "%ld  %ld %.17g\n",
+                            newRofS[frowList[i]] + n1 + 1, j + n1 + 1,
+                            pivotalFront[(j - col1) * rowCount + i]);
             }
 
 #ifndef NDEBUG  // Printing the pivotal front
@@ -251,9 +270,10 @@ void paru_write(paru_matrix *paruMatInfo, int scale, char *id,
         for (Int j = 0; j < colCount; j++)
             for (Int i = 0; i < fp; i++)
             {
-                fprintf(LUfptr, "%ld  %ld %.17g\n",
-                        newRofS[frowList[i]] + n1 + 1, fcolList[j] + n1 + 1,
-                        uPart[fp * j + i]);
+                if (uPart[fp * j + i] != 0.0)
+                    fprintf(LUfptr, "%ld  %ld %.17g\n",
+                            newRofS[frowList[i]] + n1 + 1, fcolList[j] + n1 + 1,
+                            uPart[fp * j + i]);
             }
 #ifndef NDEBUG  // Printing the  U part
         p = 1;

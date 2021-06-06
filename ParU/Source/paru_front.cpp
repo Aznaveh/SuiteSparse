@@ -18,7 +18,7 @@ int paru_front(paru_matrix *paruMatInfo,
                Int f, /* front need to be assembled */
                cholmod_common *cc)
 {
-    DEBUGLEVEL(-1);
+    DEBUGLEVEL(-2);
     /*
      * -2 Print Nothing
      * -1 Just Matlab
@@ -521,6 +521,7 @@ int paru_front(paru_matrix *paruMatInfo,
 
 #ifdef COUNT_FLOPS
     paruMatInfo->flp_cnt_dgemm += (double)2 * (rowCount - fp) * fp * colCount;
+#if 0
     for (Int ii = 0; ii < fp; ii++)
         for (Int jj = 0; jj < colCount; jj++)
             for (Int kk = fp; kk < rowCount; kk++)
@@ -529,6 +530,7 @@ int paru_front(paru_matrix *paruMatInfo,
                     pivotalFront[rowCount * ii + kk] != 0)
                     paruMatInfo->flp_cnt_real_dgemm += 2.0;
             }
+#endif
 
     PRLEVEL(p, ("\n%% FlopCount Dgemm front %ld %ld %ld \n", rowCount - fp, fp,
                 colCount));

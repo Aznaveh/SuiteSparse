@@ -192,7 +192,7 @@ void paru_pivotal(std::vector<Int> &pivotal_elements,
 
             if (isRowInFront[curRow] < rowMark)
             {  // first time seeing curRow
-#if 1
+#if 0
 
                 // Int *el_colIndex = colIndex_pointer (curEl);
                 Int *el_colIndex = (Int *)(el + 1);
@@ -327,7 +327,7 @@ void paru_pivotal(std::vector<Int> &pivotal_elements,
     for (Int i = 0; i < num_panels; i++) PRLEVEL(p, ("%ld ", panel_row[i]));
     PRLEVEL(p, ("\n"));
     PRLEVEL(p, ("%%There are %ld rows x %ld columns %ld - %ld "
-                "in front %ld with %ld zero rows: \n %%",
+                "in front %ld with %ld zero rows: \n%%",
                 rowCount, fp, col1, col2, f, zero_piv_rows));
     for (Int i = 0; i < rowCount; i++) PRLEVEL(p, (" %ld", frowList[i]));
     PRLEVEL(p, ("\n"));
