@@ -176,7 +176,7 @@ void paru_pivotal(std::vector<Int> &pivotal_elements,
 
         PRLEVEL(1, ("%% rowMark=%ld;\n", rowMark));
 
-        el->nzr_pc = 0;  // initializing ; number of zero rows 
+        el->nzr_pc = 0;  // initializing ; number of zero rows
 
         for (Int rEl = 0; rEl < mEl; rEl++)
         {
@@ -192,7 +192,7 @@ void paru_pivotal(std::vector<Int> &pivotal_elements,
 
             if (isRowInFront[curRow] < rowMark)
             {  // first time seeing curRow
-#if 0
+#if 1
 
                 // Int *el_colIndex = colIndex_pointer (curEl);
                 Int *el_colIndex = (Int *)(el + 1);
@@ -226,6 +226,7 @@ void paru_pivotal(std::vector<Int> &pivotal_elements,
 
                     zero_piv_rows++;
                     rowRelIndex[rEl] = -1;
+                    // isRowInFront[curRow] = -1;
 #ifndef NDEBUG
                     Int p = 1;
                     if (p <= 0) paru_print_element(paruMatInfo, e);
@@ -275,6 +276,48 @@ void paru_pivotal(std::vector<Int> &pivotal_elements,
 #endif
     }
 
+    // sencond pass through elements with zero rows and  
+    // growing them to better fit in current front
+    // This can possibly help in more assembly 
+    for (Int i = 0; i < (Int)pivotal_elements.size(); i++)
+    {
+        Int e = pivotal_elements[i];
+        paru_Element *el = elementList[e];
+        if (el->nzr_pc > 0)  // an elemen that has at least one zero row
+        {
+            Int mEl = el->nrows;
+            Int nEl = el->ncols;
+
+            // Int *el_rowIndex = rowIndex_pointer (el);
+            Int *el_rowIndex = (Int *)(el + 1) + nEl;
+
+            // Int *rowRelIndex = relRowInd (el);
+            Int *rowRelIndex = (Int *)(el + 1) + 2 * nEl + mEl;
+
+            for (Int rEl = 0; rEl < mEl; rEl++)
+            {
+                Int curRow = el_rowIndex[rEl];
+                if (curRow < 0) continue;    // that row has already deleted
+                if (rowRelIndex[rEl] == -1)  // the zero row
+                {
+                    if (isRowInFront[curRow] >= rowMark)
+                    {
+                        el->nzr_pc--;
+                        rowRelIndex[rEl] = isRowInFront[curRow] - rowMark;
+                    }
+                }
+            }
+#ifndef NDEBUG
+            if (el->nzr_pc == 0)
+            {  // all the zero rows fit in the front
+                PRLEVEL(-1, ("%%element %ld totally fit in current front %ld\n",
+                             e, f));
+            }
+            ASSERT(el->nzr_pc >= 0);
+#endif
+        }
+    }
+
     if (rowCount < fp)
     {
 #ifndef NDEBUG
@@ -294,7 +337,7 @@ void paru_pivotal(std::vector<Int> &pivotal_elements,
         }
 #ifndef NDEBUG
         PRLEVEL(p, ("\n"));
-        p=1;
+        p = 1;
 #endif
     }
 
@@ -374,12 +417,12 @@ void paru_pivotal(std::vector<Int> &pivotal_elements,
     paruMatInfo->frowList[f] = frowList;
 
     double *pivotalFront = (double *)paru_stack_calloc(
-            rowCount * fp, sizeof(double), paruMatInfo, cc);
+        rowCount * fp, sizeof(double), paruMatInfo, cc);
 
     if (pivotalFront == NULL)
     {
         printf("%% Out of memory when tried to allocate for pivotal part %ld",
-                f);
+               f);
         // paru_free ( num_panels, sizeof (Int), panel_row, cc);
         return;
     }
@@ -396,9 +439,9 @@ void paru_pivotal(std::vector<Int> &pivotal_elements,
     PRLEVEL(p, ("%% LUs=%ld ", paruMatInfo->actual_alloc_LUs));
     PRLEVEL(p, ("%% pivotalFront = %p size=%ld", pivotalFront, rowCount * fp));
     Int act = paruMatInfo->actual_alloc_LUs + paruMatInfo->actual_alloc_Us +
-        paruMatInfo->actual_alloc_row_int;
+              paruMatInfo->actual_alloc_row_int;
     Int upp = LUsym->Us_bound_size + LUsym->LUs_bound_size +
-        LUsym->row_Int_bound + LUsym->col_Int_bound;
+              LUsym->row_Int_bound + LUsym->col_Int_bound;
     PRLEVEL(p, ("%% MEM=%ld percent=%lf%%", act, 100.0 * act / upp));
     PRLEVEL(p, ("%% MEM=%ld percent=%lf%%\n", act, 100.0 * act / upp));
     p = 1;
@@ -485,7 +528,7 @@ void paru_pivotal(std::vector<Int> &pivotal_elements,
             // changes everyting
             // assemble cEl
             assemble_col(el_Num + cEl * mEl,
-                    pivotalFront + colIndexF * rowCount, mEl, rowRelIndex);
+                         pivotalFront + colIndexF * rowCount, mEl, rowRelIndex);
 
             el_colIndex[cEl] = flip(el_colIndex[cEl]);
             el->ncolsleft--;
