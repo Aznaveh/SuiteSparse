@@ -46,11 +46,10 @@ void paru_prior_assemble(Int f, Int start_fac,
         }
 #ifndef NDEBUG
         PRLEVEL(p, ("%%elRow[%ld]=%ld \n", e, elRow[e]));
-        if (elRow[e] != 0) PRLEVEL(-1, ("%%elRow[%ld]=%ld \n", e, elRow[e]));
+        //if (elRow[e] != 0) PRLEVEL(-1, ("%%elRow[%ld]=%ld \n", e, elRow[e]));
             // ASSERT (elRow[e] == 0);
 #endif
 
-        // TODO: fix for the CBs with pivotal rows only zero
         if (el->nzr_pc == 0)  // if all the rows are available in current front
         {
             if (el->rValid == pMark || elCol[e] == 0)
@@ -68,10 +67,35 @@ void paru_prior_assemble(Int f, Int start_fac,
             paru_eliminate_cols(e, f, colHash, paruMatInfo, cc);
             PRLEVEL(p, ("%%partial col assembly%ld in %ld done\n", e, el_ind));
             if (elementList[e] == NULL) continue;
-       }
-        //keeping current element
-        pivotal_elements[ii++] = pivotal_elements[i]; 
+        }
+        // TODO: fix for the CBs with pivotal rows only zero
+        else
+        {
+            if (el->rValid == pMark || elCol[e] == 0)
+            // This element contributes to both pivotal rows and pivotal columns
+            //  However it has zero rows in current pivotal columns therefore
+            //  not all rows are there
+            // it can be eliminated partially 
+            //       ________________________________      
+            //       |      |                         |
+            //       |      |                         |
+            //       ___xxxxxxxxxxx____________________      
+            //       |  xxxxxxxxxxx                   |  
+            //       |  oxxo|oxoxox                   | <- assemble rows
+            //       |  ooxx|oxoxox                   |
+            //       |  oooo|oxoxox                   |
+            //       ---------------------------------     
+            //          ooooooxxxxx  --> outsidie the front
+            //          ooooooxxxxx
+            // 
+            {
+                paru_eliminate_el_with0rows(e, f, colHash, paruMatInfo, cc);
+                PRLEVEL(p, ("%%assembling %ld in %ld done\n", e, el_ind));
+            }
+            // keeping current element
+        }
 
+        pivotal_elements[ii++] = pivotal_elements[i];
     }
 
     if (ii < (Int)pivotal_elements.size())
@@ -85,7 +109,7 @@ void paru_prior_assemble(Int f, Int start_fac,
      * ******/
     PRLEVEL(1, ("%% Next: work on the heap \n"));
     paru_make_heap(f, start_fac, pivotal_elements, hi, colHash, paruMatInfo,
-            cc);
+                   cc);
     PRLEVEL(1, ("%% Done: work on the heap \n"));
 
     Int eli = snM[f];
