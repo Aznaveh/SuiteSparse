@@ -44,12 +44,12 @@ extern "C"
 #endif
 
 // for printing information uncomment this; to activate assertions uncomment
-//#undef NPR    //<<1>>
+#undef NPR    //<<1>>
 
 // from spqr.hpp
 // Aznaveh For MATLAB OUTPUT UNCOMMENT HERE
 // uncomment the following line to turn on debugging
-//#undef NDEBUG  //<<2>>
+#undef NDEBUG  //<<2>>
 
 // uncomment if you want to count hardware flops
 //#define COUNT_FLOPS
@@ -506,6 +506,9 @@ void paru_eliminate_cols(Int e, Int f, std::vector<Int> &colHash,
 
 void paru_eliminate_rows(Int e, Int f, std::vector<Int> &colHash,
                          paru_matrix *paruMatInfo, cholmod_common *cc);
+
+void paru_eliminate_el_with0rows(Int e, Int f, std::vector<Int> &colHash,
+                        paru_matrix *paruMatInfo, cholmod_common *cc);
 
 // heap related
 void paru_make_heap(Int f, Int start_fac, std::vector<Int> &pivotal_elements,

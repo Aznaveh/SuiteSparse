@@ -545,13 +545,24 @@ void paru_eliminate_el_with0rows(Int e, Int f, std::vector<Int> &colHash,
     //
     DEBUGLEVEL(1);
 #ifndef NDEBUG
-    Int p = 1;
+    Int p = -1;
 #endif
-
     paru_symbolic *LUsym = paruMatInfo->LUsym;
     Int *snM = LUsym->super2atree;
     Int eli = snM[f];
+    PRLEVEL(p, ("%% \n+++++++++++++++++++++++++++++++++++++++\n"));
     PRLEVEL(p, ("%% Eliminat elment %ld  with0rows in %ld\n", e, eli));
+
+#ifndef NDEBUG
+
+    PRLEVEL(p, ("%% %ld :\n", eli));
+    if (p <= 0) paru_print_element(paruMatInfo, eli);
+
+    PRLEVEL(p, ("%% %ld :\n", e));
+    if (p <= 0) paru_print_element(paruMatInfo, e);
+
+    p = 1;
+#endif
 
     paru_Element **elementList = paruMatInfo->elementList;
 
@@ -611,26 +622,24 @@ void paru_eliminate_el_with0rows(Int e, Int f, std::vector<Int> &colHash,
 #endif
         Int fcolcolind = colRelIndex[el->lac];
         double *dC = curEl_Num + fcolcolind * curEl->nrows;
-        Int nrowsSeen = el->nrowsleft;
+        Int nrows2bSeen = el->nrowsleft;
         for (Int i = 0; i < mEl; i++)
         {
             Int rowInd = el_rowIndex[i];
             PRLEVEL(1, ("%% rowInd =%ld \n", rowInd));
             if (rowInd >= 0)
             {
-                Int ri = isRowInFront[rowInd];
                 // FIXME
-                if (rowRelIndex[i] == -1)  // row with all zeros in piv
+                if (rowRelIndex[i] != -1)  // row with at least one nz
                 {
-                    nrowsSeen--;
-                    continue;
+                    Int ri = isRowInFront[rowInd];
+                    PRLEVEL(1, ("%% ri = %ld \n", ri));
+                    PRLEVEL(1, ("%% sC [%ld] =%2.5lf \n", i, sC[i]));
+                    PRLEVEL(1, ("%% dC [%ld] =%2.5lf \n", ri, dC[ri]));
+                    dC[ri] += sC[i];
+                    PRLEVEL(1, ("%% dC [%ld] =%2.5lf \n", i, dC[ri]));
                 }
-                PRLEVEL(1, ("%% ri = %ld \n", ri));
-                PRLEVEL(1, ("%% sC [%ld] =%2.5lf \n", i, sC[i]));
-                PRLEVEL(1, ("%% dC [%ld] =%2.5lf \n", ri, dC[ri]));
-                dC[ri] += sC[i];
-                PRLEVEL(1, ("%% dC [%ld] =%2.5lf \n", i, dC[ri]));
-                if (--nrowsSeen == 0) break;
+                if (--nrows2bSeen == 0) break;
             }
         }
     }
@@ -639,19 +648,32 @@ void paru_eliminate_el_with0rows(Int e, Int f, std::vector<Int> &colHash,
         PRLEVEL(p, ("%% more than 1 col left\n %%"));
 
         // save the structure of the rows once at first
-        Int tempRow[el->nrowsleft - el->nzr_pc];  // C99
+        Int rows2assembl = el->nrowsleft - el->nzr_pc;
+        Int tempRow[rows2assembl];  // C99
         Int ii = 0;
         for (Int i = 0; i < mEl; i++)
         {
             Int rowInd = el_rowIndex[i];
-            PRLEVEL(1, ("%% rowInd =%ld \n", rowInd));
-            if (rowInd >= 0)
+            PRLEVEL(1, ("%% rowInd =%ld ", rowInd));
+#ifndef NDEBUG
+            if (rowRelIndex[i] == -1) PRLEVEL(-1, ("%% row_with0 "));
+#endif
+
+            PRLEVEL(1, ("%% \n"));
+            if (rowInd >= 0 && rowRelIndex[i] != -1)
             {
                 tempRow[ii++] = i;
-                if (ii == el->nrowsleft) break;
+                if (ii == rows2assembl) break;
             }
         }
 
+#ifndef NDEBUG
+        p = 1;
+        PRLEVEL(p, ("%% list of the rows to be assembled:\n%%"));
+        for (Int i = 0; i < rows2assembl; i++)
+            PRLEVEL(p, ("%ld ", el_rowIndex[tempRow[i]]));
+        PRLEVEL(p, ("%% \n"));
+#endif
         for (Int j = el->lac; j < nEl; j++)
         {
             PRLEVEL(1, ("%% j =%ld \n", j));
@@ -664,45 +686,53 @@ void paru_eliminate_el_with0rows(Int e, Int f, std::vector<Int> &colHash,
 
             double *dC = curEl_Num + fcolcolind * curEl->nrows;
 
-            for (Int ii = 0; ii < el->nrowsleft; ii++)
+            Int ncols2bSeen = el->ncolsleft;
+
+            for (Int ii = 0; ii < rows2assembl; ii++)
             {
                 Int i = tempRow[ii];
                 Int rowInd = el_rowIndex[i];
                 // FIXME
-                if (rowRelIndex[ii] == -1)  // row with all zeros in piv
-                    continue;
-
+                ASSERT(rowRelIndex[i] != -1);  // I already picked the rows
+                                               // that are not in zero pivots
+                ASSERT(rowInd >= 0);           // and also still alive
                 Int ri = isRowInFront[rowInd];
-                PRLEVEL(1, ("%% ri = %ld \n", ri));
+                PRLEVEL(1, ("%% ri = %ld rowInd=%ld\n", ri, rowInd));
                 PRLEVEL(1, ("%% sC [%ld] =%2.5lf \n", i, sC[i]));
                 PRLEVEL(1, ("%% dC [%ld] =%2.5lf \n", ri, dC[ri]));
                 dC[ri] += sC[i];
                 PRLEVEL(1, ("%% dC [%ld] =%2.5lf \n", i, dC[ri]));
             }
 
-            if (--el->ncolsleft == 0) break;
+            if (--ncols2bSeen == 0) break;
             PRLEVEL(1, ("\n"));
         }
     }
-    // TODO mark rows as assembled and updat lac
 
-    Int nrowsSeen = el->nrowsleft;
+    // Mark rows as assembled and updat lac
+
+    Int nrows2bSeen = el->nrowsleft;
     Int new_lac = nEl;
     for (Int ii = 0; ii < mEl; ii++)
     {
         Int rowInd = el_rowIndex[ii];
         if (rowInd < 0) continue;  // already gone
 
-        Int colInd = el_colIndex[el->lac];
         if (rowRelIndex[ii] == -1)  // row with all zeros in piv
         {                           // update lac
-            for (Int jj = colInd; jj < new_lac; jj++)
+            PRLEVEL(-1, ("%%Searching for lac in %ld\n%%", rowInd));
+            PRLEVEL(-1, ("%%col=%ld\n%%", el->lac));
+            for (Int jj = el->lac; jj < new_lac; jj++)
             // searching for the first nz
             {
+                if (el_colIndex[jj] < 0) continue;
                 // el [rowInd, jj]
+                PRLEVEL(-1, ("%% el[%ld,%ld]=%2.5lf\n%%", rowInd, jj,
+                             el_Num[mEl * jj + ii]));
                 if (el_Num[mEl * jj + ii] != 0)
                 {
                     new_lac = jj;
+                    PRLEVEL(-1, ("%%Found new-lac in %ld\n%%", jj));
                     break;
                 }
             }
@@ -711,12 +741,26 @@ void paru_eliminate_el_with0rows(Int e, Int f, std::vector<Int> &colHash,
         {
             el_rowIndex[ii] = -1;
         }
-        if (--nrowsSeen == 0) break;
+        if (--nrows2bSeen == 0) break;
     }
+    // updating lac can have effect on number of columns left
+    // I should update number of columns left too
+
+    Int ncolsleft = 0;
+    for (Int j = new_lac; j < nEl; j++)
+    {
+        if (el_colIndex[j] > 0) ncolsleft++;
+    }
+    PRLEVEL(-1, ("%%colsleft was %ld and now is %ld\n%%", el->ncolsleft,
+                 ncolsleft));
+
+    el->ncolsleft = ncolsleft;
+
     el->nrowsleft = el->nzr_pc;
     ASSERT(new_lac < nEl);
     el->lac = new_lac;
-
     Int *lacList = paruMatInfo->lacList;
     lacList[e] = el_colIndex[el->lac];
+    PRLEVEL(-1, ("%%Finlly new-lac is %ld nEl=%ld\n lacList[%ld]=%ld\n",
+                 el->lac, nEl, e, lacList[e]));
 }

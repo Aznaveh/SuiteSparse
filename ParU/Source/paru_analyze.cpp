@@ -474,9 +474,9 @@ paru_symbolic *paru_analyze
 
     PRLEVEL (0, ("%% A  is  %ld x %ld \n",m, n ));
     PRLEVEL (-1, ("LU = zeros(%ld,%ld);\n",m, n ));
-    PRLEVEL (-1, ("npivots =[]; \n" ));
-    PRLEVEL (-1, ("S = zeros(%ld,%ld); %% n1 = %ld\n",m, n, n1 ));
-    PRLEVEL (1, ("%% nf=%ld\n",nf ));
+    PRLEVEL (1, ("npivots =[]; \n" ));
+    PRLEVEL (1, ("S = zeros(%ld,%ld); %% n1 = %ld\n",m, n, n1 ));
+    PRLEVEL (-1, ("%% nf=%ld\n",nf ));
     //
     /* ---------------------------------------------------------------------- */
     /*           Fixing Parent and computing Children datat structure         */

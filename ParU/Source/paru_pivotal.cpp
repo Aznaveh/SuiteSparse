@@ -23,17 +23,18 @@ void paru_pivotal(std::vector<Int> &pivotal_elements,
     std::vector<Int> **heapList = paruMatInfo->heapList;
     Int eli = snM[f];
 
-#ifndef NDEBUG
-    Int m = paruMatInfo->m;
-    Int p = 1;
-    PRLEVEL(p, ("%% Pivotal assembly of front %ld (eli %ld)\n", f, eli));
-#endif
-
     Int *Super = LUsym->Super;
     Int col1 = Super[f]; /* fornt F has columns col1:col2-1 */
     Int col2 = Super[f + 1];
     Int *aChild = LUsym->aChild;
     Int *aChildp = LUsym->aChildp;
+
+#ifndef NDEBUG
+    Int m = paruMatInfo->m;
+    Int p = 1;
+    PRLEVEL(p, ("%% Pivotal assembly of front %ld (eli %ld) cols %ld-%ld\n", f,
+                eli, col1, col2));
+#endif
 
     paru_Element **elementList = paruMatInfo->elementList;
 
@@ -226,7 +227,6 @@ void paru_pivotal(std::vector<Int> &pivotal_elements,
 
                     zero_piv_rows++;
                     rowRelIndex[rEl] = -1;
-                    // isRowInFront[curRow] = -1;
 #ifndef NDEBUG
                     Int p = 1;
                     if (p <= 0) paru_print_element(paruMatInfo, e);
@@ -276,9 +276,9 @@ void paru_pivotal(std::vector<Int> &pivotal_elements,
 #endif
     }
 
-    // sencond pass through elements with zero rows and  
+    // sencond pass through elements with zero rows and
     // growing them to better fit in current front
-    // This can possibly help in more assembly 
+    // This can possibly help in more assembly
     for (Int i = 0; i < (Int)pivotal_elements.size(); i++)
     {
         Int e = pivotal_elements[i];
@@ -321,7 +321,7 @@ void paru_pivotal(std::vector<Int> &pivotal_elements,
     if (rowCount < fp)
     {
 #ifndef NDEBUG
-        p = -2;
+        p = 1;
         // there is a structural problem
         PRLEVEL(p,
                 ("%%STRUCTURAL PROBLEM! rowCount=%ld, fp =%ld", rowCount, fp));
@@ -485,8 +485,12 @@ void paru_pivotal(std::vector<Int> &pivotal_elements,
         Int e = pivotal_elements[i];
         paru_Element *el = elementList[e];
         // ASSERT(el != NULL);
-        if (el == NULL) continue;
         PRLEVEL(p, ("current element(%ld) %p", e, el));
+#ifndef NDEBUG
+        if (el == NULL) 
+            PRLEVEL(p, ("NULL EL"));
+#endif
+        if (el == NULL) continue;
         PRLEVEL(p, ("lac = %ld ", el->lac));
         PRLEVEL(p, ("col = %ld\n ", lacList[e]));
 
@@ -534,6 +538,8 @@ void paru_pivotal(std::vector<Int> &pivotal_elements,
             el->ncolsleft--;
             if (el->ncolsleft == 0)
             {  // free el
+                PRLEVEL(p, ("%% element %ld is freed after pivotal assembly\n",
+                            e));
                 paru_free_el(e, elementList, cc);
                 break;
             }
@@ -559,14 +565,15 @@ void paru_pivotal(std::vector<Int> &pivotal_elements,
             el->lac = cEl;
             lacList[e] = lac_el(elementList, e);
             pivotal_elements[ii++] = pivotal_elements[i];
-            ASSERT(cEl < nEl);
-            PRLEVEL(1, ("%%el->lac= %ld ", el->lac));
-            PRLEVEL(1, ("el_colIndex[el->lac]=%ld :\n", el_colIndex[el->lac]));
+            PRLEVEL(1, ("%%e = %ld, el->lac= %ld ", e, el->lac));
+            PRLEVEL(
+                1, ("el_colIndex[%ld]=%ld :\n", el->lac, el_colIndex[el->lac]));
 #ifndef NDEBUG  // print the element which has been assembled from
-            p = 2;
+            p = 1;
             PRLEVEL(p, ("%% ASSEMBLED element= %ld  mEl =%ld ", e, mEl));
             if (p <= 0) paru_print_element(paruMatInfo, e);
 #endif
+            ASSERT(cEl < nEl);
         }
     }
 
@@ -587,7 +594,7 @@ void paru_pivotal(std::vector<Int> &pivotal_elements,
         PRLEVEL(p, ("%ld ", pivotal_elements[i]));
     PRLEVEL(p, ("\n"));
 
-    p = 2;
+    p = -2;
     PRLEVEL(p, ("%% After all the assemble %ld, z=%ld\n", f, zero_piv_rows));
     PRLEVEL(p, ("%% x =  \t"));
     for (Int c = col1; c < col2; c++) PRLEVEL(p, ("%ld\t\t", c));
