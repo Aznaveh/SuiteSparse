@@ -276,47 +276,6 @@ void paru_pivotal(std::vector<Int> &pivotal_elements,
 #endif
     }
 
-    // sencond pass through elements with zero rows and
-    // growing them to better fit in current front
-    // This can possibly help in more assembly
-    for (Int i = 0; i < (Int)pivotal_elements.size(); i++)
-    {
-        Int e = pivotal_elements[i];
-        paru_Element *el = elementList[e];
-        if (el->nzr_pc > 0)  // an elemen that has at least one zero row
-        {
-            Int mEl = el->nrows;
-            Int nEl = el->ncols;
-
-            // Int *el_rowIndex = rowIndex_pointer (el);
-            Int *el_rowIndex = (Int *)(el + 1) + nEl;
-
-            // Int *rowRelIndex = relRowInd (el);
-            Int *rowRelIndex = (Int *)(el + 1) + 2 * nEl + mEl;
-
-            for (Int rEl = 0; rEl < mEl; rEl++)
-            {
-                Int curRow = el_rowIndex[rEl];
-                if (curRow < 0) continue;    // that row has already deleted
-                if (rowRelIndex[rEl] == -1)  // the zero row
-                {
-                    if (isRowInFront[curRow] >= rowMark)
-                    {
-                        el->nzr_pc--;
-                        rowRelIndex[rEl] = isRowInFront[curRow] - rowMark;
-                    }
-                }
-            }
-#ifndef NDEBUG
-            if (el->nzr_pc == 0)
-            {  // all the zero rows fit in the front
-                PRLEVEL(-1, ("%%element %ld totally fit in current front %ld\n",
-                             e, f));
-            }
-            ASSERT(el->nzr_pc >= 0);
-#endif
-        }
-    }
 
     if (rowCount < fp)
     {
@@ -586,6 +545,55 @@ void paru_pivotal(std::vector<Int> &pivotal_elements,
         PRLEVEL(p, ("%% and now is %ld\n ", ii));
         pivotal_elements.resize(ii);
     }
+
+
+
+    // sencond pass through elements with zero rows and
+    // growing them to better fit in current front
+    // This can possibly help in more assembly
+    for (Int i = 0; i < (Int)pivotal_elements.size(); i++)
+    {
+        Int e = pivotal_elements[i];
+        paru_Element *el = elementList[e];
+        if (el->nzr_pc > 0)  // an elemen that has at least one zero row
+        {
+            Int mEl = el->nrows;
+            Int nEl = el->ncols;
+
+            // Int *el_rowIndex = rowIndex_pointer (el);
+            Int *el_rowIndex = (Int *)(el + 1) + nEl;
+
+            // Int *rowRelIndex = relRowInd (el);
+            Int *rowRelIndex = (Int *)(el + 1) + 2 * nEl + mEl;
+
+            for (Int rEl = 0; rEl < mEl; rEl++)
+            {
+                Int curRow = el_rowIndex[rEl];
+                if (curRow < 0) continue;    // that row has already deleted
+                if (rowRelIndex[rEl] == -1)  // the zero row
+                {
+                    if (isRowInFront[curRow] >= rowMark)
+                    {
+                        el->nzr_pc--;
+                        rowRelIndex[rEl] = isRowInFront[curRow] - rowMark;
+                    }
+                }
+            }
+#ifndef NDEBUG
+            if (el->nzr_pc == 0)
+            {  // all the zero rows fit in the front
+                PRLEVEL(-1, ("%%element %ld totally fit in current front %ld\n",
+                             e, f));
+            }
+            ASSERT(el->nzr_pc >= 0);
+#endif
+        }
+    }
+
+
+
+
+
 
 #ifndef NDEBUG
     p = 1;
