@@ -462,8 +462,13 @@ void paru_pivotal(std::vector<Int> &pivotal_elements,
         Int mEl = el->nrows;
         Int nEl = el->ncols;
 
+        // Int *el_rowIndex = rowIndex_pointer (el);
+        Int *el_rowIndex = (Int *)(el + 1) + nEl;
+
+
         // Int *rowRelIndex = relRowInd (el);
         Int *rowRelIndex = (Int *)(el + 1) + 2 * nEl + mEl;
+
 
 #ifndef NDEBUG  // print the element which is going to be assembled from
         p = 2;
@@ -472,6 +477,7 @@ void paru_pivotal(std::vector<Int> &pivotal_elements,
 #endif
 
         Int cEl = el->lac;
+
 
         PRLEVEL(p, ("%% cEl =%ld \n", cEl));
         for (; cEl < nEl; cEl++)
@@ -493,6 +499,8 @@ void paru_pivotal(std::vector<Int> &pivotal_elements,
             // I cannot reuse the relative index because of the pivoting
             // changes everyting
             // assemble cEl
+            // TODO: use nrowsleft
+            //XXX NOT A GOOD routine
             assemble_col(el_Num + cEl * mEl,
                          pivotalFront + colIndexF * rowCount, mEl, rowRelIndex);
 

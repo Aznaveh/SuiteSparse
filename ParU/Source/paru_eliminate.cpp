@@ -554,7 +554,6 @@ void paru_eliminate_el_with0rows(Int e, Int f, std::vector<Int> &colHash,
     PRLEVEL(p, ("%% Eliminat elment %ld  with0rows in %ld\n", e, eli));
 
 #ifndef NDEBUG
-
     PRLEVEL(p, ("%% %ld :\n", eli));
     if (p <= 0) paru_print_element(paruMatInfo, eli);
 
@@ -674,6 +673,7 @@ void paru_eliminate_el_with0rows(Int e, Int f, std::vector<Int> &colHash,
             PRLEVEL(p, ("%ld ", el_rowIndex[tempRow[i]]));
         PRLEVEL(p, ("%% \n"));
 #endif
+        Int ncols2bSeen = el->ncolsleft;
         for (Int j = el->lac; j < nEl; j++)
         {
             PRLEVEL(1, ("%% j =%ld \n", j));
@@ -681,12 +681,9 @@ void paru_eliminate_el_with0rows(Int e, Int f, std::vector<Int> &colHash,
             Int colInd = el_colIndex[j];
             PRLEVEL(1, ("%% colInd =%ld \n", colInd));
             if (colInd < 0) continue;
-            // Int fcolcolind = paru_find_hash (colInd, colHash, fcolList);
             Int fcolcolind = colRelIndex[j];
 
             double *dC = curEl_Num + fcolcolind * curEl->nrows;
-
-            Int ncols2bSeen = el->ncolsleft;
 
             for (Int ii = 0; ii < rows2assembl; ii++)
             {
@@ -740,27 +737,47 @@ void paru_eliminate_el_with0rows(Int e, Int f, std::vector<Int> &colHash,
         else  // It was assembled here; mark row as assembled
         {
             el_rowIndex[ii] = -1;
+            rowRelIndex[ii] = -1;  //XXX remove this later
         }
         if (--nrows2bSeen == 0) break;
     }
     // updating lac can have effect on number of columns left
     // I should update number of columns left too
 
-    Int ncolsleft = 0;
-    for (Int j = new_lac; j < nEl; j++)
+    if (new_lac != el->lac)
     {
-        if (el_colIndex[j] > 0) ncolsleft++;
+        Int ncolsleft = 0;
+        for (Int j = new_lac; j < nEl; j++)
+        {
+            if (el_colIndex[j] > 0) ncolsleft++;
+        }
+        PRLEVEL(-1, ("%%colsleft was %ld and now is %ld\n%%", el->ncolsleft,
+                     ncolsleft));
+        el->ncolsleft = ncolsleft;
+        for (Int j = el->lac; j < new_lac; j++)
+        {
+            el_colIndex[j] = flip(el_colIndex[j]);
+        }
     }
-    PRLEVEL(-1, ("%%colsleft was %ld and now is %ld\n%%", el->ncolsleft,
-                 ncolsleft));
-
-    el->ncolsleft = ncolsleft;
 
     el->nrowsleft = el->nzr_pc;
     ASSERT(new_lac < nEl);
     el->lac = new_lac;
     Int *lacList = paruMatInfo->lacList;
     lacList[e] = el_colIndex[el->lac];
-    PRLEVEL(-1, ("%%Finlly new-lac is %ld nEl=%ld\n lacList[%ld]=%ld\n",
-                 el->lac, nEl, e, lacList[e]));
+    PRLEVEL(
+        -1,
+        ("%%Finally new-lac is %ld nEl=%ld\n lacList[%ld]=%ld nrowsleft=%ld\n",
+         el->lac, nEl, e, lacList[e], el->nrowsleft));
+
+#ifndef NDEBUG
+    p = -1;
+    PRLEVEL(p, ("%% %ld :\n", eli));
+    if (p <= 0) paru_print_element(paruMatInfo, eli);
+
+    PRLEVEL(p, ("%% %ld :\n", e));
+    if (p <= 0) paru_print_element(paruMatInfo, e);
+
+    p = 1;
+#endif
 }

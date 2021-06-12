@@ -14,6 +14,7 @@ void assemble_col (const double *sC,  //source col and destination col
         double *dC,
         Int m, const Int *relRowInd)
 {
+    //FIXME it just deponds on relRowInd Change the whole thing
     DEBUGLEVEL (0);
     for (Int i = 0; i < m; i++) 
     {
