@@ -17,7 +17,7 @@ void paru_pivotal(std::vector<Int> &pivotal_elements,
                   std::vector<Int> &panel_row, Int f, heaps_info &hi,
                   paru_matrix *paruMatInfo, cholmod_common *cc)
 {
-    DEBUGLEVEL(0);
+    DEBUGLEVEL(1);
     paru_symbolic *LUsym = paruMatInfo->LUsym;
     Int *snM = LUsym->super2atree;
     std::vector<Int> **heapList = paruMatInfo->heapList;
@@ -178,12 +178,14 @@ void paru_pivotal(std::vector<Int> &pivotal_elements,
         PRLEVEL(1, ("%% rowMark=%ld;\n", rowMark));
 
         el->nzr_pc = 0;  // initializing ; number of zero rows
+        Int nrows2bSeen = el->nrowsleft;
 
         for (Int rEl = 0; rEl < mEl; rEl++)
         {
             Int curRow = el_rowIndex[rEl];
             PRLEVEL(1, ("%% curRow =%ld rEl=%ld\n", curRow, rEl));
             if (curRow < 0) continue;  // that row has already deleted
+            if (nrows2bSeen-- == 0) break;
 
 #ifndef NDEBUG
             //            stl_rowSet.insert(curRow);
@@ -565,11 +567,13 @@ void paru_pivotal(std::vector<Int> &pivotal_elements,
 
             // Int *rowRelIndex = relRowInd (el);
             Int *rowRelIndex = (Int *)(el + 1) + 2 * nEl + mEl;
+            Int nrows2bSeen = el->nrowsleft;
 
             for (Int rEl = 0; rEl < mEl; rEl++)
             {
                 Int curRow = el_rowIndex[rEl];
                 if (curRow < 0) continue;    // that row has already deleted
+                if (nrows2bSeen-- == 0) break;
                 if (rowRelIndex[rEl] == -1)  // the zero row
                 {
                     if (isRowInFront[curRow] >= rowMark)
@@ -602,7 +606,7 @@ void paru_pivotal(std::vector<Int> &pivotal_elements,
         PRLEVEL(p, ("%ld ", pivotal_elements[i]));
     PRLEVEL(p, ("\n"));
 
-    p = -2;
+    p = 2;
     PRLEVEL(p, ("%% After all the assemble %ld, z=%ld\n", f, zero_piv_rows));
     PRLEVEL(p, ("%% x =  \t"));
     for (Int c = col1; c < col2; c++) PRLEVEL(p, ("%ld\t\t", c));
