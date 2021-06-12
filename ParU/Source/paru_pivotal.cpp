@@ -184,8 +184,9 @@ void paru_pivotal(std::vector<Int> &pivotal_elements,
         {
             Int curRow = el_rowIndex[rEl];
             PRLEVEL(1, ("%% curRow =%ld rEl=%ld\n", curRow, rEl));
+            if (nrows2bSeen == 0) break;
             if (curRow < 0) continue;  // that row has already deleted
-            if (nrows2bSeen-- == 0) break;
+            nrows2bSeen--;
 
 #ifndef NDEBUG
             //            stl_rowSet.insert(curRow);
@@ -572,8 +573,9 @@ void paru_pivotal(std::vector<Int> &pivotal_elements,
             for (Int rEl = 0; rEl < mEl; rEl++)
             {
                 Int curRow = el_rowIndex[rEl];
+                if (nrows2bSeen == 0) break;
                 if (curRow < 0) continue;    // that row has already deleted
-                if (nrows2bSeen-- == 0) break;
+                nrows2bSeen--;
                 if (rowRelIndex[rEl] == -1)  // the zero row
                 {
                     if (isRowInFront[curRow] >= rowMark)
