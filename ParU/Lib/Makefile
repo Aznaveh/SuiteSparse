@@ -67,6 +67,7 @@ OBJ = \
 	paru_bin_search.o\
 	paru_eliminate.o\
 	paru_prior_assemble.o \
+	paru_full_summed.o \
         GB_calloc_memory.o \
         GB_dealloc_memory.o \
         GB_free_memory.o \
@@ -97,7 +98,7 @@ endif
 
 ifeq ($(PROF),yes)
 	#to compile with -g options use 'make DBUG=yes'
-	FLAG = -Wno-write-strings -no-pie  -pg 
+	FLAG = -Wno-write-strings -no-pie -g -pg 
 endif
 
 
@@ -207,6 +208,9 @@ paru_prior_assemble.o:  ../Source/paru_prior_assemble.cpp
 	$(C) -c $<
 
 paru_eliminate.o: ../Source/paru_eliminate.cpp
+	$(C) -c $<
+
+paru_full_summed.o: ../Source/paru_full_summed.cpp
 	$(C) -c $<
 
 

@@ -647,8 +647,8 @@ void paru_eliminate_el_with0rows(Int e, Int f, std::vector<Int> &colHash,
         PRLEVEL(p, ("%% more than 1 col left\n %%"));
 
         // save the structure of the rows once at first
-        Int rows2assembl = el->nrowsleft - el->nzr_pc;
-        Int tempRow[rows2assembl];  // C99
+        Int nrows2assembl = el->nrowsleft - el->nzr_pc;
+        Int tempRow[nrows2assembl];  // C99
         Int ii = 0;
         for (Int i = 0; i < mEl; i++)
         {
@@ -662,14 +662,14 @@ void paru_eliminate_el_with0rows(Int e, Int f, std::vector<Int> &colHash,
             if (rowInd >= 0 && rowRelIndex[i] != -1)
             {
                 tempRow[ii++] = i;
-                if (ii == rows2assembl) break;
+                if (ii == nrows2assembl) break;
             }
         }
 
 #ifndef NDEBUG
         p = 1;
         PRLEVEL(p, ("%% list of the rows to be assembled:\n%%"));
-        for (Int i = 0; i < rows2assembl; i++)
+        for (Int i = 0; i < nrows2assembl; i++)
             PRLEVEL(p, ("%ld ", el_rowIndex[tempRow[i]]));
         PRLEVEL(p, ("%% \n"));
 #endif
@@ -685,7 +685,7 @@ void paru_eliminate_el_with0rows(Int e, Int f, std::vector<Int> &colHash,
 
             double *dC = curEl_Num + fcolcolind * curEl->nrows;
 
-            for (Int ii = 0; ii < rows2assembl; ii++)
+            for (Int ii = 0; ii < nrows2assembl; ii++)
             {
                 Int i = tempRow[ii];
                 Int rowInd = el_rowIndex[i];

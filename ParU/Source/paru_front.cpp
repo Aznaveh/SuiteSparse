@@ -18,7 +18,7 @@ int paru_front(paru_matrix *paruMatInfo,
                Int f, /* front need to be assembled */
                cholmod_common *cc)
 {
-    DEBUGLEVEL(-2);
+    DEBUGLEVEL(-1);
     /*
      * -2 Print Nothing
      * -1 Just Matlab

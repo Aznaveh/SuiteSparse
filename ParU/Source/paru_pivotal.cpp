@@ -441,110 +441,119 @@ void paru_pivotal(std::vector<Int> &pivotal_elements,
     Int ii = 0;  // using for resizing pivotal_elements
     for (Int i = 0; i < (Int)pivotal_elements.size(); i++)
     {
-#ifndef NDEBUG
-        Int p = 1;
-#endif
+//#ifndef NDEBUG
+//        Int p = 1;
+//#endif
         Int e = pivotal_elements[i];
-        paru_Element *el = elementList[e];
-        // ASSERT(el != NULL);
-        PRLEVEL(p, ("current element(%ld) %p", e, el));
-#ifndef NDEBUG
-        if (el == NULL) 
-            PRLEVEL(p, ("NULL EL"));
-#endif
-        if (el == NULL) continue;
-        PRLEVEL(p, ("lac = %ld ", el->lac));
-        PRLEVEL(p, ("col = %ld\n ", lacList[e]));
-
-        // Int *el_colIndex = colIndex_pointer (el);
-        Int *el_colIndex = (Int *)(el + 1);
-
-        Int mEl = el->nrows;
-        Int nEl = el->ncols;
-
-        // Int *el_rowIndex = rowIndex_pointer (el);
-        Int *el_rowIndex = (Int *)(el + 1) + nEl;
-
-
-        // Int *rowRelIndex = relRowInd (el);
-        Int *rowRelIndex = (Int *)(el + 1) + 2 * nEl + mEl;
-
-
-#ifndef NDEBUG  // print the element which is going to be assembled from
-        p = 2;
-        PRLEVEL(p, ("%% ASSEMBL element= %ld  mEl =%ld ", e, mEl));
-        if (p <= 0) paru_print_element(paruMatInfo, e);
-#endif
-
-        Int cEl = el->lac;
-
-
-        PRLEVEL(p, ("%% cEl =%ld \n", cEl));
-        for (; cEl < nEl; cEl++)
-        {
-            if (el_colIndex[cEl] < 0)  // already assembled somewhere
-                continue;
-
-            if (el_colIndex[cEl] >= col2) break;
-
-            PRLEVEL(p, ("ACCESS to %p\n", el_colIndex));
-
-            Int colIndexF = el_colIndex[cEl] - col1;
-            PRLEVEL(p, ("%% Inside the loop cEl =%ld \n", cEl));
-            PRLEVEL(p, ("%% colIndexF =%ld \n", colIndexF));
-
-            // double *el_Num = numeric_pointer (el);
-            double *el_Num = (double *)((Int *)(el + 1) + 2 * nEl + 2 * mEl);
-
-            // I cannot reuse the relative index because of the pivoting
-            // changes everyting
-            // assemble cEl
-            // TODO: use nrowsleft
-            //XXX NOT A GOOD routine
-            assemble_col(el_Num + cEl * mEl,
-                         pivotalFront + colIndexF * rowCount, mEl, rowRelIndex);
-
-            el_colIndex[cEl] = flip(el_colIndex[cEl]);
-            el->ncolsleft--;
-            if (el->ncolsleft == 0)
-            {  // free el
-                PRLEVEL(p, ("%% element %ld is freed after pivotal assembly\n",
-                            e));
-                paru_free_el(e, elementList, cc);
-                break;
-            }
-#ifndef NDEBUG  // Printing the pivotal front
-            p = 2;
-            PRLEVEL(p, ("%% After Assemble element %ld\n", e));
-            PRLEVEL(p, ("%% x =  \t"));
-            for (Int c = col1; c < col2; c++) PRLEVEL(p, ("%ld\t\t", c));
-            PRLEVEL(p, (" ;\n"));
-            for (Int r = 0; r < rowCount; r++)
-            {
-                PRLEVEL(p, ("%% %ld\t", frowList[r]));
-                for (Int c = col1; c < col2; c++)
-                    PRLEVEL(p, (" %2.5lf\t",
-                                pivotalFront[(c - col1) * rowCount + r]));
-                PRLEVEL(p, ("\n"));
-            }
-            p = 1;
-#endif
-        }
+        paru_full_summed(e, f, paruMatInfo, cc);
         if (elementList[e] != NULL)
         {
-            el->lac = cEl;
-            lacList[e] = lac_el(elementList, e);
             pivotal_elements[ii++] = pivotal_elements[i];
-            PRLEVEL(1, ("%%e = %ld, el->lac= %ld ", e, el->lac));
-            PRLEVEL(
-                1, ("el_colIndex[%ld]=%ld :\n", el->lac, el_colIndex[el->lac]));
-#ifndef NDEBUG  // print the element which has been assembled from
-            p = 1;
-            PRLEVEL(p, ("%% ASSEMBLED element= %ld  mEl =%ld ", e, mEl));
-            if (p <= 0) paru_print_element(paruMatInfo, e);
-#endif
-            ASSERT(cEl < nEl);
         }
+
+
+        
+    //    Int e = pivotal_elements[i];
+    //            paru_Element *el = elementList[e];
+    //            // ASSERT(el != NULL);
+    //            PRLEVEL(p, ("current element(%ld) %p", e, el));
+    //    #ifndef NDEBUG
+    //            if (el == NULL) 
+    //                PRLEVEL(p, ("NULL EL"));
+    //    #endif
+    //            if (el == NULL) continue;
+    //            PRLEVEL(p, ("lac = %ld ", el->lac));
+    //            PRLEVEL(p, ("col = %ld\n ", lacList[e]));
+    //    
+    //            // Int *el_colIndex = colIndex_pointer (el);
+    //            Int *el_colIndex = (Int *)(el + 1);
+    //    
+    //            Int mEl = el->nrows;
+    //            Int nEl = el->ncols;
+    //    
+    //            // Int *el_rowIndex = rowIndex_pointer (el);
+    //            Int *el_rowIndex = (Int *)(el + 1) + nEl;
+    //    
+    //    
+    //            // Int *rowRelIndex = relRowInd (el);
+    //            Int *rowRelIndex = (Int *)(el + 1) + 2 * nEl + mEl;
+    //    
+    //    
+    //    #ifndef NDEBUG  // print the element which is going to be assembled from
+    //            p = 2;
+    //            PRLEVEL(p, ("%% ASSEMBL element= %ld  mEl =%ld ", e, mEl));
+    //            if (p <= 0) paru_print_element(paruMatInfo, e);
+    //    #endif
+    //    
+    //            Int cEl = el->lac;
+    //    
+    //    
+    //            PRLEVEL(p, ("%% cEl =%ld \n", cEl));
+    //            for (; cEl < nEl; cEl++)
+    //            {
+    //                if (el_colIndex[cEl] < 0)  // already assembled somewhere
+    //                    continue;
+    //    
+    //                if (el_colIndex[cEl] >= col2) break;
+    //    
+    //                PRLEVEL(p, ("ACCESS to %p\n", el_colIndex));
+    //    
+    //                Int colIndexF = el_colIndex[cEl] - col1;
+    //                PRLEVEL(p, ("%% Inside the loop cEl =%ld \n", cEl));
+    //                PRLEVEL(p, ("%% colIndexF =%ld \n", colIndexF));
+    //    
+    //                // double *el_Num = numeric_pointer (el);
+    //                double *el_Num = (double *)((Int *)(el + 1) + 2 * nEl + 2 * mEl);
+    //    
+    //                // I cannot reuse the relative index because of the pivoting
+    //                // changes everyting
+    //                // assemble cEl
+    //                // TODO: use nrowsleft
+    //                //XXX NOT A GOOD routine
+    //                assemble_col(el_Num + cEl * mEl,
+    //                             pivotalFront + colIndexF * rowCount, mEl, rowRelIndex);
+    //    
+    //                el_colIndex[cEl] = flip(el_colIndex[cEl]);
+    //                el->ncolsleft--;
+    //                if (el->ncolsleft == 0)
+    //                {  // free el
+    //                    PRLEVEL(p, ("%% element %ld is freed after pivotal assembly\n",
+    //                                e));
+    //                    paru_free_el(e, elementList, cc);
+    //                    break;
+    //                }
+    //    #ifndef NDEBUG  // Printing the pivotal front
+    //                p = -2;
+    //                PRLEVEL(p, ("%% After Assemble element %ld\n", e));
+    //                PRLEVEL(p, ("%% x =  \t"));
+    //                for (Int c = col1; c < col2; c++) PRLEVEL(p, ("%ld\t\t", c));
+    //                PRLEVEL(p, (" ;\n"));
+    //                for (Int r = 0; r < rowCount; r++)
+    //                {
+    //                    PRLEVEL(p, ("%% %ld\t", frowList[r]));
+    //                    for (Int c = col1; c < col2; c++)
+    //                        PRLEVEL(p, (" %2.5lf\t",
+    //                                    pivotalFront[(c - col1) * rowCount + r]));
+    //                    PRLEVEL(p, ("\n"));
+    //                }
+    //                p = 1;
+    //    #endif
+    //            }
+    //            if (elementList[e] != NULL)
+    //            {
+    //                el->lac = cEl;
+    //                lacList[e] = lac_el(elementList, e);
+    //                pivotal_elements[ii++] = pivotal_elements[i];
+    //                PRLEVEL(1, ("%%e = %ld, el->lac= %ld ", e, el->lac));
+    //                PRLEVEL(
+    //                    1, ("el_colIndex[%ld]=%ld :\n", el->lac, el_colIndex[el->lac]));
+    //    #ifndef NDEBUG  // print the element which has been assembled from
+    //                p = 1;
+    //                PRLEVEL(p, ("%% ASSEMBLED element= %ld  mEl =%ld ", e, mEl));
+    //                if (p <= 0) paru_print_element(paruMatInfo, e);
+    //    #endif
+    //                ASSERT(cEl < nEl);
+    //            }
     }
 
 #ifndef NDEBUG
@@ -597,7 +606,7 @@ void paru_pivotal(std::vector<Int> &pivotal_elements,
             if (el->nzr_pc == 0)
             {  // all the zero rows fit in the front
                 PRLEVEL(-1, ("%%element %ld totally fit in current front %ld\n",
-                             e, f));
+                            e, f));
             }
             ASSERT(el->nzr_pc >= 0);
 #endif
