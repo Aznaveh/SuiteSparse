@@ -36,7 +36,7 @@ void paru_full_summed(Int e, Int f, paru_matrix *paruMatInfo,
                       cholmod_common *cc)
 
 {
-    DEBUGLEVEL(1);
+    DEBUGLEVEL(0);
 #ifndef NDEBUG
     Int p = 1;
 #endif
@@ -82,7 +82,7 @@ void paru_full_summed(Int e, Int f, paru_matrix *paruMatInfo,
     Int *isRowInFront = Work->rowSize;
 
 #ifndef NDEBUG  // print the element which is going to be assembled from
-    p = -2;
+    p = 2;
     PRLEVEL(p, ("%% ASSEMBL element= %ld  mEl =%ld ", e, mEl));
     if (p <= 0) paru_print_element(paruMatInfo, e);
 #endif
@@ -200,12 +200,12 @@ void paru_full_summed(Int e, Int f, paru_matrix *paruMatInfo,
         ASSERT(j < nEl);
     }
 #ifndef NDEBUG  // print the element which has been assembled from
-    p = -1;
+    p = 1;
     PRLEVEL(p, ("%% ASSEMBLED element= %ld  mEl =%ld ", e, mEl));
     if (p <= 0) paru_print_element(paruMatInfo, e);
 
     // Printing the pivotal front
-    p = -2;
+    p = 2;
     PRLEVEL(p, ("%% After Assemble element %ld\n", e));
     PRLEVEL(p, ("%% x =  \t"));
     for (Int c = col1; c < col2; c++) PRLEVEL(p, ("%ld\t\t", c));

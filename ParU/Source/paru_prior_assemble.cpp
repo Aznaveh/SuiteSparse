@@ -46,8 +46,8 @@ void paru_prior_assemble(Int f, Int start_fac,
         }
 #ifndef NDEBUG
         PRLEVEL(p, ("%%elRow[%ld]=%ld \n", e, elRow[e]));
-        //if (elRow[e] != 0) PRLEVEL(-1, ("%%elRow[%ld]=%ld \n", e, elRow[e]));
-            // ASSERT (elRow[e] == 0);
+        // if (elRow[e] != 0) PRLEVEL(-1, ("%%elRow[%ld]=%ld \n", e, elRow[e]));
+        // ASSERT (elRow[e] == 0);
 #endif
 
         if (el->nzr_pc == 0)  // if all the rows are available in current front
@@ -75,21 +75,22 @@ void paru_prior_assemble(Int f, Int start_fac,
             // This element contributes to both pivotal rows and pivotal columns
             //  However it has zero rows in current pivotal columns therefore
             //  not all rows are there
-            // it can be eliminated partially 
-            //       ________________________________      
+            // it can be eliminated partially
+            //       ________________________________
             //       |      |                         |
             //       |      |                         |
-            //       ___xxxxxxxxxxx____________________      
-            //       |  xxxxxxxxxxx                   |  
+            //       ___xxxxxxxxxxx____________________
+            //       |  xxxxxxxxxxx                   |
             //       |  oxxo|oxoxox                   | <- assemble rows
             //       |  ooxx|oxoxox                   |
             //       |  oooo|oxoxox                   |
-            //       ---------------------------------     
+            //       ---------------------------------
             //          ooooooxxxxx  --> outsidie the front
             //          ooooooxxxxx
-            // 
+            //
             {
                 paru_eliminate_el_with0rows(e, f, colHash, paruMatInfo, cc);
+                if (elementList[e] == NULL) continue;
                 PRLEVEL(p, ("%%assembling %ld in %ld done\n", e, el_ind));
             }
             // keeping current element

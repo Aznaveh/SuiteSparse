@@ -17,7 +17,7 @@ void paru_pivotal(std::vector<Int> &pivotal_elements,
                   std::vector<Int> &panel_row, Int f, heaps_info &hi,
                   paru_matrix *paruMatInfo, cholmod_common *cc)
 {
-    DEBUGLEVEL(1);
+    DEBUGLEVEL(0);
     paru_symbolic *LUsym = paruMatInfo->LUsym;
     Int *snM = LUsym->super2atree;
     std::vector<Int> **heapList = paruMatInfo->heapList;
@@ -72,7 +72,7 @@ void paru_pivotal(std::vector<Int> &pivotal_elements,
             Int lacFel = lacList[frontEl];
             PRLEVEL(p, ("%% element = %ld col1=%ld", frontEl, col1));
             PRLEVEL(p, (" lac_el = %ld \n", lacFel));
-            ASSERT(lacFel >= col1);
+            //ASSERT(lacFel >= col1);
             PRLEVEL(p, ("%% curHeap->size= %ld \n", curHeap->size()));
 
             if (lacFel >= col2) break;
@@ -271,11 +271,12 @@ void paru_pivotal(std::vector<Int> &pivotal_elements,
         }
         panel_row[(lacList[e] - col1) / panel_width] = rowCount;
 #ifndef NDEBUG
-        p = 1;
+        p=-1;
         PRLEVEL(p, ("%%rowCount=%ld", rowCount));
         PRLEVEL(p, (" lac=%ld", lacList[e]));
         ASSERT((lacList[e] - col1) / panel_width < num_panels);
         PRLEVEL(p, (" ind.=%ld\n", (lacList[e] - col1) / panel_width));
+        p=1;
 #endif
     }
 

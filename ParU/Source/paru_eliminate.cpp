@@ -761,7 +761,6 @@ void paru_eliminate_el_with0rows(Int e, Int f, std::vector<Int> &colHash,
     }
 
     el->nrowsleft = el->nzr_pc;
-    ASSERT(new_lac < nEl);
     el->lac = new_lac;
     Int *lacList = paruMatInfo->lacList;
     lacList[e] = el_colIndex[el->lac];
@@ -780,4 +779,11 @@ void paru_eliminate_el_with0rows(Int e, Int f, std::vector<Int> &colHash,
 
     p = 1;
 #endif
+   if (new_lac == nEl) 
+   {
+#ifndef NDEBUG
+    PRLEVEL(p, ("%% %ld is freed inside with0\n", eli));
+#endif
+       paru_free_el(e, elementList, cc);
+   }
 }
