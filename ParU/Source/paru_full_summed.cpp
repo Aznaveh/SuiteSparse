@@ -65,8 +65,6 @@ void paru_full_summed(Int e, Int f, paru_matrix *paruMatInfo,
     // Int *rowRelIndex = relRowInd (el);
     Int *rowRelIndex = (Int *)(el + 1) + 2 * nEl + mEl;
 
-    // Int *colRelIndex = relColInd (paru_Element *el);
-    Int *colRelIndex = (Int *)(el + 1) + mEl + nEl;
 
     // Int *el_rowIndex = rowIndex_pointer (el);
     Int *el_rowIndex = (Int *)(el + 1) + nEl;
@@ -78,8 +76,6 @@ void paru_full_summed(Int e, Int f, paru_matrix *paruMatInfo,
     // double *el_Num = numeric_pointer (el);
     double *el_Num = (double *)((Int *)(el + 1) + 2 * nEl + 2 * mEl);
 
-    work_struct *Work = paruMatInfo->Work;
-    Int *isRowInFront = Work->rowSize;
 
 #ifndef NDEBUG  // print the element which is going to be assembled from
     p = 2;
@@ -164,12 +160,11 @@ void paru_full_summed(Int e, Int f, paru_matrix *paruMatInfo,
             for (Int ii = 0; ii < nrows2assembl; ii++)
             {
                 Int i = tempRow[ii];
-                Int rowInd = el_rowIndex[i];
                 Int ri = rowRelIndex[i];
 
                 ASSERT(rowRelIndex[i] != -1);  // I already picked the rows
                 // that are not in zero pivots
-                ASSERT(rowInd >= 0);  // and also still alive
+                ASSERT(el_rowIndex[i] >= 0);  // and also still alive
 
                 PRLEVEL(1, ("%% ri = %ld \n", ri));
                 PRLEVEL(1, ("%% sC [%ld] =%2.5lf \n", i, sC[i]));

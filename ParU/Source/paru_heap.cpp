@@ -118,11 +118,10 @@ void paru_make_heap (Int f, Int start_fac,
             for(Int i = 0 ; i < (Int) pivotal_elements.size(); i++)
             {
                 Int e = pivotal_elements[i];
-//#ifndef NDEBUG  
                 paru_Element *el = elementList[e];
-                //ASSERT (el != NULL);
-//#endif
-                
+#ifndef NDEBUG  
+                ASSERT (el != NULL);
+#endif
                 if (el == NULL) continue;
                 PRLEVEL (p, ("%ld  ",e));
                 curHeap->push_back(e);

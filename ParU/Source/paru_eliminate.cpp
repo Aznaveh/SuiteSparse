@@ -74,10 +74,9 @@ void paru_eliminate_all(Int e, Int f, std::vector<Int> &colHash,
         Int colInd = el_colIndex[el->lac];
         PRLEVEL(1, ("%% colInd =%ld \n", colInd));
         ASSERT(colInd >= 0);
-        // Int fcolcolind = paru_find_hash (colInd, colHash, fcolList);
 #endif
-        Int fcolcolind = colRelIndex[el->lac];
-        double *dC = curEl_Num + fcolcolind * curEl->nrows;
+        Int fcolind = colRelIndex[el->lac];
+        double *dC = curEl_Num + fcolind * curEl->nrows;
         Int nrowsSeen = el->nrowsleft;
         for (Int i = 0; i < mEl; i++)
         {
@@ -120,10 +119,9 @@ void paru_eliminate_all(Int e, Int f, std::vector<Int> &colHash,
             Int colInd = el_colIndex[j];
             PRLEVEL(1, ("%% colInd =%ld \n", colInd));
             if (colInd < 0) continue;
-            // Int fcolcolind = paru_find_hash (colInd, colHash, fcolList);
-            Int fcolcolind = colRelIndex[j];
+            Int fcolind = colRelIndex[j];
 
-            double *dC = curEl_Num + fcolcolind * curEl->nrows;
+            double *dC = curEl_Num + fcolind * curEl->nrows;
 
             for (Int ii = 0; ii < el->nrowsleft; ii++)
             {
@@ -229,14 +227,14 @@ void paru_eliminate_cols(Int e, Int f, std::vector<Int> &colHash,
         }
 
         Int colInd = el_colIndex[el->lac];
-        Int fcolcolind = paru_find_hash(colInd, colHash, fcolList);
+        Int fcolind = paru_find_hash(colInd, colHash, fcolList);
 
         PRLEVEL(1, ("%% el->lac =%ld \n", el->lac));
         double *sC = el_Num + mEl * el->lac;  // source column pointer
         PRLEVEL(1, ("%% colInd =%ld \n", colInd));
         ASSERT(colInd >= 0);
 
-        double *dC = curEl_Num + fcolcolind * curEl->nrows;
+        double *dC = curEl_Num + fcolind * curEl->nrows;
 
         for (Int ii = 0; ii < el->nrowsleft; ii++)
         {
@@ -290,13 +288,10 @@ void paru_eliminate_cols(Int e, Int f, std::vector<Int> &colHash,
         Int colInd = el_colIndex[j];
         PRLEVEL(1, ("%% colInd =%ld \n", colInd));
         if (colInd < 0) continue;
-        Int fcolcolind = paru_find_hash(colInd, colHash, fcolList);
-        if (fcolcolind == -1)
-        {  // not found
-            continue;
-        }
+        Int fcolind = paru_find_hash(colInd, colHash, fcolList);
+        if (fcolind == -1) continue;
         toll++;  // if found
-        double *dC = curEl_Num + fcolcolind * curEl->nrows;
+        double *dC = curEl_Num + fcolind * curEl->nrows;
 
         for (Int ii = 0; ii < el->nrowsleft; ii++)
         {
@@ -474,11 +469,10 @@ void paru_eliminate_rows(Int e, Int f, std::vector<Int> &colHash,
         PRLEVEL(1, ("%% colInd =%ld \n", colInd));
         if (colInd < 0) continue;
         ncolsSeen--;
-        // Int fcolcolind = paru_find_hash (colInd, colHash, fcolList);
-        Int fcolcolind = colRelIndex[j];
+        Int fcolind = colRelIndex[j];
 
-        PRLEVEL(1, ("%% fcolcolind=%ld \n", fcolcolind));
-        double *dC = curEl_Num + fcolcolind * curEl->nrows;
+        PRLEVEL(1, ("%% fcolind=%ld \n", fcolind));
+        double *dC = curEl_Num + fcolind * curEl->nrows;
 
         for (Int ii = 0; ii < (Int)tempRow.size(); ii++)
         {
@@ -543,7 +537,7 @@ void paru_eliminate_el_with0rows(Int e, Int f, std::vector<Int> &colHash,
     //          ooooooxxxxx
     //
     //
-    DEBUGLEVEL(1);
+    DEBUGLEVEL(0);
 #ifndef NDEBUG
     Int p = -1;
 #endif
@@ -554,13 +548,13 @@ void paru_eliminate_el_with0rows(Int e, Int f, std::vector<Int> &colHash,
     PRLEVEL(p, ("%% Eliminat elment %ld  with0rows in %ld\n", e, eli));
 
 #ifndef NDEBUG
+    p = 1;
     PRLEVEL(p, ("%% %ld :\n", eli));
     if (p <= 0) paru_print_element(paruMatInfo, eli);
 
     PRLEVEL(p, ("%% %ld :\n", e));
     if (p <= 0) paru_print_element(paruMatInfo, e);
 
-    p = 1;
 #endif
 
     paru_Element **elementList = paruMatInfo->elementList;
@@ -617,10 +611,9 @@ void paru_eliminate_el_with0rows(Int e, Int f, std::vector<Int> &colHash,
         Int colInd = el_colIndex[el->lac];
         PRLEVEL(1, ("%% colInd =%ld \n", colInd));
         ASSERT(colInd >= 0);
-        // Int fcolcolind = paru_find_hash (colInd, colHash, fcolList);
 #endif
-        Int fcolcolind = colRelIndex[el->lac];
-        double *dC = curEl_Num + fcolcolind * curEl->nrows;
+        Int fcolind = colRelIndex[el->lac];
+        double *dC = curEl_Num + fcolind * curEl->nrows;
         Int nrows2bSeen = el->nrowsleft;
         for (Int i = 0; i < mEl; i++)
         {
@@ -681,9 +674,9 @@ void paru_eliminate_el_with0rows(Int e, Int f, std::vector<Int> &colHash,
             Int colInd = el_colIndex[j];
             PRLEVEL(1, ("%% colInd =%ld \n", colInd));
             if (colInd < 0) continue;
-            Int fcolcolind = colRelIndex[j];
+            Int fcolind = colRelIndex[j];
 
-            double *dC = curEl_Num + fcolcolind * curEl->nrows;
+            double *dC = curEl_Num + fcolind * curEl->nrows;
 
             for (Int ii = 0; ii < nrows2assembl; ii++)
             {
@@ -717,8 +710,8 @@ void paru_eliminate_el_with0rows(Int e, Int f, std::vector<Int> &colHash,
 
         if (rowRelIndex[ii] == -1)  // row with all zeros in piv
         {                           // update lac
-            PRLEVEL(-1, ("%%Searching for lac in %ld\n%%", rowInd));
-            PRLEVEL(-1, ("%%col=%ld\n%%", el->lac));
+            PRLEVEL(1, ("%%Searching for lac in %ld\n%%", rowInd));
+            PRLEVEL(1, ("%%col=%ld\n%%", el->lac));
             for (Int jj = el->lac; jj < new_lac; jj++)
             // searching for the first nz
             {
@@ -737,7 +730,6 @@ void paru_eliminate_el_with0rows(Int e, Int f, std::vector<Int> &colHash,
         else  // It was assembled here; mark row as assembled
         {
             el_rowIndex[ii] = -1;
-            rowRelIndex[ii] = -1;  //XXX remove this later
         }
         if (--nrows2bSeen == 0) break;
     }
@@ -756,7 +748,8 @@ void paru_eliminate_el_with0rows(Int e, Int f, std::vector<Int> &colHash,
         el->ncolsleft = ncolsleft;
         for (Int j = el->lac; j < new_lac; j++)
         {
-            el_colIndex[j] = flip(el_colIndex[j]);
+            if ( el_colIndex[j] >= 0) 
+                el_colIndex[j] = flip(el_colIndex[j]);
         }
     }
 
@@ -764,26 +757,33 @@ void paru_eliminate_el_with0rows(Int e, Int f, std::vector<Int> &colHash,
     el->lac = new_lac;
     Int *lacList = paruMatInfo->lacList;
     lacList[e] = el_colIndex[el->lac];
-    PRLEVEL(
-        -1,
-        ("%%Finally new-lac is %ld nEl=%ld\n lacList[%ld]=%ld nrowsleft=%ld\n",
-         el->lac, nEl, e, lacList[e], el->nrowsleft));
-
 #ifndef NDEBUG
+    Int *Super = LUsym->Super;
+    Int col1 = Super[f]; /* fornt F has columns col1:col2-1 */
+    Int col2 = Super[f + 1];
     p = -1;
+    PRLEVEL(p, ("%% %ld(%ld) %ld-%ld :\n", f, eli, col1, col2));
+    PRLEVEL(p, ("%%Finally new-lac is %ld ", el->lac));
+    PRLEVEL(p, ("nEl=%ld\n lacList[%ld]=%ld nrowsleft=%ld\n", nEl, e,
+                lacList[e], el->nrowsleft));
+
+    p = 1;
+    if (nEl != new_lac && el_colIndex[new_lac] < col2) p = -2;
+
     PRLEVEL(p, ("%% %ld :\n", eli));
     if (p <= 0) paru_print_element(paruMatInfo, eli);
 
     PRLEVEL(p, ("%% %ld :\n", e));
     if (p <= 0) paru_print_element(paruMatInfo, e);
-
     p = 1;
+    ASSERT(nEl == new_lac || col2 <= el_colIndex[new_lac]);
+
 #endif
-   if (new_lac == nEl) 
-   {
+    if (new_lac == nEl)
+    {
 #ifndef NDEBUG
-    PRLEVEL(p, ("%% %ld is freed inside with0\n", eli));
+        PRLEVEL(p, ("%% %ld is freed inside with0\n", eli));
 #endif
-       paru_free_el(e, elementList, cc);
-   }
+        paru_free_el(e, elementList, cc);
+    }
 }

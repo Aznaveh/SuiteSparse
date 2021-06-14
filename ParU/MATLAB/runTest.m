@@ -62,10 +62,10 @@ for k = 1:nmat
     if ( id == 2056 || id == 2034 || id == 1867 || id == 2842 || ...
         id == 2843 ||    id == 2844 || id == 2845 || id == 1396 || ...
         id == 1397 || ... %ordering failed
-       id == 1404 || id == 1297 || id == 788 || id == 1373 || id == 2265 || ...
-       id == 274 ||  id == 273 || id == 174 || id == 2015 || id == 2104 || ...%newer tests singular??
-       id == 2267 || id == 2649 || id == 2847 || id == 2337 || id == 2841)  
-
+        id == 1404 || id == 1297 || id == 788 || id == 1373 || id == 2265 || ...
+        id == 274 ||  id == 273 || id == 174 || id == 2015 || id == 2104 || ...%newer tests singular??
+        id == 576 || ...
+        id == 2267 || id == 2649 || id == 2847 || id == 2337 || id == 2841)  
         continue;
     end
     group = index.Group {id} ;
@@ -77,11 +77,11 @@ for k = 1:nmat
     if (nnz(Aorig) < NNZMat)
             continue;
     end
- 
+
     [dp,dq,dr,ds,dcc,drr] = dmperm(Aorig);
     [m n] = size (Aorig);
 
-   A = Aorig;
+    A = Aorig;
 
     if (size(dr) ~= 2 )
         %continue 
@@ -110,7 +110,7 @@ for k = 1:nmat
     end
 
     loop_cnt = loop_cnt + 1;
- 
+
     if (loop_cnt > 2150)
         break
     end
@@ -119,11 +119,39 @@ for k = 1:nmat
     %max scaling
     A = spdiags (1./max (abs(A),[], 2), 0, size(A,1), size(A,2)) * A ;
     mmwrite('../Matrix/ParUTst/tmp.mtx', A);
-%    intel = sprintf('. /home/grads/a/aznaveh/intel/bin/compilervars.sh intel64;');
-%    intel = sprintf('. /opt/intel/compilers_and_libraries/linux/bin/compilervars.sh intel64;');
+    %    intel = sprintf('. /home/grads/a/aznaveh/intel/bin/compilervars.sh intel64;');
+    %    intel = sprintf('. /opt/intel/compilers_and_libraries/linux/bin/compilervars.sh intel64;');
     str = sprintf ('../Demo/umfout %d < ../Matrix/ParUTst/tmp.mtx', id );
     %str = strcat(intel, str);
+
+    %%%  {  five times test
+    %info_name = sprintf ('%d_info.txt',id);
+    %infofullname = strcat(path, info_name);
+
+    %for i=1:5
+    %    %str = strcat(intel, str);
+    %    system(str);
+    %    t_Info = load (infofullname);
+    %    a_myElaps(i) = t_Info(1);
+    %    a_fromCode_umf_Elaps(i) = t_Info(2);
+    %end
+
+    %a_myElaps = sort(a_myElaps);
+    %a_fromCode_umf_Elaps = sort(a_fromCode_umf_Elaps);
+    %a_myElaps = a_myElaps(2:4);
+    %a_fromCode_umf_Elaps = a_fromCode_umf_Elaps (2:4);
+    %myElaps = mean(a_myElaps);
+    %fromCode_umf_Elaps = mean(a_fromCode_umf_Elaps);
+    %%%  }  five times test
+
+    %%% { one time test
+    info_name = sprintf ('%d_info.txt',id);
+    infofullname = strcat(path, info_name);
     system(str);
+    t_Info = load (infofullname);
+    myElaps = t_Info(1);
+    fromCode_umf_Elaps = t_Info(2);
+    %%% } one time test
 
 
     % Loading the results into Matlab
@@ -153,16 +181,10 @@ for k = 1:nmat
     LU_name = sprintf ('%d_LU.txt',id);
     LUfullname = strcat(path, LU_name);
 
-    info_name = sprintf ('%d_info.txt',id);
-    infofullname = strcat(path, info_name);
-    t_Info = load (infofullname);
-    myElaps = t_Info(1);
-    fromCode_umf_Elaps = t_Info(2);
-
-%    flp_cnt_dgemm = t_Info(3);
-%    flp_cnt_trsm = t_Info(4);
-%    flp_cnt_dger = t_Info(5);
-%    hardware_flp_cnt = flp_cnt_dgemm + flp_cnt_trsm + flp_cnt_dger;
+    %    flp_cnt_dgemm = t_Info(3);
+    %    flp_cnt_trsm = t_Info(4);
+    %    flp_cnt_dger = t_Info(5);
+    %    hardware_flp_cnt = flp_cnt_dgemm + flp_cnt_trsm + flp_cnt_dger;
 
 
 
