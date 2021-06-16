@@ -230,24 +230,13 @@ void paru_free_el(Int e, paru_Element **elementList, cholmod_common *cc)
     DEBUGLEVEL(0);
     paru_Element *el = elementList[e];
     if (el == NULL) return;
-#ifndef NDEBUG
-        Int nrows = el->nrows, ncols = el->ncols;
-        PRLEVEL(1, ("%%Free the element e =%ld\t", e));
-        PRLEVEL(1, ("%% nrows =%ld ", nrows));
-        PRLEVEL(1, ("%% ncols =%ld\n", ncols));
-     //Int tot_size = sizeof(paru_Element) + sizeof(Int) * (2 * (nrows + ncols))
-     //+
-     //              sizeof(double) * nrows * ncols;
-#endif
-    // TODO use GB_dealloc_memory and the free_pool
-    // paru_free(1, tot_size, el, cc);
-    //  GB_free_memory ((void **) &el, tot_size /* FIXME: wrong size */) ;
-
-    size_t size_allocated = el->size_allocated;
-    // printf ("freeing element, tot_size %ld allocated %ld\n", tot_size,
-    //    size_allocated) ;
-    GB_dealloc_memory((void **)&el, size_allocated);
-
+    Int nrows = el->nrows, ncols = el->ncols;
+    PRLEVEL(1, ("%%Free the element e =%ld\t", e));
+    PRLEVEL(1, ("%% nrows =%ld ", nrows));
+    PRLEVEL(1, ("%% ncols =%ld\n", ncols));
+    Int tot_size = sizeof(paru_Element) + sizeof(Int) * (2 * (nrows + ncols)) +
+                   sizeof(double) * nrows * ncols;
+    paru_free(1, tot_size, el, cc);
     elementList[e] = NULL;
 }
 
@@ -329,7 +318,7 @@ void paru_freemat(paru_matrix **paruMatInfo_handle, cholmod_common *cc)
     {
         if (paruMatInfo->stack_mem.mem_bank[i] == NULL) break;
         paru_free(paruMatInfo->stack_mem.size_bank[i], 1,
-                paruMatInfo->stack_mem.mem_bank[i], cc);
+                  paruMatInfo->stack_mem.mem_bank[i], cc);
     }
 
     paru_free(1, nf * sizeof(Int), paruMatInfo->time_stamp, cc);
@@ -349,7 +338,7 @@ void paru_freemat(paru_matrix **paruMatInfo_handle, cholmod_common *cc)
     }
 #endif
     paru_free(1, (m + nf + 1) * sizeof(std::vector<Int> **),
-            paruMatInfo->heapList, cc);
+              paruMatInfo->heapList, cc);
 
     paru_free(1, (m + nf + 1) * sizeof(paru_Element), elementList, cc);
     work_struct *Work = paruMatInfo->Work;
@@ -365,5 +354,4 @@ void paru_freemat(paru_matrix **paruMatInfo_handle, cholmod_common *cc)
     paru_free(1, sizeof(work_struct), paruMatInfo->Work, cc);
     paru_free(1, sizeof(paru_matrix), paruMatInfo, cc);
     *paruMatInfo_handle = NULL;
-    GB_free_pool_finalize();
 }

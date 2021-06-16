@@ -23,18 +23,16 @@ paru_Element *paru_create_element(Int nrows, Int ncols, Int init,
 
     PRLEVEL(1, ("%% creating %ldx%ld element ", nrows, ncols));
     paru_Element *curEl;
-    Int tot_size = sizeof(paru_Element) + sizeof(Int) * (2 * (nrows + ncols)) +
-                   sizeof(double) * nrows * ncols;
-    size_t size_allocated;
+    size_t tot_size = sizeof(paru_Element) +
+                      sizeof(Int) * (2 * (nrows + ncols)) +
+                      sizeof(double) * nrows * ncols;
     if (init)
     {
-        // curEl = (paru_Element*) paru_calloc(1, tot_size , cc);
-        curEl = (paru_Element *)GB_calloc_memory(1, tot_size, &size_allocated);
+        curEl = (paru_Element *)paru_calloc(1, tot_size, cc);
     }
     else
     {
-        //      curEl = (paru_Element*) paru_alloc(1, tot_size , cc);
-        curEl = (paru_Element *)GB_malloc_memory(1, tot_size, &size_allocated);
+        curEl = (paru_Element *)paru_alloc(1, tot_size, cc);
     }
     if (curEl == NULL) return NULL;  // do not do error checking
 
@@ -45,10 +43,7 @@ paru_Element *paru_create_element(Int nrows, Int ncols, Int init,
     curEl->ncolsleft = curEl->ncols = ncols;
     curEl->rValid = -1;
     curEl->cValid = -1;
-    curEl->size_allocated = size_allocated;
 
     curEl->lac = 0;
-
     return curEl;
 }
-
