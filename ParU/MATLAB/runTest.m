@@ -64,7 +64,7 @@ for k = 1:nmat
         id == 1397 || ... %ordering failed
         id == 1404 || id == 1297 || id == 788 || id == 1373 || id == 2265 || ...
         id == 274 ||  id == 273 || id == 174 || id == 2015 || id == 2104 || ...%newer tests singular??
-        id == 576 || ...
+        id == 2384 || id == 2385 || ... %memory!!
         id == 2267 || id == 2649 || id == 2847 || id == 2337 || id == 2841)  
         continue;
     end
