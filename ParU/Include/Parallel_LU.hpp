@@ -230,10 +230,13 @@ typedef struct
     // factorizes the frontal matrix chain. Since the
     // symbolic factorization only provides
 
+#ifndef NDEBUG
     Int Us_bound_size;   // Upper bound on size of all Us, sum all fp*fn
     Int LUs_bound_size;  // Upper bound on size of all LUs, sum all fp*fm
     Int row_Int_bound;   // Upper bound on size of all ints for rows
     Int col_Int_bound;   // Upper bound on size of all ints for cols
+#endif
+
 } paru_symbolic;
 
 // =============================================================================
@@ -351,15 +354,6 @@ typedef struct
 } work_struct;
 
 typedef struct
-{
-    size_t size_bank[64],  // size of each bank
-        remaining;         // remaining space of current bank
-    Int cur;               // points to current bank
-    void *mem_bank[64];
-    void *avail;  // pointer to available space in current bank
-} stack_mem_info;
-
-typedef struct
 {              /*dense factorized part pointer*/
     Int m, n;  /* mxn dense matrix */
     double *p; /* point to factorized parts */
@@ -412,7 +406,6 @@ typedef struct
     double my_time;
     double umf_time;
 
-    stack_mem_info stack_mem;
 
 #ifdef COUNT_FLOPS
     // flop count info
@@ -432,8 +425,6 @@ paru_matrix *paru_init_rowFronts(cholmod_sparse *A, int scale,
 /* Wrappers for managing memory */
 void *paru_alloc(size_t n, size_t size, cholmod_common *cc);
 void *paru_calloc(size_t n, size_t size, cholmod_common *cc);
-void *paru_stack_calloc(size_t n, size_t size, paru_matrix *paruMatInfo,
-                        cholmod_common *cc);
 void *paru_realloc(Int newsize, Int size_Entry, void *oldP, Int *size,
                    cholmod_common *cc);
 

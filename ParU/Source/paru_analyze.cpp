@@ -745,12 +745,15 @@ paru_symbolic *paru_analyze
         return NULL;  
     }
 
+#ifndef NDEBUG
     Int Us_bound_size = 0;
     Int LUs_bound_size = 0;
     Int row_Int_bound = 0;
     Int col_Int_bound = 0;
+#endif 
     for (Int f = 0; f < nf; f++)
     {    
+#ifndef NDEBUG
         Int fp = Super[f+1]-Super[f];
         Int fm = LUsym->Fm[f];
         Int fn = LUsym->Cm[f];     /* Upper bound number of cols of F */ 
@@ -758,15 +761,16 @@ paru_symbolic *paru_analyze
         LUs_bound_size += fp*fm;
         row_Int_bound += fm;
         col_Int_bound += fn;
+#endif 
         if (Parent [f] > 0)
             Childp[Parent[f]+1]++;
     }
     paru_cumsum (nf+2, Childp);
+#ifndef NDEBUG
     LUsym->Us_bound_size = Us_bound_size;
     LUsym->LUs_bound_size = LUs_bound_size;
     LUsym->row_Int_bound = row_Int_bound;
     LUsym->col_Int_bound = col_Int_bound;
-#ifndef NDEBUG
     p = 1;
     PRLEVEL (p, ("%%row_Int_bound=%ld, col_Int_bound=%ld", 
                 row_Int_bound,col_Int_bound));

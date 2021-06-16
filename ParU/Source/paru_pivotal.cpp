@@ -359,40 +359,24 @@ void paru_pivotal(std::vector<Int> &pivotal_elements,
     Int fm = LUsym->Fm[f]; /* Upper bound number of rows of F */
     ASSERT(fm >= rowCount);
 
-    // realloc version is not good for my memory management neither the parallel
-    // computation
     // freeing extra space for rows
-    // if (rowCount != fm)
-    //{
-    //    Int sz = sizeof(Int)*fm;
-    //    frowList =
-    //        (Int*) paru_realloc (rowCount, sizeof(Int), frowList, &sz, cc);
-    //    paruMatInfo ->frowList[f] = frowList;
-    //}
-
-    // new version
-    // TODO: it should be from the stack
-    Int *frowList_temp =
-        (Int *)paru_stack_calloc(rowCount, sizeof(Int), paruMatInfo, cc);
-    if (frowList_temp == NULL)
+    if (rowCount != fm)
     {
-        printf("%% Out of memory when tried to allocate for frowList %ld", f);
-        // TODO: manage return
-        return;
+        Int sz = sizeof(Int) * fm;
+        frowList =
+            (Int *)paru_realloc(rowCount, sizeof(Int), frowList, &sz, cc);
+        paruMatInfo->frowList[f] = frowList;
     }
-    memcpy(frowList_temp, frowList, rowCount * sizeof(Int));
-    paru_free(fm, sizeof(Int), frowList, cc);
-    frowList = frowList_temp;
-    paruMatInfo->frowList[f] = frowList;
 
-    double *pivotalFront = (double *)paru_stack_calloc(
-        rowCount * fp, sizeof(double), paruMatInfo, cc);
+    double *pivotalFront =
+        (double *)paru_calloc(rowCount * fp, sizeof(double), cc);
 
     if (pivotalFront == NULL)
     {
         printf("%% Out of memory when tried to allocate for pivotal part %ld",
                f);
         // paru_free ( num_panels, sizeof (Int), panel_row, cc);
+        // TODO: return
         return;
     }
 
@@ -499,7 +483,7 @@ void paru_pivotal(std::vector<Int> &pivotal_elements,
             if (el->nzr_pc == 0)
             {  // all the zero rows fit in the front
                 PRLEVEL(1, ("%%element %ld totally fit in current front %ld\n",
-                             e, f));
+                            e, f));
             }
             ASSERT(el->nzr_pc >= 0);
 #endif

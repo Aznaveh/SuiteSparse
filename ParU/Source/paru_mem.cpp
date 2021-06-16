@@ -35,99 +35,6 @@ void *paru_calloc(size_t n, size_t size, cholmod_common *cc)
     return p;
 }
 
-void *paru_stack_calloc(size_t n, size_t size, paru_matrix *paruMatInfo,
-                        cholmod_common *cc)
-{
-    DEBUGLEVEL(0);
-    PRLEVEL(1,
-            ("%% STACK ALLOC n= %ld size= %ld tot=%ld\n", n, size, n * size));
-    static Int calloc_count = 0;
-    calloc_count += n * size;
-
-    if (paruMatInfo->stack_mem.mem_bank[0] == NULL)
-    // first time
-    {
-        paru_symbolic *LUsym = paruMatInfo->LUsym;
-        Int Us_bound_size = LUsym->Us_bound_size;
-        Int LUs_bound_size = LUsym->LUs_bound_size;
-        Int double_size = LUs_bound_size + Us_bound_size;
-        Int row_Int_bound = LUsym->row_Int_bound;
-        Int col_Int_bound = LUsym->col_Int_bound;
-        Int int_size = row_Int_bound + col_Int_bound;
-        size_t upperBoundSize =
-            double_size * sizeof(double) + int_size * sizeof(Int);
-        PRLEVEL(1, ("%% ALLOC upper = %ld\n", upperBoundSize));
-
-        size_t size0;
-        if (double_size < 1000)
-            size0 = upperBoundSize;
-        else
-            // min
-            size0 = (upperBoundSize < 64 * n * size) ? upperBoundSize
-                                                     : 64 * n * size;
-
-        PRLEVEL(1, ("%% ALLOC size0= %zu\n", size0));
-        void *p = cholmod_l_calloc(size0, 1, cc);
-
-        if (p == NULL)
-        {
-            printf("Memory allocation problem for the first bank alloc!\n");
-            return NULL;
-        }
-
-        paruMatInfo->stack_mem.mem_bank[0] = p;
-        paruMatInfo->stack_mem.avail = p;
-        paruMatInfo->stack_mem.remaining = size0;
-        paruMatInfo->stack_mem.size_bank[0] = size0;
-        paruMatInfo->stack_mem.cur = 0;
-    }
-
-    Int remaining = paruMatInfo->stack_mem.remaining;
-    remaining -= n * size;
-    PRLEVEL(1, ("%% ALLOC remaining= %ld \n", remaining));
-
-    if (remaining < 0)  // alloc memory for the next bank
-    {
-        Int cur = paruMatInfo->stack_mem.cur;
-        PRLEVEL(1, ("%% ALLOC NEW cur=%ld", cur));
-        if (cur == 63)
-        {
-            printf("LAST BANK ALREADY USED!!\n");
-            return NULL;
-        }
-        size_t cur_size = paruMatInfo->stack_mem.size_bank[cur];
-
-        // The only do while loop I have ever used
-        do
-        {
-            cur_size *= 2;
-            PRLEVEL(1, ("%% $$$cur_size= %zu \n", cur_size));
-        } while (cur_size < n * size);
-        void *p = cholmod_l_calloc(cur_size, 1, cc);
-        if (p == NULL)
-        {
-            printf("Memory allocation problem for the %ld bank alloc!\n", cur);
-            return NULL;
-        }
-        paruMatInfo->stack_mem.mem_bank[++cur] = p;
-        paruMatInfo->stack_mem.cur = cur;
-        paruMatInfo->stack_mem.size_bank[cur] = cur_size;
-        paruMatInfo->stack_mem.avail = p;
-        paruMatInfo->stack_mem.remaining = cur_size;
-        remaining = cur_size - n * size;
-    }
-
-    PRLEVEL(1, ("%% ALLOC2 remaining= %ld \n", remaining));
-    paruMatInfo->stack_mem.remaining = (size_t)remaining;
-    void *avail = paruMatInfo->stack_mem.avail;
-    // void *new_avail = (void*) ( (size_t *)avail + n*size + 1);
-    void *new_avail = (void *)((char *)avail + n * size);
-    paruMatInfo->stack_mem.avail = new_avail;
-
-    PRLEVEL(1, ("%% callocated %ld in %p total= %ld\n", n * size, avail,
-                calloc_count));
-    return avail;
-}
 void *paru_realloc(
     Int newsize,     // requested size
     Int size_Entry,  // size of each Entry
@@ -293,6 +200,30 @@ void paru_freemat(paru_matrix **paruMatInfo_handle, cholmod_common *cc)
     paru_fac *LUs = paruMatInfo->partial_LUs;
     paru_fac *Us = paruMatInfo->partial_Us;
 
+    for(Int i = 0; i < nf ; i++)
+    {  
+
+        paru_free (paruMatInfo->frowCount[i], 
+                sizeof(Int), paruMatInfo->frowList[i], cc);
+
+        paru_free (paruMatInfo->fcolCount[i], 
+                sizeof(Int), paruMatInfo->fcolList[i], cc);
+
+
+        PRLEVEL (1, ("%% Freeing Us=%p\n", Us[i].p));
+        if(Us[i].p != NULL)
+        {
+            Int m = Us[i].m; Int n = Us[i].n;
+            paru_free (m*n, sizeof (double), Us[i].p, cc);
+        }
+        PRLEVEL (1, ("%% Freeing LUs=%p\n", LUs[i].p));
+        if(LUs[i].p != NULL)
+        {
+            Int m = LUs[i].m; Int n = LUs[i].n;
+            paru_free (m*n, sizeof (double), LUs[i].p, cc);
+        }
+    }
+
     PRLEVEL(1, ("%% Done LUs\n"));
     paru_free(1, nf * sizeof(Int), paruMatInfo->frowCount, cc);
     paru_free(1, nf * sizeof(Int), paruMatInfo->fcolCount, cc);
@@ -314,12 +245,6 @@ void paru_freemat(paru_matrix **paruMatInfo_handle, cholmod_common *cc)
     PRLEVEL(1, ("%% FREE upperBoundSize =%ld \n", upperBoundSize));
 #endif
 
-    for (Int i = 0; i < 64; i++)
-    {
-        if (paruMatInfo->stack_mem.mem_bank[i] == NULL) break;
-        paru_free(paruMatInfo->stack_mem.size_bank[i], 1,
-                  paruMatInfo->stack_mem.mem_bank[i], cc);
-    }
 
     paru_free(1, nf * sizeof(Int), paruMatInfo->time_stamp, cc);
     // in practice each parent should deal with the memory for the children
@@ -338,7 +263,7 @@ void paru_freemat(paru_matrix **paruMatInfo_handle, cholmod_common *cc)
     }
 #endif
     paru_free(1, (m + nf + 1) * sizeof(std::vector<Int> **),
-              paruMatInfo->heapList, cc);
+            paruMatInfo->heapList, cc);
 
     paru_free(1, (m + nf + 1) * sizeof(paru_Element), elementList, cc);
     work_struct *Work = paruMatInfo->Work;
