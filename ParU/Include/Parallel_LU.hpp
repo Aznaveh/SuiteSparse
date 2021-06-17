@@ -1,4 +1,4 @@
-#// ============================================================================/
+// ============================================================================/
 // ======================= Parallel_LU.hpp ====================================/
 // ============================================================================/
 
@@ -259,19 +259,19 @@ typedef struct
 
     Int
 
-        nrowsleft, // number of rows remaining
-        ncolsleft, // number of columns remaining
-        nrows,     // number of rows
-        ncols,     // number of columns
-        rValid,    // validity of relative row index
-        cValid;    // validity of relative column index
+        nrowsleft,  // number of rows remaining
+        ncolsleft,  // number of columns remaining
+        nrows,      // number of rows
+        ncols,      // number of columns
+        rValid,     // validity of relative row index
+        cValid;     // validity of relative column index
 
     Int lac;  // least active column which is active
               // 0 <= lac <= ncols
 
-    Int nzr_pc;     // number of zero rows in pivotal column of current front
+    Int nzr_pc;  // number of zero rows in pivotal column of current front
 
-    size_t size_allocated ;
+    size_t size_allocated;
     /* followed in memory by:
        Int
        col [0..ncols-1],	column indices of this element
@@ -406,7 +406,6 @@ typedef struct
     double my_time;
     double umf_time;
 
-
 #ifdef COUNT_FLOPS
     // flop count info
     double flp_cnt_dgemm;
@@ -447,7 +446,6 @@ Int paru_factorize(Int f, Int start_fac, std::vector<Int> &panel_row,
 
 paru_Element *paru_create_element(Int nrows, Int ncols, Int init,
                                   cholmod_common *cc);
-void assemble_col(const double *sR, double *dR, Int m, const Int *relRowInd);
 
 void assemble_row_toU(Int e, Int f, Int sR, Int dR, std::vector<Int> &colHash,
                       paru_matrix *paruMatInfo);
@@ -498,7 +496,7 @@ void paru_eliminate_rows(Int e, Int f, std::vector<Int> &colHash,
                          paru_matrix *paruMatInfo, cholmod_common *cc);
 
 void paru_eliminate_el_with0rows(Int e, Int f, std::vector<Int> &colHash,
-                        paru_matrix *paruMatInfo, cholmod_common *cc);
+                                 paru_matrix *paruMatInfo, cholmod_common *cc);
 
 // heap related
 void paru_make_heap(Int f, Int start_fac, std::vector<Int> &pivotal_elements,
