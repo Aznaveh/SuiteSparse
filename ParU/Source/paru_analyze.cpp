@@ -483,7 +483,7 @@ paru_symbolic *paru_analyze
     /* ---------------------------------------------------------------------- */
 
     // Parent size is nf+1 potentially smaller than what UMFPACK allocate
-    Int size = n + 1;
+    size_t size = n + 1;
     Int *Parent = 
         (Int*) paru_realloc (nf+1, sizeof(Int), Front_parent, &size, cc);
     ASSERT (size < n+1);

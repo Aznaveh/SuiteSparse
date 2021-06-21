@@ -8,51 +8,145 @@
  *
  */
 #include "Parallel_LU.hpp"
-
+//  Wrapper around malloc routine
+//
+//  Uses a pointer to the malloc routine.
 void *paru_alloc(size_t n, size_t size, cholmod_common *cc)
 {
     DEBUGLEVEL(0);
-    //#ifndef NDEBUG
+#ifndef NDEBUG
     static Int alloc_count = 0;
-    alloc_count += n * size;
-    //#endif
-    void *p = cholmod_l_malloc(n, size, cc);
-    PRLEVEL(1,
-            ("%% allocated %ld in %p total= %ld\n", n * size, p, alloc_count));
+#endif
+    void *p;
+    if (size == 0)
+    {
+        printf("size must be > 0\n");
+        return NULL;
+    }
+    else if (n >= (Size_max / size) || n >= INT_MAX)
+    {
+        // object is too big to allocate without causing integer overflow
+        printf("problem too large\n");
+        p = NULL;
+    }
+    else
+    {
+        p = SuiteSparse_malloc(n, size);
+        if (p == NULL)
+        {
+            // out of memory
+            printf("out of memory\n");
+        }
+        else
+        {
+#ifndef NDEBUG
+            PRLEVEL(1, ("%% allocated %ld in %p total= %ld\n", n * size, p,
+                        alloc_count));
+            alloc_count += n * size;
+#endif
+        }
+    }
     return p;
 }
 
+//  Wrapper around calloc routine
+//
+//  Uses a pointer to the calloc routine.
 void *paru_calloc(size_t n, size_t size, cholmod_common *cc)
 {
     DEBUGLEVEL(0);
-    //#ifndef NDEBUG
+#ifndef NDEBUG
     static Int calloc_count = 0;
-    calloc_count += n * size;
-    //#endif
-    void *p = cholmod_l_calloc(n, size, cc);
-    PRLEVEL(
-        1, ("%% callocated %ld in %p total= %ld\n", n * size, p, calloc_count));
+#endif
+    void *p;
+    if (size == 0)
+    {
+        printf("size must be > 0\n");
+        return NULL;
+    }
+    else if (n >= (Size_max / size) || n >= INT_MAX)
+    {
+        // object is too big to allocate without causing integer overflow
+        printf("problem too large\n");
+        p = NULL;
+    }
+    else
+    {
+        p = SuiteSparse_calloc(n, size);
+        if (p == NULL)
+        {
+            // out of memory
+            printf("out of memory\n");
+        }
+        else
+        {
+#ifndef NDEBUG
+            PRLEVEL(1, ("%% callocated %ld in %p total= %ld\n", n * size, p,
+                        calloc_count));
+            calloc_count += n * size;
+#endif
+        }
+    }
     return p;
 }
 
+//  Wrapper around realloc routine
+//
+//  Uses a pointer to the realloc routine.
 void *paru_realloc(
-    Int newsize,     // requested size
-    Int size_Entry,  // size of each Entry
+    size_t newsize,     // requested size
+    size_t size_Entry,  // size of each Entry
     void *oldP,      // pointer to the old allocated space
-    Int *size,       // a single number, input: old size, output: new size
+    size_t *size,       // a single number, input: old size, output: new size
     cholmod_common *cc)
 {
     DEBUGLEVEL(0);
-    //#ifndef NDEBUG
+#ifndef NDEBUG
     static Int realloc_count = 0;
-    realloc_count += newsize * size_Entry - *size;
-    //#endif
-    void *p = cholmod_l_realloc(newsize, size_Entry, oldP, (size_t *)size, cc);
-    PRLEVEL(1, ("%% reallocated %ld in %p and freed %p total= %ld\n",
-                newsize * size_Entry, p, oldP, realloc_count));
+#endif
+    void *p = NULL;
+    if (size == 0)
+    {
+        printf("size must be > 0\n");
+        return NULL;
+    }
+    else if (oldP == NULL)
+    {  // A new alloc
+        p = paru_alloc(newsize, size_Entry, cc);
+        *size = (p == NULL) ? 0 : newsize * size_Entry;
+    }
+    else if (newsize == *size)
+    {
+        PRLEVEL(1, ("%% reallocating nothing %ld, %ld in %p \n", newsize, *size,
+                    oldP, ));
+    }
+    else if (newsize >= (Size_max / size_Entry) || newsize >= INT_MAX)
+    {
+        // object is too big to allocate without causing integer overflow
+        printf("problem too large\n");
+    }
+
+    else
+    {  // The object exists, and is changing to some other nonzero size.
+        PRLEVEL(1, ("realloc : %d to %d, %d\n", *size, newsize, size_Entry));
+        int ok = TRUE;
+        p = SuiteSparse_realloc(newsize, *size, size_Entry, oldP, &ok);
+        //p = cholmod_l_realloc(newsize, size_Entry, oldP, (size_t *)size,cc);
+        if (ok)
+        {
+#ifndef NDEBUG
+            realloc_count += newsize * size_Entry - *size;
+#endif
+           PRLEVEL(1, ("%% reallocated %ld in %p and freed %p total= %ld\n",
+                        newsize * size_Entry, p, oldP, realloc_count));
+           *size = newsize;
+        }
+    }
     return p;
 }
 
+//  Wrapper around free routine
+//
 void paru_free(Int n, Int size, void *p, cholmod_common *cc)
 {
     DEBUGLEVEL(0);
@@ -65,7 +159,7 @@ void paru_free(Int n, Int size, void *p, cholmod_common *cc)
 
     //#endif
     if (p != NULL)
-        cholmod_l_free(n, size, p, cc);
+        SuiteSparse_free (p) ;
     else
     {
         PRLEVEL(1, ("%% freeing a NULL pointer  \n"));
@@ -200,27 +294,27 @@ void paru_freemat(paru_matrix **paruMatInfo_handle, cholmod_common *cc)
     paru_fac *LUs = paruMatInfo->partial_LUs;
     paru_fac *Us = paruMatInfo->partial_Us;
 
-    for(Int i = 0; i < nf ; i++)
-    {  
+    for (Int i = 0; i < nf; i++)
+    {
+        paru_free(paruMatInfo->frowCount[i], sizeof(Int),
+                  paruMatInfo->frowList[i], cc);
 
-        paru_free (paruMatInfo->frowCount[i], 
-                sizeof(Int), paruMatInfo->frowList[i], cc);
+        paru_free(paruMatInfo->fcolCount[i], sizeof(Int),
+                  paruMatInfo->fcolList[i], cc);
 
-        paru_free (paruMatInfo->fcolCount[i], 
-                sizeof(Int), paruMatInfo->fcolList[i], cc);
-
-
-        PRLEVEL (1, ("%% Freeing Us=%p\n", Us[i].p));
-        if(Us[i].p != NULL)
+        PRLEVEL(1, ("%% Freeing Us=%p\n", Us[i].p));
+        if (Us[i].p != NULL)
         {
-            Int m = Us[i].m; Int n = Us[i].n;
-            paru_free (m*n, sizeof (double), Us[i].p, cc);
+            Int m = Us[i].m;
+            Int n = Us[i].n;
+            paru_free(m * n, sizeof(double), Us[i].p, cc);
         }
-        PRLEVEL (1, ("%% Freeing LUs=%p\n", LUs[i].p));
-        if(LUs[i].p != NULL)
+        PRLEVEL(1, ("%% Freeing LUs=%p\n", LUs[i].p));
+        if (LUs[i].p != NULL)
         {
-            Int m = LUs[i].m; Int n = LUs[i].n;
-            paru_free (m*n, sizeof (double), LUs[i].p, cc);
+            Int m = LUs[i].m;
+            Int n = LUs[i].n;
+            paru_free(m * n, sizeof(double), LUs[i].p, cc);
         }
     }
 
@@ -245,7 +339,6 @@ void paru_freemat(paru_matrix **paruMatInfo_handle, cholmod_common *cc)
     PRLEVEL(1, ("%% FREE upperBoundSize =%ld \n", upperBoundSize));
 #endif
 
-
     paru_free(1, nf * sizeof(Int), paruMatInfo->time_stamp, cc);
     // in practice each parent should deal with the memory for the children
 #ifndef NDEBUG
@@ -263,7 +356,7 @@ void paru_freemat(paru_matrix **paruMatInfo_handle, cholmod_common *cc)
     }
 #endif
     paru_free(1, (m + nf + 1) * sizeof(std::vector<Int> **),
-            paruMatInfo->heapList, cc);
+              paruMatInfo->heapList, cc);
 
     paru_free(1, (m + nf + 1) * sizeof(paru_Element), elementList, cc);
     work_struct *Work = paruMatInfo->Work;

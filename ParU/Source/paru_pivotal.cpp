@@ -202,12 +202,9 @@ void paru_pivotal(std::vector<Int> &pivotal_elements,
 
             if (isRowInFront[curRow] < rowMark)
             {  // first time seeing curRow
-#if 1
-
                 // Int *el_colIndex = colIndex_pointer (curEl);
                 Int *el_colIndex = (Int *)(el + 1);
 
-                // FIXME
                 // checkikng if the numerical values are hard zero
                 // look at the pivotal columns and check if there is any
                 // nonzeros if there is none I can skip adding this row
@@ -240,10 +237,8 @@ void paru_pivotal(std::vector<Int> &pivotal_elements,
                     Int p = 1;
                     if (p <= 0) paru_print_element(paruMatInfo, e);
 #endif
-                    // Not adding the row
-                    continue;
+                    continue; // Not adding the row
                 }
-#endif
                 // Adding curRow to the set
 #ifndef NDEBUG
                 stl_rowSet.insert(curRow);
@@ -362,7 +357,7 @@ void paru_pivotal(std::vector<Int> &pivotal_elements,
     // freeing extra space for rows
     if (rowCount != fm)
     {
-        Int sz = sizeof(Int) * fm;
+        size_t sz = sizeof(Int) * fm;
         frowList =
             (Int *)paru_realloc(rowCount, sizeof(Int), frowList, &sz, cc);
         paruMatInfo->frowList[f] = frowList;
@@ -524,5 +519,4 @@ void paru_pivotal(std::vector<Int> &pivotal_elements,
 
     rowMarkp[eli] += rowCount;
     PRLEVEL(1, ("%% rowMarkp[%ld] =%ld\n", eli, rowMarkp[eli]));
-    return;
 }

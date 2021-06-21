@@ -100,6 +100,8 @@ static int print_level = 0;
 #define NULL ((void *)0)
 #endif
 
+#define Size_max ((size_t) (-1)) // the largest value of size_t
+
 // =============================================================================
 // === paru_symbolic ===========================================================
 // =============================================================================
@@ -424,7 +426,7 @@ paru_matrix *paru_init_rowFronts(cholmod_sparse *A, int scale,
 /* Wrappers for managing memory */
 void *paru_alloc(size_t n, size_t size, cholmod_common *cc);
 void *paru_calloc(size_t n, size_t size, cholmod_common *cc);
-void *paru_realloc(Int newsize, Int size_Entry, void *oldP, Int *size,
+void *paru_realloc(size_t newsize, size_t size_Entry, void *oldP, size_t *size,
                    cholmod_common *cc);
 
 void paru_free(Int n, Int size, void *p, cholmod_common *cc);
