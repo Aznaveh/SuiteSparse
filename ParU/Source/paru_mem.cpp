@@ -2,7 +2,7 @@
  * =======================  paru_mem.cpp ====================================  /
  * ========================================================================== */
 /*! @brief  Wrappers for managing memory
- *  allocating and freeing is done through cholmod and these wrappers
+ *  allocating and freeing is done through SuiteSparse and these wrappers
  *
  * @author Aznaveh
  *
@@ -11,7 +11,7 @@
 //  Wrapper around malloc routine
 //
 //  Uses a pointer to the malloc routine.
-void *paru_alloc(size_t n, size_t size, cholmod_common *cc)
+void *paru_alloc(size_t n, size_t size)
 {
     DEBUGLEVEL(0);
 #ifndef NDEBUG
@@ -52,7 +52,7 @@ void *paru_alloc(size_t n, size_t size, cholmod_common *cc)
 //  Wrapper around calloc routine
 //
 //  Uses a pointer to the calloc routine.
-void *paru_calloc(size_t n, size_t size, cholmod_common *cc)
+void *paru_calloc(size_t n, size_t size)
 {
     DEBUGLEVEL(0);
 #ifndef NDEBUG
@@ -96,9 +96,8 @@ void *paru_calloc(size_t n, size_t size, cholmod_common *cc)
 void *paru_realloc(
     size_t newsize,     // requested size
     size_t size_Entry,  // size of each Entry
-    void *oldP,      // pointer to the old allocated space
-    size_t *size,       // a single number, input: old size, output: new size
-    cholmod_common *cc)
+    void *oldP,         // pointer to the old allocated space
+    size_t *size)       // a single number, input: old size, output: new size
 {
     DEBUGLEVEL(0);
 #ifndef NDEBUG
@@ -112,7 +111,7 @@ void *paru_realloc(
     }
     else if (oldP == NULL)
     {  // A new alloc
-        p = paru_alloc(newsize, size_Entry, cc);
+        p = SuiteSparse_malloc(newsize, size_Entry);
         *size = (p == NULL) ? 0 : newsize * size_Entry;
     }
     else if (newsize == *size)
@@ -131,15 +130,14 @@ void *paru_realloc(
         PRLEVEL(1, ("realloc : %d to %d, %d\n", *size, newsize, size_Entry));
         int ok = TRUE;
         p = SuiteSparse_realloc(newsize, *size, size_Entry, oldP, &ok);
-        //p = cholmod_l_realloc(newsize, size_Entry, oldP, (size_t *)size,cc);
         if (ok)
         {
 #ifndef NDEBUG
             realloc_count += newsize * size_Entry - *size;
 #endif
-           PRLEVEL(1, ("%% reallocated %ld in %p and freed %p total= %ld\n",
+            PRLEVEL(1, ("%% reallocated %ld in %p and freed %p total= %ld\n",
                         newsize * size_Entry, p, oldP, realloc_count));
-           *size = newsize;
+            *size = newsize;
         }
     }
     return p;
@@ -147,7 +145,7 @@ void *paru_realloc(
 
 //  Wrapper around free routine
 //
-void paru_free(Int n, Int size, void *p, cholmod_common *cc)
+void paru_free(Int n, Int size, void *p)
 {
     DEBUGLEVEL(0);
     static Int free_count = 0;
@@ -159,16 +157,14 @@ void paru_free(Int n, Int size, void *p, cholmod_common *cc)
 
     //#endif
     if (p != NULL)
-        SuiteSparse_free (p) ;
+        SuiteSparse_free(p);
     else
     {
         PRLEVEL(1, ("%% freeing a NULL pointer  \n"));
     }
 }
 
-void paru_freesym(paru_symbolic **LUsym_handle,
-                  // workspace and parameters
-                  cholmod_common *cc)
+void paru_freesym(paru_symbolic **LUsym_handle)
 {
     DEBUGLEVEL(0);
     if (LUsym_handle == NULL || *LUsym_handle == NULL)
@@ -189,43 +185,43 @@ void paru_freesym(paru_symbolic **LUsym_handle,
                 "LUsym->anz=%ld rjsize=%ld\n",
                 m, n, nf, LUsym->anz, rjsize));
 
-    paru_free(nf + 1, sizeof(Int), LUsym->Parent, cc);
-    paru_free(nf + 1, sizeof(Int), LUsym->Child, cc);
-    paru_free(nf + 2, sizeof(Int), LUsym->Childp, cc);
-    paru_free(nf + 1, sizeof(Int), LUsym->Super, cc);
-    paru_free(n, sizeof(Int), LUsym->Qfill, cc);
-    paru_free(m, sizeof(Int), LUsym->Pinv, cc);
-    paru_free((m + 1), sizeof(Int), LUsym->Pinit, cc);
-    paru_free(nf + 1, sizeof(Int), LUsym->Fm, cc);
-    paru_free(nf + 1, sizeof(Int), LUsym->Cm, cc);
+    paru_free(nf + 1, sizeof(Int), LUsym->Parent);
+    paru_free(nf + 1, sizeof(Int), LUsym->Child);
+    paru_free(nf + 2, sizeof(Int), LUsym->Childp);
+    paru_free(nf + 1, sizeof(Int), LUsym->Super);
+    paru_free(n, sizeof(Int), LUsym->Qfill);
+    paru_free(m, sizeof(Int), LUsym->Pinv);
+    paru_free((m + 1), sizeof(Int), LUsym->Pinit);
+    paru_free(nf + 1, sizeof(Int), LUsym->Fm);
+    paru_free(nf + 1, sizeof(Int), LUsym->Cm);
 
-    paru_free(rjsize, sizeof(Int), LUsym->Rj, cc);
-    paru_free(nf + 1, sizeof(Int), LUsym->Rp, cc);
+    paru_free(rjsize, sizeof(Int), LUsym->Rj);
+    paru_free(nf + 1, sizeof(Int), LUsym->Rp);
 
-    paru_free(m + 1 - n1, sizeof(Int), LUsym->Sp, cc);
-    paru_free(snz, sizeof(Int), LUsym->Sj, cc);
-    paru_free(snz, sizeof(double), LUsym->Sx, cc);
-    paru_free(n + 2 - n1, sizeof(Int), LUsym->Sleft, cc);
+    paru_free(m + 1 - n1, sizeof(Int), LUsym->Sp);
+    paru_free(snz, sizeof(Int), LUsym->Sj);
+    paru_free(snz, sizeof(double), LUsym->Sx);
+    paru_free(n + 2 - n1, sizeof(Int), LUsym->Sleft);
 
-    paru_free((n + 1), sizeof(Int), LUsym->Chain_start, cc);
-    paru_free((n + 1), sizeof(Int), LUsym->Chain_maxrows, cc);
-    paru_free((n + 1), sizeof(Int), LUsym->Chain_maxcols, cc);
+    paru_free((n + 1), sizeof(Int), LUsym->Chain_start);
+    paru_free((n + 1), sizeof(Int), LUsym->Chain_maxrows);
+    paru_free((n + 1), sizeof(Int), LUsym->Chain_maxcols);
 
     Int ms = m - n1;  // submatrix is msxns
 
-    paru_free(ms + nf, sizeof(Int), LUsym->aParent, cc);
-    paru_free(ms + nf + 1, sizeof(Int), LUsym->aChild, cc);
-    paru_free(ms + nf + 2, sizeof(Int), LUsym->aChildp, cc);
-    paru_free(ms, sizeof(Int), LUsym->row2atree, cc);
-    paru_free(nf, sizeof(Int), LUsym->super2atree, cc);
-    paru_free(ms + nf, sizeof(Int), LUsym->first, cc);
+    paru_free(ms + nf, sizeof(Int), LUsym->aParent);
+    paru_free(ms + nf + 1, sizeof(Int), LUsym->aChild);
+    paru_free(ms + nf + 2, sizeof(Int), LUsym->aChildp);
+    paru_free(ms, sizeof(Int), LUsym->row2atree);
+    paru_free(nf, sizeof(Int), LUsym->super2atree);
+    paru_free(ms + nf, sizeof(Int), LUsym->first);
 
-    paru_free(1, sizeof(paru_symbolic), LUsym, cc);
+    paru_free(1, sizeof(paru_symbolic), LUsym);
 
     *LUsym_handle = NULL;
 }
 
-void paru_free_el(Int e, paru_Element **elementList, cholmod_common *cc)
+void paru_free_el(Int e, paru_Element **elementList)
 /* fee element e from elementList */
 {
     DEBUGLEVEL(0);
@@ -237,12 +233,12 @@ void paru_free_el(Int e, paru_Element **elementList, cholmod_common *cc)
     PRLEVEL(1, ("%% ncols =%ld\n", ncols));
     Int tot_size = sizeof(paru_Element) + sizeof(Int) * (2 * (nrows + ncols)) +
                    sizeof(double) * nrows * ncols;
-    paru_free(1, tot_size, el, cc);
+    paru_free(1, tot_size, el);
     elementList[e] = NULL;
 }
 
 /*! It uses LUsym, Do not free LUsym before*/
-void paru_freemat(paru_matrix **paruMatInfo_handle, cholmod_common *cc)
+void paru_freemat(paru_matrix **paruMatInfo_handle)
 {
     DEBUGLEVEL(0);
     if (paruMatInfo_handle == NULL || *paruMatInfo_handle == NULL) return;
@@ -262,9 +258,9 @@ void paru_freemat(paru_matrix **paruMatInfo_handle, cholmod_common *cc)
     for (Int row = 0; row < m; row++)
     {
         Int len = RowList[row].len;
-        paru_free(len, sizeof(paru_Tuple), RowList[row].list, cc);
+        paru_free(len, sizeof(paru_Tuple), RowList[row].list);
     }
-    paru_free(1, m * sizeof(tupleList), RowList, cc);
+    paru_free(1, m * sizeof(tupleList), RowList);
 
     paru_Element **elementList;
     elementList = paruMatInfo->elementList;
@@ -280,14 +276,14 @@ void paru_freemat(paru_matrix **paruMatInfo_handle, cholmod_common *cc)
         }
         Int e = LUsym->row2atree[i];  // element number in augmented tree
         PRLEVEL(1, ("%% e =%ld\t", e));
-        paru_free_el(e, elementList, cc);
+        paru_free_el(e, elementList);
     }
 
     PRLEVEL(1, ("\n%% freeing CB elements:\n"));
     for (Int i = 0; i < nf; i++)
     {                                   // freeing all other elements
         Int e = LUsym->super2atree[i];  // element number in augmented tree
-        paru_free_el(e, elementList, cc);
+        paru_free_el(e, elementList);
     }
 
     // free the answer
@@ -297,36 +293,36 @@ void paru_freemat(paru_matrix **paruMatInfo_handle, cholmod_common *cc)
     for (Int i = 0; i < nf; i++)
     {
         paru_free(paruMatInfo->frowCount[i], sizeof(Int),
-                  paruMatInfo->frowList[i], cc);
+                  paruMatInfo->frowList[i]);
 
         paru_free(paruMatInfo->fcolCount[i], sizeof(Int),
-                  paruMatInfo->fcolList[i], cc);
+                  paruMatInfo->fcolList[i]);
 
         PRLEVEL(1, ("%% Freeing Us=%p\n", Us[i].p));
         if (Us[i].p != NULL)
         {
             Int m = Us[i].m;
             Int n = Us[i].n;
-            paru_free(m * n, sizeof(double), Us[i].p, cc);
+            paru_free(m * n, sizeof(double), Us[i].p);
         }
         PRLEVEL(1, ("%% Freeing LUs=%p\n", LUs[i].p));
         if (LUs[i].p != NULL)
         {
             Int m = LUs[i].m;
             Int n = LUs[i].n;
-            paru_free(m * n, sizeof(double), LUs[i].p, cc);
+            paru_free(m * n, sizeof(double), LUs[i].p);
         }
     }
 
     PRLEVEL(1, ("%% Done LUs\n"));
-    paru_free(1, nf * sizeof(Int), paruMatInfo->frowCount, cc);
-    paru_free(1, nf * sizeof(Int), paruMatInfo->fcolCount, cc);
+    paru_free(1, nf * sizeof(Int), paruMatInfo->frowCount);
+    paru_free(1, nf * sizeof(Int), paruMatInfo->fcolCount);
 
-    paru_free(1, nf * sizeof(Int *), paruMatInfo->frowList, cc);
-    paru_free(1, nf * sizeof(Int *), paruMatInfo->fcolList, cc);
+    paru_free(1, nf * sizeof(Int *), paruMatInfo->frowList);
+    paru_free(1, nf * sizeof(Int *), paruMatInfo->fcolList);
 
-    paru_free(1, nf * sizeof(paru_fac), LUs, cc);
-    paru_free(1, nf * sizeof(paru_fac), Us, cc);
+    paru_free(1, nf * sizeof(paru_fac), LUs);
+    paru_free(1, nf * sizeof(paru_fac), Us);
 
 #ifndef NDEBUG
     Int Us_bound_size = LUsym->Us_bound_size;
@@ -339,7 +335,7 @@ void paru_freemat(paru_matrix **paruMatInfo_handle, cholmod_common *cc)
     PRLEVEL(1, ("%% FREE upperBoundSize =%ld \n", upperBoundSize));
 #endif
 
-    paru_free(1, nf * sizeof(Int), paruMatInfo->time_stamp, cc);
+    paru_free(1, nf * sizeof(Int), paruMatInfo->time_stamp);
     // in practice each parent should deal with the memory for the children
 #ifndef NDEBUG
     std::vector<Int> **heapList = paruMatInfo->heapList;
@@ -356,20 +352,20 @@ void paru_freemat(paru_matrix **paruMatInfo_handle, cholmod_common *cc)
     }
 #endif
     paru_free(1, (m + nf + 1) * sizeof(std::vector<Int> **),
-              paruMatInfo->heapList, cc);
+              paruMatInfo->heapList);
 
-    paru_free(1, (m + nf + 1) * sizeof(paru_Element), elementList, cc);
+    paru_free(1, (m + nf + 1) * sizeof(paru_Element), elementList);
     work_struct *Work = paruMatInfo->Work;
-    paru_free(m, sizeof(Int), Work->rowSize, cc);
-    paru_free(m + nf + 1, sizeof(Int), Work->rowMark, cc);
-    paru_free(m + nf, sizeof(Int), Work->elRow, cc);
-    paru_free(m + nf, sizeof(Int), Work->elCol, cc);
+    paru_free(m, sizeof(Int), Work->rowSize);
+    paru_free(m + nf + 1, sizeof(Int), Work->rowMark);
+    paru_free(m + nf, sizeof(Int), Work->elRow);
+    paru_free(m + nf, sizeof(Int), Work->elCol);
 
-    paru_free(m + nf, sizeof(Int), paruMatInfo->lacList, cc);
+    paru_free(m + nf, sizeof(Int), paruMatInfo->lacList);
 
-    paru_free(m, sizeof(Int), paruMatInfo->scale_row, cc);
-    paru_free(m, sizeof(Int), paruMatInfo->row_degree_bound, cc);
-    paru_free(1, sizeof(work_struct), paruMatInfo->Work, cc);
-    paru_free(1, sizeof(paru_matrix), paruMatInfo, cc);
+    paru_free(m, sizeof(Int), paruMatInfo->scale_row);
+    paru_free(m, sizeof(Int), paruMatInfo->row_degree_bound);
+    paru_free(1, sizeof(work_struct), paruMatInfo->Work);
+    paru_free(1, sizeof(paru_matrix), paruMatInfo);
     *paruMatInfo_handle = NULL;
 }

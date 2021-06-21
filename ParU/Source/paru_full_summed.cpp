@@ -32,8 +32,7 @@
  */
 #include "Parallel_LU.hpp"
 
-void paru_full_summed(Int e, Int f, paru_matrix *paruMatInfo,
-                      cholmod_common *cc)
+void paru_full_summed(Int e, Int f, paru_matrix *paruMatInfo)
 
 {
     DEBUGLEVEL(0);
@@ -65,7 +64,6 @@ void paru_full_summed(Int e, Int f, paru_matrix *paruMatInfo,
     // Int *rowRelIndex = relRowInd (el);
     Int *rowRelIndex = (Int *)(el + 1) + 2 * nEl + mEl;
 
-
     // Int *el_rowIndex = rowIndex_pointer (el);
     Int *el_rowIndex = (Int *)(el + 1) + nEl;
 
@@ -75,7 +73,6 @@ void paru_full_summed(Int e, Int f, paru_matrix *paruMatInfo,
 
     // double *el_Num = numeric_pointer (el);
     double *el_Num = (double *)((Int *)(el + 1) + 2 * nEl + 2 * mEl);
-
 
 #ifndef NDEBUG  // print the element which is going to be assembled from
     p = 2;
@@ -94,7 +91,7 @@ void paru_full_summed(Int e, Int f, paru_matrix *paruMatInfo,
         double *sC = el_Num + mEl * el->lac;  // source column pointer
         Int fcolInd = el_colIndex[el->lac] - col1;
 #ifndef NDEBUG
-        Int colInd =  el_colIndex[el->lac];
+        Int colInd = el_colIndex[el->lac];
         PRLEVEL(1, ("%% colInd =%ld \n", fcolInd));
         ASSERT(colInd >= 0);
 #endif
@@ -182,7 +179,7 @@ void paru_full_summed(Int e, Int f, paru_matrix *paruMatInfo,
     if (el->ncolsleft == 0)
     {  // free el
         PRLEVEL(p, ("%% element %ld is freed after pivotal assembly\n", e));
-        paru_free_el(e, elementList, cc);
+        paru_free_el(e, elementList);
     }
 
     if (elementList[e] != NULL)
@@ -211,8 +208,7 @@ void paru_full_summed(Int e, Int f, paru_matrix *paruMatInfo,
     {
         PRLEVEL(p, ("%% %ld\t", frowList[r]));
         for (Int c = col1; c < col2; c++)
-            PRLEVEL(p,
-                    (" %2.5lf\t", pivotalFront[(c - col1) * rowCount + r]));
+            PRLEVEL(p, (" %2.5lf\t", pivotalFront[(c - col1) * rowCount + r]));
         PRLEVEL(p, ("\n"));
     }
     p = 1;

@@ -100,7 +100,7 @@ static int print_level = 0;
 #define NULL ((void *)0)
 #endif
 
-#define Size_max ((size_t) (-1)) // the largest value of size_t
+#define Size_max ((size_t)(-1))  // the largest value of size_t
 
 // =============================================================================
 // === paru_symbolic ===========================================================
@@ -418,27 +418,25 @@ typedef struct
 
 } paru_matrix;
 
-paru_symbolic *paru_analyze(cholmod_sparse *A, cholmod_common *cc);
+paru_symbolic *paru_analyze(cholmod_sparse *A);
 
 paru_matrix *paru_init_rowFronts(cholmod_sparse *A, int scale,
-                                 paru_symbolic *LUsym, cholmod_common *cc);
+                                 paru_symbolic *LUsym);
 
 /* Wrappers for managing memory */
-void *paru_alloc(size_t n, size_t size, cholmod_common *cc);
-void *paru_calloc(size_t n, size_t size, cholmod_common *cc);
-void *paru_realloc(size_t newsize, size_t size_Entry, void *oldP, size_t *size,
-                   cholmod_common *cc);
+void *paru_alloc(size_t n, size_t size);
+void *paru_calloc(size_t n, size_t size);
+void *paru_realloc(size_t newsize, size_t size_Entry, void *oldP, size_t *size);
 
-void paru_free(Int n, Int size, void *p, cholmod_common *cc);
-void paru_free_el(Int e, paru_Element **elementList, cholmod_common *cc);
-void paru_freesym(paru_symbolic **LUsym_handle, cholmod_common *cc);
-void paru_freemat(paru_matrix **paruMatInfo_handle, cholmod_common *cc);
+void paru_free(Int n, Int size, void *p);
+void paru_free_el(Int e, paru_Element **elementList);
+void paru_freesym(paru_symbolic **LUsym_handle);
+void paru_freemat(paru_matrix **paruMatInfo_handle);
 
 /* add tuple functions defintions */
-Int paru_add_rowTuple(tupleList *RowList, Int row, paru_Tuple T,
-                      cholmod_common *cc);
+Int paru_add_rowTuple(tupleList *RowList, Int row, paru_Tuple T);
 
-int paru_front(paru_matrix *paruMatInfo, Int f, cholmod_common *cc);
+int paru_front(paru_matrix *paruMatInfo, Int f);
 
 Int paru_dgetrf(double *F, Int *frowList, Int m, Int n, BLAS_INT *ipiv);
 Int paru_factorize(Int f, Int start_fac, std::vector<Int> &panel_row,
@@ -446,8 +444,7 @@ Int paru_factorize(Int f, Int start_fac, std::vector<Int> &panel_row,
                    std::vector<Int> &pivotal_elements,
                    paru_matrix *paruMatInfo);
 
-paru_Element *paru_create_element(Int nrows, Int ncols, Int init,
-                                  cholmod_common *cc);
+paru_Element *paru_create_element(Int nrows, Int ncols, Int init);
 
 void assemble_row_toU(Int e, Int f, Int sR, Int dR, std::vector<Int> &colHash,
                       paru_matrix *paruMatInfo);
@@ -463,8 +460,7 @@ void paru_init_rel(Int f, paru_matrix *paruMatInfo);
 void paru_update_rel_ind_col(Int e, Int f, std::vector<Int> &colHash,
                              paru_matrix *paruMatInfo);
 
-void paru_write(paru_matrix *paruMatInfo, int scale, char *id,
-                cholmod_common *cc);
+void paru_write(paru_matrix *paruMatInfo, int scale, char *id);
 
 void paru_update_rowDeg(Int panel_num, Int row_end, Int f, Int start_fac,
                         std::set<Int> &stl_colSet,
@@ -478,7 +474,7 @@ Int bin_srch(Int *srt_lst, Int l, Int r, Int num);
 
 void paru_pivotal(std::vector<Int> &pivotal_elements,
                   std::vector<Int> &panel_row, Int f, heaps_info &hi,
-                  paru_matrix *paruMatInfo, cholmod_common *cc);
+                  paru_matrix *paruMatInfo);
 
 int paru_intersection(Int e, paru_Element **elementList,
                       std::set<Int> &stl_colSet);
@@ -486,27 +482,26 @@ int paru_intersection(Int e, paru_Element **elementList,
 void paru_prior_assemble(Int f, Int start_fac,
                          std::vector<Int> &pivotal_elements,
                          std::vector<Int> &colHash, heaps_info &hi,
-                         paru_matrix *paruMatInfo, cholmod_common *cc);
+                         paru_matrix *paruMatInfo);
 
 void paru_eliminate_all(Int e, Int f, std::vector<Int> &colHash,
-                        paru_matrix *paruMatInfo, cholmod_common *cc);
+                        paru_matrix *paruMatInfo);
 
 void paru_eliminate_cols(Int e, Int f, std::vector<Int> &colHash,
-                         paru_matrix *paruMatInfo, cholmod_common *cc);
+                         paru_matrix *paruMatInfo);
 
 void paru_eliminate_rows(Int e, Int f, std::vector<Int> &colHash,
-                         paru_matrix *paruMatInfo, cholmod_common *cc);
+                         paru_matrix *paruMatInfo);
 
 void paru_eliminate_el_with0rows(Int e, Int f, std::vector<Int> &colHash,
-                                 paru_matrix *paruMatInfo, cholmod_common *cc);
+                                 paru_matrix *paruMatInfo);
 
 // heap related
 void paru_make_heap(Int f, Int start_fac, std::vector<Int> &pivotal_elements,
                     heaps_info &hi, std::vector<Int> &colHash,
-                    paru_matrix *paruMatInfo, cholmod_common *cc);
+                    paru_matrix *paruMatInfo);
 
-void paru_full_summed(Int e, Int f, paru_matrix *paruMatInfo,
-                      cholmod_common *cc);
+void paru_full_summed(Int e, Int f, paru_matrix *paruMatInfo);
 
 // hash related
 void paru_insert_hash(Int key, Int value, std::vector<Int> &colHash);

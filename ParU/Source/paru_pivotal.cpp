@@ -15,7 +15,7 @@
 
 void paru_pivotal(std::vector<Int> &pivotal_elements,
                   std::vector<Int> &panel_row, Int f, heaps_info &hi,
-                  paru_matrix *paruMatInfo, cholmod_common *cc)
+                  paru_matrix *paruMatInfo)
 {
     DEBUGLEVEL(0);
     paru_symbolic *LUsym = paruMatInfo->LUsym;
@@ -237,7 +237,7 @@ void paru_pivotal(std::vector<Int> &pivotal_elements,
                     Int p = 1;
                     if (p <= 0) paru_print_element(paruMatInfo, e);
 #endif
-                    continue; // Not adding the row
+                    continue;  // Not adding the row
                 }
                 // Adding curRow to the set
 #ifndef NDEBUG
@@ -358,19 +358,17 @@ void paru_pivotal(std::vector<Int> &pivotal_elements,
     if (rowCount != fm)
     {
         size_t sz = sizeof(Int) * fm;
-        frowList =
-            (Int *)paru_realloc(rowCount, sizeof(Int), frowList, &sz, cc);
+        frowList = (Int *)paru_realloc(rowCount, sizeof(Int), frowList, &sz);
         paruMatInfo->frowList[f] = frowList;
     }
 
-    double *pivotalFront =
-        (double *)paru_calloc(rowCount * fp, sizeof(double), cc);
+    double *pivotalFront = (double *)paru_calloc(rowCount * fp, sizeof(double));
 
     if (pivotalFront == NULL)
     {
         printf("%% Out of memory when tried to allocate for pivotal part %ld",
                f);
-        // paru_free ( num_panels, sizeof (Int), panel_row, cc);
+        // paru_free ( num_panels, sizeof (Int), panel_row);
         // TODO: return
         return;
     }
@@ -423,7 +421,7 @@ void paru_pivotal(std::vector<Int> &pivotal_elements,
     for (Int i = 0; i < (Int)pivotal_elements.size(); i++)
     {
         Int e = pivotal_elements[i];
-        paru_full_summed(e, f, paruMatInfo, cc);
+        paru_full_summed(e, f, paruMatInfo);
         if (elementList[e] != NULL)
         {  // keeping the element
             pivotal_elements[ii++] = pivotal_elements[i];

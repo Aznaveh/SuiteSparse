@@ -15,8 +15,7 @@
 #include "Parallel_LU.hpp"
 int paru_front(paru_matrix *paruMatInfo,
                /* RowCol list/tuples and LUsym handle */
-               Int f, /* front need to be assembled */
-               cholmod_common *cc)
+               Int f) /* front need to be assembled */
 {
     DEBUGLEVEL(-2);
     /*
@@ -60,7 +59,7 @@ int paru_front(paru_matrix *paruMatInfo,
 
     Int fm = LUsym->Fm[f]; /* Upper bound number of rows of F */
     PRLEVEL(1, ("%% the size of fm is %ld\n", fm));
-    Int *frowList = (Int *)paru_alloc(fm, sizeof(Int), cc);
+    Int *frowList = (Int *)paru_alloc(fm, sizeof(Int));
     if (frowList == NULL)
     {
         printf("%% Out of memory when tried to allocate for frowList %ld", f);
@@ -113,7 +112,7 @@ int paru_front(paru_matrix *paruMatInfo,
     std::vector<Int> pivotal_elements;
     heaps_info hi;
     PRLEVEL(1, ("%% Next: work on pivotal column assembly\n"));
-    paru_pivotal(pivotal_elements, panel_row, f, hi, paruMatInfo, cc);
+    paru_pivotal(pivotal_elements, panel_row, f, hi, paruMatInfo);
     PRLEVEL(1, ("%% Done: work on pivotal column assembly\n"));
 
     Int rowCount = paruMatInfo->frowCount[f];
@@ -156,8 +155,8 @@ int paru_front(paru_matrix *paruMatInfo,
 
     if (rowCount < fp)
     {
-        //PRLEVEL(1, ("%% %ldx%ld \n", rowCount, fp));
-        PRLEVEL(1, ("%% Structural Problem\n" ));
+        // PRLEVEL(1, ("%% %ldx%ld \n", rowCount, fp));
+        PRLEVEL(1, ("%% Structural Problem\n"));
         printf("structural problem on %ld: %ldx%ld\n", f, rowCount, fp);
         return 1;
     }
@@ -246,7 +245,7 @@ int paru_front(paru_matrix *paruMatInfo,
     if (fn != 0)
     {
         PRLEVEL(1, ("%% fp=%ld fn=%ld \n", fp, fn));
-        fcolList = (Int *)paru_calloc(stl_colSet.size(), sizeof(Int), cc);
+        fcolList = (Int *)paru_calloc(stl_colSet.size(), sizeof(Int));
 
         if (fcolList == NULL)
         {
@@ -318,7 +317,7 @@ int paru_front(paru_matrix *paruMatInfo,
 
     /**** 5 ** assemble U part         Row by Row                          ****/
 
-    double *uPart = (double *)paru_calloc(fp * colCount, sizeof(double), cc);
+    double *uPart = (double *)paru_calloc(fp * colCount, sizeof(double));
     if (uPart == NULL)
     {
         printf("%% Out of memory when tried to allocate for U part %ld", f);
@@ -390,7 +389,7 @@ int paru_front(paru_matrix *paruMatInfo,
             el->nrowsleft--;
             if (el->nrowsleft == 0)
             {
-                paru_free_el(e, elementList, cc);
+                paru_free_el(e, elementList);
             }
         }
     }
@@ -455,8 +454,8 @@ int paru_front(paru_matrix *paruMatInfo,
     if (fp < rowCount)
     {
         curEl = elementList[eli] = paru_create_element(
-            rowCount - fp, colCount, 0,
-            cc);  // allocating an un-initialized part of memory
+            rowCount - fp, colCount,
+            0);  // allocating an un-initialized part of memory
 
         // While insided the DGEMM BETA == 0
         if (curEl == NULL)
@@ -540,9 +539,8 @@ int paru_front(paru_matrix *paruMatInfo,
 
     // paruMatInfo->time_stamp[f]++; //invalidating all the marks
     PRLEVEL(-1, ("\n%%||||  Start Finalize %ld ||||\n", f));
-    // paru_finalize (paruMatInfo,  f, start_fac, cc);
     paru_prior_assemble(f, start_fac, pivotal_elements, colHash, hi,
-                        paruMatInfo, cc);
+                        paruMatInfo);
     PRLEVEL(-1, ("\n%%||||  Finish Finalize %ld ||||\n", f));
 
     ////////////////////////////////////////////////////////////////////////////
@@ -553,7 +551,7 @@ int paru_front(paru_matrix *paruMatInfo,
         paru_Tuple rowTuple;
         rowTuple.e = eli;
         rowTuple.f = locIndx;
-        if (paru_add_rowTuple(RowList, frowList[i], rowTuple, cc))
+        if (paru_add_rowTuple(RowList, frowList[i], rowTuple))
         {
             printf("%% Out of memory: add_rowTuple \n");
             return 1;

@@ -16,8 +16,7 @@
  * @author Aznaveh
  *  */
 #include "Parallel_LU.hpp"
-paru_Element *paru_create_element(Int nrows, Int ncols, Int init,
-                                  cholmod_common *cc)
+paru_Element *paru_create_element(Int nrows, Int ncols, Int init)
 {
     DEBUGLEVEL(0);
 
@@ -28,11 +27,11 @@ paru_Element *paru_create_element(Int nrows, Int ncols, Int init,
                       sizeof(double) * nrows * ncols;
     if (init)
     {
-        curEl = (paru_Element *)paru_calloc(1, tot_size, cc);
+        curEl = (paru_Element *)paru_calloc(1, tot_size);
     }
     else
     {
-        curEl = (paru_Element *)paru_alloc(1, tot_size, cc);
+        curEl = (paru_Element *)paru_alloc(1, tot_size);
     }
     if (curEl == NULL) return NULL;  // do not do error checking
 

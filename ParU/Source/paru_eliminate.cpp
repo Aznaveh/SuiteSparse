@@ -9,7 +9,7 @@
 #include "Parallel_LU.hpp"
 
 void paru_eliminate_all(Int e, Int f, std::vector<Int> &colHash,
-                        paru_matrix *paruMatInfo, cholmod_common *cc)
+                        paru_matrix *paruMatInfo)
 
 {
     DEBUGLEVEL(0);
@@ -141,7 +141,7 @@ void paru_eliminate_all(Int e, Int f, std::vector<Int> &colHash,
         }
     }
 
-    paru_free_el(e, elementList, cc);
+    paru_free_el(e, elementList);
 }
 
 // try to find columns and assemble them to current front. After the first
@@ -149,7 +149,7 @@ void paru_eliminate_all(Int e, Int f, std::vector<Int> &colHash,
 // fit
 
 void paru_eliminate_cols(Int e, Int f, std::vector<Int> &colHash,
-                         paru_matrix *paruMatInfo, cholmod_common *cc)
+                         paru_matrix *paruMatInfo)
 
 {
     DEBUGLEVEL(0);
@@ -317,12 +317,12 @@ void paru_eliminate_cols(Int e, Int f, std::vector<Int> &colHash,
 
     if (el->ncolsleft == 0)
     {
-        paru_free_el(e, elementList, cc);
+        paru_free_el(e, elementList);
     }
 }
 
 void paru_eliminate_rows(Int e, Int f, std::vector<Int> &colHash,
-                         paru_matrix *paruMatInfo, cholmod_common *cc)
+                         paru_matrix *paruMatInfo)
 
 {
     DEBUGLEVEL(0);
@@ -502,7 +502,7 @@ void paru_eliminate_rows(Int e, Int f, std::vector<Int> &colHash,
     el->nrowsleft -= tempRow.size();
     if (el->nrowsleft == 0)
     {
-        paru_free_el(e, elementList, cc);
+        paru_free_el(e, elementList);
     }
 #ifndef NDEBUG
     p = 1;
@@ -517,7 +517,7 @@ void paru_eliminate_rows(Int e, Int f, std::vector<Int> &colHash,
 #include "Parallel_LU.hpp"
 
 void paru_eliminate_el_with0rows(Int e, Int f, std::vector<Int> &colHash,
-                                 paru_matrix *paruMatInfo, cholmod_common *cc)
+                                 paru_matrix *paruMatInfo)
 
 {
     // This element contributes to both pivotal rows and pivotal columns
@@ -748,8 +748,7 @@ void paru_eliminate_el_with0rows(Int e, Int f, std::vector<Int> &colHash,
         el->ncolsleft = ncolsleft;
         for (Int j = el->lac; j < new_lac; j++)
         {
-            if ( el_colIndex[j] >= 0) 
-                el_colIndex[j] = flip(el_colIndex[j]);
+            if (el_colIndex[j] >= 0) el_colIndex[j] = flip(el_colIndex[j]);
         }
     }
 
@@ -784,6 +783,6 @@ void paru_eliminate_el_with0rows(Int e, Int f, std::vector<Int> &colHash,
 #ifndef NDEBUG
         PRLEVEL(p, ("%% %ld is freed inside with0\n", eli));
 #endif
-        paru_free_el(e, elementList, cc);
+        paru_free_el(e, elementList);
     }
 }

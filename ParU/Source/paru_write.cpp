@@ -7,8 +7,7 @@
  */
 
 #include "Parallel_LU.hpp"
-void paru_write(paru_matrix *paruMatInfo, int scale, char *id,
-                cholmod_common *cc)
+void paru_write(paru_matrix *paruMatInfo, int scale, char *id)
 {
     DEBUGLEVEL(0);
     PRLEVEL(1, ("%% Start Writing\n"));
@@ -70,14 +69,14 @@ void paru_write(paru_matrix *paruMatInfo, int scale, char *id,
     Int *newRofS = NULL;
     Int *Pinit = LUsym->Pinit;
 
-    oldRofS = (Int *)paru_alloc(m, sizeof(Int), cc);  // S -> LU P
-    newRofS = (Int *)paru_alloc(m, sizeof(Int), cc);  // Pinv of S
+    oldRofS = (Int *)paru_alloc(m, sizeof(Int));  // S -> LU P
+    newRofS = (Int *)paru_alloc(m, sizeof(Int));  // Pinv of S
 
     if (oldRofS == NULL || newRofS == NULL)
     {
         printf("memory problem for writing into files\n");
-        paru_free(m, sizeof(Int), oldRofS, cc);
-        paru_free(m, sizeof(Int), newRofS, cc);
+        paru_free(m, sizeof(Int), oldRofS);
+        paru_free(m, sizeof(Int), newRofS);
         return;
     }
 
@@ -295,6 +294,6 @@ void paru_write(paru_matrix *paruMatInfo, int scale, char *id,
 
     fclose(LUfptr);
 
-    paru_free(m, sizeof(Int), oldRofS, cc);
-    paru_free(m, sizeof(Int), newRofS, cc);
+    paru_free(m, sizeof(Int), oldRofS);
+    paru_free(m, sizeof(Int), newRofS);
 }

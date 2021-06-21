@@ -18,9 +18,7 @@ paru_matrix *paru_init_rowFronts(
     cholmod_sparse *A,
     int scale,  // scales the matrix if > 0
     // symbolic analysis
-    paru_symbolic *LUsym,
-    // workspace and parameters
-    cholmod_common *cc)
+    paru_symbolic *LUsym)
 {
     DEBUGLEVEL(-1);
     if (!A->packed)
@@ -36,7 +34,7 @@ paru_matrix *paru_init_rowFronts(
     }
 
     paru_matrix *paruMatInfo;
-    paruMatInfo = (paru_matrix *)paru_alloc(1, sizeof(paru_matrix), cc);
+    paruMatInfo = (paru_matrix *)paru_alloc(1, sizeof(paru_matrix));
     if (paruMatInfo == NULL)
     {  // out of memory
         printf("Out of memory: paruMatInfo\n");
@@ -56,8 +54,7 @@ paru_matrix *paru_init_rowFronts(
     nf = LUsym->nf;
     paruMatInfo->panel_width = 32;
 
-
-    Int *row_degree_bound = (Int *)paru_alloc(m, sizeof(Int), cc);
+    Int *row_degree_bound = (Int *)paru_alloc(m, sizeof(Int));
     if (row_degree_bound == NULL)
     {  // out of memory
 
@@ -67,7 +64,7 @@ paru_matrix *paru_init_rowFronts(
 
     paruMatInfo->row_degree_bound = row_degree_bound;
 
-    Int *rowSize = (Int *)paru_alloc(m, sizeof(Int), cc);
+    Int *rowSize = (Int *)paru_alloc(m, sizeof(Int));
     if (rowSize == NULL)
     {  // out of memory
         printf("Out of memory: Work\n");
@@ -76,7 +73,7 @@ paru_matrix *paru_init_rowFronts(
     memset(rowSize, -1, m * sizeof(Int));
     PRLEVEL(1, ("%% rowSize pointer=%p size=%ld \n", rowSize, m * sizeof(Int)));
 
-    Int *rowMark = (Int *)paru_alloc(m + nf + 1, sizeof(Int), cc);
+    Int *rowMark = (Int *)paru_alloc(m + nf + 1, sizeof(Int));
     if (rowMark == NULL)
     {  // out of memory
         printf("Out of memory: Work\n");
@@ -85,7 +82,7 @@ paru_matrix *paru_init_rowFronts(
     PRLEVEL(1, ("%% rowMark pointer=%p size=%ld \n", rowMark,
                 (m + nf) * sizeof(Int)));
 
-    Int *elRow = (Int *)paru_alloc(m + nf, sizeof(Int), cc);
+    Int *elRow = (Int *)paru_alloc(m + nf, sizeof(Int));
     if (elRow == NULL)
     {  // out of memory
         printf("Out of memory: Work\n");
@@ -94,7 +91,7 @@ paru_matrix *paru_init_rowFronts(
     memset(elRow, -1, (m + nf) * sizeof(Int));
     PRLEVEL(1, ("%% elRow=%p\n", elRow));
 
-    Int *elCol = (Int *)paru_alloc(m + nf, sizeof(Int), cc);
+    Int *elCol = (Int *)paru_alloc(m + nf, sizeof(Int));
     if (elCol == NULL)
     {  // out of memory
         printf("Out of memory: Work\n");
@@ -103,7 +100,7 @@ paru_matrix *paru_init_rowFronts(
     memset(elCol, -1, (m + nf) * sizeof(Int));
     PRLEVEL(1, ("%% elCol=%p\n", elCol));
 
-    work_struct *Work = (work_struct *)paru_alloc(1, sizeof(work_struct), cc);
+    work_struct *Work = (work_struct *)paru_alloc(1, sizeof(work_struct));
     if (Work == NULL)
     {  // out of memory
         printf("Out of memory: Work\n");
@@ -119,10 +116,10 @@ paru_matrix *paru_init_rowFronts(
     PRLEVEL(1, ("%% Work =%p\n ", Work));
     paruMatInfo->Work = Work;
 
-    Int *lacList = (Int *)paru_alloc(m + nf, sizeof(Int), cc);
+    Int *lacList = (Int *)paru_alloc(m + nf, sizeof(Int));
     if (lacList == NULL)
     {  // out of memory
-        paru_freemat(&paruMatInfo, cc);
+        paru_freemat(&paruMatInfo);
         printf("Out of memory: lacList\n");
         return NULL;
     }
@@ -142,15 +139,15 @@ paru_matrix *paru_init_rowFronts(
     if (m == 0 || n == 0)
     {
         printf("%%The dimension of matrix is zero: %ld x %ld \n", m, n);
-        paru_free(1, sizeof(paru_matrix), paruMatInfo, cc);
+        paru_free(1, sizeof(paru_matrix), paruMatInfo);
         return NULL;
     }
 
     tupleList *RowList = paruMatInfo->RowList =
-        (tupleList *)paru_alloc(1, m * sizeof(tupleList), cc);
+        (tupleList *)paru_alloc(1, m * sizeof(tupleList));
     if (RowList == NULL)
     {  // out of memory
-        paru_freemat(&paruMatInfo, cc);
+        paru_freemat(&paruMatInfo);
         printf("Out of memory: RowList\n");
         return NULL;
     }
@@ -159,78 +156,77 @@ paru_matrix *paru_init_rowFronts(
 
     paru_Element **elementList;
     elementList = paruMatInfo->elementList =  // Initialize with NULL
-        (paru_Element **)paru_calloc(1, (m + nf + 1) * sizeof(paru_Element),
-                                     cc);
+        (paru_Element **)paru_calloc(1, (m + nf + 1) * sizeof(paru_Element));
     if (elementList == NULL)
     {  // out of memory
-        paru_freemat(&paruMatInfo, cc);
+        paru_freemat(&paruMatInfo);
         printf("Out of memory: elementList\n");
         return NULL;
     }
 
-    paruMatInfo->frowCount = (Int *)paru_alloc(1, nf * sizeof(Int), cc);
+    paruMatInfo->frowCount = (Int *)paru_alloc(1, nf * sizeof(Int));
     if (paruMatInfo->frowCount == NULL)
     {
-        paru_freemat(&paruMatInfo, cc);
+        paru_freemat(&paruMatInfo);
         printf("Out of memory frowCount\n");
         return NULL;
     }
-    paruMatInfo->fcolCount = (Int *)paru_alloc(1, nf * sizeof(Int), cc);
+    paruMatInfo->fcolCount = (Int *)paru_alloc(1, nf * sizeof(Int));
     if (paruMatInfo->fcolCount == NULL)
     {
-        paru_freemat(&paruMatInfo, cc);
+        paru_freemat(&paruMatInfo);
         printf("Out of memory fcolCount\n");
         return NULL;
     }
 
-    paruMatInfo->frowList = (Int **)paru_calloc(1, nf * sizeof(Int *), cc);
+    paruMatInfo->frowList = (Int **)paru_calloc(1, nf * sizeof(Int *));
     if (paruMatInfo->frowList == NULL)
     {
-        paru_freemat(&paruMatInfo, cc);
+        paru_freemat(&paruMatInfo);
         printf("Out of memory frowList \n");
         return NULL;
     }
 
-    paruMatInfo->fcolList = (Int **)paru_calloc(1, nf * sizeof(Int *), cc);
+    paruMatInfo->fcolList = (Int **)paru_calloc(1, nf * sizeof(Int *));
     if (paruMatInfo->fcolList == NULL)
     {
-        paru_freemat(&paruMatInfo, cc);
+        paru_freemat(&paruMatInfo);
         printf("Out of memory fcolList \n");
         return NULL;
     }
 
     paruMatInfo->partial_Us =  // Initialize with NULL
-        (paru_fac *)paru_calloc(1, nf * sizeof(paru_fac), cc);
+        (paru_fac *)paru_calloc(1, nf * sizeof(paru_fac));
     if (paruMatInfo->partial_Us == NULL)
     {  // out of memory
-        paru_freemat(&paruMatInfo, cc);
+        paru_freemat(&paruMatInfo);
         printf("Out of memory: Us\n");
         return NULL;
     }
 
     paruMatInfo->partial_LUs =  // Initialize with NULL
-        (paru_fac *)paru_calloc(1, nf * sizeof(paru_fac), cc);
+        (paru_fac *)paru_calloc(1, nf * sizeof(paru_fac));
     if (paruMatInfo->partial_LUs == NULL)
     {
         printf("Out of memory: LUs\n");
         return NULL;
     }
 
-    paruMatInfo->time_stamp = (Int *)paru_alloc(1, nf * sizeof(Int), cc);
+    paruMatInfo->time_stamp = (Int *)paru_alloc(1, nf * sizeof(Int));
     if (paruMatInfo->time_stamp == NULL)
     {  // out of memory
-        paru_freemat(&paruMatInfo, cc);
+        paru_freemat(&paruMatInfo);
         printf("Out of memory: time_stamp\n");
         return NULL;
     }
 
     paruMatInfo->heapList = (std::vector<Int> **)paru_calloc(
-        1, (m + nf + 1) * sizeof(std::vector<Int> *), cc);
+        1, (m + nf + 1) * sizeof(std::vector<Int> *));
     std::vector<Int> **heapList = paruMatInfo->heapList;
 
     if (heapList == NULL)
     {  // out of memory
-        paru_freemat(&paruMatInfo, cc);
+        paru_freemat(&paruMatInfo);
         printf("Out of memory: heapList\n");
         return NULL;
     }
@@ -242,10 +238,10 @@ paru_matrix *paru_init_rowFronts(
         Int *Ap = (Int *)A->p;
         Int *Ai = (Int *)A->i;
         double *Ax = (double *)A->x;
-        double *max_row = (double *)paru_calloc(m, sizeof(double), cc);
+        double *max_row = (double *)paru_calloc(m, sizeof(double));
         if (max_row == NULL)
         {  // out of memory
-            paru_freemat(&paruMatInfo, cc);
+            paru_freemat(&paruMatInfo);
             printf("of memory: max_row\n");
             return NULL;
         }
@@ -311,10 +307,10 @@ paru_matrix *paru_init_rowFronts(
         row_degree_bound[row] = ncols;  // Initialzing row degree
 
         paru_Element *curEl = elementList[e] =
-            paru_create_element(nrows, ncols, 0, cc);
+            paru_create_element(nrows, ncols, 0);
         if (curEl == NULL)
         {  // out of memory
-            paru_freemat(&paruMatInfo, cc);
+            paru_freemat(&paruMatInfo);
             printf("Out of memory: curEl\n");
             return NULL;
         }
@@ -337,10 +333,10 @@ paru_matrix *paru_init_rowFronts(
 
         // Allocating Rowlist and updating its tuples
         RowList[row].list =
-            (paru_Tuple *)paru_alloc(slackRow * nrows, sizeof(paru_Tuple), cc);
+            (paru_Tuple *)paru_alloc(slackRow * nrows, sizeof(paru_Tuple));
         if (RowList[row].list == NULL)
         {  // out of memory
-            paru_freemat(&paruMatInfo, cc);
+            paru_freemat(&paruMatInfo);
             printf("Out of memory: RowList[row].list \n");
             return NULL;
         }
@@ -350,9 +346,9 @@ paru_matrix *paru_init_rowFronts(
         paru_Tuple rowTuple;
         rowTuple.e = e;
         rowTuple.f = 0;
-        if (paru_add_rowTuple(RowList, row, rowTuple, cc))
+        if (paru_add_rowTuple(RowList, row, rowTuple))
         {
-            paru_freemat(&paruMatInfo, cc);
+            paru_freemat(&paruMatInfo);
             printf("Out of memory: add_rowTuple \n");
             return NULL;
         }
@@ -384,8 +380,8 @@ paru_matrix *paru_init_rowFronts(
     PRLEVEL(0, ("S = sparse(I,J,X);\n"));
 
     // Free here or if not wil be freed in paru_mem anyway
-    paru_free(snz, sizeof(double), Sx, cc);
-    paru_free(snz, sizeof(Int), Sj, cc);
+    paru_free(snz, sizeof(double), Sx);
+    paru_free(snz, sizeof(Int), Sj);
     LUsym->Sx = NULL;
     LUsym->Sj = NULL;
     return paruMatInfo;
