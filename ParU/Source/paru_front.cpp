@@ -282,15 +282,15 @@ int paru_front(paru_matrix *paruMatInfo,
     hash_size = (hash_size > LUsym->n) ? LUsym->n : hash_size;
     PRLEVEL(1, ("%% 2Front hash_size=%ld\n", hash_size));
     std::vector<Int> colHash(hash_size + 1, -1);
-    Int i = 0;
+    Int ii = 0;
     if (hash_size == LUsym->n)
     {
         PRLEVEL(p,
                 ("%% colHash LOOKUP size = %ld LU %ld\n", hash_size, LUsym->n));
         for (it = stl_colSet.begin(); it != stl_colSet.end(); it++)
         {
-            colHash[*it] = i;
-            fcolList[i++] = *it;
+            colHash[*it] = ii;
+            fcolList[ii++] = *it;
         }
     }
     else
@@ -303,8 +303,8 @@ int paru_front(paru_matrix *paruMatInfo,
         PRLEVEL(p, ("%% colCount=%ld\n", colCount));
         for (it = stl_colSet.begin(); it != stl_colSet.end(); it++)
         {
-            paru_insert_hash(*it, i, colHash);
-            fcolList[i++] = *it;
+            paru_insert_hash(*it, ii, colHash);
+            fcolList[ii++] = *it;
         }
         colHash[hash_size] = colCount;
     }

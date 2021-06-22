@@ -473,7 +473,7 @@ paru_symbolic *paru_analyze(
     // Parent size is nf+1 potentially smaller than what UMFPACK allocate
     size_t size = n + 1;
     Int *Parent = (Int *)paru_realloc(nf + 1, sizeof(Int), Front_parent, &size);
-    ASSERT(size < (size_t) n + 1);
+    ASSERT(size <= (size_t)n + 1);
     if (Parent == NULL)
     {  // should not happen anyway it is always shrinking
         printf("memory problem");
