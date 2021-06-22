@@ -104,7 +104,7 @@ void *paru_realloc(
     static Int realloc_count = 0;
 #endif
     void *p = NULL;
-    if (size == 0)
+    if (*size == 0)
     {
         printf("size must be > 0\n");
         return NULL;
@@ -117,7 +117,8 @@ void *paru_realloc(
     else if (newsize == *size)
     {
         PRLEVEL(1, ("%% reallocating nothing %ld, %ld in %p \n", newsize, *size,
-                    oldP ));
+                    oldP));
+        p = oldP;
     }
     else if (newsize >= (Size_max / size_Entry) || newsize >= INT_MAX)
     {
@@ -301,16 +302,16 @@ void paru_freemat(paru_matrix **paruMatInfo_handle)
         PRLEVEL(1, ("%% Freeing Us=%p\n", Us[i].p));
         if (Us[i].p != NULL)
         {
-            Int m = Us[i].m;
-            Int n = Us[i].n;
-            paru_free(m * n, sizeof(double), Us[i].p);
+            Int mm = Us[i].m;
+            Int nn = Us[i].n;
+            paru_free(mm * nn, sizeof(double), Us[i].p);
         }
         PRLEVEL(1, ("%% Freeing LUs=%p\n", LUs[i].p));
         if (LUs[i].p != NULL)
         {
-            Int m = LUs[i].m;
-            Int n = LUs[i].n;
-            paru_free(m * n, sizeof(double), LUs[i].p);
+            Int mm = LUs[i].m;
+            Int nn = LUs[i].n;
+            paru_free(mm * nn, sizeof(double), LUs[i].p);
         }
     }
 

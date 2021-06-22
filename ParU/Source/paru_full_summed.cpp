@@ -121,7 +121,8 @@ void paru_full_summed(Int e, Int f, paru_matrix *paruMatInfo)
 
         // save the structure of the rows once at first
         Int nrows2assembl = el->nrowsleft - el->nzr_pc;
-        Int tempRow[nrows2assembl];  // C99
+        //Int tempRow[nrows2assembl];  // C99
+        std::vector<Int> tempRow(nrows2assembl);
         Int ii = 0;
         for (Int i = 0; i < mEl; i++)
         {
@@ -154,9 +155,9 @@ void paru_full_summed(Int e, Int f, paru_matrix *paruMatInfo)
 
             double *dC = pivotalFront + fcolInd * rowCount;
 
-            for (Int ii = 0; ii < nrows2assembl; ii++)
+            for (Int iii = 0; iii < nrows2assembl; iii++)
             {
-                Int i = tempRow[ii];
+                Int i = tempRow[iii];
                 Int ri = rowRelIndex[i];
 
                 ASSERT(rowRelIndex[i] != -1);  // I already picked the rows
