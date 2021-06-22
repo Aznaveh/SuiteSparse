@@ -117,7 +117,7 @@ void *paru_realloc(
     else if (newsize == *size)
     {
         PRLEVEL(1, ("%% reallocating nothing %ld, %ld in %p \n", newsize, *size,
-                    oldP, ));
+                    oldP ));
     }
     else if (newsize >= (Size_max / size_Entry) || newsize >= INT_MAX)
     {
@@ -127,7 +127,7 @@ void *paru_realloc(
 
     else
     {  // The object exists, and is changing to some other nonzero size.
-        PRLEVEL(1, ("realloc : %d to %d, %d\n", *size, newsize, size_Entry));
+        PRLEVEL(1, ("realloc : %ld to %ld, %ld\n", *size, newsize, size_Entry));
         int ok = TRUE;
         p = SuiteSparse_realloc(newsize, *size, size_Entry, oldP, &ok);
         if (ok)
