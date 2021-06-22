@@ -122,11 +122,12 @@ for k = 1:nmat
     %    intel = sprintf('. /home/grads/a/aznaveh/intel/bin/compilervars.sh intel64;');
     %    intel = sprintf('. /opt/intel/compilers_and_libraries/linux/bin/compilervars.sh intel64;');
     str = sprintf ('../Demo/umfout %d < ../Matrix/ParUTst/tmp.mtx', id );
+    mypath = '../Demo/Res/';
     %str = strcat(intel, str);
 
     %%%  {  five times test
     %info_name = sprintf ('%d_info.txt',id);
-    %infofullname = strcat(path, info_name);
+    %infofullname = strcat(mypath, info_name);
 
     %for i=1:5
     %    %str = strcat(intel, str);
@@ -146,7 +147,7 @@ for k = 1:nmat
 
     %%% { one time test
     info_name = sprintf ('%d_info.txt',id);
-    infofullname = strcat(path, info_name);
+    infofullname = strcat(mypath, info_name);
     system(str);
     t_Info = load (infofullname);
     myElaps = t_Info(1);
@@ -155,22 +156,21 @@ for k = 1:nmat
 
 
     % Loading the results into Matlab
-    %path = '/export/scratch/multifrontal/aznaveh/myResults/';
-    path = '../Demo/Res/';
+    %mypath = '/export/scratch/multifrontal/aznaveh/myResults/';
 
     row_name = sprintf ('%d_row.txt',id);
-    rowfullname = strcat(path, row_name);
+    rowfullname = strcat(mypath, row_name);
     rowp = load (rowfullname);
     rowp = rowp+1;
 
     col_name = sprintf ('%d_col.txt',id);
-    colfullname = strcat(path, col_name);
+    colfullname = strcat(mypath, col_name);
     colp = load (colfullname);
     colp = colp+1;
 
     if(s == 1)
             s_name = sprintf ('%d_scale.txt', id);
-            scalefullname = strcat(path, s_name);
+            scalefullname = strcat(mypath, s_name);
             Rvec = load (scalefullname);
             R = spdiags (Rvec, 0, m, m);
     else 
@@ -179,7 +179,7 @@ for k = 1:nmat
 
 
     LU_name = sprintf ('%d_LU.txt',id);
-    LUfullname = strcat(path, LU_name);
+    LUfullname = strcat(mypath, LU_name);
 
     %    flp_cnt_dgemm = t_Info(3);
     %    flp_cnt_trsm = t_Info(4);
@@ -249,12 +249,12 @@ for k = 1:nmat
 
 
     % cleaning the files because of the memory problem
-    str = ['rm  ' path LU_name];    system(str);
-    str = ['rm  ' path col_name];    system(str);
-    str = ['rm  ' path row_name];    system(str);
-    str = ['rm  ' path info_name];    system(str);
+    str = ['rm  ' mypath LU_name];    system(str);
+    str = ['rm  ' mypath col_name];    system(str);
+    str = ['rm  ' mypath row_name];    system(str);
+    str = ['rm  ' mypath info_name];    system(str);
     if (s == 1)
-        str = ['rm  ' path s_name];    system(str);
+        str = ['rm  ' mypath s_name];    system(str);
     end
     %id
     %pause;
