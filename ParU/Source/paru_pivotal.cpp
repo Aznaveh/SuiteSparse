@@ -14,10 +14,11 @@
 #include "Parallel_LU.hpp"
 
 void paru_pivotal(std::vector<Int> &pivotal_elements,
-                  std::vector<Int> &panel_row, Int f, heaps_info &hi,
+                  std::vector<Int> &panel_row, Int &zero_piv_rows,
+                  Int f, heaps_info &hi,
                   paru_matrix *paruMatInfo)
 {
-    DEBUGLEVEL(0);
+    DEBUGLEVEL(1);
     paru_symbolic *LUsym = paruMatInfo->LUsym;
     Int *snM = LUsym->super2atree;
     std::vector<Int> **heapList = paruMatInfo->heapList;
@@ -151,7 +152,7 @@ void paru_pivotal(std::vector<Int> &pivotal_elements,
 
     Int *frowList = paruMatInfo->frowList[f];
     Int rowCount = 0;
-    Int zero_piv_rows = 0;
+    //Int zero_piv_rows = 0;
 
     /*************** finding set of rows in current front *********************/
     for (Int i = 0; i < (Int)pivotal_elements.size(); i++)
@@ -205,6 +206,7 @@ void paru_pivotal(std::vector<Int> &pivotal_elements,
                 // Int *el_colIndex = colIndex_pointer (curEl);
                 Int *el_colIndex = (Int *)(el + 1);
 
+                #if 1
                 // checkikng if the numerical values are hard zero
                 // look at the pivotal columns and check if there is any
                 // nonzeros if there is none I can skip adding this row
@@ -234,11 +236,12 @@ void paru_pivotal(std::vector<Int> &pivotal_elements,
                     zero_piv_rows++;
                     rowRelIndex[rEl] = -1;
 #ifndef NDEBUG
-                    Int p = 1;
+                    Int p = -1;
                     if (p <= 0) paru_print_element(paruMatInfo, e);
 #endif
                     continue;  // Not adding the row
                 }
+                #endif
                 // Adding curRow to the set
 #ifndef NDEBUG
                 stl_rowSet.insert(curRow);
@@ -438,15 +441,20 @@ void paru_pivotal(std::vector<Int> &pivotal_elements,
         pivotal_elements.resize(ii);
     }
 
-    // sencond pass through elements with zero rows and
+    // second pass through elements with zero rows and
     // growing them to better fit in current front
     // This can possibly help in more assembly
+
+    Int num_children_with0 = 0;
+    Int num_children_with0_which_fit = 0;
+
     for (Int i = 0; i < (Int)pivotal_elements.size(); i++)
     {
         Int e = pivotal_elements[i];
         paru_Element *el = elementList[e];
         if (el->nzr_pc > 0)  // an elemen that has at least one zero row
         {
+            num_children_with0++;
             Int mEl = el->nrows;
             Int nEl = el->ncols;
 
@@ -477,10 +485,16 @@ void paru_pivotal(std::vector<Int> &pivotal_elements,
             {  // all the zero rows fit in the front
                 PRLEVEL(1, ("%%element %ld totally fit in current front %ld\n",
                             e, f));
+                num_children_with0_which_fit++;
             }
             ASSERT(el->nzr_pc >= 0);
 #endif
         }
+    }
+    
+    if (num_children_with0 == num_children_with0_which_fit )
+    {  // all the children fit within current front
+        zero_piv_rows = 0;
     }
 
 #ifndef NDEBUG
@@ -490,7 +504,7 @@ void paru_pivotal(std::vector<Int> &pivotal_elements,
         PRLEVEL(p, ("%ld ", pivotal_elements[i]));
     PRLEVEL(p, ("\n"));
 
-    p = 2;
+    p = -2;
     PRLEVEL(p, ("%% After all the assemble %ld, z=%ld\n", f, zero_piv_rows));
     PRLEVEL(p, ("%% x =  \t"));
     for (Int c = col1; c < col2; c++) PRLEVEL(p, ("%ld\t\t", c));

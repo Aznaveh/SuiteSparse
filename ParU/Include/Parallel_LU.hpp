@@ -473,7 +473,8 @@ Int bin_srch_col(Int *srt_lst, Int l, Int r, Int num);
 Int bin_srch(Int *srt_lst, Int l, Int r, Int num);
 
 void paru_pivotal(std::vector<Int> &pivotal_elements,
-                  std::vector<Int> &panel_row, Int f, heaps_info &hi,
+                  std::vector<Int> &panel_row, Int &zero_piv_rows,
+                  Int f, heaps_info &hi,
                   paru_matrix *paruMatInfo);
 
 int paru_intersection(Int e, paru_Element **elementList,
