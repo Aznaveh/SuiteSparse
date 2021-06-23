@@ -730,6 +730,7 @@ paru_symbolic *paru_analyze(
 #endif
         if (Parent[f] > 0) Childp[Parent[f] + 1]++;
     }
+    // see GraphBLAS/Source/GB_cumsum.c
     paru_cumsum(nf + 2, Childp);
 #ifndef NDEBUG
     LUsym->Us_bound_size = Us_bound_size;
@@ -772,6 +773,7 @@ paru_symbolic *paru_analyze(
         return NULL;
     }
 
+    // see GraphBLAS/Source/GB_memcpy
     memcpy(cChildp, Childp, (nf + 2) * sizeof(Int));
 
     for (Int f = 0; f < nf; f++)

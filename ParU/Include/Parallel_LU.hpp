@@ -29,6 +29,9 @@ extern "C"
 #include "umf_internal.h"
 }
 
+// divide into user-visible components, in ParU.hpp.
+// and Source/paru_internal.hpp for things needed only inside ParU
+
 // -----------------------------------------------------------------------------
 // debugging and printing macros
 // -----------------------------------------------------------------------------
@@ -82,7 +85,7 @@ static int print_level = 0;
 #ifdef Int  // defined in amd
 #undef Int
 #endif
-#define Int SuiteSparse_long
+#define Int int64_t
 
 // -----------------------------------------------------------------------------
 // basic macros
@@ -232,12 +235,12 @@ typedef struct
     // factorizes the frontal matrix chain. Since the
     // symbolic factorization only provides
 
-#ifndef NDEBUG
+// #ifndef NDEBUG
     Int Us_bound_size;   // Upper bound on size of all Us, sum all fp*fn
     Int LUs_bound_size;  // Upper bound on size of all LUs, sum all fp*fm
     Int row_Int_bound;   // Upper bound on size of all ints for rows
     Int col_Int_bound;   // Upper bound on size of all ints for cols
-#endif
+// #endif
 
 } paru_symbolic;
 
@@ -292,6 +295,11 @@ typedef struct
 {
     Int sum_size, biggest_Child_size, biggest_Child_id;
 } heaps_info;
+
+
+// internal:
+
+
 inline Int *colIndex_pointer(paru_Element *curEl) { return (Int *)(curEl + 1); }
 // Never ever use these functions prior to initializing ncols and nrows
 inline Int *rowIndex_pointer(paru_Element *curEl)
@@ -382,12 +390,13 @@ typedef struct
     paru_fac *partial_Us;  /* size nf   size(Us)= fp*colCount[f]    */
     paru_fac *partial_LUs; /* size nf   size(LUs)= rowCount[f]*fp   */
 
-#ifndef NDEBUG
+// #ifndef NDEBUG
+// only used for statistics when debugging is enabled:
     Int actual_alloc_LUs;     /* actual memory allocated for LUs*/
     Int actual_alloc_Us;      /* actual memory allocated for Us*/
     Int actual_alloc_row_int; /* actual memory allocated for rows*/
     Int actual_alloc_col_int; /* actual memory allocated for cols*/
-#endif
+// #endif
 
     Int *row_degree_bound; /* row degree size number of rows */
     Int panel_width;       /* width of panel for dense factorizaiton*/
@@ -408,17 +417,40 @@ typedef struct
     double my_time;
     double umf_time;
 
-#ifdef COUNT_FLOPS
+// #ifdef COUNT_FLOPS
     // flop count info
     double flp_cnt_dgemm;
     double flp_cnt_trsm;
     double flp_cnt_dger;
     double flp_cnt_real_dgemm;
-#endif
+// #endif
 
 } paru_matrix;
 
+//------------------------------------------------------------------------------
+// user:
+
 paru_symbolic *paru_analyze(cholmod_sparse *A);
+
+/* usage:
+
+S = paru_analyse (A) ;
+LU = paru_factoriz (A,S) ;
+
+info: an enum: PARU_SUCCESS, PARU_OUT_OF_MEMORY, PARU_INVALID, PARU_SINGULAR, ...
+info = paru_analyse (&S, A) ;
+info = paru_factoriz (&LU, A,S) ;
+
+*/
+
+paru_factorization *paru_factoriz ( A, S ) ;
+
+
+
+//------------------------------------------------------------------------------
+// internal
+
+
 
 paru_matrix *paru_init_rowFronts(cholmod_sparse *A, int scale,
                                  paru_symbolic *LUsym);
@@ -439,6 +471,7 @@ Int paru_add_rowTuple(tupleList *RowList, Int row, paru_Tuple T);
 int paru_front(paru_matrix *paruMatInfo, Int f);
 
 Int paru_dgetrf(double *F, Int *frowList, Int m, Int n, BLAS_INT *ipiv);
+
 Int paru_factorize(Int f, Int start_fac, std::vector<Int> &panel_row,
                    std::set<Int> &stl_colSet,
                    std::vector<Int> &pivotal_elements,
@@ -496,11 +529,6 @@ void paru_eliminate_rows(Int e, Int f, std::vector<Int> &colHash,
 
 void paru_eliminate_el_with0rows(Int e, Int f, std::vector<Int> &colHash,
                                  paru_matrix *paruMatInfo);
-
-// heap related
-void paru_make_heap(Int f, Int start_fac, std::vector<Int> &pivotal_elements,
-                    heaps_info &hi, std::vector<Int> &colHash,
-                    paru_matrix *paruMatInfo);
 
 void paru_full_summed(Int e, Int f, paru_matrix *paruMatInfo);
 
