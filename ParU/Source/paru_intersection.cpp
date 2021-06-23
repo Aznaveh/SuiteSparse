@@ -6,7 +6,7 @@
  *
  *  @author Aznaveh
  */
-#include "Parallel_LU.hpp"
+#include "paru_internal.hpp"
 #define C 4
 
 int paru_intersection ( Int e, paru_Element **elementList, 

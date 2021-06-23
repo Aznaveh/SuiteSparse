@@ -15,7 +15,7 @@
  *
  * @author Aznaveh
  *  */
-#include "Parallel_LU.hpp"
+#include "paru_internal.hpp"
 paru_Element *paru_create_element(Int nrows, Int ncols, Int init)
 {
     DEBUGLEVEL(0);

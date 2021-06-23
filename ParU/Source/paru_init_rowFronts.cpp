@@ -11,21 +11,22 @@
  *
  * @author Aznaveh
  */
-#include "Parallel_LU.hpp"
+#include "paru_internal.hpp"
 
-#define FREE_ALL
-{
-    paru_free (elRoe)
-    paru_free (elCol)
-    ...
-}
-
-#define CHECK(p)
-if (p == NULL)
-{
-    FREE_ALL ;
-    return (NULL) ;
-}
+//FIXME fix everything here with no leak!
+//#define FREE_ALL
+//{
+//    paru_free (elRoe)
+//    paru_free (elCol)
+//    ...
+//}
+//
+//#define CHECK(p)
+//if (p == NULL)
+//{
+//    FREE_ALL ;
+//    return (NULL) ;
+//}
 
 paru_matrix *paru_init_rowFronts(
     // inputs, not modified
@@ -57,7 +58,7 @@ paru_matrix *paru_init_rowFronts(
     if (paruMatInfo == NULL)
     {  // out of memory
         printf("Out of memory: paruMatInfo\n");
-        FREE_ALL ;
+        //FREE_ALL ;
         return NULL;
     }
 
@@ -75,12 +76,12 @@ paru_matrix *paru_init_rowFronts(
     paruMatInfo->panel_width = 32;
 
     Int *row_degree_bound = (Int *)paru_alloc(m, sizeof(Int));
-    CHECK (row_degree_bound) ;
+    //CHECK (row_degree_bound) ;
 
     if (row_degree_bound == NULL)
     {  // out of memory
         printf("Out of memory: row_degree_bound\n");
-        FREE_ALL ;
+        // FREE_ALL ;
         return NULL;
     }
 
@@ -95,13 +96,14 @@ paru_matrix *paru_init_rowFronts(
     memset(rowSize, -1, m * sizeof(Int));
     PRLEVEL(1, ("%% rowSize pointer=%p size=%ld \n", rowSize, m * sizeof(Int)));
 
-    Int *rowMark = (Int *)paru_alloc(m + nf + 1, sizeof(Int));
-    Int *elRow = (Int *)paru_alloc(m + nf, sizeof(Int));
-    Int *elCol = (Int *)paru_alloc(m + nf, sizeof(Int));
+    //TODO These need to be fixed; possbile memory leak
+    rowMark = (Int *)paru_alloc(m + nf + 1, sizeof(Int));
+    elRow = (Int *)paru_alloc(m + nf, sizeof(Int));
+    elCol = (Int *)paru_alloc(m + nf, sizeof(Int));
 
     if (rowMark == NULL || elRow == NULL || elCol == NULL)
     {
-        FREE_ALL ;
+        //FREE_ALL ;
         return (NULL) ;
     }
 

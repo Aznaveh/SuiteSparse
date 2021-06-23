@@ -7,7 +7,7 @@
  *
  * @author Aznaveh
  *  */
-#include "Parallel_LU.hpp"
+#include "paru_internal.hpp"
 #define LEN 8
 
 

@@ -22,8 +22,7 @@
  *
  * @author Aznaveh
  */
-
-#include "Parallel_LU.hpp"
+#include "paru_internal.hpp"
 
 /// Already defined in /SuiteSparse/CHOLMOD/Include/cholmod_blas.h
 //          use BLAS_DTRSM insted

@@ -8,7 +8,7 @@
  * @author Aznaveh
  */
 
-#include "Parallel_LU.hpp"
+#include "paru_internal.hpp"
 #define TOLER 0.1  // pivot tolerance
 
 extern "C" void dgetrf_(BLAS_INT *dim1, BLAS_INT *dim2, double *a,

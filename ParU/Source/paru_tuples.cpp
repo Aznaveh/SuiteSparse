@@ -1,4 +1,3 @@
-#include "Parallel_LU.hpp"
 /** =========================================================================  /
  * =======================  paru_tuples =====================================  /
  * ========================================================================== */
@@ -12,6 +11,7 @@
  *
  * @author Aznaveh
  */
+#include "paru_internal.hpp"
 Int paru_add_rowTuple(tupleList *RowList, Int row, paru_Tuple T)
 {
     DEBUGLEVEL(0);

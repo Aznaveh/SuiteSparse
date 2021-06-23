@@ -6,7 +6,7 @@
  *
  *  @author Aznaveh
  */
-#include "Parallel_LU.hpp"
+#include "paru_internal.hpp"
 
 void paru_eliminate_all(Int e, Int f, std::vector<Int> &colHash,
                         paru_matrix *paruMatInfo)
@@ -515,8 +515,6 @@ void paru_eliminate_rows(Int e, Int f, std::vector<Int> &colHash,
     if (p <= 0) paru_print_element(paruMatInfo, e);
 #endif
 }
-
-#include "Parallel_LU.hpp"
 
 void paru_eliminate_el_with0rows(Int e, Int f, std::vector<Int> &colHash,
                                  paru_matrix *paruMatInfo)

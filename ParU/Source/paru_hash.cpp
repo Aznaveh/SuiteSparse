@@ -13,7 +13,7 @@
  *
  *  @author Aznaveh
  */
-#include "Parallel_LU.hpp"
+#include "paru_internal.hpp"
 // key*257 & mask
 #define HASH_FUNCTION(key) (( (key << 8) + (key) ) & (hash_bits))
 

@@ -6,7 +6,7 @@
  *
  * @author Aznaveh
  */
-#include "Parallel_LU.hpp"
+#include "paru_internal.hpp"
 void paru_print_element (paru_matrix *paruMatInfo, Int e)
 {
     // print out contribution blocks

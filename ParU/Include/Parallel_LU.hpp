@@ -443,7 +443,8 @@ info = paru_factoriz (&LU, A,S) ;
 
 */
 
-paru_factorization *paru_factoriz ( A, S ) ;
+//TODO add a routine that does init_row and also factorization
+// paru_factorization *paru_factoriz ( A, S ) ;
 
 
 

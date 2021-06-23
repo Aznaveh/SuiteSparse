@@ -12,7 +12,7 @@
  *
  *  @author Aznaveh
  */
-#include "Parallel_LU.hpp"
+#include "paru_internal.hpp"
 int paru_front(paru_matrix *paruMatInfo,
                /* RowCol list/tuples and LUsym handle */
                Int f) /* front need to be assembled */
@@ -266,12 +266,12 @@ int paru_front(paru_matrix *paruMatInfo,
     std::vector<Int> *curHeap = heapList[eli];
 
     // EXIT point HERE
-    // FIXME: it is not an exit if there was a zero row!! do not free the heap
-    if (colCount == 0 )
+    if (colCount == 0)
     {  // there is no CB, Nothing to be done
         if (zero_piv_rows > 0)
         {
-            //TODO: make the heap and return
+            // make the heap and return
+            paru_make_heap_empty_el(f, pivotal_elements, hi, paruMatInfo);
             return 0;
         }
         else
@@ -393,7 +393,7 @@ int paru_front(paru_matrix *paruMatInfo,
             PRLEVEL(1, ("%% element= %ld  nEl =%ld \n", e, nEl));
 
             assemble_row_toU(e, f, curRowIndex, curFsRowIndex, colHash,
-                    paruMatInfo);
+                             paruMatInfo);
 
             // FLIP(el_rowIndex[curRowIndex]); //marking row assembled
             el_rowIndex[curRowIndex] = -1;
@@ -461,29 +461,29 @@ int paru_front(paru_matrix *paruMatInfo,
 
     paru_Element *curEl;
     PRLEVEL(
-            1, ("%% rowCount=%ld, colCount=%ld, fp=%ld\n", rowCount, colCount, fp));
+        1, ("%% rowCount=%ld, colCount=%ld, fp=%ld\n", rowCount, colCount, fp));
     PRLEVEL(1, ("%% curEl is %ld by %ld\n", rowCount - fp, colCount));
     if (fp < rowCount)
     {
         curEl = elementList[eli] = paru_create_element(
-                rowCount - fp, colCount,
-                0);  // allocating an un-initialized part of memory
+            rowCount - fp, colCount,
+            0);  // allocating an un-initialized part of memory
 
         // While insided the DGEMM BETA == 0
         if (curEl == NULL)
         {
             printf("%% Out of memory when tried to allocate current CB %ld",
-                    eli);
+                   eli);
             return 1;
         }
         PRLEVEL(1, ("%% Created ele %ld in curEl =%p\n", eli, curEl));
     }
     else  // EXIT point
-        //FIXME
     {     // NO rows for current contribution block
         if (zero_piv_rows > 0)
         {
-            //TODO keep the heap and do it for the parent. 
+            // keep the heap and do it for the parent.
+            paru_make_heap_empty_el(f, pivotal_elements, hi, paruMatInfo);
             // There are stuff left from in zero
             // then return
             return 0;
@@ -492,13 +492,12 @@ int paru_front(paru_matrix *paruMatInfo,
         {
             delete curHeap;
             paruMatInfo->heapList[eli] = nullptr;
-            PRLEVEL(1, ("%%(2)Heap freed inside front %p id=%ld\n", curHeap, eli));
+            PRLEVEL(1,
+                    ("%%(2)Heap freed inside front %p id=%ld\n", curHeap, eli));
             PRLEVEL(1, ("%% pivotalFront =%p\n", pivotalFront));
             return 0;
         }
     }
-
-
 
     // Initializing curEl global indices
     // Int *el_colIndex = colIndex_pointer (curEl);
@@ -565,7 +564,7 @@ int paru_front(paru_matrix *paruMatInfo,
     // paruMatInfo->time_stamp[f]++; //invalidating all the marks
     PRLEVEL(-1, ("\n%%||||  Start Finalize %ld ||||\n", f));
     paru_prior_assemble(f, start_fac, pivotal_elements, colHash, hi,
-            paruMatInfo);
+                        paruMatInfo);
     PRLEVEL(-1, ("\n%%||||  Finish Finalize %ld ||||\n", f));
 
     ////////////////////////////////////////////////////////////////////////////

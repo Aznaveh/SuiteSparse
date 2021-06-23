@@ -5,8 +5,7 @@
  *    it must be called after ther result are computed
  *  @author Aznaveh
  */
-
-#include "Parallel_LU.hpp"
+#include "paru_internal.hpp"
 void paru_write(paru_matrix *paruMatInfo, int scale, char *id)
 {
     DEBUGLEVEL(0);

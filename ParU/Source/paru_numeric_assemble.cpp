@@ -9,7 +9,7 @@
  *
  */
 
-#include "Parallel_LU.hpp"
+#include "paru_internal.hpp"
 
 void assemble_row_toU(Int e, Int f, Int sR, Int dR, std::vector<Int> &colHash,
                       paru_matrix *paruMatInfo)

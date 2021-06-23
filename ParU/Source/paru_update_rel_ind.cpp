@@ -1,8 +1,6 @@
 /** =========================================================================  /
  * =======================  paru_update_rel_ind =============================  /
  * ========================================================================== */
-
-#include "Parallel_LU.hpp"
 /*! @brief updating element's relative indices in regard to another element 
  *      using my hash to find the columns and update relative indices
  *
@@ -10,6 +8,7 @@
  * */
 
 
+#include "paru_internal.hpp"
 void paru_update_rel_ind_col ( Int e, Int f,  
         std::vector <Int> &colHash, 
         paru_matrix *paruMatInfo) 

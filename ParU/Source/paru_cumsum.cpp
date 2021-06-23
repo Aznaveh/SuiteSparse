@@ -7,7 +7,7 @@
  * 
  * @author Aznaveh
  */
-#include "Parallel_LU.hpp"
+#include "paru_internal.hpp"
 Int paru_cumsum (Int n, Int *X)
 {   // n is size, X is size n and in/out
     Int tot = 0;

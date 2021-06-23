@@ -6,7 +6,7 @@
  * @author Aznaveh
  */
 
-#include "Parallel_LU.hpp"
+#include "paru_internal.hpp"
 
 void paru_prior_assemble(Int f, Int start_fac,
                          std::vector<Int> &pivotal_elements,

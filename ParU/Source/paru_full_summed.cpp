@@ -30,7 +30,7 @@
 
  *  @author Aznaveh
  */
-#include "Parallel_LU.hpp"
+#include "paru_internal.hpp"
 
 void paru_full_summed(Int e, Int f, paru_matrix *paruMatInfo)
 

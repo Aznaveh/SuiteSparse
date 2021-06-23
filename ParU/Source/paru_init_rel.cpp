@@ -11,7 +11,7 @@
  *
  * @author Aznaveh
  */
-#include "Parallel_LU.hpp"
+#include "paru_internal.hpp"
 void paru_init_rel  (Int f, paru_matrix *paruMatInfo )
 {
     DEBUGLEVEL(0);

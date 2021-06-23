@@ -6,7 +6,7 @@
  *
  *  @author Aznaveh
  */
-#include "Parallel_LU.hpp"
+#include "paru_internal.hpp"
 
 void paru_update_rowDeg ( Int panel_num,  Int row_end, Int f, Int start_fac,
         std::set<Int> &stl_colSet, 

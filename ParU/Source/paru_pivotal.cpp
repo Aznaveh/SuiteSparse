@@ -11,7 +11,7 @@
  *
  *  @author Aznaveh
  */
-#include "Parallel_LU.hpp"
+#include "paru_internal.hpp"
 
 void paru_pivotal(std::vector<Int> &pivotal_elements,
                   std::vector<Int> &panel_row, Int &zero_piv_rows,

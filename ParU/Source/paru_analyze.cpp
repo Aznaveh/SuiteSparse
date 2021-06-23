@@ -48,7 +48,7 @@
  *              the augmented tree does not
  * @author Aznaveh
  * */
-#include "Parallel_LU.hpp"
+#include "paru_internal.hpp"
 paru_symbolic *paru_analyze(
     // inputs, not modified
     cholmod_sparse *A)

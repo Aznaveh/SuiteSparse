@@ -7,7 +7,7 @@
  * @author Aznaveh
  *
  */
-#include "Parallel_LU.hpp"
+#include "paru_internal.hpp"
 //  Wrapper around malloc routine
 //
 //  Uses a pointer to the malloc routine.
