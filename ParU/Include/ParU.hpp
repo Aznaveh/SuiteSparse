@@ -336,4 +336,7 @@ paru_matrix *paru_init_rowFronts(cholmod_sparse *A, int scale,
                                  paru_symbolic *LUsym);
 int paru_front(paru_matrix *paruMatInfo, Int f);
 
+void paru_freesym(paru_symbolic **LUsym_handle);
+void paru_freemat(paru_matrix **paruMatInfo_handle);
+
 #endif
