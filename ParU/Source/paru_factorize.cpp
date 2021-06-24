@@ -2,7 +2,7 @@
  * =======================  paru_factorize  =================================  /
  * ========================================================================== */
 /*! @brief Doing the BLAS factorization in different panels and call degree
- * update it it is necessary
+ * update if it is necessary
  *
  *
  * @author Aznaveh
@@ -92,7 +92,6 @@ Int paru_panel_factorize(Int f, Int m, Int n, const Int panel_width,
         // Initializing maximum element in the column
         Int row_max = j;
 #ifndef NDEBUG
-        // FIXME a problem here
         Int row_deg_max = row_degree_bound[frowList[row_max]];
 #endif
         double maxval = F[j * m + row_max];
@@ -287,9 +286,11 @@ Int paru_panel_factorize(Int f, Int m, Int n, const Int panel_width,
     return 1;
 }
 
-Int paru_factorize(Int f, Int start_fac, std::vector<Int> &panel_row,
-                   std::set<Int> &stl_colSet,
-                   std::vector<Int> &pivotal_elements, paru_matrix *paruMatInfo)
+Int paru_factorize_full_summed(Int f, Int start_fac,
+                               std::vector<Int> &panel_row,
+                               std::set<Int> &stl_colSet,
+                               std::vector<Int> &pivotal_elements,
+                               paru_matrix *paruMatInfo)
 {
     DEBUGLEVEL(0);
 

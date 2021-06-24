@@ -78,7 +78,6 @@ static int print_level = 0;
 //------------------------------------------------------------------------------
 // inline internal functions
 
-
 inline Int *colIndex_pointer(paru_Element *curEl) { return (Int *)(curEl + 1); }
 // Never ever use these functions prior to initializing ncols and nrows
 inline Int *rowIndex_pointer(paru_Element *curEl)
@@ -135,13 +134,13 @@ void paru_freemat(paru_matrix **paruMatInfo_handle);
 /* add tuple functions defintions */
 Int paru_add_rowTuple(tupleList *RowList, Int row, paru_Tuple T);
 
-
 Int paru_dgetrf(double *F, Int *frowList, Int m, Int n, BLAS_INT *ipiv);
 
-Int paru_factorize(Int f, Int start_fac, std::vector<Int> &panel_row,
-                   std::set<Int> &stl_colSet,
-                   std::vector<Int> &pivotal_elements,
-                   paru_matrix *paruMatInfo);
+Int paru_factorize_full_summed(Int f, Int start_fac,
+                               std::vector<Int> &panel_row,
+                               std::set<Int> &stl_colSet,
+                               std::vector<Int> &pivotal_elements,
+                               paru_matrix *paruMatInfo);
 
 paru_Element *paru_create_element(Int nrows, Int ncols, Int init);
 
@@ -172,9 +171,8 @@ Int bin_srch_col(Int *srt_lst, Int l, Int r, Int num);
 Int bin_srch(Int *srt_lst, Int l, Int r, Int num);
 
 void paru_pivotal(std::vector<Int> &pivotal_elements,
-                  std::vector<Int> &panel_row, Int &zero_piv_rows,
-                  Int f, heaps_info &hi,
-                  paru_matrix *paruMatInfo);
+                  std::vector<Int> &panel_row, Int &zero_piv_rows, Int f,
+                  heaps_info &hi, paru_matrix *paruMatInfo);
 
 int paru_intersection(Int e, paru_Element **elementList,
                       std::set<Int> &stl_colSet);
@@ -197,7 +195,6 @@ void paru_eliminate_el_with0rows(Int e, Int f, std::vector<Int> &colHash,
                                  paru_matrix *paruMatInfo);
 
 void paru_full_summed(Int e, Int f, paru_matrix *paruMatInfo);
-
 
 // heap related
 void paru_make_heap(Int f, Int start_fac, std::vector<Int> &pivotal_elements,

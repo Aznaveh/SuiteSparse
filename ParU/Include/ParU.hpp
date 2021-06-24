@@ -224,9 +224,7 @@ typedef struct
     Int sum_size, biggest_Child_size, biggest_Child_id;
 } heaps_info;
 
-
 // internal:
-
 
 typedef struct
 { /*List of tuples */
@@ -278,7 +276,7 @@ typedef struct
     paru_fac *partial_Us;  /* size nf   size(Us)= fp*colCount[f]    */
     paru_fac *partial_LUs; /* size nf   size(LUs)= rowCount[f]*fp   */
 
-// only used for statistics when debugging is enabled:
+    // only used for statistics when debugging is enabled:
     Int actual_alloc_LUs;     /* actual memory allocated for LUs*/
     Int actual_alloc_Us;      /* actual memory allocated for Us*/
     Int actual_alloc_row_int; /* actual memory allocated for rows*/
@@ -303,13 +301,13 @@ typedef struct
     double my_time;
     double umf_time;
 
-// #ifdef COUNT_FLOPS
+    // #ifdef COUNT_FLOPS
     // flop count info
     double flp_cnt_dgemm;
     double flp_cnt_trsm;
     double flp_cnt_dger;
     double flp_cnt_real_dgemm;
-// #endif
+    // #endif
 
 } paru_matrix;
 
@@ -323,21 +321,16 @@ paru_symbolic *paru_analyze(cholmod_sparse *A);
 S = paru_analyse (A) ;
 LU = paru_factoriz (A,S) ;
 
-info: an enum: PARU_SUCCESS, PARU_OUT_OF_MEMORY, PARU_INVALID, PARU_SINGULAR, ...
-info = paru_analyse (&S, A) ;
-info = paru_factoriz (&LU, A,S) ;
+info: an enum: PARU_SUCCESS, PARU_OUT_OF_MEMORY, PARU_INVALID, PARU_SINGULAR,
+... info = paru_analyse (&S, A) ; info = paru_factoriz (&LU, A,S) ;
 
 */
 
-//TODO add a routine that does init_row and also factorization
+// TODO add a routine that does init_row and also factorization
 // paru_factorization *paru_factoriz ( A, S ) ;
-
-
 
 //------------------------------------------------------------------------------
 // internal
-
-
 
 paru_matrix *paru_init_rowFronts(cholmod_sparse *A, int scale,
                                  paru_symbolic *LUsym);
