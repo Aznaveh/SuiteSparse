@@ -29,15 +29,6 @@ extern "C"
 #include "umf_internal.h"
 }
 
-// divide into user-visible components, in ParU.hpp.
-// and Source/paru_internal.hpp for things needed only inside ParU
-
-// -----------------------------------------------------------------------------
-// debugging and printing macros
-// -----------------------------------------------------------------------------
-
-
-
 #ifdef Int  // defined in amd
 #undef Int
 #endif
@@ -350,82 +341,6 @@ info = paru_factoriz (&LU, A,S) ;
 
 paru_matrix *paru_init_rowFronts(cholmod_sparse *A, int scale,
                                  paru_symbolic *LUsym);
-
-/* Wrappers for managing memory */
-void *paru_alloc(size_t n, size_t size);
-void *paru_calloc(size_t n, size_t size);
-void *paru_realloc(size_t newsize, size_t size_Entry, void *oldP, size_t *size);
-
-void paru_free(Int n, Int size, void *p);
-void paru_free_el(Int e, paru_Element **elementList);
-void paru_freesym(paru_symbolic **LUsym_handle);
-void paru_freemat(paru_matrix **paruMatInfo_handle);
-
-/* add tuple functions defintions */
-Int paru_add_rowTuple(tupleList *RowList, Int row, paru_Tuple T);
-
 int paru_front(paru_matrix *paruMatInfo, Int f);
-
-Int paru_dgetrf(double *F, Int *frowList, Int m, Int n, BLAS_INT *ipiv);
-
-Int paru_factorize(Int f, Int start_fac, std::vector<Int> &panel_row,
-                   std::set<Int> &stl_colSet,
-                   std::vector<Int> &pivotal_elements,
-                   paru_matrix *paruMatInfo);
-
-paru_Element *paru_create_element(Int nrows, Int ncols, Int init);
-
-void assemble_row_toU(Int e, Int f, Int sR, Int dR, std::vector<Int> &colHash,
-                      paru_matrix *paruMatInfo);
-
-Int paru_trsm(double *pF, double *uPart, Int fp, Int rowCount, Int colCount);
-Int paru_dgemm(double *pF, double *uPart, double *el, Int fp, Int rowCount,
-               Int colCount);
-
-void paru_print_element(paru_matrix *paruMatInfo, Int e);
-void paru_print_tupleList(tupleList *listSet, Int index);
-void paru_init_rel(Int f, paru_matrix *paruMatInfo);
-
-void paru_update_rel_ind_col(Int e, Int f, std::vector<Int> &colHash,
-                             paru_matrix *paruMatInfo);
-
-void paru_write(paru_matrix *paruMatInfo, int scale, char *id);
-
-void paru_update_rowDeg(Int panel_num, Int row_end, Int f, Int start_fac,
-                        std::set<Int> &stl_colSet,
-                        std::vector<Int> &pivotal_elements,
-                        paru_matrix *paruMatInfo);
-
-Int paru_cumsum(Int n, Int *X);
-
-Int bin_srch_col(Int *srt_lst, Int l, Int r, Int num);
-Int bin_srch(Int *srt_lst, Int l, Int r, Int num);
-
-void paru_pivotal(std::vector<Int> &pivotal_elements,
-                  std::vector<Int> &panel_row, Int &zero_piv_rows,
-                  Int f, heaps_info &hi,
-                  paru_matrix *paruMatInfo);
-
-int paru_intersection(Int e, paru_Element **elementList,
-                      std::set<Int> &stl_colSet);
-
-void paru_prior_assemble(Int f, Int start_fac,
-                         std::vector<Int> &pivotal_elements,
-                         std::vector<Int> &colHash, heaps_info &hi,
-                         paru_matrix *paruMatInfo);
-
-void paru_eliminate_all(Int e, Int f, std::vector<Int> &colHash,
-                        paru_matrix *paruMatInfo);
-
-void paru_eliminate_cols(Int e, Int f, std::vector<Int> &colHash,
-                         paru_matrix *paruMatInfo);
-
-void paru_eliminate_rows(Int e, Int f, std::vector<Int> &colHash,
-                         paru_matrix *paruMatInfo);
-
-void paru_eliminate_el_with0rows(Int e, Int f, std::vector<Int> &colHash,
-                                 paru_matrix *paruMatInfo);
-
-void paru_full_summed(Int e, Int f, paru_matrix *paruMatInfo);
 
 #endif
