@@ -5,7 +5,7 @@
  *
  * @author Aznaveh
  * */
-#include "Parallel_LU.hpp"
+#include "ParU.hpp"
 #include "matlab_finalize.h"
 
 int main(int argc, char **argv)

@@ -1,4 +1,4 @@
-#include "Parallel_LU.hpp"
+#include "ParU.hpp"
 
 int main (int argc, char **argv)
 {

@@ -1,12 +1,13 @@
 /** =========================================================================  /
  * =======================  paru_internal.hpp ===============================  /
  * ========================================================================== */
-/*!
- * internal libraries that are not visible to the user
- * @author Aznaveh
- *  */
-//#include "ParU.hpp"
-#include "Parallel_LU.hpp"
+#ifndef PARU_INTERNAL_H
+#define PARU_INTERNAL_H
+//!
+//  internal libraries that are not visible to the user
+//  @author Aznaveh
+//   
+#include "ParU.hpp"
 
 // more here ...
 
@@ -23,3 +24,4 @@ void paru_make_heap(Int f, Int start_fac, std::vector<Int> &pivotal_elements,
 void paru_make_heap_empty_el(Int f, std::vector<Int> &pivotal_elements,
                              heaps_info &hi, paru_matrix *paruMatInfo);
 
+#endif

@@ -1,9 +1,0 @@
-#!/bin/sh
-
-./umfout <../Matrix/west0067.mtx
-./umfout <../Matrix/Franz6_id1959_aug.mtx
-./umfout <../Matrix/Ragusa16.mtx
-./umfout <../Matrix/ash219.mtx
-./umfout <../Matrix/young1c.mtx
-./umfout <../Matrix/c32.mtx
-./umfout <../Matrix/bfwa62.mtx

@@ -7,7 +7,7 @@
 
 //#include <memory_resource>
 
-#include "Parallel_LU.hpp"
+#include "ParU.hpp"
 
 int main () 
 {

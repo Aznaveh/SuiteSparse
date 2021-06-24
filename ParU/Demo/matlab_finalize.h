@@ -6,7 +6,7 @@
  * @author Aznaveh
  * */
 
-#include "Parallel_LU.hpp"
+#include "ParU.hpp"
 void matlab_finalize (Int nf)
 {
 

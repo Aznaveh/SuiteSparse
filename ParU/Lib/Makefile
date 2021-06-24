@@ -38,7 +38,7 @@ distclean: clean
 clean:
 	- $(RM) -r $(CLEAN)
 
-INC = ../Include/Parallel_LU.hpp 
+INC = ../Include/ParU.hpp 
 
 C11 = -std=c++11
 CC11 = -std=c11
@@ -74,8 +74,8 @@ $(OBJ): $(INC)
 I = -I ../../UMFPACK/Source -I../../UMFPACK/Include -I ../../CHOLMOD/Include\
 	-I ../../AMD/Include  -I ../../SuiteSparse_config -I../Include
 
-FLAG = -Wno-write-strings   -Wall #-Werror  -Wnull-dereference -Wl,--verbose\
-       #  -Wextra  -Wpedantic -Wshadow -Wnon-virtual-dtor #development
+FLAG = -Wno-write-strings   -Wall -Werror  -Wnull-dereference -Wl,--verbose\
+         -Wextra  -Wpedantic -Wshadow -Wnon-virtual-dtor #development
 
 
 ifeq ($(DEBUG),yes)
@@ -192,11 +192,11 @@ $(INSTALL_LIB)/$(SO_TARGET): $(OBJ)
 	$(C) $(SO_OPTS) $^ -o $@ $(LDLIBS)
 	( cd $(INSTALL_LIB) ; ln -sf $(SO_TARGET) $(SO_PLAIN) )
 	( cd $(INSTALL_LIB) ; ln -sf $(SO_TARGET) $(SO_MAIN) )
-	$(CP) ../Include/Parallel_LU.hpp $(INSTALL_INCLUDE)
+	$(CP) ../Include/ParU.hpp $(INSTALL_INCLUDE)
 	$(CP) ../Doc/paru_user_guide.pdf $(INSTALL_DOC)
 	$(CP) ../README.txt $(INSTALL_DOC)/PARU_README.txt
 	chmod 755 $(INSTALL_LIB)/$(SO_TARGET)
-	chmod 644 $(INSTALL_INCLUDE)/Parallel_LU.hpp
+	chmod 644 $(INSTALL_INCLUDE)/ParU.hpp
 #	chmod 644 $(INSTALL_DOC)/paru_user_guide.pdf
 	chmod 744 $(INSTALL_DOC)/paru_user_guide.pdf
 	chmod 644 $(INSTALL_DOC)/PARU_README.txt
@@ -206,6 +206,6 @@ uninstall:
 	$(RM) $(INSTALL_LIB)/$(SO_TARGET)
 	$(RM) $(INSTALL_LIB)/$(SO_PLAIN)
 	$(RM) $(INSTALL_LIB)/$(SO_MAIN)
-	$(RM) $(INSTALL_INCLUDE)/Parallel_LU.hpp
+	$(RM) $(INSTALL_INCLUDE)/ParU.hpp
 	$(RM) $(INSTALL_DOC)/paru_user_guide.pdf
 	$(RM) $(INSTALL_DOC)/PARU_README.txt
