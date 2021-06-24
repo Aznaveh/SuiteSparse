@@ -6,15 +6,118 @@
 //!
 //  internal libraries that are not visible to the user
 //  @author Aznaveh
-//   
+//
 #include "ParU.hpp"
-
-// more here ...
 
 // force debugging off
 #ifndef NDEBUG
 #define NDEBUG
 #endif
+
+#ifndef NPR
+#define NPR
+#endif
+
+// for printing information uncomment this; to activate assertions uncomment
+//#undef NPR    //<<1>>
+
+// from spqr.hpp
+// Aznaveh For MATLAB OUTPUT UNCOMMENT HERE
+// uncomment the following line to turn on debugging
+//#undef NDEBUG  //<<2>>
+
+// uncomment if you want to count hardware flops
+//#define COUNT_FLOPS
+
+// defined somewhere else
+#ifdef ASSERT
+#undef ASSERT
+#endif
+#ifndef NDEBUG
+#include <assert.h>
+#define ASSERT(e) assert(e)
+#else
+#define ASSERT(e)
+#endif
+
+#ifndef NPR
+static int print_level = 0;
+#define PRLEVEL(level, param)                   \
+    {                                           \
+        if (print_level >= level) printf param; \
+    }
+#define DEBUGLEVEL(level)    \
+    {                        \
+        print_level = level; \
+    }
+#else
+#define PRLEVEL(level, param)
+#define DEBUGLEVEL(level)
+#endif
+
+// -----------------------------------------------------------------------------
+// basic macros
+// -----------------------------------------------------------------------------
+
+#define MIN(a, b) (((a) < (b)) ? (a) : (b))
+#define MAX(a, b) (((a) > (b)) ? (a) : (b))
+#define EMPTY (-1)
+// defined in amd #define TRUE 1
+// defined in amd #define FALSE 0
+#define IMPLIES(p, q) (!(p) || (q))
+
+// NULL should already be defined, but ensure it is here.
+#ifndef NULL
+#define NULL ((void *)0)
+#endif
+
+#define Size_max ((size_t)(-1))  // the largest value of size_t
+//------------------------------------------------------------------------------
+// inline internal functions
+
+
+inline Int *colIndex_pointer(paru_Element *curEl) { return (Int *)(curEl + 1); }
+// Never ever use these functions prior to initializing ncols and nrows
+inline Int *rowIndex_pointer(paru_Element *curEl)
+{
+    return (Int *)(curEl + 1) + curEl->ncols;
+}
+
+inline Int *relColInd(paru_Element *curEl)
+//{    return (Int*)(curEl+1) + curEl->ncols + curEl->nrows + 1;}
+{
+    return (Int *)(curEl + 1) + curEl->ncols + curEl->nrows;
+}
+
+inline Int *relRowInd(paru_Element *curEl)
+//{    return (Int*)(curEl+1) + 2*curEl->ncols + curEl->nrows + 2;}
+{
+    return (Int *)(curEl + 1) + 2 * curEl->ncols + curEl->nrows;
+}
+
+inline double *numeric_pointer(paru_Element *curEl)
+// sizeof Int and double are same, but I keep it like this for clarity
+//{ return (double*)((Int*)(curEl+1) + 2*curEl->ncols + 2*curEl->nrows + 2);}
+{
+    return (double *)((Int *)(curEl + 1) + 2 * curEl->ncols + 2 * curEl->nrows);
+}
+
+inline Int flip(Int colInd) { return -colInd - 2; }
+
+inline Int lac_el(paru_Element **elementList, Int eli)
+{  // return least numbered column of the element i (eli)
+    if (elementList[eli] == NULL)
+        return LONG_MAX;
+    else
+    {
+        Int *el_colIndex = (Int *)(elementList[eli] + 1);
+        Int lac_ind = elementList[eli]->lac;
+        return el_colIndex[lac_ind];
+    }
+}
+
+//------------------------------------------------------------------------------
+// internal routines
 
 // heap related
 void paru_make_heap(Int f, Int start_fac, std::vector<Int> &pivotal_elements,
@@ -24,4 +127,7 @@ void paru_make_heap(Int f, Int start_fac, std::vector<Int> &pivotal_elements,
 void paru_make_heap_empty_el(Int f, std::vector<Int> &pivotal_elements,
                              heaps_info &hi, paru_matrix *paruMatInfo);
 
+// hash related
+void paru_insert_hash(Int key, Int value, std::vector<Int> &colHash);
+Int paru_find_hash(Int key, std::vector<Int> &colHash, Int *fcolList);
 #endif

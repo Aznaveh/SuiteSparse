@@ -36,74 +36,12 @@ extern "C"
 // debugging and printing macros
 // -----------------------------------------------------------------------------
 
-// force debugging off
-#ifndef NDEBUG
-#define NDEBUG
-#endif
 
-#ifndef NPR
-#define NPR
-#endif
-
-// for printing information uncomment this; to activate assertions uncomment
-//#undef NPR    //<<1>>
-
-// from spqr.hpp
-// Aznaveh For MATLAB OUTPUT UNCOMMENT HERE
-// uncomment the following line to turn on debugging
-//#undef NDEBUG  //<<2>>
-
-// uncomment if you want to count hardware flops
-//#define COUNT_FLOPS
-
-// defined somewhere else
-#ifdef ASSERT
-#undef ASSERT
-#endif
-#ifndef NDEBUG
-#include <assert.h>
-#define ASSERT(e) assert(e)
-#else
-#define ASSERT(e)
-#endif
-
-#ifndef NPR
-static int print_level = 0;
-#define PRLEVEL(level, param)                   \
-    {                                           \
-        if (print_level >= level) printf param; \
-    }
-#define DEBUGLEVEL(level)    \
-    {                        \
-        print_level = level; \
-    }
-#else
-#define PRLEVEL(level, param)
-#define DEBUGLEVEL(level)
-#endif
 
 #ifdef Int  // defined in amd
 #undef Int
 #endif
 #define Int int64_t
-
-// -----------------------------------------------------------------------------
-// basic macros
-// -----------------------------------------------------------------------------
-
-#define MIN(a, b) (((a) < (b)) ? (a) : (b))
-#define MAX(a, b) (((a) > (b)) ? (a) : (b))
-#define EMPTY (-1)
-// defined in amd #define TRUE 1
-// defined in amd #define FALSE 0
-#define IMPLIES(p, q) (!(p) || (q))
-
-// NULL should already be defined, but ensure it is here.
-#ifndef NULL
-#define NULL ((void *)0)
-#endif
-
-#define Size_max ((size_t)(-1))  // the largest value of size_t
 
 // =============================================================================
 // === paru_symbolic ===========================================================
@@ -235,12 +173,11 @@ typedef struct
     // factorizes the frontal matrix chain. Since the
     // symbolic factorization only provides
 
-// #ifndef NDEBUG
+    // only used for statistics when debugging is enabled:
     Int Us_bound_size;   // Upper bound on size of all Us, sum all fp*fn
     Int LUs_bound_size;  // Upper bound on size of all LUs, sum all fp*fm
     Int row_Int_bound;   // Upper bound on size of all ints for rows
     Int col_Int_bound;   // Upper bound on size of all ints for cols
-// #endif
 
 } paru_symbolic;
 
@@ -300,46 +237,6 @@ typedef struct
 // internal:
 
 
-inline Int *colIndex_pointer(paru_Element *curEl) { return (Int *)(curEl + 1); }
-// Never ever use these functions prior to initializing ncols and nrows
-inline Int *rowIndex_pointer(paru_Element *curEl)
-{
-    return (Int *)(curEl + 1) + curEl->ncols;
-}
-
-inline Int *relColInd(paru_Element *curEl)
-//{    return (Int*)(curEl+1) + curEl->ncols + curEl->nrows + 1;}
-{
-    return (Int *)(curEl + 1) + curEl->ncols + curEl->nrows;
-}
-
-inline Int *relRowInd(paru_Element *curEl)
-//{    return (Int*)(curEl+1) + 2*curEl->ncols + curEl->nrows + 2;}
-{
-    return (Int *)(curEl + 1) + 2 * curEl->ncols + curEl->nrows;
-}
-
-inline double *numeric_pointer(paru_Element *curEl)
-// sizeof Int and double are same, but I keep it like this for clarity
-//{ return (double*)((Int*)(curEl+1) + 2*curEl->ncols + 2*curEl->nrows + 2);}
-{
-    return (double *)((Int *)(curEl + 1) + 2 * curEl->ncols + 2 * curEl->nrows);
-}
-
-inline Int flip(Int colInd) { return -colInd - 2; }
-
-inline Int lac_el(paru_Element **elementList, Int eli)
-{  // return least numbered column of the element i (eli)
-    if (elementList[eli] == NULL)
-        return LONG_MAX;
-    else
-    {
-        Int *el_colIndex = (Int *)(elementList[eli] + 1);
-        Int lac_ind = elementList[eli]->lac;
-        return el_colIndex[lac_ind];
-    }
-}
-
 typedef struct
 { /*List of tuples */
 
@@ -390,13 +287,11 @@ typedef struct
     paru_fac *partial_Us;  /* size nf   size(Us)= fp*colCount[f]    */
     paru_fac *partial_LUs; /* size nf   size(LUs)= rowCount[f]*fp   */
 
-// #ifndef NDEBUG
 // only used for statistics when debugging is enabled:
     Int actual_alloc_LUs;     /* actual memory allocated for LUs*/
     Int actual_alloc_Us;      /* actual memory allocated for Us*/
     Int actual_alloc_row_int; /* actual memory allocated for rows*/
     Int actual_alloc_col_int; /* actual memory allocated for cols*/
-// #endif
 
     Int *row_degree_bound; /* row degree size number of rows */
     Int panel_width;       /* width of panel for dense factorizaiton*/
@@ -533,7 +428,4 @@ void paru_eliminate_el_with0rows(Int e, Int f, std::vector<Int> &colHash,
 
 void paru_full_summed(Int e, Int f, paru_matrix *paruMatInfo);
 
-// hash related
-void paru_insert_hash(Int key, Int value, std::vector<Int> &colHash);
-Int paru_find_hash(Int key, std::vector<Int> &colHash, Int *fcolList);
 #endif

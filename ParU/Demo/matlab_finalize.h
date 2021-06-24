@@ -6,7 +6,7 @@
  * @author Aznaveh
  * */
 
-#include "ParU.hpp"
+#include "../Source/paru_internal.hpp"
 void matlab_finalize (Int nf)
 {
 

@@ -238,6 +238,7 @@ int paru_front(paru_matrix *paruMatInfo,
     PRLEVEL(p, ("Us{%ld} =[];\n", f + 1));
     PRLEVEL(p, ("Ucols{%ld}=[];\n", f + 1));
     PRLEVEL(p, ("Urows{%ld}=[];\n", f + 1));
+    p = 1;
 #endif
 
     Int colCount = stl_colSet.size();
@@ -457,6 +458,7 @@ int paru_front(paru_matrix *paruMatInfo,
         PRLEVEL(p, (";\n    "));
     }
     PRLEVEL(p, ("];\n"));
+    p = 1;
 #endif
 
     paru_Element *curEl;
