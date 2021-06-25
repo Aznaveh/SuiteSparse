@@ -113,6 +113,15 @@ void paru_eliminate_all(Int e, Int f, std::vector<Int> &colHash,
             }
         }
 
+        // ri = map [i], map is same size as tempRow
+        // using el_rowIndex and isRowInFront, to compute map [0..mEl]
+        /*
+            for i = 0 to ii
+                rowInd = el_rowIndex [i] ;
+                ri = isRowInFront [rowind] ;
+                map [i] = ri
+        */
+
         for (Int j = el->lac; j < nEl; j++)
         {
             PRLEVEL(1, ("%% j =%ld \n", j));
@@ -126,9 +135,13 @@ void paru_eliminate_all(Int e, Int f, std::vector<Int> &colHash,
 
             for (Int iii = 0; iii < el->nrowsleft; iii++)
             {
+                // TODO: consider this
                 Int i = tempRow[iii];
                 Int rowInd = el_rowIndex[i];
                 Int ri = isRowInFront[rowInd];
+                // becomes
+                // i = tempRow [iii] ;
+                // ri = map [i] ;
 
                 PRLEVEL(1, ("%% ri = %ld \n", ri));
                 PRLEVEL(1, ("%% sC [%ld] =%2.5lf \n", i, sC[i]));

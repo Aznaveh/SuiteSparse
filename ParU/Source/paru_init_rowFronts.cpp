@@ -348,6 +348,7 @@ paru_matrix *paru_init_rowFronts(
 
         rowMark[e] = 0;
 
+        // TODO: use placement new
         std::vector<Int> *curHeap;
         curHeap = paruMatInfo->heapList[e] = new std::vector<Int>;
         PRLEVEL(1, ("%%Heap allocated %p id=%ld \n", curHeap, e));
