@@ -21,7 +21,7 @@ void paru_check_prior_element(Int e, Int f, Int start_fac,
     paru_Element *el = elementList[e];
     if (elRow[e] == 0 && el->rValid > start_fac)
     {  // all the rows are inside he current front; maybe assemble some cols
-        paru_eliminate_cols(e, f, colHash, paruMatInfo);
+        paru_assemble_cols(e, f, colHash, paruMatInfo);
         return;
     }
 
@@ -29,7 +29,7 @@ void paru_check_prior_element(Int e, Int f, Int start_fac,
     //            el->cValid == paruMatInfo->time_stamp[f])
     if (el->rValid == start_fac || el->cValid == paruMatInfo->time_stamp[f])
     {  // all the cols are inside he current front; maybe assemble some rows
-        paru_eliminate_rows(e, f, colHash, paruMatInfo);
+        paru_assemble_rows(e, f, colHash, paruMatInfo);
     }
 }
 void paru_make_heap(Int f, Int start_fac, std::vector<Int> &pivotal_elements,

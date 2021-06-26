@@ -1,5 +1,5 @@
 /** =========================================================================  /
- * =======================  paru_numeric_assemble ===========================  /
+ * =======================  paru_assemble_row2U.cpp =========================  /
  * ========================================================================== */
 /*! @brief  assemble numbers in U part of the matrix.
  *          It is per row, and the matrices are stored in column,
@@ -11,8 +11,8 @@
 
 #include "paru_internal.hpp"
 
-void assemble_row_toU(Int e, Int f, Int sR, Int dR, std::vector<Int> &colHash,
-                      paru_matrix *paruMatInfo)
+void paru_assemble_row_2U(Int e, Int f, Int sR, Int dR,
+                          std::vector<Int> &colHash, paru_matrix *paruMatInfo)
 {
     DEBUGLEVEL(0);
 

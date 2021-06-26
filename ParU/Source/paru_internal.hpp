@@ -142,8 +142,8 @@ Int paru_factorize_full_summed(Int f, Int start_fac,
 
 paru_Element *paru_create_element(Int nrows, Int ncols, Int init);
 
-void assemble_row_toU(Int e, Int f, Int sR, Int dR, std::vector<Int> &colHash,
-                      paru_matrix *paruMatInfo);
+void paru_assemble_row_2U(Int e, Int f, Int sR, Int dR,
+                          std::vector<Int> &colHash, paru_matrix *paruMatInfo);
 
 Int paru_trsm(double *pF, double *uPart, Int fp, Int rowCount, Int colCount);
 Int paru_dgemm(double *pF, double *uPart, double *el, Int fp, Int rowCount,
@@ -180,16 +180,16 @@ void paru_prior_assemble(Int f, Int start_fac,
                          std::vector<Int> &colHash, heaps_info &hi,
                          paru_matrix *paruMatInfo);
 
-void paru_eliminate_all(Int e, Int f, std::vector<Int> &colHash,
+void paru_assemble_all(Int e, Int f, std::vector<Int> &colHash,
                         paru_matrix *paruMatInfo);
 
-void paru_eliminate_cols(Int e, Int f, std::vector<Int> &colHash,
+void paru_assemble_cols(Int e, Int f, std::vector<Int> &colHash,
                          paru_matrix *paruMatInfo);
 
-void paru_eliminate_rows(Int e, Int f, std::vector<Int> &colHash,
+void paru_assemble_rows(Int e, Int f, std::vector<Int> &colHash,
                          paru_matrix *paruMatInfo);
 
-void paru_eliminate_el_with0rows(Int e, Int f, std::vector<Int> &colHash,
+void paru_assemble_el_with0rows(Int e, Int f, std::vector<Int> &colHash,
                                  paru_matrix *paruMatInfo);
 
 void paru_full_summed(Int e, Int f, paru_matrix *paruMatInfo);

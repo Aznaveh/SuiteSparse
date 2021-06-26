@@ -54,7 +54,7 @@ OBJ = \
 	paru_front.o\
 	paru_factorize.o\
 	paru_create_element.o\
-	paru_numeric_assemble.o\
+	paru_assemble_row2U.o\
 	paru_trsm.o\
 	paru_dgemm.o\
 	paru_print.o\
@@ -136,7 +136,7 @@ paru_factorize.o: ../Source/paru_factorize.cpp
 paru_create_element.o: ../Source/paru_create_element.cpp
 	$(C) -c $<
 
-paru_numeric_assemble.o: ../Source/paru_numeric_assemble.cpp
+paru_assemble_row2U.o: ../Source/paru_assemble_row2U.cpp
 	$(C) -c $<
 
 paru_trsm.o: ../Source/paru_trsm.cpp

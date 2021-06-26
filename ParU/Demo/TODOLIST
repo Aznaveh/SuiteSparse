@@ -1,4 +1,0 @@
-Eliminate cholmod_common
-check all the places that I am traversing over rows or columns and make sure use ncolsleft or nrowsleft
-find a better constructor for set
-chekck all returns to be sure if there is some problem (not enough memory or singular...) everyting works 

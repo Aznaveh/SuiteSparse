@@ -53,18 +53,18 @@ void paru_prior_assemble(Int f, Int start_fac,
         if (el->nzr_pc == 0)  // if all the rows are available in current front
         {
             if (el->rValid == pMark || elCol[e] == 0)
-            // it can be eliminated fully
+            // it can be fully assembled
             // both a pivotal column and pivotal row
             {
                 PRLEVEL(p, ("%%assembling %ld in %ld\n", e, el_ind));
                 PRLEVEL(p, ("%% size %ld x %ld\n", el->nrows, el->ncols));
-                paru_eliminate_all(e, f, colHash, paruMatInfo);
+                paru_assemble_all(e, f, colHash, paruMatInfo);
                 PRLEVEL(p, ("%%assembling %ld in %ld done\n", e, el_ind));
                 continue;
             }
 
             PRLEVEL(p, ("%%assembling %ld in %ld\n", e, el_ind));
-            paru_eliminate_cols(e, f, colHash, paruMatInfo);
+            paru_assemble_cols(e, f, colHash, paruMatInfo);
             PRLEVEL(p, ("%%partial col assembly%ld in %ld done\n", e, el_ind));
             if (elementList[e] == NULL) continue;
         }
@@ -75,7 +75,7 @@ void paru_prior_assemble(Int f, Int start_fac,
             // This element contributes to both pivotal rows and pivotal columns
             //  However it has zero rows in current pivotal columns therefore
             //  not all rows are there
-            // it can be eliminated partially
+            // it can be assembled partially
             //       ________________________________
             //       |      |                         |
             //       |      |                         |
@@ -89,7 +89,7 @@ void paru_prior_assemble(Int f, Int start_fac,
             //          ooooooxxxxx
             //
             {
-                paru_eliminate_el_with0rows(e, f, colHash, paruMatInfo);
+                paru_assemble_el_with0rows(e, f, colHash, paruMatInfo);
                 if (elementList[e] == NULL) continue;
                 PRLEVEL(p, ("%%assembling %ld in %ld done\n", e, el_ind));
             }

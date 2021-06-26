@@ -1,15 +1,15 @@
 /** =========================================================================  /
- *  ======================  paru_eliminate ==================================  /
+ *  ======================  paru_assemble ===================================  /
  *  ========================================================================= */
 /*! @brief  finding the  columns or rows of prior element and fully or partially
- * asslemle it  and eliminate it if needed
+ * assemble it  and eliminate it if needed
  *
  *  @author Aznaveh
  */
 #include "paru_internal.hpp"
 
-void paru_eliminate_all(Int e, Int f, std::vector<Int> &colHash,
-                        paru_matrix *paruMatInfo)
+void paru_assemble_all(Int e, Int f, std::vector<Int> &colHash,
+                       paru_matrix *paruMatInfo)
 
 {
     DEBUGLEVEL(0);
@@ -34,7 +34,7 @@ void paru_eliminate_all(Int e, Int f, std::vector<Int> &colHash,
     Int *el_colIndex = (Int *)(el + 1);
 
     // Int *rowRelIndex = relRowInd (el);
-    Int *rowRelIndex = (Int*)(el+1) + 2*nEl +mEl;
+    Int *rowRelIndex = (Int *)(el + 1) + 2 * nEl + mEl;
 
     if (el->cValid != paruMatInfo->time_stamp[f])
         paru_update_rel_ind_col(e, f, colHash, paruMatInfo);
@@ -99,7 +99,7 @@ void paru_eliminate_all(Int e, Int f, std::vector<Int> &colHash,
         PRLEVEL(p, ("%% more than 1 col left\n %%"));
 
         // save the structure of the rows once at first
-        //Int tempRow[el->nrowsleft];  // C99
+        // Int tempRow[el->nrowsleft];  // C99
         std::vector<Int> tempRow(el->nrowsleft);
         Int ii = 0;
         for (Int i = 0; i < mEl; i++)
@@ -109,7 +109,7 @@ void paru_eliminate_all(Int e, Int f, std::vector<Int> &colHash,
             if (rowInd >= 0)
             {
                 tempRow[ii++] = i;
-                Int ri = isRowInFront [rowInd] ;
+                Int ri = isRowInFront[rowInd];
                 rowRelIndex[i] = ri;
                 if (ii == el->nrowsleft) break;
             }
@@ -150,8 +150,8 @@ void paru_eliminate_all(Int e, Int f, std::vector<Int> &colHash,
 // column that is not in current front it gets a toll for each column doesn't
 // fit
 
-void paru_eliminate_cols(Int e, Int f, std::vector<Int> &colHash,
-                         paru_matrix *paruMatInfo)
+void paru_assemble_cols(Int e, Int f, std::vector<Int> &colHash,
+                        paru_matrix *paruMatInfo)
 
 {
     DEBUGLEVEL(0);
@@ -186,7 +186,7 @@ void paru_eliminate_cols(Int e, Int f, std::vector<Int> &colHash,
     Int *el_colIndex = (Int *)(el + 1);
 
     // Int *rowRelIndex = relRowInd (el);
-    Int *rowRelIndex = (Int*)(el+1) + 2*nEl +mEl;
+    Int *rowRelIndex = (Int *)(el + 1) + 2 * nEl + mEl;
 
     // Int *el_rowIndex = rowIndex_pointer (el);
     Int *el_rowIndex = (Int *)(el + 1) + nEl;
@@ -203,7 +203,7 @@ void paru_eliminate_cols(Int e, Int f, std::vector<Int> &colHash,
 
     Int *fcolList = paruMatInfo->fcolList[f];
 
-    //Int tempRow[el->nrowsleft];  // C99
+    // Int tempRow[el->nrowsleft];  // C99
     std::vector<Int> tempRow(el->nrowsleft);
     Int tempRow_ready = 0;
     Int toll = 8;  // number of times it continue when do not find anything
@@ -223,7 +223,7 @@ void paru_eliminate_cols(Int e, Int f, std::vector<Int> &colHash,
                 if (rowInd >= 0)
                 {
                     tempRow[ii++] = i;
-                    Int ri = isRowInFront [rowInd] ;
+                    Int ri = isRowInFront[rowInd];
                     rowRelIndex[i] = ri;
                     if (ii == el->nrowsleft) break;
                 }
@@ -281,7 +281,7 @@ void paru_eliminate_cols(Int e, Int f, std::vector<Int> &colHash,
                 if (rowInd >= 0)
                 {
                     tempRow[ii++] = i;
-                    Int ri = isRowInFront [rowInd] ;
+                    Int ri = isRowInFront[rowInd];
                     rowRelIndex[i] = ri;
                     if (ii == el->nrowsleft) break;
                 }
@@ -326,8 +326,8 @@ void paru_eliminate_cols(Int e, Int f, std::vector<Int> &colHash,
     }
 }
 
-void paru_eliminate_rows(Int e, Int f, std::vector<Int> &colHash,
-        paru_matrix *paruMatInfo)
+void paru_assemble_rows(Int e, Int f, std::vector<Int> &colHash,
+                        paru_matrix *paruMatInfo)
 
 {
     DEBUGLEVEL(0);
@@ -416,7 +416,7 @@ void paru_eliminate_rows(Int e, Int f, std::vector<Int> &colHash,
     Int toll = 8;  // number of times it continue when do not find anything
     // Toll zone
     while (i < mEl && nrowsSeen > 0 && toll > 0)
-        // while (i < mEl  && nrowsSeen >0 )
+    // while (i < mEl  && nrowsSeen >0 )
     {
         for (; el_rowIndex[i] < 0; i++)
             ;
@@ -519,8 +519,8 @@ void paru_eliminate_rows(Int e, Int f, std::vector<Int> &colHash,
 #endif
 }
 
-void paru_eliminate_el_with0rows(Int e, Int f, std::vector<Int> &colHash,
-        paru_matrix *paruMatInfo)
+void paru_assemble_el_with0rows(Int e, Int f, std::vector<Int> &colHash,
+                                paru_matrix *paruMatInfo)
 
 {
     // This element contributes to both pivotal rows and pivotal columns
@@ -644,7 +644,7 @@ void paru_eliminate_el_with0rows(Int e, Int f, std::vector<Int> &colHash,
 
         // save the structure of the rows once at first
         Int nrows2assembl = el->nrowsleft - el->nzr_pc;
-        //Int tempRow[nrows2assembl];  // C99
+        // Int tempRow[nrows2assembl];  // C99
         std::vector<Int> tempRow(nrows2assembl);
         Int ii = 0;
         for (Int i = 0; i < mEl; i++)
@@ -659,7 +659,7 @@ void paru_eliminate_el_with0rows(Int e, Int f, std::vector<Int> &colHash,
             if (rowInd >= 0 && rowRelIndex[i] != -1)
             {
                 tempRow[ii++] = i;
-                Int ri = isRowInFront [rowInd] ;
+                Int ri = isRowInFront[rowInd];
                 rowRelIndex[i] = ri;
                 if (ii == nrows2assembl) break;
             }
@@ -690,7 +690,7 @@ void paru_eliminate_el_with0rows(Int e, Int f, std::vector<Int> &colHash,
                 Int ri = rowRelIndex[i];
                 ASSERT(rowRelIndex[i] != -1);  // I already picked the rows
                 // that are not in zero pivots
-                ASSERT(rowInd >= 0);           // and also still alive
+                ASSERT(rowInd >= 0);  // and also still alive
                 PRLEVEL(1, ("%% ri = %ld rowInd=%ld\n", ri, rowInd));
                 PRLEVEL(1, ("%% sC [%ld] =%2.5lf \n", i, sC[i]));
                 PRLEVEL(1, ("%% dC [%ld] =%2.5lf \n", ri, dC[ri]));
@@ -717,12 +717,12 @@ void paru_eliminate_el_with0rows(Int e, Int f, std::vector<Int> &colHash,
             PRLEVEL(1, ("%%Searching for lac in %ld\n%%", rowInd));
             PRLEVEL(1, ("%%col=%ld\n%%", el->lac));
             for (Int jj = el->lac; jj < new_lac; jj++)
-                // searching for the first nz
+            // searching for the first nz
             {
                 if (el_colIndex[jj] < 0) continue;
                 // el [rowInd, jj]
                 PRLEVEL(-1, ("%% el[%ld,%ld]=%2.5lf\n%%", rowInd, jj,
-                            el_Num[mEl * jj + ii]));
+                             el_Num[mEl * jj + ii]));
                 if (el_Num[mEl * jj + ii] != 0)
                 {
                     new_lac = jj;
@@ -748,7 +748,7 @@ void paru_eliminate_el_with0rows(Int e, Int f, std::vector<Int> &colHash,
             if (el_colIndex[j] > 0) ncolsleft++;
         }
         PRLEVEL(-1, ("%%colsleft was %ld and now is %ld\n%%", el->ncolsleft,
-                    ncolsleft));
+                     ncolsleft));
         el->ncolsleft = ncolsleft;
         for (Int j = el->lac; j < new_lac; j++)
         {

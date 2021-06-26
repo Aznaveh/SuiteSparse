@@ -427,7 +427,7 @@ int paru_front(paru_matrix *paruMatInfo,
 
             PRLEVEL(1, ("%% element= %ld  nEl =%ld \n", e, nEl));
 
-            assemble_row_toU(e, f, curRowIndex, curFsRowIndex, colHash,
+            paru_assemble_row_2U(e, f, curRowIndex, curFsRowIndex, colHash,
                              paruMatInfo);
 
             // FLIP(el_rowIndex[curRowIndex]); //marking row assembled
