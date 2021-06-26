@@ -624,7 +624,6 @@ void paru_assemble_el_with0rows(Int e, Int f, std::vector<Int> &colHash,
             PRLEVEL(1, ("%% rowInd =%ld \n", rowInd));
             if (rowInd >= 0)
             {
-                // FIXME
                 if (rowRelIndex[i] != -1)  // row with at least one nz
                 {
                     Int ri = isRowInFront[rowInd];

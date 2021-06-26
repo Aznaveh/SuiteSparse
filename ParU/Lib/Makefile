@@ -65,7 +65,7 @@ OBJ = \
 	paru_cumsum.o\
 	paru_intersection.o\
 	paru_bin_search.o\
-	paru_eliminate.o\
+	paru_assemble.o\
 	paru_prior_assemble.o \
 	paru_full_summed.o \
 
@@ -173,7 +173,7 @@ paru_bin_search.o: ../Source/paru_bin_search.cpp
 paru_prior_assemble.o:  ../Source/paru_prior_assemble.cpp
 	$(C) -c $<
 
-paru_eliminate.o: ../Source/paru_eliminate.cpp
+paru_assemble.o: ../Source/paru_assemble.cpp
 	$(C) -c $<
 
 paru_full_summed.o: ../Source/paru_full_summed.cpp

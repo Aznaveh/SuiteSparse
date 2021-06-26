@@ -68,7 +68,6 @@ void paru_prior_assemble(Int f, Int start_fac,
             PRLEVEL(p, ("%%partial col assembly%ld in %ld done\n", e, el_ind));
             if (elementList[e] == NULL) continue;
         }
-        // TODO: fix for the CBs with pivotal rows only zero
         else
         {
             if (el->rValid == pMark || elCol[e] == 0)
