@@ -45,6 +45,7 @@ CC11 = -std=c11
 
 OBJ = \
     paru_mem.o \
+    paru_memset.o \
     paru_heap.o \
     paru_hash.o \
     paru_pivotal.o \
@@ -52,7 +53,7 @@ OBJ = \
 	paru_init_rowFronts.o\
 	paru_tuples.o\
 	paru_front.o\
-	paru_factorize.o\
+	paru_fs_factorize.o\
 	paru_create_element.o\
 	paru_assemble_row2U.o\
 	paru_trsm.o\
@@ -106,6 +107,9 @@ $(AR_TARGET): $(OBJ)
 paru_mem.o: ../Source/paru_mem.cpp
 	$(C) -c $<
 
+paru_memset.o: ../Source/paru_memset.cpp
+	$(C) -c $<
+
 paru_heap.o: ../Source/paru_heap.cpp
 	$(C) -c $<
 
@@ -130,7 +134,7 @@ paru_tuples.o: ../Source/paru_tuples.cpp
 paru_front.o: ../Source/paru_front.cpp
 	$(C) -c $<
 
-paru_factorize.o: ../Source/paru_factorize.cpp
+paru_fs_factorize.o: ../Source/paru_fs_factorize.cpp
 	$(C) -c $<
 
 paru_create_element.o: ../Source/paru_create_element.cpp

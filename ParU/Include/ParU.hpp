@@ -244,6 +244,7 @@ typedef struct
     // Int rowMark;      // Work->rowSize[x] < rowMark[eli] for each front
     Int *rowMark;  // size = m+nf
 
+    // gather scatter space for elements
     Int *elRow;  // Initalized data structure, size m+nf
     Int *elCol;  // Initalized data structure, size m+nf
 

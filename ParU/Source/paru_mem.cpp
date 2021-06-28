@@ -356,17 +356,21 @@ void paru_freemat(paru_matrix **paruMatInfo_handle)
               paruMatInfo->heapList);
 
     paru_free(1, (m + nf + 1) * sizeof(paru_Element), elementList);
+
     work_struct *Work = paruMatInfo->Work;
-    paru_free(m, sizeof(Int), Work->rowSize);
-    paru_free(m + nf + 1, sizeof(Int), Work->rowMark);
-    paru_free(m + nf, sizeof(Int), Work->elRow);
-    paru_free(m + nf, sizeof(Int), Work->elCol);
+    if (Work != NULL)
+    {
+        paru_free(m, sizeof(Int), Work->rowSize);
+        paru_free(m + nf + 1, sizeof(Int), Work->rowMark);
+        paru_free(m + nf, sizeof(Int), Work->elRow);
+        paru_free(m + nf, sizeof(Int), Work->elCol);
+        paru_free(1, sizeof(work_struct), paruMatInfo->Work);
+    }
 
     paru_free(m + nf, sizeof(Int), paruMatInfo->lacList);
 
     paru_free(m, sizeof(Int), paruMatInfo->scale_row);
     paru_free(m, sizeof(Int), paruMatInfo->row_degree_bound);
-    paru_free(1, sizeof(work_struct), paruMatInfo->Work);
     paru_free(1, sizeof(paru_matrix), paruMatInfo);
     *paruMatInfo_handle = NULL;
 }

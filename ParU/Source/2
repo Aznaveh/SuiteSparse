@@ -102,18 +102,18 @@ paru_matrix *paru_init_rowFronts(
         return (NULL);
     }
 
-    //Initializations
+    //Initializations with -1: (zero initialization done with calloc)
     PRLEVEL(1, ("%% $RowList =%p\n", RowList));
-    paru_memset(rowSize, -1, m * sizeof(Int));
+    memset(rowSize, -1, m * sizeof(Int));
     PRLEVEL(1, ("%% rowSize pointer=%p size=%ld \n", rowSize, m * sizeof(Int)));
 
     PRLEVEL(1, ("%% rowMark pointer=%p size=%ld \n", rowMark,
                 (m + nf) * sizeof(Int)));
 
-    paru_memset(elRow, -1, (m + nf) * sizeof(Int));
+    memset(elRow, -1, (m + nf) * sizeof(Int));
     PRLEVEL(1, ("%% elRow=%p\n", elRow));
 
-    paru_memset(elCol, -1, (m + nf) * sizeof(Int));
+    memset(elCol, -1, (m + nf) * sizeof(Int));
     PRLEVEL(1, ("%% elCol=%p\n", elCol));
 
     PRLEVEL(1, ("%% Work =%p\n ", Work));

@@ -1078,12 +1078,12 @@ paru_symbolic *paru_analyze(
         return NULL;
     }
     // initialization
-    memset(aParent, -1, (ms + nf) * sizeof(Int));
+    paru_memset(aParent, -1, (ms + nf) * sizeof(Int));
 #ifndef NDEBUG  // TODO: should it be in debug mode?
-    memset(aChild, -1, (ms + nf + 1) * sizeof(Int));
+    paru_memset(aChild, -1, (ms + nf + 1) * sizeof(Int));
 #endif
-    memset(aChildp, -1, (ms + nf + 2) * sizeof(Int));
-    memset(first, -1, (ms + nf) * sizeof(Int));
+    paru_memset(aChildp, -1, (ms + nf + 2) * sizeof(Int));
+    paru_memset(first, -1, (ms + nf) * sizeof(Int));
 
     aChildp[0] = 0;
     Int offset = 0;  // number of rows visited in each iteration orig front+
