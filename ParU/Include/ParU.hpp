@@ -312,6 +312,14 @@ typedef struct
 
 } paru_matrix;
 
+enum ParU_ResultCode
+{
+    PARU_SUCCESS,
+    PARU_OUT_OF_MEMORY,
+    PARU_INVALID,
+    PARU_SINGULAR
+};
+
 //------------------------------------------------------------------------------
 // user:
 
@@ -333,9 +341,10 @@ info: an enum: PARU_SUCCESS, PARU_OUT_OF_MEMORY, PARU_INVALID, PARU_SINGULAR,
 //------------------------------------------------------------------------------
 // internal
 
-paru_matrix *paru_init_rowFronts(cholmod_sparse *A, int scale,
+ParU_ResultCode paru_init_rowFronts(paru_matrix **paruMatInfo_handle,
+                                 cholmod_sparse *A, int scale,
                                  paru_symbolic *LUsym);
-int paru_front(paru_matrix *paruMatInfo, Int f);
+ParU_ResultCode paru_front(paru_matrix *paruMatInfo, Int f);
 
 void paru_freesym(paru_symbolic **LUsym_handle);
 void paru_freemat(paru_matrix **paruMatInfo_handle);

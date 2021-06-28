@@ -8,14 +8,14 @@
  *
  *
  * @param  a list of tuples and the the tuple we want to add
- * @return 0 on sucess
+ * @return  ParU_ResultCode
  *
  *  @author Aznaveh
  */
 #include "paru_internal.hpp"
-int paru_front(paru_matrix *paruMatInfo,
-               /* RowCol list/tuples and LUsym handle */
-               Int f) /* front need to be assembled */
+ParU_ResultCode paru_front(paru_matrix *paruMatInfo,
+                           /* RowCol list/tuples and LUsym handle */
+                           Int f) /* front need to be assembled */
 {
     DEBUGLEVEL(-1);
     /*
@@ -63,7 +63,7 @@ int paru_front(paru_matrix *paruMatInfo,
     if (frowList == NULL)
     {
         printf("%% Out of memory when tried to allocate for frowList %ld", f);
-        return 1;
+        return PARU_OUT_OF_MEMORY;
     }
     paruMatInfo->frowList[f] = frowList;
 
@@ -162,14 +162,14 @@ int paru_front(paru_matrix *paruMatInfo,
         // PRLEVEL(1, ("%% %ldx%ld \n", rowCount, fp));
         PRLEVEL(1, ("%% Structural Problem\n"));
         printf("structural problem on %ld: %ldx%ld\n", f, rowCount, fp);
-        return 1;
+        return PARU_SINGULAR;
     }
 
     Int start_fac = paruMatInfo->time_stamp[f];
     PRLEVEL(1, ("%% start_fac= %ld\n", start_fac));
 
-    Int fac = paru_factorize_full_summed (f, start_fac, panel_row, stl_colSet,
-                             pivotal_elements, paruMatInfo);
+    Int fac = paru_factorize_full_summed(f, start_fac, panel_row, stl_colSet,
+                                         pivotal_elements, paruMatInfo);
     ++paruMatInfo->time_stamp[f];
 
 #ifndef NDEBUG
@@ -187,7 +187,7 @@ int paru_front(paru_matrix *paruMatInfo,
     if (fac < 0)
     {
         printf("%% Some problem in factorization \n");
-        return 1;
+        return PARU_INVALID;
     }
 
 #ifndef NDEBUG  // Printing the list of rows
@@ -258,7 +258,7 @@ int paru_front(paru_matrix *paruMatInfo,
                 "%% Out of memory when tried to allocate for fcolList=%ld"
                 "with the size %ld",
                 f, fn);
-            return 1;
+            return PARU_OUT_OF_MEMORY;
         }
     }
 
@@ -274,7 +274,7 @@ int paru_front(paru_matrix *paruMatInfo,
         {
             // make the heap and return
             paru_make_heap_empty_el(f, pivotal_elements, hi, paruMatInfo);
-            return 0;
+            return PARU_SUCCESS;
         }
         else
         {
@@ -283,7 +283,7 @@ int paru_front(paru_matrix *paruMatInfo,
             delete curHeap;
             paruMatInfo->heapList[eli] = nullptr;
             PRLEVEL(1, ("%% pivotalFront =%p\n", pivotalFront));
-            return 0;
+            return PARU_SUCCESS;
         }
     }
 
@@ -336,7 +336,7 @@ int paru_front(paru_matrix *paruMatInfo,
     if (uPart == NULL)
     {
         printf("%% Out of memory when tried to allocate for U part %ld", f);
-        return 1;
+        return PARU_OUT_OF_MEMORY;
     }
 
 #ifndef NDEBUG
@@ -428,7 +428,7 @@ int paru_front(paru_matrix *paruMatInfo,
             PRLEVEL(1, ("%% element= %ld  nEl =%ld \n", e, nEl));
 
             paru_assemble_row_2U(e, f, curRowIndex, curFsRowIndex, colHash,
-                             paruMatInfo);
+                                 paruMatInfo);
 
             // FLIP(el_rowIndex[curRowIndex]); //marking row assembled
             el_rowIndex[curRowIndex] = -1;
@@ -510,7 +510,7 @@ int paru_front(paru_matrix *paruMatInfo,
         {
             printf("%% Out of memory when tried to allocate current CB %ld",
                    eli);
-            return 1;
+            return PARU_OUT_OF_MEMORY;
         }
         PRLEVEL(1, ("%% Created ele %ld in curEl =%p\n", eli, curEl));
     }
@@ -522,7 +522,7 @@ int paru_front(paru_matrix *paruMatInfo,
             paru_make_heap_empty_el(f, pivotal_elements, hi, paruMatInfo);
             // There are stuff left from in zero
             // then return
-            return 0;
+            return PARU_SUCCESS;
         }
         else
         {
@@ -531,7 +531,7 @@ int paru_front(paru_matrix *paruMatInfo,
             PRLEVEL(1,
                     ("%%(2)Heap freed inside front %p id=%ld\n", curHeap, eli));
             PRLEVEL(1, ("%% pivotalFront =%p\n", pivotalFront));
-            return 0;
+            return PARU_SUCCESS;
         }
     }
 
@@ -614,7 +614,7 @@ int paru_front(paru_matrix *paruMatInfo,
         if (paru_add_rowTuple(RowList, frowList[i], rowTuple))
         {
             printf("%% Out of memory: add_rowTuple \n");
-            return 1;
+            return PARU_OUT_OF_MEMORY;
         }
     }
 
@@ -629,5 +629,5 @@ int paru_front(paru_matrix *paruMatInfo,
     PRLEVEL(1, ("colCount =%ld", colCount));
     PRLEVEL(1, ("fp =%ld;\n", fp));
     PRLEVEL(1, ("%%~~~~~~~Assemble Front %ld finished\n", f));
-    return 0;
+    return PARU_SUCCESS;
 }

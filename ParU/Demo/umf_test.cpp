@@ -67,8 +67,9 @@ int main(int argc, char **argv)
         }
     }
 
-    paruMatInfo = paru_init_rowFronts(A, scale, LUsym);
-    if (paruMatInfo == NULL)
+    //paruMatInfo = paru_init_rowFronts(A, scale, LUsym);
+    //if (paruMatInfo == NULL)
+    if (paru_init_rowFronts(&paruMatInfo, A, scale, LUsym) != PARU_SUCCESS) 
     {
         paru_freesym(&LUsym);
         cholmod_l_free_sparse(&A, cc);
@@ -86,7 +87,7 @@ int main(int argc, char **argv)
     // nf = (nf > 10) ? 10 : nf;
     for (Int i = 0; i < nf; i++)
     {
-        if (paru_front(paruMatInfo, i))
+        if (paru_front(paruMatInfo, i) != PARU_SUCCESS)
         {
             printf("some problem\n");
             NoProblem = 0;
