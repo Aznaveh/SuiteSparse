@@ -5,7 +5,7 @@ s = 0;
 err = 10e-9;
 mmwrite('../Matrix/ParUTst/tmp.mtx', A);
 %str = sprintf ('../Demo/testazny %d %d < ../Matrix/ParUTst/tmp.mtx', id, s);
-str = sprintf ('../Demo/umfout %d %d < ../Matrix/ParUTst/tmp.mtx', id, s);
+str = sprintf ('../Demo/x_paru_demo %d %d < ../Matrix/ParUTst/tmp.mtx', id, s);
 system(str);
 
 

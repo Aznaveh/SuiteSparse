@@ -27,7 +27,7 @@ for n = 2:512
 
 
 
-    str = sprintf ('../Demo/umfout %d < ../Matrix/ParUTst/tmp.mtx', n );
+    str = sprintf ('../Demo/x_paru_demo %d < ../Matrix/ParUTst/tmp.mtx', n );
     info_name = sprintf ('%d_info.txt',n);
     infofullname = strcat(my_path, info_name);
 

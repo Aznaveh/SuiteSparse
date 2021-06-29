@@ -24,12 +24,11 @@ C17 = -std=c++17
 C20 = -std=c++20
 
 all:
-	$(C) $(FLAG) $(C11) umf_test.cpp -o umfout $(LIBS)
+	$(C) $(FLAG) $(C11) paru_demo.cpp -o x_paru_demo $(LIBS)
 
 
 run:
-	./umfout < ../Matrix/b1_ss.mtx  	#7x7
-#	./umfout < ../Matrix/ParUTst/tmp.mtx
+	./paru_demo < ../Matrix/b1_ss.mtx  	#7x7
 
 VGFLAGS = --leak-check=yes  --log-file="valgrindlogfile.log"\
 		   --show-leak-kinds=all --track-origins=yes 
@@ -38,46 +37,46 @@ VGFLAGS = --leak-check=yes  --log-file="valgrindlogfile.log"\
 
 val:
 
-	valgrind	$(VGFLAGS)	./umfout < ../Matrix/ParUTst/tmp.mtx
-#	valgrind	$(VGFLAGS)	./umfout < ../Matrix/west0067.mtx 
-#	valgrind	$(VGFLAGS)	./umfout < ../Matrix/b1_ss.mtx
+	valgrind	$(VGFLAGS)	./x_paru_demo < ../Matrix/ParUTst/tmp.mtx
+#	valgrind	$(VGFLAGS)	./x_paru_demo < ../Matrix/west0067.mtx 
+#	valgrind	$(VGFLAGS)	./x_paru_demo < ../Matrix/b1_ss.mtx
 
 	
 	#compling everything with -g
 debug:
 	(cd ../Lib; $(MAKE) purge; $(MAKE) DEBUG=yes)
 	(cd ../Demo;)
-	$(C) $(FLAG) -g umf_test.cpp -o umfout $(LIBS)
+	$(C) $(FLAG) -g paru_demo.cpp -o x_paru_demo $(LIBS)
 
 	#compling everything with -pg
 gprof:
 	(cd ../Lib; $(MAKE) purge; $(MAKE) PROF=yes)
-	$(C) $(FLAG) -no-pie -O0  -pg umf_test.cpp -o gprof.o $(LIBS)
+	$(C) $(FLAG) -no-pie -O0  -pg paru_demo.cpp -o gprof.o $(LIBS)
 	./gprof.o < ../Matrix/ParUTst/tmp.mtx
 	gprof gprof.o gmon.out > analysis.txt
 
 
 cchg: debug
-	valgrind	--tool=cachegrind -v ./umfout < ../Matrix/ParUTst/tmp.mtx
+	valgrind	--tool=cachegrind -v ./x_paru_demo < ../Matrix/ParUTst/tmp.mtx
 	
 cllg: debug
-	valgrind	--tool=callgrind -v ./umfout < ../Matrix/ParUTst/tmp.mtx
+	valgrind	--tool=callgrind -v ./x_paru_demo < ../Matrix/ParUTst/tmp.mtx
 
 mssf: debug
-	valgrind	--tool=massif -v ./umfout --log-file="valgrindlogfile.log"\
+	valgrind	--tool=massif -v ./x_paru_demo --log-file="valgrindlogfile.log"\
 		< ../Matrix/ParUTst/tmp.mtx
 
 
 tcov:
-	#$(C) $(FLAG) -Wall -fprofile-arcs -ftest-coverage umf_test.cpp -o tcov $(LIBS)
-	$(C) $(FLAG) -Wall --coverage umf_test.cpp -o tcov $(LIBS)
+	$(C) $(FLAG) -Wall --coverage paru_demo.cpp -o tcov $(LIBS)
 	./tcov < ../Matrix/west0067.mtx 
-	gcov ../Source/*.cpp umf_test.cpp 
+	gcov ../Source/*.cpp paru_demo.cpp 
 
 purge: distclean
 
 distclean: clean
 	- $(RM) umfout 
+	- $(RM) x_paru_demo
 	- $(RM) analysis.txt tcov gprof
 	- $(RM) gprof.o vprof gmon.out callgrind.out.*
 	- $(RM) paneltest
@@ -106,5 +105,3 @@ test:
 valtest:
 	valgrind --leak-check=yes  --log-file="valgrindlogfile.log"\
 		   --show-leak-kinds=all --track-origins=yes ./test	
-
-

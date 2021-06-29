@@ -129,7 +129,7 @@ void *paru_realloc(size_t newsize, size_t size_Entry, void *oldP, size_t *size);
 void paru_free(Int n, Int size, void *p);
 void paru_free_el(Int e, paru_Element **elementList);
 
-void paru_memset (void * ptr, Int value, size_t num);
+void paru_memset(void *ptr, Int value, size_t num);
 
 /* add tuple functions defintions */
 Int paru_add_rowTuple(tupleList *RowList, Int row, paru_Tuple T);
@@ -158,8 +158,6 @@ void paru_init_rel(Int f, paru_matrix *paruMatInfo);
 void paru_update_rel_ind_col(Int e, Int f, std::vector<Int> &colHash,
                              paru_matrix *paruMatInfo);
 
-void paru_write(paru_matrix *paruMatInfo, int scale, char *id);
-
 void paru_update_rowDeg(Int panel_num, Int row_end, Int f, Int start_fac,
                         std::set<Int> &stl_colSet,
                         std::vector<Int> &pivotal_elements,
@@ -169,6 +167,11 @@ Int paru_cumsum(Int n, Int *X);
 
 Int bin_srch_col(Int *srt_lst, Int l, Int r, Int num);
 Int bin_srch(Int *srt_lst, Int l, Int r, Int num);
+
+ParU_ResultCode paru_init_rowFronts(paru_matrix **paruMatInfo_handle,
+                                    cholmod_sparse *A, int scale,
+                                    paru_symbolic *LUsym);
+ParU_ResultCode paru_front(paru_matrix *paruMatInfo, Int f);
 
 void paru_pivotal(std::vector<Int> &pivotal_elements,
                   std::vector<Int> &panel_row, Int &zero_piv_rows, Int f,
@@ -183,16 +186,16 @@ void paru_prior_assemble(Int f, Int start_fac,
                          paru_matrix *paruMatInfo);
 
 void paru_assemble_all(Int e, Int f, std::vector<Int> &colHash,
-                        paru_matrix *paruMatInfo);
+                       paru_matrix *paruMatInfo);
 
 void paru_assemble_cols(Int e, Int f, std::vector<Int> &colHash,
-                         paru_matrix *paruMatInfo);
+                        paru_matrix *paruMatInfo);
 
 void paru_assemble_rows(Int e, Int f, std::vector<Int> &colHash,
-                         paru_matrix *paruMatInfo);
+                        paru_matrix *paruMatInfo);
 
 void paru_assemble_el_with0rows(Int e, Int f, std::vector<Int> &colHash,
-                                 paru_matrix *paruMatInfo);
+                                paru_matrix *paruMatInfo);
 
 void paru_full_summed(Int e, Int f, paru_matrix *paruMatInfo);
 

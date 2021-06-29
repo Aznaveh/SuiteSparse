@@ -170,6 +170,9 @@ typedef struct
     Int row_Int_bound;   // Upper bound on size of all ints for rows
     Int col_Int_bound;   // Upper bound on size of all ints for cols
 
+    // symbolic analysis time
+    double my_time;
+
 } paru_symbolic;
 
 // =============================================================================
@@ -299,7 +302,7 @@ typedef struct
     std::vector<Int> **heapList; /* size m+nf+1, initialized with nullptr  */
 
     // analysis information
-    double my_time;
+    double my_time;  // factorization time
     double umf_time;
 
     // #ifdef COUNT_FLOPS
@@ -341,10 +344,9 @@ info: an enum: PARU_SUCCESS, PARU_OUT_OF_MEMORY, PARU_INVALID, PARU_SINGULAR,
 //------------------------------------------------------------------------------
 // internal
 
-ParU_ResultCode paru_init_rowFronts(paru_matrix **paruMatInfo_handle,
-                                 cholmod_sparse *A, int scale,
-                                 paru_symbolic *LUsym);
-ParU_ResultCode paru_front(paru_matrix *paruMatInfo, Int f);
+ParU_ResultCode paru_factorize(cholmod_sparse *A, paru_symbolic *LUsym,
+                               paru_matrix **paruMatInfo_handle);
+void paru_write(paru_matrix *paruMatInfo, int scale, char *id);
 
 void paru_freesym(paru_symbolic **LUsym_handle);
 void paru_freemat(paru_matrix **paruMatInfo_handle);

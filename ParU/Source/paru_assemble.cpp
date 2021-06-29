@@ -689,8 +689,7 @@ void paru_assemble_el_with0rows(Int e, Int f, std::vector<Int> &colHash,
                 Int ri = rowRelIndex[i];
                 ASSERT(rowRelIndex[i] != -1);  // I already picked the rows
                 // that are not in zero pivots
-                ASSERT(rowInd >= 0);  // and also still alive
-                PRLEVEL(1, ("%% ri = %ld rowInd=%ld\n", ri, rowInd));
+                PRLEVEL(1, ("%% ri = %ld \n", ri));
                 PRLEVEL(1, ("%% sC [%ld] =%2.5lf \n", i, sC[i]));
                 PRLEVEL(1, ("%% dC [%ld] =%2.5lf \n", ri, dC[ri]));
                 dC[ri] += sC[i];

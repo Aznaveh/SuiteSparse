@@ -53,6 +53,7 @@ OBJ = \
 	paru_init_rowFronts.o\
 	paru_tuples.o\
 	paru_front.o\
+	paru_factorize.o\
 	paru_fs_factorize.o\
 	paru_create_element.o\
 	paru_assemble_row2U.o\
@@ -132,6 +133,9 @@ paru_tuples.o: ../Source/paru_tuples.cpp
 #	$(C) -c $<
 
 paru_front.o: ../Source/paru_front.cpp
+	$(C) -c $<
+
+paru_factorize.o: ../Source/paru_factorize.cpp
 	$(C) -c $<
 
 paru_fs_factorize.o: ../Source/paru_fs_factorize.cpp

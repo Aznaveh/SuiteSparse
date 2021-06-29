@@ -161,7 +161,7 @@ void paru_write(paru_matrix *paruMatInfo, int scale, char *id)
             printf("Error in opening a file");
             return;
         }
-        fprintf(infofptr, "%.17g\n", paruMatInfo->my_time);
+        fprintf(infofptr, "%.17g\n", paruMatInfo->my_time + LUsym->my_time);
         fprintf(infofptr, "%.17g\n", paruMatInfo->umf_time);
 
 #ifdef COUNT_FLOPS

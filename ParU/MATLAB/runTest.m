@@ -121,7 +121,7 @@ for k = 1:nmat
     mmwrite('../Matrix/ParUTst/tmp.mtx', A);
     %    intel = sprintf('. /home/grads/a/aznaveh/intel/bin/compilervars.sh intel64;');
     %    intel = sprintf('. /opt/intel/compilers_and_libraries/linux/bin/compilervars.sh intel64;');
-    str = sprintf ('../Demo/umfout %d < ../Matrix/ParUTst/tmp.mtx', id );
+    str = sprintf ('../Demo/x_paru_demo %d < ../Matrix/ParUTst/tmp.mtx', id );
     mypath = '../Demo/Res/';
     %str = strcat(intel, str);
 

@@ -54,6 +54,7 @@ paru_symbolic *paru_analyze(
     cholmod_sparse *A)
 {
     DEBUGLEVEL(0);
+    double my_start_time = omp_get_wtime();
     paru_symbolic *LUsym;
 
     LUsym = (paru_symbolic *)paru_alloc(1, sizeof(paru_symbolic));
@@ -1213,5 +1214,6 @@ paru_symbolic *paru_analyze(
     PRLEVEL(p, ("\n"));
 
 #endif
+    LUsym->my_time = omp_get_wtime() - my_start_time;
     return (LUsym);
 }
