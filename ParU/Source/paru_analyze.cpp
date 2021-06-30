@@ -776,7 +776,7 @@ paru_symbolic *paru_analyze(
     }
 
     // see GraphBLAS/Source/GB_memcpy
-    memcpy(cChildp, Childp, (nf + 2) * sizeof(Int));
+    paru_memcpy(cChildp, Childp, (nf + 2) * sizeof(Int));
 
     for (Int f = 0; f < nf; f++)
     {
@@ -945,9 +945,9 @@ paru_symbolic *paru_analyze(
     for (Int i = n1; i <= m; i++) PRLEVEL(p, ("%ld ", cSp[i - n1]));
     PRLEVEL(p, ("\n"));
 #endif
-    memcpy(Sp, cSp, (m + 1 - n1) * sizeof(Int));
+    paru_memcpy(Sp, cSp, (m + 1 - n1) * sizeof(Int));
     paru_cumsum(m + 1 - n1, Sp);
-    memcpy(cSp, Sp, (m + 1 - n1) * sizeof(Int));
+    paru_memcpy(cSp, Sp, (m + 1 - n1) * sizeof(Int));
 
 #ifndef NDEBUG
     p = 1;

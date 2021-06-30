@@ -46,6 +46,7 @@ CC11 = -std=c11
 OBJ = \
     paru_mem.o \
     paru_memset.o \
+    paru_memcpy.o \
     paru_heap.o \
     paru_hash.o \
     paru_pivotal.o \
@@ -109,6 +110,9 @@ paru_mem.o: ../Source/paru_mem.cpp
 	$(C) -c $<
 
 paru_memset.o: ../Source/paru_memset.cpp
+	$(C) -c $<
+
+paru_memcpy.o: ../Source/paru_memcpy.cpp
 	$(C) -c $<
 
 paru_heap.o: ../Source/paru_heap.cpp

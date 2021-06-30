@@ -130,6 +130,7 @@ void paru_free(Int n, Int size, void *p);
 void paru_free_el(Int e, paru_Element **elementList);
 
 void paru_memset(void *ptr, Int value, size_t num);
+void paru_memcpy(void *destination, const void *source, size_t num);
 
 /* add tuple functions defintions */
 Int paru_add_rowTuple(tupleList *RowList, Int row, paru_Tuple T);
