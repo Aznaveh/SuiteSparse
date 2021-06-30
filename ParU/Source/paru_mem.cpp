@@ -215,7 +215,7 @@ void paru_freesym(paru_symbolic **LUsym_handle)
     paru_free(ms + nf + 2, sizeof(Int), LUsym->aChildp);
     paru_free(ms, sizeof(Int), LUsym->row2atree);
     paru_free(nf, sizeof(Int), LUsym->super2atree);
-    paru_free(ms + nf, sizeof(Int), LUsym->first);
+    paru_free(nf + 1, sizeof(Int), LUsym->first);
 
     paru_free(1, sizeof(paru_symbolic), LUsym);
 

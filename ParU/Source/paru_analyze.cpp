@@ -80,7 +80,8 @@ paru_symbolic *paru_analyze(
     LUsym->Sx = NULL;
     LUsym->Fm = LUsym->Cm = LUsym->Rj = LUsym->Rp = NULL;
     LUsym->aParent = LUsym->aChildp = LUsym->aChild = LUsym->row2atree = NULL;
-    LUsym->super2atree = LUsym->first = NULL;
+    LUsym->super2atree = NULL;
+    LUsym->first = NULL;
 
     //############  Calling UMFPACK and retrieving data structure ##############
 
@@ -1037,8 +1038,8 @@ paru_symbolic *paru_analyze(
     Int *aChild = LUsym->aChild = NULL;    // size m+nf+1
     Int *rM = LUsym->row2atree = NULL;     // row map
     Int *snM = LUsym->super2atree = NULL;  // and supernode map
-    Int *first = LUsym->first = NULL;      // first descendent in augmented tree
-    // augmented tree size m+nf
+    Int *first = LUsym->first = NULL;      // first descendent in the tree
+    // augmented tree size nf+1
 
 #ifndef NDEBUG
     p = 1;
@@ -1067,7 +1068,7 @@ paru_symbolic *paru_analyze(
     LUsym->aParent = aParent = (Int *)paru_alloc(ms + nf, sizeof(Int));
     LUsym->aChild = aChild = (Int *)paru_alloc(ms + nf + 1, sizeof(Int));
     LUsym->aChildp = aChildp = (Int *)paru_alloc(ms + nf + 2, sizeof(Int));
-    LUsym->first = first = (Int *)paru_alloc(ms + nf, sizeof(Int));
+    LUsym->first = first = (Int *)paru_alloc(nf + 1, sizeof(Int));
     LUsym->row2atree = rM = (Int *)paru_alloc(ms, sizeof(Int));
     LUsym->super2atree = snM = (Int *)paru_alloc(nf, sizeof(Int));
 
@@ -1084,7 +1085,7 @@ paru_symbolic *paru_analyze(
     paru_memset(aChild, -1, (ms + nf + 1) * sizeof(Int));
 #endif
     paru_memset(aChildp, -1, (ms + nf + 2) * sizeof(Int));
-    paru_memset(first, -1, (ms + nf) * sizeof(Int));
+    paru_memset(first, -1, (nf + 1) * sizeof(Int));
 
     aChildp[0] = 0;
     Int offset = 0;  // number of rows visited in each iteration orig front+
@@ -1159,9 +1160,14 @@ paru_symbolic *paru_analyze(
     }
 
     // Initialize first descendent of augmented tree
-    for (Int i = 0; i < ms + nf; i++)
+    PRLEVEL(p, ("%% computing first of\n "));
+    for (Int i = 0; i < nf; i++)
     {
-        for (Int r = i; r != -1 && first[r] == -1; r = aParent[r]) first[r] = i;
+        for (Int r = i; r != -1 && first[r] == -1; r = Parent[r])
+        {
+            PRLEVEL(p, ("%% first of %ld is %ld\n", r, i));
+            first[r] = i;
+        }
     }
 
 #ifndef NDEBUG
@@ -1209,7 +1215,7 @@ paru_symbolic *paru_analyze(
     p = 1;
 
     PRLEVEL(p, ("%% first: "));
-    for (Int i = 0; i < ms + nf; i++)
+    for (Int i = 0; i < nf + 1; i++)
         PRLEVEL(p, ("first[%ld]=%ld ", i, first[i]));
     PRLEVEL(p, ("\n"));
 

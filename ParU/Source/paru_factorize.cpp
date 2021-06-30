@@ -10,6 +10,26 @@
 
 #include "paru_internal.hpp"
 
+ParU_ResultCode paru_do_fronts(Int f, paru_matrix *paruMatInfo)
+// This routine call paru_front from first(f)...f including f
+{
+    paru_symbolic *LUsym = paruMatInfo->LUsym;
+    Int *first = LUsym->first;
+
+    ParU_ResultCode info;
+    ASSERT(first[f] >= 0);
+    for (Int i = first[f]; i <= f; i++)
+    {
+        PRLEVEL(1, ("%% Wroking on front %ld\n", i));
+        info = paru_front(i, paruMatInfo);
+        if (info != PARU_SUCCESS)
+        {
+            PRLEVEL(1, ("%% A problem happend in %ld\n", i));
+            return info;
+        }
+    }
+    return PARU_SUCCESS;
+}
 ParU_ResultCode paru_factorize(cholmod_sparse *A, paru_symbolic *LUsym,
                                paru_matrix **paruMatInfo_handle)
 {
@@ -50,16 +70,20 @@ ParU_ResultCode paru_factorize(cholmod_sparse *A, paru_symbolic *LUsym,
 
     Int nf = paruMatInfo->LUsym->nf;
 
-    for (Int i = 0; i < nf; i++)
-    {
-        PRLEVEL(1, ("%% Wroking on front %ld\n", i));
-        info = paru_front(i, paruMatInfo);
-        if (info != PARU_SUCCESS)
-        {
-            PRLEVEL(1, ("%% A problem happend in %ld\n", i));
-            return info;
-        }
-    }
+    //TODO my plan is to make do_fronts a task parallel region
+    info = paru_do_fronts(nf-1, paruMatInfo);
+
+    // for (Int i = 0; i < nf; i++)
+    // {
+    //     PRLEVEL(1, ("%% Wroking on front %ld\n", i));
+    //     info = paru_front(i, paruMatInfo);
+    //     if (info != PARU_SUCCESS)
+    //     {
+    //         PRLEVEL(1, ("%% A problem happend in %ld\n", i));
+    //         return info;
+    //     }
+    // }
+
     paruMatInfo->my_time = omp_get_wtime() - my_start_time;
     return PARU_SUCCESS;
 }

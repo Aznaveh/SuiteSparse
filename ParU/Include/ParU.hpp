@@ -122,8 +122,8 @@ typedef struct
     Int *aParent;  // size m+nf
     Int *aChild;   // size m+nf+1
     Int *aChildp;  // size m+nf+2
-    Int *first;  // size m+nf first successor of front in augmented postordered
-    //  tree; all successors are between first[eli]...eli-1
+    Int *first;  // size nf+1 first successor of front in the tree; 
+    //all successors are between first[f]...f-1
 
     // pivot column in the front F.  This refers to a column of S.  The
     // number of expected pivot columns in F is thus
