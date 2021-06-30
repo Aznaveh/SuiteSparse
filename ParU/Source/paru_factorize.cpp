@@ -53,7 +53,7 @@ ParU_ResultCode paru_factorize(cholmod_sparse *A, paru_symbolic *LUsym,
     for (Int i = 0; i < nf; i++)
     {
         PRLEVEL(1, ("%% Wroking on front %ld\n", i));
-        info = paru_front(paruMatInfo, i);
+        info = paru_front(i, paruMatInfo);
         if (info != PARU_SUCCESS)
         {
             PRLEVEL(1, ("%% A problem happend in %ld\n", i));

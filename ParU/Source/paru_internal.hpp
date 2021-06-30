@@ -171,7 +171,7 @@ Int bin_srch(Int *srt_lst, Int l, Int r, Int num);
 ParU_ResultCode paru_init_rowFronts(paru_matrix **paruMatInfo_handle,
                                     cholmod_sparse *A, int scale,
                                     paru_symbolic *LUsym);
-ParU_ResultCode paru_front(paru_matrix *paruMatInfo, Int f);
+ParU_ResultCode paru_front(Int f, paru_matrix *paruMatInfo);
 
 void paru_pivotal(std::vector<Int> &pivotal_elements,
                   std::vector<Int> &panel_row, Int &zero_piv_rows, Int f,

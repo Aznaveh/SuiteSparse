@@ -13,9 +13,9 @@
  *  @author Aznaveh
  */
 #include "paru_internal.hpp"
-ParU_ResultCode paru_front(paru_matrix *paruMatInfo,
-                           /* RowCol list/tuples and LUsym handle */
-                           Int f) /* front need to be assembled */
+ParU_ResultCode paru_front(Int f,  // front need to be assembled
+                           paru_matrix *paruMatInfo)
+// RowCol list/tuples and LUsym handle
 {
     DEBUGLEVEL(-1);
     /*
