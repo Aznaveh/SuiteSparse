@@ -13,6 +13,7 @@
 ParU_ResultCode paru_do_fronts(Int f, paru_matrix *paruMatInfo)
 // This routine call paru_front from first(f)...f including f
 {
+    DEBUGLEVEL(1);
     paru_symbolic *LUsym = paruMatInfo->LUsym;
     Int *first = LUsym->first;
 
@@ -30,7 +31,7 @@ ParU_ResultCode paru_do_fronts(Int f, paru_matrix *paruMatInfo)
         }
     }
     //#pragma omp task shared(paruMatInfo)
-    //info = paru_front(f, paruMatInfo);
+    // info = paru_front(f, paruMatInfo);
     return PARU_SUCCESS;
 }
 ParU_ResultCode paru_factorize(cholmod_sparse *A, paru_symbolic *LUsym,
@@ -73,11 +74,16 @@ ParU_ResultCode paru_factorize(cholmod_sparse *A, paru_symbolic *LUsym,
 
     Int nf = paruMatInfo->LUsym->nf;
 
-    //TODO my plan is to make do_fronts a task parallel region
+    // TODO my plan is to make do_fronts a task parallel region
     //#pragma omp parallel shared(paruMatInfo)
     {
         //#pragma omp single
-        info = paru_do_fronts(nf-1, paruMatInfo);
+        info = paru_do_fronts(nf - 1, paruMatInfo);
+        if (info != PARU_SUCCESS)
+        {
+            PRLEVEL(1, ("%% A problem happend in %ld\n", i));
+            return info;
+        }
     }
 
     // for (Int i = 0; i < nf; i++)

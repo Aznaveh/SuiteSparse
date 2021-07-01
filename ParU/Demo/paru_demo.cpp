@@ -59,6 +59,8 @@ int main(int argc, char **argv)
     double my_time = omp_get_wtime() - my_start_time;
     if (info != PARU_SUCCESS)
     {
+        paru_freemat(&paruMatInfo);
+        paru_freesym(&LUsym);
         cholmod_l_free_sparse(&A, cc);
         cholmod_l_finish(cc);
         return info;
