@@ -208,6 +208,10 @@ void paru_freesym(paru_symbolic **LUsym_handle)
     paru_free((n + 1), sizeof(Int), LUsym->Chain_maxrows);
     paru_free((n + 1), sizeof(Int), LUsym->Chain_maxcols);
 
+    paru_free(nf + 1, sizeof(double), LUsym->front_flop_bound);
+    paru_free(nf + 1, sizeof(double), LUsym->stree_flop_bound);
+
+
     Int ms = m - n1;  // submatrix is msxns
 
     paru_free(ms + nf, sizeof(Int), LUsym->aParent);

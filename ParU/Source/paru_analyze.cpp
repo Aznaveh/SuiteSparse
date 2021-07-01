@@ -1079,9 +1079,9 @@ paru_symbolic *paru_analyze(
     double *front_flop_bound = NULL;
     double *stree_flop_bound = NULL;
     LUsym->front_flop_bound = front_flop_bound =
-        (double *)paru_alloc(nf + 1, sizeof(Int));
+        (double *)paru_alloc(nf + 1, sizeof(double));
     LUsym->stree_flop_bound = stree_flop_bound =
-        (double *)paru_calloc(nf + 1, sizeof(Int));
+        (double *)paru_calloc(nf + 1, sizeof(double));
 
     if (aParent == NULL || aChild == NULL || aChildp == NULL || rM == NULL ||
         snM == NULL || first == NULL || front_flop_bound == NULL ||
