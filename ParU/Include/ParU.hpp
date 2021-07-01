@@ -122,8 +122,8 @@ typedef struct
     Int *aParent;  // size m+nf
     Int *aChild;   // size m+nf+1
     Int *aChildp;  // size m+nf+2
-    Int *first;  // size nf+1 first successor of front in the tree; 
-    //all successors are between first[f]...f-1
+    Int *first;    // size nf+1 first successor of front in the tree;
+    // all successors are between first[f]...f-1
 
     // pivot column in the front F.  This refers to a column of S.  The
     // number of expected pivot columns in F is thus
@@ -169,6 +169,9 @@ typedef struct
     Int LUs_bound_size;  // Upper bound on size of all LUs, sum all fp*fm
     Int row_Int_bound;   // Upper bound on size of all ints for rows
     Int col_Int_bound;   // Upper bound on size of all ints for cols
+
+    double *front_flop_bound;  // bound on m*n*k for each front size nf+1
+    double *stree_flop_bound;  // flop bound for front and descendents size nf+1
 
     // symbolic analysis time
     double my_time;

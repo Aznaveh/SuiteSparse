@@ -82,6 +82,7 @@ paru_symbolic *paru_analyze(
     LUsym->aParent = LUsym->aChildp = LUsym->aChild = LUsym->row2atree = NULL;
     LUsym->super2atree = NULL;
     LUsym->first = NULL;
+    LUsym->stree_flop_bound = LUsym->front_flop_bound = NULL;
 
     //############  Calling UMFPACK and retrieving data structure ##############
 
@@ -721,6 +722,9 @@ paru_symbolic *paru_analyze(
 #endif
     for (Int f = 0; f < nf; f++)
     {
+        // TODO
+        // work[f]= fp*fm*fn;
+        // sum(work[first[f]] ...work[f]) task size
 #ifndef NDEBUG
         Int fp = Super[f + 1] - Super[f];
         Int fm = LUsym->Fm[f];
@@ -1072,8 +1076,16 @@ paru_symbolic *paru_analyze(
     LUsym->row2atree = rM = (Int *)paru_alloc(ms, sizeof(Int));
     LUsym->super2atree = snM = (Int *)paru_alloc(nf, sizeof(Int));
 
+    double *front_flop_bound = NULL;
+    double *stree_flop_bound = NULL;
+    LUsym->front_flop_bound = front_flop_bound =
+        (double *)paru_alloc(nf + 1, sizeof(Int));
+    LUsym->stree_flop_bound = stree_flop_bound =
+        (double *)paru_calloc(nf + 1, sizeof(Int));
+
     if (aParent == NULL || aChild == NULL || aChildp == NULL || rM == NULL ||
-        snM == NULL || first == NULL)
+        snM == NULL || first == NULL || front_flop_bound == NULL ||
+        stree_flop_bound == NULL)
     {
         printf("Out of memory in symbolic phase");
         paru_freesym(&LUsym);
@@ -1083,6 +1095,7 @@ paru_symbolic *paru_analyze(
     paru_memset(aParent, -1, (ms + nf) * sizeof(Int));
 #ifndef NDEBUG  // TODO: should it be in debug mode?
     paru_memset(aChild, -1, (ms + nf + 1) * sizeof(Int));
+    p = 1;
 #endif
     paru_memset(aChildp, -1, (ms + nf + 2) * sizeof(Int));
     paru_memset(first, -1, (nf + 1) * sizeof(Int));
@@ -1098,6 +1111,24 @@ paru_symbolic *paru_analyze(
         PRLEVEL(p, ("%% Front %ld\n", f));
         PRLEVEL(p, ("%% pivot columns [ %ld to %ld ] n: %ld \n", Super[f],
                     Super[f + 1] - 1, ns));
+
+
+        //computing works in each front
+        Int fp = Super[f + 1] - Super[f]; //k
+        Int fm = LUsym->Fm[f]; //m
+        Int fn = LUsym->Cm[f]; //n Upper bound number of cols of f 
+        front_flop_bound [f] = (double) (fp*fm*fn + fp*fm + fp*fn);
+        stree_flop_bound [f] += front_flop_bound [f];
+        for (Int i = Childp[f]; i <= Childp[f + 1] - 1; i++)
+        {
+           stree_flop_bound[f] += stree_flop_bound [Child[i]]; 
+            PRLEVEL(p, ("%% child=%ld fl=%lf ",
+                        Child[i], front_flop_bound[Child[i]]));
+        }
+        PRLEVEL(p, ("%% flops bound= %lf\n ", front_flop_bound[f]));
+        PRLEVEL(p, ("%% %ld %ld %ld\n ", fp, fm, fn));
+        PRLEVEL(p, ("%% stree bound= %lf\n ", stree_flop_bound[f]));
+
         ASSERT(Super[f + 1] <= ns);
         Int numRow = Sleft[Super[f + 1]] - Sleft[Super[f]];
 
@@ -1159,7 +1190,7 @@ paru_symbolic *paru_analyze(
             lastChildFlag = 0;
     }
 
-    // Initialize first descendent of augmented tree
+    // Initialize first descendent of the etree
     PRLEVEL(p, ("%% computing first of\n "));
     for (Int i = 0; i < nf; i++)
     {

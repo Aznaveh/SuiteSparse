@@ -18,6 +18,7 @@ ParU_ResultCode paru_do_fronts(Int f, paru_matrix *paruMatInfo)
 
     ParU_ResultCode info;
     ASSERT(first[f] >= 0);
+    //#pragma omp task shared(paruMatInfo)
     for (Int i = first[f]; i <= f; i++)
     {
         PRLEVEL(1, ("%% Wroking on front %ld\n", i));
@@ -28,6 +29,8 @@ ParU_ResultCode paru_do_fronts(Int f, paru_matrix *paruMatInfo)
             return info;
         }
     }
+    //#pragma omp task shared(paruMatInfo)
+    //info = paru_front(f, paruMatInfo);
     return PARU_SUCCESS;
 }
 ParU_ResultCode paru_factorize(cholmod_sparse *A, paru_symbolic *LUsym,
@@ -71,7 +74,11 @@ ParU_ResultCode paru_factorize(cholmod_sparse *A, paru_symbolic *LUsym,
     Int nf = paruMatInfo->LUsym->nf;
 
     //TODO my plan is to make do_fronts a task parallel region
-    info = paru_do_fronts(nf-1, paruMatInfo);
+    //#pragma omp parallel shared(paruMatInfo)
+    {
+        //#pragma omp single
+        info = paru_do_fronts(nf-1, paruMatInfo);
+    }
 
     // for (Int i = 0; i < nf; i++)
     // {
