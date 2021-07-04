@@ -74,15 +74,20 @@ ParU_ResultCode paru_factorize(cholmod_sparse *A, paru_symbolic *LUsym,
 
     Int nf = paruMatInfo->LUsym->nf;
 
+    Int *Parent =  LUsym->Parent;
     // TODO my plan is to make do_fronts a task parallel region
     //#pragma omp parallel shared(paruMatInfo)
+    for (Int i = 0; i < nf; i++)
     {
         //#pragma omp single
-        info = paru_do_fronts(nf - 1, paruMatInfo);
-        if (info != PARU_SUCCESS)
+        if (Parent[i] == -1)
         {
-            PRLEVEL(1, ("%% A problem happend in %ld\n", i));
-            return info;
+            info = paru_do_fronts(i, paruMatInfo);
+            if (info != PARU_SUCCESS)
+            {
+                PRLEVEL(1, ("%% A problem happend in %ld\n", i));
+                return info;
+            }
         }
     }
 
