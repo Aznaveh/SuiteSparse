@@ -2,9 +2,10 @@ index = ssget ;
 
 f = find (index.nrows == index.ncols & ...
 index.sprank == index.ncols & ...
-~index.posdef & ...
-index.isReal & ~index.isGraph  & ...
-index.numerical_symmetry <= .9 ) ;
+index.sprank == index.nrows & ...
+index.isReal & ~index.isGraph);
+%~index.posdef & ...
+%index.numerical_symmetry <= .9 ) ;
 %index.pattern_symmetry <= .6 ) ;
 
 [ignore, i] = sort (index.nnz (f) + index.nzero (f)) ;
@@ -56,15 +57,25 @@ loop_cnt = 0;
 NNZMat = 100000;
 
 for k = 1:nmat
-%for k = 469:nmat
+%for k = 605:nmat
     id = fnew (k); 
     % some problem in these matrice
     if ( id == 2056 || id == 2034 || id == 1867 || id == 2842 || ...
         id == 2843 ||    id == 2844 || id == 2845 || id == 1396 || ...
         id == 1397 || ... %ordering failed
         id == 1404 || id == 1297 || id == 788 || id == 1373 || id == 2265 || ...
-        id == 274 ||  id == 273 || id == 174 || id == 2015 || id == 2104 || ...%newer tests singular??
+        id == 274 ||  id == 273 || id == 2015 || id == 2104 || ...%newer tests singular
         id == 2384 || id == 2385 || id == 2835 || ... %memory!!
+        id == 109 ||  id == 102 || id == 113 || id == 93 || id == 119 ||...  %smaller singular
+        id == 95 ||  id == 16 || id == 17 || id == 116 || id == 117 ||...  %smaller singular
+        id == 96 ||  id == 8 || id == 121 || id == 100 || id == 98 ||...  %smaller singular
+        id == 99 ||  id == 123 || id == 114 || id == 128 || id == 125 ||...  %smaller singular
+        id == 130 ||  id == 131 || id == 18 || id == 19 || id == 134 ||...  %smaller singular
+        id == 20 ||  id == 21 || id == 105 || id == 135 || id == 104 ||...  %smaller singular
+        id == 138 ||  id == 137 || id == 111 || id == 110 || id == 112 ||...  %smaller singular
+        id == 1186 ||  id == 91 || id == 92 || id == 139 || id == 140 ||...  %smaller singular
+        id == 22 ||  id == 250 || id == 105 || id == 135 || id == 104 ||...  %smaller singular
+        id == 120||  id == 1185 || id == 1380 || id == 1303 || id == 104 ||...  %smaller singular
         id == 2267 || id == 2649 || id == 2847 || id == 2337 || id == 2841)  
         continue;
     end
