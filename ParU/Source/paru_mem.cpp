@@ -165,6 +165,28 @@ void paru_free(Int n, Int size, void *p)
     }
 }
 
+//  Global replacement of new and delete
+//
+void *operator new(
+    std::size_t sz)  // no inline, required by [replacement.functions]/3
+{
+    DEBUGLEVEL(0);
+    PRLEVEL(1, ("global op new called, size = %zu\n", sz));
+    if (sz == 0)
+        ++sz;  // avoid malloc(0) which may return nullptr on success
+
+    if (void *ptr = paru_alloc(1, sz)) return ptr;
+    throw std::bad_alloc{};
+}
+void operator delete(void *ptr) noexcept
+{
+    DEBUGLEVEL(0);
+    PRLEVEL(1, ("global op delete called"));
+    paru_free(0, 0, ptr);
+}
+
+//  freeing symbolic analysis data structure
+//  
 void paru_freesym(paru_symbolic **LUsym_handle)
 {
     DEBUGLEVEL(0);
@@ -211,7 +233,6 @@ void paru_freesym(paru_symbolic **LUsym_handle)
     paru_free(nf + 1, sizeof(double), LUsym->front_flop_bound);
     paru_free(nf + 1, sizeof(double), LUsym->stree_flop_bound);
 
-
     Int ms = m - n1;  // submatrix is msxns
 
     paru_free(ms + nf, sizeof(Int), LUsym->aParent);
@@ -226,8 +247,9 @@ void paru_freesym(paru_symbolic **LUsym_handle)
     *LUsym_handle = NULL;
 }
 
+// free element e from elementList 
+// 
 void paru_free_el(Int e, paru_Element **elementList)
-/* fee element e from elementList */
 {
     DEBUGLEVEL(0);
     paru_Element *el = elementList[e];
@@ -242,7 +264,8 @@ void paru_free_el(Int e, paru_Element **elementList)
     elementList[e] = NULL;
 }
 
-/*! It uses LUsym, Do not free LUsym before*/
+// It uses LUsym, Do not free LUsym before
+//
 void paru_freemat(paru_matrix **paruMatInfo_handle)
 {
     DEBUGLEVEL(0);
@@ -378,3 +401,4 @@ void paru_freemat(paru_matrix **paruMatInfo_handle)
     paru_free(1, sizeof(paru_matrix), paruMatInfo);
     *paruMatInfo_handle = NULL;
 }
+
