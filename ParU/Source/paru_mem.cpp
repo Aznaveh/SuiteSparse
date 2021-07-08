@@ -146,7 +146,7 @@ void *paru_realloc(
 
 //  Wrapper around free routine
 //
-void paru_free(Int n, Int size, void *p)
+void paru_free(size_t n, size_t size, void *p)
 {
     DEBUGLEVEL(0);
     static Int free_count = 0;
@@ -167,15 +167,17 @@ void paru_free(Int n, Int size, void *p)
 
 //  Global replacement of new and delete
 //
-void *operator new(
-    std::size_t sz)  // no inline, required by [replacement.functions]/3
-{
+void *operator new(size_t size)
+{  // no inline, required by [replacement.functions]/3
     DEBUGLEVEL(0);
-    PRLEVEL(1, ("global op new called, size = %zu\n", sz));
-    if (sz == 0)
-        ++sz;  // avoid malloc(0) which may return nullptr on success
+    static Int cpp_count = 0;
+    cpp_count += size;
 
-    if (void *ptr = paru_alloc(1, sz)) return ptr;
+    PRLEVEL(1, ("global op new called, size = %zu tot=%ld\n", size, cpp_count));
+    if (size == 0)
+        ++size;  // avoid malloc(0) which may return nullptr on success
+
+    if (void *ptr = paru_alloc(1, size)) return ptr;
     throw std::bad_alloc{};
 }
 void operator delete(void *ptr) noexcept
@@ -186,7 +188,7 @@ void operator delete(void *ptr) noexcept
 }
 
 //  freeing symbolic analysis data structure
-//  
+//
 void paru_freesym(paru_symbolic **LUsym_handle)
 {
     DEBUGLEVEL(0);
@@ -247,8 +249,8 @@ void paru_freesym(paru_symbolic **LUsym_handle)
     *LUsym_handle = NULL;
 }
 
-// free element e from elementList 
-// 
+// free element e from elementList
+//
 void paru_free_el(Int e, paru_Element **elementList)
 {
     DEBUGLEVEL(0);

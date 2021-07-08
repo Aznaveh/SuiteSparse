@@ -126,7 +126,7 @@ void *paru_alloc(size_t n, size_t size);
 void *paru_calloc(size_t n, size_t size);
 void *paru_realloc(size_t newsize, size_t size_Entry, void *oldP, size_t *size);
 
-void paru_free(Int n, Int size, void *p);
+void paru_free(size_t n, size_t size, void *p);
 void paru_free_el(Int e, paru_Element **elementList);
 
 void *operator new(std::size_t sz);
