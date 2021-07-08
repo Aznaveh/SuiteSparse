@@ -273,8 +273,8 @@ ParU_ResultCode paru_front(Int f,  // front need to be assembled
         if (zero_piv_rows > 0)
         {
             // make the heap and return
-            paru_make_heap_empty_el(f, pivotal_elements, hi, paruMatInfo);
-            return PARU_SUCCESS;
+            return paru_make_heap_empty_el(f, pivotal_elements, hi,
+                                           paruMatInfo);
         }
         else
         {
@@ -519,10 +519,10 @@ ParU_ResultCode paru_front(Int f,  // front need to be assembled
         if (zero_piv_rows > 0)
         {
             // keep the heap and do it for the parent.
-            paru_make_heap_empty_el(f, pivotal_elements, hi, paruMatInfo);
+            return paru_make_heap_empty_el(f, pivotal_elements, hi,
+                                           paruMatInfo);
             // There are stuff left from in zero
             // then return
-            return PARU_SUCCESS;
         }
         else
         {
@@ -599,8 +599,10 @@ ParU_ResultCode paru_front(Int f,  // front need to be assembled
 
     // paruMatInfo->time_stamp[f]++; //invalidating all the marks
     PRLEVEL(-1, ("\n%%||||  Start Finalize %ld ||||\n", f));
-    paru_prior_assemble(f, start_fac, pivotal_elements, colHash, hi,
-                        paruMatInfo);
+    ParU_ResultCode pa = paru_prior_assemble(f, start_fac, pivotal_elements,
+                                             colHash, hi, paruMatInfo);
+    if (pa != PARU_SUCCESS)
+        return pa;
     PRLEVEL(-1, ("\n%%||||  Finish Finalize %ld ||||\n", f));
 
     ////////////////////////////////////////////////////////////////////////////

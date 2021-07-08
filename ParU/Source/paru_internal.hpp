@@ -22,12 +22,12 @@
 #endif
 
 // for printing information uncomment this; to activate assertions uncomment
-//#undef NPR    //<<1>>
+#undef NPR    //<<1>>
 
 // from spqr.hpp
 // Aznaveh For MATLAB OUTPUT UNCOMMENT HERE
 // uncomment the following line to turn on debugging
-//#undef NDEBUG  //<<2>>
+#undef NDEBUG  //<<2>>
 
 // uncomment if you want to count hardware flops
 //#define COUNT_FLOPS
@@ -184,10 +184,10 @@ void paru_pivotal(std::vector<Int> &pivotal_elements,
 int paru_intersection(Int e, paru_Element **elementList,
                       std::set<Int> &stl_colSet);
 
-void paru_prior_assemble(Int f, Int start_fac,
-                         std::vector<Int> &pivotal_elements,
-                         std::vector<Int> &colHash, heaps_info &hi,
-                         paru_matrix *paruMatInfo);
+ParU_ResultCode paru_prior_assemble(Int f, Int start_fac,
+                                    std::vector<Int> &pivotal_elements,
+                                    std::vector<Int> &colHash, heaps_info &hi,
+                                    paru_matrix *paruMatInfo);
 
 void paru_assemble_all(Int e, Int f, std::vector<Int> &colHash,
                        paru_matrix *paruMatInfo);
@@ -204,12 +204,15 @@ void paru_assemble_el_with0rows(Int e, Int f, std::vector<Int> &colHash,
 void paru_full_summed(Int e, Int f, paru_matrix *paruMatInfo);
 
 // heap related
-void paru_make_heap(Int f, Int start_fac, std::vector<Int> &pivotal_elements,
-                    heaps_info &hi, std::vector<Int> &colHash,
-                    paru_matrix *paruMatInfo);
+ParU_ResultCode paru_make_heap(Int f, Int start_fac,
+                               std::vector<Int> &pivotal_elements,
+                               heaps_info &hi, std::vector<Int> &colHash,
+                               paru_matrix *paruMatInfo);
 
-void paru_make_heap_empty_el(Int f, std::vector<Int> &pivotal_elements,
-                             heaps_info &hi, paru_matrix *paruMatInfo);
+ParU_ResultCode paru_make_heap_empty_el(Int f,
+                                        std::vector<Int> &pivotal_elements,
+                                        heaps_info &hi,
+                                        paru_matrix *paruMatInfo);
 
 // hash related
 void paru_insert_hash(Int key, Int value, std::vector<Int> &colHash);

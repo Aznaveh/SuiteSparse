@@ -167,18 +167,21 @@ void paru_free(size_t n, size_t size, void *p)
 
 //  Global replacement of new and delete
 //
-void *operator new(size_t size)
+void *operator new(size_t size, const std::nothrow_t&) noexcept // nothrow
 {  // no inline, required by [replacement.functions]/3
-    DEBUGLEVEL(0);
+    DEBUGLEVEL(1);
+    printf("I am here\n");
     static Int cpp_count = 0;
     cpp_count += size;
 
     PRLEVEL(1, ("global op new called, size = %zu tot=%ld\n", size, cpp_count));
     if (size == 0)
-        ++size;  // avoid malloc(0) which may return nullptr on success
-
+    {  // avoid malloc(0) which may return nullptr on success
+        printf("size must be > 0\n");
+        return NULL;
+    }
     if (void *ptr = paru_alloc(1, size)) return ptr;
-    throw std::bad_alloc{};
+    return NULL;
 }
 void operator delete(void *ptr) noexcept
 {

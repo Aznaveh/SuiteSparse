@@ -13,12 +13,13 @@
  */
 #include "paru_internal.hpp"
 
-ParU_ResultCode paru_init_rowFronts(paru_matrix **paruMatInfo_handle,  // in/out
-                                    // inputs, not modified
-                                    cholmod_sparse *A,
-                                    int scale,  // scales the matrix if > 0
-                                    // symbolic analysis
-                                    paru_symbolic *LUsym)
+ParU_ResultCode paru_init_rowFronts(
+    paru_matrix **paruMatInfo_handle,  // in/out
+                                       // inputs, not modified
+    cholmod_sparse *A,
+    int scale,  // scales the matrix if > 0
+    // symbolic analysis
+    paru_symbolic *LUsym)
 {
     mallopt(M_MMAP_MAX, 0);                // disable mmap; it's too slow
     mallopt(M_TRIM_THRESHOLD, -1);         // disable sbrk trimming
@@ -225,6 +226,13 @@ ParU_ResultCode paru_init_rowFronts(paru_matrix **paruMatInfo_handle,  // in/out
         // TODO: use placement new
         std::vector<Int> *curHeap;
         curHeap = paruMatInfo->heapList[e] = new std::vector<Int>;
+
+        if (curHeap == NULL)
+        {  // out of memory
+            paru_freemat(&paruMatInfo);
+            printf("Out of memory\n");
+            return PARU_OUT_OF_MEMORY;
+        }
         PRLEVEL(1, ("%%Heap allocated %p id=%ld \n", curHeap, e));
         curHeap->push_back(e);
 
