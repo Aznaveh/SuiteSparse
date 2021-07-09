@@ -200,8 +200,10 @@ ParU_ResultCode paru_init_rowFronts(paru_matrix **paruMatInfo_handle,  // in/out
 
     // Activating comments after this parts will break the matlab input matrix
     // allocating row tuples, elements and updating column tuples
+//#pragma omp parallel for schedule(dynamic) 
     for (Int row = 0; row < m; row++)
     {
+        //#pragma omp cancelation point for
         Int e = LUsym->row2atree[row];
         Int nrows = 1,
             ncols =
@@ -217,6 +219,7 @@ ParU_ResultCode paru_init_rowFronts(paru_matrix **paruMatInfo_handle,  // in/out
         {  // out of memory
             paru_freemat(&paruMatInfo);
             printf("Out of memory: curEl\n");
+            //#pragma omp cancel for
             return PARU_OUT_OF_MEMORY;
         }
 
@@ -244,6 +247,7 @@ ParU_ResultCode paru_init_rowFronts(paru_matrix **paruMatInfo_handle,  // in/out
         {  // out of memory
             paru_freemat(&paruMatInfo);
             printf("Out of memory: RowList[row].list \n");
+            //#pragma omp cancel for
             return PARU_OUT_OF_MEMORY;
         }
         RowList[row].numTuple = 0;
@@ -256,6 +260,7 @@ ParU_ResultCode paru_init_rowFronts(paru_matrix **paruMatInfo_handle,  // in/out
         {
             paru_freemat(&paruMatInfo);
             printf("Out of memory: add_rowTuple \n");
+            //#pragma omp cancel for
             return PARU_OUT_OF_MEMORY;
         }
 

@@ -12,30 +12,52 @@
 
 ParU_ResultCode paru_do_fronts(Int f, paru_matrix *paruMatInfo)
 // This routine call paru_front from first(f)...f including f
+// I use this routine to call it recursively
 {
     DEBUGLEVEL(1);
     paru_symbolic *LUsym = paruMatInfo->LUsym;
-    Int *first = LUsym->first;
-
     ParU_ResultCode info;
-    ASSERT(first[f] >= 0);
-    //#pragma omp task shared(paruMatInfo)
-    for (Int i = first[f]; i <= f; i++)
+
+    // Int *first = LUsym->first;
+    // ASSERT(first[f] >= 0);
+    // for (Int i = first[f]; i <= f; i++)
+    // {
+    //     PRLEVEL(1, ("%% Wroking on front %ld\n", i));
+    //     info = paru_front(i, paruMatInfo);
+    //     if (info != PARU_SUCCESS)
+    //     {
+    //         PRLEVEL(1, ("%% A problem happend in %ld\n", i));
+    //         return info;
+    //     }
+    // }
+
+    Int *Childp = LUsym->Childp;
+    Int *Child = LUsym->Child;
+
+    for (Int i = Childp[f]; i <= Childp[f + 1] - 1; i++)
     {
-        PRLEVEL(1, ("%% Wroking on front %ld\n", i));
-        info = paru_front(i, paruMatInfo);
+        #pragma omp task shared(paruMatInfo) private(info)
+        info = paru_do_fronts(Child[i], paruMatInfo);
         if (info != PARU_SUCCESS)
         {
             PRLEVEL(1, ("%% A problem happend in %ld\n", i));
-            return info;
+            #pragma omp cancel taskgroup
+            //return info;
         }
     }
-    //#pragma omp task shared(paruMatInfo)
-    // info = paru_front(f, paruMatInfo);
+    #pragma omp taskwait
+    info = paru_front(f, paruMatInfo);
+    if (info != PARU_SUCCESS)
+    {
+        PRLEVEL(1, ("%% A problem happend in %ld\n", i));
+        #pragma omp cancel taskgroup
+        //return info;
+    }
+    #pragma omp cancellation point taskgroup
     return PARU_SUCCESS;
 }
 ParU_ResultCode paru_factorize(cholmod_sparse *A, paru_symbolic *LUsym,
-                               paru_matrix **paruMatInfo_handle)
+        paru_matrix **paruMatInfo_handle)
 {
     DEBUGLEVEL(1);
     double my_start_time = omp_get_wtime();
@@ -76,21 +98,22 @@ ParU_ResultCode paru_factorize(cholmod_sparse *A, paru_symbolic *LUsym,
 
     Int *Parent =  LUsym->Parent;
     // TODO my plan is to make do_fronts a task parallel region
-    //#pragma omp parallel shared(paruMatInfo)
+    #pragma omp parallel shared(paruMatInfo)
     for (Int i = 0; i < nf; i++)
     {
-        //#pragma omp single
+        #pragma omp single
         if (Parent[i] == -1)
         {
             info = paru_do_fronts(i, paruMatInfo);
             if (info != PARU_SUCCESS)
             {
                 PRLEVEL(1, ("%% A problem happend in %ld\n", i));
-                return info;
+                //return info;
             }
         }
     }
 
+    //// This code can work in a sequential case
     // for (Int i = 0; i < nf; i++)
     // {
     //     PRLEVEL(1, ("%% Wroking on front %ld\n", i));
