@@ -9,6 +9,7 @@
  * */
 
 #include "paru_internal.hpp"
+#define TASK_FL_THRESHOLD 1024*1024*1024
 
 ParU_ResultCode paru_do_fronts(Int f, paru_matrix *paruMatInfo)
 // This routine call paru_front from first(f)...f including f
@@ -18,46 +19,59 @@ ParU_ResultCode paru_do_fronts(Int f, paru_matrix *paruMatInfo)
     paru_symbolic *LUsym = paruMatInfo->LUsym;
     ParU_ResultCode info;
 
-    // Int *first = LUsym->first;
-    // ASSERT(first[f] >= 0);
-    // for (Int i = first[f]; i <= f; i++)
-    // {
-    //     PRLEVEL(1, ("%% Wroking on front %ld\n", i));
-    //     info = paru_front(i, paruMatInfo);
-    //     if (info != PARU_SUCCESS)
-    //     {
-    //         PRLEVEL(1, ("%% A problem happend in %ld\n", i));
-    //         return info;
-    //     }
-    // }
+    //double *front_flop_bound = LUsym->front_flop_bound;
+    double *stree_flop_bound = LUsym->stree_flop_bound;
 
-    Int *Childp = LUsym->Childp;
-    Int *Child = LUsym->Child;
-
-    for (Int i = Childp[f]; i <= Childp[f + 1] - 1; i++)
+    if (stree_flop_bound[f] < TASK_FL_THRESHOLD)
     {
-        #pragma omp task shared(paruMatInfo) private(info)
-        info = paru_do_fronts(Child[i], paruMatInfo);
-        if (info != PARU_SUCCESS)
+        Int *first = LUsym->first;
+        PRLEVEL(1, ("%% Sequential %ld - %ld is small\n",first[f], f));
+        ASSERT(first[f] >= 0);
+        for (Int i = first[f]; i <= f; i++)
         {
-            PRLEVEL(1, ("%% A problem happend in %ld\n", i));
-            #pragma omp cancel taskgroup
-            //return info;
+            PRLEVEL(1, ("%% Wroking on front %ld\n", i));
+            info = paru_front(i, paruMatInfo);
+            if (info != PARU_SUCCESS)
+            {
+                PRLEVEL(1, ("%% A problem happend in %ld\n", i));
+                return info;
+            }
         }
     }
-    #pragma omp taskwait
-    info = paru_front(f, paruMatInfo);
-    if (info != PARU_SUCCESS)
+    else
     {
-        PRLEVEL(1, ("%% A problem happend in %ld\n", i));
-        #pragma omp cancel taskgroup
-        //return info;
+        Int *Childp = LUsym->Childp;
+        Int *Child = LUsym->Child;
+
+        PRLEVEL(1, ("%% tasks are generating for children of %ld\n",f));
+        if (Childp[f + 1]- Childp[f] > 100)
+            printf ("%% lots of children here\n");
+        for (Int i = Childp[f]; i <= Childp[f + 1] - 1; i++)
+        {
+#pragma omp task shared(paruMatInfo) private(info)
+            info = paru_do_fronts(Child[i], paruMatInfo);
+            if (info != PARU_SUCCESS)
+            {
+                PRLEVEL(1, ("%% A problem happend in %ld\n", i));
+                //#pragma omp cancel taskgroup
+                // return info;
+            }
+        }
+#pragma omp taskwait
+        info = paru_front(f, paruMatInfo);
+        if (info != PARU_SUCCESS)
+        {
+            PRLEVEL(1, ("%% A problem happend in %ld\n", f));
+            //#pragma omp cancel taskgroup
+            // return info;
+        }
+        //#pragma omp cancellation point taskgroup
     }
-    #pragma omp cancellation point taskgroup
     return PARU_SUCCESS;
 }
+
 ParU_ResultCode paru_factorize(cholmod_sparse *A, paru_symbolic *LUsym,
-        paru_matrix **paruMatInfo_handle)
+                               paru_matrix **paruMatInfo_handle)
 {
     DEBUGLEVEL(1);
     double my_start_time = omp_get_wtime();
@@ -96,19 +110,22 @@ ParU_ResultCode paru_factorize(cholmod_sparse *A, paru_symbolic *LUsym,
 
     Int nf = paruMatInfo->LUsym->nf;
 
-    Int *Parent =  LUsym->Parent;
-    // TODO my plan is to make do_fronts a task parallel region
-    #pragma omp parallel shared(paruMatInfo)
+    Int *Parent = LUsym->Parent;
+// TODO my plan is to make do_fronts a task parallel region
+#pragma omp parallel shared(paruMatInfo)
     for (Int i = 0; i < nf; i++)
     {
-        #pragma omp single
+#pragma omp single
         if (Parent[i] == -1)
         {
+            //#pragma omp taskgroup
+            //#pragma omp task shared(paruMatInfo) private(info)
             info = paru_do_fronts(i, paruMatInfo);
             if (info != PARU_SUCCESS)
             {
                 PRLEVEL(1, ("%% A problem happend in %ld\n", i));
-                //return info;
+                //#pragma omp cancel taskgroup
+                // return info;
             }
         }
     }
