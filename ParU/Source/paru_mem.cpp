@@ -52,6 +52,7 @@ void *paru_alloc(size_t n, size_t size)
 //  Wrapper around calloc routine
 //
 //  Uses a pointer to the calloc routine.
+//  TODO consider making it parallel
 void *paru_calloc(size_t n, size_t size)
 {
     DEBUGLEVEL(0);
@@ -93,11 +94,11 @@ void *paru_calloc(size_t n, size_t size)
 //  Wrapper around realloc routine
 //
 //  Uses a pointer to the realloc routine.
-void *paru_realloc(
-    size_t newsize,     // requested size
-    size_t size_Entry,  // size of each Entry
-    void *oldP,         // pointer to the old allocated space
-    size_t *size)       // a single number, input: old size, output: new size
+void *
+paru_realloc(size_t newsize,    // requested size
+             size_t size_Entry, // size of each Entry
+             void *oldP,        // pointer to the old allocated space
+             size_t *size) // a single number, input: old size, output: new size
 {
     DEBUGLEVEL(0);
 #ifndef NDEBUG
@@ -110,7 +111,7 @@ void *paru_realloc(
         return NULL;
     }
     else if (oldP == NULL)
-    {  // A new alloc
+    { // A new alloc
         p = SuiteSparse_malloc(newsize, size_Entry);
         *size = (p == NULL) ? 0 : newsize * size_Entry;
     }
@@ -127,7 +128,7 @@ void *paru_realloc(
     }
 
     else
-    {  // The object exists, and is changing to some other nonzero size.
+    { // The object exists, and is changing to some other nonzero size.
         PRLEVEL(1, ("realloc : %ld to %ld, %ld\n", *size, newsize, size_Entry));
         int ok = TRUE;
         p = SuiteSparse_realloc(newsize, *size, size_Entry, oldP, &ok);
@@ -168,14 +169,14 @@ void paru_free(size_t n, size_t size, void *p)
 //  Global replacement of new and delete
 //
 void *operator new(size_t size)
-{  // no inline, required by [replacement.functions]/3
+{ // no inline, required by [replacement.functions]/3
     DEBUGLEVEL(0);
     static Int cpp_count = 0;
     cpp_count += size;
 
     PRLEVEL(1, ("global op new called, size = %zu tot=%ld\n", size, cpp_count));
     if (size == 0)
-        ++size;  // avoid malloc(0) which may return nullptr on success
+        ++size; // avoid malloc(0) which may return nullptr on success
 
     if (void *ptr = paru_alloc(1, size)) return ptr;
     throw std::bad_alloc{};
@@ -235,7 +236,7 @@ void paru_freesym(paru_symbolic **LUsym_handle)
     paru_free(nf + 1, sizeof(double), LUsym->front_flop_bound);
     paru_free(nf + 1, sizeof(double), LUsym->stree_flop_bound);
 
-    Int ms = m - n1;  // submatrix is msxns
+    Int ms = m - n1; // submatrix is msxns
 
     paru_free(ms + nf, sizeof(Int), LUsym->aParent);
     paru_free(ms + nf + 1, sizeof(Int), LUsym->aChild);
@@ -276,7 +277,7 @@ void paru_freemat(paru_matrix **paruMatInfo_handle)
     paru_matrix *paruMatInfo;
     paruMatInfo = *paruMatInfo_handle;
 
-    Int m = paruMatInfo->m;  // m and n is different than LUsym
+    Int m = paruMatInfo->m; // m and n is different than LUsym
     // Int n = paruMatInfo->n;       // Here there are submatrix size
 
     tupleList *RowList = paruMatInfo->RowList;
@@ -298,21 +299,21 @@ void paru_freemat(paru_matrix **paruMatInfo_handle)
     PRLEVEL(1, ("%% LUsym = %p\n", LUsym));
     PRLEVEL(1, ("%% freeing initialized elements:\n"));
     for (Int i = 0; i < m; i++)
-    {  // freeing all row elements
+    { // freeing all row elements
         if (LUsym == NULL)
         {
             printf("Probably LUsym has been freed before! Wrong usage\n");
             return;
         }
-        Int e = LUsym->row2atree[i];  // element number in augmented tree
+        Int e = LUsym->row2atree[i]; // element number in augmented tree
         PRLEVEL(1, ("%% e =%ld\t", e));
         paru_free_el(e, elementList);
     }
 
     PRLEVEL(1, ("\n%% freeing CB elements:\n"));
     for (Int i = 0; i < nf; i++)
-    {                                   // freeing all other elements
-        Int e = LUsym->super2atree[i];  // element number in augmented tree
+    {                                  // freeing all other elements
+        Int e = LUsym->super2atree[i]; // element number in augmented tree
         paru_free_el(e, elementList);
     }
 
@@ -403,4 +404,3 @@ void paru_freemat(paru_matrix **paruMatInfo_handle)
     paru_free(1, sizeof(paru_matrix), paruMatInfo);
     *paruMatInfo_handle = NULL;
 }
-

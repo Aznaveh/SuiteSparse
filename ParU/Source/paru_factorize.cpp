@@ -9,23 +9,23 @@
  * */
 
 #include "paru_internal.hpp"
-#define TASK_FL_THRESHOLD 1024*1024*1024
+#define TASK_FL_THRESHOLD 1024 * 1024
 
 ParU_ResultCode paru_do_fronts(Int f, paru_matrix *paruMatInfo)
-// This routine call paru_front from first(f)...f including f
-// I use this routine to call it recursively
+    // This routine call paru_front from first(f)...f including f
+    // This routine is called recursively to make tasks
 {
     DEBUGLEVEL(1);
     paru_symbolic *LUsym = paruMatInfo->LUsym;
     ParU_ResultCode info;
 
-    //double *front_flop_bound = LUsym->front_flop_bound;
+    // double *front_flop_bound = LUsym->front_flop_bound;
     double *stree_flop_bound = LUsym->stree_flop_bound;
 
     if (stree_flop_bound[f] < TASK_FL_THRESHOLD)
     {
         Int *first = LUsym->first;
-        PRLEVEL(1, ("%% Sequential %ld - %ld is small\n",first[f], f));
+        PRLEVEL(1, ("%% Sequential %ld - %ld is small\n", first[f], f));
         ASSERT(first[f] >= 0);
         for (Int i = first[f]; i <= f; i++)
         {
@@ -43,12 +43,12 @@ ParU_ResultCode paru_do_fronts(Int f, paru_matrix *paruMatInfo)
         Int *Childp = LUsym->Childp;
         Int *Child = LUsym->Child;
 
-        PRLEVEL(1, ("%% tasks are generating for children of %ld\n",f));
-        if (Childp[f + 1]- Childp[f] > 100)
-            printf ("%% lots of children here\n");
+        PRLEVEL(1, ("%% tasks are generating for children of %ld\n", f));
+        if (Childp[f + 1] - Childp[f] > 100)
+            printf("%% lots of children here\n");
         for (Int i = Childp[f]; i <= Childp[f + 1] - 1; i++)
         {
-#pragma omp task shared(paruMatInfo) private(info)
+            #pragma omp task shared(paruMatInfo) private(info)
             info = paru_do_fronts(Child[i], paruMatInfo);
             if (info != PARU_SUCCESS)
             {
@@ -57,7 +57,7 @@ ParU_ResultCode paru_do_fronts(Int f, paru_matrix *paruMatInfo)
                 // return info;
             }
         }
-#pragma omp taskwait
+        #pragma omp taskwait
         info = paru_front(f, paruMatInfo);
         if (info != PARU_SUCCESS)
         {
@@ -65,15 +65,14 @@ ParU_ResultCode paru_do_fronts(Int f, paru_matrix *paruMatInfo)
             //#pragma omp cancel taskgroup
             // return info;
         }
-        //#pragma omp cancellation point taskgroup
     }
     return PARU_SUCCESS;
 }
 
 ParU_ResultCode paru_factorize(cholmod_sparse *A, paru_symbolic *LUsym,
-                               paru_matrix **paruMatInfo_handle)
+        paru_matrix **paruMatInfo_handle)
 {
-    DEBUGLEVEL(1);
+    DEBUGLEVEL(0);
     double my_start_time = omp_get_wtime();
     if (A == NULL)
     {
@@ -111,15 +110,15 @@ ParU_ResultCode paru_factorize(cholmod_sparse *A, paru_symbolic *LUsym,
     Int nf = paruMatInfo->LUsym->nf;
 
     Int *Parent = LUsym->Parent;
-// TODO my plan is to make do_fronts a task parallel region
-#pragma omp parallel shared(paruMatInfo)
+    // do_fronts generate a task parallel region
+    #pragma omp parallel shared(paruMatInfo)
     for (Int i = 0; i < nf; i++)
     {
-#pragma omp single
+        #pragma omp single nowait
         if (Parent[i] == -1)
         {
-            //#pragma omp taskgroup
-            //#pragma omp task shared(paruMatInfo) private(info)
+            #pragma omp task default(none) shared(paruMatInfo) private(info)\
+            firstprivate(i)
             info = paru_do_fronts(i, paruMatInfo);
             if (info != PARU_SUCCESS)
             {
@@ -130,7 +129,7 @@ ParU_ResultCode paru_factorize(cholmod_sparse *A, paru_symbolic *LUsym,
         }
     }
 
-    //// This code can work in a sequential case
+    //// The following code can be substituted in a sequential case
     // for (Int i = 0; i < nf; i++)
     // {
     //     PRLEVEL(1, ("%% Wroking on front %ld\n", i));

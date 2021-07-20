@@ -3,9 +3,9 @@ index = ssget ;
 f = find (index.nrows == index.ncols & ...
 index.sprank == index.ncols & ...
 index.sprank == index.nrows & ...
-index.isReal & ~index.isGraph);
+index.isReal & ~index.isGraph & ...
+index.numerical_symmetry <= .9 ) ;
 %~index.posdef & ...
-%index.numerical_symmetry <= .9 ) ;
 %index.pattern_symmetry <= .6 ) ;
 
 [ignore, i] = sort (index.nnz (f) + index.nzero (f)) ;
@@ -75,7 +75,7 @@ for k = 1:nmat
         id == 138 ||  id == 137 || id == 111 || id == 110 || id == 112 ||...  %smaller singular
         id == 1186 ||  id == 91 || id == 92 || id == 139 || id == 140 ||...  %smaller singular
         id == 22 ||  id == 250 || id == 105 || id == 135 || id == 104 ||...  %smaller singular
-        id == 120||  id == 1185 || id == 1380 || id == 1303 || id == 104 ||...  %smaller singular
+        id == 120||  id == 1185 || id == 1380 || id == 1303 || id == 1891||...  %smaller singular
         id == 2267 || id == 2649 || id == 2847 || id == 2337 || id == 2841)  
         continue;
     end
