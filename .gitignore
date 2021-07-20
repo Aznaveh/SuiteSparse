@@ -121,6 +121,8 @@ ParU/Demo/Res/*
 ParU/Demo/valgrindlogfile.log"
 ParU/Demo/analysis.txt
 ParU/Demo/callgrind.out.*
+ParU/Demo/x_*
+ParU/Demo/TODOLIST
 ParU/Matrix/ParUTst/*
 
 ssget/MM
