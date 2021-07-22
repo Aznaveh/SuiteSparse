@@ -117,22 +117,31 @@ ParU_ResultCode paru_factorize(cholmod_sparse *A, paru_symbolic *LUsym,
 
     Int *Parent = LUsym->Parent;
     // do_fronts generate a task parallel region
-    #pragma omp parallel shared(paruMatInfo)
+    #pragma omp taskgroup 
     for (Int i = 0; i < nf; i++)
     {
         #pragma omp single nowait
         if (Parent[i] == -1)
         {
-            #pragma omp task default(none) shared(paruMatInfo) private(info)   \
+            #pragma omp task default(none) shared(paruMatInfo, info)           \
             firstprivate(i)
-            info = paru_do_fronts(i, paruMatInfo);
-            if (info != PARU_SUCCESS)
             {
-                PRLEVEL(1, ("%% A problem happend in %ld\n", i));
-                //#pragma omp cancel taskgroup
-                // return info;
+                ParU_ResultCode myInfo = paru_do_fronts(i, paruMatInfo);
+                if (myInfo != PARU_SUCCESS)
+                {
+                    PRLEVEL(1, ("%% A problem happend in %ld\n", i));
+                    info = myInfo;
+                    #pragma omp cancel taskgroup
+                    // return info;
+                }
             }
         }
+    }
+
+    if (info != PARU_SUCCESS)
+    {
+        PRLEVEL(1, ("%% factorization has some problem\n"));
+        return info;
     }
 
     //// The following code can be substituted in a sequential case
