@@ -22,6 +22,7 @@ ParU_ResultCode paru_do_fronts(Int f, paru_matrix *paruMatInfo)
     // double *front_flop_bound = LUsym->front_flop_bound;
     double *stree_flop_bound = LUsym->stree_flop_bound;
 
+    info = PARU_SUCCESS;
     if (stree_flop_bound[f] < TASK_FL_THRESHOLD)
     {
         Int *first = LUsym->first;
@@ -46,27 +47,32 @@ ParU_ResultCode paru_do_fronts(Int f, paru_matrix *paruMatInfo)
         PRLEVEL(1, ("%% tasks are generating for children of %ld\n", f));
         if (Childp[f + 1] - Childp[f] > 100)
             printf("%% lots of children here\n");
+        #pragma omp taskgroup
         for (Int i = Childp[f]; i <= Childp[f + 1] - 1; i++)
         {
-            #pragma omp task shared(paruMatInfo) private(info)
-            info = paru_do_fronts(Child[i], paruMatInfo);
-            if (info != PARU_SUCCESS)
+            #pragma omp task default(none) shared(paruMatInfo, Child, info)    \
+            firstprivate(i)
             {
-                PRLEVEL(1, ("%% A problem happend in %ld\n", i));
-                //#pragma omp cancel taskgroup
-                // return info;
+                ParU_ResultCode myInfo = paru_do_fronts(Child[i], paruMatInfo);
+                if (myInfo != PARU_SUCCESS)
+                {
+                    PRLEVEL(1, ("%% A problem happend in %ld\n", i));
+                    info = myInfo;
+                    #pragma omp cancel taskgroup
+                    // return info;
+                }
             }
         }
-        #pragma omp taskwait
+        // I could also use it but it doesnt work with cancel
+        //#pragma omp taskwait
         info = paru_front(f, paruMatInfo);
         if (info != PARU_SUCCESS)
         {
             PRLEVEL(1, ("%% A problem happend in %ld\n", f));
-            //#pragma omp cancel taskgroup
             // return info;
         }
     }
-    return PARU_SUCCESS;
+    return info;
 }
 
 ParU_ResultCode paru_factorize(cholmod_sparse *A, paru_symbolic *LUsym,
@@ -117,7 +123,7 @@ ParU_ResultCode paru_factorize(cholmod_sparse *A, paru_symbolic *LUsym,
         #pragma omp single nowait
         if (Parent[i] == -1)
         {
-            #pragma omp task default(none) shared(paruMatInfo) private(info)\
+            #pragma omp task default(none) shared(paruMatInfo) private(info)   \
             firstprivate(i)
             info = paru_do_fronts(i, paruMatInfo);
             if (info != PARU_SUCCESS)
