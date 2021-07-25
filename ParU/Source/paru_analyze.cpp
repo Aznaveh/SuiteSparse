@@ -71,6 +71,12 @@ paru_symbolic *paru_analyze(
     Int m = A->nrow;
     Int n = A->ncol;
 
+    if ( m != n)
+    {
+        printf("Input matrix is not square!\n");
+        return NULL;
+    }
+
     // Initializaing pointers with NULL; just in case for an early exit
     // not to free an uninitialized space
     LUsym->Chain_start = LUsym->Chain_maxrows = LUsym->Chain_maxcols = NULL;
