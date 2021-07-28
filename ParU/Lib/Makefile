@@ -70,6 +70,7 @@ OBJ = \
 	paru_bin_search.o\
 	paru_assemble.o\
 	paru_prior_assemble.o \
+	paru_perm.o \
 	paru_full_summed.o \
 
 $(OBJ): $(INC)
@@ -186,6 +187,9 @@ paru_prior_assemble.o:  ../Source/paru_prior_assemble.cpp
 	$(C) -c $<
 
 paru_assemble.o: ../Source/paru_assemble.cpp
+	$(C) -c $<
+
+paru_perm.o: ../Source/paru_perm.cpp
 	$(C) -c $<
 
 paru_full_summed.o: ../Source/paru_full_summed.cpp
