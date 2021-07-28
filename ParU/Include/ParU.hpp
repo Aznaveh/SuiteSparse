@@ -69,13 +69,12 @@ typedef struct
     Int *Qfill;  // size n, fill-reducing column permutation.
     // Qfill [k] = j if column k of A is column j of S.
 
-    Int *Pinv;  // size m, inverse row permutation that places
-    // S=A(P,Q) in increasing order of leftmost column
-    // index.  Pinv [i] = k if row i of A is row k of S.
-
     Int *Pinit;  // size m, row permutation.
     // UMFPACK computes it and I compute Pinv out of it.
     // I need it in several places so I decided to keep it
+
+    Int *Pfin; // size m, row permutation.
+    //ParU final permutation. Look paru_perm for more details
 
     Int *Sleft;  // size n-n1+2.  The list of rows of S whose
     // leftmost column index is j is given by

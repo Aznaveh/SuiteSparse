@@ -50,8 +50,8 @@
  * */
 #include "paru_internal.hpp"
 paru_symbolic *paru_analyze(
-    // inputs, not modified
-    cholmod_sparse *A)
+        // inputs, not modified
+        cholmod_sparse *A)
 {
     DEBUGLEVEL(0);
     double my_start_time = omp_get_wtime();
@@ -81,7 +81,7 @@ paru_symbolic *paru_analyze(
     // not to free an uninitialized space
     LUsym->Chain_start = LUsym->Chain_maxrows = LUsym->Chain_maxcols = NULL;
     LUsym->Parent = LUsym->Super = LUsym->Child = LUsym->Childp = NULL;
-    LUsym->Qfill = LUsym->Pinv = LUsym->Pinit = NULL;
+    LUsym->Qfill =  LUsym->Pfin = LUsym->Pinit = NULL;
     LUsym->Sp = LUsym->Sj = LUsym->Sleft = NULL;
     LUsym->Sx = NULL;
     LUsym->Fm = LUsym->Cm = LUsym->Rj = LUsym->Rp = NULL;
@@ -204,11 +204,11 @@ paru_symbolic *paru_analyze(
     // and NULL otherwise
 
     double status,          // Info [UMFPACK_STATUS]
-        Info[UMFPACK_INFO], // Contains statistics about the symbolic analysis
+           Info[UMFPACK_INFO], // Contains statistics about the symbolic analysis
 
-        Control[UMFPACK_CONTROL]; // it is set in umfpack_dl_defaults and
-                                  // is used in umfpack_dl_symbolic; if
-                                  // passed NULL it will use the defaults
+           Control[UMFPACK_CONTROL]; // it is set in umfpack_dl_defaults and
+    // is used in umfpack_dl_symbolic; if
+    // passed NULL it will use the defaults
 
     /* ---------------------------------------------------------------------- */
     /*    Setting up umfpakc symbolic analysis and do the  analysis phase     */
@@ -237,12 +237,12 @@ paru_symbolic *paru_analyze(
 
     void *SW;
     status = umfpack_dl_azn_symbolic(m, n, Ap, Ai, Ax,
-                                     NULL,  // user provided ordering
-                                     FALSE, // No user ordering
-                                     NULL,  // user params
-                                     &Symbolic,
-                                     &SW, // new in/out
-                                     Control, Info);
+            NULL,  // user provided ordering
+            FALSE, // No user ordering
+            NULL,  // user params
+            &Symbolic,
+            &SW, // new in/out
+            Control, Info);
 
     if (status < 0)
     {
@@ -351,8 +351,8 @@ paru_symbolic *paru_analyze(
     Int *newParent = (Int *)paru_alloc((n + 1), sizeof(Int));
 
     if (!Pinit || !Qinit || !Front_npivcol || !Front_parent || !Chain_start ||
-        !Chain_maxrows || !Chain_maxcols || !newParent || !Front_1strow ||
-        !Front_leftmostdesc || !fmap)
+            !Chain_maxrows || !Chain_maxcols || !newParent || !Front_1strow ||
+            !Front_leftmostdesc || !fmap)
     {
         paru_free((m + 1), sizeof(Int), Pinit);
         paru_free((n + 1), sizeof(Int), Qinit);
@@ -377,9 +377,9 @@ paru_symbolic *paru_analyze(
     }
 
     status = umfpack_dl_get_symbolic(
-        &nr, &nc, &n1, &anz, &nfr, &nchains, Pinit, Qinit, Front_npivcol,
-        Front_parent, Front_1strow, Front_leftmostdesc, Chain_start,
-        Chain_maxrows, Chain_maxcols, Symbolic);
+            &nr, &nc, &n1, &anz, &nfr, &nchains, Pinit, Qinit, Front_npivcol,
+            Front_parent, Front_1strow, Front_leftmostdesc, Chain_start,
+            Chain_maxrows, Chain_maxcols, Symbolic);
     if (status < 0)
     {
         printf("symbolic factorization invalid");
@@ -554,7 +554,7 @@ paru_symbolic *paru_analyze(
         PRLEVEL(p, ("%%size of Potential pivot= %ld\n",
                     Super[Parent[repr] + 1] - Super[f]));
         while (Super[Parent[repr] + 1] - Super[f] < threshold &&
-               Parent[repr] != -1)
+                Parent[repr] != -1)
         {
             repr = Parent[repr];
             PRLEVEL(p, ("%%Middle stage f= %ld repr = %ld\n", f, repr));
@@ -805,7 +805,7 @@ paru_symbolic *paru_analyze(
 
     Int *Sp = LUsym->Sp = (Int *)paru_calloc(m + 1 - n1, sizeof(Int));
     Int *Sleft = LUsym->Sleft = (Int *)paru_alloc(n + 2 - n1, sizeof(Int));
-    Int *Pinv = LUsym->Pinv = (Int *)paru_alloc(m + 1, sizeof(Int));
+    Int *Pinv = (Int *)paru_alloc(m + 1, sizeof(Int));
 
     if (Sp == NULL || Sleft == NULL || Pinv == NULL)
     {
@@ -817,6 +817,7 @@ paru_symbolic *paru_analyze(
         paru_freesym(&LUsym);
         // umfpack_dl_azn_free_sw (&SW);
 
+        paru_free(m, sizeof(Int), Pinv);
         return NULL;
     }
 
@@ -851,6 +852,7 @@ paru_symbolic *paru_analyze(
         paru_free((m + 1), sizeof(Int), Pinit);
         paru_free((MAX(m, n) + 2), sizeof(Int), Work);
 
+        paru_free(m, sizeof(Int), Pinv);
         // umfpack_dl_azn_free_sw (&SW);
         paru_freesym(&LUsym);
         return NULL;
@@ -922,6 +924,7 @@ paru_symbolic *paru_analyze(
         paru_free((m + 1), sizeof(Int), Pinit);
         paru_free((MAX(m, n) + 2), sizeof(Int), Work);
 
+        paru_free(m, sizeof(Int), Pinv);
         paru_freesym(&LUsym);
         // umfpack_dl_azn_free_sw (&SW);
         return NULL; // Free memory
@@ -992,6 +995,7 @@ paru_symbolic *paru_analyze(
     if (Sj == NULL || Sx == NULL)
     {
         printf("memory problem");
+        paru_free(m, sizeof(Int), Pinv);
         paru_freesym(&LUsym);
         // umfpack_dl_azn_free_sw (&SW);
         return NULL;
@@ -1090,10 +1094,11 @@ paru_symbolic *paru_analyze(
         (double *)paru_calloc(nf + 1, sizeof(double));
 
     if (aParent == NULL || aChild == NULL || aChildp == NULL || rM == NULL ||
-        snM == NULL || first == NULL || front_flop_bound == NULL ||
-        stree_flop_bound == NULL)
+            snM == NULL || first == NULL || front_flop_bound == NULL ||
+            stree_flop_bound == NULL)
     {
         printf("Out of memory in symbolic phase");
+        paru_free(m, sizeof(Int), Pinv);
         paru_freesym(&LUsym);
         return NULL;
     }
@@ -1108,7 +1113,7 @@ paru_symbolic *paru_analyze(
 
     aChildp[0] = 0;
     Int offset = 0; // number of rows visited in each iteration orig front+
-                    // rows
+    // rows
     Int lastChildFlag = 0;
     Int childpointer = 0;
 
@@ -1184,7 +1189,7 @@ paru_symbolic *paru_analyze(
         ASSERT(aChildp[offset] == -1);
         aChildp[offset] = aChildp[offset - 1] + numRow + numoforiginalChild;
         PRLEVEL(
-            1, ("\n %% f=%ld numoforiginalChild=%ld\n", f, numoforiginalChild));
+                1, ("\n %% f=%ld numoforiginalChild=%ld\n", f, numoforiginalChild));
 
         if (Parent[f] == f + 1)
         { // last child due to staircase
@@ -1257,5 +1262,6 @@ paru_symbolic *paru_analyze(
 
 #endif
     LUsym->my_time = omp_get_wtime() - my_start_time;
+    paru_free(m, sizeof(Int), Pinv);
     return (LUsym);
 }

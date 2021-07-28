@@ -17,7 +17,6 @@ void paru_write(paru_matrix *paruMatInfo, int scale, char *id)
     Int n = LUsym->n;
     Int n1 = LUsym->n1;  // row+col singletons
 
-    // Int *Pinv =  LUsym->Pinv;
     Int *Qfill = LUsym->Qfill;
 
     paru_fac *LUs = paruMatInfo->partial_LUs;
@@ -78,6 +77,16 @@ void paru_write(paru_matrix *paruMatInfo, int scale, char *id)
         paru_free(m, sizeof(Int), newRofS);
         return;
     }
+
+ //   I have this transition   A ---> S ---> LU
+ //   Mostly in the code I have rows of S. 
+ //   It is why I compute oldRofS and newRofS
+ //              oldRofS
+ //             -------->   
+ //           S           LU
+ //             <-------  
+ //              newRofS
+ //
 
     {
         FILE *rowfptr;
