@@ -9,13 +9,10 @@
  */
 
 #include "paru_internal.hpp"
-#define TOLER 0.1 // pivot tolerance
+#define TOLER 0.1  // pivot tolerance
 
-extern "C" void dgetrf_(BLAS_INT *dim1, BLAS_INT *dim2, double *a,
-                        BLAS_INT *lda, BLAS_INT *ipiv, BLAS_INT *info);
-// dger is already defined in ~/SuiteSparse/CHOLMOD/Include/cholmod_blas.h
-
-template <class T> void inline swap(T &a, T &b)
+template <class T>
+void inline swap(T &a, T &b)
 {
     T c(a);
     a = b;
@@ -41,7 +38,7 @@ Int paru_panel_factorize(Int f, Int m, Int n, const Int panel_width,
     PRLEVEL(1, ("%% Inside panel factorization %ld \n", panel_num));
 
     Int *row_degree_bound = paruMatInfo->row_degree_bound;
-    Int j1 = panel_num * panel_width; // panel starting column
+    Int j1 = panel_num * panel_width;  // panel starting column
 
     //  j1 <= panel columns < j2
     //     last panel might be smaller
@@ -56,7 +53,7 @@ Int paru_panel_factorize(Int f, Int m, Int n, const Int panel_width,
     paru_fac *LUs = paruMatInfo->partial_LUs;
     double *F = LUs[f].p;
 
-#ifndef NDEBUG // Printing the panel
+#ifndef NDEBUG  // Printing the panel
     Int num_col_panel = j2 - j1;
     Int p = 1;
     PRLEVEL(p, ("%% Starting the factorization\n"));
@@ -93,7 +90,7 @@ Int paru_panel_factorize(Int f, Int m, Int n, const Int panel_width,
 
         Int origCol = Qfill ? Qfill[j + col1] : j + col1;
         Int row_diag = (origCol == Pinit[frowList[j]]) ? j : -1;
-        double diag_val = maxval; // initialization
+        double diag_val = maxval;  // initialization
         PRLEVEL(1, ("%%curCol=%ld origCol= %ld row_diag=%ld\n", j + col1,
                     origCol, row_diag));
 
@@ -158,7 +155,7 @@ Int paru_panel_factorize(Int f, Int m, Int n, const Int panel_width,
             for (Int i = j; i < row_end; i++)
                 if (fabs(TOLER * maxval) < fabs(F[j * m + i]) &&
                     row_degree_bound[frowList[i]] < row_deg_sp)
-                { // numerically acceptalbe and sparser
+                {  // numerically acceptalbe and sparser
                     piv = F[j * m + i];
                     row_deg_sp = row_degree_bound[frowList[i]];
                     row_sp = i;
@@ -172,7 +169,7 @@ Int paru_panel_factorize(Int f, Int m, Int n, const Int panel_width,
         PRLEVEL(1, ("%% Swaping rows j=%ld, row_piv=%ld\n", j, row_piv));
         swap_rows(F, frowList, m, n, j, row_piv);
 
-#ifndef NDEBUG // Printing the pivotal front
+#ifndef NDEBUG  // Printing the pivotal front
         p = 1;
         if (row_piv != row_max) PRLEVEL(p, ("%% \n"));
         PRLEVEL(p, ("%% After Swaping\n"));
@@ -242,7 +239,7 @@ Int paru_panel_factorize(Int f, Int m, Int n, const Int panel_width,
             double *A = F + j * m + j + m + 1;
             BLAS_INT lda = (BLAS_INT)m;
 
-#ifndef NDEBUG // Printing dger input
+#ifndef NDEBUG  // Printing dger input
             Int p = 1;
             PRLEVEL(p, ("%% lda =%d ", lda));
             PRLEVEL(p, ("%% M =%d ", M));
@@ -264,7 +261,7 @@ Int paru_panel_factorize(Int f, Int m, Int n, const Int panel_width,
 #endif
         }
 
-#ifndef NDEBUG // Printing the pivotal front
+#ifndef NDEBUG  // Printing the pivotal front
         Int p = 1;
         PRLEVEL(p, ("%% After dger\n"));
         for (Int r = j; r < row_end; r++)
@@ -299,7 +296,7 @@ Int paru_factorize_full_summed(Int f, Int start_fac,
     Int panel_width = paruMatInfo->panel_width;
     for (Int panel_num = 0;; panel_num++)
     {
-#ifndef NDEBUG // Printing the pivotal front
+#ifndef NDEBUG  // Printing the pivotal front
         Int *frowList = paruMatInfo->frowList[f];
         Int p = 1;
         PRLEVEL(p, ("%%Pivotal Front Before %ld\n", panel_num));
@@ -323,12 +320,12 @@ Int paru_factorize_full_summed(Int f, Int start_fac,
                              paruMatInfo);
 
         // This can be done parallel to the  next part
-        if (paruMatInfo->LUsym->Cm[f] != 0) // if there is potential column
-                                            // left
+        if (paruMatInfo->LUsym->Cm[f] != 0)  // if there is potential column
+                                             // left
             paru_update_rowDeg(panel_num, row_end, f, start_fac, stl_colSet,
                                pivotal_elements, paruMatInfo);
 
-        if (j2 >= fp) // if it is the last panel
+        if (j2 >= fp)  // if it is the last panel
             break;
 
         /*               trsm
@@ -443,7 +440,7 @@ Int paru_factorize_full_summed(Int f, Int start_fac,
             BLAS_INT lda = (BLAS_INT)rowCount;
             double *B = F + j2 * rowCount + j1;
             BLAS_INT ldb = (BLAS_INT)rowCount;
-            double beta = 1; // keep current values
+            double beta = 1;  // keep current values
             double *C = F + j2 * rowCount + j2;
             BLAS_INT ldc = (BLAS_INT)rowCount;
 #ifndef NDEBUG

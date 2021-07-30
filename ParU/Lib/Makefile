@@ -71,6 +71,7 @@ OBJ = \
 	paru_assemble.o\
 	paru_prior_assemble.o \
 	paru_perm.o \
+	paru_lsolve.o \
 	paru_full_summed.o \
 
 $(OBJ): $(INC)
@@ -190,6 +191,9 @@ paru_assemble.o: ../Source/paru_assemble.cpp
 	$(C) -c $<
 
 paru_perm.o: ../Source/paru_perm.cpp
+	$(C) -c $<
+
+paru_lsolve.o: ../Source/paru_lsolve.cpp
 	$(C) -c $<
 
 paru_full_summed.o: ../Source/paru_full_summed.cpp

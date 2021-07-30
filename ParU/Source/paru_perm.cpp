@@ -33,7 +33,7 @@
  * @author Aznaveh
  * */
 #include "paru_internal.hpp"
-void paru_perm(paru_matrix *paruMatInfo)
+void paru_perm (paru_matrix *paruMatInfo)
 {
     DEBUGLEVEL(1);
     paru_symbolic *LUsym = paruMatInfo->LUsym;
@@ -109,7 +109,12 @@ Int paru_apply_perm(const Int *p, const double *b, double *x, Int m)
     }
     PRLEVEL(1, (" \n"));
 #endif
-    for (Int k = 0; k < m; k++) x[p[k]] = b[k];
+    for (Int k = 0; k < m; k++)
+    {
+        Int j = p[k];  // k-new and j-old; P(new) = old
+        x[k] = b[j];
+        // x[j] = b[k];   // Pinv(old) = new
+    }
 
 #ifndef NDEBUG
     PRLEVEL(1, ("%% after applying permutaion x is:\n%%"));
@@ -126,25 +131,19 @@ Int paru_apply_inv_perm(const Int *p, const double *b, double *x, Int m)
     DEBUGLEVEL(1);
     if (!x || !b) return (0);
 #ifndef NDEBUG
-    PRLEVEL(1, ("%% before applying inverse permutaion x is:\n%%"));
+    PRLEVEL(1, ("%% before applying inverse permutaion b is:\n%%"));
     for (Int k = 0; k < m; k++)
     {
-        PRLEVEL(1, (" %.2lf, ", x[k]));
+        PRLEVEL(1, (" %.2lf, ", b[k]));
     }
     PRLEVEL(1, (" \n"));
-//    Int Pinv[m];
-//    for (Int k = 0; k < m; k++)
-//    {
-//
-//        Pinv[p[k]]=k;
-//    }
 #endif
 
     for (Int k = 0; k < m; k++)
     {
         Int j = p[k];  // k-new and j-old; P(new) = old
-        x[k] = b[j];
-        // ASSERT (x[Pinv[k]] == b[k]);
+        x[j] = b[k];   // Pinv(old) = new
+        // x[k] = b[j];
     }
 
 #ifndef NDEBUG

@@ -50,7 +50,7 @@ ParU_ResultCode paru_do_fronts(Int f, paru_matrix *paruMatInfo)
         //#pragma omp taskgroup
         for (Int i = Childp[f]; i <= Childp[f + 1] - 1; i++)
         {
-            //   #pragma omp task default(none) shared(paruMatInfo, Child, info)    \
+          //   #pragma omp task default(none) shared(paruMatInfo, Child, info)
          //   firstprivate(i)
             {
                 ParU_ResultCode myInfo = paru_do_fronts(Child[i], paruMatInfo);
@@ -155,14 +155,14 @@ ParU_ResultCode paru_factorize(cholmod_sparse *A, paru_symbolic *LUsym,
         }
     }
     //TODO: temporary to test perm
-    paru_perm (paruMatInfo);
-    Int m = LUsym->m;
-    double b[m];
-    double x[m];
-    for (Int i = 0; i < m; ++i)
-        b[i] = i+1;
-    paru_apply_perm(LUsym->Pfin, b, x, m);
-    paru_apply_inv_perm(LUsym->Pfin, x, b, m);
+    //paru_perm (paruMatInfo);
+    //Int m = LUsym->m;
+    //double b[m];
+    //double x[m];
+    //for (Int i = 0; i < m; ++i)
+    //    b[i] = i+1;
+    //paru_apply_perm(LUsym->Pfin, b, x, m);  // x = p (b)
+    //paru_apply_inv_perm(LUsym->Pfin, x, b, m); // b = pinv (x)
 
 
     paruMatInfo->my_time = omp_get_wtime() - my_start_time;
