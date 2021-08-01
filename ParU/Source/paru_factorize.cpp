@@ -155,13 +155,14 @@ ParU_ResultCode paru_factorize(cholmod_sparse *A, paru_symbolic *LUsym,
         }
     }
     //TODO: temporary to test perm
-    //paru_perm (paruMatInfo);
-    //Int m = LUsym->m;
-    //double b[m];
-    //double x[m];
-    //for (Int i = 0; i < m; ++i)
-    //    b[i] = i+1;
-    //paru_apply_perm(LUsym->Pfin, b, x, m);  // x = p (b)
+    paru_perm (paruMatInfo);
+    Int m = LUsym->m;
+    double b[m];
+    double x[m];
+    for (Int i = 0; i < m; ++i)
+        b[i] = i+1;
+    paru_apply_perm(LUsym->Pfin, b, x, m);  // x = p (b)
+    paru_lsolve(paruMatInfo, x);
     //paru_apply_inv_perm(LUsym->Pfin, x, b, m); // b = pinv (x)
 
 

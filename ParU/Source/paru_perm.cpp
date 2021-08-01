@@ -33,7 +33,7 @@
  * @author Aznaveh
  * */
 #include "paru_internal.hpp"
-void paru_perm (paru_matrix *paruMatInfo)
+void paru_perm(paru_matrix *paruMatInfo)
 {
     DEBUGLEVEL(1);
     paru_symbolic *LUsym = paruMatInfo->LUsym;
@@ -113,7 +113,6 @@ Int paru_apply_perm(const Int *p, const double *b, double *x, Int m)
     {
         Int j = p[k];  // k-new and j-old; P(new) = old
         x[k] = b[j];
-        // x[j] = b[k];   // Pinv(old) = new
     }
 
 #ifndef NDEBUG
@@ -143,7 +142,6 @@ Int paru_apply_inv_perm(const Int *p, const double *b, double *x, Int m)
     {
         Int j = p[k];  // k-new and j-old; P(new) = old
         x[j] = b[k];   // Pinv(old) = new
-        // x[k] = b[j];
     }
 
 #ifndef NDEBUG

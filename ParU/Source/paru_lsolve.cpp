@@ -10,13 +10,13 @@
  *       |*DTRSV*\|_________________________________|       c
  *       |******* |\         |                      |       c
  *       |        |****\     |       U2             |       x
- *       |   LU1  |********\ |______________________|       x DGEMV updates
+ *       |   LU1  |*DTRSV**\ |______________________|       x DGEMV updates
  *       |        |          |**\         |         |       x   here
  *       |        | LU2      |*****\      |   U3    |       x
- *       | DGEMV  |          |********\   |_________|       x
+ *       | DGEMV  |          |*DTRSV**\   |_________|       x
  *       |        |          |   LU3      |* LU4    |       x
- *       |        |          |            |****     |       x
- *       |        |          |            |******   |       x
+ *       |        | DGEMV    |  DGEMV     |****     |       x
+ *       |        |          |            |DTRSV*   |       x
  *       |________|__________|____________|_________|       x
  *
  *       This function just goes through LUs in the data structure and does a
@@ -32,15 +32,14 @@
 #include "paru_internal.hpp"
 Int paru_lsolve(paru_matrix *paruMatInfo, double *x)
 {
-    DEBUGLEVEL(0);
+    DEBUGLEVEL(1);
     // TODO check if input is read
     if (!x) return (0);
     paru_symbolic *LUsym = paruMatInfo->LUsym;
     Int nf = LUsym->nf;
 
-    //TODO singletons
+    // TODO singletons
     // Int n1 = LUsym->n1;  // row+col singletons
-
 
     paru_fac *LUs = paruMatInfo->partial_LUs;
     Int *Super = LUsym->Super;
@@ -57,21 +56,24 @@ Int paru_lsolve(paru_matrix *paruMatInfo, double *x)
         BLAS_INT N = (BLAS_INT)fp;
         BLAS_INT lda = (BLAS_INT)rowCount;
         BLAS_INT Incx = (BLAS_INT)1;
-        // TODO do the trsv
-        BLAS_DTRSV("L",  // UPLO lower triangular
-                   "N",  // TRANS A*X=b not the A**T
-                   "U",  // DIAG A is assumed to be unit traingular
-                   &N,    // N is order of the matrix A
-                   A,    // A
-                   &lda,  // LDA leading demension
-                   x,    // X
-                   &Incx);   // INCX the increment of elements of X.
+
+        PRLEVEL(1, ("%% Working on DTRSV\n"));
+        BLAS_DTRSV("L",     // UPLO lower triangular
+                   "N",     // TRANS A*X=b not the A**T
+                   "U",     // DIAG A is assumed to be unit traingular
+                   &N,      // N is order of the matrix A
+                   A,       // A
+                   &lda,    // LDA leading demension
+                   x,       // X
+                   &Incx);  // INCX the increment of elements of X.
+        PRLEVEL(1, ("%% DTRSV is just finished\n"));
 
         // TODO do dgemv
         // I am not calling BLAS_DGEMV
 
         for (Int i = fp; i < rowCount; i++)
         {
+            PRLEVEL(1, ("%% Working on DGEMV\n%%"));
             // computing the inner product
             double i_prod = 0.0;  // innter product
             for (Int j = col1; j < col2; j++)
@@ -83,5 +85,15 @@ Int paru_lsolve(paru_matrix *paruMatInfo, double *x)
             x[r] -= i_prod;
         }
     }
+
+#ifndef NDEBUG
+    Int m = LUsym->m;
+    PRLEVEL(1, ("%% after lusolve x is:\n%%"));
+    for (Int k = 0; k < m; k++)
+    {
+        PRLEVEL(1, (" %.2lf, ", x[k]));
+    }
+    PRLEVEL(1, (" \n"));
+#endif
     return (1);
 }
