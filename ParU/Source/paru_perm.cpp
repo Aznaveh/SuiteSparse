@@ -155,7 +155,7 @@ Int paru_apply_perm(const Int *p, const double *b, double *x, Int m)
 #endif
     return (1);
 }
-///////////////apply inve perm x = b(pinv) /////////////////////////////////////
+///////////////apply inverse perm x = b(pinv) //////////////////////////////////
 Int paru_apply_inv_perm(const Int *p, const double *b, double *x, Int m)
 {
     DEBUGLEVEL(1);
