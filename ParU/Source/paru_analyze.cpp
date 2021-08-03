@@ -81,7 +81,7 @@ paru_symbolic *paru_analyze(
     // not to free an uninitialized space
     LUsym->Chain_start = LUsym->Chain_maxrows = LUsym->Chain_maxcols = NULL;
     LUsym->Parent = LUsym->Super = LUsym->Child = LUsym->Childp = NULL;
-    LUsym->Qfill =  LUsym->Pfin = LUsym->Pinit = NULL;
+    LUsym->Qfill =  LUsym->Pfin = LUsym->Pinit = LUsym->Ps = NULL;
     LUsym->Sp = LUsym->Sj = LUsym->Sleft = NULL;
     LUsym->Sx = NULL;
     LUsym->Fm = LUsym->Cm = LUsym->Rj = LUsym->Rp = NULL;
@@ -483,7 +483,8 @@ paru_symbolic *paru_analyze(
     size_t size = n + 1;
     Int *Parent = (Int *)paru_realloc(nf + 1, sizeof(Int), Front_parent, &size);
     ASSERT(size <= (size_t)n + 1);
-    if (Parent == NULL)
+    //TODO: nf == 0 is a weird condintion I have to check
+    if (Parent == NULL || nf == 0) 
     { // should not happen anyway it is always shrinking
         printf("memory problem");
         // free memory
