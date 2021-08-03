@@ -73,6 +73,10 @@ typedef struct
     // UMFPACK computes it and I compute Pinv out of it.
     // I need it in several places so I decided to keep it
 
+    Int *Ps; // size m, row permutation.
+    //Permutation from S to LU. needed for lsolve and usolve 
+    //Look paru_perm for more details
+
     Int *Pfin; // size m, row permutation.
     //ParU final permutation. Look paru_perm for more details
 

@@ -223,5 +223,6 @@ Int paru_apply_inv_perm(const Int *p, const double *b, double *x, Int m);
 
 //lsolve and usolve
 Int paru_lsolve(paru_matrix *paruMatInfo, double *x);
+Int paru_usolve(paru_matrix *paruMatInfo, double *x);
 
 #endif

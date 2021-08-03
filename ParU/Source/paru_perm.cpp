@@ -16,11 +16,11 @@
  *
  *                          Pfin (COMPUTED HERE)
  *                    ------------------>
- *                      Pinit      oldRofS (paru_write)
+ *                      Pinit     Ps = (compute here) newRofS (paru_write)
  *                    --------> -------->
  *                   A         S           LU
  *                    <-------   <-------
- *         (paru_analyze)Pinv     newRofS (paru_write)
+ *         (paru_analyze)Pinv     oldRofS (paru_write)
  *
  *
  *  We need these permuataions for compuing Ax = b
@@ -52,20 +52,34 @@ void paru_perm(paru_matrix *paruMatInfo)
 
     // some working memory that is freed in this function
     Int *Pfin = NULL;
+    Int *Ps = NULL;
     Int *Pinit = LUsym->Pinit;
 
     LUsym->Pfin = Pfin = (Int *)paru_alloc(m, sizeof(Int));
+    LUsym->Ps = Ps = (Int *)paru_alloc(m, sizeof(Int));
 
-    if (Pfin == NULL)
+    PRLEVEL(1, ("%% Inside Perm\n"));
+    if (Pfin == NULL || Ps == NULL)
     {
-        printf("memory problem for writing into files\n");
+        printf("memory problem inside perm\n");
         return;
     }
 
+#ifndef NDEBUG
+    Int *oldRofS = (Int *)paru_alloc(m, sizeof(Int));
+    Int *newRofS = (Int *)paru_alloc(m, sizeof(Int));
+    if (oldRofS == NULL || newRofS == NULL)
+    {
+        printf("memory problem inside perm in debug mode\n");
+        return;
+    }
+#endif
+
     Int ip = 0;  // number of rows seen so far
-    for (Int k = 0; k < n1; k++)
-        // first singletons
-        Pfin[ip++] = Pinit[k];
+    // TODO: singletons shouldn't affect this.
+    // for (Int k = 0; k < n1; k++)
+    //    // first singletons
+    //    Pfin[ip++] = Pinit[k];
 
     for (Int f = 0; f < nf; f++)
     {  // rows for each front
@@ -77,10 +91,25 @@ void paru_perm(paru_matrix *paruMatInfo)
         for (Int k = 0; k < fp; k++)
         {
             // P[k] = i
+#ifndef NDEBUG
+            oldRofS[ip] = frowList[k];  // computing permutation for S
+#endif
+            Ps[frowList[k]] = ip;
             Pfin[ip++] = Pinit[frowList[k]];
         }
     }
+
 #ifndef NDEBUG
+    //-------- computing the direct permutation of S only for debug
+    for (Int k = 0; k < m - n1; k++)
+    {
+        // Inv permutation for S Pinv[i] = k;
+        newRofS[oldRofS[k]] = k;
+        ASSERT(Ps[oldRofS[k]] == newRofS[oldRofS[k]]);
+    }
+
+    paru_free(m, sizeof(Int), oldRofS);
+    paru_free(m, sizeof(Int), newRofS);
     PRLEVEL(1, ("%% Final row permutaion is:\n%%"));
     for (Int k = 0; k < m; k++)
     {
@@ -89,6 +118,7 @@ void paru_perm(paru_matrix *paruMatInfo)
     PRLEVEL(1, (" \n"));
 #endif
 }
+///////////////apply perm x = b(p) /////////////////////////////////////////////
 Int paru_apply_perm(const Int *p, const double *b, double *x, Int m)
 {
     DEBUGLEVEL(1);
@@ -125,11 +155,19 @@ Int paru_apply_perm(const Int *p, const double *b, double *x, Int m)
 #endif
     return (1);
 }
+///////////////apply inve perm x = b(pinv) /////////////////////////////////////
 Int paru_apply_inv_perm(const Int *p, const double *b, double *x, Int m)
 {
     DEBUGLEVEL(1);
     if (!x || !b) return (0);
 #ifndef NDEBUG
+    PRLEVEL(1, ("%% Inside apply inv permutaion p is:\n%%"));
+    for (Int k = 0; k < m; k++)
+    {
+        PRLEVEL(1, (" %ld, ", p[k]));
+    }
+    PRLEVEL(1, (" \n"));
+
     PRLEVEL(1, ("%% before applying inverse permutaion b is:\n%%"));
     for (Int k = 0; k < m; k++)
     {
@@ -148,7 +186,7 @@ Int paru_apply_inv_perm(const Int *p, const double *b, double *x, Int m)
     PRLEVEL(1, ("%% after applying inverse permutaion x is:\n%%"));
     for (Int k = 0; k < m; k++)
     {
-        PRLEVEL(1, (" %.2lf, ", x[k]));
+        PRLEVEL(1, (" %.8lf, ", x[k]));
     }
     PRLEVEL(1, (" \n"));
 #endif

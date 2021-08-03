@@ -163,7 +163,8 @@ ParU_ResultCode paru_factorize(cholmod_sparse *A, paru_symbolic *LUsym,
         b[i] = i+1;
     paru_apply_perm(LUsym->Pfin, b, x, m);  // x = p (b)
     paru_lsolve(paruMatInfo, x);
-    //paru_apply_inv_perm(LUsym->Pfin, x, b, m); // b = pinv (x)
+    paru_usolve(paruMatInfo, x);
+    paru_apply_inv_perm(LUsym->Pfin, x, b, m); // b = pinv (x)
 
 
     paruMatInfo->my_time = omp_get_wtime() - my_start_time;

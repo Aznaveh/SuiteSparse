@@ -80,7 +80,7 @@ Int paru_lsolve(paru_matrix *paruMatInfo, double *x)
             {
                 i_prod += A[(j - col1) * rowCount + i] * x[j];
             }
-            Int *p = LUsym->Pfin;  // row permutation
+            Int *p = LUsym->Ps;  // row permutation
             Int r = p[frowList[i]];
             x[r] -= i_prod;
         }
@@ -88,7 +88,7 @@ Int paru_lsolve(paru_matrix *paruMatInfo, double *x)
 
 #ifndef NDEBUG
     Int m = LUsym->m;
-    PRLEVEL(1, ("%% after lusolve x is:\n%%"));
+    PRLEVEL(1, ("%% after lsolve x is:\n%%"));
     for (Int k = 0; k < m; k++)
     {
         PRLEVEL(1, (" %.2lf, ", x[k]));

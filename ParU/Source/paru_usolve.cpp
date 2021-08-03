@@ -45,35 +45,38 @@ Int paru_usolve(paru_matrix *paruMatInfo, double *x)
     paru_fac *Us = paruMatInfo->partial_Us;
     Int *Super = LUsym->Super;
 
-    for (Int f = nf - 1; f >= nf; f++)
+    for (Int f = nf - 1; f >= 0; --f)
     {
-        Int rowCount = paruMatInfo->frowCount[f];
         Int *frowList = paruMatInfo->frowList[f];
+        Int *fcolList = paruMatInfo->fcolList[f];
         Int col1 = Super[f];
         Int col2 = Super[f + 1];
         Int fp = col2 - col1;
+        Int colCount = paruMatInfo->fcolCount[f];
 
         // TODO do dgemv
         // performed on Us
         // I am not calling BLAS_DGEMV
 
+        PRLEVEL(1, ("%% Usolve: Working on DGEMV\n%%"));
         double *A2 = Us[f].p;
         if (!A2)
         {
             for (Int i = 0; i < fp; i++)
             {
-                PRLEVEL(1, ("%% Working on DGEMV\n%%"));
                 // computing the inner product
                 double i_prod = 0.0;  // innter product
-                for (Int j = col1; j < col2; j++)
+                for (Int j = 0; j < colCount; j++)
                 {
-                    i_prod += A2[(j - col1) * rowCount + i] * x[j];
+                    i_prod += A2[fp * j + i] * x[ fcolList[j] ];
                 }
-                Int *p = LUsym->Pfin;  // row permutation
+                Int *p = LUsym->Ps;  // row permutation
                 Int r = p[frowList[i]];
                 x[r] -= i_prod;
             }
         }
+
+        Int rowCount = paruMatInfo->frowCount[f];
 
         double *A1 = LUs[f].p;
         BLAS_INT N = (BLAS_INT)fp;
@@ -81,7 +84,7 @@ Int paru_usolve(paru_matrix *paruMatInfo, double *x)
         BLAS_INT Incx = (BLAS_INT)1;
 
         // performed on LUs
-        PRLEVEL(1, ("%% Working on DTRSV\n"));
+        PRLEVEL(1, ("%% Usolve: Working on DTRSV\n"));
         BLAS_DTRSV("U",     // UPLO upper triangular
                    "N",     // TRANS A1*X=b not the A1**T
                    "N",     // DIAG A1 is assumed not to be unit traingular
@@ -95,7 +98,7 @@ Int paru_usolve(paru_matrix *paruMatInfo, double *x)
 
 #ifndef NDEBUG
     Int m = LUsym->m;
-    PRLEVEL(1, ("%% after lusolve x is:\n%%"));
+    PRLEVEL(1, ("%% after usolve x is:\n%%"));
     for (Int k = 0; k < m; k++)
     {
         PRLEVEL(1, (" %.2lf, ", x[k]));
