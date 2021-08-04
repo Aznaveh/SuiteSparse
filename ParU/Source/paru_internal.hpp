@@ -22,7 +22,7 @@
 #endif
 
 // for printing information uncomment this; to activate assertions uncomment
-#undef NPR    //<<1>>
+#undef NPR  //<<1>>
 
 // from spqr.hpp
 // Aznaveh For MATLAB OUTPUT UNCOMMENT HERE
@@ -215,17 +215,15 @@ void paru_make_heap_empty_el(Int f, std::vector<Int> &pivotal_elements,
 void paru_insert_hash(Int key, Int value, std::vector<Int> &colHash);
 Int paru_find_hash(Int key, std::vector<Int> &colHash, Int *fcolList);
 
-
-//permutation stuff for the solver
+// permutation stuff for the solver
 void paru_perm(paru_matrix *paruMatInfo);
-Int paru_apply_perm(const Int *p, const double *b, double *x, Int m);
-Int paru_apply_inv_perm(const Int *p, const double *b, double *x, Int m);
+Int paru_apply_perm(const Int *P, const double *b, double *x, Int m);
+Int paru_apply_inv_perm(const Int *P, const double *b, double *x, Int m);
 
-//lsolve and usolve
+// lsolve and usolve
 Int paru_lsolve(paru_matrix *paruMatInfo, double *x);
 Int paru_usolve(paru_matrix *paruMatInfo, double *x);
 
-
-Int paru_gaxpy (cholmod_sparse *A, const double *x, double *y);
+Int paru_gaxpy(cholmod_sparse *A, const double *x, double *y);
 
 #endif

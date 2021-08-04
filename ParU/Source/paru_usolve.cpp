@@ -58,20 +58,20 @@ Int paru_usolve(paru_matrix *paruMatInfo, double *x)
         // performed on Us
         // I am not calling BLAS_DGEMV
 
-        PRLEVEL(1, ("%% Usolve: Working on DGEMV\n%%"));
         double *A2 = Us[f].p;
-        if (!A2)
+        if (colCount != 0)
         {
             for (Int i = 0; i < fp; i++)
             {
+                PRLEVEL(1, ("%% Usolve: Working on DGEMV\n"));
                 // computing the inner product
                 double i_prod = 0.0;  // innter product
                 for (Int j = 0; j < colCount; j++)
                 {
-                    i_prod += A2[fp * j + i] * x[ fcolList[j] ];
+                    i_prod += A2[fp * j + i] * x[fcolList[j]];
                 }
-                Int *p = LUsym->Ps;  // row permutation
-                Int r = p[frowList[i]];
+                Int *Ps = LUsym->Ps;  // row permutation
+                Int r = Ps[frowList[i]];
                 x[r] -= i_prod;
             }
         }
@@ -82,6 +82,7 @@ Int paru_usolve(paru_matrix *paruMatInfo, double *x)
         BLAS_INT N = (BLAS_INT)fp;
         BLAS_INT lda = (BLAS_INT)rowCount;
         BLAS_INT Incx = (BLAS_INT)1;
+        double *X = x + col1;
 
         // performed on LUs
         PRLEVEL(1, ("%% Usolve: Working on DTRSV\n"));
@@ -91,7 +92,7 @@ Int paru_usolve(paru_matrix *paruMatInfo, double *x)
                    &N,      // N is order of the matrix A1
                    A1,      // A1
                    &lda,    // LDA leading demension
-                   x,       // X
+                   X,       // X
                    &Incx);  // INCX the increment of elements of X.
         PRLEVEL(1, ("%% DTRSV is just finished\n"));
     }

@@ -52,6 +52,7 @@ Int paru_lsolve(paru_matrix *paruMatInfo, double *x)
         Int col2 = Super[f + 1];
         Int fp = col2 - col1;
         double *A = LUs[f].p;
+        double *X = x + col1;
 
         BLAS_INT N = (BLAS_INT)fp;
         BLAS_INT lda = (BLAS_INT)rowCount;
@@ -64,9 +65,30 @@ Int paru_lsolve(paru_matrix *paruMatInfo, double *x)
                    &N,      // N is order of the matrix A
                    A,       // A
                    &lda,    // LDA leading demension
-                   x,       // X
+                   X,       // X
                    &Incx);  // INCX the increment of elements of X.
         PRLEVEL(1, ("%% DTRSV is just finished\n"));
+#ifndef NDEBUG
+        Int p = 1;
+        PRLEVEL(p, ("%% LUs:\n%%"));
+        for (Int r = 0; r < rowCount; r++)
+        {
+            PRLEVEL(p, ("%% %ld\t", frowList[r]));
+            for (Int c = col1; c < col2; c++)
+                PRLEVEL(p, (" %2.5lf\t", A[(c - col1) * rowCount + r]));
+            PRLEVEL(p, ("\n"));
+        }
+
+        PRLEVEL(1, ("%% lad = %d\n%%", lda));
+        PRLEVEL(1, ("%% during lsolve x [%ld-%ld)is:\n%%", col1, col2));
+        // for (Int k = col1; k < col2; k++)
+        Int m = LUsym->m;
+        for (Int k = 0; k < m; k++)
+        {
+            PRLEVEL(1, (" %.2lf, ", x[k]));
+        }
+        PRLEVEL(1, (" \n"));
+#endif
 
         // TODO do dgemv
         // I am not calling BLAS_DGEMV
@@ -80,8 +102,8 @@ Int paru_lsolve(paru_matrix *paruMatInfo, double *x)
             {
                 i_prod += A[(j - col1) * rowCount + i] * x[j];
             }
-            Int *p = LUsym->Ps;  // row permutation
-            Int r = p[frowList[i]];
+            Int *Ps = LUsym->Ps;  // row permutation
+            Int r = Ps[frowList[i]];
             x[r] -= i_prod;
         }
     }

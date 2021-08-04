@@ -10,7 +10,7 @@
  *   Row permutation happens from S to LU.
  *   Row permutation and inverse permutation is computed here
  *
- *                         ------p--->
+ *                         ------P--->
  *                         A         LU
  *                         <----q----
  *
@@ -24,7 +24,7 @@
  *
  *
  *  We need these permuataions for compuing Ax = b
- *        x = b (p)
+ *        x = b (P)
  *        x = L\x
  *        x = U\x
  *        b(q) = x
@@ -118,17 +118,17 @@ void paru_perm(paru_matrix *paruMatInfo)
     PRLEVEL(1, (" \n"));
 #endif
 }
-///////////////apply perm x = b(p) /////////////////////////////////////////////
-Int paru_apply_perm(const Int *p, const double *b, double *x, Int m)
+///////////////apply perm x = b(P) /////////////////////////////////////////////
+Int paru_apply_perm(const Int *P, const double *b, double *x, Int m)
 {
     DEBUGLEVEL(1);
     if (!x || !b) return (0);
 
 #ifndef NDEBUG
-    PRLEVEL(1, ("%% Inside apply permutaion p is:\n%%"));
+    PRLEVEL(1, ("%% Inside apply permutaion P is:\n%%"));
     for (Int k = 0; k < m; k++)
     {
-        PRLEVEL(1, (" %ld, ", p[k]));
+        PRLEVEL(1, (" %ld, ", P[k]));
     }
     PRLEVEL(1, (" \n"));
 
@@ -141,7 +141,7 @@ Int paru_apply_perm(const Int *p, const double *b, double *x, Int m)
 #endif
     for (Int k = 0; k < m; k++)
     {
-        Int j = p[k];  // k-new and j-old; P(new) = old
+        Int j = P[k];  // k-new and j-old; P(new) = old
         x[k] = b[j];
     }
 
@@ -156,15 +156,15 @@ Int paru_apply_perm(const Int *p, const double *b, double *x, Int m)
     return (1);
 }
 ///////////////apply inverse perm x = b(pinv) //////////////////////////////////
-Int paru_apply_inv_perm(const Int *p, const double *b, double *x, Int m)
+Int paru_apply_inv_perm(const Int *P, const double *b, double *x, Int m)
 {
     DEBUGLEVEL(1);
     if (!x || !b) return (0);
 #ifndef NDEBUG
-    PRLEVEL(1, ("%% Inside apply inv permutaion p is:\n%%"));
+    PRLEVEL(1, ("%% Inside apply inv permutaion P is:\n%%"));
     for (Int k = 0; k < m; k++)
     {
-        PRLEVEL(1, (" %ld, ", p[k]));
+        PRLEVEL(1, (" %ld, ", P[k]));
     }
     PRLEVEL(1, (" \n"));
 
@@ -178,7 +178,7 @@ Int paru_apply_inv_perm(const Int *p, const double *b, double *x, Int m)
 
     for (Int k = 0; k < m; k++)
     {
-        Int j = p[k];  // k-new and j-old; P(new) = old
+        Int j = P[k];  // k-new and j-old; P(new) = old
         x[j] = b[k];   // Pinv(old) = new
     }
 
