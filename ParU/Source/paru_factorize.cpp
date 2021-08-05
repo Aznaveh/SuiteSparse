@@ -170,8 +170,8 @@ ParU_ResultCode paru_factorize(cholmod_sparse *A, paru_symbolic *LUsym,
     paru_gaxpy(A, xt, b);
     double res = paru_vec_1norm(b, m);
     double weighted_res = res / (paru_spm_1norm(A) * paru_vec_1norm(xt, m));
-    printf("Residual is |%.16lf| and weigheted residual is |%.16lf|.\n", 
-            res, weighted_res);
+    printf("Residual is |%.2lf| and weigheted residual is |%.2f|.\n", 
+            log10(res), log10(weighted_res) );
 
     paruMatInfo->my_time = omp_get_wtime() - my_start_time;
     return PARU_SUCCESS;
