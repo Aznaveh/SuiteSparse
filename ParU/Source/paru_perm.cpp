@@ -44,7 +44,6 @@ void paru_perm(paru_matrix *paruMatInfo)
 
     Int m = LUsym->m;
     // Int n = LUsym->n;
-    Int n1 = LUsym->n1;  // row+col singletons
 
     // paru_fac *LUs = paruMatInfo->partial_LUs;
     // paru_fac *Us = paruMatInfo->partial_Us;
@@ -66,6 +65,8 @@ void paru_perm(paru_matrix *paruMatInfo)
     }
 
 #ifndef NDEBUG
+    Int n1 = LUsym->n1;  // row+col singletons //TODO: work with singletons
+
     Int *oldRofS = (Int *)paru_alloc(m, sizeof(Int));
     Int *newRofS = (Int *)paru_alloc(m, sizeof(Int));
     if (oldRofS == NULL || newRofS == NULL)
