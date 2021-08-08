@@ -35,7 +35,7 @@
 #include "paru_internal.hpp"
 void paru_perm(paru_matrix *paruMatInfo)
 {
-    DEBUGLEVEL(1);
+    DEBUGLEVEL(0);
     paru_symbolic *LUsym = paruMatInfo->LUsym;
 
     if (LUsym->Pfin != NULL)  // it must have been computed
@@ -122,7 +122,7 @@ void paru_perm(paru_matrix *paruMatInfo)
 ///////////////apply perm x = b(P) /////////////////////////////////////////////
 Int paru_apply_perm(const Int *P, const double *b, double *x, Int m)
 {
-    DEBUGLEVEL(1);
+    DEBUGLEVEL(0);
     if (!x || !b) return (0);
 
 #ifndef NDEBUG
@@ -159,7 +159,7 @@ Int paru_apply_perm(const Int *P, const double *b, double *x, Int m)
 ///////////////apply inverse perm x = b(pinv) //////////////////////////////////
 Int paru_apply_inv_perm(const Int *P, const double *b, double *x, Int m)
 {
-    DEBUGLEVEL(1);
+    DEBUGLEVEL(0);
     if (!x || !b) return (0);
 #ifndef NDEBUG
     PRLEVEL(1, ("%% Inside apply inv permutaion P is:\n%%"));

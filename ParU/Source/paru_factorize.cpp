@@ -165,6 +165,13 @@ ParU_ResultCode paru_factorize(cholmod_sparse *A, paru_symbolic *LUsym,
     paru_lsolve(paruMatInfo, x);
     paru_usolve(paruMatInfo, x);
     paru_apply_inv_perm(LUsym->Qfill, x, xt, m);  // xt = qinv (x)
+
+
+    printf ("x = [ ");
+    for (Int i = 0; i < MIN(m,10); ++i) 
+        printf ("%lf ",xt[i]);
+    printf (" ...]\n");
+
     for (Int i = 0; i < m; ++i) b[i] *= -1;
     //    b[i] = 0;
     paru_gaxpy(A, xt, b);

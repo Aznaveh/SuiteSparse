@@ -326,11 +326,11 @@ paru_symbolic *paru_analyze(
 #endif
 
 #ifndef NDEBUG
-    p = 1;
+    p = -1;
     PRLEVEL(p, ("\n%% Symbolic factorization of A: "));
     if (p <= 0) (void)umfpack_dl_report_symbolic(Symbolic, Control);
-    PRLEVEL(p, ("\n%%\tcolsingleton = %ld, rowsingleton=%ld", cs1, rs1));
-    //    PRLEVEL(p, ("\n %%maxnrow= %ld, maxncol=%ld",maxnrows, maxncols));
+    PRLEVEL(p, ("\n%%\tcolsingleton = %ld, rowsingleton=%ld\n", cs1, rs1));
+    p = 1;
 #endif
 
     /* ---------------------------------------------------------------------- */
@@ -1026,15 +1026,15 @@ paru_symbolic *paru_analyze(
 
     paru_free((m - n1), sizeof(Int), Ps);
 #ifndef NDEBUG
-    p = 1;
+    p = -1;
     PRLEVEL(p, ("Sp =\n"));
     for (Int i = n1; i <= m; i++) PRLEVEL(p, ("%ld ", Sp[i - n1]));
     PRLEVEL(p, ("\n"));
 
     PRLEVEL(p, ("Sj =\n"));
     for (Int k = 0; k < snz; k++) PRLEVEL(p, ("%ld ", Sj[k]));
-    p = 1;
     PRLEVEL(p, ("\n"));
+    p = 1;
     for (Int i = 0; i < m - n1; i++)
     {
         PRLEVEL(p, (" i=%ld cSp=%ld Sp=%ld\n", i, cSp[i], Sp[i + 1]));

@@ -11,7 +11,7 @@
 #include "paru_internal.hpp"
 Int paru_gaxpy (cholmod_sparse *A, const double *x, double *y)
 {
-    DEBUGLEVEL(1);
+    DEBUGLEVEL(0);
 
     if (!A || !x || !y) return (0);
     Int *Ap = (Int *)A->p;

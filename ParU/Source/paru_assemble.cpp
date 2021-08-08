@@ -542,7 +542,7 @@ void paru_assemble_el_with0rows(Int e, Int f, std::vector<Int> &colHash,
     //
     DEBUGLEVEL(0);
 #ifndef NDEBUG
-    Int p = -1;
+    Int p = 1;
 #endif
     paru_symbolic *LUsym = paruMatInfo->LUsym;
     Int *snM = LUsym->super2atree;
@@ -630,7 +630,7 @@ void paru_assemble_el_with0rows(Int e, Int f, std::vector<Int> &colHash,
                     PRLEVEL(1, ("%% ri = %ld \n", ri));
                     PRLEVEL(1, ("%% sC [%ld] =%2.5lf \n", i, sC[i]));
                     PRLEVEL(1, ("%% dC [%ld] =%2.5lf \n", ri, dC[ri]));
-                    dC[ri] += sC[i];
+                   dC[ri] += sC[i];
                     PRLEVEL(1, ("%% dC [%ld] =%2.5lf \n", i, dC[ri]));
                 }
                 if (--nrows2bSeen == 0) break;
@@ -651,7 +651,7 @@ void paru_assemble_el_with0rows(Int e, Int f, std::vector<Int> &colHash,
             Int rowInd = el_rowIndex[i];
             PRLEVEL(1, ("%% rowInd =%ld ", rowInd));
 #ifndef NDEBUG
-            if (rowRelIndex[i] == -1) PRLEVEL(-1, ("%% row_with0 "));
+            if (rowRelIndex[i] == -1) PRLEVEL(1, ("%% row_with0 "));
 #endif
 
             PRLEVEL(1, ("%% \n"));
@@ -719,12 +719,12 @@ void paru_assemble_el_with0rows(Int e, Int f, std::vector<Int> &colHash,
             {
                 if (el_colIndex[jj] < 0) continue;
                 // el [rowInd, jj]
-                PRLEVEL(-1, ("%% el[%ld,%ld]=%2.5lf\n%%", rowInd, jj,
+                PRLEVEL(1, ("%% el[%ld,%ld]=%2.5lf\n%%", rowInd, jj,
                              el_Num[mEl * jj + ii]));
                 if (el_Num[mEl * jj + ii] != 0)
                 {
                     new_lac = jj;
-                    PRLEVEL(-1, ("%%Found new-lac in %ld\n%%", jj));
+                    PRLEVEL(1, ("%%Found new-lac in %ld\n%%", jj));
                     break;
                 }
             }
@@ -745,7 +745,7 @@ void paru_assemble_el_with0rows(Int e, Int f, std::vector<Int> &colHash,
         {
             if (el_colIndex[j] > 0) ncolsleft++;
         }
-        PRLEVEL(-1, ("%%colsleft was %ld and now is %ld\n%%", el->ncolsleft,
+        PRLEVEL(1, ("%%colsleft was %ld and now is %ld\n%%", el->ncolsleft,
                      ncolsleft));
         el->ncolsleft = ncolsleft;
         for (Int j = el->lac; j < new_lac; j++)
@@ -762,7 +762,7 @@ void paru_assemble_el_with0rows(Int e, Int f, std::vector<Int> &colHash,
     Int *Super = LUsym->Super;
     Int col1 = Super[f]; /* fornt F has columns col1:col2-1 */
     Int col2 = Super[f + 1];
-    p = -1;
+    p = 1;
     PRLEVEL(p, ("%% %ld(%ld) %ld-%ld :\n", f, eli, col1, col2));
     PRLEVEL(p, ("%%Finally new-lac is %ld ", el->lac));
     PRLEVEL(p, ("nEl=%ld\n lacList[%ld]=%ld nrowsleft=%ld\n", nEl, e,
