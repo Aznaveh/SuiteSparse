@@ -219,6 +219,7 @@ Int paru_find_hash(Int key, std::vector<Int> &colHash, Int *fcolList);
 void paru_perm(paru_matrix *paruMatInfo);
 Int paru_apply_perm(const Int *P, const double *b, double *x, Int m);
 Int paru_apply_inv_perm(const Int *P, const double *b, double *x, Int m);
+Int paru_apply_scale (const double *s, double *x, Int m, Int n1);
 
 // lsolve and usolve
 Int paru_lsolve(paru_matrix *paruMatInfo, double *x);

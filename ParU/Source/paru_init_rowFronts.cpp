@@ -236,7 +236,6 @@ ParU_ResultCode paru_init_rowFronts(
 
             rowMark[e] = 0;
 
-            // TODO: use placement new
             // My new is calling paru_alloc now; so there is no need
             std::vector<Int> *curHeap;
             curHeap = paruMatInfo->heapList[e] = new std::vector<Int>;
@@ -293,8 +292,10 @@ ParU_ResultCode paru_init_rowFronts(
                 el_colrowIndex[j] = Sj[p];
                 // TODO: adding the scale here
                 // el_colrowNum[j++] = Sx[p]/scale[p];
-                el_colrowNum[j++] = Sx[p];
-                PRLEVEL(1, ("Sj[%ld] =%ld Sx[%ld]=%lf\n", p, Sj[p], p, Sx[p]));
+                double *s = paruMatInfo->scale_row;
+                el_colrowNum[j++] = (scale == 0)? Sx[p] : (Sx[p] / s[row]);
+                PRLEVEL(1, ("Sj[%ld] =%ld Sx[%ld]=%lf scaled=%lf\n", 
+                            p, Sj[p], p, Sx[p], (Sx[p] / s[row])));
                 // for Matlab
                 PRLEVEL(0, ("%ld,%ld, %.16lf;\n", row + 1, Sj[p] + 1, Sx[p]));
             }

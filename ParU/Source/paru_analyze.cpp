@@ -928,6 +928,8 @@ paru_symbolic *paru_analyze(
             }
         }
     }
+    LUsym->ustons.nnz = sunz;
+    LUsym->lstons.nnz = slnz;
 #ifndef NDEBUG
     p = -1;
     PRLEVEL(p, ("(%ld) Sup =", sunz));

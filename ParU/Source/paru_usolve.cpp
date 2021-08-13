@@ -38,8 +38,7 @@ Int paru_usolve(paru_matrix *paruMatInfo, double *x)
     paru_symbolic *LUsym = paruMatInfo->LUsym;
     Int nf = LUsym->nf;
 
-    // TODO singletons
-    // Int n1 = LUsym->n1;  // row+col singletons
+    Int n1 = LUsym->n1;  // row+col singletons
 
     paru_fac *LUs = paruMatInfo->partial_LUs;
     paru_fac *Us = paruMatInfo->partial_Us;
@@ -68,11 +67,11 @@ Int paru_usolve(paru_matrix *paruMatInfo, double *x)
                 double i_prod = 0.0;  // innter product
                 for (Int j = 0; j < colCount; j++)
                 {
-                    i_prod += A2[fp * j + i] * x[fcolList[j]];
+                    i_prod += A2[fp * j + i] * x[fcolList[j] + n1];
                 }
                 Int *Ps = LUsym->Ps;  // row permutation
                 Int r = Ps[frowList[i]];
-                x[r] -= i_prod;
+                x[r + n1] -= i_prod;
             }
         }
 
@@ -82,7 +81,7 @@ Int paru_usolve(paru_matrix *paruMatInfo, double *x)
         BLAS_INT N = (BLAS_INT)fp;
         BLAS_INT lda = (BLAS_INT)rowCount;
         BLAS_INT Incx = (BLAS_INT)1;
-        double *X = x + col1;
+        double *X = x + col1 + n1;
 
         // performed on LUs
         PRLEVEL(1, ("%% Usolve: Working on DTRSV\n"));

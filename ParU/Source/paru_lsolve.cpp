@@ -38,10 +38,11 @@ Int paru_lsolve(paru_matrix *paruMatInfo, double *x)
     paru_symbolic *LUsym = paruMatInfo->LUsym;
     Int nf = LUsym->nf;
 
+    Int n1 = LUsym->n1;  // row+col singletons
+
     // singletons
     // Int rs1 = LUsym->rs1;
     //Int cs1 = LUsym->cs1;
-    //Int n1 = LUsym->n1;  // row+col singletons
     //Int *Sp = LUsym->Sp;
     //Int *Sj = LUsym->Sj;
     //double *Sx = LUsym->Sx;
@@ -70,7 +71,7 @@ Int paru_lsolve(paru_matrix *paruMatInfo, double *x)
         Int col2 = Super[f + 1];
         Int fp = col2 - col1;
         double *A = LUs[f].p;
-        double *X = x + col1;
+        double *X = x + col1 + n1;
 
         BLAS_INT N = (BLAS_INT)fp;
         BLAS_INT lda = (BLAS_INT)rowCount;
@@ -118,11 +119,11 @@ Int paru_lsolve(paru_matrix *paruMatInfo, double *x)
             double i_prod = 0.0;  // innter product
             for (Int j = col1; j < col2; j++)
             {
-                i_prod += A[(j - col1) * rowCount + i] * x[j];
+                i_prod += A[(j - col1) * rowCount + i] * x[j+n1];
             }
             Int *Ps = LUsym->Ps;  // row permutation
             Int r = Ps[frowList[i]];
-            x[r] -= i_prod;
+            x[r+n1] -= i_prod;
         }
     }
 

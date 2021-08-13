@@ -119,7 +119,7 @@ void paru_perm(paru_matrix *paruMatInfo)
     PRLEVEL(1, (" \n"));
 #endif
 }
-///////////////apply perm x = b(P) /////////////////////////////////////////////
+///////////////apply perm x = b(P) ///////////////////////////////////
 Int paru_apply_perm(const Int *P, const double *b, double *x, Int m)
 {
     DEBUGLEVEL(0);
@@ -185,6 +185,37 @@ Int paru_apply_inv_perm(const Int *P, const double *b, double *x, Int m)
 
 #ifndef NDEBUG
     PRLEVEL(1, ("%% after applying inverse permutaion x is:\n%%"));
+    for (Int k = 0; k < m; k++)
+    {
+        PRLEVEL(1, (" %.8lf, ", x[k]));
+    }
+    PRLEVEL(1, (" \n"));
+#endif
+    return (1);
+}
+
+///////////////apply scale x= s.b  /////////////////////////////////////////////
+Int paru_apply_scale (const double *s, double *x, Int m, Int n1)
+{
+#ifndef NDEBUG
+    PRLEVEL(1, ("%% before applying scale x is:\n%%"));
+    for (Int k = 0; k < m; k++)
+    {
+        PRLEVEL(1, (" %.2lf, ", x[k]));
+    }
+    PRLEVEL(1, (" \n"));
+#endif
+
+    DEBUGLEVEL(0);
+    if (!x || !s) return (0);
+
+    for (Int k = n1; k < m; k++)
+    {
+        x[k] = x[k]/s[k-n1];   // Pinv(old) = new
+    }
+
+#ifndef NDEBUG
+    PRLEVEL(1, ("%% after applying scale x is:\n%%"));
     for (Int k = 0; k < m; k++)
     {
         PRLEVEL(1, (" %.8lf, ", x[k]));
