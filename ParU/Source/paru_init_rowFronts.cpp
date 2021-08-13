@@ -174,7 +174,7 @@ ParU_ResultCode paru_init_rowFronts(
         paruMatInfo->scale_row = max_row;
 
 #ifndef NDEBUG
-        Int p = 1;
+        Int p = -1;
         PRLEVEL(p, ("%% scale =[ "));
         for (Int row = 0; row < m; row++) PRLEVEL(p, ("%lf ", max_row[row]));
         PRLEVEL(p, ("]\n"));

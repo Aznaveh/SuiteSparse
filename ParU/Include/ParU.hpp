@@ -44,6 +44,27 @@ extern "C"
 // This makes parallelism easier to manage, since all threads can
 // have access to this object without synchronization.
 //
+
+//typedef struct U_singleton
+struct U_singleton
+{
+    // CSR format for U singletons
+    Int nnz;     // nnz in submatrix
+    Int *Sup;     // size cs1
+    Int *Suj;     // size ?
+    double *Sux;  // size ?
+};
+
+//typedef struct L_singleton
+struct L_singleton
+{
+    // CSC format for U singletons
+    Int nnz;     // nnz in submatrix
+    Int *Slp;     // size rs1 
+    Int *Sli;     // size ?
+    double *Slx;  // size ?
+};
+
 typedef struct
 { /* paru_symbolic*/
 
@@ -65,6 +86,10 @@ typedef struct
     Int *Sp;     // size m+1-n1, row pointers of S
     Int *Sj;     // size snz = Sp [n], column indices of S
     double *Sx;  // size snz = Sp [n], numeric values of S
+
+    //TODO: Usingletons and Lsingltons
+    U_singleton ustons;
+    L_singleton lstons;
 
     Int *Qfill;  // size n, fill-reducing column permutation.
     // Qfill [k] = j if column k of A is column j of S.
@@ -105,7 +130,7 @@ typedef struct
 
     Int nf;        // number of frontal matrices; nf <= MIN (m,n)
     Int n1;        // number of singletons in the matrix
-                   // the matrix S is the one without any singletons
+    // the matrix S is the one without any singletons
     Int rs1, cs1;  // number of row and column singletons, n1 = rs1+cs1;
 
     // parent, child, and childp define the row merge tree or etree (A'A)
@@ -209,7 +234,7 @@ typedef struct
         cValid;     // validity of relative column index
 
     Int lac;  // least active column which is active
-              // 0 <= lac <= ncols
+    // 0 <= lac <= ncols
 
     Int nzr_pc;  // number of zero rows in pivotal column of current front
 
@@ -336,8 +361,8 @@ paru_symbolic *paru_analyze(cholmod_sparse *A);
 
 /* usage:
 
-S = paru_analyse (A) ;
-LU = paru_factoriz (A,S) ;
+   S = paru_analyse (A) ;
+   LU = paru_factoriz (A,S) ;
 
 info: an enum: PARU_SUCCESS, PARU_OUT_OF_MEMORY, PARU_INVALID, PARU_SINGULAR,
 ... info = paru_analyse (&S, A) ; info = paru_factoriz (&LU, A,S) ;
@@ -351,7 +376,7 @@ info: an enum: PARU_SUCCESS, PARU_OUT_OF_MEMORY, PARU_INVALID, PARU_SINGULAR,
 // internal
 
 ParU_ResultCode paru_factorize(cholmod_sparse *A, paru_symbolic *LUsym,
-                               paru_matrix **paruMatInfo_handle);
+        paru_matrix **paruMatInfo_handle);
 void paru_write(paru_matrix *paruMatInfo, int scale, char *id);
 
 void paru_freesym(paru_symbolic **LUsym_handle);
