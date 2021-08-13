@@ -126,10 +126,10 @@ Int paru_apply_perm(const Int *P, const double *b, double *x, Int m)
     if (!x || !b) return (0);
 
 #ifndef NDEBUG
-    PRLEVEL(1, ("%% Inside apply permutaion P is:\n%%"));
+    PRLEVEL(-1, ("%% Inside apply permutaion P is:\n%%"));
     for (Int k = 0; k < m; k++)
     {
-        PRLEVEL(1, (" %ld, ", P[k]));
+        PRLEVEL(-1, (" %ld, ", P[k]));
     }
     PRLEVEL(1, (" \n"));
 
@@ -211,7 +211,7 @@ Int paru_apply_scale (const double *s, double *x, Int m, Int n1)
 
     for (Int k = n1; k < m; k++)
     {
-        x[k] = x[k]/s[k-n1];   // Pinv(old) = new
+        x[k] = x[k]/s[k-n1];
     }
 
 #ifndef NDEBUG
