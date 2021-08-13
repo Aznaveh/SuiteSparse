@@ -862,9 +862,9 @@ paru_symbolic *paru_analyze(
     if (cs1 != 0)
         Slp = LUsym->lstons.Slp = (Int *)paru_calloc(cs1 + 1, sizeof(Int));
 
-    if ((Slp == NULL && rs1 != 0) || (Sup == NULL && cs1 != 0) || Ps == NULL)
+    if ((Slp == NULL && cs1 != 0) || (Sup == NULL && rs1 != 0) || Ps == NULL)
     {
-        printf("memory problem");
+        printf("rs1=%ld cs1=%ld memory problem\n", rs1, cs1);
         paru_free((m + 1), sizeof(Int), Pinit);
         paru_free((MAX(m, n) + 2), sizeof(Int), Work);
         paru_free(m, sizeof(Int), Pinv);

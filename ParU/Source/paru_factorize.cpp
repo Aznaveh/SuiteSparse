@@ -155,30 +155,30 @@ ParU_ResultCode paru_factorize(cholmod_sparse *A, paru_symbolic *LUsym,
         }
     }
     // TODO: temporary to test perm
-    paru_perm(paruMatInfo);
-    Int m = LUsym->m;
-    double b[m];
-    double x[m];
-    double xt[m];
-    for (Int i = 0; i < m; ++i) b[i] = i + 1;
-    paru_apply_perm(LUsym->Pfin, b, x, m);  // x = p (b)
-    paru_lsolve(paruMatInfo, x);
-    paru_usolve(paruMatInfo, x);
-    paru_apply_inv_perm(LUsym->Qfill, x, xt, m);  // xt = qinv (x)
+    //paru_perm(paruMatInfo);
+    //Int m = LUsym->m;
+    //double b[m];
+    //double x[m];
+    //double xt[m];
+    //for (Int i = 0; i < m; ++i) b[i] = i + 1;
+    //paru_apply_perm(LUsym->Pfin, b, x, m);  // x = p (b)
+    //paru_lsolve(paruMatInfo, x);
+    //paru_usolve(paruMatInfo, x);
+    //paru_apply_inv_perm(LUsym->Qfill, x, xt, m);  // xt = qinv (x)
 
 
-    printf ("x = [ ");
-    for (Int i = 0; i < MIN(m,10); ++i) 
-        printf ("%lf ",xt[i]);
-    printf (" ...]\n");
+    //printf ("x = [ ");
+    //for (Int i = 0; i < MIN(m,10); ++i) 
+    //    printf ("%lf ",xt[i]);
+    //printf (" ...]\n");
 
-    for (Int i = 0; i < m; ++i) b[i] *= -1;
-    //    b[i] = 0;
-    paru_gaxpy(A, xt, b);
-    double res = paru_vec_1norm(b, m);
-    double weighted_res = res / (paru_spm_1norm(A) * paru_vec_1norm(xt, m));
-    printf("Residual is |%.2lf| and weigheted residual is |%.2f|.\n", 
-            log10(res), log10(weighted_res) );
+    //for (Int i = 0; i < m; ++i) b[i] *= -1;
+    ////    b[i] = 0;
+    //paru_gaxpy(A, xt, b);
+    //double res = paru_vec_1norm(b, m);
+    //double weighted_res = res / (paru_spm_1norm(A) * paru_vec_1norm(xt, m));
+    //printf("Residual is |%.2lf| and weigheted residual is |%.2f|.\n", 
+    //        log10(res), log10(weighted_res) );
 
     paruMatInfo->my_time = omp_get_wtime() - my_start_time;
     return PARU_SUCCESS;
