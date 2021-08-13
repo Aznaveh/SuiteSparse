@@ -109,9 +109,33 @@ paru_symbolic *paru_analyze(
         n1,  // The number of pivots with zero Markowitz cost.
         // Info[UMFPACK_COL_SINGLETONS]+Info[UMFPACK_ROW_SINGLETONS]
         // They apper first in the output permutations P and Q
+        //
+        //
+        //  --- Copied from UMFPACK
+        // 	---   x x x x x x x x x
+        // 	---   . x x x x x x x x
+        // 	---   . . x x x x x x x
+        // 	---   . . . x . . . . .
+        // 	---   . . . x x . . . .
+        // 	---   . . . x x s s s s
+        // 	---   . . . x x s s s s
+        // 	---   . . . x x s s s s
+        // 	---   . . . x x s s s s
+        //
+        //  ---   The above example has 3 column singletons (the first three
+        //  ---   columns and their corresponding pivot rows) and 2 row
+        //  ---   singletons.  The singletons are ordered first, because they
+        //  ---   have zero Markowitz cost. The LU factorization for these first
+        //  ---   five rows and columns is free - there is no work to do (except
+        //  ---   to scale the pivot columns for the 2 row singletons), and no
+        //  ---   fill-in occurs.  The remaining submatrix (4-by-4 in the above
+        //  ---   example) has no rows or columns with degree one.  It may have
+        //  ---   empty rows or columns.
+        //
+        //
         //        _______________
         //       |\**************r
-        //       |  \************r -> UMFPACK_ROW_SINGLETONS
+        //       |  \************r -> UMFPACK_COL_SINGLETONS
         //       |   \***********r
         //       |    *\         |
         //       |    ***\       |
@@ -119,7 +143,7 @@ paru_symbolic *paru_analyze(
         //       |    ***xxxx\xxx|            +   = n1
         //       -----ccc--------            /
         //             |
-        //            UMFPACK_COL_SINGLETONS
+        //            UMFPACK_ROW_SINGLETONS
 
         nfr,  // The number of frontam matrices; nf in SPQR analysis
 
@@ -857,12 +881,12 @@ paru_symbolic *paru_analyze(
     Int *Sup;  // Singlton u p
     Int *Slp;  // Singlton l p
     Ps = (Int *)paru_calloc(m - n1, sizeof(Int));
-    if (rs1 != 0)
-        Sup = LUsym->ustons.Sup = (Int *)paru_calloc(rs1 + 1, sizeof(Int));
     if (cs1 != 0)
-        Slp = LUsym->lstons.Slp = (Int *)paru_calloc(cs1 + 1, sizeof(Int));
+        Sup = LUsym->ustons.Sup = (Int *)paru_calloc(cs1 + 1, sizeof(Int));
+    if (rs1 != 0)
+        Slp = LUsym->lstons.Slp = (Int *)paru_calloc(rs1 + 1, sizeof(Int));
 
-    if ((Slp == NULL && cs1 != 0) || (Sup == NULL && rs1 != 0) || Ps == NULL)
+    if ((Slp == NULL && rs1 != 0) || (Sup == NULL && cs1 != 0) || Ps == NULL)
     {
         printf("rs1=%ld cs1=%ld memory problem\n", rs1, cs1);
         paru_free((m + 1), sizeof(Int), Pinit);
@@ -874,39 +898,43 @@ paru_symbolic *paru_analyze(
     }
     Int sunz = 0;  // U nnz: singlteton nnzero of s
     Int slnz = 0;  // L nnz: singlteton nnzero of s
-    Int snz = 0;  // s nonzero: nnz in submatrix excluding singletons
+    Int snz = 0;   // s nonzero: nnz in submatrix excluding singletons
     Int rowcount = 0;
     Sleft[0] = 0;
     // counting number of entries in each row of submatrix Sp and also making
     // the singelton matrices
-    PRLEVEL(1, ("Computing Staircase Structure and singleton structure\n"));
+    PRLEVEL(-1, ("Computing Staircase Structure and singleton structure\n"));
+    PRLEVEL(-1, ("rs1= %ld cs1=%ld\n", rs1, cs1));
     for (Int newcol = 0; newcol < n1; newcol++)
-    {
+    {  // The columns that are just in singleton
         Int oldcol = Qinit[newcol];
-        PRLEVEL(1, ("newcol = %ld oldcol=%ld\n", newcol, oldcol));
+        PRLEVEL(2, ("newcol = %ld oldcol=%ld\n", newcol, oldcol));
         for (Int p = Ap[oldcol]; p < Ap[oldcol + 1]; p++)
         {
             Int oldrow = Ai[p];
             Int newrow = Pinv[oldrow];
-            if (newrow < rs1) 
-            {//inside U singletons
+            PRLEVEL(1, ("newrow=%ld oldrow=%ld\n", newrow, oldrow));
+            if (newrow < cs1)
+            {  // inside U singletons
+                PRLEVEL(2, ("Inside U singletons\n"));
                 sunz++;
                 Sup[newrow]++;
             }
             else
-            {//inside L singletons
+            {  // inside L singletons
+                PRLEVEL(2, ("Inside L singletons\n"));
                 slnz++;
-                Slp[newcol-rs1]++;
+                Slp[newcol - cs1]++;
             }
         }
     }
 #ifndef NDEBUG
     p = -1;
-    PRLEVEL(p, ("Sup ="));
-    for (Int k = 0; k < rs1; k++) PRLEVEL(p, ("%ld ", Sup[k]));
+    PRLEVEL(p, ("(%ld) Sup =", sunz));
+    for (Int k = 0; k < cs1; k++) PRLEVEL(p, ("%ld ", Sup[k]));
     PRLEVEL(p, ("\n"));
-    PRLEVEL(p, ("Slp ="));
-    for (Int k = rs1; k < n1; k++) PRLEVEL(p, ("%ld ", Slp[k-rs1]));
+    PRLEVEL(p, ("(%ld) Slp =", slnz));
+    for (Int k = cs1; k < n1; k++) PRLEVEL(p, ("%ld ", Slp[k - cs1]));
     PRLEVEL(p, ("\n"));
 #endif
     for (Int newcol = n1; newcol < n; newcol++)
