@@ -868,17 +868,32 @@ paru_symbolic *paru_analyze(
 
     Int *Ps; // new row permutation for just the Submatrix part
 
-    Int *Sup; // Singlton u p
-    Int *Slp; // Singlton l p
+    Int *Sup;  // Singlton u p
+    Int *cSup; // copy of Singlton u p
+    Int *Slp;  // Singlton l p
+    Int *cSlp; // copy Singlton l p
     Ps = (Int *)paru_calloc(m - n1, sizeof(Int));
     if (cs1 != 0)
+    {
         Sup = LUsym->ustons.Sup = (Int *)paru_calloc(cs1 + 1, sizeof(Int));
+        cSup = LUsym->ustons.Sup = (Int *)paru_calloc(cs1 + 1, sizeof(Int));
+    }
     if (rs1 != 0)
+    {
         Slp = LUsym->lstons.Slp = (Int *)paru_calloc(rs1 + 1, sizeof(Int));
+        cSlp = LUsym->lstons.Slp = (Int *)paru_calloc(rs1 + 1, sizeof(Int));
+    }
 
-    if ((Slp == NULL && rs1 != 0) || (Sup == NULL && cs1 != 0) || Ps == NULL)
+    if (((Slp == NULL || cSlp == NULL) && rs1 != 0) ||
+        ((Sup == NULL || cSup == NULL) && cs1 != 0) || Ps == NULL)
     {
         printf("rs1=%ld cs1=%ld memory problem\n", rs1, cs1);
+        paru_free((cs1 + 1), sizeof(Int), Sup);
+        paru_free((cs1 + 1), sizeof(Int), cSup);
+
+        paru_free((rs1 + 1), sizeof(Int), Slp);
+        paru_free((rs1 + 1), sizeof(Int), cSlp);
+
         paru_free((m + 1), sizeof(Int), Pinit);
         paru_free((MAX(m, n) + 2), sizeof(Int), Work);
         paru_free(m, sizeof(Int), Pinv);
@@ -1049,10 +1064,6 @@ paru_symbolic *paru_analyze(
     PRLEVEL(p, ("\n"));
 #endif
 
-    // Updating Sj and Sx using copy of Sp
-    Int *Sj = (Int *)paru_alloc(snz, sizeof(Int));
-    double *Sx = (double *)paru_alloc(snz, sizeof(double));
-
     Int *Suj = NULL;
     double *Sux = NULL;
     if (cs1 > 0)
@@ -1072,6 +1083,10 @@ paru_symbolic *paru_analyze(
     }
     LUsym->lstons.Slx = Slx;
     LUsym->lstons.Sli = Sli;
+
+    // Updating Sj and Sx using copy of Sp
+    Int *Sj = (Int *)paru_alloc(snz, sizeof(Int));
+    double *Sx = (double *)paru_alloc(snz, sizeof(double));
 
     LUsym->Sj = Sj;
     LUsym->Sx = Sx;
@@ -1105,8 +1120,13 @@ paru_symbolic *paru_analyze(
                 Sj[cSp[srow]] = scol;
                 Sx[cSp[srow]++] = Ax[p];
             }
+            else
+            { // TODO inside the U singletons
+            }
         }
     }
+    paru_free((cs1 + 1), sizeof(Int), cSup);
+    paru_free((rs1 + 1), sizeof(Int), cSlp);
 
     paru_free((m - n1), sizeof(Int), Ps);
 #ifndef NDEBUG
@@ -1179,8 +1199,8 @@ paru_symbolic *paru_analyze(
         (double *)paru_calloc(nf + 1, sizeof(double));
 
     if (aParent == NULL || aChild == NULL || aChildp == NULL || rM == NULL ||
-        snM == NULL || first == NULL || front_flop_bound == NULL ||
-        stree_flop_bound == NULL)
+            snM == NULL || first == NULL || front_flop_bound == NULL ||
+            stree_flop_bound == NULL)
     {
         printf("Out of memory in symbolic phase");
         paru_free(m, sizeof(Int), Pinv);
@@ -1274,7 +1294,7 @@ paru_symbolic *paru_analyze(
         ASSERT(aChildp[offset] == -1);
         aChildp[offset] = aChildp[offset - 1] + numRow + numoforiginalChild;
         PRLEVEL(
-            1, ("\n %% f=%ld numoforiginalChild=%ld\n", f, numoforiginalChild));
+                1, ("\n %% f=%ld numoforiginalChild=%ld\n", f, numoforiginalChild));
 
         if (Parent[f] == f + 1)
         { // last child due to staircase

@@ -126,10 +126,10 @@ Int paru_apply_perm(const Int *P, const double *b, double *x, Int m)
     if (!x || !b) return (0);
 
 #ifndef NDEBUG
-    PRLEVEL(-1, ("%% Inside apply permutaion P is:\n%%"));
+    PRLEVEL(1, ("%% Inside apply permutaion P is:\n%%"));
     for (Int k = 0; k < m; k++)
     {
-        PRLEVEL(-1, (" %ld, ", P[k]));
+        PRLEVEL(1, (" %ld, ", P[k]));
     }
     PRLEVEL(1, (" \n"));
 
