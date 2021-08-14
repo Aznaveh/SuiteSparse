@@ -1066,24 +1066,25 @@ paru_symbolic *paru_analyze(
     Int *Sj = (Int *)paru_alloc(snz, sizeof(Int));
     double *Sx = (double *)paru_alloc(snz, sizeof(double));
 
+    Int *Suj; double *Sux;
     if (cs1 >0 )
     {
-        Int *Suj = (Int *)paru_alloc(sunz, sizeof(Int));
-        double *Sux = (double *)paru_alloc(sunz, sizeof(double));
+        Suj = (Int *)paru_alloc(sunz, sizeof(Int));
+        Sux = (double *)paru_alloc(sunz, sizeof(double));
     }
 
-
+    Int *Sli; double *Slx;
     if (rs1 >0 )
     {
-        Int *Sli = (Int *)paru_alloc(slnz, sizeof(Int));
-        double *Slx = (double *)paru_alloc(slnz, sizeof(double));
+        Sli = (Int *)paru_alloc(slnz, sizeof(Int));
+        Slx = (double *)paru_alloc(slnz, sizeof(double));
     }
 
     LUsym->Sj = Sj;
     LUsym->Sx = Sx;
 
     if (Sj == NULL || Sx == NULL || (cs1 > 0 && ( Suj == NULL || Sux == NULL ) )
-           (rs1 > 0 && ( Slj == NULL || Slx == NULL ) ) )
+         ||  (rs1 > 0 && ( Sli == NULL || Slx == NULL ) ) )
     {
         printf("memory problem");
         paru_free(m, sizeof(Int), Pinv);
