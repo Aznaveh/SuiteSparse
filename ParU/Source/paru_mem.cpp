@@ -248,21 +248,21 @@ void paru_freesym(paru_symbolic **LUsym_handle)
 
     if (n1 > 0)
     {  // freeing singletons
-        Int rs1 = LUsym->rs1;
-        if (rs1 > 0)
+        Int cs1 = LUsym->cs1;
+        if (cs1 > 0)
         {
             U_singleton ustons = LUsym->ustons;
-            paru_free(rs1, sizeof(Int), ustons.Sup);
+            paru_free(cs1+1, sizeof(Int), ustons.Sup);
             Int nnz = ustons.nnz;
             paru_free(nnz, sizeof(Int), ustons.Suj);
             paru_free(nnz, sizeof(Int), ustons.Sux);
         }
 
-        Int cs1 = LUsym->cs1;
-        if (cs1 > 0)
+        Int rs1 = LUsym->rs1;
+        if (rs1 > 0)
         {
             L_singleton lstons = LUsym->lstons;
-            paru_free(cs1, sizeof(Int), lstons.Slp);
+            paru_free(rs1+1, sizeof(Int), lstons.Slp);
             Int nnz = lstons.nnz;
             paru_free(nnz, sizeof(Int), lstons.Sli);
             paru_free(nnz, sizeof(double), lstons.Slx);
