@@ -920,10 +920,10 @@ paru_symbolic *paru_analyze(
     // the singelton matrices
 #ifndef NDEBUG
     PR = -1;
-#endif
-
     PRLEVEL(PR, ("Computing Staircase Structure and singleton structure\n"));
     PRLEVEL(PR, ("rs1= %ld cs1=%ld\n", rs1, cs1));
+    PR = 1;
+#endif
     for (Int newcol = 0; newcol < n1; newcol++)
     {  // The columns that are just in singleton
         Int oldcol = Qinit[newcol];
@@ -941,6 +941,9 @@ paru_symbolic *paru_analyze(
             }
             else
             {  // inside L singletons
+#ifndef NDEBUG
+                PR = 1;
+#endif
                 PRLEVEL(PR, ("Inside L singletons\n"));
                 slnz++;
                 Slp[newcol - cs1 + 1]++;
@@ -950,16 +953,20 @@ paru_symbolic *paru_analyze(
     LUsym->ustons.nnz = sunz;
     LUsym->lstons.nnz = slnz;
 #ifndef NDEBUG
-    PR = -1;
-    PRLEVEL(PR, ("Sup and Slp in the middle"));
-    PRLEVEL(PR, ("(%ld) Sup =", sunz));
+    PR = 1;
+    PRLEVEL(PR, ("Sup and Slp in the middle\n"));
     if (cs1 > 0)
+    {
+        PRLEVEL(PR, ("(%ld) Sup =", sunz));
         for (Int k = 0; k <= cs1; k++) PRLEVEL(PR, ("%ld ", Sup[k]));
-    PRLEVEL(PR, ("\n"));
-    PRLEVEL(PR, ("(%ld) Slp =", slnz));
+        PRLEVEL(PR, ("\n"));
+    }
     if (rs1 > 0)
+    {
+        PRLEVEL(PR, ("(%ld) Slp =", slnz));
         for (Int k = cs1; k <= n1; k++) PRLEVEL(PR, ("%ld ", Slp[k - cs1]));
-    PRLEVEL(PR, ("\n"));
+        PRLEVEL(PR, ("\n"));
+    }
 #endif
     for (Int newcol = n1; newcol < n; newcol++)
     {
@@ -995,17 +1002,21 @@ paru_symbolic *paru_analyze(
     Sleft[n - n1 + 1] = m - n1 - rowcount;  // empty rows of S if any
     LUsym->snz = snz;
 #ifndef NDEBUG
-    PR = -1;
-    PRLEVEL(PR, ("Sup and Slp in the middle"));
-    PRLEVEL(PR, ("(%ld) Sup =", sunz));
+    PR = 1;
+    PRLEVEL(PR, ("Sup and Slp finished (before cumsum)U-sing =%ld L-sing=%ld\n", 
+                sunz, slnz));
     if (cs1 > 0)
+    {
+        PRLEVEL(PR, ("(%ld) Sup =", sunz));
         for (Int k = 0; k <= cs1; k++) PRLEVEL(PR, ("%ld ", Sup[k]));
-    PRLEVEL(PR, ("\n"));
-    PRLEVEL(PR, ("(%ld) Slp =", slnz));
+        PRLEVEL(PR, ("\n"));
+    }
     if (rs1 > 0)
+    {
+        PRLEVEL(PR, ("(%ld) Slp =", slnz));
         for (Int k = cs1; k <= n1; k++) PRLEVEL(PR, ("%ld ", Slp[k - cs1]));
-    PRLEVEL(PR, ("\n"));
-
+        PRLEVEL(PR, ("\n"));
+    }
     PR = 1;
     PRLEVEL(PR, ("Ps =\n"));
     for (Int k = 0; k < rowcount; k++) PRLEVEL(PR, ("%ld ", Ps[k]));
@@ -1077,12 +1088,12 @@ paru_symbolic *paru_analyze(
 
     if (cs1 > 0)
     {
-        paru_cumsum(cs1, Sup);
+        paru_cumsum(cs1+1, Sup);
         paru_memcpy(cSup, Sup, cs1);
     }
     if (rs1 > 0)
     {
-        paru_cumsum(rs1, Slp);
+        paru_cumsum(rs1+1, Slp);
         paru_memcpy(cSlp, Slp, rs1);
     }
 
@@ -1149,7 +1160,7 @@ paru_symbolic *paru_analyze(
 
     // construct Sj, Sx and singltons
 #ifndef NDEBUG
-    PR = -1;
+    PR = 1;
     PRLEVEL(PR, ("Constructing Sj and singletons\n"));
 #endif
     for (Int newcol = 0; newcol < n1; newcol++)
@@ -1209,8 +1220,8 @@ paru_symbolic *paru_analyze(
             }
             else
             {  // inside the U singletons
-                PRLEVEL(PR, ("Usingleton, rest newcol = %ld oldcol=%ld\n",
-                             newcol, oldcol));
+                PRLEVEL(PR, ("Usingleton rest newcol = %ld newrow=%ld\n",
+                             newcol, newrow));
                 ASSERT(newrow != newcol);  // not a diagonal entry
                 Suj[++cSup[newrow]] = newcol;
                 Sux[cSup[newrow]] = Ax[p];
@@ -1223,6 +1234,40 @@ paru_symbolic *paru_analyze(
     paru_free((m - n1), sizeof(Int), Ps);
     PRLEVEL(PR, ("Constructing Sj and singletons finished here\n"));
 #ifndef NDEBUG
+    PR = -1;
+    PRLEVEL(PR, ("Sup and Slp after mading Sux Slx\n"));
+    if (cs1 > 0)
+    {
+        PRLEVEL(PR, ("(%ld) Sup =", sunz));
+        for (Int k = 0; k <= cs1; k++) PRLEVEL(PR, ("%ld ", Sup[k]));
+        PRLEVEL(PR, ("\n"));
+
+        for(Int newrow = 0; newrow < cs1; newrow ++)
+        {
+            PRLEVEL(PR, ("row = %ld\n", newrow));
+            for(Int p = Sup[newrow]; p < Sup[newrow+1]; p++)
+            {
+                PRLEVEL(PR, (" (%ld)%.2lf", Suj[p],Sux[p]));
+            }
+            PRLEVEL(PR, ("\n"));
+        }
+    }
+    if (rs1 > 0)
+    {
+        PRLEVEL(PR, ("(%ld) Slp =", slnz));
+        for (Int k = cs1; k <= n1; k++) PRLEVEL(PR, ("%ld ", Slp[k - cs1]));
+        PRLEVEL(PR, ("\n"));
+
+        for(Int newcol = cs1; newcol < n1; newcol++)
+        {
+            PRLEVEL(PR, ("col = %ld\n", newcol+cs1));
+            for(Int p = Slp[newcol-cs1]; p < Slp[newcol-cs1+1]; p++)
+            {
+                PRLEVEL(PR, (" (%ld)%.2lf", Sli[p],Slx[p]));
+            }
+            PRLEVEL(PR, ("\n"));
+        }
+    }
     PR = 1;
     PRLEVEL(PR, ("Sp =\n"));
     for (Int i = n1; i <= m; i++) PRLEVEL(PR, ("%ld ", Sp[i - n1]));
