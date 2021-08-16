@@ -32,33 +32,46 @@
 #include "paru_internal.hpp"
 Int paru_lsolve(paru_matrix *paruMatInfo, double *x)
 {
-    DEBUGLEVEL(0);
+    DEBUGLEVEL(1);
     // TODO check if input is read
     if (!x) return (0);
     paru_symbolic *LUsym = paruMatInfo->LUsym;
     Int nf = LUsym->nf;
 
+#ifndef NDEBUG
+    Int PR = -1;
+#endif
     Int n1 = LUsym->n1;  // row+col singletons
 
     // singletons
-    // Int rs1 = LUsym->rs1;
-    //Int cs1 = LUsym->cs1;
-    //Int *Sp = LUsym->Sp;
-    //Int *Sj = LUsym->Sj;
-    //double *Sx = LUsym->Sx;
-    //PRLEVEL(1, ("%%lsove singletons started n1=%ld, cs1=%ld:\n", n1, cs1));
-    //for (Int j = cs1; j < n1; j++)
-    //{
-    //    PRLEVEL(1,
-    //            ("%% x[%ld]=%lf Sx[%ld]=%lf  \n", j, x[j], Sp[j], Sx[Sp[j]]));
+    Int rs1 = LUsym->rs1;
+    if (rs1 >0)
+    {
+        Int cs1 = LUsym->cs1;
 
-    //    x[j] /= Sx[Sp[j]];
-    //    for (Int p = Sp[j] + 1; p < Sp[j + 1]; p++)
-    //    {
-    //        x[Sj[p]] -= Sx[p] * x[j];
-    //    }
-    //}
-    PRLEVEL(1, ("%%lsove singletons finished.\n"));
+        for(Int j = cs1;  j < n1; j++)
+        {
+            PRLEVEL(PR, ("j = %ld\n", j));
+            Int *Slp = LUsym->lstons.Slp;
+            Int *Sli = LUsym->lstons.Sli;
+            double *Slx = LUsym->lstons.Slx;
+            ASSERT (Sli != NULL && Slx != NULL && Slp != NULL);
+            Int diag =  Slp[j-cs1];
+            PRLEVEL(PR, (" x[%ld]=%.2lf Slx[%ld]=%.2lf\n", 
+                        j, x[j], diag, Slx[diag]));
+            x[j] /= Slx[diag];
+            PRLEVEL(PR, (" After x[%ld]=%.2lf \n",j, x[j]));
+            for(Int p = Slp[j-cs1]+1; p < Slp[j-cs1+1]; p++)
+            {
+                PRLEVEL(PR, ("B x[%ld]=%.2lf Slx=%lf\n",
+                            Sli[p], x[Sli[p]], Slx[p]));
+                x[Sli[p]] -= Slx[p] * x[j];
+                PRLEVEL(PR, ("A x[%ld]=%.2lf\n", Sli[p], x[Sli[p]]));
+            }
+            PRLEVEL(PR, ("\n"));
+        }
+    }
+    PRLEVEL(PR, ("%%lsove singletons finished.\n"));
 
     paru_fac *LUs = paruMatInfo->partial_LUs;
     Int *Super = LUsym->Super;
@@ -88,14 +101,14 @@ Int paru_lsolve(paru_matrix *paruMatInfo, double *x)
                    &Incx);  // INCX the increment of elements of X.
         PRLEVEL(1, ("%% DTRSV is just finished\n"));
 #ifndef NDEBUG
-        Int p = 2;
-        PRLEVEL(p, ("%% LUs:\n%%"));
+        PR = 2;
+        PRLEVEL(PR, ("%% LUs:\n%%"));
         for (Int r = 0; r < rowCount; r++)
         {
-            PRLEVEL(p, ("%% %ld\t", frowList[r]));
+            PRLEVEL(PR, ("%% %ld\t", frowList[r]));
             for (Int c = col1; c < col2; c++)
-                PRLEVEL(p, (" %2.5lf\t", A[(c - col1) * rowCount + r]));
-            PRLEVEL(p, ("\n"));
+                PRLEVEL(PR, (" %2.5lf\t", A[(c - col1) * rowCount + r]));
+            PRLEVEL(PR, ("\n"));
         }
 
         PRLEVEL(2, ("%% lda = %d\n%%", lda));
