@@ -32,7 +32,7 @@
 #include "paru_internal.hpp"
 Int paru_lsolve(paru_matrix *paruMatInfo, double *x)
 {
-    DEBUGLEVEL(1);
+    DEBUGLEVEL(0);
     // TODO check if input is read
     if (!x) return (0);
     paru_symbolic *LUsym = paruMatInfo->LUsym;
@@ -42,6 +42,7 @@ Int paru_lsolve(paru_matrix *paruMatInfo, double *x)
     Int PR = -1;
 #endif
     Int n1 = LUsym->n1;  // row+col singletons
+    Int *Ps = LUsym->Ps;  // row permutation S->LU
 
     // singletons
     Int rs1 = LUsym->rs1;
@@ -63,9 +64,11 @@ Int paru_lsolve(paru_matrix *paruMatInfo, double *x)
             PRLEVEL(PR, (" After x[%ld]=%.2lf \n",j, x[j]));
             for(Int p = Slp[j-cs1]+1; p < Slp[j-cs1+1]; p++)
             {
-                PRLEVEL(PR, ("B x[%ld]=%.2lf Slx=%lf\n",
-                            Sli[p], x[Sli[p]], Slx[p]));
-                x[Sli[p]] -= Slx[p] * x[j];
+                Int r = Sli[p]-n1 > 0 ? Ps[Sli[p]-n1] : Sli[p];
+
+                PRLEVEL(PR, (" r=%ld\n", r));
+
+                x[r] -= Slx[p] * x[j];
                 PRLEVEL(PR, ("A x[%ld]=%.2lf\n", Sli[p], x[Sli[p]]));
             }
             PRLEVEL(PR, ("\n"));
@@ -134,7 +137,6 @@ Int paru_lsolve(paru_matrix *paruMatInfo, double *x)
             {
                 i_prod += A[(j - col1) * rowCount + i] * x[j+n1];
             }
-            Int *Ps = LUsym->Ps;  // row permutation
             Int r = Ps[frowList[i]];
             x[r+n1] -= i_prod;
         }

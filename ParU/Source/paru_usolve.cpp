@@ -38,7 +38,8 @@ Int paru_usolve(paru_matrix *paruMatInfo, double *x)
     paru_symbolic *LUsym = paruMatInfo->LUsym;
     Int nf = LUsym->nf;
 
-    Int n1 = LUsym->n1;  // row+col singletons
+    Int n1 = LUsym->n1;   // row+col singletons
+    Int *Ps = LUsym->Ps;  // row permutation
 
     paru_fac *LUs = paruMatInfo->partial_LUs;
     paru_fac *Us = paruMatInfo->partial_Us;
@@ -69,7 +70,6 @@ Int paru_usolve(paru_matrix *paruMatInfo, double *x)
                 {
                     i_prod += A2[fp * j + i] * x[fcolList[j] + n1];
                 }
-                Int *Ps = LUsym->Ps;  // row permutation
                 Int r = Ps[frowList[i]];
                 x[r + n1] -= i_prod;
             }
@@ -96,6 +96,32 @@ Int paru_usolve(paru_matrix *paruMatInfo, double *x)
         PRLEVEL(1, ("%% DTRSV is just finished\n"));
     }
 
+#ifndef NDEBUG
+    Int PR = 1;
+#endif
+    Int cs1 = LUsym->cs1;
+    if (cs1 >0)
+    {
+        for(Int i = 0;  i < cs1; i++)
+        {
+            PRLEVEL(PR, ("i = %ld\n", i));
+            Int *Sup = LUsym->ustons.Sup;
+            Int *Suj = LUsym->ustons.Suj;
+            double *Sux = LUsym->ustons.Sux;
+            ASSERT (Suj != NULL && Sux != NULL && Sup != NULL);
+            Int diag =  Sup[i];
+            PRLEVEL(PR, (" After x[%ld]=%.2lf \n",i, x[i]));
+            for(Int p = Sup[i]+1; p < Sup[i+1]; p++)
+            {
+                Int r = Suj[p]-n1 > 0 ? Ps[Suj[p]-n1] : Suj[p];
+                PRLEVEL(PR, (" r=%ld\n", r));
+                x[i] -= Sux[p] * x[r];
+                PRLEVEL(PR, ("A x[%ld]=%.2lf\n", Suj[p], x[Suj[p]]));
+            }
+            x[i] /= Sux[diag];
+            PRLEVEL(PR, ("\n"));
+        }
+    }
 #ifndef NDEBUG
     Int m = LUsym->m;
     PRLEVEL(1, ("%% after usolve x is:\n%%"));
