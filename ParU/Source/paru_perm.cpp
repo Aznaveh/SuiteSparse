@@ -12,6 +12,10 @@
  *
  *                         ------P--->
  *                         A         LU
+ *                     **********    
+ *                     **********     The rest is identity
+ *                     ***#######    #######    
+ *                     ***#######    #######    
  *                         <----q----
  *
  *                          Pfin (COMPUTED HERE)
@@ -43,10 +47,7 @@ void paru_perm(paru_matrix *paruMatInfo)
     Int nf = LUsym->nf;
 
     Int m = LUsym->m;
-    // Int n = LUsym->n;
 
-    // paru_fac *LUs = paruMatInfo->partial_LUs;
-    // paru_fac *Us = paruMatInfo->partial_Us;
     Int *Super = LUsym->Super;
 
     // some working memory that is freed in this function
@@ -65,8 +66,6 @@ void paru_perm(paru_matrix *paruMatInfo)
     }
 
 #ifndef NDEBUG
-    Int n1 = LUsym->n1;  // row+col singletons //TODO: work with singletons
-
     Int *oldRofS = (Int *)paru_alloc(m, sizeof(Int));
     Int *newRofS = (Int *)paru_alloc(m, sizeof(Int));
     if (oldRofS == NULL || newRofS == NULL)
@@ -74,14 +73,27 @@ void paru_perm(paru_matrix *paruMatInfo)
         printf("memory problem inside perm in debug mode\n");
         return;
     }
+    Int PR = 1;
+
+    PRLEVEL(PR, ("%% Initial row permutaion is:\n%%"));
+    for (Int k = 0; k < m; k++)
+    {
+        PRLEVEL(PR, (" %ld, ", Pinit[k]));
+    }
+    PRLEVEL(PR, (" \n"));
 #endif
 
-    Int ip = 0;  // number of rows seen so far
-    // TODO: singletons shouldn't affect this.
-    // for (Int k = 0; k < n1; k++)
-    //    // first singletons
-    //    Pfin[ip++] = Pinit[k];
+    Int n1 = LUsym->n1;  // row+col singletons 
+    Int ip = 0;          // number of rows seen so far
+    PRLEVEL(PR, ("%% singlton part"));
+    for (Int k = 0; k < n1; k++)
+    {  // first singletons
+        Pfin[ip++] = Pinit[k];
+        PRLEVEL(PR, ("(%ld)%ld ", ip-1, Pfin[ip-1]));
+    }
+    PRLEVEL(PR, ("\n"));
 
+    PRLEVEL(PR, ("%% the rest\n"));
     for (Int f = 0; f < nf; f++)
     {  // rows for each front
         Int col1 = Super[f];
@@ -93,12 +105,15 @@ void paru_perm(paru_matrix *paruMatInfo)
         {
             // P[k] = i
 #ifndef NDEBUG
-            oldRofS[ip] = frowList[k];  // computing permutation for S
+            oldRofS[ip - n1] = frowList[k];  // computing permutation for S
+            PRLEVEL(1, ("%% frowList[%ld]= %ld-", k, frowList[k]));
 #endif
-            Ps[frowList[k]] = ip;
-            Pfin[ip++] = Pinit[frowList[k]];
+            Ps[frowList[k]] = ip - n1;
+            Pfin[ip++] = Pinit[frowList[k]+n1];
+            PRLEVEL(PR, ("(%ld)%ld\n ", ip-1, Pfin[ip-1]));
         }
     }
+    PRLEVEL(PR, ("\n"));
 
 #ifndef NDEBUG
     //-------- computing the direct permutation of S only for debug
@@ -111,12 +126,20 @@ void paru_perm(paru_matrix *paruMatInfo)
 
     paru_free(m, sizeof(Int), oldRofS);
     paru_free(m, sizeof(Int), newRofS);
-    PRLEVEL(1, ("%% Final row permutaion is:\n%%"));
+
+    PRLEVEL(PR, ("%% Final Ps:\n%%"));
+    for (Int k = 0; k < m-n1; k++)
+    {
+        PRLEVEL(PR, (" %ld, ", Ps[k]));
+    }
+    PRLEVEL(PR, (" \n"));
+    PR = -1;
+    PRLEVEL(PR, ("%% n1=%ld Final row permutaion is:\n%%",n1));
     for (Int k = 0; k < m; k++)
     {
-        PRLEVEL(1, (" %ld, ", Pfin[k]));
+        PRLEVEL(PR, (" %ld, ", Pfin[k]));
     }
-    PRLEVEL(1, (" \n"));
+    PRLEVEL(PR, (" \n"));
 #endif
 }
 ///////////////apply perm x = b(P) ///////////////////////////////////
@@ -195,7 +218,7 @@ Int paru_apply_inv_perm(const Int *P, const double *b, double *x, Int m)
 }
 
 ///////////////apply scale x= s.b  /////////////////////////////////////////////
-Int paru_apply_scale (const double *s, double *x, Int m, Int n1)
+Int paru_apply_scale(const double *s, double *x, Int m, Int n1)
 {
 #ifndef NDEBUG
     PRLEVEL(1, ("%% before applying scale x is:\n%%"));
@@ -211,7 +234,7 @@ Int paru_apply_scale (const double *s, double *x, Int m, Int n1)
 
     for (Int k = n1; k < m; k++)
     {
-        x[k] = x[k]/s[k-n1];
+        x[k] = x[k] / s[k - n1];
     }
 
 #ifndef NDEBUG

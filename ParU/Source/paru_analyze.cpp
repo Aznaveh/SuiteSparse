@@ -361,7 +361,6 @@ paru_symbolic *paru_analyze(
     PR = -1;
     PRLEVEL(PR, ("\n%% Symbolic factorization of A: "));
     if (PR <= 0) (void)umfpack_dl_report_symbolic(Symbolic, Control);
-    PRLEVEL(PR, ("\n%%\tcolsingleton = %ld, rowsingleton=%ld\n", cs1, rs1));
     PR = 1;
 #endif
 
@@ -435,7 +434,7 @@ paru_symbolic *paru_analyze(
     }
 #ifndef NDEBUG
     PR = 1;
-    PRLEVEL(PR, ("%%%% n1 is %ld\n", n1));
+    PRLEVEL(-1, ("\n%%\tcs1 = %ld, rs1=%ld n1=%ld\n", cs1, rs1, n1));
     PRLEVEL(PR, ("From the Symbolic object,\
                 C is of dimension %ld-by-%ld\n",
                  nr, nc));

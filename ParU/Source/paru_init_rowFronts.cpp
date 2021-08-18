@@ -144,7 +144,7 @@ ParU_ResultCode paru_init_rowFronts(
 
     //~~~~~~~~~~ scaling the A matrix
     // TODO change this part using S matrix
-    scale = 1;
+    scale = 0;
     if (scale)
     {
         double *max_row = (double *)paru_calloc(m, sizeof(double));
@@ -243,7 +243,7 @@ ParU_ResultCode paru_init_rowFronts(
             curHeap->push_back(e);
 
 #ifndef NDEBUG  // Printing the pointers info
-            Int p = 0;
+            Int p = 1;
             PRLEVEL(p, ("%% curEl = %p ", curEl));
             Int size = sizeof(paru_Element) +
                        sizeof(Int) * (2 * (nrows + ncols)) +

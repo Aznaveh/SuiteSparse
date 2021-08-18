@@ -39,7 +39,7 @@ Int paru_lsolve(paru_matrix *paruMatInfo, double *x)
     Int nf = LUsym->nf;
 
 #ifndef NDEBUG
-    Int PR = -1;
+    Int PR = 1;
 #endif
     Int n1 = LUsym->n1;  // row+col singletons
     Int *Ps = LUsym->Ps;  // row permutation S->LU
@@ -68,7 +68,7 @@ Int paru_lsolve(paru_matrix *paruMatInfo, double *x)
 
                 PRLEVEL(PR, (" r=%ld\n", r));
 
-                x[r] -= Slx[p] * x[j];
+                x[r+n1] -= Slx[p] * x[j];
                 PRLEVEL(PR, ("A x[%ld]=%.2lf\n", Sli[p], x[Sli[p]]));
             }
             PRLEVEL(PR, ("\n"));
