@@ -70,8 +70,8 @@ Int paru_usolve(paru_matrix *paruMatInfo, double *x)
                 {
                     i_prod += A2[fp * j + i] * x[fcolList[j] + n1];
                 }
-                Int r = Ps[frowList[i]];
-                x[r + n1] -= i_prod;
+                Int r = Ps[frowList[i]]+n1;
+                x[r] -= i_prod;
             }
         }
 
@@ -113,8 +113,7 @@ Int paru_usolve(paru_matrix *paruMatInfo, double *x)
             Int *Qfill = LUsym->Qfill;
             for(Int p = Sup[i]+1; p < Sup[i+1]; p++)
             {
-                //Int r = Suj[p]-n1 > 0 ? Qfill[Suj[p]] : Suj[p];
-                Int r =  Qfill[Suj[p]] ;
+                Int r = Suj[p]-n1 > 0 ? Ps[Suj[p]-n1]+n1 : Suj[p];
                 PRLEVEL(PR, (" r=%ld\n", r));
                 x[i] -= Sux[p] * x[r];
                 PRLEVEL(PR, ("A x[%ld]=%.2lf\n", Suj[p], x[Suj[p]]));

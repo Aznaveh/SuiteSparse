@@ -64,11 +64,9 @@ Int paru_lsolve(paru_matrix *paruMatInfo, double *x)
             PRLEVEL(PR, (" After x[%ld]=%.2lf \n",j, x[j]));
             for(Int p = Slp[j-cs1]+1; p < Slp[j-cs1+1]; p++)
             {
-                Int r = Sli[p]-n1 > 0 ? Ps[Sli[p]-n1] : Sli[p];
-
+                Int r = Sli[p]-n1 > 0 ? Ps[Sli[p]-n1]+n1 : Sli[p];
                 PRLEVEL(PR, (" r=%ld\n", r));
-
-                x[r+n1] -= Slx[p] * x[j];
+                x[r] -= Slx[p] * x[j];
                 PRLEVEL(PR, ("A x[%ld]=%.2lf\n", Sli[p], x[Sli[p]]));
             }
             PRLEVEL(PR, ("\n"));
@@ -137,8 +135,8 @@ Int paru_lsolve(paru_matrix *paruMatInfo, double *x)
             {
                 i_prod += A[(j - col1) * rowCount + i] * x[j+n1];
             }
-            Int r = Ps[frowList[i]];
-            x[r+n1] -= i_prod;
+            Int r = Ps[frowList[i]]+n1;
+            x[r] -= i_prod;
         }
     }
 
