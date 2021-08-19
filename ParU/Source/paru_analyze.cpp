@@ -501,7 +501,7 @@ paru_symbolic *paru_analyze(
     LUsym->Qfill = Qinit;
 
     PRLEVEL(0, ("%% A  is  %ld x %ld \n", m, n));
-    PRLEVEL(-1, ("LU = zeros(%ld,%ld);\n", m, n));
+    PRLEVEL(1, ("LU = zeros(%ld,%ld);\n", m, n));
     PRLEVEL(1, ("npivots =[]; \n"));
     PRLEVEL(1, ("S = zeros(%ld,%ld); %% n1 = %ld\n", m, n, n1));
     PRLEVEL(1, ("%% nf=%ld\n", nf));
@@ -517,7 +517,10 @@ paru_symbolic *paru_analyze(
     // TODO: nf == 0 is a weird condintion I have to check
     if (Parent == NULL || nf == 0)
     {  // should not happen anyway it is always shrinking
-        printf("memory problem");
+        if (nf == 0)
+            printf("No fronts... TODO\n");
+        else 
+            printf("memory problem\n");
         // free memory
         paru_free((n + 1), sizeof(Int), Front_npivcol);
         paru_free((n + 1), sizeof(Int), Front_parent);
@@ -533,7 +536,7 @@ paru_symbolic *paru_analyze(
     Int *Super = LUsym->Super = (Int *)paru_alloc((nf + 1), sizeof(Int));
     if (Super == NULL)
     {
-        printf("memory problem");
+        printf("memory problem\n");
         paru_free((m + 1), sizeof(Int), Pinit);
         paru_freesym(&LUsym);
         umfpack_dl_azn_free_sw(&SW);
@@ -650,7 +653,7 @@ paru_symbolic *paru_analyze(
     // TODO: I have not checked memory problems after changin the code
     if (Fm == NULL || Cm == NULL)
     {
-        printf("memory problem");
+        printf("memory problem\n");
         paru_freesym(&LUsym);
         umfpack_dl_azn_free_sw(&SW);
         return NULL;
@@ -745,7 +748,7 @@ paru_symbolic *paru_analyze(
     LUsym->Childp = Childp;
     if (Childp == NULL)
     {
-        printf("memory problem");
+        printf("memory problem\n");
         paru_free((m + 1), sizeof(Int), Pinit);
         paru_freesym(&LUsym);
         // umfpack_dl_azn_free_sw (&SW);
@@ -797,7 +800,7 @@ paru_symbolic *paru_analyze(
     LUsym->Child = Child;
     if (Child == NULL)
     {
-        printf("memory problem");
+        printf("memory problem\n");
         paru_free((m + 1), sizeof(Int), Pinit);
         paru_freesym(&LUsym);
         // umfpack_dl_azn_free_sw (&SW);
@@ -809,7 +812,7 @@ paru_symbolic *paru_analyze(
     Int *cChildp = Work;
     if (cChildp == NULL)
     {
-        printf("memory problem");
+        printf("memory problem\n");
         paru_free((m + 1), sizeof(Int), Pinit);
         paru_free((MAX(m, n) + 2), sizeof(Int), Work);
         paru_freesym(&LUsym);
@@ -841,7 +844,7 @@ paru_symbolic *paru_analyze(
 
     if (Sp == NULL || Sleft == NULL || Pinv == NULL)
     {
-        printf("memory problem");
+        printf("memory problem\n");
 
         paru_free((m + 1), sizeof(Int), Pinit);
         paru_free((MAX(m, n) + 2), sizeof(Int), Work);
@@ -1179,7 +1182,7 @@ paru_symbolic *paru_analyze(
     if (Sj == NULL || Sx == NULL || (cs1 > 0 && (Suj == NULL || Sux == NULL)) ||
         (rs1 > 0 && (Sli == NULL || Slx == NULL)))
     {
-        printf("memory problem");
+        printf("memory problem\n");
         paru_free(m, sizeof(Int), Pinv);
         paru_freesym(&LUsym);
         // umfpack_dl_azn_free_sw (&SW);
@@ -1262,7 +1265,7 @@ paru_symbolic *paru_analyze(
     paru_free((m - n1), sizeof(Int), Ps);
     PRLEVEL(PR, ("Constructing Sj and singletons finished here\n"));
 #ifndef NDEBUG
-    PR = 1;
+    PR = -1;
     PRLEVEL(PR, ("Sup and Slp after mading Sux Slx\n"));
     if (cs1 > 0)
     {
