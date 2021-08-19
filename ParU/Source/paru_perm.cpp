@@ -133,7 +133,7 @@ void paru_perm(paru_matrix *paruMatInfo)
         PRLEVEL(PR, (" %ld, ", Ps[k]));
     }
     PRLEVEL(PR, (" \n"));
-    PR = -1;
+    PR = 1;
     PRLEVEL(PR, ("%% n1=%ld Final row permutaion is:\n%%",n1));
     for (Int k = 0; k < m; k++)
     {
