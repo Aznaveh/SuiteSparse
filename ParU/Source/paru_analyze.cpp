@@ -863,10 +863,11 @@ paru_symbolic *paru_analyze(
     }
 
 #ifndef NDEBUG
-    PR = 1;
+    PR = -1;
     PRLEVEL(PR, ("Qinit =\n"));
     for (Int j = 0; j < m; j++) PRLEVEL(PR, ("%ld ", Qinit[j]));
     PRLEVEL(PR, ("\n"));
+    PR = 1;
 
     PRLEVEL(PR, ("Pinit =\n"));
     for (Int i = 0; i < m; i++) PRLEVEL(PR, ("%ld ", Pinit[i]));

@@ -39,7 +39,7 @@
 #include "paru_internal.hpp"
 void paru_perm(paru_matrix *paruMatInfo)
 {
-    DEBUGLEVEL(0);
+    DEBUGLEVEL(1);
     paru_symbolic *LUsym = paruMatInfo->LUsym;
 
     if (LUsym->Pfin != NULL)  // it must have been computed
@@ -66,13 +66,13 @@ void paru_perm(paru_matrix *paruMatInfo)
     }
 
 #ifndef NDEBUG
-    Int *oldRofS = (Int *)paru_alloc(m, sizeof(Int));
-    Int *newRofS = (Int *)paru_alloc(m, sizeof(Int));
-    if (oldRofS == NULL || newRofS == NULL)
-    {
-        printf("memory problem inside perm in debug mode\n");
-        return;
-    }
+    //Int *oldRofS = (Int *)paru_alloc(m, sizeof(Int));
+    //Int *newRofS = (Int *)paru_alloc(m, sizeof(Int));
+    //if (oldRofS == NULL || newRofS == NULL)
+    //{
+    //    printf("memory problem inside perm in debug mode\n");
+    //    return;
+    //}
     Int PR = 1;
 
     PRLEVEL(PR, ("%% Initial row permutaion is:\n%%"));
@@ -105,8 +105,8 @@ void paru_perm(paru_matrix *paruMatInfo)
         {
             // P[k] = i
 #ifndef NDEBUG
-            oldRofS[ip - n1] = frowList[k];  // computing permutation for S
-            PRLEVEL(1, ("%% frowList[%ld]= %ld-", k, frowList[k]));
+     //       oldRofS[ip - n1] = frowList[k];  // computing permutation for S
+     //       PRLEVEL(1, ("%% frowList[%ld]= %ld-", k, frowList[k]));
 #endif
             Ps[frowList[k]] = ip - n1;
             Pfin[ip++] = Pinit[frowList[k]+n1];
@@ -117,15 +117,17 @@ void paru_perm(paru_matrix *paruMatInfo)
 
 #ifndef NDEBUG
     //-------- computing the direct permutation of S only for debug
-    for (Int k = 0; k < m - n1; k++)
-    {
-        // Inv permutation for S Pinv[i] = k;
-        newRofS[oldRofS[k]] = k;
-        ASSERT(Ps[oldRofS[k]] == newRofS[oldRofS[k]]);
-    }
+//    for (Int k = 0; k < m - n1; k++)
+//    {
+//        // Inv permutation for S Pinv[i] = k;
+//        newRofS[oldRofS[k]] = k;
+//        ASSERT(Ps[oldRofS[k]] == newRofS[oldRofS[k]]);
+//    }
+//
+//    paru_free(m, sizeof(Int), oldRofS);
+//    paru_free(m, sizeof(Int), newRofS);
+//
 
-    paru_free(m, sizeof(Int), oldRofS);
-    paru_free(m, sizeof(Int), newRofS);
 
     PRLEVEL(PR, ("%% Final Ps:\n%%"));
     for (Int k = 0; k < m-n1; k++)
@@ -218,23 +220,29 @@ Int paru_apply_inv_perm(const Int *P, const double *b, double *x, Int m)
 }
 
 ///////////////apply scale x= s.b  /////////////////////////////////////////////
-Int paru_apply_scale(const double *s, double *x, Int m, Int n1)
+Int paru_apply_scale(const double *s, const Int *Ps, double *x, Int m, Int n1)
 {
+    DEBUGLEVEL(1);
 #ifndef NDEBUG
     PRLEVEL(1, ("%% before applying scale x is:\n%%"));
     for (Int k = 0; k < m; k++)
     {
         PRLEVEL(1, (" %.2lf, ", x[k]));
     }
+    PRLEVEL(1, ("\n%% and s is\n"));
+
+    for (Int k = n1; k < m; k++)
+    {
+        PRLEVEL(1, (" %lf, ", s[k-n1]));
+    }
     PRLEVEL(1, (" \n"));
 #endif
 
-    DEBUGLEVEL(0);
     if (!x || !s) return (0);
 
     for (Int k = n1; k < m; k++)
     {
-        x[k] = x[k] / s[k - n1];
+        x[k] = x[k] / s[Ps[k - n1]];
     }
 
 #ifndef NDEBUG

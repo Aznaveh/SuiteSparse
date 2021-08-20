@@ -163,7 +163,7 @@ ParU_ResultCode paru_factorize(cholmod_sparse *A, paru_symbolic *LUsym,
     for (Int i = 0; i < m; ++i) b[i] = i + 1;
     paru_apply_perm(LUsym->Pfin, b, x, m);  // x = p (b)
     if (paruMatInfo->scale_row)
-        paru_apply_scale (paruMatInfo->scale_row, x, m, LUsym->n1);
+        paru_apply_scale (paruMatInfo->scale_row, LUsym->Ps, x, m, LUsym->n1);
     paru_lsolve(paruMatInfo, x);
     paru_usolve(paruMatInfo, x);
     paru_apply_inv_perm(LUsym->Qfill, x, xt, m);  // xt = qinv (x)

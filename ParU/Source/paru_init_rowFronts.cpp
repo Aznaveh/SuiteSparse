@@ -143,7 +143,6 @@ ParU_ResultCode paru_init_rowFronts(
     Int *Sj = LUsym->Sj;
 
     //~~~~~~~~~~ scaling the A matrix
-    // TODO change this part using S matrix
     scale = 0;
     if (scale)
     {
@@ -174,7 +173,7 @@ ParU_ResultCode paru_init_rowFronts(
         paruMatInfo->scale_row = max_row;
 
 #ifndef NDEBUG
-        Int p = 1;
+        Int p = -1;
         PRLEVEL(p, ("%% scale =[ "));
         for (Int row = 0; row < m; row++) PRLEVEL(p, ("%lf ", max_row[row]));
         PRLEVEL(p, ("]\n"));

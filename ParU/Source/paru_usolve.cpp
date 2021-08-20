@@ -32,7 +32,7 @@
 #include "paru_internal.hpp"
 Int paru_usolve(paru_matrix *paruMatInfo, double *x)
 {
-    DEBUGLEVEL(0);
+    DEBUGLEVEL(1);
     // TODO check if input is read
     if (!x) return (0);
     paru_symbolic *LUsym = paruMatInfo->LUsym;
@@ -40,6 +40,7 @@ Int paru_usolve(paru_matrix *paruMatInfo, double *x)
 
     Int n1 = LUsym->n1;   // row+col singletons
     Int *Ps = LUsym->Ps;  // row permutation
+    Int *Qfill = LUsym->Qfill;
 
     paru_fac *LUs = paruMatInfo->partial_LUs;
     paru_fac *Us = paruMatInfo->partial_Us;
@@ -70,7 +71,8 @@ Int paru_usolve(paru_matrix *paruMatInfo, double *x)
                 {
                     i_prod += A2[fp * j + i] * x[fcolList[j] + n1];
                 }
-                Int r = Ps[frowList[i]]+n1;
+                //Int r = Ps[frowList[i]]+n1;
+                Int r = Qfill[frowList[i]+n1];
                 x[r] -= i_prod;
             }
         }
@@ -98,6 +100,13 @@ Int paru_usolve(paru_matrix *paruMatInfo, double *x)
 
 #ifndef NDEBUG
     Int PR = 1;
+    Int m = LUsym->m;
+    PRLEVEL(1, ("%% before singleton x is:\n%%"));
+    for (Int k = 0; k < m; k++)
+    {
+        PRLEVEL(1, (" %.2lf, ", x[k]));
+    }
+    PRLEVEL(1, (" \n"));
 #endif
     Int cs1 = LUsym->cs1;
     if (cs1 >0)
@@ -109,14 +118,16 @@ Int paru_usolve(paru_matrix *paruMatInfo, double *x)
             Int *Suj = LUsym->ustons.Suj;
             double *Sux = LUsym->ustons.Sux;
             ASSERT (Suj != NULL && Sux != NULL && Sup != NULL);
-            PRLEVEL(PR, (" After x[%ld]=%.2lf \n",i, x[i]));
-            Int *Qfill = LUsym->Qfill;
+            PRLEVEL(PR, (" Before computation x[%ld]=%.2lf \n",i, x[i]))
             for(Int p = Sup[i]+1; p < Sup[i+1]; p++)
             {
-                Int r = Suj[p]-n1 >= 0 ? Ps[Suj[p]-n1]+n1 : Suj[p];
+                //Int r = Suj[p]-n1 >= 0 ? Ps[Suj[p]-n1]+n1 : Suj[p];
+                //Int r = Suj[p]-n1 >= 0 ? Qfill[Suj[p]-n1]+n1 : Suj[p];
+                Int r = Suj[p];
                 PRLEVEL(PR, (" r=%ld\n", r));
                 x[i] -= Sux[p] * x[r];
-                PRLEVEL(PR, ("A x[%ld]=%.2lf\n", Suj[p], x[Suj[p]]));
+                PRLEVEL(PR, ("Suj[%ld]=%ld\n", p, Suj[p]));
+                PRLEVEL(PR, (" x[%ld]=%.2lf x[%ld]=%.2lf\n", r, x[r], i, x[i]));
             }
             Int diag =  Sup[i];
             x[i] /= Sux[diag];
@@ -124,7 +135,6 @@ Int paru_usolve(paru_matrix *paruMatInfo, double *x)
         }
     }
 #ifndef NDEBUG
-    Int m = LUsym->m;
     PRLEVEL(1, ("%% after usolve x is:\n%%"));
     for (Int k = 0; k < m; k++)
     {
