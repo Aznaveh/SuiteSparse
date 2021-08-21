@@ -129,13 +129,13 @@ void paru_perm(paru_matrix *paruMatInfo)
 //
 
 
+    PR = -1;
     PRLEVEL(PR, ("%% Final Ps:\n%%"));
     for (Int k = 0; k < m-n1; k++)
     {
         PRLEVEL(PR, (" %ld, ", Ps[k]));
     }
     PRLEVEL(PR, (" \n"));
-    PR = 1;
     PRLEVEL(PR, ("%% n1=%ld Final row permutaion is:\n%%",n1));
     for (Int k = 0; k < m; k++)
     {
@@ -239,12 +239,19 @@ Int paru_apply_scale(const double *s, const Int *Ps, double *x, Int m, Int n1)
 #endif
 
     if (!x || !s) return (0);
-
+    Int Psin[m-n1];
+    for (Int k = 0; k < m-n1; k++)
+    {
+        Psin[Ps[k]] = k;
+    }
     for (Int k = n1; k < m; k++)
     {
         PRLEVEL(1, ("x[%ld]= %lf, ", k, x[k]));
         PRLEVEL(1, ("s[%ld]= %lf, ", Ps[k - n1], s[Ps[k - n1]] ));
-        x[k] = x[k] / s[Ps[k - n1]];
+        //x[k] = x[k] / s[Ps[k - n1]];
+        //Int t = Ps[k-n1];
+        //x[t] = x[t] / s[k-n1];
+        x[k] = x[k] / s[Psin[k - n1]];
         //x[k] = x[k] / s[k - n1];
     }
 

@@ -62,6 +62,13 @@ Int paru_lsolve(paru_matrix *paruMatInfo, double *x)
                         j, x[j], diag, Slx[diag]));
             x[j] /= Slx[diag];
             PRLEVEL(PR, (" After x[%ld]=%.2lf \n",j, x[j]));
+            //TODO OO
+            //Int Psin[LUsym->m-n1];
+            //for (Int k = 0; k < LUsym->m-n1; k++)
+            //{
+            //    Psin[Ps[k]] = k;
+            //}
+
             for(Int p = Slp[j-cs1]+1; p < Slp[j-cs1+1]; p++)
             {
                 //Int r = Sli[p]-n1 >= 0 ? Ps[Sli[p]-n1]+n1 : Sli[p];
@@ -69,7 +76,7 @@ Int paru_lsolve(paru_matrix *paruMatInfo, double *x)
                 //x[r] -= Slx[p] * x[j];
                 //PRLEVEL(PR, ("A x[%ld]=%.2lf\n", Sli[p], x[Sli[p]]));
 #ifndef NDEBUG
-    PR = 1;
+                PR = -1;
 #endif
                 if ( Sli[p]-n1 >= 0)
                 {
@@ -94,9 +101,9 @@ Int paru_lsolve(paru_matrix *paruMatInfo, double *x)
                     PRLEVEL(PR, ("In singlton area r=%ld\n", r));
                     x[r] -= Slx[p] * x[j];
                 }
-                 PRLEVEL(PR, ("\n"));
+                PRLEVEL(PR, ("\n"));
 #ifndef NDEBUG
-    PR = 1;
+                PR = 1;
 #endif
             }
         }
