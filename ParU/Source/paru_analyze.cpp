@@ -867,12 +867,12 @@ paru_symbolic *paru_analyze(
     PRLEVEL(PR, ("Qinit =\n"));
     for (Int j = 0; j < m; j++) PRLEVEL(PR, ("%ld ", Qinit[j]));
     PRLEVEL(PR, ("\n"));
-    PR = 1;
 
     PRLEVEL(PR, ("Pinit =\n"));
     for (Int i = 0; i < m; i++) PRLEVEL(PR, ("%ld ", Pinit[i]));
     PRLEVEL(PR, ("\n"));
 
+    PR = 1;
     PRLEVEL(PR, ("Pinv =\n"));
     for (Int i = 0; i < m; i++) PRLEVEL(PR, ("%ld ", Pinv[i]));
     PRLEVEL(PR, ("\n"));
@@ -1266,7 +1266,7 @@ paru_symbolic *paru_analyze(
     paru_free((m - n1), sizeof(Int), Ps);
     PRLEVEL(PR, ("Constructing Sj and singletons finished here\n"));
 #ifndef NDEBUG
-    PR = -1;
+    PR = 1;
     PRLEVEL(PR, ("Sup and Slp after mading Sux Slx\n"));
     if (cs1 > 0)
     {

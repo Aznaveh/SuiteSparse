@@ -39,7 +39,7 @@
 #include "paru_internal.hpp"
 void paru_perm(paru_matrix *paruMatInfo)
 {
-    DEBUGLEVEL(1);
+    DEBUGLEVEL(0);
     paru_symbolic *LUsym = paruMatInfo->LUsym;
 
     if (LUsym->Pfin != NULL)  // it must have been computed
@@ -242,11 +242,14 @@ Int paru_apply_scale(const double *s, const Int *Ps, double *x, Int m, Int n1)
 
     for (Int k = n1; k < m; k++)
     {
+        PRLEVEL(1, ("x[%ld]= %lf, ", k, x[k]));
+        PRLEVEL(1, ("s[%ld]= %lf, ", Ps[k - n1], s[Ps[k - n1]] ));
         x[k] = x[k] / s[Ps[k - n1]];
+        //x[k] = x[k] / s[k - n1];
     }
 
 #ifndef NDEBUG
-    PRLEVEL(1, ("%% after applying scale x is:\n%%"));
+    PRLEVEL(1, ("\n%% after applying scale x is:\n%%"));
     for (Int k = 0; k < m; k++)
     {
         PRLEVEL(1, (" %.8lf, ", x[k]));

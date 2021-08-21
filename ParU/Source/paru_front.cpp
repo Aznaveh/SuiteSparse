@@ -17,7 +17,7 @@ ParU_ResultCode paru_front(Int f,  // front need to be assembled
                            paru_matrix *paruMatInfo)
 // RowCol list/tuples and LUsym handle
 {
-    DEBUGLEVEL(0);
+    DEBUGLEVEL(-1);
     /*
      * -2 Print Nothing
      * -1 Just Matlab

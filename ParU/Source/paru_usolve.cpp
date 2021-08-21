@@ -32,7 +32,7 @@
 #include "paru_internal.hpp"
 Int paru_usolve(paru_matrix *paruMatInfo, double *x)
 {
-    DEBUGLEVEL(1);
+    DEBUGLEVEL(0);
     // TODO check if input is read
     if (!x) return (0);
     paru_symbolic *LUsym = paruMatInfo->LUsym;
@@ -71,8 +71,8 @@ Int paru_usolve(paru_matrix *paruMatInfo, double *x)
                 {
                     i_prod += A2[fp * j + i] * x[fcolList[j] + n1];
                 }
-                //Int r = Ps[frowList[i]]+n1;
-                Int r = Qfill[frowList[i]+n1];
+                Int r = Ps[frowList[i]]+n1;
+                //Int r = Qfill[frowList[i]+n1];
                 x[r] -= i_prod;
             }
         }

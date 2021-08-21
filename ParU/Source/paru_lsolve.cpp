@@ -69,7 +69,7 @@ Int paru_lsolve(paru_matrix *paruMatInfo, double *x)
                 //x[r] -= Slx[p] * x[j];
                 //PRLEVEL(PR, ("A x[%ld]=%.2lf\n", Sli[p], x[Sli[p]]));
 #ifndef NDEBUG
-    PR = -1;
+    PR = 1;
 #endif
                 if ( Sli[p]-n1 >= 0)
                 {
