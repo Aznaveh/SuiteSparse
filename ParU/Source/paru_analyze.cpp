@@ -434,7 +434,7 @@ paru_symbolic *paru_analyze(
     }
 #ifndef NDEBUG
     PR = 1;
-    PRLEVEL(-1, ("\n%%\tcs1 = %ld, rs1=%ld n1=%ld\n", cs1, rs1, n1));
+    PRLEVEL(-1, ("\n%%\tcs1 = %ld, rs1 = %ld n1 = %ld\n", cs1, rs1, n1));
     PRLEVEL(PR, ("From the Symbolic object,\
                 C is of dimension %ld-by-%ld\n",
                  nr, nc));

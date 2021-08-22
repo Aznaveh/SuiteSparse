@@ -225,7 +225,7 @@ Int paru_apply_scale (const double *s, const Int *Ps, double *x, Int m, Int n1);
 Int paru_lsolve(paru_matrix *paruMatInfo, double *x);
 Int paru_usolve(paru_matrix *paruMatInfo, double *x);
 
-Int paru_gaxpy(cholmod_sparse *A, const double *x, double *y);
+Int paru_gaxpy(cholmod_sparse *A, const double *x, double *y, double alpha);
 double paru_spm_1norm(cholmod_sparse *A);
 double paru_vec_1norm(const double *x, Int n);
 

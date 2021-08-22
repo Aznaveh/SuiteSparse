@@ -1,7 +1,7 @@
 /** =========================================================================  /
  *  ======================  paru_gaxpy ======================================  /
  *  ========================================================================= */
-/*! @brief  computing y = A*x+y
+/*! @brief  computing y = alpha * A*x+y
  *  doesn't need performance improvement mostly borrowed from CSparse
  *  just is used for tests
  *
@@ -9,7 +9,7 @@
  *  @author Aznaveh
  */
 #include "paru_internal.hpp"
-Int paru_gaxpy (cholmod_sparse *A, const double *x, double *y)
+Int paru_gaxpy (cholmod_sparse *A, const double *x, double *y, double alpha)
 {
     DEBUGLEVEL(0);
 
@@ -23,7 +23,7 @@ Int paru_gaxpy (cholmod_sparse *A, const double *x, double *y)
     {
         for (Int p = Ap[j]; p < Ap[j + 1]; p++)
         {
-            y[Ai[p]] += Ax[p] * x[j];
+            y[Ai[p]] += alpha * Ax[p] * x[j];
         }
     }
 
