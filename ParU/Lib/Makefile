@@ -73,6 +73,8 @@ OBJ = \
 	paru_perm.o \
 	paru_lsolve.o \
 	paru_usolve.o \
+	paru_solve.o \
+	paru_residual.o \
 	paru_gaxpy.o \
 	paru_norms.o \
 	paru_full_summed.o \
@@ -200,6 +202,12 @@ paru_lsolve.o: ../Source/paru_lsolve.cpp
 	$(C) -c $<
 
 paru_usolve.o: ../Source/paru_usolve.cpp
+	$(C) -c $<
+
+paru_solve.o: ../Source/paru_solve.cpp
+	$(C) -c $<
+
+paru_residual.o: ../Source/paru_residual.cpp
 	$(C) -c $<
 
 paru_gaxpy.o: ../Source/paru_gaxpy.cpp

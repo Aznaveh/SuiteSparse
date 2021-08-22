@@ -377,6 +377,7 @@ info: an enum: PARU_SUCCESS, PARU_OUT_OF_MEMORY, PARU_INVALID, PARU_SINGULAR,
 
 ParU_ResultCode paru_factorize(cholmod_sparse *A, paru_symbolic *LUsym,
         paru_matrix **paruMatInfo_handle);
+ParU_ResultCode paru_solve(paru_matrix *paruMatInfo, double *b);
 void paru_write(paru_matrix *paruMatInfo, int scale, char *id);
 
 void paru_freesym(paru_symbolic **LUsym_handle);
