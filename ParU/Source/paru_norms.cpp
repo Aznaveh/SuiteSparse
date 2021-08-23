@@ -35,9 +35,10 @@ double paru_spm_1norm(cholmod_sparse *A)
 double paru_vec_1norm(const double *x, Int n)
 {
     DEBUGLEVEL(0);
-    double norm = 0;
+    double norm = 0.0;
     for (Int i = 0; i < n; i++)
     {
+        PRLEVEL(1, ("so far norm = %lf + %lf\n", norm, fabs(x[i])));
         norm += fabs(x[i]);
     }
     PRLEVEL(1, ("vec 1norm = %.8lf\n", norm));

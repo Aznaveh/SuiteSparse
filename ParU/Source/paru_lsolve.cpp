@@ -41,65 +41,60 @@ Int paru_lsolve(paru_matrix *paruMatInfo, double *x)
 #ifndef NDEBUG
     Int PR = 1;
 #endif
-    Int n1 = LUsym->n1;  // row+col singletons
+    Int n1 = LUsym->n1;   // row+col singletons
     Int *Ps = LUsym->Ps;  // row permutation S->LU
 
     // singletons
     Int rs1 = LUsym->rs1;
-    if (rs1 >0)
+    if (rs1 > 0)
     {
         Int cs1 = LUsym->cs1;
 
-        for(Int j = cs1;  j < n1; j++)
+        for (Int j = cs1; j < n1; j++)
         {
             PRLEVEL(PR, ("j = %ld\n", j));
             Int *Slp = LUsym->lstons.Slp;
             Int *Sli = LUsym->lstons.Sli;
             double *Slx = LUsym->lstons.Slx;
-            ASSERT (Sli != NULL && Slx != NULL && Slp != NULL);
-            Int diag =  Slp[j-cs1];
-            PRLEVEL(PR, (" x[%ld]=%.2lf Slx[%ld]=%.2lf\n", 
-                        j, x[j], diag, Slx[diag]));
+            ASSERT(Sli != NULL && Slx != NULL && Slp != NULL);
+            Int diag = Slp[j - cs1];
+            PRLEVEL(PR, (" x[%ld]=%.2lf Slx[%ld]=%.2lf\n", j, x[j], diag,
+                         Slx[diag]));
             x[j] /= Slx[diag];
-            PRLEVEL(PR, (" After x[%ld]=%.2lf \n",j, x[j]));
-            //TODO OO
-            //Int Psin[LUsym->m-n1];
-            //for (Int k = 0; k < LUsym->m-n1; k++)
-            //{
-            //    Psin[Ps[k]] = k;
-            //}
+            PRLEVEL(PR, (" After x[%ld]=%.2lf \n", j, x[j]));
 
-            for(Int p = Slp[j-cs1]+1; p < Slp[j-cs1+1]; p++)
+            for (Int p = Slp[j - cs1] + 1; p < Slp[j - cs1 + 1]; p++)
             {
-                //Int r = Sli[p]-n1 >= 0 ? Ps[Sli[p]-n1]+n1 : Sli[p];
-                //PRLEVEL(PR, (" r=%ld\n", r));
-                //x[r] -= Slx[p] * x[j];
-                //PRLEVEL(PR, ("A x[%ld]=%.2lf\n", Sli[p], x[Sli[p]]));
+                // Int r = Sli[p]-n1 >= 0 ? Ps[Sli[p]-n1]+n1 : Sli[p];
+                // PRLEVEL(PR, (" r=%ld\n", r));
+                // x[r] -= Slx[p] * x[j];
+                // PRLEVEL(PR, ("A x[%ld]=%.2lf\n", Sli[p], x[Sli[p]]));
 #ifndef NDEBUG
                 PR = -1;
 #endif
-                if ( Sli[p]-n1 >= 0)
+                if (Sli[p] < n1)
                 {
-                    Int r = Ps[Sli[p]-n1]+n1;
+                    Int r = Sli[p];
+                    PRLEVEL(PR, ("Singlton not permuted r=%ld\n", r));
+                    x[r] -= Slx[p] * x[j];
+                }
+                else
+                {  // singletons that are permuted
+                    Int r = Ps[Sli[p] - n1] + n1;
                     double *scale = paruMatInfo->scale_row;
                     PRLEVEL(PR, (" r=%ld\n", r));
-                    if ( scale == NULL)
+                    if (scale == NULL)
                     {
                         x[r] -= Slx[p] * x[j];
                         PRLEVEL(PR, ("Not scaled x=%lf\n", x[r]));
                     }
-                    else 
+                    else
                     {
-                        x[r] -= (Slx[p] * x[j]) / scale[Ps[Sli[p]-n1]];
-                        PRLEVEL(PR, ("scale =%lf Slip = %ld Slx = %lf x=%lf\n", 
-                                    scale[Ps[Sli[p]-n1]], Sli[p], Slx[p], x[r]));
+                        x[r] -= (Slx[p] * x[j]) / scale[Ps[Sli[p] - n1]];
+                        PRLEVEL(PR,
+                                ("scale =%lf Slip = %ld Slx = %lf x=%lf\n",
+                                 scale[Ps[Sli[p] - n1]], Sli[p], Slx[p], x[r]));
                     }
-                }
-                else
-                {
-                    Int r = Sli[p]; 
-                    PRLEVEL(PR, ("In singlton area r=%ld\n", r));
-                    x[r] -= Slx[p] * x[j];
                 }
                 PRLEVEL(PR, ("\n"));
 #ifndef NDEBUG
@@ -129,13 +124,13 @@ Int paru_lsolve(paru_matrix *paruMatInfo, double *x)
 
         PRLEVEL(1, ("%% Working on DTRSV\n"));
         BLAS_DTRSV("L",     // UPLO lower triangular
-                "N",     // TRANS A*X=b not the A**T
-                "U",     // DIAG A is assumed to be unit traingular
-                &N,      // N is order of the matrix A
-                A,       // A
-                &lda,    // LDA leading demension
-                X,       // X
-                &Incx);  // INCX the increment of elements of X.
+                   "N",     // TRANS A*X=b not the A**T
+                   "U",     // DIAG A is assumed to be unit traingular
+                   &N,      // N is order of the matrix A
+                   A,       // A
+                   &lda,    // LDA leading demension
+                   X,       // X
+                   &Incx);  // INCX the increment of elements of X.
         PRLEVEL(1, ("%% DTRSV is just finished\n"));
 #ifndef NDEBUG
         PR = 2;
@@ -169,9 +164,9 @@ Int paru_lsolve(paru_matrix *paruMatInfo, double *x)
             double i_prod = 0.0;  // innter product
             for (Int j = col1; j < col2; j++)
             {
-                i_prod += A[(j - col1) * rowCount + i] * x[j+n1];
+                i_prod += A[(j - col1) * rowCount + i] * x[j + n1];
             }
-            Int r = Ps[frowList[i]]+n1;
+            Int r = Ps[frowList[i]] + n1;
             x[r] -= i_prod;
         }
     }
