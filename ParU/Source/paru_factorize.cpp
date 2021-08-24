@@ -179,6 +179,8 @@ ParU_ResultCode paru_factorize(cholmod_sparse *A, paru_symbolic *LUsym,
     //double res = paru_vec_1norm(b, m);
      
     paru_residual(A, paruMatInfo, b);
+    for (Int i = 0; i < m; ++i) b[i] = i + 1;
+    paru_backward(A, paruMatInfo, b);
     //double res = paru_residual(A, paruMatInfo, b);
     //double weighted_res = res / (paru_spm_1norm(A) * paru_vec_1norm(xt, m));
     //printf("Residual is |%.2lf| and weigheted residual is |%.2f|.\n", 
