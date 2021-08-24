@@ -32,7 +32,7 @@
 #include "paru_internal.hpp"
 Int paru_usolve(paru_matrix *paruMatInfo, double *x)
 {
-    DEBUGLEVEL(1);
+    DEBUGLEVEL(0);
     // TODO check if input is read
     if (!x) return (0);
     paru_symbolic *LUsym = paruMatInfo->LUsym;
@@ -40,7 +40,7 @@ Int paru_usolve(paru_matrix *paruMatInfo, double *x)
 
     Int n1 = LUsym->n1;   // row+col singletons
     Int *Ps = LUsym->Ps;  // row permutation
-    Int *Qfill = LUsym->Qfill;
+    //Int *Qfill = LUsym->Qfill;
 
     paru_fac *LUs = paruMatInfo->partial_LUs;
     paru_fac *Us = paruMatInfo->partial_Us;
@@ -107,7 +107,7 @@ Int paru_usolve(paru_matrix *paruMatInfo, double *x)
         PRLEVEL(1, (" %.2lf, ", x[k]));
     }
     PRLEVEL(1, (" \n"));
-    PR = -1;
+    PR = 1;
 #endif
     Int cs1 = LUsym->cs1;
     if (cs1 >0)

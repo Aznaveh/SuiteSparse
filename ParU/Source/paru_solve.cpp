@@ -12,7 +12,7 @@
 
 ParU_ResultCode paru_solve(paru_matrix *paruMatInfo, double *b)
 {
-    DEBUGLEVEL(1);
+    DEBUGLEVEL(0);
     PRLEVEL(1, ("%% inside solve\n"));
     paru_symbolic *LUsym = paruMatInfo->LUsym;
     Int m = LUsym->m;

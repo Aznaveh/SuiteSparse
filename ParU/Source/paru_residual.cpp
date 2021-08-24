@@ -12,7 +12,7 @@
 
 double paru_residual(cholmod_sparse *A, paru_matrix *paruMatInfo, double *b)
 {
-    DEBUGLEVEL(1);
+    DEBUGLEVEL(0);
     PRLEVEL(1, ("%% inside residual\n"));
     paru_symbolic *LUsym = paruMatInfo->LUsym;
     Int m = LUsym->m;

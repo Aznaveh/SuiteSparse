@@ -153,12 +153,13 @@ ParU_ResultCode paru_factorize(cholmod_sparse *A, paru_symbolic *LUsym,
             return info;
         }
     }
-    // TODO: temporary to test perm
-    paru_perm(paruMatInfo);
+    paru_perm(paruMatInfo); // to form the final permutation
     Int m = LUsym->m;
-    double b[m];
-    double x[m];
-    double xt[m];
+    double *b = (double *)paru_alloc(m, sizeof(double));
+    
+    //double b[m];
+    //double x[m];
+    //double xt[m];
     for (Int i = 0; i < m; ++i) b[i] = i + 1;
 
     //paru_apply_perm(LUsym->Pfin, b, x, m);  // x = p (b)
@@ -176,8 +177,10 @@ ParU_ResultCode paru_factorize(cholmod_sparse *A, paru_symbolic *LUsym,
 
     //paru_gaxpy(A, xt, b, -1);
     //double res = paru_vec_1norm(b, m);
-    double res = paru_residual(A, paruMatInfo, b);
-    double weighted_res = res / (paru_spm_1norm(A) * paru_vec_1norm(xt, m));
+     
+    paru_residual(A, paruMatInfo, b);
+    //double res = paru_residual(A, paruMatInfo, b);
+    //double weighted_res = res / (paru_spm_1norm(A) * paru_vec_1norm(xt, m));
     //printf("Residual is |%.2lf| and weigheted residual is |%.2f|.\n", 
     //        log10(res), log10(weighted_res) );
 
