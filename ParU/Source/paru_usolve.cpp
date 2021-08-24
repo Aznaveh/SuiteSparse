@@ -32,7 +32,7 @@
 #include "paru_internal.hpp"
 Int paru_usolve(paru_matrix *paruMatInfo, double *x)
 {
-    DEBUGLEVEL(0);
+    DEBUGLEVEL(1);
     // TODO check if input is read
     if (!x) return (0);
     paru_symbolic *LUsym = paruMatInfo->LUsym;
@@ -107,6 +107,7 @@ Int paru_usolve(paru_matrix *paruMatInfo, double *x)
         PRLEVEL(1, (" %.2lf, ", x[k]));
     }
     PRLEVEL(1, (" \n"));
+    PR = -1;
 #endif
     Int cs1 = LUsym->cs1;
     if (cs1 >0)
@@ -123,6 +124,8 @@ Int paru_usolve(paru_matrix *paruMatInfo, double *x)
             {
                 //Int r = Suj[p]-n1 >= 0 ? Ps[Suj[p]-n1]+n1 : Suj[p];
                 //Int r = Suj[p]-n1 >= 0 ? Qfill[Suj[p]-n1]+n1 : Suj[p];
+                //Int r = Suj[p] < n1  ? Suj[p] : Qfill[Suj[p]] ;
+                //Int r = Qfill[Suj[p]] ;
                 Int r = Suj[p];
                 PRLEVEL(PR, (" r=%ld\n", r));
                 x[i] -= Sux[p] * x[r];
@@ -131,6 +134,7 @@ Int paru_usolve(paru_matrix *paruMatInfo, double *x)
             }
             Int diag =  Sup[i];
             x[i] /= Sux[diag];
+            PRLEVEL(PR, (" After computation x[%ld]=%.2lf \n",i, x[i]))
             PRLEVEL(PR, ("\n"));
         }
     }

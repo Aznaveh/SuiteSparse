@@ -51,6 +51,7 @@
 #include "paru_internal.hpp"
 paru_symbolic *paru_analyze(
     // inputs, not modified
+    Int scale,  // if scale == 1 the S will be scaled by max_row
     cholmod_sparse *A)
 {
     DEBUGLEVEL(0);
@@ -519,7 +520,7 @@ paru_symbolic *paru_analyze(
     {  // should not happen anyway it is always shrinking
         if (nf == 0)
             printf("No fronts... TODO\n");
-        else 
+        else
             printf("memory problem\n");
         // free memory
         paru_free((n + 1), sizeof(Int), Front_npivcol);
@@ -863,7 +864,7 @@ paru_symbolic *paru_analyze(
     }
 
 #ifndef NDEBUG
-    PR = -1;
+    PR = 1;
     PRLEVEL(PR, ("Qinit =\n"));
     for (Int j = 0; j < m; j++) PRLEVEL(PR, ("%ld ", Qinit[j]));
     PRLEVEL(PR, ("\n"));
@@ -881,11 +882,14 @@ paru_symbolic *paru_analyze(
 
     Int *Ps;  // new row permutation for just the Submatrix part
 
-    Int *Sup = NULL;   // Singlton u p
-    Int *cSup = NULL;  // copy of Singlton u p
-    Int *Slp = NULL;   // Singlton l p
-    Int *cSlp = NULL;  // copy Singlton l p
+    Int *Sup = NULL;    // Singlton u p
+    Int *cSup = NULL;   // copy of Singlton u p
+    Int *Slp = NULL;    // Singlton l p
+    Int *cSlp = NULL;   // copy Singlton l p
+    double *Rs = NULL;  // row scaling
     Ps = (Int *)paru_calloc(m - n1, sizeof(Int));
+    scale = 1;
+    if (scale == 1) Rs = (double *)paru_calloc(m, sizeof(double));
     if (cs1 > 0)
     {
         Sup = LUsym->ustons.Sup = (Int *)paru_calloc(cs1 + 1, sizeof(Int));
@@ -898,6 +902,7 @@ paru_symbolic *paru_analyze(
     }
 
     if (((Slp == NULL || cSlp == NULL) && rs1 != 0) ||
+        (Rs == NULL && scale == 1) ||
         ((Sup == NULL || cSup == NULL) && cs1 != 0) || Ps == NULL)
     {
         printf("rs1=%ld cs1=%ld memory problem\n", rs1, cs1);
@@ -908,6 +913,7 @@ paru_symbolic *paru_analyze(
         paru_free((rs1 + 1), sizeof(Int), cSlp);
 
         paru_free((m + 1), sizeof(Int), Pinit);
+        paru_free(m, sizeof(Int), Rs);
         paru_free((MAX(m, n) + 2), sizeof(Int), Work);
         paru_free(m, sizeof(Int), Pinv);
         // umfpack_dl_azn_free_sw (&SW);
@@ -935,6 +941,7 @@ paru_symbolic *paru_analyze(
         {
             Int oldrow = Ai[p];
             Int newrow = Pinv[oldrow];
+            if (Rs) Rs[oldrow] = MAX(Rs[oldrow], fabs(Ax[p]));
             PRLEVEL(PR, ("newrow=%ld oldrow=%ld\n", newrow, oldrow));
             if (newrow < cs1)
             {  // inside U singletons
@@ -981,6 +988,7 @@ paru_symbolic *paru_analyze(
             Int oldrow = Ai[p];
             Int newrow = Pinv[oldrow];
             Int srow = newrow - n1;
+            if (Rs) Rs[oldrow] = MAX(Rs[oldrow], fabs(Ax[p]));
             PRLEVEL(1, ("\tnewrow=%ld oldrow=%ld srow=%ld\n", newrow, oldrow,
                         srow));
             if (srow >= 0)
@@ -1005,9 +1013,22 @@ paru_symbolic *paru_analyze(
     }
     Sleft[n - n1 + 1] = m - n1 - rowcount;  // empty rows of S if any
     LUsym->snz = snz;
+    LUsym->scale_row = Rs;
 #ifndef NDEBUG
     PR = 1;
-    PRLEVEL(PR, ("Sup and Slp finished (before cumsum)U-sing =%ld L-sing=%ld\n", 
+    PRLEVEL(PR, ("%% scale_row:\n["));
+    if (Rs)
+    {
+        for (Int k = 0; k < m; k++) 
+        {
+            PRLEVEL(PR, ("%lf ", Rs[k]));
+            ASSERT (Rs[k] > 0);
+        }
+    }
+    PRLEVEL(PR, ("]\n"));
+
+    PR = 1;
+    PRLEVEL(PR, ("Sup and Slp finished (before cumsum)U-sing =%ld L-sing=%ld\n",
                 sunz, slnz));
     if (cs1 > 0)
     {
@@ -1092,13 +1113,13 @@ paru_symbolic *paru_analyze(
 
     if (cs1 > 0)
     {
-        paru_cumsum (cs1+1, Sup);
-        paru_memcpy (cSup, Sup, (cs1+1) * sizeof(Int));
+        paru_cumsum(cs1 + 1, Sup);
+        paru_memcpy(cSup, Sup, (cs1 + 1) * sizeof(Int));
     }
     if (rs1 > 0)
     {
-        paru_cumsum (rs1+1, Slp);
-        paru_memcpy (cSlp, Slp, (rs1+1) * sizeof(Int));
+        paru_cumsum(rs1 + 1, Slp);
+        paru_memcpy(cSlp, Slp, (rs1 + 1) * sizeof(Int));
     }
 
 #ifndef NDEBUG
@@ -1107,26 +1128,26 @@ paru_symbolic *paru_analyze(
     if (cs1 > 0)
     {
         PRLEVEL(PR, ("(%ld) Sup =", sunz));
-        for (Int k = 0; k <= cs1; k++) 
+        for (Int k = 0; k <= cs1; k++)
         {
             PRLEVEL(PR, ("%ld ", Sup[k]));
-            if (Sup[k] != cSup[k]) 
-                PRLEVEL(PR, ("Sup[%ld] =%ld, cSup=%ld", k, Sup[k],  cSup[k]));
-            ASSERT (Sup[k] == cSup[k]);
+            if (Sup[k] != cSup[k])
+                PRLEVEL(PR, ("Sup[%ld] =%ld, cSup=%ld", k, Sup[k], cSup[k]));
+            ASSERT(Sup[k] == cSup[k]);
         }
         PRLEVEL(PR, ("\n"));
     }
     if (rs1 > 0)
     {
         PRLEVEL(PR, ("(%ld) Slp =", slnz));
-        for (Int k = 0; k <= rs1; k++) 
+        for (Int k = 0; k <= rs1; k++)
         {
             PRLEVEL(PR, ("%ld ", Slp[k]));
             PRLEVEL(PR, ("o%ld ", cSlp[k]));
-            if (Slp[k] != cSlp[k]) 
-                PRLEVEL(PR, ("\nSup[%ld] =%ld, cSup=%ld\n", 
-                            k, Slp[k],  cSlp[k]));
-            ASSERT (Slp[k] == cSlp[k]);
+            if (Slp[k] != cSlp[k])
+                PRLEVEL(PR,
+                        ("\nSup[%ld] =%ld, cSup=%ld\n", k, Slp[k], cSlp[k]));
+            ASSERT(Slp[k] == cSlp[k]);
         }
         PRLEVEL(PR, ("\n"));
     }
@@ -1210,12 +1231,14 @@ paru_symbolic *paru_analyze(
                 if (newcol == newrow)
                 {  // diagonal entry
                     Suj[Sup[newrow]] = newcol;
-                    Sux[Sup[newrow]] = Ax[p];
+                    Sux[Sup[newrow]] =
+                        (Rs == NULL) ? Ax[p] : Ax[p] / Rs[oldrow];
                 }
                 else
                 {
                     Suj[++cSup[newrow]] = newcol;
-                    Sux[cSup[newrow]] = Ax[p];
+                    Sux[cSup[newrow]] =
+                        (Rs == NULL) ? Ax[p] : Ax[p] / Rs[oldrow];
                 }
             }
             else
@@ -1224,12 +1247,14 @@ paru_symbolic *paru_analyze(
                 if (newcol == newrow)
                 {  // diagonal entry
                     Sli[Slp[newcol - cs1]] = newrow;
-                    Slx[Slp[newcol - cs1]] = Ax[p];
+                    Slx[Slp[newcol - cs1]] =
+                        (Rs == NULL) ? Ax[p] : Ax[p] / Rs[oldrow];
                 }
                 else
                 {
                     Sli[++cSlp[newcol - cs1]] = newrow;
-                    Slx[cSlp[newcol - cs1]] = Ax[p];
+                    Slx[cSlp[newcol - cs1]] =
+                        (Rs == NULL) ? Ax[p] : Ax[p] / Rs[oldrow];
                 }
             }
         }
@@ -1248,7 +1273,7 @@ paru_symbolic *paru_analyze(
             if (srow >= 0)
             {  // it is insdie S otherwise it is part of singleton
                 Sj[cSp[srow]] = scol;
-                Sx[cSp[srow]++] = Ax[p];
+                Sx[cSp[srow]++] = (Rs == NULL) ? Ax[p] : Ax[p] / Rs[oldrow];
             }
             else
             {  // inside the U singletons
@@ -1256,7 +1281,7 @@ paru_symbolic *paru_analyze(
                              newcol, newrow));
                 ASSERT(newrow != newcol);  // not a diagonal entry
                 Suj[++cSup[newrow]] = newcol;
-                Sux[cSup[newrow]] = Ax[p];
+                Sux[cSup[newrow]] = (Rs == NULL) ? Ax[p] : Ax[p] / Rs[oldrow];
             }
         }
     }
@@ -1274,10 +1299,10 @@ paru_symbolic *paru_analyze(
         for (Int k = 0; k <= cs1; k++) PRLEVEL(PR, ("%ld ", Sup[k]));
         PRLEVEL(PR, ("\n"));
 
-        for(Int newrow = 0; newrow < cs1; newrow ++)
+        for (Int newrow = 0; newrow < cs1; newrow++)
         {
             PRLEVEL(PR, ("row = %ld\n", newrow));
-            for(Int p = Sup[newrow]; p < Sup[newrow+1]; p++)
+            for (Int p = Sup[newrow]; p < Sup[newrow + 1]; p++)
             {
                 PRLEVEL(PR, (" (%ld)%.2lf", Suj[p], Sux[p]));
             }
@@ -1290,10 +1315,10 @@ paru_symbolic *paru_analyze(
         for (Int k = cs1; k <= n1; k++) PRLEVEL(PR, ("%ld ", Slp[k - cs1]));
         PRLEVEL(PR, ("\n"));
 
-        for(Int newcol = cs1; newcol < n1; newcol++)
+        for (Int newcol = cs1; newcol < n1; newcol++)
         {
             PRLEVEL(PR, ("col = %ld\n", newcol));
-            for(Int p = Slp[newcol-cs1]; p < Slp[newcol-cs1+1]; p++)
+            for (Int p = Slp[newcol - cs1]; p < Slp[newcol - cs1 + 1]; p++)
             {
                 PRLEVEL(PR, (" (%ld)%.2lf", Sli[p], Slx[p]));
             }

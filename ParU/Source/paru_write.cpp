@@ -137,7 +137,7 @@ void paru_write(paru_matrix *paruMatInfo, int scale, char *id)
     //-------------------- writing row scales to a file
     if (scale)
     {
-        double *scale_row = paruMatInfo->scale_row;
+        double *scale_row = LUsym->scale_row;
         FILE *scalefptr;
         char fname[100] = "";
         strcat(fname, dpath);

@@ -80,14 +80,17 @@ typedef struct
     // indices in each row of S are in strictly ascending order, even though
     // the input matrix A need not be sorted.
 
-    Int m, n, anz;  // S is m-by-n with anz entries
+    Int m, n, anz;  // S is m-by-n with anz entries; S is scaled
 
     Int snz;     // nnz in submatrix
     Int *Sp;     // size m+1-n1, row pointers of S
     Int *Sj;     // size snz = Sp [n], column indices of S
     double *Sx;  // size snz = Sp [n], numeric values of S
 
-    //TODO: Usingletons and Lsingltons
+    double *scale_row; // the array for row scaling based on original matrix
+                        // size = m
+
+    //Usingletons and Lsingltons
     U_singleton ustons;
     L_singleton lstons;
 
@@ -324,7 +327,6 @@ typedef struct
                      el_colIndex[el->lac]  == lacList [e]
                      number of element*/
 
-    double *scale_row; /* the array for row scaling */
 
     // each active front owns and manage a heap list. The heap is based on the
     // least numbered column. The active front Takes the pointer of the biggest
@@ -357,7 +359,7 @@ enum ParU_ResultCode
 //------------------------------------------------------------------------------
 // user:
 
-paru_symbolic *paru_analyze(cholmod_sparse *A);
+paru_symbolic *paru_analyze(Int scale, cholmod_sparse *A);
 
 /* usage:
 

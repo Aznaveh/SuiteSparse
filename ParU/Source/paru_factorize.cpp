@@ -97,13 +97,12 @@ ParU_ResultCode paru_factorize(cholmod_sparse *A, paru_symbolic *LUsym,
         return PARU_INVALID;
     }
 
-    int scale = 0;
 
     paru_matrix *paruMatInfo;
     paruMatInfo = *paruMatInfo_handle;
 
     ParU_ResultCode info;
-    info = paru_init_rowFronts(&paruMatInfo, A, scale, LUsym);
+    info = paru_init_rowFronts(&paruMatInfo, A, LUsym);
     *paruMatInfo_handle = paruMatInfo;
 
     PRLEVEL(1, ("%% init_row is done\n"));

@@ -173,8 +173,7 @@ Int bin_srch_col(Int *srt_lst, Int l, Int r, Int num);
 Int bin_srch(Int *srt_lst, Int l, Int r, Int num);
 
 ParU_ResultCode paru_init_rowFronts(paru_matrix **paruMatInfo_handle,
-                                    cholmod_sparse *A, int scale,
-                                    paru_symbolic *LUsym);
+                                    cholmod_sparse *A, paru_symbolic *LUsym);
 ParU_ResultCode paru_front(Int f, paru_matrix *paruMatInfo);
 
 void paru_pivotal(std::vector<Int> &pivotal_elements,
@@ -217,9 +216,9 @@ Int paru_find_hash(Int key, std::vector<Int> &colHash, Int *fcolList);
 
 // permutation stuff for the solver
 void paru_perm(paru_matrix *paruMatInfo);
-Int paru_apply_perm(const Int *P, const double *b, double *x, Int m);
 Int paru_apply_inv_perm(const Int *P, const double *b, double *x, Int m);
-Int paru_apply_scale (const double *s, const Int *Ps, double *x, Int m, Int n1);
+Int paru_apply_perm_scale(const Int *P, const double *s, const double *b,
+        double *x, Int m);
 
 // lsolve and usolve
 Int paru_lsolve(paru_matrix *paruMatInfo, double *x);

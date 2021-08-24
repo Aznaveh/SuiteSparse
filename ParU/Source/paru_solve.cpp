@@ -22,10 +22,13 @@ ParU_ResultCode paru_solve(paru_matrix *paruMatInfo, double *b)
         printf("Memory problem inside solve\n");
         return PARU_OUT_OF_MEMORY;
     }
+    paru_memcpy(x, b, m * sizeof(double));
 
-    paru_apply_perm(LUsym->Pfin, b, x, m);  // x = b (p)
-    if (paruMatInfo->scale_row)             // x = s.Ps[x]
-        paru_apply_scale(paruMatInfo->scale_row, LUsym->Ps, x, m, LUsym->n1);
+    //if (LUsym->scale_row)             // x = s.x
+    //    paru_apply_scale(LUsym->scale_row, x, m);
+    //paru_memcpy(b, x, m * sizeof(double));
+    //paru_apply_perm(LUsym->Pfin, b, x, m);  // x = b (p)
+    paru_apply_perm_scale (LUsym->Pfin, LUsym->scale_row, b, x, m);
 
     PRLEVEL(1, ("%% lsolve\n"));
     paru_lsolve(paruMatInfo, x);                 // x = L\x

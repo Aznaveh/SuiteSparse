@@ -65,37 +65,37 @@ Int paru_lsolve(paru_matrix *paruMatInfo, double *x)
 
             for (Int p = Slp[j - cs1] + 1; p < Slp[j - cs1 + 1]; p++)
             {
-                // Int r = Sli[p]-n1 >= 0 ? Ps[Sli[p]-n1]+n1 : Sli[p];
-                // PRLEVEL(PR, (" r=%ld\n", r));
-                // x[r] -= Slx[p] * x[j];
-                // PRLEVEL(PR, ("A x[%ld]=%.2lf\n", Sli[p], x[Sli[p]]));
+                 Int r = Sli[p]-n1 >= 0 ? Ps[Sli[p]-n1]+n1 : Sli[p];
+                 PRLEVEL(PR, (" r=%ld\n", r));
+                 x[r] -= Slx[p] * x[j];
+                 PRLEVEL(PR, ("A x[%ld]=%.2lf\n", Sli[p], x[Sli[p]]));
 #ifndef NDEBUG
-                PR = -1;
+                PR = 1;
 #endif
-                if (Sli[p] < n1)
-                {
-                    Int r = Sli[p];
-                    PRLEVEL(PR, ("Singlton not permuted r=%ld\n", r));
-                    x[r] -= Slx[p] * x[j];
-                }
-                else
-                {  // singletons that are permuted
-                    Int r = Ps[Sli[p] - n1] + n1;
-                    double *scale = paruMatInfo->scale_row;
-                    PRLEVEL(PR, (" r=%ld\n", r));
-                    if (scale == NULL)
-                    {
-                        x[r] -= Slx[p] * x[j];
-                        PRLEVEL(PR, ("Not scaled x=%lf\n", x[r]));
-                    }
-                    else
-                    {
-                        x[r] -= (Slx[p] * x[j]) / scale[Ps[Sli[p] - n1]];
-                        PRLEVEL(PR,
-                                ("scale =%lf Slip = %ld Slx = %lf x=%lf\n",
-                                 scale[Ps[Sli[p] - n1]], Sli[p], Slx[p], x[r]));
-                    }
-                }
+                //if (Sli[p] < n1)
+                //{
+                //    Int r = Sli[p];
+                //    PRLEVEL(PR, ("Singlton not permuted r=%ld\n", r));
+                //    x[r] -= Slx[p] * x[j];
+                //}
+                //else
+                //{  // singletons that are permuted
+                //    Int r = Ps[Sli[p] - n1] + n1;
+                //    double *scale = paruMatInfo->scale_row;
+                //    PRLEVEL(PR, (" r=%ld\n", r));
+                //    if (scale == NULL)
+                //    {
+                //        x[r] -= Slx[p] * x[j];
+                //        PRLEVEL(PR, ("Not scaled x=%lf\n", x[r]));
+                //    }
+                //    else
+                //    {
+                //        x[r] -= (Slx[p] * x[j]) / scale[Ps[Sli[p] - n1]];
+                //        PRLEVEL(PR,
+                //                ("scale =%lf Slip = %ld Slx = %lf x=%lf\n",
+                //                 scale[Ps[Sli[p] - n1]], Sli[p], Slx[p], x[r]));
+                //    }
+                //}
                 PRLEVEL(PR, ("\n"));
 #ifndef NDEBUG
                 PR = 1;

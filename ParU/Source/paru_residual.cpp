@@ -17,12 +17,13 @@ double paru_residual(cholmod_sparse *A, paru_matrix *paruMatInfo, double *b)
     paru_symbolic *LUsym = paruMatInfo->LUsym;
     Int m = LUsym->m;
 #ifndef NDEBUG
-    PRLEVEL(2, ("%% before everything b is:\n%%"));
+    Int PR = 1;
+    PRLEVEL(PR, ("%% before everything b is:\n%%"));
     for (Int k = 0; k < m; k++)
     {
-        PRLEVEL(1, (" %.2lf, ", b[k]));
+        PRLEVEL(PR, (" %.2lf, ", b[k]));
     }
-    PRLEVEL(2, (" \n"));
+    PRLEVEL(PR, (" \n"));
 #endif
     double *x = (double *)paru_alloc(m, sizeof(double));
     if (x == NULL)
@@ -50,7 +51,7 @@ double paru_residual(cholmod_sparse *A, paru_matrix *paruMatInfo, double *b)
     }
 
 #ifndef NDEBUG
-    Int PR = -1;
+    PR = -1;
     PRLEVEL(PR, ("x = [ "));
     for (Int i = 0; i < MIN(m, 10); ++i) PRLEVEL(PR, ("%lf ", x[i]));
     PRLEVEL(PR, (" ...]\n"));
@@ -61,9 +62,13 @@ double paru_residual(cholmod_sparse *A, paru_matrix *paruMatInfo, double *b)
     double res = paru_vec_1norm(b, m);
     PRLEVEL(1, ("%% res=%lf\n",res));
     double weighted_res = res / (paru_spm_1norm(A) * paru_vec_1norm(x, m));
-    PRLEVEL(1, ("Residual is |%.2lf| and weigheted residual is |%.2f|.\n",
+//    PRLEVEL(1, ("Residual is |%.2lf| and weigheted residual is |%.2f|.\n",
+//                res == 0 ? 0 : log10(res), 
+//                res == 0 ? 0 :log10(weighted_res)));
+//
+    printf ("Residual is |%.2lf| and weigheted residual is |%.2f|.\n",
                 res == 0 ? 0 : log10(res), 
-                res == 0 ? 0 :log10(weighted_res)));
+                res == 0 ? 0 :log10(weighted_res));
 
     paru_free(m, sizeof(Int), x);
     return res;

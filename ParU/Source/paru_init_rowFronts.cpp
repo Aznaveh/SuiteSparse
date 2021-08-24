@@ -17,15 +17,13 @@ ParU_ResultCode paru_init_rowFronts(
     paru_matrix **paruMatInfo_handle,  // in/out
                                        // inputs, not modified
     cholmod_sparse *A,
-    int scale,  // scales the matrix if > 0
     // symbolic analysis
     paru_symbolic *LUsym)
 {
-    mallopt(M_MMAP_MAX, 0);                // disable mmap; it's too slow
     mallopt(M_TRIM_THRESHOLD, -1);         // disable sbrk trimming
     mallopt(M_TOP_PAD, 16 * 1024 * 1024);  // increase padding to speedup malloc
 
-    DEBUGLEVEL(0);
+    DEBUGLEVEL(-1);
     if (!A->packed)
     {
         printf("A is not packed; Wrong format \n");
@@ -142,46 +140,6 @@ ParU_ResultCode paru_init_rowFronts(
     Int *Sp = LUsym->Sp;
     Int *Sj = LUsym->Sj;
 
-    //~~~~~~~~~~ scaling the A matrix
-    scale = 1;
-    if (scale)
-    {
-        double *max_row = (double *)paru_calloc(m, sizeof(double));
-        if (max_row == NULL)
-        {  // out of memory
-            paru_freemat(&paruMatInfo);
-            printf("of memory: max_row\n");
-            return PARU_OUT_OF_MEMORY;
-        }
-
-        for (Int row = 0; row < m; row++)
-        {
-            double max = fabs(Sx[Sp[row]]);
-            for (Int p = Sp[row] + 1; p < Sp[row + 1]; p++)
-            {
-                // el_colrowNum[j++] = Sx[p]/scale[p];
-                max = MAX(fabs(Sx[p]), max);
-                PRLEVEL(1, ("Sj[%ld] =%ld Sx[%ld]=%lf\n", p, Sj[p], p, Sx[p]));
-                // for Matlab
-                PRLEVEL(0, ("%ld,%ld, %.16lf;\n", row + 1, Sj[p] + 1, Sx[p]));
-            }
-            PRLEVEL(1, ("max in row %ld is %lf\n", row, max));
-            max_row[row] = max;
-        }
-
-        // TODO Do the division when puting stuff into element rows
-        paruMatInfo->scale_row = max_row;
-
-#ifndef NDEBUG
-        Int p = -1;
-        PRLEVEL(p, ("%% scale =[ "));
-        for (Int row = 0; row < m; row++) PRLEVEL(p, ("%lf ", max_row[row]));
-        PRLEVEL(p, ("]\n"));
-#endif
-    }
-    else
-        paruMatInfo->scale_row = NULL;
-
     /// ------------------------------------------------------------------------
     // create S = A (p,q)', or S=A(p,q) if S is considered to be in row-form
     // -------------------------------------------------------------------------
@@ -286,22 +244,13 @@ ParU_ResultCode paru_init_rowFronts(
 
             Int j = 0;  // Index inside an element
             // TODO choosing p as a variable can shadow p in debug mode
-            double *s = paruMatInfo->scale_row;
-            double r_scale;
-            if (s != NULL) r_scale = s[row];
             for (Int p = Sp[row]; p < Sp[row + 1]; p++)
             {
-                // PRLEVEL(0, ("scale = %lf\t", r_scale));
                 el_colrowIndex[j] = Sj[p];
-                // TODO: adding the scale here
-                // el_colrowNum[j++] = Sx[p]/scale[p];
-                el_colrowNum[j++] = (scale == 0) ? Sx[p] : (Sx[p] / r_scale);
-                PRLEVEL(1, ("Sj[%ld] =%ld Sx[%ld]=%lf scaled=%lf\n", p, Sj[p],
-                            p, Sx[p], (Sx[p] / s[row])));
+                el_colrowNum[j++] = Sx[p];
+                PRLEVEL(1, ("Sj[%ld] =%ld Sx[%ld]=%lf \n", p, Sj[p], p, Sx[p]));
                 // for Matlab
-                PRLEVEL(0, ("%ld,%ld, %.16lf;\n", row + 1, Sj[p] + 1,
-                            (scale == 0) ? Sx[p] : (Sx[p] / s[row])));
-                // Sx[p]));
+                PRLEVEL(0, ("%ld,%ld, %.16lf;\n", row + 1, Sj[p] + 1, Sx[p] ));
             }
             el_colrowIndex[j++] = row;  // initializing element row index
             paruMatInfo->lacList[e] = lac_el(elementList, e);

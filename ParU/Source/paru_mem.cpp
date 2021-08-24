@@ -245,6 +245,7 @@ void paru_freesym(paru_symbolic **LUsym_handle)
     paru_free(ms, sizeof(Int), LUsym->row2atree);
     paru_free(nf, sizeof(Int), LUsym->super2atree);
     paru_free(nf + 1, sizeof(Int), LUsym->first);
+    paru_free(m, sizeof(Int), LUsym->scale_row);
 
     if (n1 > 0)
     {  // freeing singletons
@@ -423,7 +424,6 @@ void paru_freemat(paru_matrix **paruMatInfo_handle)
 
     paru_free(m + nf, sizeof(Int), paruMatInfo->lacList);
 
-    paru_free(m, sizeof(Int), paruMatInfo->scale_row);
     paru_free(m, sizeof(Int), paruMatInfo->row_degree_bound);
     paru_free(1, sizeof(paru_matrix), paruMatInfo);
     *paruMatInfo_handle = NULL;

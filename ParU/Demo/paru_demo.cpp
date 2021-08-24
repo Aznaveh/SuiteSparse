@@ -43,10 +43,11 @@ int main(int argc, char **argv)
 
     int scale = 0;
     Int NoProblem = 0;
+    
 
     double my_start_time = omp_get_wtime();
 
-    LUsym = paru_analyze(A);
+    LUsym = paru_analyze(scale, A);
     if (LUsym == NULL)
     {
         cholmod_l_free_sparse(&A, cc);
