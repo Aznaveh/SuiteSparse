@@ -75,6 +75,7 @@ OBJ = \
 	paru_usolve.o \
 	paru_solve.o \
 	paru_residual.o \
+	paru_backward.o \
 	paru_gaxpy.o \
 	paru_norms.o \
 	paru_full_summed.o \
@@ -84,7 +85,7 @@ $(OBJ): $(INC)
 I = -I ../../UMFPACK/Source -I../../UMFPACK/Include -I ../../CHOLMOD/Include\
 	-I ../../AMD/Include  -I ../../SuiteSparse_config -I../Include
 
-FLAG = -Wno-write-strings   -Wall #-Werror -Wnull-dereference -Wl,--verbose\
+FLAG = -Wno-write-strings   -Wall -Werror -Wnull-dereference -Wl,--verbose\
          -Wextra  -Wpedantic -Wshadow -Wnon-virtual-dtor #development
 
 
@@ -208,6 +209,9 @@ paru_solve.o: ../Source/paru_solve.cpp
 	$(C) -c $<
 
 paru_residual.o: ../Source/paru_residual.cpp
+	$(C) -c $<
+
+paru_backward.o: ../Source/paru_backward.cpp
 	$(C) -c $<
 
 paru_gaxpy.o: ../Source/paru_gaxpy.cpp
