@@ -1102,11 +1102,6 @@ paru_symbolic *paru_analyze(
     for (Int i = n1; i <= m; i++) PRLEVEL(PR, ("%ld ", cSp[i - n1]));
     PRLEVEL(PR, ("\n"));
 #endif
-    // TODO is it too much memcpy?
-    // Prior falsy version:
-    // paru_memcpy(Sp, cSp, (m + 1 - n1) * sizeof(Int));
-    // paru_cumsum(m + 1 - n1, Sp);
-    // paru_memcpy(cSp, Sp, (m + 1 - n1) * sizeof(Int));
 
     paru_cumsum(m + 1 - n1, cSp);
     paru_memcpy(Sp, cSp, (m + 1 - n1) * sizeof(Int));

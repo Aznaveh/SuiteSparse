@@ -10,7 +10,12 @@
 
 #include "paru_internal.hpp"
 
-double paru_residual(cholmod_sparse *A, paru_matrix *paruMatInfo, double *b)
+ParU_ResultCode paru_residual(cholmod_sparse *A, paru_matrix *paruMatInfo, 
+        double *b, 
+        double *Results) // output 
+                         //  0 residual
+                         //  1 weighted residual
+                         //  2 time
 {
     DEBUGLEVEL(0);
     PRLEVEL(1, ("%% inside residual\n"));
@@ -29,7 +34,7 @@ double paru_residual(cholmod_sparse *A, paru_matrix *paruMatInfo, double *b)
     if (x == NULL)
     {
         printf("Memory problem inside residual\n");
-        return -1;
+        return PARU_OUT_OF_MEMORY;
     }
     paru_memcpy(x, b, m * sizeof(double));
 
@@ -47,7 +52,7 @@ double paru_residual(cholmod_sparse *A, paru_matrix *paruMatInfo, double *b)
     if (info != PARU_SUCCESS)
     {
         PRLEVEL(1, ("%% A problem happend during factorization\n"));
-        return -1;
+        return info;
     }
 
 #ifndef NDEBUG
@@ -71,5 +76,7 @@ double paru_residual(cholmod_sparse *A, paru_matrix *paruMatInfo, double *b)
                 res == 0 ? 0 :log10(weighted_res));
 
     paru_free(m, sizeof(Int), x);
-    return res;
+    Results[0] = res;
+    Results[1] = weighted_res;
+    return PARU_SUCCESS;
 }

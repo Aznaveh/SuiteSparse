@@ -218,7 +218,7 @@ Int paru_find_hash(Int key, std::vector<Int> &colHash, Int *fcolList);
 void paru_perm(paru_matrix *paruMatInfo);
 Int paru_apply_inv_perm(const Int *P, const double *b, double *x, Int m);
 Int paru_apply_perm_scale(const Int *P, const double *s, const double *b,
-        double *x, Int m);
+                          double *x, Int m);
 
 // lsolve and usolve
 Int paru_lsolve(paru_matrix *paruMatInfo, double *x);
@@ -227,6 +227,8 @@ Int paru_usolve(paru_matrix *paruMatInfo, double *x);
 Int paru_gaxpy(cholmod_sparse *A, const double *x, double *y, double alpha);
 double paru_spm_1norm(cholmod_sparse *A);
 double paru_vec_1norm(const double *x, Int n);
-double paru_residual(cholmod_sparse *A, paru_matrix *paruMatInfo, double *b);
-double paru_backward (cholmod_sparse *A, paru_matrix *paruMatInfo, double *x1);
+ParU_ResultCode paru_residual(cholmod_sparse *A, paru_matrix *paruMatInfo,
+                              double *b, double *Results);
+ParU_ResultCode paru_backward(cholmod_sparse *A, paru_matrix *paruMatInfo,
+                              double *x1, double *Results);
 #endif

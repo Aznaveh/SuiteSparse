@@ -12,7 +12,12 @@
 
 #include "paru_internal.hpp"
 
-double paru_backward(cholmod_sparse *A, paru_matrix *paruMatInfo, double *x1)
+ParU_ResultCode paru_backward(cholmod_sparse *A, paru_matrix *paruMatInfo, 
+        double *x1,
+        double *Results) // output 
+    //  0 residual
+    //  1 weighted residual
+    //  2 time
 {
     DEBUGLEVEL(0);
     PRLEVEL(1, ("%% inside backward\n"));
@@ -31,7 +36,7 @@ double paru_backward(cholmod_sparse *A, paru_matrix *paruMatInfo, double *x1)
     if (b == NULL)
     {
         printf("Memory problem inside residual\n");
-        return -1;
+        return  PARU_OUT_OF_MEMORY;
     }
     paru_gaxpy(A, x1, b, 1);
 #ifndef NDEBUG
@@ -48,7 +53,7 @@ double paru_backward(cholmod_sparse *A, paru_matrix *paruMatInfo, double *x1)
     if (info != PARU_SUCCESS)
     {
         PRLEVEL(1, ("%% A problem happend during factorization\n"));
-        return -1;
+        return info; 
     }
 
 #ifndef NDEBUG
@@ -60,7 +65,7 @@ double paru_backward(cholmod_sparse *A, paru_matrix *paruMatInfo, double *x1)
 
     for (Int k = 0; k < m; k++)
         b [k] -= x1[k];
-    
+
     double res = paru_vec_1norm(b, m);
     PRLEVEL(1, ("%% res=%lf\n", res));
     double weighted_res = res / (paru_spm_1norm(A) * paru_vec_1norm(x1, m));
@@ -73,5 +78,7 @@ double paru_backward(cholmod_sparse *A, paru_matrix *paruMatInfo, double *x1)
            res == 0 ? 0 : log10(res), res == 0 ? 0 : log10(weighted_res));
 
     paru_free(m, sizeof(Int), b);
-    return res;
+    Results[0] = res;
+    Results[1] = weighted_res;
+    return PARU_SUCCESS;
 }
