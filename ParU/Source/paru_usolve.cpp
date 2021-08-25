@@ -40,7 +40,7 @@ Int paru_usolve(paru_matrix *paruMatInfo, double *x)
 
     Int n1 = LUsym->n1;   // row+col singletons
     Int *Ps = LUsym->Ps;  // row permutation
-    //Int *Qfill = LUsym->Qfill;
+    // Int *Qfill = LUsym->Qfill;
 
     paru_fac *LUs = paruMatInfo->partial_LUs;
     paru_fac *Us = paruMatInfo->partial_Us;
@@ -71,8 +71,7 @@ Int paru_usolve(paru_matrix *paruMatInfo, double *x)
                 {
                     i_prod += A2[fp * j + i] * x[fcolList[j] + n1];
                 }
-                Int r = Ps[frowList[i]]+n1;
-                //Int r = Qfill[frowList[i]+n1];
+                Int r = Ps[frowList[i]] + n1;
                 x[r] -= i_prod;
             }
         }
@@ -110,31 +109,27 @@ Int paru_usolve(paru_matrix *paruMatInfo, double *x)
     PR = 1;
 #endif
     Int cs1 = LUsym->cs1;
-    if (cs1 >0)
+    if (cs1 > 0)
     {
-        for(Int i = cs1 - 1;  i >= 0; i--)
+        for (Int i = cs1 - 1; i >= 0; i--)
         {
             PRLEVEL(PR, ("i = %ld\n", i));
             Int *Sup = LUsym->ustons.Sup;
             Int *Suj = LUsym->ustons.Suj;
             double *Sux = LUsym->ustons.Sux;
-            ASSERT (Suj != NULL && Sux != NULL && Sup != NULL);
-            PRLEVEL(PR, (" Before computation x[%ld]=%.2lf \n",i, x[i]))
-            for(Int p = Sup[i]+1; p < Sup[i+1]; p++)
+            ASSERT(Suj != NULL && Sux != NULL && Sup != NULL);
+            PRLEVEL(PR, (" Before computation x[%ld]=%.2lf \n", i, x[i]))
+            for (Int p = Sup[i] + 1; p < Sup[i + 1]; p++)
             {
-                //Int r = Suj[p]-n1 >= 0 ? Ps[Suj[p]-n1]+n1 : Suj[p];
-                //Int r = Suj[p]-n1 >= 0 ? Qfill[Suj[p]-n1]+n1 : Suj[p];
-                //Int r = Suj[p] < n1  ? Suj[p] : Qfill[Suj[p]] ;
-                //Int r = Qfill[Suj[p]] ;
                 Int r = Suj[p];
                 PRLEVEL(PR, (" r=%ld\n", r));
                 x[i] -= Sux[p] * x[r];
                 PRLEVEL(PR, ("Suj[%ld]=%ld\n", p, Suj[p]));
                 PRLEVEL(PR, (" x[%ld]=%.2lf x[%ld]=%.2lf\n", r, x[r], i, x[i]));
             }
-            Int diag =  Sup[i];
+            Int diag = Sup[i];
             x[i] /= Sux[diag];
-            PRLEVEL(PR, (" After computation x[%ld]=%.2lf \n",i, x[i]))
+            PRLEVEL(PR, (" After computation x[%ld]=%.2lf \n", i, x[i]))
             PRLEVEL(PR, ("\n"));
         }
     }
