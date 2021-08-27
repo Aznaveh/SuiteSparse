@@ -433,6 +433,7 @@ paru_symbolic *paru_analyze(
 
         return NULL;
     }
+    printf("In: %ldx%ld nnz = %ld \n", nr, nc, anz);
 #ifndef NDEBUG
     PR = 1;
     PRLEVEL(-1, ("\n%%\tcs1 = %ld, rs1 = %ld n1 = %ld\n", cs1, rs1, n1));

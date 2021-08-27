@@ -155,6 +155,9 @@ ParU_ResultCode paru_factorize(cholmod_sparse *A, paru_symbolic *LUsym,
     }
     paru_perm(paruMatInfo); // to form the final permutation
     Int m = LUsym->m;
+    paruMatInfo->my_time = omp_get_wtime() - my_start_time;
+    printf("time = %lf\n",paruMatInfo->my_time);
+
     double *b = (double *)paru_alloc(m, sizeof(double));
     
     //double b[m];
@@ -178,9 +181,11 @@ ParU_ResultCode paru_factorize(cholmod_sparse *A, paru_symbolic *LUsym,
     //paru_gaxpy(A, xt, b, -1);
     //double res = paru_vec_1norm(b, m);
      
-    paru_residual(A, paruMatInfo, b);
+    double Res[4];
+    paru_residual(A, paruMatInfo, b, Res);
     for (Int i = 0; i < m; ++i) b[i] = i + 1;
-    paru_backward(A, paruMatInfo, b);
+    paru_backward(A, paruMatInfo, b, Res);
+    // printf("Hooh %lf\n", log10(Res[1]));
     //double res = paru_residual(A, paruMatInfo, b);
     //double weighted_res = res / (paru_spm_1norm(A) * paru_vec_1norm(xt, m));
     //printf("Residual is |%.2lf| and weigheted residual is |%.2f|.\n", 
@@ -204,6 +209,6 @@ ParU_ResultCode paru_factorize(cholmod_sparse *A, paru_symbolic *LUsym,
     //        log10(res), log10(weighted_res) );
 
 
-    paruMatInfo->my_time = omp_get_wtime() - my_start_time;
+    paru_free (m, sizeof(double), b);
     return PARU_SUCCESS;
 }
