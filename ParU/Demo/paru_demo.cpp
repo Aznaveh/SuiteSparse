@@ -115,8 +115,10 @@ int main(int argc, char **argv)
     if (info == PARU_SUCCESS)
     {
         paruMatInfo->umf_time = umf_time;
-        paru_write(paruMatInfo, scale, argv[1]);
+   //     paru_write(paruMatInfo, scale, argv[1]);
     }
+    printf("my_time = %lf umf_time=%lf ratio = %lf\n",
+            my_time, umf_time, my_time/umf_time);
 
     //~~~~~~~~~~~~~~~~~~~Free Everything~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     paru_freemat(&paruMatInfo);

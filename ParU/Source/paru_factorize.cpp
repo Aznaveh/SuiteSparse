@@ -156,7 +156,6 @@ ParU_ResultCode paru_factorize(cholmod_sparse *A, paru_symbolic *LUsym,
     paru_perm(paruMatInfo); // to form the final permutation
     Int m = LUsym->m;
     paruMatInfo->my_time = omp_get_wtime() - my_start_time;
-    printf("time = %lf\n",paruMatInfo->my_time);
 
     double *b = (double *)paru_alloc(m, sizeof(double));
     
