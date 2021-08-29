@@ -60,7 +60,7 @@ Int paru_usolve(paru_matrix *paruMatInfo, double *x)
         // I am not calling BLAS_DGEMV
 
         double *A2 = Us[f].p;
-        if (colCount != 0)
+        if (A2 != NULL )
         {
             for (Int i = 0; i < fp; i++)
             {
