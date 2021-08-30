@@ -227,8 +227,4 @@ Int paru_usolve(paru_matrix *paruMatInfo, double *x);
 Int paru_gaxpy(cholmod_sparse *A, const double *x, double *y, double alpha);
 double paru_spm_1norm(cholmod_sparse *A);
 double paru_vec_1norm(const double *x, Int n);
-ParU_ResultCode paru_residual(cholmod_sparse *A, paru_matrix *paruMatInfo,
-                              double *b, double *Results);
-ParU_ResultCode paru_backward(cholmod_sparse *A, paru_matrix *paruMatInfo,
-                              double *x1, double *Results);
 #endif

@@ -67,6 +67,18 @@ int main(int argc, char **argv)
         return info;
     }
 
+    //~~~~~~~~~~~~~~~~~~~Test the results ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    //double *b = (double *)paru_alloc(m, sizeof(double));
+    Int m = LUsym->m;
+    double *b = (double *)malloc(m*sizeof(double));
+    for (Int i = 0; i < m; ++i) b[i] = i + 1;
+    double Res[4];
+    paru_residual(A, paruMatInfo, b, Res);
+    for (Int i = 0; i < m; ++i) b[i] = i + 1;
+    paru_backward(A, paruMatInfo, b, Res);
+    //paru_free (m, sizeof(double), b);
+    free(b);
+ 
     //~~~~~~~~~~~~~~~~~~~End computation~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     //~~~~~~~~~~~~~~~~~~~Calling umfpack~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -115,7 +127,7 @@ int main(int argc, char **argv)
     if (info == PARU_SUCCESS)
     {
         paruMatInfo->umf_time = umf_time;
-   //     paru_write(paruMatInfo, scale, argv[1]);
+        //paru_write(paruMatInfo, scale, argv[1]);
     }
     printf("my_time = %lf umf_time=%lf ratio = %lf\n",
             my_time, umf_time, my_time/umf_time);
