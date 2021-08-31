@@ -99,6 +99,7 @@ ParU_ResultCode paru_factorize(cholmod_sparse *A, paru_symbolic *LUsym,
 
     paru_matrix *paruMatInfo;
     paruMatInfo = *paruMatInfo_handle;
+    Int nf = LUsym->nf;
 
     ParU_ResultCode info;
     info = paru_init_rowFronts(&paruMatInfo, A, LUsym);
@@ -111,7 +112,7 @@ ParU_ResultCode paru_factorize(cholmod_sparse *A, paru_symbolic *LUsym,
         return info;
     }
 
-    Int nf = paruMatInfo->LUsym->nf;
+    
 
     //// do_fronts generate a task parallel region
     // Int *Parent = LUsym->Parent;

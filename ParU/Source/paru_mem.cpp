@@ -396,19 +396,22 @@ void paru_freemat(paru_matrix **paruMatInfo_handle)
 #ifndef NDEBUG
     std::vector<Int> **heapList = paruMatInfo->heapList;
     // freeing memory of heaps.
-    for (Int eli = 0; eli < m + nf + 1; eli++)
+    if (heapList != NULL)
     {
-        if (heapList[eli] != nullptr)
+        for (Int eli = 0; eli < m + nf + 1; eli++)
         {
-            PRLEVEL(1, ("%% %ld has not been freed %p\n", eli, heapList[eli]));
-            delete heapList[eli];
-            heapList[eli] = nullptr;
+            if (heapList[eli] != nullptr)
+            {
+                PRLEVEL(1, ("%% %ld has not been freed %p\n", eli, heapList[eli]));
+                delete heapList[eli];
+                heapList[eli] = nullptr;
+            }
+            ASSERT(heapList[eli] == nullptr);
         }
-        ASSERT(heapList[eli] == nullptr);
     }
 #endif
     paru_free(1, (m + nf + 1) * sizeof(std::vector<Int> **),
-              paruMatInfo->heapList);
+            paruMatInfo->heapList);
 
     paru_free(1, (m + nf + 1) * sizeof(paru_Element), elementList);
 

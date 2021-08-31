@@ -63,6 +63,26 @@ ParU_ResultCode paru_init_rowFronts(
         paru_freemat(&paruMatInfo);
         return PARU_OUT_OF_MEMORY;
     }
+
+    Work->rowMark = Work->elRow = NULL; 
+    Work->elCol = Work->rowSize = NULL; 
+    paruMatInfo->row_degree_bound = NULL; 
+    paruMatInfo->RowList =  NULL; 
+    paruMatInfo->lacList =  NULL; 
+    paruMatInfo->frowCount =  NULL; 
+    paruMatInfo->fcolCount = NULL; 
+    paruMatInfo->frowList = NULL; 
+    paruMatInfo->fcolList = NULL; 
+    paruMatInfo->partial_Us = NULL; 
+    paruMatInfo->partial_LUs =  NULL; 
+    paruMatInfo->heapList = NULL;
+    paruMatInfo->elementList = NULL; 
+    paruMatInfo->time_stamp =  NULL; 
+
+    if (nf == 0)
+    {  // nothing to be done
+        return PARU_SUCCESS;
+    }
     // Memory allocations for paruMatInfo
     Int *rowMark = Work->rowMark = (Int *)paru_alloc(m + nf + 1, sizeof(Int));
     Int *elRow = Work->elRow = (Int *)paru_alloc(m + nf, sizeof(Int));
@@ -250,7 +270,7 @@ ParU_ResultCode paru_init_rowFronts(
                 el_colrowNum[j++] = Sx[p];
                 PRLEVEL(1, ("Sj[%ld] =%ld Sx[%ld]=%lf \n", p, Sj[p], p, Sx[p]));
                 // for Matlab
-                PRLEVEL(0, ("%ld,%ld, %.16lf;\n", row + 1, Sj[p] + 1, Sx[p] ));
+                PRLEVEL(0, ("%ld,%ld, %.16lf;\n", row + 1, Sj[p] + 1, Sx[p]));
             }
             el_colrowIndex[j++] = row;  // initializing element row index
             paruMatInfo->lacList[e] = lac_el(elementList, e);

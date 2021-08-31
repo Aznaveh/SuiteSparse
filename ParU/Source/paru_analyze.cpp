@@ -478,6 +478,16 @@ paru_symbolic *paru_analyze(
         PRLEVEL(PR, ("\tworking array of size %ld-by-%ld\n", Chain_maxrows[j],
                      Chain_maxcols[j]));
     }
+
+    PR = -1;
+    PRLEVEL(PR, ("Forthwith Pinit =\n"));
+    for (Int i = 0; i < MIN(64, m); i++) PRLEVEL(PR, ("%ld ", Pinit[i]));
+    PRLEVEL(PR, ("\n"));
+    PRLEVEL(PR, ("Forthwith Qinit =\n"));
+    for (Int i = 0; i < MIN(64, m); i++) PRLEVEL(PR, ("%ld ", Qinit[i]));
+    PRLEVEL(PR, ("\n"));
+    PR = 1;
+
 #endif
 
     umfpack_dl_free_symbolic(&Symbolic);
@@ -517,12 +527,9 @@ paru_symbolic *paru_analyze(
     Int *Parent = (Int *)paru_realloc(nf + 1, sizeof(Int), Front_parent, &size);
     ASSERT(size <= (size_t)n + 1);
     // TODO: nf == 0 is a weird condintion I have to check
-    if (Parent == NULL || nf == 0)
+    if (Parent == NULL )
     {  // should not happen anyway it is always shrinking
-        if (nf == 0)
-            printf("No fronts... TODO\n");
-        else
-            printf("memory problem\n");
+        printf("memory problem\n");
         // free memory
         paru_free((n + 1), sizeof(Int), Front_npivcol);
         paru_free((n + 1), sizeof(Int), Front_parent);
@@ -535,21 +542,25 @@ paru_symbolic *paru_analyze(
 
     // Making Super data structure
     // like SPQR: Super[f]<= pivotal columns of (f) < Super[f+1]
-    Int *Super = LUsym->Super = (Int *)paru_alloc((nf + 1), sizeof(Int));
-    if (Super == NULL)
+    Int *Super = LUsym->Super = NULL;
+    if (nf > 0)
     {
-        printf("memory problem\n");
-        paru_free((m + 1), sizeof(Int), Pinit);
-        paru_freesym(&LUsym);
-        umfpack_dl_azn_free_sw(&SW);
-        return NULL;
+        Super = LUsym->Super = (Int *)paru_alloc((nf + 1), sizeof(Int));
+        if (Super == NULL)
+        {
+            printf("memory problem\n");
+            paru_free((m + 1), sizeof(Int), Pinit);
+            paru_freesym(&LUsym);
+            umfpack_dl_azn_free_sw(&SW);
+            return NULL;
+        }
+        Super[0] = 0;
+        for (Int k = 1; k <= nf; k++)
+        {
+            Super[k] = Front_npivcol[k - 1];
+        }
+        paru_cumsum(nf + 1, Super);
     }
-    Super[0] = 0;
-    for (Int k = 1; k <= nf; k++)
-    {
-        Super[k] = Front_npivcol[k - 1];
-    }
-    paru_cumsum(nf + 1, Super);
 
     /* ---------------------------------------------------------------------- */
     /*                          Relaxed amalgamation                          */
@@ -589,16 +600,16 @@ paru_symbolic *paru_analyze(
         // amalgamate till number of pivot columns is small
         PRLEVEL(PR, ("%% repr = %ld Parent =%ld\n", repr, Parent[repr]));
         PRLEVEL(PR, ("%%size of Potential pivot= %ld\n",
-                     Super[Parent[repr] + 1] - Super[f]));
+                    Super[Parent[repr] + 1] - Super[f]));
         while (Super[Parent[repr] + 1] - Super[f] < threshold &&
-               Parent[repr] != -1)
+                Parent[repr] != -1)
         {
             repr = Parent[repr];
             PRLEVEL(PR, ("%%Middle stage f= %ld repr = %ld\n", f, repr));
             PRLEVEL(PR, ("%%number of pivot cols= %ld\n",
-                         Super[repr + 1] - Super[f]));
+                        Super[repr + 1] - Super[f]));
             PRLEVEL(PR, ("%%number of pivot cols if Parent collapsed= %ld\n",
-                         Super[Parent[repr] + 1] - Super[f]));
+                        Super[Parent[repr] + 1] - Super[f]));
         }
 
         PRLEVEL(PR, ("%% newF = %ld for:\n", newF));
@@ -620,6 +631,7 @@ paru_symbolic *paru_analyze(
     fmap[nf] = -1;
     // nf =  LUsym->nf = newF;
     // newParent size is newF+1 potentially smaller than nf
+
     newParent = (Int *)paru_realloc(newF + 1, sizeof(Int), newParent, &size);
     ASSERT(newF <= nf);
     // TODO: add memory guard?
@@ -687,7 +699,7 @@ paru_symbolic *paru_analyze(
             PRLEVEL(PR, ("Cm[newf]=%ld\n", Cm[newf]));
         }
     }
-    Super[newNf] = Super[nf];
+    if (Super) Super[newNf] = Super[nf];
 
     LUsym->Rj = NULL;
     //    LUsym->Rj = QRsym->Rj;
@@ -788,7 +800,7 @@ paru_symbolic *paru_analyze(
     LUsym->col_Int_bound = col_Int_bound;
     PR = 1;
     PRLEVEL(PR, ("%%row_Int_bound=%ld, col_Int_bound=%ld", row_Int_bound,
-                 col_Int_bound));
+                col_Int_bound));
     PRLEVEL(PR,
             ("%%-Us_bound_size = %ld LUs_bound_size = %ld sum = %ld\n",
              Us_bound_size, LUs_bound_size,
@@ -867,11 +879,11 @@ paru_symbolic *paru_analyze(
 #ifndef NDEBUG
     PR = -1;
     PRLEVEL(PR, ("Qinit =\n"));
-    for (Int j = 0; j < m; j++) PRLEVEL(PR, ("%ld ", Qinit[j]));
+    for (Int j = 0; j < MIN(64, n); j++) PRLEVEL(PR, ("%ld ", Qinit[j]));
     PRLEVEL(PR, ("\n"));
 
     PRLEVEL(PR, ("Pinit =\n"));
-    for (Int i = 0; i < m; i++) PRLEVEL(PR, ("%ld ", Pinit[i]));
+    for (Int i = 0; i < MIN(64, m); i++) PRLEVEL(PR, ("%ld ", Pinit[i]));
     PRLEVEL(PR, ("\n"));
 
     PR = 1;
@@ -903,8 +915,8 @@ paru_symbolic *paru_analyze(
     }
 
     if (((Slp == NULL || cSlp == NULL) && rs1 != 0) ||
-        (Rs == NULL && scale == 1) ||
-        ((Sup == NULL || cSup == NULL) && cs1 != 0) || Ps == NULL)
+            (Rs == NULL && scale == 1) ||
+            ((Sup == NULL || cSup == NULL) && cs1 != 0) || Ps == NULL)
     {
         printf("rs1=%ld cs1=%ld memory problem\n", rs1, cs1);
         paru_free((cs1 + 1), sizeof(Int), Sup);
@@ -958,15 +970,15 @@ paru_symbolic *paru_analyze(
                 PRLEVEL(PR, ("Counting phase,Inside L singletons "));
                 PRLEVEL(PR, ("newrow=%ld oldrow=%ld\n", newrow, oldrow));
                 slnz++;
-                //if (newcol-cs1 +1 == 0)
-                if(newcol < cs1  )
+                // if (newcol-cs1 +1 == 0)
+                if (newcol < cs1)
                 {
                     PRLEVEL(PR, ("newrow=%ld oldrow=%ld\n", newrow, oldrow));
                     PRLEVEL(PR, ("!!!! newcol=%ld cs1=%ld\n", newcol, cs1));
-                    printf ("################################\n");
+                    printf("################################\n");
                 }
-                ASSERT (newcol-cs1 +1 != 0);
-                ASSERT (newcol >= cs1 );
+                ASSERT(newcol - cs1 + 1 != 0);
+                ASSERT(newcol >= cs1);
                 Slp[newcol - cs1 + 1]++;
             }
         }
@@ -1029,10 +1041,10 @@ paru_symbolic *paru_analyze(
     PRLEVEL(PR, ("%% scale_row:\n["));
     if (Rs)
     {
-        for (Int k = 0; k < m; k++) 
+        for (Int k = 0; k < m; k++)
         {
             PRLEVEL(PR, ("%lf ", Rs[k]));
-            ASSERT (Rs[k] > 0);
+            ASSERT(Rs[k] > 0);
         }
     }
     PRLEVEL(PR, ("]\n"));
@@ -1114,7 +1126,7 @@ paru_symbolic *paru_analyze(
     if (rs1 > 0)
     {
         PRLEVEL(PR, ("(%ld) Slp =", slnz));
-        for (Int k = 0; k <= rs1; k++)  PRLEVEL(PR, ("%ld ", Slp[k]));
+        for (Int k = 0; k <= rs1; k++) PRLEVEL(PR, ("%ld ", Slp[k]));
     }
 #endif
 
@@ -1141,7 +1153,7 @@ paru_symbolic *paru_analyze(
         for (Int k = 0; k <= cs1; k++)
         {
             PRLEVEL(PR, ("%ld ", Sup[k]));
-            PRLEVEL(PR+2, ("c%ld ", cSup[k]));
+            PRLEVEL(PR + 2, ("c%ld ", cSup[k]));
             if (Sup[k] != cSup[k])
                 PRLEVEL(PR, ("Sup[%ld] =%ld, cSup=%ld", k, Sup[k], cSup[k]));
             ASSERT(Sup[k] == cSup[k]);
@@ -1154,7 +1166,7 @@ paru_symbolic *paru_analyze(
         for (Int k = 0; k <= rs1; k++)
         {
             PRLEVEL(PR, ("%ld ", Slp[k]));
-            PRLEVEL(PR+2, ("o%ld ", cSlp[k]));
+            PRLEVEL(PR + 2, ("o%ld ", cSlp[k]));
             if (Slp[k] != cSlp[k])
                 PRLEVEL(PR,
                         ("\nSup[%ld] =%ld, cSup=%ld\n", k, Slp[k], cSlp[k]));
@@ -1213,7 +1225,7 @@ paru_symbolic *paru_analyze(
     LUsym->Sx = Sx;
 
     if (Sj == NULL || Sx == NULL || (cs1 > 0 && (Suj == NULL || Sux == NULL)) ||
-            (rs1 > 0 && (Sli == NULL || Slx == NULL)))
+        (rs1 > 0 && (Sli == NULL || Slx == NULL)))
     {
         printf("memory problem\n");
         paru_free(m, sizeof(Int), Pinv);
@@ -1289,7 +1301,7 @@ paru_symbolic *paru_analyze(
             else
             {  // inside the U singletons
                 PRLEVEL(PR, ("Usingleton rest newcol = %ld newrow=%ld\n",
-                            newcol, newrow));
+                             newcol, newrow));
                 ASSERT(newrow != newcol);  // not a diagonal entry
                 Suj[++cSup[newrow]] = newcol;
                 Sux[cSup[newrow]] = (Rs == NULL) ? Ax[p] : Ax[p] / Rs[oldrow];
@@ -1405,8 +1417,8 @@ paru_symbolic *paru_analyze(
         (double *)paru_calloc(nf + 1, sizeof(double));
 
     if (aParent == NULL || aChild == NULL || aChildp == NULL || rM == NULL ||
-            snM == NULL || first == NULL || front_flop_bound == NULL ||
-            stree_flop_bound == NULL)
+        snM == NULL || first == NULL || front_flop_bound == NULL ||
+        stree_flop_bound == NULL)
     {
         printf("Out of memory in symbolic phase");
         paru_free(m, sizeof(Int), Pinv);
@@ -1432,7 +1444,7 @@ paru_symbolic *paru_analyze(
     {
         PRLEVEL(PR, ("%% Front %ld\n", f));
         PRLEVEL(PR, ("%% pivot columns [ %ld to %ld ] n: %ld \n", Super[f],
-                    Super[f + 1] - 1, ns));
+                     Super[f + 1] - 1, ns));
 
         // computing works in each front
         Int fp = Super[f + 1] - Super[f];  // k
@@ -1444,7 +1456,7 @@ paru_symbolic *paru_analyze(
         {
             stree_flop_bound[f] += stree_flop_bound[Child[i]];
             PRLEVEL(PR, ("%% child=%ld fl=%lf ", Child[i],
-                        front_flop_bound[Child[i]]));
+                         front_flop_bound[Child[i]]));
         }
         PRLEVEL(PR, ("%% flops bound= %lf\n ", front_flop_bound[f]));
         PRLEVEL(PR, ("%% %ld %ld %ld\n ", fp, fm, fn));
@@ -1466,7 +1478,7 @@ paru_symbolic *paru_analyze(
                 ASSERT(snM[c] < ms + nf + 1);
                 aParent[snM[c]] = offset + numRow;
                 PRLEVEL(PR, ("%% aParent[%ld] =%ld\n", aParent[snM[c]],
-                            offset + numRow));
+                             offset + numRow));
                 ASSERT(childpointer < ms + nf + 1);
                 aChild[childpointer++] = snM[c];
             }
@@ -1500,7 +1512,7 @@ paru_symbolic *paru_analyze(
         ASSERT(aChildp[offset] == -1);
         aChildp[offset] = aChildp[offset - 1] + numRow + numoforiginalChild;
         PRLEVEL(
-                1, ("\n %% f=%ld numoforiginalChild=%ld\n", f, numoforiginalChild));
+            1, ("\n %% f=%ld numoforiginalChild=%ld\n", f, numoforiginalChild));
 
         if (Parent[f] == f + 1)
         {  // last child due to staircase
