@@ -37,8 +37,8 @@ nmat = length (fnew) ;
 
 
 for k = 1:nmat
-    group = index.Group {id} ;
-    name = index.Name {id} ;
-    fprintf(ff,'tar zvfxO $COL_PATH/%s/%s',group,name);
+    group = index.Group {k} ;
+    name = index.Name {k} ;
+    fprintf(ff,'tar zvfxO $COL_PATH/%s/%s.tar.gz',group,name);
     fprintf(ff,' | ./x_paru_demo\n');
 end
