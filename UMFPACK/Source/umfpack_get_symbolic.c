@@ -110,6 +110,11 @@ GLOBAL Int UMFPACK_get_symbolic
 		P [k] = Rperm_init [k] ;
 	    }
 	}
+    
+        //printf("\nInside UMFPACK P=:\n");
+	    //for (k = 0 ; k < n_row ; k++)
+        //    printf("%ld ", P [k]);
+        //printf("\n");
     }
 
     if (Q != (Int *) NULL)
