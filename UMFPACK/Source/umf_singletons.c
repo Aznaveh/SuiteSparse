@@ -898,6 +898,14 @@ GLOBAL Int UMF_singletons
      * an UMFPACK bug.  It is fixed in gcc version 4.3.2.  However, as a
      * workaround for the compiler, the code below has been "fixed". */
 
+    /*
+    if (n1 > 0)
+    {
+        is_sym = FALSE ;
+    }
+    else
+    */
+
     if (n_row == n_col && nempty_row == nempty_col)
     {
 	/* is_sym is true if the submatrix is square, and
