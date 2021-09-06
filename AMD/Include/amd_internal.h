@@ -39,8 +39,9 @@
 
 /*
     To enable debugging, uncomment the following line:
-#undef NDEBUG
 */
+// FIXME
+#undef NDEBUG
 
 /* ------------------------------------------------------------------------- */
 /* ANSI include files */

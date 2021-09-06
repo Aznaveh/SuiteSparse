@@ -704,7 +704,7 @@ PRIVATE Int finish_permutation
     for (k = 0 ; k < nx ; k++)
     {
 	x = (Xuser != (Int *) NULL) ? Xuser [k] : k ;
-	DEBUG0 (("finish perm k "ID" x "ID" nx "ID"\n", k, x, nx)) ;
+	DEBUG1 (("finish perm k "ID" x "ID" nx "ID"\n", k, x, nx)) ;
 	deg = Xdeg [x] ;
 	if (deg == 0)
 	{
