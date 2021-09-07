@@ -10,6 +10,7 @@
 
 #include "paru_internal.hpp"
 #define TOLER 0.1  // pivot tolerance
+// TODO add two tolerances
 
 template <class T>
 void inline swap(T &a, T &b)
@@ -70,6 +71,7 @@ Int paru_panel_factorize(Int f, Int m, Int n, const Int panel_width,
     paru_symbolic *LUsym = paruMatInfo->LUsym;
     Int *Qfill = LUsym->Qfill;
     Int *Pinit = LUsym->Pinit;
+    Int n1 = LUsym->n1;
 
     // column jth of the panel
     for (Int j = j1; j < j2; j++)
@@ -88,8 +90,8 @@ Int paru_panel_factorize(Int f, Int m, Int n, const Int panel_width,
         PRLEVEL(1, ("%% before search max value= %2.4lf row_deg = %ld\n",
                     maxval, row_deg_max));
 
-        Int origCol = Qfill ? Qfill[j + col1] : j + col1;
-        Int row_diag = (origCol == Pinit[frowList[j]]) ? j : -1;
+        Int origCol = Qfill ? Qfill[j + col1 + n1] : j + col1 + n1;
+        Int row_diag = (origCol == Pinit[frowList[j] + n1]) ? j + n1 : -1;
         double diag_val = maxval;  // initialization
         PRLEVEL(1, ("%%curCol=%ld origCol= %ld row_diag=%ld\n", j + col1,
                     origCol, row_diag));

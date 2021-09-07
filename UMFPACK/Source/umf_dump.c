@@ -17,7 +17,7 @@
 
 /* These global debugging variables and arrays do not exist if debugging */
 /* is disabled at compile time (which is the default). */
-GLOBAL Int UMF_debug = 0 ; // -999 ;   FIXME
+GLOBAL Int UMF_debug = -999 ; // -999 ;   FIXME
 GLOBAL Int UMF_allocfail = FALSE ;
 GLOBAL double UMF_gprob = -1.0 ;
 

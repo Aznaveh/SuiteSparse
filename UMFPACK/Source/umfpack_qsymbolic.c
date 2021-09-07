@@ -591,9 +591,9 @@ PRIVATE void combine_ordering
 {
     Int k, oldcol, newcol, knew ;
 
-    printf ("UMFPACK combine_ordering, n1: "ID" nempty_col "ID" n_col "ID
-        "\n", n1, nempty_col, n_col) ;
-    printf ("UMF_debug %d\n", UMF_debug) ;
+    //printf ("UMFPACK combine_ordering, n1: "ID" nempty_col "ID" n_col "ID
+    //    "\n", n1, nempty_col, n_col) ;
+    //printf ("UMF_debug %d\n", UMF_debug) ;
 
     /* combine the singleton ordering with Qinv */
 #ifndef NDEBUG
@@ -1112,7 +1112,7 @@ PRIVATE Int symbolic_analysis
 	UMFPACK_DENSE_DEGREE_THRESHOLD (drow, n_col - n1 - nempty_col) ;
     Symbolic->dense_row_threshold = dense_row_threshold ;
 
-    printf ("Is submatrix symmetric after removing singletons: %d\n", is_sym) ;
+    //printf ("Is submatrix symmetric after removing singletons: %d\n", is_sym) ;
 
     if (!is_sym)
     {
@@ -1122,7 +1122,7 @@ PRIVATE Int symbolic_analysis
 	 * strategy. */
 	strategy = UMFPACK_STRATEGY_UNSYMMETRIC ;
 	DEBUGm4 (("Strategy: Unsymmetric singletons\n")) ;
-        printf ("is_sym is false: punt to unsymmetric strategy\n") ;
+     //   printf ("is_sym is false: punt to unsymmetric strategy\n") ;
     }
 
     /* ---------------------------------------------------------------------- */

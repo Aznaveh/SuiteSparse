@@ -96,10 +96,10 @@ GLOBAL Int UMFPACK_get_symbolic
 	if (Diagonal_map != (Int *) NULL)
 	{
 	    ASSERT (n_row == n_col) ;
-            printf ("Diagonal_map is present\n") ;
+        //printf ("Diagonal_map is present\n") ;
 	    for (k = 0 ; k < n1 ; k++)
 	    {
-		P [k] = Rperm_init [k] ;
+	    P [k] = Rperm_init [k] ;
 	    }
 	    /* next pivot rows are found in the diagonal map */
 	    for (k = n1 ; k < n_row ; k++)
@@ -107,9 +107,15 @@ GLOBAL Int UMFPACK_get_symbolic
                 Int knew = Diagonal_map [k] ;
                 ASSERT (knew >= n1) ;
                 // FIXME: remove this:
-                if (knew >= n1) { printf ("Hey!!! this broke\n") ; abort ( ) ; }
-		P [k] = Rperm_init [knew] ;
+                //if (knew < n1) { printf ("Hey!!! this broke\n") ; abort ( ) ; }
+                P [k] = Rperm_init [knew] ;
 	    }
+
+	    //for (k = 0 ; k < n_row ; k++)
+        //{
+        //    Int knew = Diagonal_map [k] ;
+        //    P [k] = Rperm_init [knew] ;
+        //}
 	}
 	else
 	{
