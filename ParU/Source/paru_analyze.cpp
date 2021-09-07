@@ -74,7 +74,7 @@ paru_symbolic *paru_analyze(
 
     if (m != n)
     {
-        printf("Input matrix is not square!\n");
+        printf("Paru: Input matrix is not square!\n");
         return NULL;
     }
 
@@ -281,7 +281,7 @@ paru_symbolic *paru_analyze(
     {
         umfpack_dl_report_info(Control, Info);
         umfpack_dl_report_status(Control, status);
-        printf("umfpack_dl_symbolic failed");
+        printf("Paru: umfpack_dl_symbolic failed");
         umfpack_dl_azn_free_sw(&SW);
         umfpack_dl_free_symbolic(&Symbolic);
         paru_freesym(&LUsym);
@@ -399,7 +399,7 @@ paru_symbolic *paru_analyze(
         paru_free((n + 1), sizeof(Int), fmap);
         paru_free((n + 1), sizeof(Int), newParent);
 
-        printf("out of memory");
+        printf("Paru: out of memory");
 
         paru_freesym(&LUsym);
         umfpack_dl_free_symbolic(&Symbolic);
@@ -414,7 +414,7 @@ paru_symbolic *paru_analyze(
         Chain_maxrows, Chain_maxcols, Symbolic);
     if (status < 0)
     {
-        printf("symbolic factorization invalid");
+        printf("Paru: symbolic factorization invalid");
 
         // free memory
         paru_free((m + 1), sizeof(Int), Pinit);
@@ -529,7 +529,7 @@ paru_symbolic *paru_analyze(
     // TODO: nf == 0 is a weird condintion I have to check
     if (Parent == NULL )
     {  // should not happen anyway it is always shrinking
-        printf("memory problem\n");
+        printf("Paru: memory problem\n");
         // free memory
         paru_free((n + 1), sizeof(Int), Front_npivcol);
         paru_free((n + 1), sizeof(Int), Front_parent);
@@ -548,7 +548,7 @@ paru_symbolic *paru_analyze(
         Super = LUsym->Super = (Int *)paru_alloc((nf + 1), sizeof(Int));
         if (Super == NULL)
         {
-            printf("memory problem\n");
+            printf("Paru: memory problem\n");
             paru_free((m + 1), sizeof(Int), Pinit);
             paru_freesym(&LUsym);
             umfpack_dl_azn_free_sw(&SW);
@@ -667,7 +667,7 @@ paru_symbolic *paru_analyze(
     // TODO: I have not checked memory problems after changin the code
     if (Fm == NULL || Cm == NULL)
     {
-        printf("memory problem\n");
+        printf("Paru: memory problem\n");
         paru_freesym(&LUsym);
         umfpack_dl_azn_free_sw(&SW);
         return NULL;
@@ -762,7 +762,7 @@ paru_symbolic *paru_analyze(
     LUsym->Childp = Childp;
     if (Childp == NULL)
     {
-        printf("memory problem\n");
+        printf("Paru: memory problem\n");
         paru_free((m + 1), sizeof(Int), Pinit);
         paru_freesym(&LUsym);
         // umfpack_dl_azn_free_sw (&SW);
@@ -814,7 +814,7 @@ paru_symbolic *paru_analyze(
     LUsym->Child = Child;
     if (Child == NULL)
     {
-        printf("memory problem\n");
+        printf("Paru: memory problem\n");
         paru_free((m + 1), sizeof(Int), Pinit);
         paru_freesym(&LUsym);
         // umfpack_dl_azn_free_sw (&SW);
@@ -826,7 +826,7 @@ paru_symbolic *paru_analyze(
     Int *cChildp = Work;
     if (cChildp == NULL)
     {
-        printf("memory problem\n");
+        printf("Paru: memory problem\n");
         paru_free((m + 1), sizeof(Int), Pinit);
         paru_free((MAX(m, n) + 2), sizeof(Int), Work);
         paru_freesym(&LUsym);
@@ -858,7 +858,7 @@ paru_symbolic *paru_analyze(
 
     if (Sp == NULL || Sleft == NULL || Pinv == NULL)
     {
-        printf("memory problem\n");
+        printf("Paru: memory problem\n");
 
         paru_free((m + 1), sizeof(Int), Pinit);
         paru_free((MAX(m, n) + 2), sizeof(Int), Work);
@@ -918,7 +918,7 @@ paru_symbolic *paru_analyze(
             (Rs == NULL && scale == 1) ||
             ((Sup == NULL || cSup == NULL) && cs1 != 0) || Ps == NULL)
     {
-        printf("rs1=%ld cs1=%ld memory problem\n", rs1, cs1);
+        printf("Paru: rs1=%ld cs1=%ld memory problem\n", rs1, cs1);
         paru_free((cs1 + 1), sizeof(Int), Sup);
         paru_free((cs1 + 1), sizeof(Int), cSup);
 
@@ -1036,20 +1036,30 @@ paru_symbolic *paru_analyze(
     Sleft[n - n1 + 1] = m - n1 - rowcount;  // empty rows of S if any
     LUsym->snz = snz;
     LUsym->scale_row = Rs;
-#ifndef NDEBUG
-    PR = 1;
+
     PRLEVEL(PR, ("%% scale_row:\n["));
-    if (Rs)
-    {
+    if (Rs != NULL)
+    { //making sure that every row has at most one element more than zero
         for (Int k = 0; k < m; k++)
         {
             PRLEVEL(PR, ("%lf ", Rs[k]));
-            ASSERT(Rs[k] > 0);
+            if (Rs[k] <= 0 ) 
+            {
+                printf("Paru: Matrix is singular, row %ld is zero\n",k);
+                paru_free((m - n1), sizeof(Int), Ps);
+                paru_free((m + 1), sizeof(Int), Pinit);
+                paru_free((MAX(m, n) + 2), sizeof(Int), Work);
+                paru_free(m, sizeof(Int), Pinv);
+                if (cs1 > 0) paru_free((cs1 + 1), sizeof(Int), cSup);
+                if (rs1 > 0) paru_free((rs1 + 1), sizeof(Int), cSlp);
+                paru_freesym(&LUsym);
+                return NULL;  // Free memory
+            }
         }
     }
     PRLEVEL(PR, ("]\n"));
 
-    PR = 1;
+#ifndef NDEBUG
     PRLEVEL(PR, ("Sup and Slp finished (before cumsum)U-sing =%ld L-sing=%ld\n",
                 sunz, slnz));
     if (cs1 > 0)
@@ -1073,7 +1083,7 @@ paru_symbolic *paru_analyze(
     if (rowcount < m - n1)
     {
         // I think that must not happen anyway while umfpack finds it
-        printf("Empty rows in submatrix\n");
+        printf("Paru: Empty rows in submatrix\n");
 
 #ifndef NDEBUG
         PRLEVEL(1, ("m = %ld, n1 = %ld, rowcount = %ld, snz = %ld\n", m, n1,
@@ -1225,9 +1235,9 @@ paru_symbolic *paru_analyze(
     LUsym->Sx = Sx;
 
     if (Sj == NULL || Sx == NULL || (cs1 > 0 && (Suj == NULL || Sux == NULL)) ||
-        (rs1 > 0 && (Sli == NULL || Slx == NULL)))
+            (rs1 > 0 && (Sli == NULL || Slx == NULL)))
     {
-        printf("memory problem\n");
+        printf("Paru: memory problem\n");
         paru_free(m, sizeof(Int), Pinv);
         paru_freesym(&LUsym);
         // umfpack_dl_azn_free_sw (&SW);
@@ -1301,7 +1311,7 @@ paru_symbolic *paru_analyze(
             else
             {  // inside the U singletons
                 PRLEVEL(PR, ("Usingleton rest newcol = %ld newrow=%ld\n",
-                             newcol, newrow));
+                            newcol, newrow));
                 ASSERT(newrow != newcol);  // not a diagonal entry
                 Suj[++cSup[newrow]] = newcol;
                 Sux[cSup[newrow]] = (Rs == NULL) ? Ax[p] : Ax[p] / Rs[oldrow];
@@ -1417,10 +1427,10 @@ paru_symbolic *paru_analyze(
         (double *)paru_calloc(nf + 1, sizeof(double));
 
     if (aParent == NULL || aChild == NULL || aChildp == NULL || rM == NULL ||
-        snM == NULL || first == NULL || front_flop_bound == NULL ||
-        stree_flop_bound == NULL)
+            snM == NULL || first == NULL || front_flop_bound == NULL ||
+            stree_flop_bound == NULL)
     {
-        printf("Out of memory in symbolic phase");
+        printf("Paru: Out of memory in symbolic phase");
         paru_free(m, sizeof(Int), Pinv);
         paru_freesym(&LUsym);
         return NULL;
@@ -1444,7 +1454,7 @@ paru_symbolic *paru_analyze(
     {
         PRLEVEL(PR, ("%% Front %ld\n", f));
         PRLEVEL(PR, ("%% pivot columns [ %ld to %ld ] n: %ld \n", Super[f],
-                     Super[f + 1] - 1, ns));
+                    Super[f + 1] - 1, ns));
 
         // computing works in each front
         Int fp = Super[f + 1] - Super[f];  // k
@@ -1456,7 +1466,7 @@ paru_symbolic *paru_analyze(
         {
             stree_flop_bound[f] += stree_flop_bound[Child[i]];
             PRLEVEL(PR, ("%% child=%ld fl=%lf ", Child[i],
-                         front_flop_bound[Child[i]]));
+                        front_flop_bound[Child[i]]));
         }
         PRLEVEL(PR, ("%% flops bound= %lf\n ", front_flop_bound[f]));
         PRLEVEL(PR, ("%% %ld %ld %ld\n ", fp, fm, fn));
@@ -1478,7 +1488,7 @@ paru_symbolic *paru_analyze(
                 ASSERT(snM[c] < ms + nf + 1);
                 aParent[snM[c]] = offset + numRow;
                 PRLEVEL(PR, ("%% aParent[%ld] =%ld\n", aParent[snM[c]],
-                             offset + numRow));
+                            offset + numRow));
                 ASSERT(childpointer < ms + nf + 1);
                 aChild[childpointer++] = snM[c];
             }
@@ -1512,7 +1522,7 @@ paru_symbolic *paru_analyze(
         ASSERT(aChildp[offset] == -1);
         aChildp[offset] = aChildp[offset - 1] + numRow + numoforiginalChild;
         PRLEVEL(
-            1, ("\n %% f=%ld numoforiginalChild=%ld\n", f, numoforiginalChild));
+                1, ("\n %% f=%ld numoforiginalChild=%ld\n", f, numoforiginalChild));
 
         if (Parent[f] == f + 1)
         {  // last child due to staircase
