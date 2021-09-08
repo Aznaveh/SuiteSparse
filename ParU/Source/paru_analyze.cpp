@@ -281,10 +281,9 @@ paru_symbolic *paru_analyze(
     {
         umfpack_dl_report_info(Control, Info);
         umfpack_dl_report_status(Control, status);
-        printf("Paru: umfpack_dl_symbolic failed");
-        umfpack_dl_azn_free_sw(&SW);
+        printf("Paru: umfpack_dl_symbolic failed\n");
         umfpack_dl_free_symbolic(&Symbolic);
-        paru_freesym(&LUsym);
+        paru_free (1, sizeof(paru_symbolic), LUsym);
         return NULL;
     }
 
@@ -399,7 +398,7 @@ paru_symbolic *paru_analyze(
         paru_free((n + 1), sizeof(Int), fmap);
         paru_free((n + 1), sizeof(Int), newParent);
 
-        printf("Paru: out of memory");
+        printf("Paru: out of memory\n");
 
         paru_freesym(&LUsym);
         umfpack_dl_free_symbolic(&Symbolic);
@@ -414,7 +413,7 @@ paru_symbolic *paru_analyze(
         Chain_maxrows, Chain_maxcols, Symbolic);
     if (status < 0)
     {
-        printf("Paru: symbolic factorization invalid");
+        printf("Paru: symbolic factorization invalid\n");
 
         // free memory
         paru_free((m + 1), sizeof(Int), Pinit);
