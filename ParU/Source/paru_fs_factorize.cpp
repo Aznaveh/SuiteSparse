@@ -9,25 +9,17 @@
  */
 
 #include "paru_internal.hpp"
-#define TOLER 0.1  // pivot tolerance
-// TODO add two tolerances
-
-template <class T>
-void inline swap(T &a, T &b)
-{
-    T c(a);
-    a = b;
-    b = c;
-}
+#define PIV_TOLER 0.1  // pivot tolerance
+#define DIAG_TOLER 0.001  // pivot tolerance
 
 void swap_rows(double *F, Int *frowList, Int m, Int n, Int r1, Int r2)
 {
     // This function also swap rows r1 and r2 wholly and indices
     if (r1 == r2) return;
-    swap(frowList[r1], frowList[r2]);
+    std::swap(frowList[r1], frowList[r2]);
     for (Int j = 0; j < n; j++)
         // each column
-        swap(F[j * m + r1], F[j * m + r2]);
+        std::swap(F[j * m + r1], F[j * m + r2]);
 }
 
 Int paru_panel_factorize(Int f, Int m, Int n, const Int panel_width,
@@ -72,6 +64,7 @@ Int paru_panel_factorize(Int f, Int m, Int n, const Int panel_width,
     Int *Qfill = LUsym->Qfill;
     Int *Pinit = LUsym->Pinit;
     Int n1 = LUsym->n1;
+    n1 = 0;
 
     // column jth of the panel
     for (Int j = j1; j < j2; j++)
@@ -137,7 +130,7 @@ Int paru_panel_factorize(Int f, Int m, Int n, const Int panel_width,
         if (LUsym->strategy == UMFPACK_STRATEGY_SYMMETRIC)
         {
             if (row_diag != -1)
-                if (fabs(TOLER * TOLER * maxval) < fabs(diag_val))
+                if (fabs(DIAG_TOLER * maxval) < fabs(diag_val))
                 {
                     piv = diag_val;
                     row_piv = row_diag;
@@ -155,7 +148,7 @@ Int paru_panel_factorize(Int f, Int m, Int n, const Int panel_width,
         {
             Int row_sp = row_max;
             for (Int i = j; i < row_end; i++)
-                if (fabs(TOLER * maxval) < fabs(F[j * m + i]) &&
+                if (fabs(PIV_TOLER * maxval) < fabs(F[j * m + i]) &&
                     row_degree_bound[frowList[i]] < row_deg_sp)
                 {  // numerically acceptalbe and sparser
                     piv = F[j * m + i];

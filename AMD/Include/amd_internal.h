@@ -41,7 +41,7 @@
     To enable debugging, uncomment the following line:
 */
 // FIXME
-#undef NDEBUG
+//#undef NDEBUG
 
 /* ------------------------------------------------------------------------- */
 /* ANSI include files */
