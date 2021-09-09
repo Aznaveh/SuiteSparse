@@ -16,10 +16,15 @@ ParU_ResultCode paru_solve(paru_matrix *paruMatInfo, double *b)
     PRLEVEL(1, ("%% inside solve\n"));
     paru_symbolic *LUsym = paruMatInfo->LUsym;
     Int m = LUsym->m;
+    if (paruMatInfo-> res == PARU_SINGULAR )
+    {
+        printf("Paru: the matrix is singular; cannot be solved.\n");
+        return PARU_SINGULAR;
+    }
     double *x = (double *)paru_alloc(m, sizeof(double));
     if (x == NULL)
     {
-        printf("Memory problem inside solve\n");
+        printf("Paru: memory problem inside solve\n");
         return PARU_OUT_OF_MEMORY;
     }
     paru_memcpy(x, b, m * sizeof(double));

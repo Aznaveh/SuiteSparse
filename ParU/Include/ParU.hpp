@@ -293,6 +293,14 @@ typedef struct
     double *p; /* point to factorized parts */
 } paru_fac;
 
+enum ParU_ResultCode
+{
+    PARU_SUCCESS,
+    PARU_OUT_OF_MEMORY,
+    PARU_INVALID,
+    PARU_SINGULAR
+};
+
 typedef struct
 {             /*Matrix */
     Int m, n; /* size of the sumbatrix that is factorized */
@@ -345,16 +353,11 @@ typedef struct
     double flp_cnt_dger;
     double flp_cnt_real_dgemm;
     // #endif
+    ParU_ResultCode res;
 
 } paru_matrix;
 
-enum ParU_ResultCode
-{
-    PARU_SUCCESS,
-    PARU_OUT_OF_MEMORY,
-    PARU_INVALID,
-    PARU_SINGULAR
-};
+
 
 //------------------------------------------------------------------------------
 // user:

@@ -23,6 +23,7 @@ ParU_ResultCode paru_do_fronts(Int f, paru_matrix *paruMatInfo)
     double *stree_flop_bound = LUsym->stree_flop_bound;
 
     info = PARU_SUCCESS;
+    paruMatInfo->res = PARU_SUCCESS;
     if (stree_flop_bound[f] < TASK_FL_THRESHOLD)
     {
         Int *first = LUsym->first;
