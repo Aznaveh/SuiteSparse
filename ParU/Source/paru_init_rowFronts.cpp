@@ -53,6 +53,7 @@ ParU_ResultCode paru_init_rowFronts(
     n = paruMatInfo->n = LUsym->n - LUsym->n1;
     nf = LUsym->nf;
     paruMatInfo->panel_width = 32;
+    paruMatInfo-> res = PARU_SUCCESS;
 
     work_struct *Work = paruMatInfo->Work =
         (work_struct *)paru_alloc(1, sizeof(work_struct));

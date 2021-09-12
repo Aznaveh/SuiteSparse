@@ -48,21 +48,22 @@ Int paru_panel_factorize(Int f, Int m, Int n, const Int panel_width,
 
 #ifndef NDEBUG  // Printing the panel
     Int num_col_panel = j2 - j1;
-    Int p = 1;
-    PRLEVEL(p, ("%% Starting the factorization\n"));
-    PRLEVEL(p, ("%% This Panel:\n"));
+    Int PR = 1;
+    PRLEVEL(PR, ("%% Starting the factorization\n"));
+    PRLEVEL(PR, ("%% This Panel:\n"));
     for (Int r = j1; r < row_end; r++)
     {
-        PRLEVEL(p, ("%% %ld\t", frowList[r]));
-        for (Int c = j1; c < j2; c++) PRLEVEL(p, (" %2.5lf\t", F[c * m + r]));
-        PRLEVEL(p, ("\n"));
+        PRLEVEL(PR, ("%% %ld\t", frowList[r]));
+        for (Int c = j1; c < j2; c++) PRLEVEL(PR, (" %2.5lf\t", F[c * m + r]));
+        PRLEVEL(PR, ("\n"));
     }
 #endif
     Int *Super = paruMatInfo->LUsym->Super;
     Int col1 = Super[f]; /* fornt F has columns col1:col2-1 */
     paru_symbolic *LUsym = paruMatInfo->LUsym;
-    Int *Qfill = LUsym->Qfill;
-    Int *Pinit = LUsym->Pinit;
+    //Int *Qfill = LUsym->Qfill;
+    //Int *Pinit = LUsym->Pinit;
+    Int *Diag_map= LUsym->Diag_map;
     Int n1 = LUsym->n1;
     n1 = 0;
 
@@ -76,18 +77,22 @@ Int paru_panel_factorize(Int f, Int m, Int n, const Int panel_width,
 
         // Initializing maximum element in the column
         Int row_max = j;
-#ifndef NDEBUG
+#ifndef NDEBUG 
+
         Int row_deg_max = row_degree_bound[frowList[row_max]];
 #endif
         double maxval = F[j * m + row_max];
         PRLEVEL(1, ("%% before search max value= %2.4lf row_deg = %ld\n",
                     maxval, row_deg_max));
 
-        Int origCol = Qfill ? Qfill[j + col1 + n1] : j + col1 + n1;
-        Int row_diag = (origCol == Pinit[frowList[j] + n1]) ? j + n1 : -1;
+        //Int origCol = Qfill ? Qfill[j + col1 + n1] : j + col1 + n1;
+        //Int row_diag = (origCol == Pinit[frowList[j] + n1]) ? j + n1 : -1;
+        Int row_diag = (Diag_map[0] != -1) ? Diag_map [col1+j+n1] : -1;
+        Int diag_found = -1;
         double diag_val = maxval;  // initialization
-        PRLEVEL(1, ("%%curCol=%ld origCol= %ld row_diag=%ld\n", j + col1,
-                    origCol, row_diag));
+        //PRLEVEL(1, ("%%curCol=%ld origCol= %ld row_diag=%ld\n", j + col1,
+        //            origCol, row_diag));
+        PRLEVEL (1, ("%%curCol=%ld row_diag=%ld\n", j + col1 +n1, row_diag));
 
         PRLEVEL(1, ("%%##j=%ld value= %2.4lf\n", j, F[j * m + j]));
         // find max
@@ -100,12 +105,14 @@ Int paru_panel_factorize(Int f, Int m, Int n, const Int panel_width,
                 row_max = i;
                 maxval = F[j * m + i];
             }
-            Int origRow = Pinit[frowList[i]];
-            PRLEVEL(1, ("%%curRow=%ld origRow= %ld\n", frowList[i], origRow));
-            if (origRow == origCol)
+            //Int origRow = Pinit[frowList[i]];
+            //PRLEVEL(1, ("%%curRow=%ld origRow= %ld\n", frowList[i], origRow));
+            //if (origRow == origCol)
+            if (frowList[i] == row_diag)
             {
                 PRLEVEL(1, ("%%Found it %2.4lf\n", F[j * m + i]));
-                row_diag = i;
+                //row_diag = i;
+                diag_found = i;
                 diag_val = F[j * m + i];
             }
         }
@@ -130,11 +137,11 @@ Int paru_panel_factorize(Int f, Int m, Int n, const Int panel_width,
 
         if (LUsym->strategy == UMFPACK_STRATEGY_SYMMETRIC)
         {
-            if (row_diag != -1)
+            if (diag_found != -1)
                 if (fabs(DIAG_TOLER * maxval) < fabs(diag_val))
                 {
                     piv = diag_val;
-                    row_piv = row_diag;
+                    row_piv = diag_found;
                     PRLEVEL(1, ("%% symmetric pivot piv value= %2.4lf"
                                 " row_piv=%ld\n",
                                 piv, row_piv));
@@ -166,16 +173,16 @@ Int paru_panel_factorize(Int f, Int m, Int n, const Int panel_width,
         swap_rows(F, frowList, m, n, j, row_piv);
 
 #ifndef NDEBUG  // Printing the pivotal front
-        p = 1;
-        if (row_piv != row_max) PRLEVEL(p, ("%% \n"));
-        PRLEVEL(p, ("%% After Swaping\n"));
-        PRLEVEL(p, (" \n"));
+        PR = 1;
+        if (row_piv != row_max) PRLEVEL(PR, ("%% \n"));
+        PRLEVEL(PR, ("%% After Swaping\n"));
+        PRLEVEL(PR, (" \n"));
         for (Int r = 0; r < row_end; r++)
         {
-            PRLEVEL(p, ("%% %ld\t", frowList[r]));
+            PRLEVEL(PR, ("%% %ld\t", frowList[r]));
             for (Int c = 0; c < num_col_panel; c++)
-                PRLEVEL(p, (" %2.5lf\t", F[c * m + r]));
-            PRLEVEL(p, ("\n"));
+                PRLEVEL(PR, (" %2.5lf\t", F[c * m + r]));
+            PRLEVEL(PR, ("\n"));
         }
 #endif
 
@@ -236,36 +243,36 @@ Int paru_panel_factorize(Int f, Int m, Int n, const Int panel_width,
             BLAS_INT lda = (BLAS_INT)m;
 
 #ifndef NDEBUG  // Printing dger input
-            Int p = 1;
-            PRLEVEL(p, ("%% lda =%d ", lda));
-            PRLEVEL(p, ("%% M =%d ", M));
-            PRLEVEL(p, ("N =%d \n %%", N));
-            PRLEVEL(p, ("%% x= (%d)", N));
-            for (Int i = 0; i < M; i++) PRLEVEL(p, (" %lf ", X[i]));
-            PRLEVEL(p, ("\n %% y= (%d)", N));
-            for (Int j = 0; j < N; j++) PRLEVEL(p, (" %lf ", Y[j * m]));
-            PRLEVEL(p, ("\n"));
+            Int PR = 1;
+            PRLEVEL(PR, ("%% lda =%d ", lda));
+            PRLEVEL(PR, ("%% M =%d ", M));
+            PRLEVEL(PR, ("N =%d \n %%", N));
+            PRLEVEL(PR, ("%% x= (%d)", N));
+            for (Int i = 0; i < M; i++) PRLEVEL(PR, (" %lf ", X[i]));
+            PRLEVEL(PR, ("\n %% y= (%d)", N));
+            for (Int j = 0; j < N; j++) PRLEVEL(PR, (" %lf ", Y[j * m]));
+            PRLEVEL(PR, ("\n"));
 
 #endif
             BLAS_DGER(&M, &N, &alpha, X, &Incx, Y, &Incy, A, &lda);
 #ifdef COUNT_FLOPS
             paruMatInfo->flp_cnt_dger += (double)2 * M * N;
 #ifndef NDEBUG
-            PRLEVEL(p, ("\n%% FlopCount Dger fac %d %d ", M, N));
-            PRLEVEL(p, ("cnt = %lf\n ", paruMatInfo->flp_cnt_dger));
+            PRLEVEL(PR, ("\n%% FlopCount Dger fac %d %d ", M, N));
+            PRLEVEL(PR, ("cnt = %lf\n ", paruMatInfo->flp_cnt_dger));
 #endif
 #endif
         }
 
 #ifndef NDEBUG  // Printing the pivotal front
-        Int p = 1;
-        PRLEVEL(p, ("%% After dger\n"));
+        Int PR = 1;
+        PRLEVEL(PR, ("%% After dger\n"));
         for (Int r = j; r < row_end; r++)
         {
-            PRLEVEL(p, ("%% %ld\t", frowList[r]));
+            PRLEVEL(PR, ("%% %ld\t", frowList[r]));
             for (Int c = j; c < j2; c++)
-                PRLEVEL(p, (" %2.5lf\t", F[c * m + r]));
-            PRLEVEL(p, ("\n"));
+                PRLEVEL(PR, (" %2.5lf\t", F[c * m + r]));
+            PRLEVEL(PR, ("\n"));
         }
 #endif
     }
@@ -294,17 +301,17 @@ Int paru_factorize_full_summed(Int f, Int start_fac,
     {
 #ifndef NDEBUG  // Printing the pivotal front
         Int *frowList = paruMatInfo->frowList[f];
-        Int p = 1;
-        PRLEVEL(p, ("%%Pivotal Front Before %ld\n", panel_num));
+        Int PR = 1;
+        PRLEVEL(PR, ("%%Pivotal Front Before %ld\n", panel_num));
 
         for (Int r = 0; r < rowCount; r++)
         {
-            PRLEVEL(p, ("%% %ld\t", frowList[r]));
+            PRLEVEL(PR, ("%% %ld\t", frowList[r]));
             for (Int c = 0; c < fp; c++)
             {
-                PRLEVEL(p, (" %2.5lf\t", F[c * rowCount + r]));
+                PRLEVEL(PR, (" %2.5lf\t", F[c * rowCount + r]));
             }
-            PRLEVEL(p, ("\n"));
+            PRLEVEL(PR, ("\n"));
         }
 #endif
 
@@ -359,17 +366,17 @@ Int paru_factorize_full_summed(Int f, Int start_fac,
             double *B = F + j2 * rowCount + j1;
             BLAS_INT ldb = (BLAS_INT)rowCount;
 #ifndef NDEBUG
-            Int p = 1;
-            PRLEVEL(p, ("%% M =%d N = %d alpha = %f \n", M, N, alpha));
-            PRLEVEL(p, ("%% lda =%d ldb =%d\n", lda, ldb));
+            Int PR = 1;
+            PRLEVEL(PR, ("%% M =%d N = %d alpha = %f \n", M, N, alpha));
+            PRLEVEL(PR, ("%% lda =%d ldb =%d\n", lda, ldb));
             PRLEVEL(
-                p, ("%% Pivotal Front Before Trsm: %ld x %ld\n", fp, rowCount));
+               PR, ("%% Pivotal Front Before Trsm: %ld x %ld\n", fp, rowCount));
             for (Int r = 0; r < rowCount; r++)
             {
-                PRLEVEL(p, ("%% %ld\t", frowList[r]));
+                PRLEVEL(PR, ("%% %ld\t", frowList[r]));
                 for (Int c = 0; c < fp; c++)
-                    PRLEVEL(p, (" %2.5lf\t", F[c * rowCount + r]));
-                PRLEVEL(p, ("\n"));
+                    PRLEVEL(PR, (" %2.5lf\t", F[c * rowCount + r]));
+                PRLEVEL(PR, ("\n"));
             }
 
 #endif
@@ -377,22 +384,22 @@ Int paru_factorize_full_summed(Int f, Int start_fac,
 #ifdef COUNT_FLOPS
             paruMatInfo->flp_cnt_trsm += (double)(M + 1) * M * N;
 #ifndef NDEBUG
-            p = 0;
-            PRLEVEL(p, ("\n%% FlopCount Trsm factorize %d %d ", M, N));
-            PRLEVEL(p, ("cnt = %lf\n ", paruMatInfo->flp_cnt_trsm));
+            PR = 0;
+            PRLEVEL(PR, ("\n%% FlopCount Trsm factorize %d %d ", M, N));
+            PRLEVEL(PR, ("cnt = %lf\n ", paruMatInfo->flp_cnt_trsm));
 #endif
 
 #endif
 
 #ifndef NDEBUG
-            PRLEVEL(p, ("%% Pivotal Front After Trsm: %ld x %ld\n %%", fp,
+            PRLEVEL(PR, ("%% Pivotal Front After Trsm: %ld x %ld\n %%", fp,
                         rowCount));
             for (Int r = 0; r < rowCount; r++)
             {
-                PRLEVEL(p, ("%% %ld\t", frowList[r]));
+                PRLEVEL(PR, ("%% %ld\t", frowList[r]));
                 for (Int c = 0; c < fp; c++)
-                    PRLEVEL(p, (" %2.5lf\t", F[c * rowCount + r]));
-                PRLEVEL(p, ("\n"));
+                    PRLEVEL(PR, (" %2.5lf\t", F[c * rowCount + r]));
+                PRLEVEL(PR, ("\n"));
             }
 #endif
         }
@@ -440,13 +447,13 @@ Int paru_factorize_full_summed(Int f, Int start_fac,
             double *C = F + j2 * rowCount + j2;
             BLAS_INT ldc = (BLAS_INT)rowCount;
 #ifndef NDEBUG
-            Int p = 1;
-            PRLEVEL(p, ("%% DGEMM "));
-            PRLEVEL(p,
+            Int PR = 1;
+            PRLEVEL(PR, ("%% DGEMM "));
+            PRLEVEL(PR,
                     ("%% M =%d K = %d N = %d alpha = %f \n", M, K, N, alpha));
-            PRLEVEL(p, ("%% lda =%d ldb =%d\n", lda, ldb));
-            PRLEVEL(p, ("%% j2 =%ld j1=%ld\n", j2, j1));
-            PRLEVEL(p, ("\n %%"));
+            PRLEVEL(PR, ("%% lda =%d ldb =%d\n", lda, ldb));
+            PRLEVEL(PR, ("%% j2 =%ld j1=%ld\n", j2, j1));
+            PRLEVEL(PR, ("\n %%"));
 #endif
 
             // double start_time = omp_get_wtime();
@@ -460,23 +467,22 @@ Int paru_factorize_full_summed(Int f, Int start_fac,
             paruMatInfo->flp_cnt_dgemm += (double)2 * M * N * K;
             paruMatInfo->flp_cnt_real_dgemm += (double)2 * M * N * K;
 #ifndef NDEBUG
-            PRLEVEL(p, ("\n%% FlopCount Dgemm factorize %d %d %d ", M, N, K));
-            PRLEVEL(p, ("%d %d %d \n", M, N, K));
-
-            PRLEVEL(p, ("cnt = %lf\n ", paruMatInfo->flp_cnt_dgemm));
+            PRLEVEL(PR, ("\n%% FlopCount Dgemm factorize %d %d %d ", M, N, K));
+            PRLEVEL(PR, ("%d %d %d \n", M, N, K));
+            PRLEVEL(PR, ("cnt = %lf\n ", paruMatInfo->flp_cnt_dgemm));
 #endif
 #endif
         }
 
 #ifndef NDEBUG
-        PRLEVEL(p,
+        PRLEVEL(PR,
                 ("%% Pivotal Front After Dgemm: %ld x %ld\n %%", fp, rowCount));
         for (Int r = 0; r < rowCount; r++)
         {
-            PRLEVEL(p, ("%% %ld\t", frowList[r]));
+            PRLEVEL(PR, ("%% %ld\t", frowList[r]));
             for (Int c = 0; c < fp; c++)
-                PRLEVEL(p, (" %2.5lf\t", F[c * rowCount + r]));
-            PRLEVEL(p, ("\n"));
+                PRLEVEL(PR, (" %2.5lf\t", F[c * rowCount + r]));
+            PRLEVEL(PR, ("\n"));
         }
 #endif
     }

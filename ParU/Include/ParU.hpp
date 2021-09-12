@@ -101,6 +101,9 @@ typedef struct
     // UMFPACK computes it and I compute Pinv out of it.
     // I need it in several places so I decided to keep it
 
+    Int *Diag_map; //size m, 
+    // UMFPACK computes it and I use it to find original diags out of it
+
     Int *Ps; // size m, row permutation.
     //Permutation from S to LU. needed for lsolve and usolve 
     //Look paru_perm for more details
