@@ -78,6 +78,7 @@ OBJ = \
 	paru_backward.o \
 	paru_gaxpy.o \
 	paru_norms.o \
+	paru_Diag_update.o \
 	paru_full_summed.o \
 
 $(OBJ): $(INC)
@@ -218,6 +219,9 @@ paru_gaxpy.o: ../Source/paru_gaxpy.cpp
 	$(C) -c $<
 
 paru_norms.o: ../Source/paru_norms.cpp
+	$(C) -c $<
+
+paru_Diag_update.o: ../Source/paru_Diag_update.cpp
 	$(C) -c $<
 
 paru_full_summed.o: ../Source/paru_full_summed.cpp

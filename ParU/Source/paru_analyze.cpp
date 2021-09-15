@@ -189,12 +189,12 @@ paru_symbolic *paru_analyze(
 
         *Diag_map,
         // Diag_map[newcol] = newrow; It is how UMFPACK see it
-        // TODO: it should be updated during makding staircase structure
+        // it should be updated during makding staircase structure
         // my Diag_map would be Diag_map[col_s] = row_s 
         // col_s = newcol - n1, row_s comes from staircase structure
         // I have to make initial Diag_map inverse to be able to compute mine
         *inv_Diag_map,
-        // it will be freed here anyway
+        // it will be freed here anyway but I will make another copy
 
         *Front_npivcol,  // size = n_col +1;  actual size = nfr+1
         // NOTE: This is not the case for SPQR
@@ -379,8 +379,8 @@ paru_symbolic *paru_analyze(
     /* ---------------------------------------------------------------------- */
     Pinit = (Int *)paru_alloc((m + 1), sizeof(Int));
     Qinit = (Int *)paru_alloc((n + 1), sizeof(Int));
-    Diag_map = (Int *)paru_alloc((n + 1), sizeof(Int));
-    inv_Diag_map = (Int *)paru_alloc((n + 1), sizeof(Int));
+    Diag_map = (Int *)paru_alloc(n, sizeof(Int));
+    inv_Diag_map = (Int *)paru_alloc(n, sizeof(Int));
     Front_npivcol = (Int *)paru_alloc((n + 1), sizeof(Int));
     Front_1strow = (Int *)paru_alloc((n + 1), sizeof(Int));
     Front_leftmostdesc = (Int *)paru_alloc((n + 1), sizeof(Int));
@@ -399,8 +399,8 @@ paru_symbolic *paru_analyze(
     {
         paru_free((m + 1), sizeof(Int), Pinit);
         paru_free((n + 1), sizeof(Int), Qinit);
-        paru_free((n + 1), sizeof(Int), Diag_map);
-        paru_free((n + 1), sizeof(Int), inv_Diag_map);
+        paru_free(n, sizeof(Int), Diag_map);
+        paru_free(n, sizeof(Int), inv_Diag_map);
         paru_free((n + 1), sizeof(Int), Front_npivcol);
         paru_free((n + 1), sizeof(Int), Front_1strow);
         paru_free((n + 1), sizeof(Int), Front_leftmostdesc);
@@ -432,8 +432,8 @@ paru_symbolic *paru_analyze(
         // free memory
         paru_free((m + 1), sizeof(Int), Pinit);
         paru_free((n + 1), sizeof(Int), Qinit);
-        paru_free((n + 1), sizeof(Int), Diag_map);
-        paru_free((n + 1), sizeof(Int), inv_Diag_map);
+        paru_free(n, sizeof(Int), Diag_map);
+        paru_free(n, sizeof(Int), inv_Diag_map);
         paru_free((n + 1), sizeof(Int), Front_npivcol);
         paru_free((n + 1), sizeof(Int), Front_1strow);
         paru_free((n + 1), sizeof(Int), Front_leftmostdesc);
@@ -504,7 +504,7 @@ paru_symbolic *paru_analyze(
     if (Diag_map[0] != -1)
     {
         PRLEVEL(PR, ("Forthwith Diag_map =\n"));
-        for (Int i = 0; i < MIN(64, m); i++) PRLEVEL(PR, ("%ld ", Diag_map[i]));
+        for (Int i = 0; i < MIN(64, n); i++) PRLEVEL(PR, ("%ld ", Diag_map[i]));
         PRLEVEL(PR, ("\n"));
     }
     PR = 1;
@@ -555,7 +555,7 @@ paru_symbolic *paru_analyze(
         paru_free((n + 1), sizeof(Int), Front_npivcol);
         paru_free((n + 1), sizeof(Int), Front_parent);
         paru_free((m + 1), sizeof(Int), Pinit);
-        paru_free((n + 1), sizeof(Int), inv_Diag_map);
+        paru_free(n, sizeof(Int), inv_Diag_map);
         paru_freesym(&LUsym);
         umfpack_dl_azn_free_sw(&SW);
         return NULL;
@@ -572,7 +572,7 @@ paru_symbolic *paru_analyze(
         {
             printf("Paru: memory problem\n");
             paru_free((m + 1), sizeof(Int), Pinit);
-            paru_free((n + 1), sizeof(Int), inv_Diag_map);
+            paru_free(n, sizeof(Int), inv_Diag_map);
             paru_freesym(&LUsym);
             umfpack_dl_azn_free_sw(&SW);
             return NULL;
@@ -691,7 +691,7 @@ paru_symbolic *paru_analyze(
     if (Fm == NULL || Cm == NULL)
     {
         printf("Paru: memory problem\n");
-        paru_free((n + 1), sizeof(Int), inv_Diag_map);
+        paru_free(n, sizeof(Int), inv_Diag_map);
         paru_freesym(&LUsym);
         umfpack_dl_azn_free_sw(&SW);
         return NULL;
@@ -789,7 +789,7 @@ paru_symbolic *paru_analyze(
         printf("Paru: memory problem\n");
         paru_free((m + 1), sizeof(Int), Pinit);
         paru_freesym(&LUsym);
-        paru_free((n + 1), sizeof(Int), inv_Diag_map);
+        paru_free(n, sizeof(Int), inv_Diag_map);
         // umfpack_dl_azn_free_sw (&SW);
         return NULL;
     }
@@ -842,7 +842,7 @@ paru_symbolic *paru_analyze(
         printf("Paru: memory problem\n");
         paru_free((m + 1), sizeof(Int), Pinit);
         paru_freesym(&LUsym);
-        paru_free((n + 1), sizeof(Int), inv_Diag_map);
+        paru_free(n, sizeof(Int), inv_Diag_map);
         // umfpack_dl_azn_free_sw (&SW);
         return NULL;
     }
@@ -856,7 +856,7 @@ paru_symbolic *paru_analyze(
         paru_free((m + 1), sizeof(Int), Pinit);
         paru_free((MAX(m, n) + 2), sizeof(Int), Work);
         paru_freesym(&LUsym);
-        paru_free((n + 1), sizeof(Int), inv_Diag_map);
+        paru_free(n, sizeof(Int), inv_Diag_map);
         // umfpack_dl_azn_free_sw (&SW);
         return NULL;
     }
@@ -893,7 +893,7 @@ paru_symbolic *paru_analyze(
         paru_freesym(&LUsym);
         // umfpack_dl_azn_free_sw (&SW);
 
-        paru_free((n + 1), sizeof(Int), inv_Diag_map);
+        paru_free(n, sizeof(Int), inv_Diag_map);
         paru_free(m, sizeof(Int), Pinv);
         return NULL;
     }
@@ -931,7 +931,7 @@ paru_symbolic *paru_analyze(
 
     PR = 1;
     PRLEVEL(PR, ("inv_Diag_map =\n"));
-    for (Int i = 0; i < n; i++) PRLEVEL(PR, ("%ld ", inv_Diag_map[i]));
+    for (Int i = 0; i < MIN(64,n); i++) PRLEVEL(PR, ("%ld ", inv_Diag_map[i]));
     PRLEVEL(PR, ("\n"));
 
 #endif
@@ -972,7 +972,7 @@ paru_symbolic *paru_analyze(
         paru_free(m, sizeof(Int), Rs);
         paru_free((MAX(m, n) + 2), sizeof(Int), Work);
         paru_free(m, sizeof(Int), Pinv);
-        paru_free((n + 1), sizeof(Int), inv_Diag_map);
+        paru_free(n, sizeof(Int), inv_Diag_map);
         // umfpack_dl_azn_free_sw (&SW);
         paru_freesym(&LUsym);
         return NULL;
@@ -1089,7 +1089,7 @@ paru_symbolic *paru_analyze(
     Sleft[n - n1 + 1] = m - n1 - rowcount;  // empty rows of S if any
     LUsym->snz = snz;
     LUsym->scale_row = Rs;
-    paru_free((n + 1), sizeof(Int), inv_Diag_map);
+    paru_free(n, sizeof(Int), inv_Diag_map);
 
     PRLEVEL(PR, ("%% scale_row:\n["));
     if (Rs != NULL)

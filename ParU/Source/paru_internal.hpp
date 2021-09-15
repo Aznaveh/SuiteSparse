@@ -22,12 +22,12 @@
 #endif
 
 // for printing information uncomment this; to activate assertions uncomment
-#undef NPR  //<<1>>
+//#undef NPR  //<<1>>
 
 // from spqr.hpp
 // Aznaveh For MATLAB OUTPUT UNCOMMENT HERE
 // uncomment the following line to turn on debugging
-#undef NDEBUG  //<<2>>
+//#undef NDEBUG  //<<2>>
 
 // uncomment if you want to count hardware flops
 //#define COUNT_FLOPS
@@ -227,4 +227,5 @@ Int paru_usolve(paru_matrix *paruMatInfo, double *x);
 Int paru_gaxpy(cholmod_sparse *A, const double *x, double *y, double alpha);
 double paru_spm_1norm(cholmod_sparse *A);
 double paru_vec_1norm(const double *x, Int n);
+void paru_Diag_update(Int pivcol, Int pivrow, paru_matrix *paruMatInfo);
 #endif

@@ -9,7 +9,7 @@
  */
 
 #include "paru_internal.hpp"
-#define PIV_TOLER 0.1  // pivot tolerance
+#define PIV_TOLER 0.1     // pivot tolerance
 #define DIAG_TOLER 0.001  // pivot tolerance
 
 void swap_rows(double *F, Int *frowList, Int m, Int n, Int r1, Int r2)
@@ -61,9 +61,9 @@ Int paru_panel_factorize(Int f, Int m, Int n, const Int panel_width,
     Int *Super = paruMatInfo->LUsym->Super;
     Int col1 = Super[f]; /* fornt F has columns col1:col2-1 */
     paru_symbolic *LUsym = paruMatInfo->LUsym;
-    //Int *Qfill = LUsym->Qfill;
-    //Int *Pinit = LUsym->Pinit;
-    Int *Diag_map= LUsym->Diag_map;
+    // Int *Qfill = LUsym->Qfill;
+    // Int *Pinit = LUsym->Pinit;
+    Int *Diag_map = paruMatInfo->Diag_map;
     Int n1 = LUsym->n1;
     n1 = 0;
 
@@ -77,7 +77,7 @@ Int paru_panel_factorize(Int f, Int m, Int n, const Int panel_width,
 
         // Initializing maximum element in the column
         Int row_max = j;
-#ifndef NDEBUG 
+#ifndef NDEBUG
 
         Int row_deg_max = row_degree_bound[frowList[row_max]];
 #endif
@@ -85,14 +85,14 @@ Int paru_panel_factorize(Int f, Int m, Int n, const Int panel_width,
         PRLEVEL(1, ("%% before search max value= %2.4lf row_deg = %ld\n",
                     maxval, row_deg_max));
 
-        //Int origCol = Qfill ? Qfill[j + col1 + n1] : j + col1 + n1;
-        //Int row_diag = (origCol == Pinit[frowList[j] + n1]) ? j + n1 : -1;
-        Int row_diag = (Diag_map[0] != -1) ? Diag_map [col1+j+n1] : -1;
-        Int diag_found = -1;
+        // Int origCol = Qfill ? Qfill[j + col1 + n1] : j + col1 + n1;
+        // Int row_diag = (origCol == Pinit[frowList[j] + n1]) ? j + n1 : -1;
+        Int row_diag = (Diag_map) ? Diag_map[col1 + j + n1] : -1;
         double diag_val = maxval;  // initialization
-        //PRLEVEL(1, ("%%curCol=%ld origCol= %ld row_diag=%ld\n", j + col1,
+        Int diag_found = frowList[j] == row_diag ? j : -1;
+        // PRLEVEL(1, ("%%curCol=%ld origCol= %ld row_diag=%ld\n", j + col1,
         //            origCol, row_diag));
-        PRLEVEL (1, ("%%curCol=%ld row_diag=%ld\n", j + col1 +n1, row_diag));
+        PRLEVEL(1, ("%%curCol=%ld row_diag=%ld\n", j + col1 + n1, row_diag));
 
         PRLEVEL(1, ("%%##j=%ld value= %2.4lf\n", j, F[j * m + j]));
         // find max
@@ -105,13 +105,13 @@ Int paru_panel_factorize(Int f, Int m, Int n, const Int panel_width,
                 row_max = i;
                 maxval = F[j * m + i];
             }
-            //Int origRow = Pinit[frowList[i]];
-            //PRLEVEL(1, ("%%curRow=%ld origRow= %ld\n", frowList[i], origRow));
-            //if (origRow == origCol)
+            // Int origRow = Pinit[frowList[i]];
+            // PRLEVEL(1, ("%%curRow=%ld origRow= %ld\n", frowList[i],
+            // origRow)); if (origRow == origCol)
             if (frowList[i] == row_diag)
             {
                 PRLEVEL(1, ("%%Found it %2.4lf\n", F[j * m + i]));
-                //row_diag = i;
+                // row_diag = i;
                 diag_found = i;
                 diag_val = F[j * m + i];
             }
@@ -125,7 +125,7 @@ Int paru_panel_factorize(Int f, Int m, Int n, const Int panel_width,
 
         if (maxval == 0)
         {
-            PRLEVEL(-1, ("%% NO pivot found in %ld\n", n1+col1+j));
+            PRLEVEL(-1, ("%% NO pivot found in %ld\n", n1 + col1 + j));
             paruMatInfo->res = PARU_SINGULAR;
             continue;
         }
@@ -138,6 +138,7 @@ Int paru_panel_factorize(Int f, Int m, Int n, const Int panel_width,
         if (LUsym->strategy == UMFPACK_STRATEGY_SYMMETRIC)
         {
             if (diag_found != -1)
+            {
                 if (fabs(DIAG_TOLER * maxval) < fabs(diag_val))
                 {
                     piv = diag_val;
@@ -147,6 +148,21 @@ Int paru_panel_factorize(Int f, Int m, Int n, const Int panel_width,
                                 piv, row_piv));
                     chose_diag = 1;
                 }
+#ifndef NDEBUG
+                else
+                {
+                    PRLEVEL(-1, ("%% diag found but too small %ld"
+                    " maxval=%2.4lf diag_val=%e \n", 
+                    row_piv, maxval, diag_val));
+                }
+#endif
+            }
+#ifndef NDEBUG
+            else
+            {
+                PRLEVEL(-1, ("%% diag not found %ld\n", row_piv));
+            }
+#endif
         }
 
         // find sparsest between accepteble ones
@@ -166,6 +182,17 @@ Int paru_panel_factorize(Int f, Int m, Int n, const Int panel_width,
             row_piv = row_sp;
         }
 
+        if (LUsym->strategy == UMFPACK_STRATEGY_SYMMETRIC && chose_diag == 0)
+        {
+            // TODO update the Diag_map
+            // paru_Diag_update()
+            Int pivcol = col1 + j + n1;      // S col index + n1
+            Int pivrow = frowList[row_piv];  // S row index
+            paru_Diag_update(pivcol, pivrow, paruMatInfo);
+            PRLEVEL(-1, ("%% symmetric matrix but the diag didn't picked for "
+                         "row_piv=%ld\n",
+                         row_piv));
+        }
         PRLEVEL(1, ("%% piv value= %2.4lf row_deg=%ld\n", piv, row_deg_sp));
 
         // swap rows
@@ -324,7 +351,7 @@ Int paru_factorize_full_summed(Int f, Int start_fac,
 
         // This can be done parallel to the  next part
         if (paruMatInfo->LUsym->Cm[f] != 0)  // if there is potential column
-                                             // left
+            // left
             paru_update_rowDeg(panel_num, row_end, f, start_fac, stl_colSet,
                                pivotal_elements, paruMatInfo);
 
@@ -369,8 +396,8 @@ Int paru_factorize_full_summed(Int f, Int start_fac,
             Int PR = 1;
             PRLEVEL(PR, ("%% M =%d N = %d alpha = %f \n", M, N, alpha));
             PRLEVEL(PR, ("%% lda =%d ldb =%d\n", lda, ldb));
-            PRLEVEL(
-               PR, ("%% Pivotal Front Before Trsm: %ld x %ld\n", fp, rowCount));
+            PRLEVEL(PR, ("%% Pivotal Front Before Trsm: %ld x %ld\n", fp,
+                         rowCount));
             for (Int r = 0; r < rowCount; r++)
             {
                 PRLEVEL(PR, ("%% %ld\t", frowList[r]));
@@ -393,7 +420,7 @@ Int paru_factorize_full_summed(Int f, Int start_fac,
 
 #ifndef NDEBUG
             PRLEVEL(PR, ("%% Pivotal Front After Trsm: %ld x %ld\n %%", fp,
-                        rowCount));
+                         rowCount));
             for (Int r = 0; r < rowCount; r++)
             {
                 PRLEVEL(PR, ("%% %ld\t", frowList[r]));

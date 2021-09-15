@@ -101,7 +101,7 @@ typedef struct
     // UMFPACK computes it and I compute Pinv out of it.
     // I need it in several places so I decided to keep it
 
-    Int *Diag_map; //size m, 
+    Int *Diag_map; //size n, 
     // UMFPACK computes it and I use it to find original diags out of it
 
     Int *Ps; // size m, row permutation.
@@ -338,6 +338,13 @@ typedef struct
                      el_colIndex[el->lac]  == lacList [e]
                      number of element*/
 
+    Int *Diag_map; //size n, 
+    // Both of these are NULL if the stratey is not symmetric
+    // copy of Diag_map from LUsym; 
+    // this copy can be updated during the factorization
+    Int *inv_Diag_map; //size n, 
+    // inverse of Diag_map from LUsym; 
+    // It helps editing the Diag_map
 
     // each active front owns and manage a heap list. The heap is based on the
     // least numbered column. The active front Takes the pointer of the biggest

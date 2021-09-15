@@ -53,7 +53,7 @@ ParU_ResultCode paru_init_rowFronts(
     n = paruMatInfo->n = LUsym->n - LUsym->n1;
     nf = LUsym->nf;
     paruMatInfo->panel_width = 32;
-    paruMatInfo-> res = PARU_SUCCESS;
+    paruMatInfo->res = PARU_SUCCESS;
 
     work_struct *Work = paruMatInfo->Work =
         (work_struct *)paru_alloc(1, sizeof(work_struct));
@@ -65,20 +65,22 @@ ParU_ResultCode paru_init_rowFronts(
         return PARU_OUT_OF_MEMORY;
     }
 
-    Work->rowMark = Work->elRow = NULL; 
-    Work->elCol = Work->rowSize = NULL; 
-    paruMatInfo->row_degree_bound = NULL; 
-    paruMatInfo->RowList =  NULL; 
-    paruMatInfo->lacList =  NULL; 
-    paruMatInfo->frowCount =  NULL; 
-    paruMatInfo->fcolCount = NULL; 
-    paruMatInfo->frowList = NULL; 
-    paruMatInfo->fcolList = NULL; 
-    paruMatInfo->partial_Us = NULL; 
-    paruMatInfo->partial_LUs =  NULL; 
+    Work->rowMark = Work->elRow = NULL;
+    Work->elCol = Work->rowSize = NULL;
+    paruMatInfo->row_degree_bound = NULL;
+    paruMatInfo->RowList = NULL;
+    paruMatInfo->lacList = NULL;
+    paruMatInfo->frowCount = NULL;
+    paruMatInfo->fcolCount = NULL;
+    paruMatInfo->frowList = NULL;
+    paruMatInfo->fcolList = NULL;
+    paruMatInfo->partial_Us = NULL;
+    paruMatInfo->partial_LUs = NULL;
     paruMatInfo->heapList = NULL;
-    paruMatInfo->elementList = NULL; 
-    paruMatInfo->time_stamp =  NULL; 
+    paruMatInfo->elementList = NULL;
+    paruMatInfo->time_stamp = NULL;
+    paruMatInfo->Diag_map = NULL;
+    paruMatInfo->inv_Diag_map = NULL;
 
     if (nf == 0)
     {  // nothing to be done
@@ -110,6 +112,14 @@ ParU_ResultCode paru_init_rowFronts(
     paru_Element **elementList;
     elementList = paruMatInfo->elementList =  // Initialize with NULL
         (paru_Element **)paru_calloc(1, (m + nf + 1) * sizeof(paru_Element));
+    Int *Diag_map = paruMatInfo->Diag_map = NULL;
+    Int *inv_Diag_map = paruMatInfo->inv_Diag_map = NULL;
+    if (LUsym->strategy == UMFPACK_STRATEGY_SYMMETRIC)
+    {
+        Diag_map = paruMatInfo->Diag_map = (Int *)paru_alloc(n, sizeof(Int));
+        inv_Diag_map = paruMatInfo->inv_Diag_map =
+            (Int *)paru_alloc(n, sizeof(Int));
+    }
 
     if (rowMark == NULL || elRow == NULL || elCol == NULL || rowSize == NULL ||
         paruMatInfo->lacList == NULL || RowList == NULL ||
@@ -117,7 +127,9 @@ ParU_ResultCode paru_init_rowFronts(
         paruMatInfo->frowCount == NULL || paruMatInfo->fcolCount == NULL ||
         paruMatInfo->frowList == NULL || paruMatInfo->fcolList == NULL ||
         paruMatInfo->partial_Us == NULL || paruMatInfo->partial_LUs == NULL ||
-        paruMatInfo->time_stamp == NULL || heapList == NULL)
+        paruMatInfo->time_stamp == NULL || heapList == NULL ||
+        (LUsym->strategy == UMFPACK_STRATEGY_SYMMETRIC &&
+         (Diag_map == NULL || inv_Diag_map == NULL)))
     {
         paru_freemat(&paruMatInfo);
         return PARU_OUT_OF_MEMORY;
@@ -165,15 +177,15 @@ ParU_ResultCode paru_init_rowFronts(
     // create S = A (p,q)', or S=A(p,q) if S is considered to be in row-form
     // -------------------------------------------------------------------------
 #ifndef NDEBUG
-    Int p = 1;
-    PRLEVEL(p, ("\n%% Insid init row fronts\n"));
-    PRLEVEL(p, ("%% Sp =\n%%"));
-    for (Int i = 0; i <= m; i++) PRLEVEL(p, ("%ld ", Sp[i]));
-    PRLEVEL(p, ("\n"));
+    Int PR = 1;
+    PRLEVEL(PR, ("\n%% Insid init row fronts\n"));
+    PRLEVEL(PR, ("%% Sp =\n%%"));
+    for (Int i = 0; i <= m; i++) PRLEVEL(PR, ("%ld ", Sp[i]));
+    PRLEVEL(PR, ("\n"));
 
-    PRLEVEL(p, ("Sj =\n"));
-    for (Int k = 0; k < snz; k++) PRLEVEL(p, ("%ld ", Sj[k]));
-    PRLEVEL(p, ("\n"));
+    PRLEVEL(PR, ("Sj =\n"));
+    for (Int k = 0; k < snz; k++) PRLEVEL(PR, ("%ld ", Sj[k]));
+    PRLEVEL(PR, ("\n"));
 
 #endif
 
@@ -181,6 +193,29 @@ ParU_ResultCode paru_init_rowFronts(
     Int slackRow = 2;
 
     PRLEVEL(0, ("InMatrix=[\n"));  // MATLAB matrix,
+
+    // copying Diag_map
+    if (Diag_map)
+    {
+        for (Int i = 0; i < n; i++)
+        {
+            Diag_map[i] = LUsym->Diag_map[i];
+            ASSERT(Diag_map[i] >= 0);
+            ASSERT(Diag_map[i] < n);
+            inv_Diag_map[Diag_map[i]] = i;
+        }
+#ifndef NDEBUG
+        PR = -1;
+        PRLEVEL(PR, ("Diag_map =\n"));
+        for (Int i = 0; i < MIN(64, n); i++) PRLEVEL(PR, ("%ld ", Diag_map[i]));
+        PRLEVEL(PR, ("\n"));
+        PRLEVEL(PR, ("inv_Diag_map =\n"));
+        for (Int i = 0; i < MIN(64, n); i++)
+            PRLEVEL(PR, ("%ld ", inv_Diag_map[i]));
+        PRLEVEL(PR, ("\n"));
+        PR = 1;
+#endif
+    }
 
     // Activating comments after this parts will break the matlab input matrix
     // allocating row tuples, elements and updating column tuples
@@ -221,13 +256,13 @@ ParU_ResultCode paru_init_rowFronts(
             curHeap->push_back(e);
 
 #ifndef NDEBUG  // Printing the pointers info
-            Int p = 1;
-            PRLEVEL(p, ("%% curEl = %p ", curEl));
+            Int PR = 1;
+            PRLEVEL(PR, ("%% curEl = %p ", curEl));
             Int size = sizeof(paru_Element) +
                        sizeof(Int) * (2 * (nrows + ncols)) +
                        sizeof(double) * nrows * ncols;
-            PRLEVEL(p, ("size= %ld", size));
-            PRLEVEL(p, ("\n"));
+            PRLEVEL(PR, ("size= %ld", size));
+            PRLEVEL(PR, ("\n"));
 #endif
 
             // Allocating Rowlist and updating its tuples
