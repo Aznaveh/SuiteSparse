@@ -17,7 +17,7 @@
 void paru_Diag_update(Int pivcol, Int pivrow, paru_matrix *paruMatInfo)
 
 {
-    DEBUGLEVEL(1);
+    DEBUGLEVEL(0);
 #ifndef NDEBUG
     Int PR = 1;
 #endif

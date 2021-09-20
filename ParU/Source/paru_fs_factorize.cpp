@@ -65,7 +65,6 @@ Int paru_panel_factorize(Int f, Int m, Int n, const Int panel_width,
     // Int *Pinit = LUsym->Pinit;
     Int *Diag_map = paruMatInfo->Diag_map;
     Int n1 = LUsym->n1;
-    n1 = 0;
 
     // column jth of the panel
     for (Int j = j1; j < j2; j++)
@@ -87,7 +86,7 @@ Int paru_panel_factorize(Int f, Int m, Int n, const Int panel_width,
 
         // Int origCol = Qfill ? Qfill[j + col1 + n1] : j + col1 + n1;
         // Int row_diag = (origCol == Pinit[frowList[j] + n1]) ? j + n1 : -1;
-        Int row_diag = (Diag_map) ? Diag_map[col1 + j + n1] : -1;
+        Int row_diag = (Diag_map) ? Diag_map[col1 + j + n1] - n1 : -1;
         double diag_val = maxval;  // initialization
         Int diag_found = frowList[j] == row_diag ? j : -1;
         // PRLEVEL(1, ("%%curCol=%ld origCol= %ld row_diag=%ld\n", j + col1,

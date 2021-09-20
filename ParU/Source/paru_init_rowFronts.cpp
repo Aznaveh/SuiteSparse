@@ -116,9 +116,13 @@ ParU_ResultCode paru_init_rowFronts(
     Int *inv_Diag_map = paruMatInfo->inv_Diag_map = NULL;
     if (LUsym->strategy == UMFPACK_STRATEGY_SYMMETRIC)
     {
-        Diag_map = paruMatInfo->Diag_map = (Int *)paru_alloc(n, sizeof(Int));
+        //TODO xenon1 fail without initializing alloc here
+        Diag_map = paruMatInfo->Diag_map = 
+            (Int *)paru_calloc(LUsym->n, sizeof(Int));
         inv_Diag_map = paruMatInfo->inv_Diag_map =
-            (Int *)paru_alloc(n, sizeof(Int));
+            (Int *)paru_calloc(LUsym->n, sizeof(Int));
+        //paru_memset(Diag_map, -1, LUsym->n * sizeof(Int));
+        //paru_memset(inv_Diag_map, -1, LUsym->n * sizeof(Int));
     }
 
     if (rowMark == NULL || elRow == NULL || elCol == NULL || rowSize == NULL ||
@@ -197,22 +201,37 @@ ParU_ResultCode paru_init_rowFronts(
     // copying Diag_map
     if (Diag_map)
     {
-        for (Int i = 0; i < n; i++)
+        for (Int i = 0; i < LUsym->n; i++)
         {
+            //paru_memcpy(Diag_map, LUsym->Diag_map, (LUsym->n) * sizeof(Int));
             Diag_map[i] = LUsym->Diag_map[i];
             ASSERT(Diag_map[i] >= 0);
-            ASSERT(Diag_map[i] < n);
+            ASSERT(Diag_map[i] < LUsym->n);
             inv_Diag_map[Diag_map[i]] = i;
         }
 #ifndef NDEBUG
         PR = -1;
-        PRLEVEL(PR, ("Diag_map =\n"));
-        for (Int i = 0; i < MIN(64, n); i++) PRLEVEL(PR, ("%ld ", Diag_map[i]));
+        PRLEVEL(PR, ("init_row Diag_map (%ld) =\n", LUsym->n));
+        for (Int i = 0; i < MIN(64, LUsym->n); i++) 
+            PRLEVEL(PR, ("%ld ", Diag_map[i]));
         PRLEVEL(PR, ("\n"));
         PRLEVEL(PR, ("inv_Diag_map =\n"));
-        for (Int i = 0; i < MIN(64, n); i++)
+        for (Int i = 0; i < MIN(64, LUsym->n); i++)
             PRLEVEL(PR, ("%ld ", inv_Diag_map[i]));
         PRLEVEL(PR, ("\n"));
+        for (Int i = 0; i < LUsym->n; i++)
+        {
+            if (Diag_map[i] == -1)
+                PRLEVEL(PR, ("Diag_map[%ld] is not correctly initialized\n",
+                            i));
+
+            if (inv_Diag_map[i] == -1)
+                PRLEVEL(PR, ("inv_Diag_map[%ld] is not correctly initialized\n",
+                            i));
+
+            ASSERT(Diag_map[i] != -1);
+            //ASSERT(inv_Diag_map[i] != -1);
+        }
         PR = 1;
 #endif
     }

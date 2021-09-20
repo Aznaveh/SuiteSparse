@@ -393,7 +393,7 @@ paru_symbolic *paru_analyze(
     Int *fmap = (Int *)paru_alloc((n + 1), sizeof(Int));
     Int *newParent = (Int *)paru_alloc((n + 1), sizeof(Int));
 
-    if (!Pinit || !Qinit || !Diag_map || !inv_Diag_map || !Front_npivcol || 
+    if (!Pinit || !Qinit || !Diag_map || !inv_Diag_map|| !Front_npivcol || 
         !Front_parent || !Chain_start || !Chain_maxrows || !Chain_maxcols || 
         !newParent || !Front_1strow || !Front_leftmostdesc || !fmap)
     {
@@ -449,12 +449,35 @@ paru_symbolic *paru_analyze(
         return NULL;
     }
     printf("In: %ldx%ld nnz = %ld \n", nr, nc, anz);
+    //just an alias
+    //SymbolicType *Sym_umf = (SymbolicType *)Symbolic;
+
+    //n1 = Sym_umf->n1;
+    //Diag_map = Sym_umf->Diagonal_map;
+    //int *umf_Diagonal = Sym_umf->Diagonal_map;
+    ////if (umf_Diagonal != NULL )
+    ////if (Sym_umf->Diagonal_map!= NULL )
+    //if (strategy == UMFPACK_STRATEGY_SYMMETRIC)
+    //{
+    //   for (Int i = 0; i < n; i++)
+    //    {
+    //        Diag_map[i] = (Int)umf_Diagonal[i];
+    //    }
+    //}
+    //else 
+    //{
+    //    paru_free(n, sizeof(Int), Diag_map);
+    //    paru_free(n, sizeof(Int), inv_Diag_map);
+    //    Diag_map = NULL;
+    //    inv_Diag_map = NULL;
+    //}
+    //Sym_umf->Diagonal_map = NULL;
 #ifndef NDEBUG
     PR = 1;
     PRLEVEL(-1, ("\n%%\tcs1 = %ld, rs1 = %ld n1 = %ld\n", cs1, rs1, n1));
     PRLEVEL(PR, ("From the Symbolic object,\
                 C is of dimension %ld-by-%ld\n",
-                 nr, nc));
+                nr, nc));
     PRLEVEL(PR, ("   with nz = %ld, number of fronts = %ld,\n", anz, nfr));
     PR = 1;
     PRLEVEL(PR, ("   number of frontal matrix chains = %ld\n", nchains));
@@ -467,41 +490,42 @@ paru_symbolic *paru_analyze(
     {
         Int fnpiv = Front_npivcol[i];
         PRLEVEL(PR, ("Front %ld: parent front: %ld number of pivot cols: %ld\n",
-                     i, Front_parent[i], fnpiv));
+                    i, Front_parent[i], fnpiv));
         PRLEVEL(PR, ("%% first row is %ld\n", Front_1strow[i]));
 
         for (Int j = 0; j < fnpiv; j++)
         {
             Int col = Qinit[k];
             PRLEVEL(PR, ("%ld-th pivot column is column %ld"
-                         " in original matrix\n",
-                         k, col));
+                        " in original matrix\n",
+                        k, col));
             k++;
         }
     }
     PR = 1;
 
     PRLEVEL(PR, ("\nTotal number of pivot columns "
-                 "in frontal matrices: %ld\n",
-                 k));
+                "in frontal matrices: %ld\n",
+                k));
 
     PRLEVEL(PR, ("\nFrontal matrix chains:\n"));
     for (Int j = 0; j < nchains; j++)
     {
         PRLEVEL(PR, ("Frontal matrices %ld to %ld in chain\n", Chain_start[j],
-                     Chain_start[j + 1] - 1));
+                    Chain_start[j + 1] - 1));
         PRLEVEL(PR, ("\tworking array of size %ld-by-%ld\n", Chain_maxrows[j],
-                     Chain_maxcols[j]));
+                    Chain_maxcols[j]));
     }
 
-    PR = -1;
     PRLEVEL(PR, ("Forthwith Pinit =\n"));
     for (Int i = 0; i < MIN(64, m); i++) PRLEVEL(PR, ("%ld ", Pinit[i]));
     PRLEVEL(PR, ("\n"));
     PRLEVEL(PR, ("Forthwith Qinit =\n"));
     for (Int i = 0; i < MIN(64, m); i++) PRLEVEL(PR, ("%ld ", Qinit[i]));
     PRLEVEL(PR, ("\n"));
+    PR = -1;
     if (Diag_map[0] != -1)
+    //if (Diag_map)
     {
         PRLEVEL(PR, ("Forthwith Diag_map =\n"));
         for (Int i = 0; i < MIN(64, n); i++) PRLEVEL(PR, ("%ld ", Diag_map[i]));
@@ -904,6 +928,7 @@ paru_symbolic *paru_analyze(
         Pinv[Pinit[i]] = i;
     }
     if (Diag_map[0] != -1)
+    //if (Diag_map)
     {
         for (Int i = 0; i < m; i++)
         {
@@ -915,7 +940,6 @@ paru_symbolic *paru_analyze(
     }
 
 #ifndef NDEBUG
-    PR = -1;
     PRLEVEL(PR, ("Qinit =\n"));
     for (Int j = 0; j < MIN(64, n); j++) PRLEVEL(PR, ("%ld ", Qinit[j]));
     PRLEVEL(PR, ("\n"));
@@ -929,10 +953,15 @@ paru_symbolic *paru_analyze(
     for (Int i = 0; i < m; i++) PRLEVEL(PR, ("%ld ", Pinv[i]));
     PRLEVEL(PR, ("\n"));
 
+    PR = -1;
+    //if (inv_Diag_map)
+    if (Diag_map[0] != -1)
+    {
+        PRLEVEL(PR, ("inv_Diag_map =\n"));
+        for (Int i = 0; i < MIN(64,n); i++) PRLEVEL(PR, ("%ld ", inv_Diag_map[i]));
+        PRLEVEL(PR, ("\n"));
+    }
     PR = 1;
-    PRLEVEL(PR, ("inv_Diag_map =\n"));
-    for (Int i = 0; i < MIN(64,n); i++) PRLEVEL(PR, ("%ld ", inv_Diag_map[i]));
-    PRLEVEL(PR, ("\n"));
 
 #endif
 
@@ -1059,18 +1088,19 @@ paru_symbolic *paru_analyze(
                         srow));
             if (srow >= 0)
             {  // it is insdie S otherwise it is part of singleton
-                //TODO: update Diag_map
+                // and update Diag_map
                 if (Sp[srow + 1] == 0)
                 {  // first time seen
                     PRLEVEL(1, ("\tPs[%ld]= %ld\n", rowcount, srow));
                     Ps[rowcount] = srow;
                     Pinit[n1 + rowcount] = oldrow;
                     if  (Diag_map[0] != -1)
+                    //if  (Diag_map)
                     {
                         Int diag_col = inv_Diag_map [newrow];
                         ASSERT (diag_col >= n1);
                         // row of s ~~~~~~> col Qfill confusing be aware
-                        Diag_map [diag_col] = rowcount; //updating diag_map
+                        Diag_map [diag_col] = rowcount + n1; //updating diag_map
                     }
 
                     rowcount++;
@@ -1128,10 +1158,20 @@ paru_symbolic *paru_analyze(
         for (Int k = cs1; k <= n1; k++) PRLEVEL(PR, ("%ld ", Slp[k - cs1]));
         PRLEVEL(PR, ("\n"));
     }
-    PR = 1;
     PRLEVEL(PR, ("Ps =\n"));
     for (Int k = 0; k < rowcount; k++) PRLEVEL(PR, ("%ld ", Ps[k]));
     PRLEVEL(PR, ("\n"));
+    PR = -1;
+    if (Diag_map[0] != -1)
+    //if (Diag_map)
+    {
+        PRLEVEL(PR, ("Sym Diag_map (%ld) =\n",n));
+        for (Int i = 0; i < MIN(64, n); i++) 
+            PRLEVEL(PR, ("%ld ", Diag_map[i]));
+        PRLEVEL(PR, ("\n"));
+    }
+    PR = 1;
+
 #endif
 
     if (rowcount < m - n1)
@@ -1212,7 +1252,7 @@ paru_symbolic *paru_analyze(
     }
 
 #ifndef NDEBUG
-    PR = -1;
+    PR = 1;
     PRLEVEL(PR, ("Sup and Slp in the middle\n"));
     if (cs1 > 0)
     {
@@ -1292,7 +1332,7 @@ paru_symbolic *paru_analyze(
     LUsym->Sx = Sx;
 
     if (Sj == NULL || Sx == NULL || (cs1 > 0 && (Suj == NULL || Sux == NULL)) ||
-        (rs1 > 0 && (Sli == NULL || Slx == NULL)))
+            (rs1 > 0 && (Sli == NULL || Slx == NULL)))
     {
         printf("Paru: memory problem\n");
         paru_free(m, sizeof(Int), Pinv);
@@ -1368,7 +1408,7 @@ paru_symbolic *paru_analyze(
             else
             {  // inside the U singletons
                 PRLEVEL(PR, ("Usingleton rest newcol = %ld newrow=%ld\n",
-                             newcol, newrow));
+                            newcol, newrow));
                 ASSERT(newrow != newcol);  // not a diagonal entry
                 Suj[++cSup[newrow]] = newcol;
                 Sux[cSup[newrow]] = (Rs == NULL) ? Ax[p] : Ax[p] / Rs[oldrow];
