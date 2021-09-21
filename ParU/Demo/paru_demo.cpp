@@ -43,7 +43,6 @@ int main(int argc, char **argv)
 
     int scale = 0;
     Int NoProblem = 0;
-    
 
     double my_start_time = omp_get_wtime();
 
@@ -68,17 +67,17 @@ int main(int argc, char **argv)
     }
 
     //~~~~~~~~~~~~~~~~~~~Test the results ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    //double *b = (double *)paru_alloc(m, sizeof(double));
+    // double *b = (double *)paru_alloc(m, sizeof(double));
     Int m = LUsym->m;
-    double *b = (double *)malloc(m*sizeof(double));
+    double *b = (double *)malloc(m * sizeof(double));
     for (Int i = 0; i < m; ++i) b[i] = i + 1;
     double Res[4];
     paru_residual(A, paruMatInfo, b, Res);
     for (Int i = 0; i < m; ++i) b[i] = i + 1;
     paru_backward(A, paruMatInfo, b, Res);
-    //paru_free (m, sizeof(double), b);
+    // paru_free (m, sizeof(double), b);
     free(b);
- 
+
     //~~~~~~~~~~~~~~~~~~~End computation~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     //~~~~~~~~~~~~~~~~~~~Calling umfpack~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -126,11 +125,23 @@ int main(int argc, char **argv)
     // Writing results to a file
     if (info == PARU_SUCCESS)
     {
-        paruMatInfo->umf_time = umf_time;
-        //paru_write(paruMatInfo, scale, argv[1]);
+        // paruMatInfo->umf_time = umf_time;
+        // Writing LU factors into a file, can be time consuming
+        // paru_write(paruMatInfo, scale, argv[1]);
+        FILE *res_file;
+        char res_name[] = "../Demo/Res/res.txt";
+        res_file = fopen(res_name, "a");
+        if (res_file == NULL)
+        {
+            printf("Paru: error in making %s to write the results!\n",
+                   res_name);
+        }
+        fprintf(res_file, "%ld %ld %lf %lf %lf\n", LUsym->m, LUsym->anz,
+                my_time, umf_time, my_time / umf_time);
+        fclose(res_file);
     }
-    printf("my_time = %lf umf_time=%lf ratio = %lf\n",
-            my_time, umf_time, my_time/umf_time);
+    printf("my_time = %lf umf_time=%lf ratio = %lf\n", my_time, umf_time,
+           my_time / umf_time);
 
     //~~~~~~~~~~~~~~~~~~~Free Everything~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     paru_freemat(&paruMatInfo);
