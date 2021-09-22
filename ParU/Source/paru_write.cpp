@@ -78,15 +78,15 @@ void paru_write(paru_matrix *paruMatInfo, int scale, char *id)
         return;
     }
 
- //   I have this transition   A ---> S ---> LU
- //   Mostly in the code I have rows of S. 
- //   It is why I compute oldRofS and newRofS
- //              oldRofS
- //             -------->   
- //           S           LU
- //             <-------  
- //              newRofS
- //
+    //   I have this transition   A ---> S ---> LU
+    //   Mostly in the code I have rows of S.
+    //   It is why I compute oldRofS and newRofS
+    //              oldRofS
+    //             -------->
+    //           S           LU
+    //             <-------
+    //              newRofS
+    //
 
     {
         FILE *rowfptr;
@@ -233,7 +233,7 @@ void paru_write(paru_matrix *paruMatInfo, int scale, char *id)
     fprintf(LUfptr, "%ld  %ld %ld\n", m, n, nnz);
 
     // writing the singletons
-    // TODO
+    // TODO (I haven't add that part yet)
 
     // writing the L and U factors
     for (Int f = 0; f < nf; f++)

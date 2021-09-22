@@ -14,9 +14,8 @@
 #include "paru_internal.hpp"
 
 void paru_pivotal(std::vector<Int> &pivotal_elements,
-                  std::vector<Int> &panel_row, Int &zero_piv_rows,
-                  Int f, heaps_info &hi,
-                  paru_matrix *paruMatInfo)
+                  std::vector<Int> &panel_row, Int &zero_piv_rows, Int f,
+                  heaps_info &hi, paru_matrix *paruMatInfo)
 {
     DEBUGLEVEL(0);
     paru_symbolic *LUsym = paruMatInfo->LUsym;
@@ -152,7 +151,7 @@ void paru_pivotal(std::vector<Int> &pivotal_elements,
 
     Int *frowList = paruMatInfo->frowList[f];
     Int rowCount = 0;
-    //Int zero_piv_rows = 0;
+    // Int zero_piv_rows = 0;
 
     /*************** finding set of rows in current front *********************/
     for (Int i = 0; i < (Int)pivotal_elements.size(); i++)
@@ -369,10 +368,11 @@ void paru_pivotal(std::vector<Int> &pivotal_elements,
 
     if (pivotalFront == NULL)
     {
-        printf("%% Out of memory when tried to allocate for pivotal part %ld",
-               f);
+        printf(
+            "%%Paru; 0ut of memory when tried to allocate for pivotal part %ld",
+            f);
+        //TODO: check here for possible memory leak
         // paru_free ( num_panels, sizeof (Int), panel_row);
-        // TODO: return
         return;
     }
 
@@ -491,8 +491,8 @@ void paru_pivotal(std::vector<Int> &pivotal_elements,
 #endif
         }
     }
-    
-    if (num_children_with0 == num_children_with0_which_fit )
+
+    if (num_children_with0 == num_children_with0_which_fit)
     {  // all the children fit within current front
         zero_piv_rows = 0;
     }

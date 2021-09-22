@@ -254,7 +254,7 @@ void paru_freesym(paru_symbolic **LUsym_handle)
         if (cs1 > 0)
         {
             U_singleton ustons = LUsym->ustons;
-            paru_free(cs1+1, sizeof(Int), ustons.Sup);
+            paru_free(cs1 + 1, sizeof(Int), ustons.Sup);
             Int nnz = ustons.nnz;
             paru_free(nnz, sizeof(Int), ustons.Suj);
             paru_free(nnz, sizeof(Int), ustons.Sux);
@@ -264,7 +264,7 @@ void paru_freesym(paru_symbolic **LUsym_handle)
         if (rs1 > 0)
         {
             L_singleton lstons = LUsym->lstons;
-            paru_free(rs1+1, sizeof(Int), lstons.Slp);
+            paru_free(rs1 + 1, sizeof(Int), lstons.Slp);
             Int nnz = lstons.nnz;
             paru_free(nnz, sizeof(Int), lstons.Sli);
             paru_free(nnz, sizeof(double), lstons.Slx);
@@ -304,7 +304,7 @@ void paru_freemat(paru_matrix **paruMatInfo_handle)
     paruMatInfo = *paruMatInfo_handle;
 
     Int m = paruMatInfo->m;  // m and n is different than LUsym
-    Int n = paruMatInfo->n;       // Here there are submatrix size
+    Int n = paruMatInfo->n;  // Here there are submatrix size
 
     tupleList *RowList = paruMatInfo->RowList;
     PRLEVEL(1, ("%% RowList =%p\n", RowList));
@@ -408,7 +408,8 @@ void paru_freemat(paru_matrix **paruMatInfo_handle)
         {
             if (heapList[eli] != nullptr)
             {
-                PRLEVEL(1, ("%% %ld has not been freed %p\n", eli, heapList[eli]));
+                PRLEVEL(1,
+                        ("%% %ld has not been freed %p\n", eli, heapList[eli]));
                 delete heapList[eli];
                 heapList[eli] = nullptr;
             }
@@ -417,7 +418,7 @@ void paru_freemat(paru_matrix **paruMatInfo_handle)
     }
 #endif
     paru_free(1, (m + nf + 1) * sizeof(std::vector<Int> **),
-            paruMatInfo->heapList);
+              paruMatInfo->heapList);
 
     paru_free(1, (m + nf + 1) * sizeof(paru_Element), elementList);
 

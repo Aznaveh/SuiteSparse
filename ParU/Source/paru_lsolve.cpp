@@ -33,7 +33,6 @@
 Int paru_lsolve(paru_matrix *paruMatInfo, double *x)
 {
     DEBUGLEVEL(0);
-    // TODO check if input is read
     if (!x) return (0);
     paru_symbolic *LUsym = paruMatInfo->LUsym;
     Int nf = LUsym->nf;
@@ -123,8 +122,7 @@ Int paru_lsolve(paru_matrix *paruMatInfo, double *x)
         PRLEVEL(1, (" \n"));
 #endif
 
-        // TODO do dgemv
-        // I am not calling BLAS_DGEMV
+        // I am not calling BLAS_DGEMV for now
 
         for (Int i = fp; i < rowCount; i++)
         {

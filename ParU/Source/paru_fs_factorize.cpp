@@ -151,8 +151,8 @@ Int paru_panel_factorize(Int f, Int m, Int n, const Int panel_width,
                 else
                 {
                     PRLEVEL(-1, ("%% diag found but too small %ld"
-                    " maxval=%2.4lf diag_val=%e \n", 
-                    row_piv, maxval, diag_val));
+                                 " maxval=%2.4lf diag_val=%e \n",
+                                 row_piv, maxval, diag_val));
                 }
 #endif
             }
@@ -183,8 +183,6 @@ Int paru_panel_factorize(Int f, Int m, Int n, const Int panel_width,
 
         if (LUsym->strategy == UMFPACK_STRATEGY_SYMMETRIC && chose_diag == 0)
         {
-            // TODO update the Diag_map
-            // paru_Diag_update()
             Int pivcol = col1 + j + n1;      // S col index + n1
             Int pivrow = frowList[row_piv];  // S row index
             paru_Diag_update(pivcol, pivrow, paruMatInfo);
@@ -212,7 +210,7 @@ Int paru_panel_factorize(Int f, Int m, Int n, const Int panel_width,
         }
 #endif
 
-        // dscal //TODO?: loop unroll is also possible
+        // dscal loop unroll is also possible
 
         if (j < row_end - 1)
         {

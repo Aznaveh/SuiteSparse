@@ -45,22 +45,22 @@ extern "C"
 // have access to this object without synchronization.
 //
 
-//typedef struct U_singleton
+// typedef struct U_singleton
 struct U_singleton
 {
     // CSR format for U singletons
-    Int nnz;     // nnz in submatrix
+    Int nnz;      // nnz in submatrix
     Int *Sup;     // size cs1
     Int *Suj;     // size ?
     double *Sux;  // size ?
 };
 
-//typedef struct L_singleton
+// typedef struct L_singleton
 struct L_singleton
 {
     // CSC format for U singletons
-    Int nnz;     // nnz in submatrix
-    Int *Slp;     // size rs1 
+    Int nnz;      // nnz in submatrix
+    Int *Slp;     // size rs1
     Int *Sli;     // size ?
     double *Slx;  // size ?
 };
@@ -87,10 +87,10 @@ typedef struct
     Int *Sj;     // size snz = Sp [n], column indices of S
     double *Sx;  // size snz = Sp [n], numeric values of S
 
-    double *scale_row; // the array for row scaling based on original matrix
+    double *scale_row;  // the array for row scaling based on original matrix
                         // size = m
 
-    //Usingletons and Lsingltons
+    // Usingletons and Lsingltons
     U_singleton ustons;
     L_singleton lstons;
 
@@ -101,15 +101,15 @@ typedef struct
     // UMFPACK computes it and I compute Pinv out of it.
     // I need it in several places so I decided to keep it
 
-    Int *Diag_map; //size n, 
+    Int *Diag_map;  // size n,
     // UMFPACK computes it and I use it to find original diags out of it
 
-    Int *Ps; // size m, row permutation.
-    //Permutation from S to LU. needed for lsolve and usolve 
-    //Look paru_perm for more details
+    Int *Ps;  // size m, row permutation.
+    // Permutation from S to LU. needed for lsolve and usolve
+    // Look paru_perm for more details
 
-    Int *Pfin; // size m, row permutation.
-    //ParU final permutation. Look paru_perm for more details
+    Int *Pfin;  // size m, row permutation.
+    // ParU final permutation. Look paru_perm for more details
 
     Int *Sleft;  // size n-n1+2.  The list of rows of S whose
     // leftmost column index is j is given by
@@ -134,8 +134,8 @@ typedef struct
     // vectors are kept, the row indices are computed dynamically during
     // numerical factorization.
 
-    Int nf;        // number of frontal matrices; nf <= MIN (m,n)
-    Int n1;        // number of singletons in the matrix
+    Int nf;  // number of frontal matrices; nf <= MIN (m,n)
+    Int n1;  // number of singletons in the matrix
     // the matrix S is the one without any singletons
     Int rs1, cs1;  // number of row and column singletons, n1 = rs1+cs1;
 
@@ -338,12 +338,12 @@ typedef struct
                      el_colIndex[el->lac]  == lacList [e]
                      number of element*/
 
-    Int *Diag_map; //size n, 
+    Int *Diag_map;  // size n,
     // Both of these are NULL if the stratey is not symmetric
-    // copy of Diag_map from LUsym; 
+    // copy of Diag_map from LUsym;
     // this copy can be updated during the factorization
-    Int *inv_Diag_map; //size n, 
-    // inverse of Diag_map from LUsym; 
+    Int *inv_Diag_map;  // size n,
+    // inverse of Diag_map from LUsym;
     // It helps editing the Diag_map
 
     // each active front owns and manage a heap list. The heap is based on the
@@ -367,37 +367,26 @@ typedef struct
 
 } paru_matrix;
 
-
-
 //------------------------------------------------------------------------------
 // user:
 
 paru_symbolic *paru_analyze(Int scale, cholmod_sparse *A);
 
 /* usage:
-
    S = paru_analyse (A) ;
    LU = paru_factoriz (A,S) ;
-
 info: an enum: PARU_SUCCESS, PARU_OUT_OF_MEMORY, PARU_INVALID, PARU_SINGULAR,
 ... info = paru_analyse (&S, A) ; info = paru_factoriz (&LU, A,S) ;
-
 */
 
-// TODO add a routine that does init_row and also factorization
-// paru_factorization *paru_factoriz ( A, S ) ;
-
-//------------------------------------------------------------------------------
-// internal
-
+// a routine that does init_row and also factorization
 ParU_ResultCode paru_factorize(cholmod_sparse *A, paru_symbolic *LUsym,
-        paru_matrix **paruMatInfo_handle);
+                               paru_matrix **paruMatInfo_handle);
 ParU_ResultCode paru_solve(paru_matrix *paruMatInfo, double *b);
 void paru_write(paru_matrix *paruMatInfo, int scale, char *id);
 
 void paru_freesym(paru_symbolic **LUsym_handle);
 void paru_freemat(paru_matrix **paruMatInfo_handle);
-
 
 ParU_ResultCode paru_residual(cholmod_sparse *A, paru_matrix *paruMatInfo,
                               double *b, double *Results);

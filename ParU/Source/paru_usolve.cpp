@@ -33,7 +33,7 @@
 Int paru_usolve(paru_matrix *paruMatInfo, double *x)
 {
     DEBUGLEVEL(0);
-    // TODO check if input is read
+    // check if input is read
     if (!x) return (0);
     paru_symbolic *LUsym = paruMatInfo->LUsym;
     Int nf = LUsym->nf;
@@ -55,12 +55,12 @@ Int paru_usolve(paru_matrix *paruMatInfo, double *x)
         Int fp = col2 - col1;
         Int colCount = paruMatInfo->fcolCount[f];
 
-        // TODO do dgemv
+        // do dgemv
         // performed on Us
         // I am not calling BLAS_DGEMV
 
         double *A2 = Us[f].p;
-        if (A2 != NULL )
+        if (A2 != NULL)
         {
             for (Int i = 0; i < fp; i++)
             {
