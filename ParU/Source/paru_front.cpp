@@ -312,7 +312,6 @@ ParU_ResultCode paru_front(Int f,  // front need to be assembled
     {
         // hash_bits is a bit mask to compute the result modulo the hash table
         // size, which is always a power of 2.
-        //
 
         PRLEVEL(p, ("%% colHash HASH hash_size=%ld\n", hash_size));
         PRLEVEL(p, ("%% colCount=%ld\n", colCount));

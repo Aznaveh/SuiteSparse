@@ -84,19 +84,14 @@ Int paru_panel_factorize(Int f, Int m, Int n, const Int panel_width,
         PRLEVEL(1, ("%% before search max value= %2.4lf row_deg = %ld\n",
                     maxval, row_deg_max));
 
-        // Int origCol = Qfill ? Qfill[j + col1 + n1] : j + col1 + n1;
-        // Int row_diag = (origCol == Pinit[frowList[j] + n1]) ? j + n1 : -1;
         Int row_diag = (Diag_map) ? Diag_map[col1 + j + n1] - n1 : -1;
         double diag_val = maxval;  // initialization
         Int diag_found = frowList[j] == row_diag ? j : -1;
-        // PRLEVEL(1, ("%%curCol=%ld origCol= %ld row_diag=%ld\n", j + col1,
-        //            origCol, row_diag));
         PRLEVEL(1, ("%%curCol=%ld row_diag=%ld\n", j + col1 + n1, row_diag));
-
         PRLEVEL(1, ("%%##j=%ld value= %2.4lf\n", j, F[j * m + j]));
-        // find max
+
         for (Int i = j + 1; i < row_end; i++)
-        {
+        {  // find max
             PRLEVEL(1, ("%%i=%ld value= %2.4lf", i, F[j * m + i]));
             PRLEVEL(1, (" deg = %ld \n", row_degree_bound[frowList[i]]));
             if (fabs(maxval) < fabs(F[j * m + i]))
@@ -104,9 +99,6 @@ Int paru_panel_factorize(Int f, Int m, Int n, const Int panel_width,
                 row_max = i;
                 maxval = F[j * m + i];
             }
-            // Int origRow = Pinit[frowList[i]];
-            // PRLEVEL(1, ("%%curRow=%ld origRow= %ld\n", frowList[i],
-            // origRow)); if (origRow == origCol)
             if (frowList[i] == row_diag)
             {
                 PRLEVEL(1, ("%%Found it %2.4lf\n", F[j * m + i]));

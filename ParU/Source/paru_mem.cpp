@@ -157,7 +157,6 @@ void paru_free(size_t n, size_t size, void *p)
     //    PRLEVEL (1, ("%% free %ld in %p total= %ld\n",
     //                n*size, p, free_count));
 
-    //#endif
     if (p != NULL)
         SuiteSparse_free(p);
     else
@@ -189,7 +188,6 @@ void operator delete(void *ptr) noexcept
 }
 
 //  freeing symbolic analysis data structure
-//
 void paru_freesym(paru_symbolic **LUsym_handle)
 {
     DEBUGLEVEL(0);
@@ -204,12 +202,10 @@ void paru_freesym(paru_symbolic **LUsym_handle)
     Int n = LUsym->n;
     Int n1 = LUsym->n1;
     Int nf = LUsym->nf;
-    // Int anz = LUsym->anz;
     Int snz = LUsym->snz;
-    Int rjsize = LUsym->rjsize;
     PRLEVEL(1, ("%% In free sym: m=%ld n=%ld\n nf=%ld "
-                "LUsym->anz=%ld rjsize=%ld\n",
-                m, n, nf, LUsym->anz, rjsize));
+                "LUsym->anz=%ld \n",
+                m, n, nf, LUsym->anz));
 
     paru_free(nf + 1, sizeof(Int), LUsym->Parent);
     paru_free(nf + 1, sizeof(Int), LUsym->Child);
@@ -222,9 +218,6 @@ void paru_freesym(paru_symbolic **LUsym_handle)
     paru_free((m + 1), sizeof(Int), LUsym->Pinit);
     paru_free(nf + 1, sizeof(Int), LUsym->Fm);
     paru_free(nf + 1, sizeof(Int), LUsym->Cm);
-
-    paru_free(rjsize, sizeof(Int), LUsym->Rj);
-    paru_free(nf + 1, sizeof(Int), LUsym->Rp);
 
     paru_free(m + 1 - n1, sizeof(Int), LUsym->Sp);
     paru_free(snz, sizeof(Int), LUsym->Sj);
@@ -277,7 +270,6 @@ void paru_freesym(paru_symbolic **LUsym_handle)
 }
 
 // free element e from elementList
-//
 void paru_free_el(Int e, paru_Element **elementList)
 {
     DEBUGLEVEL(0);
@@ -294,7 +286,6 @@ void paru_free_el(Int e, paru_Element **elementList)
 }
 
 // It uses LUsym, Do not free LUsym before
-//
 void paru_freemat(paru_matrix **paruMatInfo_handle)
 {
     DEBUGLEVEL(0);

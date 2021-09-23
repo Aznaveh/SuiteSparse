@@ -630,7 +630,7 @@ void paru_assemble_el_with0rows(Int e, Int f, std::vector<Int> &colHash,
                     PRLEVEL(1, ("%% ri = %ld \n", ri));
                     PRLEVEL(1, ("%% sC [%ld] =%2.5lf \n", i, sC[i]));
                     PRLEVEL(1, ("%% dC [%ld] =%2.5lf \n", ri, dC[ri]));
-                   dC[ri] += sC[i];
+                    dC[ri] += sC[i];
                     PRLEVEL(1, ("%% dC [%ld] =%2.5lf \n", i, dC[ri]));
                 }
                 if (--nrows2bSeen == 0) break;
@@ -720,7 +720,7 @@ void paru_assemble_el_with0rows(Int e, Int f, std::vector<Int> &colHash,
                 if (el_colIndex[jj] < 0) continue;
                 // el [rowInd, jj]
                 PRLEVEL(1, ("%% el[%ld,%ld]=%2.5lf\n%%", rowInd, jj,
-                             el_Num[mEl * jj + ii]));
+                            el_Num[mEl * jj + ii]));
                 if (el_Num[mEl * jj + ii] != 0)
                 {
                     new_lac = jj;
@@ -746,7 +746,7 @@ void paru_assemble_el_with0rows(Int e, Int f, std::vector<Int> &colHash,
             if (el_colIndex[j] > 0) ncolsleft++;
         }
         PRLEVEL(1, ("%%colsleft was %ld and now is %ld\n%%", el->ncolsleft,
-                     ncolsleft));
+                    ncolsleft));
         el->ncolsleft = ncolsleft;
         for (Int j = el->lac; j < new_lac; j++)
         {

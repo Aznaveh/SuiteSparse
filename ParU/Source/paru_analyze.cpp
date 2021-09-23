@@ -86,7 +86,7 @@ paru_symbolic *paru_analyze(
         NULL;
     LUsym->Sp = LUsym->Sj = LUsym->Sleft = NULL;
     LUsym->Sx = NULL;
-    LUsym->Fm = LUsym->Cm = LUsym->Rj = LUsym->Rp = NULL;
+    LUsym->Fm = LUsym->Cm = NULL;
     LUsym->aParent = LUsym->aChildp = LUsym->aChild = LUsym->row2atree = NULL;
     LUsym->super2atree = NULL;
     LUsym->first = NULL;
@@ -194,7 +194,8 @@ paru_symbolic *paru_analyze(
         // col_s = newcol - n1, row_s comes from staircase structure
         // I have to make initial Diag_map inverse to be able to compute mine
         *inv_Diag_map,
-        // it will be freed here anyway but I will make another copy
+        // it will be freed in symbolic anyway but I will make another copy
+        // in paru_init_rowFronts; that copy can be updated
 
         *Front_npivcol,  // size = n_col +1;  actual size = nfr+1
         // NOTE: This is not the case for SPQR
@@ -275,8 +276,6 @@ paru_symbolic *paru_analyze(
 #endif
 
     /* performing the symbolic analysis */
-    //  status = umfpack_dl_symbolic (m, n, Ap, Ai, Ax, &Symbolic, Control,
-    //  Info);
 
     void *SW;
     status = umfpack_dl_azn_symbolic(m, n, Ap, Ai, Ax,
@@ -297,6 +296,7 @@ paru_symbolic *paru_analyze(
         return NULL;
     }
 
+    // TODO: find an appropriate way to get these numbers
     Int cs1 = Info[UMFPACK_COL_SINGLETONS];
     Int rs1 = Info[UMFPACK_ROW_SINGLETONS];
 
@@ -741,14 +741,6 @@ paru_symbolic *paru_analyze(
     }
     if (Super) Super[newNf] = Super[nf];
 
-    LUsym->Rj = NULL;
-    //    LUsym->Rj = QRsym->Rj;
-    //    QRsym->Rj = NULL;
-
-    LUsym->Rp = NULL;
-    //    LUsym->Rp = QRsym->Rp;
-    //    QRsym->Rp = NULL;
-
 #ifndef NDEBUG
     PR = 1;
     PRLEVEL(PR, ("%%%% After relaxed amalgmation\n"));
@@ -877,7 +869,7 @@ paru_symbolic *paru_analyze(
         return NULL;
     }
 
-    // see GraphBLAS/Source/GB_memcpy
+    // TODO: see GraphBLAS/Source/GB_memcpy
     paru_memcpy(cChildp, Childp, (nf + 2) * sizeof(Int));
 
     for (Int f = 0; f < nf; f++)
@@ -1169,7 +1161,7 @@ paru_symbolic *paru_analyze(
 
     if (rowcount < m - n1)
     {
-        // I think that must not happen anyway while umfpack finds it
+        // That must not happen anyway if umfpack finds it
         printf("Paru: Empty rows in submatrix\n");
 
 #ifndef NDEBUG

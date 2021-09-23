@@ -121,7 +121,7 @@ void paru_full_summed(Int e, Int f, paru_matrix *paruMatInfo)
 
         // save the structure of the rows once at first
         Int nrows2assembl = el->nrowsleft - el->nzr_pc;
-        //Int tempRow[nrows2assembl];  // C99
+        // Int tempRow[nrows2assembl];  // C99
         std::vector<Int> tempRow(nrows2assembl);
         Int ii = 0;
         for (Int i = 0; i < mEl; i++)

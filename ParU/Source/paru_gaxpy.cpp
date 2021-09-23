@@ -9,7 +9,7 @@
  *  @author Aznaveh
  */
 #include "paru_internal.hpp"
-Int paru_gaxpy (cholmod_sparse *A, const double *x, double *y, double alpha)
+Int paru_gaxpy(cholmod_sparse *A, const double *x, double *y, double alpha)
 {
     DEBUGLEVEL(0);
 

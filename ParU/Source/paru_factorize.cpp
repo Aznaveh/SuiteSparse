@@ -113,8 +113,6 @@ ParU_ResultCode paru_factorize(cholmod_sparse *A, paru_symbolic *LUsym,
         return info;
     }
 
-    
-
     //// do_fronts generate a task parallel region
     // Int *Parent = LUsym->Parent;
     // #pragma omp taskgroup

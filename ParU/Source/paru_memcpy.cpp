@@ -9,5 +9,6 @@
 
 void paru_memcpy(void *destination, const void *source, size_t num)
 {
+    // TODO: consider make it parallel
     memcpy(destination, source, num);
 }

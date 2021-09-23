@@ -371,7 +371,7 @@ void paru_pivotal(std::vector<Int> &pivotal_elements,
         printf(
             "%%Paru; 0ut of memory when tried to allocate for pivotal part %ld",
             f);
-        //TODO: check here for possible memory leak
+        // TODO: check here for possible memory leak
         // paru_free ( num_panels, sizeof (Int), panel_row);
         return;
     }
