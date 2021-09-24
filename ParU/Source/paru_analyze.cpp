@@ -59,46 +59,35 @@ paru_symbolic *paru_analyze(
     paru_symbolic *LUsym;
 
     LUsym = (paru_symbolic *)paru_alloc(1, sizeof(paru_symbolic));
-    // ... check for LUsym NULL ...
-    if (LUsym == NULL)
-        // out of memory
-        return NULL;
+    if (!LUsym) return NULL;
 
-    Int anz;
-
-    Int *Ap = (Int *)A->p;
-    Int *Ai = (Int *)A->i;
-    double *Ax = (double *)A->x;
     Int m = A->nrow;
     Int n = A->ncol;
-
     if (m != n)
     {
         printf("Paru: Input matrix is not square!\n");
         return NULL;
     }
 
+    Int *Ap = (Int *)A->p;
+    Int *Ai = (Int *)A->i;
+    double *Ax = (double *)A->x;
+
+
     // Initializaing pointers with NULL; just in case for an early exit
     // not to free an uninitialized space
     LUsym->Chain_start = LUsym->Chain_maxrows = LUsym->Chain_maxcols = NULL;
     LUsym->Parent = LUsym->Super = LUsym->Child = LUsym->Childp = NULL;
-    LUsym->Qfill = LUsym->Pfin = LUsym->Pinit = LUsym->Diag_map = LUsym->Ps =
-        NULL;
-    LUsym->Sp = LUsym->Sj = LUsym->Sleft = NULL;
+    LUsym->Qfill = LUsym->Pfin = LUsym->Pinit = LUsym->Diag_map = NULL;
+    LUsym->Sp = LUsym->Sj = LUsym->Sleft = LUsym->Ps = NULL;
     LUsym->Sx = NULL;
     LUsym->Fm = LUsym->Cm = NULL;
     LUsym->aParent = LUsym->aChildp = LUsym->aChild = LUsym->row2atree = NULL;
-    LUsym->super2atree = NULL;
-    LUsym->first = NULL;
+    LUsym->super2atree = LUsym->first = NULL;
     LUsym->stree_flop_bound = LUsym->front_flop_bound = NULL;
-
-    LUsym->ustons.Sup = NULL;
-    LUsym->ustons.Suj = NULL;
-    LUsym->ustons.Sux = NULL;
-
-    LUsym->lstons.Slp = NULL;
-    LUsym->lstons.Sli = NULL;
-    LUsym->lstons.Slx = NULL;
+    LUsym->ustons.Sup = LUsym->lstons.Slp = NULL;
+    LUsym->ustons.Suj = LUsym->lstons.Sli = NULL;
+    LUsym->ustons.Sux = LUsym->lstons.Slx = NULL;
 
     //############  Calling UMFPACK and retrieving data structure ##############
 
@@ -421,6 +410,7 @@ paru_symbolic *paru_analyze(
         return NULL;
     }
 
+    Int anz;
     status = umfpack_dl_get_symbolic(
         &nr, &nc, &n1, &anz, &nfr, &nchains, Pinit, Qinit, Diag_map,
         Front_npivcol, Front_parent, Front_1strow, Front_leftmostdesc,
