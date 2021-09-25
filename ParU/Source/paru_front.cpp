@@ -62,7 +62,9 @@ ParU_ResultCode paru_front(Int f,  // front need to be assembled
     Int *frowList = (Int *)paru_alloc(fm, sizeof(Int));
     if (frowList == NULL)
     {
-        printf("%% Out of memory when tried to allocate for frowList %ld", f);
+        printf(
+            "%%Paru: out of memory when tried to allocate for frowList %ld\n",
+            f);
         return PARU_OUT_OF_MEMORY;
     }
     paruMatInfo->frowList[f] = frowList;
@@ -256,8 +258,8 @@ ParU_ResultCode paru_front(Int f,  // front need to be assembled
         if (fcolList == NULL)
         {
             printf(
-                "%% Out of memory when tried to allocate for fcolList=%ld"
-                "with the size %ld",
+                "%%Paru: out of memory when tried to allocate for fcolList=%ld"
+                "with the size %ld\n",
                 f, fn);
             return PARU_OUT_OF_MEMORY;
         }
@@ -335,7 +337,8 @@ ParU_ResultCode paru_front(Int f,  // front need to be assembled
     double *uPart = (double *)paru_calloc(fp * colCount, sizeof(double));
     if (uPart == NULL)
     {
-        printf("%% Out of memory when tried to allocate for U part %ld", f);
+        printf("%%Paru: out of memory when tried to allocate for U part %ld\n",
+               f);
         return PARU_OUT_OF_MEMORY;
     }
 
@@ -508,8 +511,9 @@ ParU_ResultCode paru_front(Int f,  // front need to be assembled
         // While insided the DGEMM BETA == 0
         if (curEl == NULL)
         {
-            printf("%% Out of memory when tried to allocate current CB %ld",
-                   eli);
+            printf(
+                "%%Paru: out of memory when tried to allocate current CB %ld\n",
+                eli);
             return PARU_OUT_OF_MEMORY;
         }
         PRLEVEL(1, ("%% Created ele %ld in curEl =%p\n", eli, curEl));
@@ -613,7 +617,7 @@ ParU_ResultCode paru_front(Int f,  // front need to be assembled
         rowTuple.f = locIndx;
         if (paru_add_rowTuple(RowList, frowList[i], rowTuple))
         {
-            printf("%% Out of memory: add_rowTuple \n");
+            printf("%%Paru: out of memory: add_rowTuple \n");
             return PARU_OUT_OF_MEMORY;
         }
     }
