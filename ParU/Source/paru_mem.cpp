@@ -20,13 +20,13 @@ void *paru_alloc(size_t n, size_t size)
     void *p;
     if (size == 0)
     {
-        printf("size must be > 0\n");
+        printf("Paru: size must be > 0\n");
         return NULL;
     }
     else if (n >= (Size_max / size) || n >= INT_MAX)
     {
         // object is too big to allocate without causing integer overflow
-        printf("problem too large\n");
+        printf("Paru: problem too large\n");
         p = NULL;
     }
     else
@@ -35,7 +35,7 @@ void *paru_alloc(size_t n, size_t size)
         if (p == NULL)
         {
             // out of memory
-            printf("out of memory\n");
+            printf("Paru: out of memory\n");
         }
         else
         {
@@ -62,13 +62,13 @@ void *paru_calloc(size_t n, size_t size)
     void *p;
     if (size == 0)
     {
-        printf("size must be > 0\n");
+        printf("Paru: size must be > 0\n");
         return NULL;
     }
     else if (n >= (Size_max / size) || n >= INT_MAX)
     {
         // object is too big to allocate without causing integer overflow
-        printf("problem too large\n");
+        printf("Paru: problem too large\n");
         p = NULL;
     }
     else
@@ -77,7 +77,7 @@ void *paru_calloc(size_t n, size_t size)
         if (p == NULL)
         {
             // out of memory
-            printf("out of memory\n");
+            printf("Paru: out of memory\n");
         }
         else
         {
@@ -107,7 +107,7 @@ void *paru_realloc(
     void *p = NULL;
     if (*size == 0)
     {
-        printf("size must be > 0\n");
+        printf("Paru: size must be > 0\n");
         return NULL;
     }
     else if (oldP == NULL)
@@ -124,7 +124,7 @@ void *paru_realloc(
     else if (newsize >= (Size_max / size_Entry) || newsize >= INT_MAX)
     {
         // object is too big to allocate without causing integer overflow
-        printf("problem too large\n");
+        printf("Paru: problem too large\n");
     }
 
     else
@@ -319,7 +319,7 @@ void paru_freemat(paru_matrix **paruMatInfo_handle)
     {  // freeing all row elements
         if (LUsym == NULL)
         {
-            printf("Probably LUsym has been freed before! Wrong usage\n");
+            printf("Paru: probably LUsym has been freed before! Wrong usage\n");
             return;
         }
         Int e = LUsym->row2atree[i];  // element number in augmented tree
