@@ -61,7 +61,7 @@ void paru_perm(paru_matrix *paruMatInfo)
     PRLEVEL(1, ("%% Inside Perm\n"));
     if (Pfin == NULL || Ps == NULL)
     {
-        printf("memory problem inside perm\n");
+        printf("Paru: memory problem inside perm\n");
         return;
     }
 

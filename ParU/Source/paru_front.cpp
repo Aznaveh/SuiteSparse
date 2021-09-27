@@ -63,8 +63,7 @@ ParU_ResultCode paru_front(Int f,  // front need to be assembled
     if (frowList == NULL)
     {
         printf(
-            "%%Paru: out of memory when tried to allocate for frowList %ld\n",
-            f);
+            "Paru: out of memory when tried to allocate for frowList %ld\n", f);
         return PARU_OUT_OF_MEMORY;
     }
     paruMatInfo->frowList[f] = frowList;
@@ -163,7 +162,7 @@ ParU_ResultCode paru_front(Int f,  // front need to be assembled
     {
         // PRLEVEL(1, ("%% %ldx%ld \n", rowCount, fp));
         PRLEVEL(1, ("%% Structural Problem\n"));
-        printf("structural problem on %ld: %ldx%ld\n", f, rowCount, fp);
+        printf("Paru: structural problem on %ld: %ldx%ld\n", f, rowCount, fp);
         paruMatInfo->res = PARU_SINGULAR;
         return PARU_SINGULAR;
     }
@@ -189,7 +188,7 @@ ParU_ResultCode paru_front(Int f,  // front need to be assembled
 
     if (fac < 0)
     {
-        printf("%% Some problem in factorization \n");
+        printf("Paru: Some problem in factorization \n");
         return PARU_INVALID;
     }
 
@@ -258,7 +257,7 @@ ParU_ResultCode paru_front(Int f,  // front need to be assembled
         if (fcolList == NULL)
         {
             printf(
-                "%%Paru: out of memory when tried to allocate for fcolList=%ld"
+                "Paru: out of memory when tried to allocate for fcolList=%ld"
                 "with the size %ld\n",
                 f, fn);
             return PARU_OUT_OF_MEMORY;
@@ -337,7 +336,7 @@ ParU_ResultCode paru_front(Int f,  // front need to be assembled
     double *uPart = (double *)paru_calloc(fp * colCount, sizeof(double));
     if (uPart == NULL)
     {
-        printf("%%Paru: out of memory when tried to allocate for U part %ld\n",
+        printf("Paru: out of memory when tried to allocate for U part %ld\n",
                f);
         return PARU_OUT_OF_MEMORY;
     }
@@ -512,7 +511,7 @@ ParU_ResultCode paru_front(Int f,  // front need to be assembled
         if (curEl == NULL)
         {
             printf(
-                "%%Paru: out of memory when tried to allocate current CB %ld\n",
+                "Paru: out of memory when tried to allocate current CB %ld\n",
                 eli);
             return PARU_OUT_OF_MEMORY;
         }
@@ -617,7 +616,7 @@ ParU_ResultCode paru_front(Int f,  // front need to be assembled
         rowTuple.f = locIndx;
         if (paru_add_rowTuple(RowList, frowList[i], rowTuple))
         {
-            printf("%%Paru: out of memory: add_rowTuple \n");
+            printf("Paru: out of memory: add_rowTuple \n");
             return PARU_OUT_OF_MEMORY;
         }
     }

@@ -45,9 +45,11 @@ ParU_ResultCode paru_do_fronts(Int f, paru_matrix *paruMatInfo)
         Int *Childp = LUsym->Childp;
         Int *Child = LUsym->Child;
 
+#ifndef NDEBUG
         PRLEVEL(1, ("%% tasks are generating for children of %ld\n", f));
         if (Childp[f + 1] - Childp[f] > 100)
-            printf("%% lots of children here\n");
+            PRLEVEL(1,("%% lots of children here\n"));
+#endif
         //#pragma omp taskgroup
         for (Int i = Childp[f]; i <= Childp[f + 1] - 1; i++)
         {

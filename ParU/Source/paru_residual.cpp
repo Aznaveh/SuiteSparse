@@ -33,7 +33,7 @@ ParU_ResultCode paru_residual(cholmod_sparse *A, paru_matrix *paruMatInfo,
     double *x = (double *)paru_alloc(m, sizeof(double));
     if (x == NULL)
     {
-        printf("Memory problem inside residual\n");
+        printf("Paru: memory problem inside residual\n");
         return PARU_OUT_OF_MEMORY;
     }
     paru_memcpy(x, b, m * sizeof(double));

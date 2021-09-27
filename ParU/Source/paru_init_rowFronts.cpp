@@ -26,13 +26,13 @@ ParU_ResultCode paru_init_rowFronts(
     DEBUGLEVEL(-1);
     if (!A->packed)
     {
-        printf("A is not packed; Wrong format \n");
+        printf("Paru: A is not packed; Wrong format \n");
         return PARU_INVALID;
     }
 
     if (LUsym == NULL)
     {
-        printf("LUsym is NULL\n");
+        printf("Paru: LUsym is NULL\n");
         return PARU_INVALID;
     }
 
@@ -41,7 +41,7 @@ ParU_ResultCode paru_init_rowFronts(
     paruMatInfo = (paru_matrix *)paru_alloc(1, sizeof(paru_matrix));
     if (paruMatInfo == NULL)
     {  // out of memory
-        printf("Out of memory: paruMatInfo\n");
+        printf("Paru: out of memory, paruMatInfo\n");
         // Nothing to be freed
         return PARU_OUT_OF_MEMORY;
     }
@@ -60,7 +60,7 @@ ParU_ResultCode paru_init_rowFronts(
 
     if (Work == NULL)
     {  // out of memory
-        printf("Out of memory: Work\n");
+        printf("Paru: out of memory: Work\n");
         paru_freemat(&paruMatInfo);
         return PARU_OUT_OF_MEMORY;
     }
@@ -168,7 +168,7 @@ ParU_ResultCode paru_init_rowFronts(
     // pointers to pointers that are allocated
     if (m == 0 || n == 0)
     {
-        printf("%%The dimension of matrix is zero: %ld x %ld \n", m, n);
+        printf("Paru: the dimension of matrix is zero: %ld x %ld \n", m, n);
         paru_free(1, sizeof(paru_matrix), paruMatInfo);
         return PARU_INVALID;
     }
@@ -261,7 +261,7 @@ ParU_ResultCode paru_init_rowFronts(
             if (curEl == NULL)
             {  // out of memory
                 paru_freemat(&paruMatInfo);
-                printf("Out of memory: curEl\n");
+                printf("Paru: Out of memory: curEl\n");
                 info = PARU_OUT_OF_MEMORY;
                 //#pragma omp cancel for
                 return PARU_OUT_OF_MEMORY;
@@ -291,7 +291,7 @@ ParU_ResultCode paru_init_rowFronts(
             if (RowList[row].list == NULL)
             {  // out of memory
                 paru_freemat(&paruMatInfo);
-                printf("Out of memory: RowList[row].list \n");
+                printf("Paru: out of memory, RowList[row].list \n");
                 info = PARU_OUT_OF_MEMORY;
                 //#pragma omp cancel for
                 return PARU_OUT_OF_MEMORY;
@@ -305,7 +305,7 @@ ParU_ResultCode paru_init_rowFronts(
             if (paru_add_rowTuple(RowList, row, rowTuple))
             {
                 paru_freemat(&paruMatInfo);
-                printf("Out of memory: add_rowTuple \n");
+                printf("Paru: out of memory, add_rowTuple \n");
                 info = PARU_OUT_OF_MEMORY;
                 //#pragma omp cancel for
                 return PARU_OUT_OF_MEMORY;

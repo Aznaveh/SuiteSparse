@@ -35,7 +35,7 @@ ParU_ResultCode paru_backward(cholmod_sparse *A, paru_matrix *paruMatInfo,
     double *b = (double *)paru_calloc(m, sizeof(double));
     if (b == NULL)
     {
-        printf("Memory problem inside residual\n");
+        printf("Paru: memory problem inside residual\n");
         return PARU_OUT_OF_MEMORY;
     }
     paru_gaxpy(A, x1, b, 1);
