@@ -2,21 +2,22 @@
 //////////////////////////  paru_trsm //////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 /*! @brief trsm wrapper
- *     l11*u12=a12 and u12 is unkonwn  so we need this:
- *              op( A ) * X = alpha*B
- *             part(pF) * X = 1 * upart
- *             part(pF) * upart = 1 * upart
- *      SIDE = 'L' or 'l'
- *      UPLO = 'L' or 'l'; A is a lower triangular matrix.
- *      TRANSA = 'N' or 'n'   op( A ) = A.
- *      DIAG = 'U' or 'u'   A is assumed to be unit triangular.
- *      M     M specifies the number of rows of B.    (fp)
- *      N     N specifies the number of columns of B. (colCount)
- *      ALPHA, (alpha = 1.0)
- *      A (pF)
- *      LDA  leading dimension of A. (rowCount)
- *      B (upart)
- *      LDB  leading dimension of B.  (fp)
+ *
+ *       l11*u12=a12 and u12 is unkonwn  so we need this:
+ *                op( A ) * X = alpha*B
+ *               part(pF) * X = 1 * upart
+ *               part(pF) * upart = 1 * upart
+ *        SIDE = 'L' or 'l'
+ *        UPLO = 'L' or 'l'; A is a lower triangular matrix.
+ *        TRANSA = 'N' or 'n'   op( A ) = A.
+ *        DIAG = 'U' or 'u'   A is assumed to be unit triangular.
+ *        M     M specifies the number of rows of B.    (fp)
+ *        N     N specifies the number of columns of B. (colCount)
+ *        ALPHA, (alpha = 1.0)
+ *        A (pF)
+ *        LDA  leading dimension of A. (rowCount)
+ *        B (upart)
+ *        LDB  leading dimension of B.  (fp)
  *
  * @author Aznaveh
  */

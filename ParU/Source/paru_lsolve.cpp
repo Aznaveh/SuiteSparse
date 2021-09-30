@@ -2,31 +2,33 @@
 ///////////////////////////////// paru_lsolve //////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 /*! @brief  In this file I have lsovle x = L\x
- *       The final result is something like this (nf = 4)                     /n
- *       ___________________________________________                          /n
- *       |\       |                                 |       c                 /n
- *       |*\      |         U1                      |       c                 /n
- *       |****\   |                                 |       c  DTRSV on here  /n
- *       |*DTRSV*\|_________________________________|       c                 /n
- *       |******* |\         |                      |       c                 /n
- *       |        |****\     |       U2             |       x                 /n
- *       |   LU1  |*DTRSV**\ |______________________|       x DGEMV updates   /n
- *       |        |          |**\         |         |       x   here          /n
- *       |        | LU2      |*****\      |   U3    |       x                 /n
- *       | DGEMV  |          |*DTRSV**\   |_________|       x                 /n
- *       |        |          |   LU3      |* LU4    |       x                 /n
- *       |        | DGEMV    |  DGEMV     |****     |       x                 /n
- *       |        |          |            |DTRSV*   |       x                 /n
- *       |________|__________|____________|_________|       x                 /n
- *                                                                            /n
- *       This function just goes through LUs in the data structure and does a /n
- *       TRSV on triangular part                                              /n
- *       Then does DGEMV on the rest for 0 to nf                              /n
+ * 
  *
- *             BLAS_DTRSV  is used here but I do not use BLAS_DGEMV explicitly
- *             while it needs space for each thread doing this computation.
- *             I guess using this way can have a good performance.
- *
+ ********    The final result is something like this (nf = 4)                     
+ *     ___________________________________________                          
+ *     |\       |                                 |       c                 
+ *     |*\      |         U1                      |       c                 
+ *     |****\   |                                 |       c  DTRSV on here  
+ *     |*DTRSV*\|_________________________________|       c                 
+ *     |******* |\         |                      |       c                 
+ *     |        |****\     |       U2             |       x                 
+ *     |   LU1  |*DTRSV**\ |______________________|       x DGEMV updates   
+ *     |        |          |**\         |         |       x   here          
+ *     |        | LU2      |*****\      |   U3    |       x                 
+ *     | DGEMV  |          |*DTRSV**\   |_________|       x                 
+ *     |        |          |   LU3      |* LU4    |       x                 
+ *     |        | DGEMV    |  DGEMV     |****     |       x                 
+ *     |        |          |            |DTRSV*   |       x                 
+ *     |________|__________|____________|_________|       x                 
+ *                                                                          
+ *     This function just goes through LUs in the data structure and does a 
+ *     TRSV on triangular part                                              
+ *     Then does DGEMV on the rest for 0 to nf                              
+ *  
+ *           BLAS_DTRSV  is used here but I do not use BLAS_DGEMV explicitly
+ *           while it needs space for each thread doing this computation.
+ *           I guess using this way can have a good performance.
+ *  
  * @author Aznaveh
  * */
 #include "paru_internal.hpp"

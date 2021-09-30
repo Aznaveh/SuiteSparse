@@ -2,30 +2,32 @@
 ///////////////////////////////// paru_usolve //////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 /*! @brief  In this file I have usovle x = U\x
- *       The final result is something like this (nf = 4)
- *       ___________________________________________
- *       |\*******|                                 |       x
- *       | \*DTRSV|         U1   DGEMV              |       x
- *       |    \***|                                 |       x
- *       |       \|_________________________________|       x
- *       |        |\**DTRSV**|                      |       x
- *       |        |    \*****|       U2    DGEMV    |       x
- *       |   LU1  |        \*|______________________|       o
- *       |        |          |  \**DTRSV**|  DGEMV  |       o
- *       |        | LU2      |     \******|   U3    |       o
- *       |        |          |        \***|_________|       o DGEMV updates
- *       |        |          |   LU3      |*********|       c  here
- *       |        |          |            |  *******|       c   DTRSV on here
- *       |        |          |            |LU4  ****|       c
- *       |________|__________|____________|________*|       c
  *
- *       This function just goes through LUs and US in the data structure and
- *       does a TRSV on triangular part  Then does DGEMV on the rest
- *      for nf down to 0
  *
- *             BLAS_DTRSV  is used here but I do not use BLAS_DGEMV explicitly
- *             while it needs space for each thread doing this computation.
- *             I guess using this way can have a good performance.
+ ********       The final result is something like this (nf = 4)
+ *        ___________________________________________
+ *        |\*******|                                 |       x
+ *        | \*DTRSV|         U1   DGEMV              |       x
+ *        |    \***|                                 |       x
+ *        |       \|_________________________________|       x
+ *        |        |\**DTRSV**|                      |       x
+ *        |        |    \*****|       U2    DGEMV    |       x
+ *        |   LU1  |        \*|______________________|       o
+ *        |        |          |  \**DTRSV**|  DGEMV  |       o
+ *        |        | LU2      |     \******|   U3    |       o
+ *        |        |          |        \***|_________|       o DGEMV updates
+ *        |        |          |   LU3      |*********|       c  here
+ *        |        |          |            |  *******|       c   DTRSV on here
+ *        |        |          |            |LU4  ****|       c
+ *        |________|__________|____________|________*|       c
+ *
+ *        This function just goes through LUs and US in the data structure and
+ *        does a TRSV on triangular part  Then does DGEMV on the rest
+ *       for nf down to 0
+ *
+ *              BLAS_DTRSV  is used here but I do not use BLAS_DGEMV explicitly
+ *              while it needs space for each thread doing this computation.
+ *              I guess using this way can have a good performance.
  *
  * @author Aznaveh
  * */

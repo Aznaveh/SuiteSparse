@@ -6,27 +6,26 @@
  *  in curent front. If the prior contribution block is empty free it here.
  *
  *
- ***************  assembling the pivotal part of the front ****************/
-/*
+ ***************  assembling the pivotal part of the front 
  *
- *  el           nEl
- *              6, 7, 11, 12
- *             _____________
- *          23 | X  Y  .  .     stored in memory like this:
- *      mEl 17 | X  Y  .  .     ..6, 7,11, 12, 23, 17, 2, X, X, X, Y, Y, Y,
- *           2 | X  Y  .  .
+ *      el           nEl
+ *                  6, 7, 11, 12
+ *                 _____________
+ *              23 | X  Y  .  .     stored in memory like this:
+ *          mEl 17 | X  Y  .  .     ..6, 7,11, 12, 23, 17, 2, X, X, X, Y, Y, Y,
+ *               2 | X  Y  .  .
  *
- *    It must be assembled in current pivotal fron like this:
- *                                     fp
- *                                 col1, ... , col
+ *        It must be assembled in current pivotal fron like this:
+ *                                         fp
+ *                                     col1, ... , col
  *
- *                                  6, 7, 8, 9, 10
- *                                  ______________
- *                          0   23 | X  Y  .  .  .
- *               rowCount   1    2 | X  Y  .  .  .
- *                          2    4 | *  *  .  .  .  isRowInFront[4] == 2
- *                          3   17 | X  Y  .  .  .
-
+ *                                      6, 7, 8, 9, 10
+ *                                      ______________
+ *                              0   23 | X  Y  .  .  .
+ *                   rowCount   1    2 | X  Y  .  .  .
+ *                              2    4 | *  *  .  .  .  isRowInFront[4] == 2
+ *                              3   17 | X  Y  .  .  .
+ *
  *  @author Aznaveh
  */
 #include "paru_internal.hpp"

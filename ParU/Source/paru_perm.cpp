@@ -3,6 +3,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 /*! @brief Computing and saving row permutation. This must be doen after
  * factorization.
+ *
  *   I have this transition   A ---> S ---> LU
  *   There are both col and row permutation form A to S.
  *   However there is no column permuation from S to LU. Therefore the overall
@@ -10,24 +11,24 @@
  *   Row permutation happens from S to LU.
  *   Row permutation and inverse permutation is computed here
  *
- *                         ------P--->
- *                         A         LU
- *                     **********
- *                     **********     The rest is identity
- *                     ***#######    #######
- *                     ***#######    #######
- *                         <----q----
+ *                    ------P--->
+ *                    A         LU
+ *                **********
+ *                **********     The rest is identity
+ *                ***#######    #######
+ *                ***#######    #######
+ *                    <----q----
  *
- *                          Pfin (COMPUTED HERE)
- *                    ------------------>
- *                      Pinit     Ps = (compute here) newRofS (paru_write)
- *                    --------> -------->
- *                   A         S           LU
- *                    <-------   <-------
- *         (paru_analyze)Pinv     oldRofS (paru_write)
+ *                     Pfin (COMPUTED HERE)
+ *               ------------------>
+ *                 Pinit     Ps = (compute here) newRofS (paru_write)
+ *               --------> -------->
+ *              A         S           LU
+ *               <-------   <-------
+ *          (paru_analyze)Pinv     oldRofS (paru_write)
  *
  *
- *  We need these permuataions for compuing Ax = b
+ *   We need these permuataions for compuing Ax = b
  *        x = b (P)
  *        x = L\x
  *        x = U\x
