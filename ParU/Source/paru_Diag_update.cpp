@@ -1,14 +1,14 @@
-/** =========================================================================  /
- *  ======================  paru_Diag_update ================================  /
- *  ========================================================================= */
+////////////////////////////////////////////////////////////////////////////////
+/////////////////////////// paru_Diag_update ///////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 /*! @brief  updating the diagonal map when strategy is symmetric but for some
  *      reason the diagonal entry is not picked
  *
- *          \o\     col2
- *            \\    |
- *              \\  |   Instead of picking o we are picking x
- *   new_d  x-----\\|    so we put x's row for col2
- *                  \\
+ *                  \o\     col2
+ *                    \\    |
+ *                      \\  |   Instead of picking o we are picking x
+ *           new_d  x-----\\|    so we put x's row for col2
+ *                          \\
  *
  *  @author Aznaveh
  */

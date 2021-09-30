@@ -1,7 +1,6 @@
-
-/** =========================================================================  /
- *  ======================  paru_full_summed ================================  /
- *  ========================================================================= */
+////////////////////////////////////////////////////////////////////////////////
+//////////////////////////  paru_full_summed ///////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 /*! @brief  fully sum the pivotal column from a prior contribution block e
  *  assembling starts with el->lac and continues until no assembly is possible
  *  in curent front. If the prior contribution block is empty free it here.

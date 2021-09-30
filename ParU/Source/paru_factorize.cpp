@@ -1,12 +1,13 @@
-/** =========================================================================  /
- * =======================  paru_factorize ==================================  /
- * ==========================================================================  /
- * @brief    get a matrix and factorize it
+////////////////////////////////////////////////////////////////////////////////
+//////////////////////////  paru_factorize /////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+/*! @brief    get a matrix and factorize it
+ *      specify the order of eliminating fronts
  *      Allocate space for paruMatInfo
  *      the user should free the space
  *
  * @author Aznaveh
- * */
+ */
 
 #include "paru_internal.hpp"
 #define TASK_FL_THRESHOLD 1024 * 1024
