@@ -1,13 +1,13 @@
-/** =========================================================================  /
- * =======================  paru_front   ====================================  /
- * ========================================================================== */
+////////////////////////////////////////////////////////////////////////////////
+/////////////////////////// paru_front  ////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 
 /*! @brief Computing factorization of current front and doing the numerical
  * assembly that ancestors will assemble. Degree update will be used in this
  * version. Just like ./paru_assemble.cpp
  *
  *
- * @param  a list of tuples and the the tuple we want to add
+ * @param  the front that is going to be computed
  * @return  ParU_ResultCode
  *
  *  @author Aznaveh
@@ -15,7 +15,6 @@
 #include "paru_internal.hpp"
 ParU_ResultCode paru_front(Int f,  // front need to be assembled
                            paru_matrix *paruMatInfo)
-// RowCol list/tuples and LUsym handle
 {
     DEBUGLEVEL(-2);
     /*
