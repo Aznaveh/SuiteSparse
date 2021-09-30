@@ -1,7 +1,7 @@
-/* =========================================================================   /
- * ============================== paru_analyze =============================   /
- * =========================================================================   /
- * @brief Computing etree and do the symbolic analysis. In this file I am going
+////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////// paru_analyze /////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+/*! @brief Computing etree and do the symbolic analysis. In this file I am going
  * to use umfpack symbolic analysis instaed of spqrsym. However, I will keep the
  * style of spqr mostly.
  *
@@ -10,44 +10,44 @@
  *                      Example: ./Matrix/b1_ss.mtx
  * original post ordered etree:
  *
- *   5(2) <-- front(number of pivotal cols)
- *   |   \
- *   0(1) 4(1)__
- *        |     \
- *        1(1)   3(1)
- *                \
- *                2(1)
- *
- * Relaxed tree:  threshold=3  front(number of pivotal cols)##oldfront
- *   3(2)##5
- *   |       \
- *   0(1)##0 2(3)##2,3,4
- *            |
- *            1(1)##1
- *
- *            0 1 2 3 4 5 -1
- *      fmap: 0 1 2 2 2 3 -1  last one is necessary for my check
- *
- *      fmap[oldf] == fmap [oldf+1]  amalgamated
- *      fmap[oldf-1] == fmap [oldf]  amalgamated  and root of subtree
- *
- *  Augmented tree creation:
- *
- *                      Example: ./Matrix/problem.mtx
- * original post ordered etree:          augmented tree: (Row elements)
- *
- *   4___                                     16_____
- *   |   \                                    |   \  (14-15)
- *   0    3__                                 3    13_____
- *        |  \                              (0-2)  |  \   \
- *        1   2                                    7   10 (11-12)
- *                                                 |    \
- *                                               (4-6) (8-9)
- *
- *      Note: the original etree use a dummy parent for all the tree(forest)
- *              the augmented tree does not
+ *   5(2) <-- front(number of pivotal cols)                                   \n
+ *   |   \                                                                    \n
+ *   0(1) 4(1)__                                                              \n
+ *        |     \                                                             \n 
+ *        1(1)   3(1)                                                         \n
+ *                \                                                           \n
+ *                2(1)                                                        \n
+ *                                                                            \n
+ * Relaxed tree:  threshold=3  front(number of pivotal cols)##oldfront        \n
+ *   3(2)##5                                                                  \n
+ *   |       \                                                                \n
+ *   0(1)##0 2(3)##2,3,4                                                      \n
+ *            |                                                               \n
+ *            1(1)##1                                                         \n
+ *                                                                            \n
+ *            0 1 2 3 4 5 -1                                                  \n
+ *      fmap: 0 1 2 2 2 3 -1  last one is necessary for my check              \n
+ *                                                                            \n
+ *      fmap[oldf] == fmap [oldf+1]  amalgamated                              \n
+ *      fmap[oldf-1] == fmap [oldf]  amalgamated  and root of subtree         \n
+ *                                                                            \n
+ *  Augmented tree creation:                                                  \n
+ *                                                                            \n
+ *                      Example: ./Matrix/problem.mtx                         \n
+ * original post ordered etree:          augmented tree: (Row elements)       \n
+ *                                                                            \n
+ *   4___                                     16_____                         \n
+ *   |   \                                    |   \  (14-15)                  \n
+ *   0    3__                                 3    13_____                    \n
+ *        |  \                              (0-2)  |  \   \                   \n
+ *        1   2                                    7   10 (11-12)             \n
+ *                                                 |    \                     \n
+ *                                               (4-6) (8-9)                  \n
+ *                                                                            \n
+ *      Note: the original etree use a dummy parent for all the tree(forest)  \n
+ *              the augmented tree does not                                   \n
  * @author Aznaveh
- * */
+ * */                                                                          
 #include "paru_internal.hpp"
 paru_symbolic *paru_analyze(
     // inputs, not modified
