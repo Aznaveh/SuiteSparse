@@ -251,8 +251,10 @@ ParU_ResultCode paru_init_rowFronts(
             Int nrows = 1,
                 ncols = Sp[row + 1] -
                         Sp[row];  // nrows and ncols of current front/row
-
             PRLEVEL(1, ("%% element %ld = %ld x %ld\n", e, nrows, ncols));
+
+            ASSERT (nrows > 0);
+            ASSERT (ncols > 0);
 
             row_degree_bound[row] = ncols;  // Initialzing row degree
 

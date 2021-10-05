@@ -439,8 +439,10 @@ paru_symbolic *paru_analyze(
     }
     printf("In: %ldx%ld nnz = %ld \n", nr, nc, anz);
     // just an alias
-    // SymbolicType *Sym_umf = (SymbolicType *)Symbolic;
+    SymbolicType *Sym_umf = (SymbolicType *)Symbolic;
 
+    if (n1 != (Int) Sym_umf->n1)
+        printf ("Symboilic doesn't work as expected\n");
     // n1 = Sym_umf->n1;
     // Diag_map = Sym_umf->Diagonal_map;
     // int *umf_Diagonal = Sym_umf->Diagonal_map;

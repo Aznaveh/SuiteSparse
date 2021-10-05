@@ -16,7 +16,7 @@ ParU_ResultCode paru_do_fronts(Int f, paru_matrix *paruMatInfo)
 // This routine call paru_front from first(f)...f including f
 // This routine is called recursively to make tasks
 {
-    DEBUGLEVEL(1);
+    DEBUGLEVEL(0);
     paru_symbolic *LUsym = paruMatInfo->LUsym;
     ParU_ResultCode info;
 
@@ -106,7 +106,9 @@ ParU_ResultCode paru_factorize(cholmod_sparse *A, paru_symbolic *LUsym,
     Int nf = LUsym->nf;
 
     ParU_ResultCode info;
+    //printf ("Starting init row\n");
     info = paru_init_rowFronts(&paruMatInfo, A, LUsym);
+   //printf ("Finishing init row\n");
     *paruMatInfo_handle = paruMatInfo;
 
     PRLEVEL(1, ("%% init_row is done\n"));
@@ -129,7 +131,7 @@ ParU_ResultCode paru_factorize(cholmod_sparse *A, paru_symbolic *LUsym,
                  ParU_ResultCode myInfo = paru_do_fronts(i, paruMatInfo);
                  if (myInfo != PARU_SUCCESS)
                  {
-                     PRLEVEL(1, ("%% A problem happend in %ld\n", i));
+                     //PRLEVEL(1, ("%% A problem happend in %ld\n", i));
                      info = myInfo;
                      #pragma omp cancel taskgroup
                      // return info;

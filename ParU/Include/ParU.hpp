@@ -27,6 +27,7 @@ extern "C"
 #include "cholmod.h"
 #include "cholmod_blas.h"
 #include "umf_internal.h"
+//#include <mkl.h>
 }
 
 #ifdef Int  // defined in amd
