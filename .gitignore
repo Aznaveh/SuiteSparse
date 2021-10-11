@@ -223,6 +223,8 @@ RBio/Tcov/*.rb
 
 Matrix/*
 
+metis-5.1.0/build
+
 # Do not ignore this file
 !.gitignore
 

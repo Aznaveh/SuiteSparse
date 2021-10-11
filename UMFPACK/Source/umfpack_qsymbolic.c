@@ -1104,6 +1104,8 @@ PRIVATE Int symbolic_analysis
     ASSERT (AMD_valid (n_row, n_col, Ap, Ai) == AMD_OK) ;
 
     Symbolic->n1 = n1 ;
+    Symbolic->n1r = n1r ;
+    Symbolic->n1c = n1c ;
     Symbolic->nempty = nempty ;
     ASSERT (n1 <= n_inner) ;
     n2 = nn - n1 - nempty ;
