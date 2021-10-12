@@ -21,20 +21,17 @@
 
 #include <omp.h>
 
-#define DLONG
 extern "C"
 {
-// #include "umfpack.h"
+#include "umfpack.h"
 #include "cholmod.h"
-#include "cholmod_blas.h"
-#include "umf_internal.h"
 //#include <mkl.h>
 }
 
-//#ifdef Int  // defined in amd
-//#undef Int
-//#endif
-//#define Int int64_t
+#ifdef Int  // defined in amd
+#undef Int
+#endif
+#define Int int64_t
 
 // =============================================================================
 // === paru_symbolic ===========================================================

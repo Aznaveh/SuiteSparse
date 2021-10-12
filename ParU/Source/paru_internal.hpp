@@ -21,6 +21,21 @@
 #define NPR
 #endif
 
+
+
+#ifdef Int  // defined in amd
+#undef Int
+#endif
+
+#define DLONG
+extern "C"
+{
+#include "cholmod_blas.h"
+#include "umf_internal.h"
+}
+
+
+
 // for printing information uncomment this; to activate assertions uncomment
 //#undef NPR  //<<1>>
 
