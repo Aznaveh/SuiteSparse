@@ -224,9 +224,9 @@ void paru_freesym(paru_symbolic **LUsym_handle)
     paru_free(snz, sizeof(double), LUsym->Sx);
     paru_free(n + 2 - n1, sizeof(Int), LUsym->Sleft);
 
-    paru_free((n + 1), sizeof(Int), LUsym->Chain_start);
-    paru_free((n + 1), sizeof(Int), LUsym->Chain_maxrows);
-    paru_free((n + 1), sizeof(Int), LUsym->Chain_maxcols);
+    //paru_free((n + 1), sizeof(Int), LUsym->Chain_start);
+    //paru_free((n + 1), sizeof(Int), LUsym->Chain_maxrows);
+    //paru_free((n + 1), sizeof(Int), LUsym->Chain_maxcols);
 
     paru_free(nf + 1, sizeof(double), LUsym->front_flop_bound);
     paru_free(nf + 1, sizeof(double), LUsym->stree_flop_bound);

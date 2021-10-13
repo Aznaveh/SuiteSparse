@@ -10,43 +10,43 @@
  *                           Example: ./Matrix/b1_ss.mtx
  *      original post ordered etree:
  *
- *        5(2) <-- front(number of pivotal cols)                                   
+ *        5(2) <-- front(number of pivotal cols)
  *        |   \
- *        0(1) 4(1)__                                                              
+ *        0(1) 4(1)__
  *             |     \
- *             1(1)   3(1)                                                         
+ *             1(1)   3(1)
  *                     \
- *                     2(1)                                                        
- *                                                                                 
- **********  Relaxed tree:  threshold=3  front(number of pivotal cols)##oldfront        
- *          3(2)##5                                                                  
+ *                     2(1)
+ *
+ **********  Relaxed tree:  threshold=3  front(number of pivotal cols)##oldfront
+ *          3(2)##5
  *          |       \
- *          0(1)##0 2(3)##2,3,4                                                      
- *                   |                                                               
- *                   1(1)##1                                                         
- *                                                                                   
- *                   0 1 2 3 4 5 -1                                                  
- *             fmap: 0 1 2 2 2 3 -1  last one is necessary for my check              
- *             fmap[oldf] == fmap [oldf+1]  amalgamated                              
- *             fmap[oldf-1] == fmap [oldf]  amalgamated  and root of subtree         
- *                                                                                   
- ****************  Augmented tree creation:                                                  
- *                                                                            
- *                      Example: ./Matrix/problem.mtx                         
- *  original post ordered etree:          augmented tree: (Row elements)       
- *                                                                                 
- *        4___                                     16_____                         
- *        |   \                                    |   \  (14-15)                  
- *        0    3__                                 3    13_____                    
+ *          0(1)##0 2(3)##2,3,4
+ *                   |
+ *                   1(1)##1
+ *
+ *                   0 1 2 3 4 5 -1
+ *             fmap: 0 1 2 2 2 3 -1  last one is necessary for my check
+ *             fmap[oldf] == fmap [oldf+1]  amalgamated
+ *             fmap[oldf-1] == fmap [oldf]  amalgamated  and root of subtree
+ *
+ ****************  Augmented tree creation:
+ *
+ *                      Example: ./Matrix/problem.mtx
+ *  original post ordered etree:          augmented tree: (Row elements)
+ *
+ *        4___                                     16_____
+ *        |   \                                    |   \  (14-15)
+ *        0    3__                                 3    13_____
  *             |  \                              (0-2)  |  \   \
- *             1   2                                    7   10 (11-12)             
+ *             1   2                                    7   10 (11-12)
  *                                                      |    \
- *                                                    (4-6) (8-9)                  
- *                                                                                 
- *      Note: the original etree use a dummy parent for all the tree(forest)  
- *              the augmented tree does not                                   
+ *                                                    (4-6) (8-9)
+ *
+ *      Note: the original etree use a dummy parent for all the tree(forest)
+ *              the augmented tree does not
  * @author Aznaveh
- * */                                                                          
+ * */
 #include "paru_internal.hpp"
 paru_symbolic *paru_analyze(
     // inputs, not modified
@@ -72,10 +72,9 @@ paru_symbolic *paru_analyze(
     Int *Ai = (Int *)A->i;
     double *Ax = (double *)A->x;
 
-
     // Initializaing pointers with NULL; just in case for an early exit
     // not to free an uninitialized space
-    LUsym->Chain_start = LUsym->Chain_maxrows = LUsym->Chain_maxcols = NULL;
+    // LUsym->Chain_start = LUsym->Chain_maxrows = LUsym->Chain_maxcols = NULL;
     LUsym->Parent = LUsym->Super = LUsym->Child = LUsym->Childp = NULL;
     LUsym->Qfill = LUsym->Pfin = LUsym->Pinit = LUsym->Diag_map = NULL;
     LUsym->Sp = LUsym->Sj = LUsym->Sleft = LUsym->Ps = NULL;
@@ -137,7 +136,7 @@ paru_symbolic *paru_analyze(
 
         nfr,  // The number of frontam matrices; nf in SPQR analysis
 
-        nchains,  // The frontal matrices are related to one another by the
+        //nchains,  // The frontal matrices are related to one another by the
         // supernodal column elimination tree. Each nod in this tree
         // is one frontal matrix. The tree is partitioned into a set
         // of disjoint paths, and a frontal matrix chaing is one path
@@ -195,11 +194,11 @@ paru_symbolic *paru_analyze(
         // Front_parent [nfr+1] is a place holder for columns
         // with no entries
 
-        *Front_parent,  // size = n_col +1;  actual size = nfr+1
+        *Front_parent;  // size = n_col +1;  actual size = nfr+1
         // NOTE: This is not the case for SPQR
         // Parent is the one I should use instead.
 
-        *Front_1strow,  // size = n_col +1;  actual size = nfr+1
+        // *Front_1strow,  // size = n_col +1;  actual size = nfr+1
         // Front_1strow [k] is the row index of the first row in
         // A (P,Q) whose leftmost entry is in pivot column for
         // kth front.
@@ -211,11 +210,11 @@ paru_symbolic *paru_analyze(
         // (Front_1strow [k]) and so on up the tree.
         // Aznaveh: I am now using it at least for the rowMarks.
 
-        *Front_leftmostdesc,  // size = n_col +1;  actual size = nfr+1
+        // *Front_leftmostdesc,  // size = n_col +1;  actual size = nfr+1
         // Aznaveh: I have a module computing leftmostdesc
         // for my augmented tree; so maybe do not need it
 
-        *Chain_start,  // size = n_col +1;  actual size = nfr+1
+        //*Chain_start,  // size = n_col +1;  actual size = nfr+1
         // The kth frontal matrix chain consists of frontal
         // matrices Chain_start [k] through Chain_start [k+1]-1.
         // Thus, Chain_start [0] is always 0 and
@@ -224,8 +223,8 @@ paru_symbolic *paru_analyze(
         // within a single chian, f+1 is always the parent of f
         // (that is, Front_parent [f] = f+1).
         //
-        *Chain_maxrows,  // size = n_col +1;  actual size = nfr+1
-        *Chain_maxcols;  // The kth frontal matrix chain requires a single
+        // *Chain_maxrows,  // size = n_col +1;  actual size = nfr+1
+        // *Chain_maxcols;  // The kth frontal matrix chain requires a single
     // working array of dimension Chain_maxrows [k] by
     // Chain_maxcols [k], for the unifrontal technique that
     // factorizes the frontal matrix chain. Since the
@@ -283,11 +282,6 @@ paru_symbolic *paru_analyze(
         paru_free(1, sizeof(paru_symbolic), LUsym);
         return NULL;
     }
-
-    // TODO: find an appropriate way to get these numbers
-    Int cs1 = Info[UMFPACK_COL_SINGLETONS];
-    Int rs1 = Info[UMFPACK_ROW_SINGLETONS];
-
     /* ---------------------------------------------------------------------- */
     /* startegy UMFPACK used*/
     /* ---------------------------------------------------------------------- */
@@ -365,104 +359,56 @@ paru_symbolic *paru_analyze(
     /* ---------------------------------------------------------------------- */
     /*    Copy the contents of Symbolic in my data structure                  */
     /* ---------------------------------------------------------------------- */
-    Pinit = (Int *)paru_alloc((m + 1), sizeof(Int));
-    Qinit = (Int *)paru_alloc((n + 1), sizeof(Int));
-    Diag_map = (Int *)paru_alloc(n, sizeof(Int));
-    inv_Diag_map = (Int *)paru_alloc(n, sizeof(Int));
-    Front_npivcol = (Int *)paru_alloc((n + 1), sizeof(Int));
-    Front_1strow = (Int *)paru_alloc((n + 1), sizeof(Int));
-    Front_leftmostdesc = (Int *)paru_alloc((n + 1), sizeof(Int));
-    Front_parent = (Int *)paru_alloc((n + 1), sizeof(Int));
-    Chain_start = (Int *)paru_alloc((n + 1), sizeof(Int));
-    Chain_maxrows = (Int *)paru_alloc((n + 1), sizeof(Int));
-    Chain_maxcols = (Int *)paru_alloc((n + 1), sizeof(Int));
-
+    SymbolicType *Sym_umf = (SymbolicType *)Symbolic;  // just an alias
     // temp amalgamation data structure
     Int *fmap = (Int *)paru_alloc((n + 1), sizeof(Int));
     Int *newParent = (Int *)paru_alloc((n + 1), sizeof(Int));
-
-    if (!Pinit || !Qinit || !Diag_map || !inv_Diag_map || !Front_npivcol ||
-        !Front_parent || !Chain_start || !Chain_maxrows || !Chain_maxcols ||
-        !newParent || !Front_1strow || !Front_leftmostdesc || !fmap)
+    Diag_map = Sym_umf->Diagonal_map;
+    if (Diag_map)
+        inv_Diag_map = (Int *)paru_alloc(n, sizeof(Int));
+    else
+        inv_Diag_map = NULL;
+    if (!fmap || !newParent || (!Diag_map != !inv_Diag_map))
     {
-        paru_free((m + 1), sizeof(Int), Pinit);
-        paru_free((n + 1), sizeof(Int), Qinit);
-        paru_free(n, sizeof(Int), Diag_map);
-        paru_free(n, sizeof(Int), inv_Diag_map);
-        paru_free((n + 1), sizeof(Int), Front_npivcol);
-        paru_free((n + 1), sizeof(Int), Front_1strow);
-        paru_free((n + 1), sizeof(Int), Front_leftmostdesc);
-        paru_free((n + 1), sizeof(Int), Front_parent);
-        paru_free((n + 1), sizeof(Int), Chain_start);
-        paru_free((n + 1), sizeof(Int), Chain_maxrows);
-        paru_free((n + 1), sizeof(Int), Chain_maxcols);
-
         paru_free((n + 1), sizeof(Int), fmap);
         paru_free((n + 1), sizeof(Int), newParent);
-
-        printf("Paru: out of memory\n");
-
-        paru_freesym(&LUsym);
-        umfpack_dl_free_symbolic(&Symbolic);
-        umfpack_dl_azn_free_sw(&SW);
-
-        return NULL;
-    }
-
-    Int anz;
-    status = umfpack_dl_get_symbolic(
-        &nr, &nc, &n1, &anz, &nfr, &nchains, Pinit, Qinit, Diag_map,
-        Front_npivcol, Front_parent, Front_1strow, Front_leftmostdesc,
-        Chain_start, Chain_maxrows, Chain_maxcols, Symbolic);
-    if (status < 0)
-    {
-        printf("Paru: symbolic factorization invalid\n");
-
-        // free memory
-        paru_free((m + 1), sizeof(Int), Pinit);
-        paru_free((n + 1), sizeof(Int), Qinit);
-        paru_free(n, sizeof(Int), Diag_map);
         paru_free(n, sizeof(Int), inv_Diag_map);
-        paru_free((n + 1), sizeof(Int), Front_npivcol);
-        paru_free((n + 1), sizeof(Int), Front_1strow);
-        paru_free((n + 1), sizeof(Int), Front_leftmostdesc);
-        paru_free((n + 1), sizeof(Int), Front_parent);
-        paru_free((n + 1), sizeof(Int), Chain_start);
-        paru_free((n + 1), sizeof(Int), Chain_maxrows);
-        paru_free((n + 1), sizeof(Int), Chain_maxcols);
-
+        printf("Paru: out of memory\n");
         paru_freesym(&LUsym);
         umfpack_dl_free_symbolic(&Symbolic);
         umfpack_dl_azn_free_sw(&SW);
-
         return NULL;
     }
-    printf("In: %ldx%ld nnz = %ld \n", nr, nc, anz);
-    // just an alias
-    SymbolicType *Sym_umf = (SymbolicType *)Symbolic;
 
-    if (n1 != (Int) Sym_umf->n1)
-        printf ("Symboilic doesn't work as expected\n");
-    // n1 = Sym_umf->n1;
-    // Diag_map = Sym_umf->Diagonal_map;
-    // int *umf_Diagonal = Sym_umf->Diagonal_map;
-    ////if (umf_Diagonal != NULL )
-    ////if (Sym_umf->Diagonal_map!= NULL )
-    // if (strategy == UMFPACK_STRATEGY_SYMMETRIC)
-    //{
-    //   for (Int i = 0; i < n; i++)
-    //    {
-    //        Diag_map[i] = (Int)umf_Diagonal[i];
-    //    }
-    //}
-    // else
-    //{
-    //    paru_free(n, sizeof(Int), Diag_map);
-    //    paru_free(n, sizeof(Int), inv_Diag_map);
-    //    Diag_map = NULL;
-    //    inv_Diag_map = NULL;
-    //}
-    // Sym_umf->Diagonal_map = NULL;
+    nr = Sym_umf->n_row;
+    nc = Sym_umf->n_col;
+    n1 = Sym_umf->n1;
+    Int anz = Sym_umf->nz;
+    nfr = Sym_umf->nfr;
+    //nchains = Sym_umf->nchains;
+    Int cs1 = Sym_umf->n1c;
+    Int rs1 = Sym_umf->n1r;
+
+    printf("In: %ldx%ld nnz = %ld \n", nr, nc, anz);
+
+    Pinit = Sym_umf->Rperm_init;
+    Qinit = Sym_umf->Cperm_init;
+    Front_npivcol = Sym_umf->Front_npivcol;
+    Front_parent = Sym_umf->Front_parent;
+
+    //Chain_start = Sym_umf->Chain_start;
+    //Chain_maxrows = Sym_umf->Chain_maxrows;
+    //Chain_maxcols = Sym_umf->Chain_maxcols;
+
+    Sym_umf->Diagonal_map = NULL;
+    Sym_umf->Rperm_init = NULL;
+    Sym_umf->Cperm_init = NULL;
+    Sym_umf->Front_npivcol = NULL;
+    Sym_umf->Front_parent = NULL;
+    //Sym_umf->Chain_start = NULL;
+    //Sym_umf->Chain_maxrows = NULL;
+    //Sym_umf->Chain_maxcols = NULL;
+
 #ifndef NDEBUG
     PR = 1;
     PRLEVEL(-1, ("\n%%\tcs1 = %ld, rs1 = %ld n1 = %ld\n", cs1, rs1, n1));
@@ -471,7 +417,7 @@ paru_symbolic *paru_analyze(
                  nr, nc));
     PRLEVEL(PR, ("   with nz = %ld, number of fronts = %ld,\n", anz, nfr));
     PR = 1;
-    PRLEVEL(PR, ("   number of frontal matrix chains = %ld\n", nchains));
+    //PRLEVEL(PR, ("   number of frontal matrix chains = %ld\n", nchains));
 
     PRLEVEL(1, ("\nPivot columns in each front, and parent of each front:\n"));
     Int k = 0;
@@ -482,7 +428,7 @@ paru_symbolic *paru_analyze(
         Int fnpiv = Front_npivcol[i];
         PRLEVEL(PR, ("Front %ld: parent front: %ld number of pivot cols: %ld\n",
                      i, Front_parent[i], fnpiv));
-        PRLEVEL(PR, ("%% first row is %ld\n", Front_1strow[i]));
+        // PRLEVEL(PR, ("%% first row is %ld\n", Front_1strow[i]));
 
         for (Int j = 0; j < fnpiv; j++)
         {
@@ -500,13 +446,13 @@ paru_symbolic *paru_analyze(
                  k));
 
     PRLEVEL(PR, ("\nFrontal matrix chains:\n"));
-    for (Int j = 0; j < nchains; j++)
-    {
-        PRLEVEL(PR, ("Frontal matrices %ld to %ld in chain\n", Chain_start[j],
-                     Chain_start[j + 1] - 1));
-        PRLEVEL(PR, ("\tworking array of size %ld-by-%ld\n", Chain_maxrows[j],
-                     Chain_maxcols[j]));
-    }
+//    for (Int j = 0; j < nchains; j++)
+//    {
+//        PRLEVEL(PR, ("Frontal matrices %ld to %ld in chain\n", Chain_start[j],
+//                     Chain_start[j + 1] - 1));
+//        PRLEVEL(PR, ("\tworking array of size %ld-by-%ld\n", Chain_maxrows[j],
+//                     Chain_maxcols[j]));
+//    }
 
     PRLEVEL(PR, ("Forthwith Pinit =\n"));
     for (Int i = 0; i < MIN(64, m); i++) PRLEVEL(PR, ("%ld ", Pinit[i]));
@@ -515,8 +461,7 @@ paru_symbolic *paru_analyze(
     for (Int i = 0; i < MIN(64, m); i++) PRLEVEL(PR, ("%ld ", Qinit[i]));
     PRLEVEL(PR, ("\n"));
     PR = -1;
-    if (Diag_map[0] != -1)
-    // if (Diag_map)
+    if (Diag_map)
     {
         PRLEVEL(PR, ("Forthwith Diag_map =\n"));
         for (Int i = 0; i < MIN(64, n); i++) PRLEVEL(PR, ("%ld ", Diag_map[i]));
@@ -527,9 +472,6 @@ paru_symbolic *paru_analyze(
 #endif
 
     umfpack_dl_free_symbolic(&Symbolic);
-
-    paru_free((n + 1), sizeof(Int), Front_leftmostdesc);
-    paru_free((n + 1), sizeof(Int), Front_1strow);
 
     //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
@@ -543,9 +485,10 @@ paru_symbolic *paru_analyze(
     LUsym->cs1 = cs1;
     LUsym->anz = anz;
     Int nf = LUsym->nf = nfr;
-    LUsym->Chain_start = Chain_start;
-    LUsym->Chain_maxrows = Chain_maxrows;
-    LUsym->Chain_maxcols = Chain_maxcols;
+
+    //LUsym->Chain_start = Chain_start;
+    //LUsym->Chain_maxrows = Chain_maxrows;
+    //LUsym->Chain_maxcols = Chain_maxcols;
     LUsym->Qfill = Qinit;
     LUsym->Diag_map = Diag_map;
 
@@ -592,6 +535,7 @@ paru_symbolic *paru_analyze(
             umfpack_dl_azn_free_sw(&SW);
             return NULL;
         }
+
         Super[0] = 0;
         for (Int k = 1; k <= nf; k++)
         {
@@ -902,8 +846,8 @@ paru_symbolic *paru_analyze(
     {
         Pinv[Pinit[i]] = i;
     }
-    if (Diag_map[0] != -1)
-    // if (Diag_map)
+
+    if (Diag_map)
     {
         for (Int i = 0; i < m; i++)
         {
@@ -929,8 +873,7 @@ paru_symbolic *paru_analyze(
     PRLEVEL(PR, ("\n"));
 
     PR = -1;
-    // if (inv_Diag_map)
-    if (Diag_map[0] != -1)
+    if (inv_Diag_map)
     {
         PRLEVEL(PR, ("inv_Diag_map =\n"));
         for (Int i = 0; i < MIN(64, n); i++)
@@ -1070,8 +1013,7 @@ paru_symbolic *paru_analyze(
                     PRLEVEL(1, ("\tPs[%ld]= %ld\n", rowcount, srow));
                     Ps[rowcount] = srow;
                     Pinit[n1 + rowcount] = oldrow;
-                    if (Diag_map[0] != -1)
-                    // if  (Diag_map)
+                    if (Diag_map)
                     {
                         Int diag_col = inv_Diag_map[newrow];
                         ASSERT(diag_col >= n1);
@@ -1139,8 +1081,7 @@ paru_symbolic *paru_analyze(
     for (Int k = 0; k < rowcount; k++) PRLEVEL(PR, ("%ld ", Ps[k]));
     PRLEVEL(PR, ("\n"));
     PR = -1;
-    if (Diag_map[0] != -1)
-    // if (Diag_map)
+    if (Diag_map)
     {
         PRLEVEL(PR, ("Sym Diag_map (%ld) =\n", n));
         for (Int i = 0; i < MIN(64, n); i++) PRLEVEL(PR, ("%ld ", Diag_map[i]));
@@ -1525,6 +1466,7 @@ paru_symbolic *paru_analyze(
 
     for (Int f = 0; f < nf; f++)
     {
+        PR = 1;
         PRLEVEL(PR, ("%% Front %ld\n", f));
         PRLEVEL(PR, ("%% pivot columns [ %ld to %ld ] n: %ld \n", Super[f],
                      Super[f + 1] - 1, ns));
