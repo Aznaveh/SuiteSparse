@@ -7,7 +7,7 @@
  * @author Aznaveh
  */
 #include "paru_internal.hpp"
-#define MEM_CHUNK (1024 * 1024 * 128)  // hard coded chunk-size
+#define MEM_CHUNK (1024 * 1024 )  // hard coded chunk-size
 
 void paru_memcpy(void *destination, const void *source, size_t num)
 {
