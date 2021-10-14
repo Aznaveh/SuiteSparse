@@ -136,7 +136,7 @@ paru_symbolic *paru_analyze(
 
         nfr,  // The number of frontam matrices; nf in SPQR analysis
 
-        //nchains,  // The frontal matrices are related to one another by the
+        // nchains,  // The frontal matrices are related to one another by the
         // supernodal column elimination tree. Each nod in this tree
         // is one frontal matrix. The tree is partitioned into a set
         // of disjoint paths, and a frontal matrix chaing is one path
@@ -195,36 +195,36 @@ paru_symbolic *paru_analyze(
         // with no entries
 
         *Front_parent;  // size = n_col +1;  actual size = nfr+1
-        // NOTE: This is not the case for SPQR
-        // Parent is the one I should use instead.
+    // NOTE: This is not the case for SPQR
+    // Parent is the one I should use instead.
 
-        // *Front_1strow,  // size = n_col +1;  actual size = nfr+1
-        // Front_1strow [k] is the row index of the first row in
-        // A (P,Q) whose leftmost entry is in pivot column for
-        // kth front.
-        // This is necessary only to properly factorize singular
-        // matrices. Rows in the range Front_1strow [k] to
-        // Front_1strow [k+1]-1 first become pivot row candidate
-        // at the kth front. Any rows not eliminated in the kth
-        // front maybe selected as pivot rows in the parent of k
-        // (Front_1strow [k]) and so on up the tree.
-        // Aznaveh: I am now using it at least for the rowMarks.
+    // *Front_1strow,  // size = n_col +1;  actual size = nfr+1
+    // Front_1strow [k] is the row index of the first row in
+    // A (P,Q) whose leftmost entry is in pivot column for
+    // kth front.
+    // This is necessary only to properly factorize singular
+    // matrices. Rows in the range Front_1strow [k] to
+    // Front_1strow [k+1]-1 first become pivot row candidate
+    // at the kth front. Any rows not eliminated in the kth
+    // front maybe selected as pivot rows in the parent of k
+    // (Front_1strow [k]) and so on up the tree.
+    // Aznaveh: I am now using it at least for the rowMarks.
 
-        // *Front_leftmostdesc,  // size = n_col +1;  actual size = nfr+1
-        // Aznaveh: I have a module computing leftmostdesc
-        // for my augmented tree; so maybe do not need it
+    // *Front_leftmostdesc,  // size = n_col +1;  actual size = nfr+1
+    // Aznaveh: I have a module computing leftmostdesc
+    // for my augmented tree; so maybe do not need it
 
-        //*Chain_start,  // size = n_col +1;  actual size = nfr+1
-        // The kth frontal matrix chain consists of frontal
-        // matrices Chain_start [k] through Chain_start [k+1]-1.
-        // Thus, Chain_start [0] is always 0 and
-        // Chain_start[nchains] is the total number of frontal
-        // matrices, nfr. For two adjacent fornts f and f+1
-        // within a single chian, f+1 is always the parent of f
-        // (that is, Front_parent [f] = f+1).
-        //
-        // *Chain_maxrows,  // size = n_col +1;  actual size = nfr+1
-        // *Chain_maxcols;  // The kth frontal matrix chain requires a single
+    //*Chain_start,  // size = n_col +1;  actual size = nfr+1
+    // The kth frontal matrix chain consists of frontal
+    // matrices Chain_start [k] through Chain_start [k+1]-1.
+    // Thus, Chain_start [0] is always 0 and
+    // Chain_start[nchains] is the total number of frontal
+    // matrices, nfr. For two adjacent fornts f and f+1
+    // within a single chian, f+1 is always the parent of f
+    // (that is, Front_parent [f] = f+1).
+    //
+    // *Chain_maxrows,  // size = n_col +1;  actual size = nfr+1
+    // *Chain_maxcols;  // The kth frontal matrix chain requires a single
     // working array of dimension Chain_maxrows [k] by
     // Chain_maxcols [k], for the unifrontal technique that
     // factorizes the frontal matrix chain. Since the
@@ -385,7 +385,7 @@ paru_symbolic *paru_analyze(
     n1 = Sym_umf->n1;
     Int anz = Sym_umf->nz;
     nfr = Sym_umf->nfr;
-    //nchains = Sym_umf->nchains;
+    // nchains = Sym_umf->nchains;
     Int cs1 = Sym_umf->n1c;
     Int rs1 = Sym_umf->n1r;
 
@@ -396,18 +396,18 @@ paru_symbolic *paru_analyze(
     Front_npivcol = Sym_umf->Front_npivcol;
     Front_parent = Sym_umf->Front_parent;
 
-    //Chain_start = Sym_umf->Chain_start;
-    //Chain_maxrows = Sym_umf->Chain_maxrows;
-    //Chain_maxcols = Sym_umf->Chain_maxcols;
+    // Chain_start = Sym_umf->Chain_start;
+    // Chain_maxrows = Sym_umf->Chain_maxrows;
+    // Chain_maxcols = Sym_umf->Chain_maxcols;
 
     Sym_umf->Diagonal_map = NULL;
     Sym_umf->Rperm_init = NULL;
     Sym_umf->Cperm_init = NULL;
     Sym_umf->Front_npivcol = NULL;
     Sym_umf->Front_parent = NULL;
-    //Sym_umf->Chain_start = NULL;
-    //Sym_umf->Chain_maxrows = NULL;
-    //Sym_umf->Chain_maxcols = NULL;
+    // Sym_umf->Chain_start = NULL;
+    // Sym_umf->Chain_maxrows = NULL;
+    // Sym_umf->Chain_maxcols = NULL;
 
 #ifndef NDEBUG
     PR = 1;
@@ -417,7 +417,7 @@ paru_symbolic *paru_analyze(
                  nr, nc));
     PRLEVEL(PR, ("   with nz = %ld, number of fronts = %ld,\n", anz, nfr));
     PR = 1;
-    //PRLEVEL(PR, ("   number of frontal matrix chains = %ld\n", nchains));
+    // PRLEVEL(PR, ("   number of frontal matrix chains = %ld\n", nchains));
 
     PRLEVEL(1, ("\nPivot columns in each front, and parent of each front:\n"));
     Int k = 0;
@@ -446,13 +446,15 @@ paru_symbolic *paru_analyze(
                  k));
 
     PRLEVEL(PR, ("\nFrontal matrix chains:\n"));
-//    for (Int j = 0; j < nchains; j++)
-//    {
-//        PRLEVEL(PR, ("Frontal matrices %ld to %ld in chain\n", Chain_start[j],
-//                     Chain_start[j + 1] - 1));
-//        PRLEVEL(PR, ("\tworking array of size %ld-by-%ld\n", Chain_maxrows[j],
-//                     Chain_maxcols[j]));
-//    }
+    //    for (Int j = 0; j < nchains; j++)
+    //    {
+    //        PRLEVEL(PR, ("Frontal matrices %ld to %ld in chain\n",
+    //        Chain_start[j],
+    //                     Chain_start[j + 1] - 1));
+    //        PRLEVEL(PR, ("\tworking array of size %ld-by-%ld\n",
+    //        Chain_maxrows[j],
+    //                     Chain_maxcols[j]));
+    //    }
 
     PRLEVEL(PR, ("Forthwith Pinit =\n"));
     for (Int i = 0; i < MIN(64, m); i++) PRLEVEL(PR, ("%ld ", Pinit[i]));
@@ -486,9 +488,9 @@ paru_symbolic *paru_analyze(
     LUsym->anz = anz;
     Int nf = LUsym->nf = nfr;
 
-    //LUsym->Chain_start = Chain_start;
-    //LUsym->Chain_maxrows = Chain_maxrows;
-    //LUsym->Chain_maxcols = Chain_maxcols;
+    // LUsym->Chain_start = Chain_start;
+    // LUsym->Chain_maxrows = Chain_maxrows;
+    // LUsym->Chain_maxcols = Chain_maxcols;
     LUsym->Qfill = Qinit;
     LUsym->Diag_map = Diag_map;
 
@@ -537,11 +539,14 @@ paru_symbolic *paru_analyze(
         }
 
         Super[0] = 0;
+        Int sum = 0;
         for (Int k = 1; k <= nf; k++)
         {
-            Super[k] = Front_npivcol[k - 1];
+            sum += Front_npivcol[k - 1];
+            Super[k] = sum;
+            // Super[k] = Front_npivcol[k - 1];
         }
-        paru_cumsum(nf + 1, Super);
+        // paru_cumsum(nf + 1, Super);
     }
 
     /* ---------------------------------------------------------------------- */
@@ -1466,7 +1471,6 @@ paru_symbolic *paru_analyze(
 
     for (Int f = 0; f < nf; f++)
     {
-        PR = 1;
         PRLEVEL(PR, ("%% Front %ld\n", f));
         PRLEVEL(PR, ("%% pivot columns [ %ld to %ld ] n: %ld \n", Super[f],
                      Super[f + 1] - 1, ns));
