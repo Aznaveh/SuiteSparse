@@ -51,24 +51,23 @@ ParU_ResultCode paru_do_fronts(Int f, paru_matrix *paruMatInfo)
         if (Childp[f + 1] - Childp[f] > 100)
             PRLEVEL(1,("%% lots of children here\n"));
 #endif
-        //#pragma omp taskgroup
+        #pragma omp taskgroup
         for (Int i = Childp[f]; i <= Childp[f + 1] - 1; i++)
         {
-            //   #pragma omp task default(none) shared(paruMatInfo, Child, info)
-            //   firstprivate(i)
+            #pragma omp task default(none) shared(paruMatInfo, Child, info) firstprivate(i)
             {
                 ParU_ResultCode myInfo = paru_do_fronts(Child[i], paruMatInfo);
                 if (myInfo != PARU_SUCCESS)
                 {
                     PRLEVEL(1, ("%% A problem happend in %ld\n", i));
                     info = myInfo;
-                    //#pragma omp cancel taskgroup
+                    #pragma omp cancel taskgroup
                     // return info;
                 }
             }
         }
         // I could also use it but it doesnt work with cancel
-        //#pragma omp taskwait
+        #pragma omp taskwait
         info = paru_front(f, paruMatInfo);
         if (info != PARU_SUCCESS)
         {
@@ -126,7 +125,7 @@ ParU_ResultCode paru_factorize(cholmod_sparse *A, paru_symbolic *LUsym,
          #pragma omp single nowait
          if (Parent[i] == -1)
          {
-      #pragma omp task default(none) shared(paruMatInfo, info) firstprivate(i)
+        #pragma omp task default(none) shared(paruMatInfo, info) firstprivate(i)
              {
                  ParU_ResultCode myInfo = paru_do_fronts(i, paruMatInfo);
                  if (myInfo != PARU_SUCCESS)

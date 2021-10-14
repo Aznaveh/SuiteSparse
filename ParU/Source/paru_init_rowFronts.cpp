@@ -242,9 +242,9 @@ ParU_ResultCode paru_init_rowFronts(
 
     ParU_ResultCode info;
     info = PARU_SUCCESS;
-    //#pragma omp parallel shared (info)
+    #pragma omp parallel shared (info)
     {
-        //#pragma omp for
+        #pragma omp for
         for (Int row = 0; row < m; row++)
         {
             Int e = LUsym->row2atree[row];
@@ -265,8 +265,8 @@ ParU_ResultCode paru_init_rowFronts(
                 paru_freemat(&paruMatInfo);
                 printf("Paru: Out of memory: curEl\n");
                 info = PARU_OUT_OF_MEMORY;
-                //#pragma omp cancel for
-                return PARU_OUT_OF_MEMORY;
+                #pragma omp cancel for
+                //return PARU_OUT_OF_MEMORY;
             }
 
             rowMark[e] = 0;
@@ -295,8 +295,8 @@ ParU_ResultCode paru_init_rowFronts(
                 paru_freemat(&paruMatInfo);
                 printf("Paru: out of memory, RowList[row].list \n");
                 info = PARU_OUT_OF_MEMORY;
-                //#pragma omp cancel for
-                return PARU_OUT_OF_MEMORY;
+                #pragma omp cancel for
+                //return PARU_OUT_OF_MEMORY;
             }
             RowList[row].numTuple = 0;
             RowList[row].len = slackRow;
@@ -309,8 +309,8 @@ ParU_ResultCode paru_init_rowFronts(
                 paru_freemat(&paruMatInfo);
                 printf("Paru: out of memory, add_rowTuple \n");
                 info = PARU_OUT_OF_MEMORY;
-                //#pragma omp cancel for
-                return PARU_OUT_OF_MEMORY;
+                #pragma omp cancel for
+                //return PARU_OUT_OF_MEMORY;
             }
 
             // Allocating elements
