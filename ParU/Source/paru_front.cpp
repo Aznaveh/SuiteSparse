@@ -114,8 +114,14 @@ ParU_ResultCode paru_front(Int f,  // front need to be assembled
     Int zero_piv_rows = 0;  // If there are zero rows is
                             // importiant for Exit point
     PRLEVEL(1, ("%% Next: work on pivotal column assembly\n"));
-    paru_pivotal(pivotal_elements, panel_row, zero_piv_rows, f, hi,
-                 paruMatInfo);
+    ParU_ResultCode res_pivotal;
+    res_pivotal =  paru_pivotal(pivotal_elements, panel_row, zero_piv_rows, 
+            f, hi, paruMatInfo);
+    if (res_pivotal == PARU_OUT_OF_MEMORY)
+    {
+        printf("Paru: out of memory making pivotal of front %ld\n", f);
+        return PARU_OUT_OF_MEMORY;
+    }
     PRLEVEL(1, ("%% Done: work on pivotal column assembly\n"));
 
     Int rowCount = paruMatInfo->frowCount[f];

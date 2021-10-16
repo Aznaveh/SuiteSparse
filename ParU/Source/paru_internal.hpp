@@ -191,7 +191,7 @@ ParU_ResultCode paru_init_rowFronts(paru_matrix **paruMatInfo_handle,
                                     cholmod_sparse *A, paru_symbolic *LUsym);
 ParU_ResultCode paru_front(Int f, paru_matrix *paruMatInfo);
 
-void paru_pivotal(std::vector<Int> &pivotal_elements,
+ParU_ResultCode paru_pivotal(std::vector<Int> &pivotal_elements,
                   std::vector<Int> &panel_row, Int &zero_piv_rows, Int f,
                   heaps_info &hi, paru_matrix *paruMatInfo);
 

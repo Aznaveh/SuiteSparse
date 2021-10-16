@@ -12,9 +12,9 @@
  */
 #include "paru_internal.hpp"
 
-void paru_pivotal(std::vector<Int> &pivotal_elements,
-                  std::vector<Int> &panel_row, Int &zero_piv_rows, Int f,
-                  heaps_info &hi, paru_matrix *paruMatInfo)
+ParU_ResultCode paru_pivotal(std::vector<Int> &pivotal_elements,
+                             std::vector<Int> &panel_row, Int &zero_piv_rows,
+                             Int f, heaps_info &hi, paru_matrix *paruMatInfo)
 {
     DEBUGLEVEL(0);
     paru_symbolic *LUsym = paruMatInfo->LUsym;
@@ -365,14 +365,12 @@ void paru_pivotal(std::vector<Int> &pivotal_elements,
 
     double *pivotalFront = (double *)paru_calloc(rowCount * fp, sizeof(double));
 
-    if (pivotalFront == NULL)
+    if (pivotalFront == NULL || frowList == NULL )
     {
         printf(
             "Paru: 0ut of memory when tried to allocate for pivotal part %ld",
             f);
-        // TODO: check here for possible memory leak
-        // paru_free ( num_panels, sizeof (Int), panel_row);
-        return;
+        return PARU_OUT_OF_MEMORY;
     }
 
 #ifndef NDEBUG
@@ -530,4 +528,5 @@ void paru_pivotal(std::vector<Int> &pivotal_elements,
 
     rowMarkp[eli] += rowCount;
     PRLEVEL(1, ("%% rowMarkp[%ld] =%ld\n", eli, rowMarkp[eli]));
+    return PARU_SUCCESS;
 }
