@@ -230,7 +230,7 @@ void paru_insert_hash(Int key, Int value, std::vector<Int> &colHash);
 Int paru_find_hash(Int key, std::vector<Int> &colHash, Int *fcolList);
 
 // permutation stuff for the solver
-void paru_perm(paru_matrix *paruMatInfo);
+ParU_ResultCode paru_perm(paru_matrix *paruMatInfo);
 Int paru_apply_inv_perm(const Int *P, const double *b, double *x, Int m);
 Int paru_apply_perm_scale(const Int *P, const double *s, const double *b,
                           double *x, Int m);

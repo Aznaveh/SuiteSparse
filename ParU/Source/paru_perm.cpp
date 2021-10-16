@@ -38,13 +38,13 @@
  * @author Aznaveh
  * */
 #include "paru_internal.hpp"
-void paru_perm(paru_matrix *paruMatInfo)
+ParU_ResultCode paru_perm(paru_matrix *paruMatInfo)
 {
     DEBUGLEVEL(0);
     paru_symbolic *LUsym = paruMatInfo->LUsym;
 
     if (LUsym->Pfin != NULL)  // it must have been computed
-        return;
+        return PARU_SUCCESS;
     Int nf = LUsym->nf;
 
     Int m = LUsym->m;
@@ -63,7 +63,7 @@ void paru_perm(paru_matrix *paruMatInfo)
     if (Pfin == NULL || Ps == NULL)
     {
         printf("Paru: memory problem inside perm\n");
-        return;
+        return PARU_OUT_OF_MEMORY;
     }
 
 #ifndef NDEBUG
@@ -120,6 +120,7 @@ void paru_perm(paru_matrix *paruMatInfo)
     }
     PRLEVEL(PR, (" \n"));
 #endif
+    return PARU_SUCCESS;
 }
 
 ///////////////apply inverse perm x = b(pinv) //////////////////////////////////

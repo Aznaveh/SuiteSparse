@@ -368,7 +368,7 @@ ParU_ResultCode paru_pivotal(std::vector<Int> &pivotal_elements,
     if (pivotalFront == NULL || frowList == NULL )
     {
         printf(
-            "Paru: 0ut of memory when tried to allocate for pivotal part %ld",
+            "Paru: 0ut of memory when tried to allocate for pivotal part %ld\n",
             f);
         return PARU_OUT_OF_MEMORY;
     }

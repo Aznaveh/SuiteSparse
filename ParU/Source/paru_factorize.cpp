@@ -54,7 +54,8 @@ ParU_ResultCode paru_do_fronts(Int f, paru_matrix *paruMatInfo)
         #pragma omp taskgroup
         for (Int i = Childp[f]; i <= Childp[f + 1] - 1; i++)
         {
-            #pragma omp task default(none) shared(paruMatInfo, Child, info) firstprivate(i)
+            #pragma omp task default(none) shared(paruMatInfo, Child, info) \
+                firstprivate(i)
             {
                 ParU_ResultCode myInfo = paru_do_fronts(Child[i], paruMatInfo);
                 if (myInfo != PARU_SUCCESS)
@@ -156,7 +157,14 @@ ParU_ResultCode paru_factorize(cholmod_sparse *A, paru_symbolic *LUsym,
     //        return info;
     //    }
     //}
-    paru_perm(paruMatInfo);  // to form the final permutation
+    info = paru_perm(paruMatInfo);  // to form the final permutation
+
+    if (info == PARU_OUT_OF_MEMORY)
+    {
+        printf ("Paru: memory problem after factorizaiton, in perumutaion.\n");
+        return info;
+    }
+
     paruMatInfo->my_time = omp_get_wtime() - my_start_time;
 
     return PARU_SUCCESS;
