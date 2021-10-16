@@ -83,6 +83,7 @@ int main(int argc, char **argv)
     //~~~~~~~~~~~~~~~~~~~End computation~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     //~~~~~~~~~~~~~~~~~~~Calling umfpack~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    double umf_time = 0;
 
 #if 1
     double umf_start_time = omp_get_wtime();
@@ -119,7 +120,7 @@ int main(int argc, char **argv)
         printf("umfpack_dl_numeric failed\n");
     }
 
-    double umf_time = omp_get_wtime() - umf_start_time;
+    umf_time = omp_get_wtime() - umf_start_time;
     umfpack_dl_free_symbolic(&Symbolic);
     umfpack_dl_free_numeric(&Numeric);
 #endif
@@ -135,7 +136,7 @@ int main(int argc, char **argv)
         res_file = fopen(res_name, "a");
         if (res_file == NULL)
         {
-            printf("Paru: error in making %s to write the results!\n",
+            printf("Par: error in making %s to write the results!\n",
                    res_name);
         }
         fprintf(res_file, "%ld %ld %lf %lf %lf\n", LUsym->m, LUsym->anz,
