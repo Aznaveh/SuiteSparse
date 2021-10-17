@@ -32,9 +32,10 @@ void paru_check_prior_element(Int e, Int f, Int start_fac,
         paru_assemble_rows(e, f, colHash, paruMatInfo);
     }
 }
-void paru_make_heap(Int f, Int start_fac, std::vector<Int> &pivotal_elements,
-                    heaps_info &hi, std::vector<Int> &colHash,
-                    paru_matrix *paruMatInfo)
+ParU_ResultCode paru_make_heap(Int f, Int start_fac,
+                               std::vector<Int> &pivotal_elements,
+                               heaps_info &hi, std::vector<Int> &colHash,
+                               paru_matrix *paruMatInfo)
 {
     DEBUGLEVEL(0);
 #ifndef NDEBUG
@@ -162,7 +163,15 @@ void paru_make_heap(Int f, Int start_fac, std::vector<Int> &pivotal_elements,
     {
         PRLEVEL(p, ("Nothing in the heap. size of pivotal %ld \n",
                     pivotal_elements.size()));
-        std::vector<Int> *curHeap = heapList[eli] = new std::vector<Int>;
+        std::vector<Int> *curHeap; 
+        try
+        {
+            curHeap = heapList[eli] = new std::vector<Int>;
+        }
+        catch (std::bad_alloc const&)
+        {  // out of memory
+            return PARU_OUT_OF_MEMORY;
+        }
         // deep copy
         //*curHeap = pivotal_elements;
         // swap provides a shallow copy
@@ -191,10 +200,13 @@ void paru_make_heap(Int f, Int start_fac, std::vector<Int> &pivotal_elements,
         ASSERT(lacList[pelid] <= lacList[elid]);
     }
 #endif
+    return PARU_SUCCESS;
 }
 
-void paru_make_heap_empty_el(Int f, std::vector<Int> &pivotal_elements,
-                             heaps_info &hi, paru_matrix *paruMatInfo)
+ParU_ResultCode paru_make_heap_empty_el(Int f,
+                                        std::vector<Int> &pivotal_elements,
+                                        heaps_info &hi,
+                                        paru_matrix *paruMatInfo)
 {
     DEBUGLEVEL(0);
 #ifndef NDEBUG
@@ -318,7 +330,15 @@ void paru_make_heap_empty_el(Int f, std::vector<Int> &pivotal_elements,
     {
         PRLEVEL(p, ("Nothing in the heap. size of pivotal %ld \n",
                     pivotal_elements.size()));
-        std::vector<Int> *curHeap = heapList[eli] = new std::vector<Int>;
+        std::vector<Int> *curHeap; 
+        try
+        {
+            curHeap = heapList[eli] = new std::vector<Int>;
+        }
+        catch (std::bad_alloc const&)
+        {  // out of memory
+            return PARU_OUT_OF_MEMORY;
+        }
         // deep copy
         //*curHeap = pivotal_elements;
         // swap provides a shallow copy
@@ -346,4 +366,5 @@ void paru_make_heap_empty_el(Int f, std::vector<Int> &pivotal_elements,
         ASSERT(lacList[pelid] <= lacList[elid]);
     }
 #endif
+    return PARU_SUCCESS;
 }

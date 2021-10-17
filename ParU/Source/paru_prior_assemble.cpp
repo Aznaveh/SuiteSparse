@@ -8,10 +8,10 @@
 
 #include "paru_internal.hpp"
 
-void paru_prior_assemble(Int f, Int start_fac,
-                         std::vector<Int> &pivotal_elements,
-                         std::vector<Int> &colHash, heaps_info &hi,
-                         paru_matrix *paruMatInfo)
+ParU_ResultCode paru_prior_assemble(Int f, Int start_fac,
+                                    std::vector<Int> &pivotal_elements,
+                                    std::vector<Int> &colHash, heaps_info &hi,
+                                    paru_matrix *paruMatInfo)
 {
     DEBUGLEVEL(0);
 
@@ -108,14 +108,17 @@ void paru_prior_assemble(Int f, Int start_fac,
     /************ Making the heap from list of the immediate children
      * ******/
     PRLEVEL(1, ("%% Next: work on the heap \n"));
-    paru_make_heap(f, start_fac, pivotal_elements, hi, colHash, paruMatInfo);
+    ParU_ResultCode res_make_heap;
+    res_make_heap = paru_make_heap(f, start_fac, pivotal_elements, hi, colHash,
+                                   paruMatInfo);
+    if (res_make_heap != PARU_SUCCESS) return res_make_heap;
     PRLEVEL(1, ("%% Done: work on the heap \n"));
 
     Int eli = snM[f];
     std::vector<Int> **heapList = paruMatInfo->heapList;
     std::vector<Int> *curHeap = heapList[eli];
 
-    if (curHeap->empty()) return;
+    if (curHeap->empty()) return PARU_SUCCESS;
 
 #ifndef NDEBUG
     p = 1;
@@ -156,4 +159,5 @@ void paru_prior_assemble(Int f, Int start_fac,
     }
 
 #endif
+    return PARU_SUCCESS;
 }

@@ -170,8 +170,10 @@ void paru_free(size_t n, size_t size, void *p)
 void *operator new(size_t size)
 {  // no inline, required by [replacement.functions]/3
     DEBUGLEVEL(0);
+#ifndef NDEBUG
     static Int cpp_count = 0;
     cpp_count += size;
+#endif
 
     PRLEVEL(1, ("global op new called, size = %zu tot=%ld\n", size, cpp_count));
     if (size == 0)

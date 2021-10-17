@@ -242,7 +242,7 @@ ParU_ResultCode paru_init_rowFronts(
 
     ParU_ResultCode info;
     info = PARU_SUCCESS;
-    #pragma omp parallel shared (info)
+    #pragma omp parallel shared(info)
     {
         #pragma omp for
         for (Int row = 0; row < m; row++)
@@ -253,8 +253,8 @@ ParU_ResultCode paru_init_rowFronts(
                         Sp[row];  // nrows and ncols of current front/row
             PRLEVEL(1, ("%% element %ld = %ld x %ld\n", e, nrows, ncols));
 
-            ASSERT (nrows > 0);
-            ASSERT (ncols > 0);
+            ASSERT(nrows > 0);
+            ASSERT(ncols > 0);
 
             row_degree_bound[row] = ncols;  // Initialzing row degree
 
@@ -266,15 +266,27 @@ ParU_ResultCode paru_init_rowFronts(
                 printf("Paru: Out of memory: curEl\n");
                 info = PARU_OUT_OF_MEMORY;
                 #pragma omp cancel for
-                //return PARU_OUT_OF_MEMORY;
+                // return PARU_OUT_OF_MEMORY;
             }
 
             rowMark[e] = 0;
 
-            // My new is calling paru_alloc now; so there is no need
+            // My new is calling paru_alloc
             std::vector<Int> *curHeap;
-            curHeap = paruMatInfo->heapList[e] = new std::vector<Int>;
+            try
+            {
+                curHeap = paruMatInfo->heapList[e] = new std::vector<Int>;
+            }
+            catch (std::bad_alloc const&)
+            {  // out of memory
+                paru_freemat(&paruMatInfo);
+                printf("Paru: Out of memory: curHeap\n");
+                info = PARU_OUT_OF_MEMORY;
+                #pragma omp cancel for
+                // return PARU_OUT_OF_MEMORY;
+            }
             PRLEVEL(1, ("%%Heap allocated %p id=%ld \n", curHeap, e));
+
             curHeap->push_back(e);
 
 #ifndef NDEBUG  // Printing the pointers info
@@ -296,7 +308,7 @@ ParU_ResultCode paru_init_rowFronts(
                 printf("Paru: out of memory, RowList[row].list \n");
                 info = PARU_OUT_OF_MEMORY;
                 #pragma omp cancel for
-                //return PARU_OUT_OF_MEMORY;
+                // return PARU_OUT_OF_MEMORY;
             }
             RowList[row].numTuple = 0;
             RowList[row].len = slackRow;
@@ -310,7 +322,7 @@ ParU_ResultCode paru_init_rowFronts(
                 printf("Paru: out of memory, add_rowTuple \n");
                 info = PARU_OUT_OF_MEMORY;
                 #pragma omp cancel for
-                //return PARU_OUT_OF_MEMORY;
+                // return PARU_OUT_OF_MEMORY;
             }
 
             // Allocating elements

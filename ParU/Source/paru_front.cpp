@@ -61,8 +61,8 @@ ParU_ResultCode paru_front(Int f,  // front need to be assembled
     Int *frowList = (Int *)paru_alloc(fm, sizeof(Int));
     if (frowList == NULL)
     {
-        printf(
-            "Paru: out of memory when tried to allocate for frowList %ld\n", f);
+        printf("Paru: out of memory when tried to allocate for frowList %ld\n",
+               f);
         return PARU_OUT_OF_MEMORY;
     }
     paruMatInfo->frowList[f] = frowList;
@@ -115,8 +115,8 @@ ParU_ResultCode paru_front(Int f,  // front need to be assembled
                             // importiant for Exit point
     PRLEVEL(1, ("%% Next: work on pivotal column assembly\n"));
     ParU_ResultCode res_pivotal;
-    res_pivotal =  paru_pivotal(pivotal_elements, panel_row, zero_piv_rows, 
-            f, hi, paruMatInfo);
+    res_pivotal = paru_pivotal(pivotal_elements, panel_row, zero_piv_rows, f,
+                               hi, paruMatInfo);
     if (res_pivotal == PARU_OUT_OF_MEMORY)
     {
         printf("Paru: out of memory making pivotal of front %ld\n", f);
@@ -280,8 +280,8 @@ ParU_ResultCode paru_front(Int f,  // front need to be assembled
         if (zero_piv_rows > 0)
         {
             // make the heap and return
-            paru_make_heap_empty_el(f, pivotal_elements, hi, paruMatInfo);
-            return PARU_SUCCESS;
+            return paru_make_heap_empty_el(f, pivotal_elements, hi,
+                                           paruMatInfo);
         }
         else
         {
@@ -527,10 +527,10 @@ ParU_ResultCode paru_front(Int f,  // front need to be assembled
         if (zero_piv_rows > 0)
         {
             // keep the heap and do it for the parent.
-            paru_make_heap_empty_el(f, pivotal_elements, hi, paruMatInfo);
+            return paru_make_heap_empty_el(f, pivotal_elements, hi,
+                                           paruMatInfo);
             // There are stuff left from in zero
             // then return
-            return PARU_SUCCESS;
         }
         else
         {
@@ -607,8 +607,10 @@ ParU_ResultCode paru_front(Int f,  // front need to be assembled
 
     // paruMatInfo->time_stamp[f]++; //invalidating all the marks
     PRLEVEL(-1, ("\n%%||||  Start Finalize %ld ||||\n", f));
-    paru_prior_assemble(f, start_fac, pivotal_elements, colHash, hi,
+    ParU_ResultCode res_prior;
+    res_prior = paru_prior_assemble(f, start_fac, pivotal_elements, colHash, hi,
                         paruMatInfo);
+    if (res_prior != PARU_SUCCESS) return res_prior;
     PRLEVEL(-1, ("\n%%||||  Finish Finalize %ld ||||\n", f));
 
     ////////////////////////////////////////////////////////////////////////////
