@@ -29,7 +29,7 @@ ParU_ResultCode paru_front(Int f,  // front need to be assembled
     /* get the front F  */
     /* ---------------------------------------------------------------------- */
 
-    PRLEVEL(-1, ("%%~~~~~~~  Assemble Front %ld start ~~~~\n", f));
+    PRLEVEL(-2, ("%%~~~~~~~  Assemble Front %ld start ~~~~\n", f));
     /* pivotal columns Super [f] ... Super [f+1]-1 */
     Int col1 = Super[f]; /* fornt F has columns col1:col2-1 */
     Int col2 = Super[f + 1];
@@ -280,6 +280,7 @@ ParU_ResultCode paru_front(Int f,  // front need to be assembled
         if (zero_piv_rows > 0)
         {
             // make the heap and return
+            PRLEVEL(-2, ("%%~~~~~~~Assemble Front %ld finished~~~1\n", f));
             return paru_make_heap_empty_el(f, pivotal_elements, hi,
                                            paruMatInfo);
         }
@@ -290,6 +291,7 @@ ParU_ResultCode paru_front(Int f,  // front need to be assembled
             delete curHeap;
             paruMatInfo->heapList[eli] = nullptr;
             PRLEVEL(1, ("%% pivotalFront =%p\n", pivotalFront));
+            PRLEVEL(-2, ("%%~~~~~~~Assemble Front %ld finished~~~2\n", f));
             return PARU_SUCCESS;
         }
     }
@@ -527,6 +529,7 @@ ParU_ResultCode paru_front(Int f,  // front need to be assembled
         if (zero_piv_rows > 0)
         {
             // keep the heap and do it for the parent.
+            PRLEVEL(-2, ("%%~~~~~~~Assemble Front %ld finished~~~3\n", f));
             return paru_make_heap_empty_el(f, pivotal_elements, hi,
                                            paruMatInfo);
             // There are stuff left from in zero
@@ -539,6 +542,7 @@ ParU_ResultCode paru_front(Int f,  // front need to be assembled
             PRLEVEL(1,
                     ("%%(2)Heap freed inside front %p id=%ld\n", curHeap, eli));
             PRLEVEL(1, ("%% pivotalFront =%p\n", pivotalFront));
+            PRLEVEL(-2, ("%%~~~~~~~Assemble Front %ld finished~~~4\n", f));
             return PARU_SUCCESS;
         }
     }
@@ -638,6 +642,6 @@ ParU_ResultCode paru_front(Int f,  // front need to be assembled
     PRLEVEL(1, ("%%rowCount =%ld  ", rowCount));
     PRLEVEL(1, ("colCount =%ld", colCount));
     PRLEVEL(1, ("fp =%ld;\n", fp));
-    PRLEVEL(1, ("%%~~~~~~~Assemble Front %ld finished\n", f));
+    PRLEVEL(-2, ("%%~~~~~~~Assemble Front %ld finished~~~5\n", f));
     return PARU_SUCCESS;
 }

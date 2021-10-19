@@ -10,13 +10,13 @@
  */
 
 #include "paru_internal.hpp"
-#define TASK_FL_THRESHOLD 1024 * 1024
+#define TASK_FL_THRESHOLD 1024 
 
 ParU_ResultCode paru_do_fronts(Int f, paru_matrix *paruMatInfo)
 // This routine call paru_front from first(f)...f including f
 // This routine is called recursively to make tasks
 {
-    DEBUGLEVEL(0);
+    DEBUGLEVEL(1);
     paru_symbolic *LUsym = paruMatInfo->LUsym;
     ParU_ResultCode info;
 
@@ -32,7 +32,7 @@ ParU_ResultCode paru_do_fronts(Int f, paru_matrix *paruMatInfo)
         ASSERT(first[f] >= 0);
         for (Int i = first[f]; i <= f; i++)
         {
-            PRLEVEL(1, ("%% Wroking on front %ld\n", i));
+            PRLEVEL(2, ("%% Wroking on front %ld\n", i));
             info = paru_front(i, paruMatInfo);
             if (info != PARU_SUCCESS)
             {
@@ -60,7 +60,7 @@ ParU_ResultCode paru_do_fronts(Int f, paru_matrix *paruMatInfo)
                 ParU_ResultCode myInfo = paru_do_fronts(Child[i], paruMatInfo);
                 if (myInfo != PARU_SUCCESS)
                 {
-                    PRLEVEL(1, ("%% A problem happend in %ld\n", i));
+                    //PRLEVEL(1, ("%% A problem happend in %ld\n", i));
                     info = myInfo;
                     #pragma omp cancel taskgroup
                     // return info;
@@ -82,7 +82,7 @@ ParU_ResultCode paru_do_fronts(Int f, paru_matrix *paruMatInfo)
 ParU_ResultCode paru_factorize(cholmod_sparse *A, paru_symbolic *LUsym,
                                paru_matrix **paruMatInfo_handle)
 {
-    DEBUGLEVEL(0);
+    DEBUGLEVEL(1);
     double my_start_time = omp_get_wtime();
     if (A == NULL)
     {
@@ -149,7 +149,8 @@ ParU_ResultCode paru_factorize(cholmod_sparse *A, paru_symbolic *LUsym,
     // The following code can be substituted in a sequential case
     //for (Int i = 0; i < nf; i++)
     //{
-    //    PRLEVEL(1, ("%% Wroking on front %ld\n", i));
+    //    if (i %1000 == 0) PRLEVEL(1, ("%% Wroking on front %ld\n", i));
+
     //    info = paru_front(i, paruMatInfo);
     //    if (info != PARU_SUCCESS)
     //    {
