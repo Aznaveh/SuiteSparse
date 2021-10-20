@@ -10,7 +10,7 @@
  */
 
 #include "paru_internal.hpp"
-#define TASK_FL_THRESHOLD 1024
+#define TASK_FL_THRESHOLD (double(1024 * 1024))
 
 ParU_ResultCode paru_do_fronts(Int f, paru_matrix *paruMatInfo)
 // This routine call paru_front from first(f)...f including f
