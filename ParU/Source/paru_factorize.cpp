@@ -10,7 +10,7 @@
  */
 
 #include "paru_internal.hpp"
-#define TASK_FL_THRESHOLD 1024 
+#define TASK_FL_THRESHOLD 1024
 
 ParU_ResultCode paru_do_fronts(Int f, paru_matrix *paruMatInfo)
 // This routine call paru_front from first(f)...f including f
@@ -28,7 +28,8 @@ ParU_ResultCode paru_do_fronts(Int f, paru_matrix *paruMatInfo)
     if (stree_flop_bound[f] < TASK_FL_THRESHOLD)
     {
         Int *first = LUsym->first;
-        PRLEVEL(1, ("%% Sequential %ld - %ld is small\n", first[f], f));
+        PRLEVEL(1, ("%% Sequential %ld - %ld is small (%lf)\n", first[f], f,
+                    stree_flop_bound[f]));
         ASSERT(first[f] >= 0);
         for (Int i = first[f]; i <= f; i++)
         {
@@ -47,20 +48,21 @@ ParU_ResultCode paru_do_fronts(Int f, paru_matrix *paruMatInfo)
         Int *Child = LUsym->Child;
 
 #ifndef NDEBUG
-        PRLEVEL(1, ("%% tasks are generating for children of %ld\n", f));
+        PRLEVEL(1, ("%% tasks are generating for children of %ld(%lf)\n", f,
+                    stree_flop_bound[f]));
         if (Childp[f + 1] - Childp[f] > 100)
-            PRLEVEL(1,("%% lots of children here\n"));
+            PRLEVEL(1, ("%% lots of children here\n"));
 #endif
         #pragma omp taskgroup
         for (Int i = Childp[f]; i <= Childp[f + 1] - 1; i++)
         {
-            #pragma omp task default(none) shared(paruMatInfo, Child, info) \
-                firstprivate(i)
+            #pragma omp task default(none) shared(paruMatInfo, Child, info)  \
+            firstprivate(i)
             {
                 ParU_ResultCode myInfo = paru_do_fronts(Child[i], paruMatInfo);
                 if (myInfo != PARU_SUCCESS)
                 {
-                    //PRLEVEL(1, ("%% A problem happend in %ld\n", i));
+                    // PRLEVEL(1, ("%% A problem happend in %ld\n", i));
                     info = myInfo;
                     #pragma omp cancel taskgroup
                     // return info;
@@ -106,9 +108,9 @@ ParU_ResultCode paru_factorize(cholmod_sparse *A, paru_symbolic *LUsym,
     Int nf = LUsym->nf;
 
     ParU_ResultCode info;
-    //printf ("Starting init row\n");
+    // printf ("Starting init row\n");
     info = paru_init_rowFronts(&paruMatInfo, A, LUsym);
-   //printf ("Finishing init row\n");
+    // printf ("Finishing init row\n");
     *paruMatInfo_handle = paruMatInfo;
 
     PRLEVEL(1, ("%% init_row is done\n"));
@@ -119,26 +121,30 @@ ParU_ResultCode paru_factorize(cholmod_sparse *A, paru_symbolic *LUsym,
     }
 
     // do_fronts generate a task parallel region
-     Int *Parent = LUsym->Parent;
-     #pragma omp taskgroup
-     for (Int i = 0; i < nf; i++)
-     {
-         #pragma omp single nowait
-         if (Parent[i] == -1)
-         {
-        #pragma omp task default(none) shared(paruMatInfo, info) firstprivate(i)
-             {
-                 ParU_ResultCode myInfo = paru_do_fronts(i, paruMatInfo);
-                 if (myInfo != PARU_SUCCESS)
-                 {
-                     //PRLEVEL(1, ("%% A problem happend in %ld\n", i));
-                     info = myInfo;
-                     #pragma omp cancel taskgroup
-                     // return info;
-                 }
-             }
-         }
-     }
+    Int *Parent = LUsym->Parent;
+    #pragma omp parallel
+    {
+        #pragma omp taskgroup
+        for (Int i = 0; i < nf; i++)
+        {
+            #pragma omp single nowait
+            if (Parent[i] == -1)
+            {
+                #pragma omp task default(none) shared(paruMatInfo, info) \
+                 firstprivate(i)
+                {
+                    ParU_ResultCode myInfo = paru_do_fronts(i, paruMatInfo);
+                    if (myInfo != PARU_SUCCESS)
+                    {
+                        // PRLEVEL(1, ("%% A problem happend in %ld\n", i));
+                        info = myInfo;
+                        #pragma omp cancel taskgroup
+                        // return info;
+                    }
+                }
+            }
+        }
+    }
 
     if (info != PARU_SUCCESS)
     {
@@ -147,7 +153,7 @@ ParU_ResultCode paru_factorize(cholmod_sparse *A, paru_symbolic *LUsym,
     }
 
     // The following code can be substituted in a sequential case
-    //for (Int i = 0; i < nf; i++)
+    // for (Int i = 0; i < nf; i++)
     //{
     //    if (i %1000 == 0) PRLEVEL(1, ("%% Wroking on front %ld\n", i));
 
@@ -162,7 +168,7 @@ ParU_ResultCode paru_factorize(cholmod_sparse *A, paru_symbolic *LUsym,
 
     if (info == PARU_OUT_OF_MEMORY)
     {
-        printf ("Paru: memory problem after factorizaiton, in perumutaion.\n");
+        printf("Paru: memory problem after factorizaiton, in perumutaion.\n");
         return info;
     }
 

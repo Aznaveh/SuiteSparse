@@ -713,8 +713,9 @@ paru_symbolic *paru_analyze(
     for (Int k = 0; k <= nf; k++) PRLEVEL(PR, ("  %ld", fmap[k]));
     PRLEVEL(PR, ("\n"));
 
+    PR = -1;
     PRLEVEL(PR, ("%%%% newParent:\n"));
-    for (Int k = 0; k <= newNf; k++) PRLEVEL(PR, ("  %ld", newParent[k]));
+    for (Int k = 0; k < newNf; k++) PRLEVEL(PR, ("  %ld", newParent[k]));
     PRLEVEL(PR, ("\n"));
 
 #endif
