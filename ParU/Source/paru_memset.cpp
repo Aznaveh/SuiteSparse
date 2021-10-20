@@ -19,7 +19,7 @@ void paru_memset(void* ptr, Int value, size_t num)
         size_t nchunks = 1 + (num / MEM_CHUNK);
 
         int64_t k;
-        #pragma omp taskloop private(k) num_tasks(nchunks)
+        #pragma omp parallel for schedule(dynamic,1)
         for (k = 0; k < (int64_t)nchunks; k++)
         {
             size_t start = k * MEM_CHUNK;

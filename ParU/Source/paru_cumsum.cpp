@@ -28,12 +28,12 @@ Int paru_cumsum(Int n, Int *X)
     {
         #pragma omp single
         {
-        #pragma omp task shared(sum)
+            #pragma omp task shared(sum)
             sum = paru_cumsum(mid, X);
-        #pragma omp task 
+            #pragma omp task 
             paru_cumsum(n - mid, X+mid);
-        #pragma omp taskwait 
-        #pragma omp taskloop 
+            #pragma omp taskwait 
+            #pragma omp taskloop 
             for (int i = mid; i < n; i ++)
             {
                 X[i] += sum;
@@ -42,4 +42,3 @@ Int paru_cumsum(Int n, Int *X)
     }
     return X[n-1];
 }
-
