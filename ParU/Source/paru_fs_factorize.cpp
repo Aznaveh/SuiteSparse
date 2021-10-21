@@ -98,7 +98,7 @@ Int paru_panel_factorize(Int f, Int m, Int n, const Int panel_width,
                 row_max = i;
                 maxval = F[j * m + i];
             }
-            if (frowList[i] == row_diag)
+            if (frowList[i] == row_diag) //find diag
             {
                 PRLEVEL(1, ("%%Found it %2.4lf\n", F[j * m + i]));
                 // row_diag = i;
@@ -206,6 +206,7 @@ Int paru_panel_factorize(Int f, Int m, Int n, const Int panel_width,
         if (j < row_end - 1)
         {
             PRLEVEL(1, ("%% dscal\n"));
+            #pragma omp simd
             for (Int i = j + 1; i < row_end; i++)
             {
                 PRLEVEL(1, ("%%i=%ld value= %2.4lf", i, F[j * m + i]));

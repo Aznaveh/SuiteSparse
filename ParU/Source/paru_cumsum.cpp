@@ -24,11 +24,11 @@ Int paru_cumsum(Int n, Int *X)
     }
     Int mid = n/2;
     Int sum = 0;
-    #pragma omp parallel
+    #pragma omp parallel default(none) shared(sum, n, X) firstprivate(mid)
     {
         #pragma omp single
         {
-            #pragma omp task shared(sum)
+            #pragma omp task 
             sum = paru_cumsum(mid, X);
             #pragma omp task 
             paru_cumsum(n - mid, X+mid);
