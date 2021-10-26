@@ -473,8 +473,12 @@ Int paru_factorize_full_summed(Int f, Int start_fac,
 #endif
 
             // double start_time = omp_get_wtime();
-            BLAS_DGEMM("N", "N", &M, &N, &K, &alpha, A, &lda, B, &ldb, &beta, C,
-                       &ldc);
+            //BLAS_DGEMM("N", "N", &M, &N, &K, &alpha, A, &lda, B, &ldb, &beta, C,
+            //           &ldc);
+
+            paru_tasked_dgemm("N", "N", &M, &N, &K, &alpha, A,
+                    &lda, B, &ldb, &beta, C, &ldc);
+
             // double tot_time = omp_get_wtime() - start_time;
             // printf ("%ld  %lf ",f, tot_time);
             // printf ("%d %d %d ",M ,N, K);

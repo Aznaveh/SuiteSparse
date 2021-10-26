@@ -80,6 +80,7 @@ OBJ = \
 	paru_norms.o \
 	paru_Diag_update.o \
 	paru_full_summed.o \
+	paru_tasked_dgemm.o \
 
 $(OBJ): $(INC)
 
@@ -225,6 +226,9 @@ paru_Diag_update.o: ../Source/paru_Diag_update.cpp
 	$(C) -c $<
 
 paru_full_summed.o: ../Source/paru_full_summed.cpp
+	$(C) -c $<
+
+paru_tasked_dgemm.o: ../Source/paru_tasked_dgemm.cpp
 	$(C) -c $<
 
 
