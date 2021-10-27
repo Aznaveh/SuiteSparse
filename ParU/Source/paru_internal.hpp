@@ -163,8 +163,8 @@ void paru_assemble_row_2U(Int e, Int f, Int sR, Int dR,
                           std::vector<Int> &colHash, paru_matrix *paruMatInfo);
 
 Int paru_trsm(double *pF, double *uPart, Int fp, Int rowCount, Int colCount);
-Int paru_dgemm(double *pF, double *uPart, double *el, Int fp, Int rowCount,
-               Int colCount);
+Int paru_dgemm(Int f, double *pF, double *uPart, double *el, Int fp,
+               Int rowCount, Int colCount);
 
 void paru_print_element(paru_matrix *paruMatInfo, Int e);
 void paru_print_tupleList(tupleList *listSet, Int index);
@@ -195,9 +195,9 @@ int paru_intersection(Int e, paru_Element **elementList,
                       std::set<Int> &stl_colSet);
 
 ParU_ResultCode paru_prior_assemble(Int f, Int start_fac,
-                         std::vector<Int> &pivotal_elements,
-                         std::vector<Int> &colHash, heaps_info &hi,
-                         paru_matrix *paruMatInfo);
+                                    std::vector<Int> &pivotal_elements,
+                                    std::vector<Int> &colHash, heaps_info &hi,
+                                    paru_matrix *paruMatInfo);
 
 void paru_assemble_all(Int e, Int f, std::vector<Int> &colHash,
                        paru_matrix *paruMatInfo);
@@ -242,7 +242,8 @@ Int paru_gaxpy(cholmod_sparse *A, const double *x, double *y, double alpha);
 double paru_spm_1norm(cholmod_sparse *A);
 double paru_vec_1norm(const double *x, Int n);
 void paru_Diag_update(Int pivcol, Int pivrow, paru_matrix *paruMatInfo);
-void paru_tasked_dgemm (char *transa, char *transb, BLAS_INT *m, BLAS_INT *n,
-	BLAS_INT *k, double *alpha, double *A, BLAS_INT *lda, double *B,
-	BLAS_INT *ldb, double *beta, double *C, BLAS_INT *ldc) ;
+void paru_tasked_dgemm(Int f, char *transa, char *transb, BLAS_INT *m,
+                       BLAS_INT *n, BLAS_INT *k, double *alpha, double *A,
+                       BLAS_INT *lda, double *B, BLAS_INT *ldb, double *beta,
+                       double *C, BLAS_INT *ldc);
 #endif

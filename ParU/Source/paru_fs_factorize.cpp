@@ -476,7 +476,7 @@ Int paru_factorize_full_summed(Int f, Int start_fac,
             //BLAS_DGEMM("N", "N", &M, &N, &K, &alpha, A, &lda, B, &ldb, &beta, C,
             //           &ldc);
 
-            paru_tasked_dgemm("N", "N", &M, &N, &K, &alpha, A,
+            paru_tasked_dgemm(f, "N", "N", &M, &N, &K, &alpha, A,
                     &lda, B, &ldb, &beta, C, &ldc);
 
             // double tot_time = omp_get_wtime() - start_time;

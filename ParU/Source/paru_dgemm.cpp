@@ -21,8 +21,8 @@
 //	BLAS_INT *ldb, double *beta, double *C, BLAS_INT *ldc) ;
 //
 
-Int paru_dgemm(double *pF, double *uPart, double *el, Int fp, Int rowCount,
-               Int colCount)
+Int paru_dgemm(Int f, double *pF, double *uPart, double *el, Int fp, 
+        Int rowCount, Int colCount)
 {
     DEBUGLEVEL(0);
     PRLEVEL(1, ("%% rowCount =%ld  ", rowCount));
@@ -86,7 +86,7 @@ Int paru_dgemm(double *pF, double *uPart, double *el, Int fp, Int rowCount,
     //BLAS_DGEMM("N", "N", &mA, &nB, &nA, &alpha, pF + fp, &lda, uPart, &ldb,
     //           &beta, el, &ldc);
 
-    paru_tasked_dgemm("N", "N", &mA, &nB, &nA, &alpha, pF + fp, &lda, 
+    paru_tasked_dgemm(f, "N", "N", &mA, &nB, &nA, &alpha, pF + fp, &lda, 
             uPart, &ldb, &beta, el, &ldc);
 
 #ifndef NDEBUG
