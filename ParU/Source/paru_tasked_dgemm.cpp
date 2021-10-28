@@ -1,20 +1,21 @@
 ////////////////////////////////////////////////////////////////////////////////
 //////////////////////////  paru_tasked_dgemm //////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
-/*! @brief      a wrapper around  BLAS_DGEMM
+/*! @brief      a wrapper around  BLAS_DGEMM for tasking
  *
  *
  * @author Aznaveh
  */
 #include "paru_internal.hpp"
-#define L 128
+#define L 256
 void paru_tasked_dgemm(Int f, char *transa, char *transb, BLAS_INT *M,
                        BLAS_INT *N, BLAS_INT *K, double *alpha, double *A,
                        BLAS_INT *lda, double *B, BLAS_INT *ldb, double *beta,
                        double *C, BLAS_INT *ldc)
 {
-    DEBUGLEVEL(1);
+    DEBUGLEVEL(0);
     if (*M < L && *N < L)
+    //if (1)
     {
         PRLEVEL(1, ("%% No tasking for BLAS (%dx%d) in %ld\n", *M, *N, f));
         BLAS_DGEMM(transa, transb, M, N, K, alpha, A, lda, B, ldb, beta, C,
@@ -25,8 +26,8 @@ void paru_tasked_dgemm(Int f, char *transa, char *transb, BLAS_INT *M,
         PRLEVEL(1, ("%% YES tasking for BLAS (%dx%d) in %ld", *M, *N, f));
         Int num_col_blocks = (*M % L == 0) ? *M / L : *M / L + 1;
         Int num_row_blocks = (*N % L == 0) ? *N / L : *N / L + 1;
-        PRLEVEL(1, ("%% col-blocks=%ld,row-blocks=%ld) \n", 
-                    num_col_blocks, num_row_blocks));
+        PRLEVEL(1, ("%% col-blocks=%ld,row-blocks=%ld) \n", num_col_blocks,
+                    num_row_blocks));
         #pragma omp parallel
         {
             #pragma omp single
@@ -41,12 +42,11 @@ void paru_tasked_dgemm(Int f, char *transa, char *transb, BLAS_INT *M,
                         PRLEVEL(1, ("%% I=%ld J=%ld m=%ld n=%ld in %ld\n", I, J,
                                     m, n, f));
                         #pragma omp task
-                        BLAS_DGEMM(transa, transb, &m, &n, K, alpha, A + (I * L),
-                                   lda, B + (J * *K * L), ldb, beta,
-                                   C + (J * *M * L + I * L), ldc);
+                        BLAS_DGEMM(transa, transb, &m, &n, K, alpha,
+                                   A + (I * L), lda, B + (J * *ldb * L), ldb,
+                                   beta, C + (J * *ldc * L + I * L), ldc);
                     }
                 }
-
             }  // end of single region
         }      // end of parallel region
     }
