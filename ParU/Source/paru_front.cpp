@@ -469,7 +469,7 @@ ParU_ResultCode paru_front(Int f,  // front need to be assembled
 
     /**** 6 ****                     TRSM and DGEMM                         ***/
 
-    paru_trsm(pivotalFront, uPart, fp, rowCount, colCount);
+    paru_trsm(f, pivotalFront, uPart, fp, rowCount, colCount);
 
 #ifdef COUNT_FLOPS
     paruMatInfo->flp_cnt_trsm += (double)(fp + 1) * fp * colCount;

@@ -162,7 +162,8 @@ paru_Element *paru_create_element(Int nrows, Int ncols, Int init);
 void paru_assemble_row_2U(Int e, Int f, Int sR, Int dR,
                           std::vector<Int> &colHash, paru_matrix *paruMatInfo);
 
-Int paru_trsm(double *pF, double *uPart, Int fp, Int rowCount, Int colCount);
+Int paru_trsm(Int f, double *pF, double *uPart, Int fp, Int rowCount,
+              Int colCount);
 Int paru_dgemm(Int f, double *pF, double *uPart, double *el, Int fp,
                Int rowCount, Int colCount);
 
@@ -246,4 +247,7 @@ void paru_tasked_dgemm(Int f, char *transa, char *transb, BLAS_INT *m,
                        BLAS_INT *n, BLAS_INT *k, double *alpha, double *A,
                        BLAS_INT *lda, double *B, BLAS_INT *ldb, double *beta,
                        double *C, BLAS_INT *ldc);
+void paru_tasked_trsm(Int f, char *side, char *uplo, char *transa, char *diag,
+                      int *m, int *n, double *alpha, double *a, int *lda,
+                      double *b, int *ldb);
 #endif

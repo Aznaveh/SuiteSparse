@@ -396,7 +396,9 @@ Int paru_factorize_full_summed(Int f, Int start_fac,
             }
 
 #endif
-            BLAS_DTRSM("L", "L", "N", "U", &M, &N, &alpha, A, &lda, B, &ldb);
+            //BLAS_DTRSM("L", "L", "N", "U", &M, &N, &alpha, A, &lda, B, &ldb);
+            paru_tasked_trsm (f, "L", "L", "N", "U", &M, &N, &alpha, 
+                    A, &lda, B, &ldb);
 #ifdef COUNT_FLOPS
             paruMatInfo->flp_cnt_trsm += (double)(M + 1) * M * N;
 #ifndef NDEBUG
