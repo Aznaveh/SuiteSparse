@@ -98,7 +98,7 @@ Int paru_panel_factorize(Int f, Int m, Int n, const Int panel_width,
                 row_max = i;
                 maxval = F[j * m + i];
             }
-            if (frowList[i] == row_diag) //find diag
+            if (frowList[i] == row_diag)  // find diag
             {
                 PRLEVEL(1, ("%%Found it %2.4lf\n", F[j * m + i]));
                 // row_diag = i;
@@ -313,7 +313,9 @@ Int paru_factorize_full_summed(Int f, Int start_fac,
     double *F = LUs[f].p;
 
     Int panel_width = paruMatInfo->panel_width;
-    for (Int panel_num = 0;; panel_num++)
+    Int num_panels =
+        (fp % panel_width == 0) ? fp / panel_width : fp / panel_width + 1;
+    for (Int panel_num = 0; panel_num < num_panels; panel_num++)
     {
 #ifndef NDEBUG  // Printing the pivotal front
         Int *frowList = paruMatInfo->frowList[f];
@@ -344,9 +346,6 @@ Int paru_factorize_full_summed(Int f, Int start_fac,
             paru_update_rowDeg(panel_num, row_end, f, start_fac, stl_colSet,
                                pivotal_elements, paruMatInfo);
 
-        if (j2 >= fp)  // if it is the last panel
-            break;
-
         /*               trsm
          *
          *        F = fully summed part of the pivotal front
@@ -372,7 +371,7 @@ Int paru_factorize_full_summed(Int f, Int start_fac,
          * v              |___....____________________..._____|
          *
          */
-        ASSERT(j2 < fp);
+        if (j2 < fp) //if it is not the last 
         {
             BLAS_INT M = (BLAS_INT)panel_width;
             BLAS_INT N = (BLAS_INT)fp - j2;
@@ -396,9 +395,9 @@ Int paru_factorize_full_summed(Int f, Int start_fac,
             }
 
 #endif
-            //BLAS_DTRSM("L", "L", "N", "U", &M, &N, &alpha, A, &lda, B, &ldb);
-            paru_tasked_trsm (f, "L", "L", "N", "U", &M, &N, &alpha, 
-                    A, &lda, B, &ldb);
+            // BLAS_DTRSM("L", "L", "N", "U", &M, &N, &alpha, A, &lda, B, &ldb);
+            paru_tasked_trsm(f, "L", "L", "N", "U", &M, &N, &alpha, A, &lda, B,
+                             &ldb);
 #ifdef COUNT_FLOPS
             paruMatInfo->flp_cnt_trsm += (double)(M + 1) * M * N;
 #ifndef NDEBUG
@@ -451,6 +450,7 @@ Int paru_factorize_full_summed(Int f, Int start_fac,
          *
          */
 
+        if (j2 < fp)
         {
             BLAS_INT M = (BLAS_INT)(row_end - j2);
 
@@ -475,11 +475,12 @@ Int paru_factorize_full_summed(Int f, Int start_fac,
 #endif
 
             // double start_time = omp_get_wtime();
-            //BLAS_DGEMM("N", "N", &M, &N, &K, &alpha, A, &lda, B, &ldb, &beta, C,
+            // BLAS_DGEMM("N", "N", &M, &N, &K, &alpha, A, &lda, B, &ldb, &beta,
+            // C,
             //           &ldc);
 
-            paru_tasked_dgemm(f, "N", "N", &M, &N, &K, &alpha, A,
-                    &lda, B, &ldb, &beta, C, &ldc);
+            paru_tasked_dgemm(f, "N", "N", &M, &N, &K, &alpha, A, &lda, B, &ldb,
+                              &beta, C, &ldc);
 
             // double tot_time = omp_get_wtime() - start_time;
             // printf ("%ld  %lf ",f, tot_time);
@@ -497,14 +498,17 @@ Int paru_factorize_full_summed(Int f, Int start_fac,
         }
 
 #ifndef NDEBUG
-        PRLEVEL(PR,
-                ("%% Pivotal Front After Dgemm: %ld x %ld\n %%", fp, rowCount));
-        for (Int r = 0; r < rowCount; r++)
+        if (j2 < fp)
         {
-            PRLEVEL(PR, ("%% %ld\t", frowList[r]));
-            for (Int c = 0; c < fp; c++)
-                PRLEVEL(PR, (" %2.5lf\t", F[c * rowCount + r]));
-            PRLEVEL(PR, ("\n"));
+            PRLEVEL(PR, ("%% Pivotal Front After Dgemm: %ld x %ld\n %%", fp,
+                         rowCount));
+            for (Int r = 0; r < rowCount; r++)
+            {
+                PRLEVEL(PR, ("%% %ld\t", frowList[r]));
+                for (Int c = 0; c < fp; c++)
+                    PRLEVEL(PR, (" %2.5lf\t", F[c * rowCount + r]));
+                PRLEVEL(PR, ("\n"));
+            }
         }
 #endif
     }
