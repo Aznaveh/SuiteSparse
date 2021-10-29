@@ -69,6 +69,7 @@ int main(int argc, char **argv)
     printf ("Paru: factorization was successfull.\n");
 
     //~~~~~~~~~~~~~~~~~~~Test the results ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#if 1
     // double *b = (double *)paru_alloc(m, sizeof(double));
     Int m = LUsym->m;
     double *b = (double *)malloc(m * sizeof(double));
@@ -79,6 +80,7 @@ int main(int argc, char **argv)
     paru_backward(A, paruMatInfo, b, Res);
     // paru_free (m, sizeof(double), b);
     free(b);
+#endif
 
     //~~~~~~~~~~~~~~~~~~~End computation~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -123,7 +125,6 @@ int main(int argc, char **argv)
     umf_time = omp_get_wtime() - umf_start_time;
     umfpack_dl_free_symbolic(&Symbolic);
     umfpack_dl_free_numeric(&Numeric);
-#endif
 
     // Writing results to a file
     if (info == PARU_SUCCESS)
@@ -146,6 +147,7 @@ int main(int argc, char **argv)
     printf("my_time = %lf umf_time=%lf ratio = %lf\n", my_time, umf_time,
            my_time / umf_time);
 
+#endif
     //~~~~~~~~~~~~~~~~~~~Free Everything~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     paru_freemat(&paruMatInfo);
     paru_freesym(&LUsym);
