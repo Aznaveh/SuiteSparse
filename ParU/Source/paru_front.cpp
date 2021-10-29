@@ -168,7 +168,8 @@ ParU_ResultCode paru_front(Int f,  // front need to be assembled
     {
         // PRLEVEL(1, ("%% %ldx%ld \n", rowCount, fp));
         PRLEVEL(1, ("%% Structural Problem\n"));
-        printf("Paru: structural problem on %ld: %ldx%ld\n", f, rowCount, fp);
+        printf("Paru: singular, structural problem on %ld: %ldx%ld\n", 
+                f, rowCount, fp);
         paruMatInfo->res = PARU_SINGULAR;
         return PARU_SINGULAR;
     }
