@@ -87,23 +87,44 @@ Int paru_panel_factorize(Int f, Int m, Int n, const Int panel_width,
         PRLEVEL(1, ("%%curCol=%ld row_diag=%ld\n", j + col1 + n1, row_diag));
         PRLEVEL(1, ("%%##j=%ld value= %2.4lf\n", j, F[j * m + j]));
 
+        //for (Int i = j + 1; i < row_end; i++)
+        //{  // find max
+        //    PRLEVEL(1, ("%%i=%ld value= %2.4lf", i, F[j * m + i]));
+        //    PRLEVEL(1, (" deg = %ld \n", row_degree_bound[frowList[i]]));
+        //    if (fabs(maxval) < fabs(F[j * m + i]))
+        //    {
+        //        row_max = i;
+        //        maxval = F[j * m + i];
+        //    }
+        //    if (frowList[i] == row_diag)  // find diag
+        //    {
+        //        PRLEVEL(1, ("%%Found it %2.4lf\n", F[j * m + i]));
+        //        // row_diag = i;
+        //        diag_found = i;
+        //        diag_val = F[j * m + i];
+        //    }
+        //}
+
+
+        #pragma omp declare reduction\
+        (maxfabs : double: \
+         omp_out = fabs(omp_in) > fabs(omp_out) ? omp_in : omp_out )
+        //#pragma omp parallel for reduction(maxfabs: maxval) default(none) shared(F, row_max, j, m, row_end, frowList, diag_found, diag_val ) firstprivate(row_diag)
+        #pragma omp simd reduction(maxfabs: maxval) 
         for (Int i = j + 1; i < row_end; i++)
         {  // find max
-            PRLEVEL(1, ("%%i=%ld value= %2.4lf", i, F[j * m + i]));
-            PRLEVEL(1, (" deg = %ld \n", row_degree_bound[frowList[i]]));
             if (fabs(maxval) < fabs(F[j * m + i]))
             {
-                row_max = i;
                 maxval = F[j * m + i];
+                row_max = i;
             }
             if (frowList[i] == row_diag)  // find diag
             {
-                PRLEVEL(1, ("%%Found it %2.4lf\n", F[j * m + i]));
-                // row_diag = i;
                 diag_found = i;
                 diag_val = F[j * m + i];
             }
         }
+
 
 #ifndef NDEBUG
         row_deg_max = row_degree_bound[frowList[row_max]];
