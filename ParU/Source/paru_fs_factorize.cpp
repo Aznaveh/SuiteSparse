@@ -60,8 +60,6 @@ Int paru_panel_factorize(Int f, Int m, Int n, const Int panel_width,
     Int *Super = paruMatInfo->LUsym->Super;
     Int col1 = Super[f]; /* fornt F has columns col1:col2-1 */
     paru_symbolic *LUsym = paruMatInfo->LUsym;
-    // Int *Qfill = LUsym->Qfill;
-    // Int *Pinit = LUsym->Pinit;
     Int *Diag_map = paruMatInfo->Diag_map;
     Int n1 = LUsym->n1;
 
@@ -340,86 +338,98 @@ Int paru_factorize_full_summed(Int f, Int start_fac,
         paru_panel_factorize(f, rowCount, fp, panel_width, panel_num, row_end,
                              paruMatInfo);
 
-        // This can be done parallel to the  next part
-        if (paruMatInfo->LUsym->Cm[f] != 0)  // if there is potential column
-            // left
-            paru_update_rowDeg(panel_num, row_end, f, start_fac, stl_colSet,
-                               pivotal_elements, paruMatInfo);
-
-        /*               trsm
-         *
-         *        F = fully summed part of the pivotal front
-         *           op( A ) * B = alpha*B
-         *
-         *                <----------fp------------------->
-         *                        j1 current j2
-         *    F                    ^  panel  ^
-         *     \           ____..._|_________|__________...___
-         * ^              |\      |         |                 |
-         * |              | \     |<--panel | rest of         |
-         * |              |  \    | width-> |  piv front      |
-         * |              |___\...|_______ _|_________ ... ___|
-         * |   ^    j1--> |       |\        |                 |
-         * | panel        |       |**\ A    |   B(In out)     |
-         * | width        |       |*L**\    |                 |
-         * |   v          |____...|******\ _|_________...____ |
-         * |        j2--> |       |         |                 |
-         * rowCount       |       |         |                 |
-         * |              .       .         .                 .
-         * |              .       .         .                 .
-         * |              .       .         .                 .
-         * v              |___....____________________..._____|
-         *
-         */
-        if (j2 < fp) //if it is not the last 
+        #pragma omp parallel
         {
-            BLAS_INT M = (BLAS_INT)panel_width;
-            BLAS_INT N = (BLAS_INT)fp - j2;
-            double alpha = 1.0;
-            double *A = F + j1 * rowCount + j1;
-            BLAS_INT lda = (BLAS_INT)rowCount;
-            double *B = F + j2 * rowCount + j1;
-            BLAS_INT ldb = (BLAS_INT)rowCount;
-#ifndef NDEBUG
-            Int PR = 1;
-            PRLEVEL(PR, ("%% M =%d N = %d alpha = %f \n", M, N, alpha));
-            PRLEVEL(PR, ("%% lda =%d ldb =%d\n", lda, ldb));
-            PRLEVEL(PR, ("%% Pivotal Front Before Trsm: %ld x %ld\n", fp,
-                         rowCount));
-            for (Int r = 0; r < rowCount; r++)
+            #pragma omp single
             {
-                PRLEVEL(PR, ("%% %ld\t", frowList[r]));
-                for (Int c = 0; c < fp; c++)
-                    PRLEVEL(PR, (" %2.5lf\t", F[c * rowCount + r]));
-                PRLEVEL(PR, ("\n"));
-            }
+                // This can be done parallel to the  next part
+                #pragma omp task default(none) \
+                shared(paruMatInfo, pivotal_elements, stl_colSet) \
+                firstprivate(panel_num, row_end, f, start_fac)
+                if (paruMatInfo->LUsym->Cm[f] !=0)  
+                {  // if there is potential column left
+                    paru_update_rowDeg(panel_num, row_end, f, start_fac,
+                                       stl_colSet, pivotal_elements,
+                                       paruMatInfo);
+                }
+
+                /*               trsm
+                 *
+                 *        F = fully summed part of the pivotal front
+                 *           op( A ) * B = alpha*B
+                 *
+                 *                <----------fp------------------->
+                 *                        j1 current j2
+                 *    F                    ^  panel  ^
+                 *     \           ____..._|_________|__________...___
+                 * ^              |\      |         |                 |
+                 * |              | \     |<--panel | rest of         |
+                 * |              |  \    | width-> |  piv front      |
+                 * |              |___\...|_______ _|_________ ... ___|
+                 * |   ^    j1--> |       |\        |                 |
+                 * | panel        |       |**\ A    |   B(In out)     |
+                 * | width        |       |*L**\    |                 |
+                 * |   v          |____...|******\ _|_________...____ |
+                 * |        j2--> |       |         |                 |
+                 * rowCount       |       |         |                 |
+                 * |              .       .         .                 .
+                 * |              .       .         .                 .
+                 * |              .       .         .                 .
+                 * v              |___....____________________..._____|
+                 *
+                 */
+                #pragma omp task default(none) shared(F) \
+                firstprivate(panel_width, j1, j2, fp, f, rowCount)
+                if (j2 < fp)  // if it is not the last
+                {
+                    BLAS_INT M = (BLAS_INT)panel_width;
+                    BLAS_INT N = (BLAS_INT)fp - j2;
+                    double alpha = 1.0;
+                    double *A = F + j1 * rowCount + j1;
+                    BLAS_INT lda = (BLAS_INT)rowCount;
+                    double *B = F + j2 * rowCount + j1;
+                    BLAS_INT ldb = (BLAS_INT)rowCount;
+#ifndef NDEBUG
+                    Int PR = 1;
+                    PRLEVEL(PR, ("%% M =%d N = %d alpha = %f \n", M, N, alpha));
+                    PRLEVEL(PR, ("%% lda =%d ldb =%d\n", lda, ldb));
+                    PRLEVEL(PR, ("%% Pivotal Front Before Trsm: %ld x %ld\n",
+                                 fp, rowCount));
+                    for (Int r = 0; r < rowCount; r++)
+                    {
+                        PRLEVEL(PR, ("%% %ld\t", frowList[r]));
+                        for (Int c = 0; c < fp; c++)
+                            PRLEVEL(PR, (" %2.5lf\t", F[c * rowCount + r]));
+                        PRLEVEL(PR, ("\n"));
+                    }
 
 #endif
-            // BLAS_DTRSM("L", "L", "N", "U", &M, &N, &alpha, A, &lda, B, &ldb);
-            paru_tasked_trsm(f, "L", "L", "N", "U", &M, &N, &alpha, A, &lda, B,
-                             &ldb);
+                    paru_tasked_trsm(f, "L", "L", "N", "U", &M, &N, &alpha, A,
+                                     &lda, B, &ldb);
 #ifdef COUNT_FLOPS
-            paruMatInfo->flp_cnt_trsm += (double)(M + 1) * M * N;
+                    paruMatInfo->flp_cnt_trsm += (double)(M + 1) * M * N;
 #ifndef NDEBUG
-            PR = 0;
-            PRLEVEL(PR, ("\n%% FlopCount Trsm factorize %d %d ", M, N));
-            PRLEVEL(PR, ("cnt = %lf\n ", paruMatInfo->flp_cnt_trsm));
+                    PR = 0;
+                    PRLEVEL(PR, ("\n%% FlopCount Trsm factorize %d %d ", M, N));
+                    PRLEVEL(PR, ("cnt = %lf\n ", paruMatInfo->flp_cnt_trsm));
 #endif
 
 #endif
 
 #ifndef NDEBUG
-            PRLEVEL(PR, ("%% Pivotal Front After Trsm: %ld x %ld\n %%", fp,
-                         rowCount));
-            for (Int r = 0; r < rowCount; r++)
-            {
-                PRLEVEL(PR, ("%% %ld\t", frowList[r]));
-                for (Int c = 0; c < fp; c++)
-                    PRLEVEL(PR, (" %2.5lf\t", F[c * rowCount + r]));
-                PRLEVEL(PR, ("\n"));
-            }
+                    PRLEVEL(PR, ("%% Pivotal Front After Trsm: %ld x %ld\n %%",
+                                 fp, rowCount));
+                    for (Int r = 0; r < rowCount; r++)
+                    {
+                        PRLEVEL(PR, ("%% %ld\t", frowList[r]));
+                        for (Int c = 0; c < fp; c++)
+                            PRLEVEL(PR, (" %2.5lf\t", F[c * rowCount + r]));
+                        PRLEVEL(PR, ("\n"));
+                    }
 #endif
-        }
+                }
+            }  // end of single region
+        }      // end of parallel region
 
         /*               dgemm   C := alpha*op(A)*op(B) + beta*C
          *
