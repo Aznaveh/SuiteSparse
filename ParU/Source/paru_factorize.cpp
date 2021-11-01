@@ -12,6 +12,8 @@
 #include "paru_internal.hpp"
 #define TASK_FL_THRESHOLD (double(1024 * 1024))
 
+Int ntasks = 0 ;
+
 ParU_ResultCode paru_do_fronts(Int f, paru_matrix *paruMatInfo)
 // This routine call paru_front from first(f)...f including f
 // This routine is called recursively to make tasks
@@ -53,29 +55,107 @@ ParU_ResultCode paru_do_fronts(Int f, paru_matrix *paruMatInfo)
         if (Childp[f + 1] - Childp[f] > 100)
             PRLEVEL(1, ("%% lots of children here\n"));
 #endif
-        #pragma omp taskgroup
-        for (Int i = Childp[f]; i <= Childp[f + 1] - 1; i++)
+
+        Int nchild = (Childp[f + 1] - Childp[f]) ;
+
+        if (nchild == 1)
         {
-            #pragma omp task default(none) shared(paruMatInfo, Child, info)  \
-            firstprivate(i)
+
+            Int i = Childp[f] ;
             {
-                ParU_ResultCode myInfo = paru_do_fronts(Child[i], paruMatInfo);
-                if (myInfo != PARU_SUCCESS)
                 {
-                    // PRLEVEL(1, ("%% A problem happend in %ld\n", i));
-                    info = myInfo;
-                    #pragma omp cancel taskgroup
-                    // return info;
+                    ParU_ResultCode myInfo = paru_do_fronts(Child[i], paruMatInfo);
+                    if (myInfo != PARU_SUCCESS)
+                    {
+                        // PRLEVEL(1, ("%% A problem happend in %ld\n", i));
+                        info = myInfo;
+                    }
                 }
             }
+            // I could also use it but it doesnt work with cancel
+            info = paru_front(f, paruMatInfo);
+            if (info != PARU_SUCCESS)
+            {
+                PRLEVEL(1, ("%% A problem happend in %ld\n", f));
+                // return info;
+            }
+
         }
-        // I could also use it but it doesnt work with cancel
-        #pragma omp taskwait
-        info = paru_front(f, paruMatInfo);
-        if (info != PARU_SUCCESS)
+        else
         {
-            PRLEVEL(1, ("%% A problem happend in %ld\n", f));
-            // return info;
+
+#if 0
+
+            // at least 2 children
+
+            #pragma omp atomic
+            ntasks += nchild ;
+
+            #pragma omp taskgroup
+            for (Int i = Childp[f]; i <= Childp[f + 1] - 1; i++)
+            {
+                #pragma omp task default(none) shared(paruMatInfo, Child, info)  \
+                firstprivate(i)
+                {
+                    ParU_ResultCode myInfo = paru_do_fronts(Child[i], paruMatInfo);
+                    if (myInfo != PARU_SUCCESS)
+                    {
+                        // PRLEVEL(1, ("%% A problem happend in %ld\n", i));
+                        info = myInfo;
+                        #pragma omp cancel taskgroup
+                        // return info;
+                    }
+                }
+            }
+
+#else
+
+            // at least 2 children
+
+            #pragma omp atomic
+            ntasks += (nchild - 1) ;
+
+            #pragma omp taskgroup
+            for (Int i = Childp[f] + 1; i <= Childp[f + 1] - 1; i++)
+            {
+                #pragma omp task default(none) shared(paruMatInfo, Child, info)  \
+                firstprivate(i)
+                {
+                    ParU_ResultCode myInfo = paru_do_fronts(Child[i], paruMatInfo);
+                    if (myInfo != PARU_SUCCESS)
+                    {
+                        // PRLEVEL(1, ("%% A problem happend in %ld\n", i));
+                        info = myInfo;
+                        #pragma omp cancel taskgroup
+                        // return info;
+                    }
+                }
+            }
+
+            Int i = Childp[f] + 1;
+            {
+                {
+                    ParU_ResultCode myInfo = paru_do_fronts(Child[i], paruMatInfo);
+                    if (myInfo != PARU_SUCCESS)
+                    {
+                        // PRLEVEL(1, ("%% A problem happend in %ld\n", i));
+                        info = myInfo;
+                        // return info;
+                    }
+                }
+            }
+
+#endif
+
+            // I could also use it but it doesnt work with cancel
+            #pragma omp taskwait
+            info = paru_front(f, paruMatInfo);
+            if (info != PARU_SUCCESS)
+            {
+                PRLEVEL(1, ("%% A problem happend in %ld\n", f));
+                // return info;
+            }
+
         }
     }
     return info;
