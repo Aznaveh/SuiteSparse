@@ -107,7 +107,7 @@ ParU_ResultCode paru_do_fronts(Int f, paru_matrix *paruMatInfo)
                     {
                         // PRLEVEL(1, ("%% A problem happend in %ld\n", i));
                         info = myInfo;
-                        #pragma omp cancel taskgroup
+                        //#pragma omp cancel taskgroup
                         // return info;
                     }
                 }
@@ -205,8 +205,10 @@ ParU_ResultCode paru_factorize(cholmod_sparse *A, paru_symbolic *LUsym,
     }
 
     // do_fronts generate a task parallel region
+#ifndef NDEBUG
     Int *Parent = LUsym->Parent;
-    #pragma omp taskloop nogroup
+#endif
+    #pragma omp taskloop nogroup 
     for (Int i = 0; i < LUsym->num_roots; i++)
     {
         Int r = LUsym->roots[i];
@@ -216,7 +218,7 @@ ParU_ResultCode paru_factorize(cholmod_sparse *A, paru_symbolic *LUsym,
         {
             // PRLEVEL(1, ("%% A problem happend in %ld\n", i));
             info = myInfo;
-            #pragma omp cancel taskgroup
+            //#pragma omp cancel taskgroup
             // return info;
         }
     }
