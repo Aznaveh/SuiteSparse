@@ -208,18 +208,24 @@ ParU_ResultCode paru_factorize(cholmod_sparse *A, paru_symbolic *LUsym,
 #ifndef NDEBUG
     Int *Parent = LUsym->Parent;
 #endif
-    #pragma omp taskloop nogroup 
-    for (Int i = 0; i < LUsym->num_roots; i++)
+    if (LUsym->num_roots == 1)
+        info = paru_do_fronts(LUsym->roots[0], paruMatInfo);
+    else
     {
-        Int r = LUsym->roots[i];
-        ASSERT(Parent[r] == -1);
-        ParU_ResultCode myInfo = paru_do_fronts(r, paruMatInfo);
-        if (myInfo != PARU_SUCCESS)
+
+        #pragma omp taskloop nogroup 
+        for (Int i = 0; i < LUsym->num_roots; i++)
         {
-            // PRLEVEL(1, ("%% A problem happend in %ld\n", i));
-            info = myInfo;
-            //#pragma omp cancel taskgroup
-            // return info;
+            Int r = LUsym->roots[i];
+            ASSERT(Parent[r] == -1);
+            ParU_ResultCode myInfo = paru_do_fronts(r, paruMatInfo);
+            if (myInfo != PARU_SUCCESS)
+            {
+                // PRLEVEL(1, ("%% A problem happend in %ld\n", i));
+                info = myInfo;
+                //#pragma omp cancel taskgroup
+                // return info;
+            }
         }
     }
 
