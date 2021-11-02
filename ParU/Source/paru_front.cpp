@@ -16,7 +16,7 @@
 ParU_ResultCode paru_front(Int f,  // front need to be assembled
                            paru_matrix *paruMatInfo)
 {
-    DEBUGLEVEL(-2);
+    DEBUGLEVEL(-3);
     /*
      * -2 Print Nothing
      * -1 Just Matlab

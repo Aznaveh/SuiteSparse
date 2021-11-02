@@ -12,7 +12,9 @@
 #include "paru_internal.hpp"
 #define TASK_FL_THRESHOLD (double(1024 * 1024))
 
+#ifndef NDEBUG
 Int ntasks = 0 ;
+#endif
 
 ParU_ResultCode paru_do_fronts(Int f, paru_matrix *paruMatInfo)
 // This routine call paru_front from first(f)...f including f
@@ -60,6 +62,7 @@ ParU_ResultCode paru_do_fronts(Int f, paru_matrix *paruMatInfo)
 
         if (nchild == 1)
         {
+            PRLEVEL(1, ("%% Just one child for %ld\n",f));
 
             Int i = Childp[f] ;
             {
@@ -69,6 +72,7 @@ ParU_ResultCode paru_do_fronts(Int f, paru_matrix *paruMatInfo)
                     {
                         // PRLEVEL(1, ("%% A problem happend in %ld\n", i));
                         info = myInfo;
+                        return info;
                     }
                 }
             }
@@ -77,27 +81,28 @@ ParU_ResultCode paru_do_fronts(Int f, paru_matrix *paruMatInfo)
             if (info != PARU_SUCCESS)
             {
                 PRLEVEL(1, ("%% A problem happend in %ld\n", f));
-                // return info;
+                return info;
             }
 
         }
         else
         {
 
-#if 0
+#if 1
 
             // at least 2 children
 
+#ifndef NDEBUG
             #pragma omp atomic
             ntasks += nchild ;
+#endif
 
-            #pragma omp taskgroup
+            #pragma omp taskloop grainsize(1)
             for (Int i = Childp[f]; i <= Childp[f + 1] - 1; i++)
             {
-                #pragma omp task default(none) shared(paruMatInfo, Child, info)  \
-                firstprivate(i)
                 {
-                    ParU_ResultCode myInfo = paru_do_fronts(Child[i], paruMatInfo);
+                    ParU_ResultCode myInfo = 
+                        paru_do_fronts(Child[i], paruMatInfo);
                     if (myInfo != PARU_SUCCESS)
                     {
                         // PRLEVEL(1, ("%% A problem happend in %ld\n", i));
@@ -112,14 +117,14 @@ ParU_ResultCode paru_do_fronts(Int f, paru_matrix *paruMatInfo)
 
             // at least 2 children
 
+#ifndef NDEBUG
             #pragma omp atomic
             ntasks += (nchild - 1) ;
+#endif
 
-            #pragma omp taskgroup
+            #pragma omp taskloop nogroup
             for (Int i = Childp[f] + 1; i <= Childp[f + 1] - 1; i++)
             {
-                #pragma omp task default(none) shared(paruMatInfo, Child, info)  \
-                firstprivate(i)
                 {
                     ParU_ResultCode myInfo = paru_do_fronts(Child[i], paruMatInfo);
                     if (myInfo != PARU_SUCCESS)
@@ -132,7 +137,7 @@ ParU_ResultCode paru_do_fronts(Int f, paru_matrix *paruMatInfo)
                 }
             }
 
-            Int i = Childp[f] + 1;
+            Int i = Childp[f];
             {
                 {
                     ParU_ResultCode myInfo = paru_do_fronts(Child[i], paruMatInfo);
@@ -145,10 +150,10 @@ ParU_ResultCode paru_do_fronts(Int f, paru_matrix *paruMatInfo)
                 }
             }
 
+            #pragma omp taskwait
 #endif
 
             // I could also use it but it doesnt work with cancel
-            #pragma omp taskwait
             info = paru_front(f, paruMatInfo);
             if (info != PARU_SUCCESS)
             {
@@ -185,7 +190,6 @@ ParU_ResultCode paru_factorize(cholmod_sparse *A, paru_symbolic *LUsym,
 
     paru_matrix *paruMatInfo;
     paruMatInfo = *paruMatInfo_handle;
-    Int nf = LUsym->nf;
 
     ParU_ResultCode info;
     // printf ("Starting init row\n");
@@ -202,27 +206,18 @@ ParU_ResultCode paru_factorize(cholmod_sparse *A, paru_symbolic *LUsym,
 
     // do_fronts generate a task parallel region
     Int *Parent = LUsym->Parent;
-    #pragma omp parallel
+    #pragma omp taskloop nogroup
+    for (Int i = 0; i < LUsym->num_roots; i++)
     {
-        #pragma omp taskgroup
-        for (Int i = 0; i < nf; i++)
+        Int r = LUsym->roots[i];
+        ASSERT(Parent[r] == -1);
+        ParU_ResultCode myInfo = paru_do_fronts(r, paruMatInfo);
+        if (myInfo != PARU_SUCCESS)
         {
-            #pragma omp single nowait
-            if (Parent[i] == -1)
-            {
-                #pragma omp task default(none) shared(paruMatInfo, info) \
-                 firstprivate(i)
-                {
-                    ParU_ResultCode myInfo = paru_do_fronts(i, paruMatInfo);
-                    if (myInfo != PARU_SUCCESS)
-                    {
-                        // PRLEVEL(1, ("%% A problem happend in %ld\n", i));
-                        info = myInfo;
-                        #pragma omp cancel taskgroup
-                        // return info;
-                    }
-                }
-            }
+            // PRLEVEL(1, ("%% A problem happend in %ld\n", i));
+            info = myInfo;
+            #pragma omp cancel taskgroup
+            // return info;
         }
     }
 
@@ -231,8 +226,15 @@ ParU_ResultCode paru_factorize(cholmod_sparse *A, paru_symbolic *LUsym,
         PRLEVEL(1, ("%% factorization has some problem\n"));
         return info;
     }
+#ifndef NDEBUG
+    else 
+    {
+        PRLEVEL(1, ("%% factorization is done with %ld tasks\n",ntasks));
+    }
+#endif
 
     // The following code can be substituted in a sequential case
+    //Int nf = LUsym->nf;
     // for (Int i = 0; i < nf; i++)
     //{
     //    if (i %1000 == 0) PRLEVEL(1, ("%% Wroking on front %ld\n", i));

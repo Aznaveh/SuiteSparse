@@ -161,6 +161,10 @@ typedef struct
     // number of expected pivot columns in F is thus
     // Super [f+1] - Super [f].
 
+    Int num_roots;  //number of roots 
+    // it is at least one and can be more in case of forest
+    Int *roots;
+
     // Upper bound number of rows for each front
     Int *Fm;  // size nf+1
 

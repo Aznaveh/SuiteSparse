@@ -40,7 +40,7 @@ Int paru_trsm(Int f, double *pF, double *uPart, Int fp, Int rowCount,
     BLAS_INT ldb = (BLAS_INT)fp;
 
 #ifndef NDEBUG  // Printing the  U part
-    PRLEVEL(0, ("TRSM (%dx%d) (%dx%d) \n", mB, mB, mB, nB));
+    PRLEVEL(1, ("TRSM (%dx%d) (%dx%d) \n", mB, mB, mB, nB));
     Int p = 1;
     PRLEVEL(p, ("mB=%d nB = %d alpha = %f \n", mB, nB, alpha));
     PRLEVEL(p, ("lda =%d ldb =%d\n", lda, ldb));

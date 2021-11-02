@@ -221,6 +221,8 @@ void paru_freesym(paru_symbolic **LUsym_handle)
     paru_free(nf + 1, sizeof(Int), LUsym->Fm);
     paru_free(nf + 1, sizeof(Int), LUsym->Cm);
 
+    paru_free(LUsym->num_roots, sizeof(Int), LUsym->roots);
+
     paru_free(m + 1 - n1, sizeof(Int), LUsym->Sp);
     paru_free(snz, sizeof(Int), LUsym->Sj);
     paru_free(snz, sizeof(double), LUsym->Sx);

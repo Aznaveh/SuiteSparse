@@ -106,11 +106,16 @@ Int paru_panel_factorize(Int f, Int m, Int n, const Int panel_width,
         //}
 
 
-        #pragma omp declare reduction\
-        (maxfabs : double: \
-         omp_out = fabs(omp_in) > fabs(omp_out) ? omp_in : omp_out )
-        //#pragma omp parallel for reduction(maxfabs: maxval) default(none) shared(F, row_max, j, m, row_end, frowList, diag_found, diag_val ) firstprivate(row_diag)
-        #pragma omp simd reduction(maxfabs: maxval) 
+        /*** ATTENTION: IT FACE A NUMERICAL PROBLEM HOWEVER I USE REDUCTION**/
+        //#pragma omp declare reduction\
+        //(maxfabs : double: \
+        // omp_out = fabs(omp_in) > fabs(omp_out) ? omp_in : omp_out )
+
+        //#pragma omp parallel for reduction(maxfabs: maxval) default(none) 
+        //shared(F, row_max, j, m, row_end, frowList, diag_found, diag_val ) 
+        //firstprivate(row_diag)
+        //
+        //#pragma omp simd reduction(maxfabs: maxval) 
         for (Int i = j + 1; i < row_end; i++)
         {  // find max
             if (fabs(maxval) < fabs(F[j * m + i]))
@@ -160,7 +165,7 @@ Int paru_panel_factorize(Int f, Int m, Int n, const Int panel_width,
 #ifndef NDEBUG
                 else
                 {
-                    PRLEVEL(-1, ("%% diag found but too small %ld"
+                    PRLEVEL(1, ("%% diag found but too small %ld"
                                  " maxval=%2.4lf diag_val=%e \n",
                                  row_piv, maxval, diag_val));
                 }
@@ -169,7 +174,7 @@ Int paru_panel_factorize(Int f, Int m, Int n, const Int panel_width,
 #ifndef NDEBUG
             else
             {
-                PRLEVEL(-1, ("%% diag not found %ld\n", row_piv));
+                PRLEVEL(1, ("%% diag not found %ld\n", row_piv));
             }
 #endif
         }
@@ -399,8 +404,13 @@ Int paru_factorize_full_summed(Int f, Int start_fac,
                  * v              |___....____________________..._____|
                  *
                  */
-                #pragma omp task default(none) shared(F) \
+                #pragma omp task  shared(F) \
                 firstprivate(panel_width, j1, j2, fp, f, rowCount)
+                
+                // I cannot use defualt none or it will have problem with my 
+                // debug code. I can use it in production though:
+                //default(none) firstprivate(print_level) shared(frowList)
+                
                 if (j2 < fp)  // if it is not the last
                 {
                     BLAS_INT M = (BLAS_INT)panel_width;
