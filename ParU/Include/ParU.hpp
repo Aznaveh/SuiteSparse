@@ -25,8 +25,15 @@ extern "C"
 {
 #include "umfpack.h"
 #include "cholmod.h"
-//#include <mkl.h>
 }
+
+#ifdef MKLROOT
+#include <mkl.h>
+#define BLAS_set_num_threads(n)  mkl_set_num_threads(n)
+#else
+#include <cblas.h>
+#define BLAS_set_num_threads(n)    openblas_set_num_threads(n) 
+#endif
 
 #ifdef Int  // defined in amd
 #undef Int

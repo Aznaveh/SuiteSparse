@@ -39,6 +39,8 @@ int main(int argc, char **argv)
         exit(1);
     }
 
+    //openblas_set_num_threads(1) ;
+    BLAS_set_num_threads(1);
     //~~~~~~~~~~~~~~~~~~~Starting computation~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     int scale = 0;
@@ -83,6 +85,8 @@ int main(int argc, char **argv)
 #endif
 
     //~~~~~~~~~~~~~~~~~~~End computation~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    //openblas_set_num_threads(1) ;
+    BLAS_set_num_threads(1);
 
     //~~~~~~~~~~~~~~~~~~~Calling umfpack~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     double umf_time = 0;
