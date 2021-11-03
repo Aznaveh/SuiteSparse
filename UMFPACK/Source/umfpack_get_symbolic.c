@@ -25,7 +25,7 @@ GLOBAL Int UMFPACK_get_symbolic
     Int *p_nchains,
     Int P [ ],
     Int Q [ ],
-    Int Diag_map [],
+ //   Int Diag_map [],
     Int Front_npivcol [ ],
     Int Front_parent [ ],
     Int Front_1strow [ ],
@@ -111,12 +111,12 @@ GLOBAL Int UMFPACK_get_symbolic
         //        //if (knew < n1) { printf ("Hey!!! this broke\n") ; abort ( ) ; }
         //        P [k] = Rperm_init [knew] ;
 	    //}
-        for (k = 0 ; k < n_row ; k++)
-            Diag_map [k] = Diagonal_map [k];
+        //for (k = 0 ; k < n_row ; k++)
+        //    Diag_map [k] = Diagonal_map [k];
 	}
     else
     {
-        Diag_map[0] = -1;
+     //   Diag_map[0] = -1;
     }
     /* there is no diagonal map.  */
     for (k = 0 ; k < n_row ; k++)
