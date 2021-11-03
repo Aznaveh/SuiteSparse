@@ -32,6 +32,7 @@ extern "C"
 #include "umf_internal.h"
 }
 
+
 // for printing information uncomment this; to activate assertions uncomment
 //#undef NPR  //<<1>>
 

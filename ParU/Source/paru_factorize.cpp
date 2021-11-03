@@ -97,7 +97,7 @@ ParU_ResultCode paru_do_fronts(Int f, paru_matrix *paruMatInfo)
             ntasks += nchild ;
 #endif
 
-            #pragma omp taskloop grainsize(1)
+            #pragma omp taskloop grainsize(1) shared(info)
             for (Int i = Childp[f]; i <= Childp[f + 1] - 1; i++)
             {
                 {
@@ -106,6 +106,7 @@ ParU_ResultCode paru_do_fronts(Int f, paru_matrix *paruMatInfo)
                     if (myInfo != PARU_SUCCESS)
                     {
                         // PRLEVEL(1, ("%% A problem happend in %ld\n", i));
+                        #pragma omp critical
                         info = myInfo;
                         //#pragma omp cancel taskgroup
                         // return info;
@@ -153,6 +154,10 @@ ParU_ResultCode paru_do_fronts(Int f, paru_matrix *paruMatInfo)
             #pragma omp taskwait
 #endif
 
+            if (info != PARU_SUCCESS)
+            {
+                return info;
+            }
             // I could also use it but it doesnt work with cancel
             info = paru_front(f, paruMatInfo);
             if (info != PARU_SUCCESS)
@@ -167,7 +172,7 @@ ParU_ResultCode paru_do_fronts(Int f, paru_matrix *paruMatInfo)
 }
 
 ParU_ResultCode paru_factorize(cholmod_sparse *A, paru_symbolic *LUsym,
-                               paru_matrix **paruMatInfo_handle)
+        paru_matrix **paruMatInfo_handle)
 {
     DEBUGLEVEL(1);
     double my_start_time = omp_get_wtime();
