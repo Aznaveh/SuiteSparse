@@ -886,7 +886,7 @@ paru_symbolic *paru_analyze(
     for (Int i = 0; i < m; i++) PRLEVEL(PR, ("%ld ", Pinv[i]));
     PRLEVEL(PR, ("\n"));
 
-    PR = -1;
+    PR = 1;
     if (inv_Diag_map)
     {
         PRLEVEL(PR, ("inv_Diag_map =\n"));
@@ -1094,7 +1094,7 @@ paru_symbolic *paru_analyze(
     PRLEVEL(PR, ("Ps =\n"));
     for (Int k = 0; k < rowcount; k++) PRLEVEL(PR, ("%ld ", Ps[k]));
     PRLEVEL(PR, ("\n"));
-    PR = -1;
+    PR = 1;
     if (Diag_map)
     {
         PRLEVEL(PR, ("Sym Diag_map (%ld) =\n", n));
@@ -1160,12 +1160,13 @@ paru_symbolic *paru_analyze(
     PRLEVEL(PR, ("After permutation Sp =\n"));
     for (Int i = n1; i <= m; i++) PRLEVEL(PR, ("%ld ", cSp[i - n1]));
     PRLEVEL(PR, ("\n"));
-    PR = -1;
+    PR = 1;
     if (rs1 > 0)
     {
         PRLEVEL(PR, ("(%ld) Slp =", slnz));
         for (Int k = 0; k <= rs1; k++) PRLEVEL(PR, ("%ld ", Slp[k]));
     }
+    PRLEVEL(PR, ("\n"));
 #endif
 
     paru_cumsum(m + 1 - n1, cSp);
