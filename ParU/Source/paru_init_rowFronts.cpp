@@ -241,110 +241,106 @@ ParU_ResultCode paru_init_rowFronts(
     // allocating row tuples, elements and updating column tuples
 
     ParU_ResultCode info;
-    info = PARU_SUCCESS;
-    #pragma omp parallel shared(info)
+    Int out_of_memory = 0;
+    #pragma omp parallel for shared(out_of_memory)
+    for (Int row = 0; row < m; row++)
     {
-        #pragma omp for
-        for (Int row = 0; row < m; row++)
+        Int e = LUsym->row2atree[row];
+        Int nrows = 1,
+            ncols =
+                Sp[row + 1] - Sp[row];  // nrows and ncols of current front/row
+        PRLEVEL(1, ("%% element %ld = %ld x %ld\n", e, nrows, ncols));
+
+        ASSERT(nrows > 0);
+        ASSERT(ncols > 0);
+
+        row_degree_bound[row] = ncols;  // Initialzing row degree
+
+        paru_Element *curEl = elementList[e] =
+            paru_create_element(nrows, ncols, 0);
+        if (curEl == NULL)
+        {  // out of memory
+            paru_freemat(&paruMatInfo);
+            printf("Paru: Out of memory: curEl\n");
+            #pragma omp atomic
+            out_of_memory += 1;
+        }
+
+        rowMark[e] = 0;
+
+        // My new is calling paru_alloc
+        std::vector<Int> *curHeap;
+        try
         {
-            Int e = LUsym->row2atree[row];
-            Int nrows = 1,
-                ncols = Sp[row + 1] -
-                        Sp[row];  // nrows and ncols of current front/row
-            PRLEVEL(1, ("%% element %ld = %ld x %ld\n", e, nrows, ncols));
+            curHeap = paruMatInfo->heapList[e] = new std::vector<Int>;
+        }
+        catch (std::bad_alloc const &)
+        {  // out of memory
+            paru_freemat(&paruMatInfo);
+            printf("Paru: Out of memory: curHeap\n");
+            #pragma omp atomic
+            out_of_memory += 1;
+        }
+        PRLEVEL(1, ("%%Heap allocated %p id=%ld \n", curHeap, e));
 
-            ASSERT(nrows > 0);
-            ASSERT(ncols > 0);
-
-            row_degree_bound[row] = ncols;  // Initialzing row degree
-
-            paru_Element *curEl = elementList[e] =
-                paru_create_element(nrows, ncols, 0);
-            if (curEl == NULL)
-            {  // out of memory
-                paru_freemat(&paruMatInfo);
-                printf("Paru: Out of memory: curEl\n");
-                info = PARU_OUT_OF_MEMORY;
-                #pragma omp cancel for
-                // return PARU_OUT_OF_MEMORY;
-            }
-
-            rowMark[e] = 0;
-
-            // My new is calling paru_alloc
-            std::vector<Int> *curHeap;
-            try
-            {
-                curHeap = paruMatInfo->heapList[e] = new std::vector<Int>;
-            }
-            catch (std::bad_alloc const&)
-            {  // out of memory
-                paru_freemat(&paruMatInfo);
-                printf("Paru: Out of memory: curHeap\n");
-                info = PARU_OUT_OF_MEMORY;
-                #pragma omp cancel for
-                // return PARU_OUT_OF_MEMORY;
-            }
-            PRLEVEL(1, ("%%Heap allocated %p id=%ld \n", curHeap, e));
-
-            curHeap->push_back(e);
+        curHeap->push_back(e);
 
 #ifndef NDEBUG  // Printing the pointers info
-            Int PR = 1;
-            PRLEVEL(PR, ("%% curEl = %p ", curEl));
-            Int size = sizeof(paru_Element) +
-                       sizeof(Int) * (2 * (nrows + ncols)) +
-                       sizeof(double) * nrows * ncols;
-            PRLEVEL(PR, ("size= %ld", size));
-            PRLEVEL(PR, ("\n"));
+        Int PR = 1;
+        PRLEVEL(PR, ("%% curEl = %p ", curEl));
+        Int size = sizeof(paru_Element) + sizeof(Int) * (2 * (nrows + ncols)) +
+                   sizeof(double) * nrows * ncols;
+        PRLEVEL(PR, ("size= %ld", size));
+        PRLEVEL(PR, ("\n"));
 #endif
 
-            // Allocating Rowlist and updating its tuples
-            RowList[row].list =
-                (paru_Tuple *)paru_alloc(slackRow * nrows, sizeof(paru_Tuple));
-            if (RowList[row].list == NULL)
-            {  // out of memory
-                paru_freemat(&paruMatInfo);
-                printf("Paru: out of memory, RowList[row].list \n");
-                info = PARU_OUT_OF_MEMORY;
-                #pragma omp cancel for
-                // return PARU_OUT_OF_MEMORY;
-            }
-            RowList[row].numTuple = 0;
-            RowList[row].len = slackRow;
-
-            paru_Tuple rowTuple;
-            rowTuple.e = e;
-            rowTuple.f = 0;
-            if (paru_add_rowTuple(RowList, row, rowTuple))
-            {
-                paru_freemat(&paruMatInfo);
-                printf("Paru: out of memory, add_rowTuple \n");
-                info = PARU_OUT_OF_MEMORY;
-                #pragma omp cancel for
-                // return PARU_OUT_OF_MEMORY;
-            }
-
-            // Allocating elements
-            Int *el_colrowIndex = colIndex_pointer(curEl);
-            double *el_colrowNum = numeric_pointer(curEl);
-
-            PRLEVEL(1, ("el_colrowIndex =%p, el_colrowNum = %p \n",
-                        el_colrowIndex, el_colrowNum));
-
-            Int j = 0;  // Index inside an element
-            for (Int p = Sp[row]; p < Sp[row + 1]; p++)
-            {
-                el_colrowIndex[j] = Sj[p];
-                el_colrowNum[j++] = Sx[p];
-                PRLEVEL(1, ("Sj[%ld] =%ld Sx[%ld]=%lf \n", p, Sj[p], p, Sx[p]));
-                // for Matlab
-                PRLEVEL(0, ("%ld,%ld, %.16lf;\n", row + 1, Sj[p] + 1, Sx[p]));
-            }
-            el_colrowIndex[j++] = row;  // initializing element row index
-            paruMatInfo->lacList[e] = lac_el(elementList, e);
+        // Allocating Rowlist and updating its tuples
+        RowList[row].list =
+            (paru_Tuple *)paru_alloc(slackRow * nrows, sizeof(paru_Tuple));
+        if (RowList[row].list == NULL)
+        {  // out of memory
+            paru_freemat(&paruMatInfo);
+            printf("Paru: out of memory, RowList[row].list \n");
+            #pragma omp atomic
+            out_of_memory += 1;
         }
+        RowList[row].numTuple = 0;
+        RowList[row].len = slackRow;
+
+        paru_Tuple rowTuple;
+        rowTuple.e = e;
+        rowTuple.f = 0;
+        if (paru_add_rowTuple(RowList, row, rowTuple))
+        {
+            paru_freemat(&paruMatInfo);
+            printf("Paru: out of memory, add_rowTuple \n");
+            #pragma omp atomic
+            out_of_memory += 1;
+        }
+
+        // Allocating elements
+        Int *el_colrowIndex = colIndex_pointer(curEl);
+        double *el_colrowNum = numeric_pointer(curEl);
+
+        PRLEVEL(1, ("el_colrowIndex =%p, el_colrowNum = %p \n", el_colrowIndex,
+                    el_colrowNum));
+
+        Int j = 0;  // Index inside an element
+        for (Int p = Sp[row]; p < Sp[row + 1]; p++)
+        {
+            el_colrowIndex[j] = Sj[p];
+            el_colrowNum[j++] = Sx[p];
+            PRLEVEL(1, ("Sj[%ld] =%ld Sx[%ld]=%lf \n", p, Sj[p], p, Sx[p]));
+            // for Matlab
+            PRLEVEL(0, ("%ld,%ld, %.16lf;\n", row + 1, Sj[p] + 1, Sx[p]));
+        }
+        el_colrowIndex[j++] = row;  // initializing element row index
+        paruMatInfo->lacList[e] = lac_el(elementList, e);
     }
+    if (out_of_memory)
+        info = PARU_OUT_OF_MEMORY;
+    else 
+        info = PARU_SUCCESS;
 
     PRLEVEL(0, ("];\n"));
     PRLEVEL(0, ("I = InMatrix(:,1);\n"));
