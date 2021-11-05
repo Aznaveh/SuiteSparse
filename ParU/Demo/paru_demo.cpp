@@ -39,7 +39,6 @@ int main(int argc, char **argv)
         exit(1);
     }
 
-    //openblas_set_num_threads(1) ;
     BLAS_set_num_threads(1);
     //~~~~~~~~~~~~~~~~~~~Starting computation~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -85,8 +84,8 @@ int main(int argc, char **argv)
 #endif
 
     //~~~~~~~~~~~~~~~~~~~End computation~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    //openblas_set_num_threads(1) ;
-    BLAS_set_num_threads(1);
+    Int nprocs = omp_get_num_procs();
+    BLAS_set_num_threads(nprocs);
 
     //~~~~~~~~~~~~~~~~~~~Calling umfpack~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     double umf_time = 0;

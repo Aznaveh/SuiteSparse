@@ -13,7 +13,7 @@
 #define TASK_FL_THRESHOLD (double(1024 * 1024))
 
 #ifndef NDEBUG
-Int ntasks = 0 ;
+Int ntasks = 0;
 #endif
 
 ParU_ResultCode paru_do_fronts(Int f, paru_matrix *paruMatInfo)
@@ -58,16 +58,17 @@ ParU_ResultCode paru_do_fronts(Int f, paru_matrix *paruMatInfo)
             PRLEVEL(1, ("%% lots of children here\n"));
 #endif
 
-        Int nchild = (Childp[f + 1] - Childp[f]) ;
+        Int nchild = (Childp[f + 1] - Childp[f]);
 
         if (nchild == 1)
         {
-            PRLEVEL(1, ("%% Just one child for %ld\n",f));
+            PRLEVEL(1, ("%% Just one child for %ld\n", f));
 
-            Int i = Childp[f] ;
+            Int i = Childp[f];
             {
                 {
-                    ParU_ResultCode myInfo = paru_do_fronts(Child[i], paruMatInfo);
+                    ParU_ResultCode myInfo =
+                        paru_do_fronts(Child[i], paruMatInfo);
                     if (myInfo != PARU_SUCCESS)
                     {
                         // PRLEVEL(1, ("%% A problem happend in %ld\n", i));
@@ -83,96 +84,37 @@ ParU_ResultCode paru_do_fronts(Int f, paru_matrix *paruMatInfo)
                 PRLEVEL(1, ("%% A problem happend in %ld\n", f));
                 return info;
             }
-
         }
         else
         {
-
-#if 1
-
             // at least 2 children
-
 #ifndef NDEBUG
             #pragma omp atomic
-            ntasks += nchild ;
+            ntasks += nchild;
 #endif
-
             #pragma omp taskloop grainsize(1) shared(info)
             for (Int i = Childp[f]; i <= Childp[f + 1] - 1; i++)
             {
                 {
-                    ParU_ResultCode myInfo = 
+                    ParU_ResultCode myInfo =
                         paru_do_fronts(Child[i], paruMatInfo);
                     if (myInfo != PARU_SUCCESS)
                     {
-                        // PRLEVEL(1, ("%% A problem happend in %ld\n", i));
                         #pragma omp critical
                         info = myInfo;
-                        //#pragma omp cancel taskgroup
-                        // return info;
                     }
                 }
             }
-
-#else
-
-            // at least 2 children
-
-#ifndef NDEBUG
-            #pragma omp atomic
-            ntasks += (nchild - 1) ;
-#endif
-
-            #pragma omp taskloop nogroup
-            for (Int i = Childp[f] + 1; i <= Childp[f + 1] - 1; i++)
-            {
-                {
-                    ParU_ResultCode myInfo = paru_do_fronts(Child[i], paruMatInfo);
-                    if (myInfo != PARU_SUCCESS)
-                    {
-                        // PRLEVEL(1, ("%% A problem happend in %ld\n", i));
-                        info = myInfo;
-                        #pragma omp cancel taskgroup
-                        // return info;
-                    }
-                }
-            }
-
-            Int i = Childp[f];
-            {
-                {
-                    ParU_ResultCode myInfo = paru_do_fronts(Child[i], paruMatInfo);
-                    if (myInfo != PARU_SUCCESS)
-                    {
-                        // PRLEVEL(1, ("%% A problem happend in %ld\n", i));
-                        info = myInfo;
-                        // return info;
-                    }
-                }
-            }
-
-            #pragma omp taskwait
-#endif
-
-            if (info != PARU_SUCCESS)
-            {
-                return info;
-            }
-            // I could also use it but it doesnt work with cancel
+            if (info != PARU_SUCCESS) return info;
             info = paru_front(f, paruMatInfo);
-            if (info != PARU_SUCCESS)
-            {
-                PRLEVEL(1, ("%% A problem happend in %ld\n", f));
-                // return info;
-            }
-
+            if (info != PARU_SUCCESS) return info;
         }
     }
     return info;
 }
 
 ParU_ResultCode paru_factorize(cholmod_sparse *A, paru_symbolic *LUsym,
-        paru_matrix **paruMatInfo_handle)
+                               paru_matrix **paruMatInfo_handle)
 {
     DEBUGLEVEL(1);
     double my_start_time = omp_get_wtime();
@@ -217,8 +159,7 @@ ParU_ResultCode paru_factorize(cholmod_sparse *A, paru_symbolic *LUsym,
         info = paru_do_fronts(LUsym->roots[0], paruMatInfo);
     else
     {
-
-        #pragma omp taskloop nogroup 
+        #pragma omp taskloop nogroup
         for (Int i = 0; i < LUsym->num_roots; i++)
         {
             Int r = LUsym->roots[i];
@@ -226,10 +167,8 @@ ParU_ResultCode paru_factorize(cholmod_sparse *A, paru_symbolic *LUsym,
             ParU_ResultCode myInfo = paru_do_fronts(r, paruMatInfo);
             if (myInfo != PARU_SUCCESS)
             {
-                // PRLEVEL(1, ("%% A problem happend in %ld\n", i));
+                #pragma omp critical
                 info = myInfo;
-                //#pragma omp cancel taskgroup
-                // return info;
             }
         }
     }
@@ -240,14 +179,15 @@ ParU_ResultCode paru_factorize(cholmod_sparse *A, paru_symbolic *LUsym,
         return info;
     }
 #ifndef NDEBUG
-    else 
+    else
     {
-        PRLEVEL(1, ("%% factorization is done with %ld tasks\n",ntasks));
+        PRLEVEL(1, ("%% factorization is done with %ld tasks\n", ntasks));
+        printf("%% factorization is done with %ld tasks\n", ntasks);
     }
 #endif
 
     // The following code can be substituted in a sequential case
-    //Int nf = LUsym->nf;
+    // Int nf = LUsym->nf;
     // for (Int i = 0; i < nf; i++)
     //{
     //    if (i %1000 == 0) PRLEVEL(1, ("%% Wroking on front %ld\n", i));
