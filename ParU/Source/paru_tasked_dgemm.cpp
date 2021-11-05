@@ -29,25 +29,23 @@ void paru_tasked_dgemm(Int f, char *transa, char *transb, BLAS_INT *M,
         PRLEVEL(1, ("%% col-blocks=%ld,row-blocks=%ld) \n", num_col_blocks,
                     num_row_blocks));
         #pragma omp parallel
+        #pragma omp single
         {
-            #pragma omp single
+            for (Int I = 0; I < num_col_blocks; I++)
             {
-                for (Int I = 0; I < num_col_blocks; I++)
-                {
-                    BLAS_INT m = (I + 1) * L > *M ? (*M - I * L) : L;
+                BLAS_INT m = (I + 1) * L > *M ? (*M - I * L) : L;
 
-                    for (Int J = 0; J < num_row_blocks; J++)
-                    {
-                        BLAS_INT n = (J + 1) * L > *N ? (*N - J * L) : L;
-                        PRLEVEL(1, ("%% I=%ld J=%ld m=%ld n=%ld in %ld\n", I, J,
-                                    m, n, f));
-                        #pragma omp task
-                        BLAS_DGEMM(transa, transb, &m, &n, K, alpha,
-                                   A + (I * L), lda, B + (J * *ldb * L), ldb,
-                                   beta, C + (J * *ldc * L + I * L), ldc);
-                    }
+                for (Int J = 0; J < num_row_blocks; J++)
+                {
+                    BLAS_INT n = (J + 1) * L > *N ? (*N - J * L) : L;
+                    PRLEVEL(1, ("%% I=%ld J=%ld m=%ld n=%ld in %ld\n", I, J,
+                                m, n, f));
+                    #pragma omp task
+                    BLAS_DGEMM(transa, transb, &m, &n, K, alpha,
+                            A + (I * L), lda, B + (J * *ldb * L), ldb,
+                            beta, C + (J * *ldc * L + I * L), ldc);
                 }
-            }  // end of single region
-        }      // end of parallel region
+            }
+        }  
     }
 }

@@ -24,18 +24,16 @@ void paru_tasked_trsm(Int f, char *side, char *uplo, char *transa, char *diag,
         Int num_blocks = (*n %L == 0) ? *n / L : *n / L + 1;
         PRLEVEL(1, ("%%  num_blocks = %ld", num_blocks));
         #pragma omp parallel
+        #pragma omp single
         {
-            #pragma omp single
+            for (Int J = 0; J < num_blocks; J++)
             {
-                for (Int J = 0; J < num_blocks; J++)
-                {
-                    BLAS_INT n_b = (J + 1) * L > *n ? (*n - J * L) : L;
-                    PRLEVEL(1, ("%%  n_b= %d\n", n_b));
-                    #pragma omp task
-                    BLAS_DTRSM(side, uplo, transa, diag, m, &n_b, alpha, a, lda, 
-                            (b + J * L* *ldb), ldb);
-                }
-            }  // end of single region
-        }      // end of parallel region
+                BLAS_INT n_b = (J + 1) * L > *n ? (*n - J * L) : L;
+                PRLEVEL(1, ("%%  n_b= %d\n", n_b));
+                #pragma omp task 
+                BLAS_DTRSM(side, uplo, transa, diag, m, &n_b, alpha, a, lda, 
+                        (b + J * L* *ldb), ldb);
+            }
+        }  
     }
 }
