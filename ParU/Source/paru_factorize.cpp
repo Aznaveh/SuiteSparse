@@ -51,13 +51,6 @@ ParU_ResultCode paru_do_fronts(Int f, paru_matrix *paruMatInfo)
         Int *Childp = LUsym->Childp;
         Int *Child = LUsym->Child;
 
-#ifndef NDEBUG
-        PRLEVEL(1, ("%% tasks are generating for children of %ld(%lf)\n", f,
-                    stree_flop_bound[f]));
-        if (Childp[f + 1] - Childp[f] > 100)
-            PRLEVEL(1, ("%% lots of children here\n"));
-#endif
-
         Int nchild = (Childp[f + 1] - Childp[f]);
 
         if (nchild == 1)
@@ -71,13 +64,11 @@ ParU_ResultCode paru_do_fronts(Int f, paru_matrix *paruMatInfo)
                         paru_do_fronts(Child[i], paruMatInfo);
                     if (myInfo != PARU_SUCCESS)
                     {
-                        // PRLEVEL(1, ("%% A problem happend in %ld\n", i));
                         info = myInfo;
                         return info;
                     }
                 }
             }
-            // I could also use it but it doesnt work with cancel
             info = paru_front(f, paruMatInfo);
             if (info != PARU_SUCCESS)
             {
@@ -95,17 +86,18 @@ ParU_ResultCode paru_do_fronts(Int f, paru_matrix *paruMatInfo)
             #pragma omp taskloop grainsize(1) shared(info)
             for (Int i = Childp[f]; i <= Childp[f + 1] - 1; i++)
             {
+                ParU_ResultCode myInfo =
+                    paru_do_fronts(Child[i], paruMatInfo);
+                if (myInfo != PARU_SUCCESS)
                 {
-                    ParU_ResultCode myInfo =
-                        paru_do_fronts(Child[i], paruMatInfo);
-                    if (myInfo != PARU_SUCCESS)
-                    {
-                        #pragma omp critical
-                        info = myInfo;
-                    }
+                    #pragma omp critical
+                    info = myInfo;
                 }
             }
-            if (info != PARU_SUCCESS) return info;
+            if (info != PARU_SUCCESS) 
+            {
+                return info;
+            }
             info = paru_front(f, paruMatInfo);
             if (info != PARU_SUCCESS) return info;
         }
@@ -114,7 +106,7 @@ ParU_ResultCode paru_do_fronts(Int f, paru_matrix *paruMatInfo)
 }
 
 ParU_ResultCode paru_factorize(cholmod_sparse *A, paru_symbolic *LUsym,
-                               paru_matrix **paruMatInfo_handle)
+        paru_matrix **paruMatInfo_handle)
 {
     DEBUGLEVEL(1);
     double my_start_time = omp_get_wtime();
@@ -159,7 +151,7 @@ ParU_ResultCode paru_factorize(cholmod_sparse *A, paru_symbolic *LUsym,
         info = paru_do_fronts(LUsym->roots[0], paruMatInfo);
     else
     {
-        #pragma omp taskloop nogroup
+        #pragma omp taskloop shared(info) nogroup
         for (Int i = 0; i < LUsym->num_roots; i++)
         {
             Int r = LUsym->roots[i];
@@ -176,14 +168,15 @@ ParU_ResultCode paru_factorize(cholmod_sparse *A, paru_symbolic *LUsym,
     if (info != PARU_SUCCESS)
     {
         PRLEVEL(1, ("%% factorization has some problem\n"));
+        if  (info == PARU_OUT_OF_MEMORY)
+            printf("Paru: out of memory during factorization\n");
+        else if  (info == PARU_SINGULAR)
+            printf("Paru: Input matrix is singular\n");
         return info;
     }
 #ifndef NDEBUG
     else
-    {
         PRLEVEL(1, ("%% factorization is done with %ld tasks\n", ntasks));
-        printf("%% factorization is done with %ld tasks\n", ntasks);
-    }
 #endif
 
     // The following code can be substituted in a sequential case
