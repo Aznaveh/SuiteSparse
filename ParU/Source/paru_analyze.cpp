@@ -759,9 +759,6 @@ paru_symbolic *paru_analyze(
 #endif
     for (Int f = 0; f < nf; f++)
     {
-        // TODO
-        // work[f]= fp*fm*fn;
-        // sum(work[first[f]] ...work[f]) task size
 #ifndef NDEBUG
         Int fp = Super[f + 1] - Super[f];
         Int fm = LUsym->Fm[f];
@@ -818,7 +815,6 @@ paru_symbolic *paru_analyze(
         return NULL;
     }
 
-    // TODO: see GraphBLAS/Source/GB_memcpy
     paru_memcpy(cChildp, Childp, (nf + 2) * sizeof(Int));
 
     for (Int f = 0; f < nf; f++)
@@ -856,6 +852,7 @@ paru_symbolic *paru_analyze(
     }
 
     //-------- computing the inverse permutation for P and Diag_map
+    #pragma omp taskloop shared(m, Pinv, Pinit) grainsize(512)
     for (Int i = 0; i < m; i++)
     {
         Pinv[Pinit[i]] = i;
@@ -863,6 +860,7 @@ paru_symbolic *paru_analyze(
 
     if (Diag_map)
     {
+        #pragma omp taskloop shared(m, Diag_map, inv_Diag_map) grainsize(512)
         for (Int i = 0; i < m; i++)
         {
             Int newrow = Diag_map[i];  // Diag_map[newcol] = newrow
@@ -1141,6 +1139,7 @@ paru_symbolic *paru_analyze(
 #endif
 
     // update Pinv
+    #pragma omp taskloop shared(m, n1, Pinv, Pinit) grainsize(512)
     for (Int i = n1; i < m; i++)
     {
         Pinv[Pinit[i]] = i;
@@ -1148,6 +1147,7 @@ paru_symbolic *paru_analyze(
 
     ///////////////////////////////////////////////////////////////
     Int *cSp = Work;
+    #pragma omp taskloop shared(m, n1, cSp, Sp) grainsize(512)
     for (Int i = n1; i < m; i++)
     {
         Int row = i - n1;
