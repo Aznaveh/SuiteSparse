@@ -16,6 +16,7 @@ void swap_rows(double *F, Int *frowList, Int m, Int n, Int r1, Int r2)
     // This function also swap rows r1 and r2 wholly and indices
     if (r1 == r2) return;
     std::swap(frowList[r1], frowList[r2]);
+    #pragma omp taskloop shared(F, m, r1, r2, n) grainsize(512)
     for (Int j = 0; j < n; j++)
         // each column
         std::swap(F[j * m + r1], F[j * m + r2]);
@@ -106,30 +107,35 @@ Int paru_panel_factorize(Int f, Int m, Int n, const Int panel_width,
         //}
 
 
-        /*** ATTENTION: IT FACE A NUMERICAL PROBLEM HOWEVER I USE REDUCTION**/
-        //#pragma omp declare reduction\
-        //(maxfabs : double: \
-        // omp_out = fabs(omp_in) > fabs(omp_out) ? omp_in : omp_out )
+        /*** ATTENTION: IT FACES A NUMERICAL PROBLEM HOWEVER I USE REDUCTION**/
+        /*  #pragma omp declare reduction\
+        //  (maxfabs : double: \
+        //   omp_out = fabs(omp_in) > fabs(omp_out) ? omp_in : omp_out )
+        */
 
-        //#pragma omp parallel for reduction(maxfabs: maxval) default(none) 
-        //shared(F, row_max, j, m, row_end, frowList, diag_found, diag_val ) 
-        //firstprivate(row_diag)
-        //
-        //#pragma omp simd reduction(maxfabs: maxval) 
+        #pragma omp taskloop \
+        shared(maxval, F,row_max, row_end, \
+                row_diag, diag_val, diag_found, m, frowList) grainsize(512)
         for (Int i = j + 1; i < row_end; i++)
         {  // find max
-            if (fabs(maxval) < fabs(F[j * m + i]))
+            double value = F[j * m + i];
+            if (fabs(maxval) < fabs(value))
             {
-                maxval = F[j * m + i];
-                row_max = i;
+                #pragma omp critical
+                {
+                    maxval = value;
+                    row_max = i;
+                }
             }
             if (frowList[i] == row_diag)  // find diag
             {
-                diag_found = i;
-                diag_val = F[j * m + i];
+                #pragma omp critical
+                {//actually this will be seen at most one time
+                    diag_found = i;
+                    diag_val = value;
+                }
             }
         }
-
 
 #ifndef NDEBUG
         row_deg_max = row_degree_bound[frowList[row_max]];
@@ -166,8 +172,8 @@ Int paru_panel_factorize(Int f, Int m, Int n, const Int panel_width,
                 else
                 {
                     PRLEVEL(1, ("%% diag found but too small %ld"
-                                 " maxval=%2.4lf diag_val=%e \n",
-                                 row_piv, maxval, diag_val));
+                                " maxval=%2.4lf diag_val=%e \n",
+                                row_piv, maxval, diag_val));
                 }
 #endif
             }
@@ -185,14 +191,22 @@ Int paru_panel_factorize(Int f, Int m, Int n, const Int panel_width,
         if (chose_diag == 0)
         {
             Int row_sp = row_max;
+            #pragma omp taskloop  shared(maxval, F, row_sp, row_end, \
+                    m, piv, frowList, row_deg_sp) grainsize(512)
             for (Int i = j; i < row_end; i++)
-                if (fabs(PIV_TOLER * maxval) < fabs(F[j * m + i]) &&
-                    row_degree_bound[frowList[i]] < row_deg_sp)
+            {
+                double value = F[j * m + i];
+                if (fabs(PIV_TOLER * maxval) < fabs(value) &&
+                        row_degree_bound[frowList[i]] < row_deg_sp)
                 {  // numerically acceptalbe and sparser
-                    piv = F[j * m + i];
-                    row_deg_sp = row_degree_bound[frowList[i]];
-                    row_sp = i;
+                    #pragma omp critical
+                    {
+                        piv = value;
+                        row_deg_sp = row_degree_bound[frowList[i]];
+                        row_sp = i;
+                    }
                 }
+            }
             row_piv = row_sp;
         }
 
@@ -202,8 +216,8 @@ Int paru_panel_factorize(Int f, Int m, Int n, const Int panel_width,
             Int pivrow = frowList[row_piv];  // S row index
             paru_Diag_update(pivcol, pivrow, paruMatInfo);
             PRLEVEL(-1, ("%% symmetric matrix but the diag didn't picked for "
-                         "row_piv=%ld\n",
-                         row_piv));
+                        "row_piv=%ld\n",
+                        row_piv));
         }
         PRLEVEL(1, ("%% piv value= %2.4lf row_deg=%ld\n", piv, row_deg_sp));
 
@@ -230,7 +244,7 @@ Int paru_panel_factorize(Int f, Int m, Int n, const Int panel_width,
         if (j < row_end - 1)
         {
             PRLEVEL(1, ("%% dscal\n"));
-            #pragma omp simd
+            #pragma omp taskloop simd grainsize(512)
             for (Int i = j + 1; i < row_end; i++)
             {
                 PRLEVEL(1, ("%%i=%ld value= %2.4lf", i, F[j * m + i]));
@@ -320,10 +334,10 @@ Int paru_panel_factorize(Int f, Int m, Int n, const Int panel_width,
 }
 
 Int paru_factorize_full_summed(Int f, Int start_fac,
-                               std::vector<Int> &panel_row,
-                               std::set<Int> &stl_colSet,
-                               std::vector<Int> &pivotal_elements,
-                               paru_matrix *paruMatInfo)
+        std::vector<Int> &panel_row,
+        std::set<Int> &stl_colSet,
+        std::vector<Int> &pivotal_elements,
+        paru_matrix *paruMatInfo)
 {
     DEBUGLEVEL(0);
 
@@ -362,70 +376,69 @@ Int paru_factorize_full_summed(Int f, Int start_fac,
         Int j2 = (panel_num + 1) * panel_width;
         // factorize current panel
         paru_panel_factorize(f, rowCount, fp, panel_width, panel_num, row_end,
-                             paruMatInfo);
+                paruMatInfo);
 
         #pragma omp parallel
+        #pragma omp single
         {
-            #pragma omp single
-            {
-                // This can be done parallel to the  next part
-                #pragma omp task default(none) \
-                shared(paruMatInfo, pivotal_elements, stl_colSet) \
-                firstprivate(panel_num, row_end, f, start_fac)
-                if (paruMatInfo->LUsym->Cm[f] !=0)  
-                {  // if there is potential column left
-                    paru_update_rowDeg(panel_num, row_end, f, start_fac,
-                                       stl_colSet, pivotal_elements,
-                                       paruMatInfo);
-                }
+            // update row degree and dgeem can be done in parallel
+            #pragma omp task default(none) \
+            shared(paruMatInfo, pivotal_elements, stl_colSet) \
+            firstprivate(panel_num, row_end, f, start_fac)
+            if (paruMatInfo->LUsym->Cm[f] !=0)  
+            {  // if there is potential column left
+                paru_update_rowDeg(panel_num, row_end, f, start_fac,
+                        stl_colSet, pivotal_elements,
+                        paruMatInfo);
+            }
 
-                /*               trsm
-                 *
-                 *        F = fully summed part of the pivotal front
-                 *           op( A ) * B = alpha*B
-                 *
-                 *                <----------fp------------------->
-                 *                        j1 current j2
-                 *    F                    ^  panel  ^
-                 *     \           ____..._|_________|__________...___
-                 * ^              |\      |         |                 |
-                 * |              | \     |<--panel | rest of         |
-                 * |              |  \    | width-> |  piv front      |
-                 * |              |___\...|_______ _|_________ ... ___|
-                 * |   ^    j1--> |       |\        |                 |
-                 * | panel        |       |**\ A    |   B(In out)     |
-                 * | width        |       |*L**\    |                 |
-                 * |   v          |____...|******\ _|_________...____ |
-                 * |        j2--> |       |         |                 |
-                 * rowCount       |       |         |                 |
-                 * |              .       .         .                 .
-                 * |              .       .         .                 .
-                 * |              .       .         .                 .
-                 * v              |___....____________________..._____|
-                 *
-                 */
-                #pragma omp task  shared(F) \
-                firstprivate(panel_width, j1, j2, fp, f, rowCount)
-                
-                // I cannot use defualt none or it will have problem with my 
-                // debug code. I can use it in production though:
-                //default(none) firstprivate(print_level) shared(frowList)
-                
-                if (j2 < fp)  // if it is not the last
-                {
-                    BLAS_INT M = (BLAS_INT)panel_width;
-                    BLAS_INT N = (BLAS_INT)fp - j2;
-                    double alpha = 1.0;
-                    double *A = F + j1 * rowCount + j1;
-                    BLAS_INT lda = (BLAS_INT)rowCount;
-                    double *B = F + j2 * rowCount + j1;
-                    BLAS_INT ldb = (BLAS_INT)rowCount;
+            /*               trsm
+             *
+             *        F = fully summed part of the pivotal front
+             *           op( A ) * B = alpha*B
+             *
+             *                <----------fp------------------->
+             *                        j1 current j2
+             *    F                    ^  panel  ^
+             *     \           ____..._|_________|__________...___
+             * ^              |\      |         |                 |
+             * |              | \     |<--panel | rest of         |
+             * |              |  \    | width-> |  piv front      |
+             * |              |___\...|_______ _|_________ ... ___|
+             * |   ^    j1--> |       |\        |                 |
+             * | panel        |       |**\ A    |   B(In out)     |
+             * | width        |       |*L**\    |                 |
+             * |   v          |____...|******\ _|_________...____ |
+             * |        j2--> |       |         |                 |
+             * rowCount       |       |         |                 |
+             * |              .       .         .                 .
+             * |              .       .         .                 .
+             * |              .       .         .                 .
+             * v              |___....____________________..._____|
+             *
+             */
+            #pragma omp task  shared(F) \
+            firstprivate(panel_width, j1, j2, fp, f, rowCount)
+
+            // I cannot use defualt none or it will have problem with my 
+            // debug code. I can use it in production though:
+            //default(none) firstprivate(print_level) shared(frowList)
+
+            if (j2 < fp)  // if it is not the last
+            {
+                BLAS_INT M = (BLAS_INT)panel_width;
+                BLAS_INT N = (BLAS_INT)fp - j2;
+                double alpha = 1.0;
+                double *A = F + j1 * rowCount + j1;
+                BLAS_INT lda = (BLAS_INT)rowCount;
+                double *B = F + j2 * rowCount + j1;
+                BLAS_INT ldb = (BLAS_INT)rowCount;
 #ifndef NDEBUG
                     Int PR = 1;
                     PRLEVEL(PR, ("%% M =%d N = %d alpha = %f \n", M, N, alpha));
                     PRLEVEL(PR, ("%% lda =%d ldb =%d\n", lda, ldb));
                     PRLEVEL(PR, ("%% Pivotal Front Before Trsm: %ld x %ld\n",
-                                 fp, rowCount));
+                                fp, rowCount));
                     for (Int r = 0; r < rowCount; r++)
                     {
                         PRLEVEL(PR, ("%% %ld\t", frowList[r]));
@@ -436,7 +449,7 @@ Int paru_factorize_full_summed(Int f, Int start_fac,
 
 #endif
                     paru_tasked_trsm(f, "L", "L", "N", "U", &M, &N, &alpha, A,
-                                     &lda, B, &ldb);
+                            &lda, B, &ldb);
 #ifdef COUNT_FLOPS
                     paruMatInfo->flp_cnt_trsm += (double)(M + 1) * M * N;
 #ifndef NDEBUG
@@ -449,7 +462,7 @@ Int paru_factorize_full_summed(Int f, Int start_fac,
 
 #ifndef NDEBUG
                     PRLEVEL(PR, ("%% Pivotal Front After Trsm: %ld x %ld\n %%",
-                                 fp, rowCount));
+                                fp, rowCount));
                     for (Int r = 0; r < rowCount; r++)
                     {
                         PRLEVEL(PR, ("%% %ld\t", frowList[r]));
@@ -459,7 +472,6 @@ Int paru_factorize_full_summed(Int f, Int start_fac,
                     }
 #endif
                 }
-            }  // end of single region
         }      // end of parallel region
 
         /*               dgemm   C := alpha*op(A)*op(B) + beta*C
@@ -521,7 +533,7 @@ Int paru_factorize_full_summed(Int f, Int start_fac,
             //           &ldc);
 
             paru_tasked_dgemm(f, "N", "N", &M, &N, &K, &alpha, A, &lda, B, &ldb,
-                              &beta, C, &ldc);
+                    &beta, C, &ldc);
 
             // double tot_time = omp_get_wtime() - start_time;
             // printf ("%ld  %lf ",f, tot_time);
@@ -542,7 +554,7 @@ Int paru_factorize_full_summed(Int f, Int start_fac,
         if (j2 < fp)
         {
             PRLEVEL(PR, ("%% Pivotal Front After Dgemm: %ld x %ld\n %%", fp,
-                         rowCount));
+                        rowCount));
             for (Int r = 0; r < rowCount; r++)
             {
                 PRLEVEL(PR, ("%% %ld\t", frowList[r]));

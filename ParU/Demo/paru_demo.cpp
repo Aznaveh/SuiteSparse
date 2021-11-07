@@ -39,9 +39,9 @@ int main(int argc, char **argv)
         exit(1);
     }
 
-    BLAS_set_num_threads(1);
     //~~~~~~~~~~~~~~~~~~~Starting computation~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+    BLAS_set_num_threads(1);
     int scale = 0;
     Int NoProblem = 0;
 
