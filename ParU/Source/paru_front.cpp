@@ -367,38 +367,6 @@ ParU_ResultCode paru_front(Int f,  // front need to be assembled
     ASSERT(Us[f].p == NULL);
     Us[f].p = uPart;
 
-    // use current mark for updating pivotal rows relative indices
-
-    /*
-
-        for (i = 0 ; i < n ; n++)
-        {
-        }
-
-        #pragma omp parallel for num_threads( ... ) schedule(static)
-        for (i = 0 ; i < n ; n++)
-        {
-        }
-
-        #pragma omp parallel for num_threads( ... ) schedule(dynamic,1)
-        for (int taskid = 0 ; taskid < ntasks ; taskid++)
-        {
-            taskid does [ lo... hi] of the index space
-            GB_PARITITION, to find lo:hi
-            ...
-        }
-
-        for (int taskid = 0 ; taskid < ntasks ; taskid++)
-        {
-            #pragma omp task
-            ...
-            taskid does [ lo... hi] of the index space
-        }
-        #pragma omp taskwait ...
-
-
-    */
-
     // TODO: consider using parallel tasks for this loop,
     // or a #pragma omp parallel for
     tupleList *RowList = paruMatInfo->RowList;

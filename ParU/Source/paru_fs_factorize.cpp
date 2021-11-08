@@ -16,7 +16,7 @@ void swap_rows(double *F, Int *frowList, Int m, Int n, Int r1, Int r2)
     // This function also swap rows r1 and r2 wholly and indices
     if (r1 == r2) return;
     std::swap(frowList[r1], frowList[r2]);
-    #pragma omp taskloop shared(F, m, r1, r2, n) grainsize(512)
+    #pragma omp taskloop default(none) shared(F, m, r1, r2, n) grainsize(512)
     for (Int j = 0; j < n; j++)
         // each column
         std::swap(F[j * m + r1], F[j * m + r2]);
@@ -113,8 +113,8 @@ Int paru_panel_factorize(Int f, Int m, Int n, const Int panel_width,
         //   omp_out = fabs(omp_in) > fabs(omp_out) ? omp_in : omp_out )
         */
 
-        #pragma omp taskloop \
-        shared(maxval, F,row_max, row_end, \
+        #pragma omp taskloop default(none)\
+        shared(maxval, F,row_max, row_end, j,\
                 row_diag, diag_val, diag_found, m, frowList) grainsize(512)
         for (Int i = j + 1; i < row_end; i++)
         {  // find max
@@ -191,8 +191,9 @@ Int paru_panel_factorize(Int f, Int m, Int n, const Int panel_width,
         if (chose_diag == 0)
         {
             Int row_sp = row_max;
-            #pragma omp taskloop  shared(maxval, F, row_sp, row_end, \
-                    m, piv, frowList, row_deg_sp) grainsize(512)
+            #pragma omp taskloop  default(none) shared(maxval, F, row_sp, j, \
+            row_end, m, piv, frowList, row_degree_bound, row_deg_sp)\
+            grainsize(512)
             for (Int i = j; i < row_end; i++)
             {
                 double value = F[j * m + i];
@@ -244,12 +245,13 @@ Int paru_panel_factorize(Int f, Int m, Int n, const Int panel_width,
         if (j < row_end - 1)
         {
             PRLEVEL(1, ("%% dscal\n"));
-            #pragma omp taskloop simd grainsize(512)
+            #pragma omp taskloop simd default(none)\
+            shared(j, row_end, F, m, piv) grainsize(512)
             for (Int i = j + 1; i < row_end; i++)
             {
-                PRLEVEL(1, ("%%i=%ld value= %2.4lf", i, F[j * m + i]));
+                //printf("%%i=%ld value= %2.4lf", i, F[j * m + i]);
                 F[j * m + i] /= piv;
-                PRLEVEL(1, (" -> %2.4lf\n", F[j * m + i]));
+                //printf(" -> %2.4lf\n", F[j * m + i]);
             }
         }
 

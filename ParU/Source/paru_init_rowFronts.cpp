@@ -194,22 +194,17 @@ ParU_ResultCode paru_init_rowFronts(
 
 #endif
 
-    // constants for initialzing lists
-    Int slackRow = 2;
-
     PRLEVEL(0, ("InMatrix=[\n"));  // MATLAB matrix,
 
     // copying Diag_map
     if (Diag_map)
     {
-        #pragma omp taskloop\
+        #pragma omp taskloop default(none)\
         shared(LUsym, Diag_map, inv_Diag_map) grainsize(512)
         for (Int i = 0; i < LUsym->n; i++)
         {
             // paru_memcpy(Diag_map, LUsym->Diag_map, (LUsym->n) * sizeof(Int));
             Diag_map[i] = LUsym->Diag_map[i];
-            ASSERT(Diag_map[i] >= 0);
-            ASSERT(Diag_map[i] < LUsym->n);
             inv_Diag_map[Diag_map[i]] = i;
         }
 #ifndef NDEBUG
@@ -245,17 +240,16 @@ ParU_ResultCode paru_init_rowFronts(
     ParU_ResultCode info;
     Int out_of_memory = 0;
     //#pragma omp parallel for shared(out_of_memory)
-    #pragma omp taskloop shared(out_of_memory) grainsize(512)
+    #pragma omp taskloop default(none) \
+    shared(out_of_memory, LUsym, Sp, row_degree_bound, elementList, \
+            paruMatInfo, rowMark, RowList, Sj, Sx) grainsize(512)
     for (Int row = 0; row < m; row++)
     {
         Int e = LUsym->row2atree[row];
         Int nrows = 1,
             ncols =
                 Sp[row + 1] - Sp[row];  // nrows and ncols of current front/row
-        PRLEVEL(1, ("%% element %ld = %ld x %ld\n", e, nrows, ncols));
-
-        ASSERT(nrows > 0);
-        ASSERT(ncols > 0);
+        //printf("%% element %ld = %ld x %ld\n", e, nrows, ncols);
 
         row_degree_bound[row] = ncols;  // Initialzing row degree
 
@@ -284,18 +278,19 @@ ParU_ResultCode paru_init_rowFronts(
             #pragma omp atomic
             out_of_memory += 1;
         }
-        PRLEVEL(1, ("%%Heap allocated %p id=%ld \n", curHeap, e));
+        //printf("%%Heap allocated %p id=%ld \n", curHeap, e);
 
         curHeap->push_back(e);
 
 #ifndef NDEBUG  // Printing the pointers info
-        Int PR = 1;
-        PRLEVEL(PR, ("%% curEl = %p ", curEl));
+        //printf ("%% curEl = %p ", curEl);
         Int size = sizeof(paru_Element) + sizeof(Int) * (2 * (nrows + ncols)) +
                    sizeof(double) * nrows * ncols;
-        PRLEVEL(PR, ("size= %ld", size));
-        PRLEVEL(PR, ("\n"));
+        //printf("size= %ld\n", size);
 #endif
+
+        // constants for initialzing lists
+        Int slackRow = 2;
 
         // Allocating Rowlist and updating its tuples
         RowList[row].list =
@@ -325,17 +320,17 @@ ParU_ResultCode paru_init_rowFronts(
         Int *el_colrowIndex = colIndex_pointer(curEl);
         double *el_colrowNum = numeric_pointer(curEl);
 
-        PRLEVEL(1, ("el_colrowIndex =%p, el_colrowNum = %p \n", el_colrowIndex,
-                    el_colrowNum));
+        //printf("el_colrowIndex =%p, el_colrowNum = %p \n",
+        // el_colrowIndex, el_colrowNum);
 
         Int j = 0;  // Index inside an element
         for (Int p = Sp[row]; p < Sp[row + 1]; p++)
         {
             el_colrowIndex[j] = Sj[p];
             el_colrowNum[j++] = Sx[p];
-            PRLEVEL(1, ("Sj[%ld] =%ld Sx[%ld]=%lf \n", p, Sj[p], p, Sx[p]));
+            //printf("Sj[%ld] =%ld Sx[%ld]=%lf \n", p, Sj[p], p, Sx[p]);
             // for Matlab
-            PRLEVEL(0, ("%ld,%ld, %.16lf;\n", row + 1, Sj[p] + 1, Sx[p]));
+            //printf("%ld,%ld, %.16lf;\n", row + 1, Sj[p] + 1, Sx[p]);
         }
         el_colrowIndex[j++] = row;  // initializing element row index
         paruMatInfo->lacList[e] = lac_el(elementList, e);

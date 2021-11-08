@@ -83,7 +83,8 @@ ParU_ResultCode paru_do_fronts(Int f, paru_matrix *paruMatInfo)
             #pragma omp atomic
             ntasks += nchild;
 #endif
-            #pragma omp taskloop grainsize(1) shared(info)
+            #pragma omp taskloop default(none)\
+            shared(info, f, Child, Childp, paruMatInfo)
             for (Int i = Childp[f]; i <= Childp[f + 1] - 1; i++)
             {
                 ParU_ResultCode myInfo =
@@ -148,17 +149,18 @@ ParU_ResultCode paru_factorize(cholmod_sparse *A, paru_symbolic *LUsym,
     {
         // do_fronts generate a task parallel region
 #ifndef NDEBUG
-        Int *Parent = LUsym->Parent;
+        //Int *Parent = LUsym->Parent;
 #endif
         if (LUsym->num_roots == 1)
             info = paru_do_fronts(LUsym->roots[0], paruMatInfo);
         else
         {
-            #pragma omp taskloop shared(info) nogroup
+            #pragma omp taskloop  default(none)\
+            shared(info, LUsym, paruMatInfo)
             for (Int i = 0; i < LUsym->num_roots; i++)
             {
                 Int r = LUsym->roots[i];
-                ASSERT(Parent[r] == -1);
+                //ASSERT(Parent[r] == -1);
                 ParU_ResultCode myInfo = paru_do_fronts(r, paruMatInfo);
                 if (myInfo != PARU_SUCCESS)
                 {
