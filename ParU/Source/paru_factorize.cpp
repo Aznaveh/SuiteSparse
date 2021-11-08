@@ -143,24 +143,28 @@ ParU_ResultCode paru_factorize(cholmod_sparse *A, paru_symbolic *LUsym,
         return info;
     }
 
-    // do_fronts generate a task parallel region
-#ifndef NDEBUG
-    Int *Parent = LUsym->Parent;
-#endif
-    if (LUsym->num_roots == 1)
-        info = paru_do_fronts(LUsym->roots[0], paruMatInfo);
-    else
+    #pragma omp parallel
+    #pragma omp single
     {
-        #pragma omp taskloop shared(info) nogroup
-        for (Int i = 0; i < LUsym->num_roots; i++)
+        // do_fronts generate a task parallel region
+#ifndef NDEBUG
+        Int *Parent = LUsym->Parent;
+#endif
+        if (LUsym->num_roots == 1)
+            info = paru_do_fronts(LUsym->roots[0], paruMatInfo);
+        else
         {
-            Int r = LUsym->roots[i];
-            ASSERT(Parent[r] == -1);
-            ParU_ResultCode myInfo = paru_do_fronts(r, paruMatInfo);
-            if (myInfo != PARU_SUCCESS)
+            #pragma omp taskloop shared(info) nogroup
+            for (Int i = 0; i < LUsym->num_roots; i++)
             {
-                #pragma omp critical
-                info = myInfo;
+                Int r = LUsym->roots[i];
+                ASSERT(Parent[r] == -1);
+                ParU_ResultCode myInfo = paru_do_fronts(r, paruMatInfo);
+                if (myInfo != PARU_SUCCESS)
+                {
+                    #pragma omp critical
+                    info = myInfo;
+                }
             }
         }
     }
