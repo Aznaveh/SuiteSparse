@@ -202,6 +202,8 @@ ParU_ResultCode paru_init_rowFronts(
     // copying Diag_map
     if (Diag_map)
     {
+        #pragma omp taskloop\
+        shared(LUsym, Diag_map, inv_Diag_map) grainsize(512)
         for (Int i = 0; i < LUsym->n; i++)
         {
             // paru_memcpy(Diag_map, LUsym->Diag_map, (LUsym->n) * sizeof(Int));
@@ -242,7 +244,8 @@ ParU_ResultCode paru_init_rowFronts(
 
     ParU_ResultCode info;
     Int out_of_memory = 0;
-    #pragma omp parallel for shared(out_of_memory)
+    //#pragma omp parallel for shared(out_of_memory)
+    #pragma omp taskloop shared(out_of_memory) grainsize(512)
     for (Int row = 0; row < m; row++)
     {
         Int e = LUsym->row2atree[row];
