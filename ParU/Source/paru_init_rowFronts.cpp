@@ -284,8 +284,8 @@ ParU_ResultCode paru_init_rowFronts(
 
 #ifndef NDEBUG  // Printing the pointers info
         //printf ("%% curEl = %p ", curEl);
-        Int size = sizeof(paru_Element) + sizeof(Int) * (2 * (nrows + ncols)) +
-                   sizeof(double) * nrows * ncols;
+        //Int size = sizeof(paru_Element) + sizeof(Int) * (2 * (nrows + ncols)) 
+        //           + sizeof(double) * nrows * ncols;
         //printf("size= %ld\n", size);
 #endif
 

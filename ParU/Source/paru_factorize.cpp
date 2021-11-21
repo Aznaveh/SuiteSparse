@@ -78,6 +78,7 @@ ParU_ResultCode paru_do_fronts(Int f, paru_matrix *paruMatInfo)
         }
         else
         {
+            PRLEVEL(1, ("%% At least 2 children, creating tasks for %ld\n", f));
             // at least 2 children
 #ifndef NDEBUG
             #pragma omp atomic

@@ -54,7 +54,7 @@ int main(int argc, char **argv)
         cholmod_l_finish(cc);
         return PARU_INVALID;
     }
-    printf ("Paru: Symbolic fatorization is done!\n");
+    printf ("Paru: Symbolic factorization is done!\n");
     ParU_ResultCode info;
     paru_matrix *paruMatInfo;
     info = paru_factorize(A, LUsym, &paruMatInfo);

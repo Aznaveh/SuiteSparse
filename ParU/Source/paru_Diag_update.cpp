@@ -34,7 +34,7 @@ void paru_Diag_update(Int pivcol, Int pivrow, paru_matrix *paruMatInfo)
     Int col2 = inv_Diag_map[pivrow];
     Diag_map[col2] = diag_row;
 
-    PRLEVEL(1, ("%% Inside Diag update pivcol=%ld pivrow=%ld"
+    PRLEVEL(PR, ("%% Inside Diag update pivcol=%ld pivrow=%ld"
                 " diag_row=%ld col2=%ld\n",
                 pivcol, pivrow, diag_row, col2));
 

@@ -38,7 +38,7 @@ void paru_tasked_dgemm(Int f, char *transa, char *transb, BLAS_INT *M,
                 for (Int J = 0; J < num_row_blocks; J++)
                 {
                     BLAS_INT n = (J + 1) * L > *N ? (*N - J * L) : L;
-                    PRLEVEL(1, ("%% I=%ld J=%ld m=%ld n=%ld in %ld\n", I, J,
+                    PRLEVEL(1, ("%% I=%ld J=%ld m=%d n=%d in %ld\n", I, J,
                                 m, n, f));
                     #pragma omp task
                     BLAS_DGEMM(transa, transb, &m, &n, K, alpha,

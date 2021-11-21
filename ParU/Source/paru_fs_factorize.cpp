@@ -216,7 +216,7 @@ Int paru_panel_factorize(Int f, Int m, Int n, const Int panel_width,
             Int pivcol = col1 + j + n1;      // S col index + n1
             Int pivrow = frowList[row_piv];  // S row index
             paru_Diag_update(pivcol, pivrow, paruMatInfo);
-            PRLEVEL(-1, ("%% symmetric matrix but the diag didn't picked for "
+            PRLEVEL(1, ("%% symmetric matrix but the diag didn't picked for "
                         "row_piv=%ld\n",
                         row_piv));
         }
