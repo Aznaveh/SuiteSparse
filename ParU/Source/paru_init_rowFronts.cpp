@@ -241,7 +241,7 @@ ParU_ResultCode paru_init_rowFronts(
     Int out_of_memory = 0;
     //#pragma omp parallel for shared(out_of_memory)
     #pragma omp taskloop default(none) \
-    shared(out_of_memory, LUsym, Sp, row_degree_bound, elementList, \
+    shared(out_of_memory, LUsym, Sp, row_degree_bound, elementList, m, \
             paruMatInfo, rowMark, RowList, Sj, Sx) grainsize(512)
     for (Int row = 0; row < m; row++)
     {
