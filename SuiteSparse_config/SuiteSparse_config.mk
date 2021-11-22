@@ -163,10 +163,10 @@ SUITESPARSE_VERSION = 5.5.0
 
     # LAPACK ?= -llapack
 	# Aznaveh: uncomment here to use openblas
-     BLAS ?= -lopenblas
+     # BLAS ?= -lopenblas
 
     ifndef BLAS
-        ifdef MKLROOT
+#       ifdef MKLROOT
             # use the Intel MKL for BLAS and LAPACK
             # using static linking:
             # BLAS = -Wl,--start-group \
@@ -175,12 +175,13 @@ SUITESPARSE_VERSION = 5.5.0
             #   $(MKLROOT)/lib/intel64/libmkl_intel_thread.a \
             #   -Wl,--end-group -lpthread -lm
             # using dynamic linking:
+            CFLAGS += -DMKLROOT -I/usr/include/mkl
             BLAS = -lmkl_intel_lp64 -lmkl_core -lmkl_intel_thread -liomp5 -lpthread -lm
             LAPACK =
-        else
-            # use the OpenBLAS at http://www.openblas.net
-            BLAS = -lopenblas
-        endif
+#       else
+#           # use the OpenBLAS at http://www.openblas.net
+#           BLAS = -lopenblas
+#       endif
     endif
 
     # For ACML, use this instead:
