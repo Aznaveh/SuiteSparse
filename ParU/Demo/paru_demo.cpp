@@ -67,7 +67,7 @@ int main(int argc, char **argv)
         cholmod_l_finish(cc);
         return info;
     }
-    printf ("Paru: factorization was successfull.\n");
+    printf ("Paru: factorization was successfull in %lf seconds.\n",my_time);
 
     //~~~~~~~~~~~~~~~~~~~Test the results ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #if 1
