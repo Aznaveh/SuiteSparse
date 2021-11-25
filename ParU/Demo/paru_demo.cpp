@@ -84,8 +84,8 @@ int main(int argc, char **argv)
 #endif
 
     //~~~~~~~~~~~~~~~~~~~End computation~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    Int nprocs = omp_get_num_procs();
-    BLAS_set_num_threads(nprocs);
+    Int max_threads = omp_get_max_threads();
+    BLAS_set_num_threads(max_threads);
 
     //~~~~~~~~~~~~~~~~~~~Calling umfpack~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     double umf_time = 0;
