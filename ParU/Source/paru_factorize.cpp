@@ -14,13 +14,15 @@
 
 #ifndef NDEBUG
 Int ntasks = 0;
+Int ntasks_bar = 16;
 #endif
+Int nbranches= 0;
 
 ParU_ResultCode paru_do_fronts(Int f, paru_matrix *paruMatInfo)
 // This routine call paru_front from first(f)...f including f
 // This routine is called recursively to make tasks
 {
-    DEBUGLEVEL(1);
+    DEBUGLEVEL(0);
     paru_symbolic *LUsym = paruMatInfo->LUsym;
     ParU_ResultCode info;
 
@@ -83,25 +85,63 @@ ParU_ResultCode paru_do_fronts(Int f, paru_matrix *paruMatInfo)
 #ifndef NDEBUG
             #pragma omp atomic
             ntasks += nchild;
-#endif
-            #pragma omp taskloop default(none)\
-            shared(info, f, Child, Childp, paruMatInfo)
-            for (Int i = Childp[f]; i <= Childp[f + 1] - 1; i++)
+
+            #pragma omp critical
             {
-                ParU_ResultCode myInfo =
-                    paru_do_fronts(Child[i], paruMatInfo);
-                if (myInfo != PARU_SUCCESS)
+                PRLEVEL(1, ("%% ntasks=%ld\n", ntasks));
+                if( ntasks > ntasks_bar) 
                 {
-                    #pragma omp critical
-                    info = myInfo;
+                    printf("%% ntasks=%ld\n", ntasks);
+                    ntasks_bar<<=1;
                 }
             }
-            if (info != PARU_SUCCESS) 
+#endif
+           if (nbranches> 64*64)
             {
-                return info;
+                for (Int i = Childp[f]; i <= Childp[f + 1] - 1; i++)
+                    //for (Int i = Childp[f+1] -1 ; i >= Childp[f]; i--)
+                {
+                    ParU_ResultCode myInfo =
+                        paru_do_fronts(Child[i], paruMatInfo);
+                    if (myInfo != PARU_SUCCESS)
+                    {
+                        #pragma omp critical
+                        info = myInfo;
+                    }
+                }
+                if (info != PARU_SUCCESS) 
+                {
+                    return info;
+                }
+                info = paru_front(f, paruMatInfo);
+                if (info != PARU_SUCCESS) return info;
             }
-            info = paru_front(f, paruMatInfo);
-            if (info != PARU_SUCCESS) return info;
+            else
+            {
+                #pragma omp atomic
+                nbranches+= nchild;
+
+                #pragma omp taskloop default(none)\
+                shared(info, f, Child, Childp, paruMatInfo)
+                for (Int i = Childp[f]; i <= Childp[f + 1] - 1; i++)
+                    //for (Int i = Childp[f+1] -1 ; i >= Childp[f]; i--)
+                {
+                    ParU_ResultCode myInfo =
+                        paru_do_fronts(Child[i], paruMatInfo);
+                    if (myInfo != PARU_SUCCESS)
+                    {
+                        #pragma omp critical
+                        info = myInfo;
+                    }
+                }
+                if (info != PARU_SUCCESS) 
+                {
+                    return info;
+                }
+                info = paru_front(f, paruMatInfo);
+                if (info != PARU_SUCCESS) return info;
+ 
+            }
         }
     }
     return info;
@@ -183,7 +223,7 @@ ParU_ResultCode paru_factorize(cholmod_sparse *A, paru_symbolic *LUsym,
     }
 #ifndef NDEBUG
     else
-        PRLEVEL(1, ("%% factorization is done with %ld tasks\n", ntasks));
+        PRLEVEL(0, ("%% factorization is done with %ld tasks\n", ntasks));
 #endif
 
     // The following code can be substituted in a sequential case
