@@ -121,17 +121,23 @@ ParU_ResultCode paru_do_fronts(Int f, paru_matrix *paruMatInfo)
                 #pragma omp atomic
                 nbranches+= nchild;
 
-                #pragma omp taskloop default(none)\
-                shared(info, f, Child, Childp, paruMatInfo)
+                //#pragma omp taskloop default(none)\
+                //shared(info, f, Child, Childp, paruMatInfo)
+                #pragma omp taskgroup 
                 for (Int i = Childp[f]; i <= Childp[f + 1] - 1; i++)
                     //for (Int i = Childp[f+1] -1 ; i >= Childp[f]; i--)
                 {
-                    ParU_ResultCode myInfo =
-                        paru_do_fronts(Child[i], paruMatInfo);
-                    if (myInfo != PARU_SUCCESS)
+                    Int *Depth = LUsym->Depth;
+                    Int d = Depth[Child[i]];
+                    #pragma omp task priority(d)
                     {
-                        #pragma omp critical
-                        info = myInfo;
+                        ParU_ResultCode myInfo =
+                            paru_do_fronts(Child[i], paruMatInfo);
+                        if (myInfo != PARU_SUCCESS)
+                        {
+                            #pragma omp critical
+                            info = myInfo;
+                        }
                     }
                 }
                 if (info != PARU_SUCCESS) 
@@ -140,7 +146,7 @@ ParU_ResultCode paru_do_fronts(Int f, paru_matrix *paruMatInfo)
                 }
                 info = paru_front(f, paruMatInfo);
                 if (info != PARU_SUCCESS) return info;
- 
+
             }
         }
     }
