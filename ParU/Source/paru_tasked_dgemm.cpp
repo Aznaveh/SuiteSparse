@@ -7,22 +7,22 @@
  * @author Aznaveh
  */
 #include "paru_internal.hpp"
-#define L 512
+#define L 256
 void paru_tasked_dgemm(Int f, char *transa, char *transb, BLAS_INT *M,
                        BLAS_INT *N, BLAS_INT *K, double *alpha, double *A,
                        BLAS_INT *lda, double *B, BLAS_INT *ldb, double *beta,
                        double *C, BLAS_INT *ldc)
 {
-    DEBUGLEVEL(1);
+    DEBUGLEVEL(0);
     if (*M < L && *N < L)
     { //TODO use a nested loop for very small dgemms?
-        PRLEVEL(1, ("%% No tasking for BLAS (%dx%d) in %ld\n", *M, *N, f));
+        PRLEVEL(1, ("%% No tasking for DGEMM (%dx%d) in %ld\n", *M, *N, f));
         BLAS_DGEMM(transa, transb, M, N, K, alpha, A, lda, B, ldb, beta, C,
                    ldc);
     }
     else
     {
-        PRLEVEL(1, ("%% YES tasking for BLAS (%dx%d) in %ld", *M, *N, f));
+        PRLEVEL(1, ("%% YES tasking for DGEMM (%dx%d) in %ld", *M, *N, f));
 
         Int num_col_blocks =  *N / L + 1 ;
         Int num_row_blocks =  *M / L + 1 ;
@@ -33,7 +33,7 @@ void paru_tasked_dgemm(Int f, char *transa, char *transb, BLAS_INT *M,
         PRLEVEL(1, ("%% col-blocks=%ld,row-blocks=%ld) \n", num_col_blocks,
                     num_row_blocks));
  
-        #pragma omp parallel
+        #pragma omp parallel proc_bind(close)
         #pragma omp single
         {
             for (Int I = 0; I < num_row_blocks; I++)
