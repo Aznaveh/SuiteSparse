@@ -149,6 +149,8 @@ typedef struct
     Int *Child;   // size nf+1      tree
     Int *Childp;  // size nf+2
 
+    Int *Depth;  // size nf distance of each node from the root
+
     // The parent of a front f is Parent [f], or EMPTY if f=nf.
     // A list of children of f can be obtained in the list
     // Child [Childp [f] ... Childp [f+1]-1].

@@ -525,10 +525,12 @@ paru_symbolic *paru_analyze(
     // Making Super data structure
     // like SPQR: Super[f]<= pivotal columns of (f) < Super[f+1]
     Int *Super = LUsym->Super = NULL;
+    Int *Depth= LUsym->Depth = NULL;
     if (nf > 0)
     {
         Super = LUsym->Super = (Int *)paru_alloc((nf + 1), sizeof(Int));
-        if (Super == NULL)
+        Depth = LUsym->Depth = (Int *)paru_calloc(nf, sizeof(Int));
+        if (Super == NULL || Depth == NULL)
         {
             printf("Paru: memory problem\n");
             paru_free((m + 1), sizeof(Int), Pinit);
@@ -736,7 +738,50 @@ paru_symbolic *paru_analyze(
     paru_free((n + 1), sizeof(Int), Front_npivcol);
     paru_free((n + 1), sizeof(Int), fmap);
 
-    //////////////////////end of relaxed amalgamation/////////////////////////
+    //////////////////////end of relaxed amalgamation//////////////////////////
+
+    
+    //////////////////////computing the depth of each front ///////////////////
+    //
+#ifndef NDEBUG
+PR = 1;
+#endif
+
+    for (Int f = 0; f < nf; f++)
+    {
+        if (Parent[f] != -1 && Depth[f] == 0) //not computed so far
+        {
+            PRLEVEL(PR, ("%% Precompute Depth[%ld]=%ld\n",f,Depth[f]));
+            Int d = 1;
+            Int p = Parent[f];
+            while( Parent[p] != -1 && Depth[p] == 0)
+            {
+                p = Parent[p];
+                d++;
+                PRLEVEL(PR, ("%% Up Depth[%ld]=%ld d=%ld\n",p,Depth[p],d));
+            }
+            Depth[f] = d + Depth[p]; //depth is computed
+            PRLEVEL(PR, ("%% Depth[%ld]=%ld Depth[%ld]=%ld\n",
+                        p,Depth[p],f,Depth[f]));
+            // updating ancestors
+            d = Depth[f];
+            p = Parent[f];
+            while( Parent[p] != -1 && Depth[p] == 0)
+            {
+                Depth[p] = --d;
+                p = Parent[p];
+                PRLEVEL(PR, ("%% down Depth[%ld]=%ld d=%ld\n",p,Depth[p],d));
+            }
+        }
+        PRLEVEL(PR, ("%% Postcompute Depth[%ld]=%ld\n",f,Depth[f]));
+    }
+
+#ifndef NDEBUG
+PR = 1;
+#endif
+
+    //////////////////////end of computing the depth of each front ////////////
+
 
     // Making Children list and computing the bound sizes
     Int *Childp = (Int *)paru_calloc((nf + 2), sizeof(Int));
@@ -779,7 +824,7 @@ paru_symbolic *paru_analyze(
     LUsym->col_Int_bound = col_Int_bound;
     PR = 1;
     PRLEVEL(PR, ("%%row_Int_bound=%ld, col_Int_bound=%ld", row_Int_bound,
-                 col_Int_bound));
+                col_Int_bound));
     PRLEVEL(PR,
             ("%%-Us_bound_size = %ld LUs_bound_size = %ld sum = %ld\n",
              Us_bound_size, LUs_bound_size,
@@ -1631,6 +1676,11 @@ paru_symbolic *paru_analyze(
     PRLEVEL(PR, ("%%%% roots:\n"));
     for (Int k = 0; k < num_roots; k++) PRLEVEL(PR, ("  %ld", roots[k]));
     PRLEVEL(PR, ("\n"));
+
+    PRLEVEL(PR, ("%%%% Depth:\n"));
+    for (Int k = 0; k < nf; k++) PRLEVEL(PR, ("  %ld", Depth[k]));
+    PRLEVEL(PR, ("\n"));
+
 
 #endif
     LUsym->my_time = omp_get_wtime() - my_start_time;
