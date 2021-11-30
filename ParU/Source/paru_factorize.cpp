@@ -118,6 +118,7 @@ ParU_ResultCode paru_do_fronts(Int f, paru_matrix *paruMatInfo)
             }
             else
             {
+                Int *Depth = LUsym->Depth;
                 #pragma omp atomic
                 nbranches+= nchild;
 
@@ -127,10 +128,11 @@ ParU_ResultCode paru_do_fronts(Int f, paru_matrix *paruMatInfo)
                 for (Int i = Childp[f]; i <= Childp[f + 1] - 1; i++)
                     //for (Int i = Childp[f+1] -1 ; i >= Childp[f]; i--)
                 {
-                    Int *Depth = LUsym->Depth;
                     Int d = Depth[Child[i]];
                     #pragma omp task priority(d)
                     {
+                        //printf ("subtree of %ld with priority %ld\n",
+                        //        Child[i], d);
                         ParU_ResultCode myInfo =
                             paru_do_fronts(Child[i], paruMatInfo);
                         if (myInfo != PARU_SUCCESS)

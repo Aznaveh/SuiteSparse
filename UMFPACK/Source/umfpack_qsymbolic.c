@@ -679,7 +679,8 @@ PRIVATE Int symbolic_analysis
     void **SW_Handle,
 
     const double Control [UMFPACK_CONTROL],
-    double User_Info [UMFPACK_INFO]
+    double User_Info [UMFPACK_INFO],
+    const int for_Paru
 )
 {
 
@@ -2049,7 +2050,7 @@ PRIVATE Int symbolic_analysis
      * matrix A.  It is used to construct the Diagonal_map.
      */
 
-    if (prefer_diagonal)
+    if (prefer_diagonal || for_Paru)
     {
 	Int *Diagonal_map ;
 	ASSERT (n_row == n_col && nn == n_row) ;
@@ -2710,7 +2711,7 @@ GLOBAL Int UMFPACK_qsymbolic
         /* do not return SW to the caller */
         (void *) NULL,
 
-        Control, User_Info)) ;
+        Control, User_Info, 0)) ;
 }
 
 
@@ -2771,7 +2772,7 @@ GLOBAL Int UMFPACK_fsymbolic
         /* do not return SW to the caller */
         (void *) NULL,
 
-        Control, User_Info)) ;
+        Control, User_Info, 0)) ;
 }
 
 
@@ -2836,6 +2837,6 @@ GLOBAL Int UMFPACK_azn_symbolic
         /* also return SW to the caller */
         SW_Handle,
 
-        Control, User_Info)) ;
+        Control, User_Info, 1)) ;
 }
 

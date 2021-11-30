@@ -114,7 +114,7 @@ ParU_ResultCode paru_init_rowFronts(
         (paru_Element **)paru_calloc(1, (m + nf + 1) * sizeof(paru_Element));
     Int *Diag_map = paruMatInfo->Diag_map = NULL;
     Int *inv_Diag_map = paruMatInfo->inv_Diag_map = NULL;
-    if (LUsym->strategy == UMFPACK_STRATEGY_SYMMETRIC)
+    if (LUsym->strategy == PARU_STRATEGY_SYMMETRIC)
     {
         Diag_map = paruMatInfo->Diag_map =
             (Int *)paru_alloc(LUsym->n, sizeof(Int));
@@ -133,7 +133,7 @@ ParU_ResultCode paru_init_rowFronts(
         paruMatInfo->frowList == NULL || paruMatInfo->fcolList == NULL ||
         paruMatInfo->partial_Us == NULL || paruMatInfo->partial_LUs == NULL ||
         paruMatInfo->time_stamp == NULL || heapList == NULL ||
-        (LUsym->strategy == UMFPACK_STRATEGY_SYMMETRIC &&
+        (LUsym->strategy == PARU_STRATEGY_SYMMETRIC &&
          (Diag_map == NULL || inv_Diag_map == NULL)))
     {
         paru_freemat(&paruMatInfo);

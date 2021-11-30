@@ -254,7 +254,8 @@ paru_symbolic *paru_analyze(
     //      Page 22 UserGuide
     umfpack_dl_defaults(Control);
     Control[UMFPACK_ORDERING] = UMFPACK_ORDERING_METIS;
-    Control[UMFPACK_FIXQ] = -1;
+    //Control[UMFPACK_STRATEGY] = UMFPACK_STRATEGY_UNSYMMETRIC;
+    //Control[UMFPACK_FIXQ] = -1;
 
 #ifndef NDEBUG
     /* print the control parameters */
@@ -1138,10 +1139,10 @@ PR = 1;
     PRLEVEL(PR, ("Ps =\n"));
     for (Int k = 0; k < rowcount; k++) PRLEVEL(PR, ("%ld ", Ps[k]));
     PRLEVEL(PR, ("\n"));
-    PR = 1;
+    PR = -1;
     if (Diag_map)
     {
-        PRLEVEL(PR, ("Sym Diag_map (%ld) =\n", n));
+        PRLEVEL(PR, ("Symbolic Diag_map (%ld) =\n", n));
         for (Int i = 0; i < MIN(64, n); i++) PRLEVEL(PR, ("%ld ", Diag_map[i]));
         PRLEVEL(PR, ("\n"));
     }

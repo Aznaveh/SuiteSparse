@@ -23,22 +23,29 @@
 
 extern "C"
 {
-#include "umfpack.h"
 #include "cholmod.h"
+#include "umfpack.h"
 }
 
 #ifdef MKLROOT
 #include <mkl.h>
-#define BLAS_set_num_threads(n)  mkl_set_num_threads(n)
+#define BLAS_set_num_threads(n) mkl_set_num_threads(n)
 #else
 #include <cblas.h>
-#define BLAS_set_num_threads(n)    openblas_set_num_threads(n) 
+#define BLAS_set_num_threads(n) openblas_set_num_threads(n)
 #endif
 
 #ifdef Int  // defined in amd
 #undef Int
 #endif
 #define Int int64_t
+
+//  Just like UMFPACK_STRATEGY defined in UMFPACK/Include/umfpack.h
+//  However I might use different strategies in symbolic analysis and
+//  factorization; they match with UMFPACK_STRATEGY
+#define PARU_STRATEGY_AUTO 0         // decided to use sym. or unsym. strategy
+#define PARU_STRATEGY_UNSYMMETRIC 1  // COLAMD(A), metis, hmetis(?)
+#define PARU_STRATEGY_SYMMETRIC 3    // prefer diagonal
 
 // =============================================================================
 // === paru_symbolic ===========================================================
@@ -170,7 +177,7 @@ typedef struct
     // number of expected pivot columns in F is thus
     // Super [f+1] - Super [f].
 
-    Int num_roots;  //number of roots 
+    Int num_roots;  // number of roots
     // it is at least one and can be more in case of forest
     Int *roots;
 
