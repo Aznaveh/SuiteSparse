@@ -97,6 +97,7 @@ ParU_ResultCode paru_do_fronts(Int f, paru_matrix *paruMatInfo)
             }
 #endif
            if (nbranches> 64*64)
+           //if(0)
             {
                 for (Int i = Childp[f]; i <= Childp[f + 1] - 1; i++)
                     //for (Int i = Childp[f+1] -1 ; i >= Childp[f]; i--)

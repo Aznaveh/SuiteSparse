@@ -7,7 +7,7 @@
  * @author Aznaveh
  */
 #include "paru_internal.hpp"
-#define L 256
+#define L 4096
 void paru_tasked_trsm(Int f, char *side, char *uplo, char *transa, char *diag,
                       int *m, int *n, double *alpha, double *a, int *lda,
                       double *b, int *ldb)

@@ -254,8 +254,8 @@ paru_symbolic *paru_analyze(
     //      Page 22 UserGuide
     umfpack_dl_defaults(Control);
     Control[UMFPACK_ORDERING] = UMFPACK_ORDERING_METIS;
-    //Control[UMFPACK_STRATEGY] = UMFPACK_STRATEGY_UNSYMMETRIC;
-    //Control[UMFPACK_FIXQ] = -1;
+    Control[UMFPACK_FIXQ] = -1;
+    Control[UMFPACK_STRATEGY] = UMFPACK_STRATEGY_UNSYMMETRIC;
 
 #ifndef NDEBUG
     /* print the control parameters */
@@ -288,7 +288,8 @@ paru_symbolic *paru_analyze(
     /* ---------------------------------------------------------------------- */
 
     Int strategy = Info[UMFPACK_STRATEGY_USED];
-    LUsym->strategy = strategy;
+    //LUsym->strategy = strategy;
+    LUsym->strategy = PARU_STRATEGY_SYMMETRIC;
 
 #ifndef NDEBUG
     PR = 0;

@@ -7,7 +7,7 @@
  * @author Aznaveh
  */
 #include "paru_internal.hpp"
-#define L 256
+#define L 4096
 void paru_tasked_dgemm(Int f, char *transa, char *transb, BLAS_INT *M,
                        BLAS_INT *N, BLAS_INT *K, double *alpha, double *A,
                        BLAS_INT *lda, double *B, BLAS_INT *ldb, double *beta,
