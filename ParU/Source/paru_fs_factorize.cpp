@@ -146,6 +146,7 @@ Int paru_panel_factorize(Int f, Int m, Int n, const Int panel_width,
         if (maxval == 0)
         {
             PRLEVEL(-1, ("%% NO pivot found in %ld\n", n1 + col1 + j));
+            #pragma omp critical
             paruMatInfo->res = PARU_SINGULAR;
             continue;
         }

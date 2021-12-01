@@ -255,7 +255,7 @@ paru_symbolic *paru_analyze(
     umfpack_dl_defaults(Control);
     Control[UMFPACK_ORDERING] = UMFPACK_ORDERING_METIS;
     Control[UMFPACK_FIXQ] = -1;
-    Control[UMFPACK_STRATEGY] = UMFPACK_STRATEGY_UNSYMMETRIC;
+    //Control[UMFPACK_STRATEGY] = UMFPACK_STRATEGY_UNSYMMETRIC;
 
 #ifndef NDEBUG
     /* print the control parameters */
@@ -288,8 +288,8 @@ paru_symbolic *paru_analyze(
     /* ---------------------------------------------------------------------- */
 
     Int strategy = Info[UMFPACK_STRATEGY_USED];
-    //LUsym->strategy = strategy;
-    LUsym->strategy = PARU_STRATEGY_SYMMETRIC;
+    LUsym->strategy = strategy;
+    //LUsym->strategy = PARU_STRATEGY_SYMMETRIC;
 
 #ifndef NDEBUG
     PR = 0;
@@ -778,6 +778,16 @@ PR = 1;
         PRLEVEL(PR, ("%% Postcompute Depth[%ld]=%ld\n",f,Depth[f]));
     }
 
+    // depth of each non leave node is the max of depth of its children
+    //for (Int f = 0; f < nf; f++)
+    //{
+    //    Int p = f;
+    //    while (Parent[p] != -1 && Depth[Parent[p]] < Depth[p])
+    //    {
+    //        Depth[Parent[p]] = Depth[p];
+    //        p = Parent[p];
+    //    }
+    //}
 #ifndef NDEBUG
 PR = 1;
 #endif
