@@ -255,7 +255,7 @@ paru_symbolic *paru_analyze(
     umfpack_dl_defaults(Control);
     Control[UMFPACK_ORDERING] = UMFPACK_ORDERING_METIS;
     Control[UMFPACK_FIXQ] = -1;
-    //Control[UMFPACK_STRATEGY] = UMFPACK_STRATEGY_UNSYMMETRIC;
+    // Control[UMFPACK_STRATEGY] = UMFPACK_STRATEGY_UNSYMMETRIC;
 
 #ifndef NDEBUG
     /* print the control parameters */
@@ -289,7 +289,7 @@ paru_symbolic *paru_analyze(
 
     Int strategy = Info[UMFPACK_STRATEGY_USED];
     LUsym->strategy = strategy;
-    //LUsym->strategy = PARU_STRATEGY_SYMMETRIC;
+    // LUsym->strategy = PARU_STRATEGY_SYMMETRIC;
 
 #ifndef NDEBUG
     PR = 0;
@@ -365,7 +365,12 @@ paru_symbolic *paru_analyze(
     // temp amalgamation data structure
     Int *fmap = (Int *)paru_alloc((n + 1), sizeof(Int));
     Int *newParent = (Int *)paru_alloc((n + 1), sizeof(Int));
-    Diag_map = Sym_umf->Diagonal_map;
+    // TODO: unsymmetric strategy and Diag_map is not working good together
+    if (strategy == PARU_STRATEGY_SYMMETRIC)
+        Diag_map = Sym_umf->Diagonal_map;
+    else
+        Diag_map = NULL;
+
     if (Diag_map)
         inv_Diag_map = (Int *)paru_alloc(n, sizeof(Int));
     else
@@ -402,7 +407,7 @@ paru_symbolic *paru_analyze(
     // Chain_maxrows = Sym_umf->Chain_maxrows;
     // Chain_maxcols = Sym_umf->Chain_maxcols;
 
-    Sym_umf->Diagonal_map = NULL;
+    if (Diag_map) Sym_umf->Diagonal_map = NULL;
     Sym_umf->Rperm_init = NULL;
     Sym_umf->Cperm_init = NULL;
     Sym_umf->Front_npivcol = NULL;
@@ -464,7 +469,7 @@ paru_symbolic *paru_analyze(
     PRLEVEL(PR, ("Forthwith Qinit =\n"));
     for (Int i = 0; i < MIN(64, m); i++) PRLEVEL(PR, ("%ld ", Qinit[i]));
     PRLEVEL(PR, ("\n"));
-    PR = 1;
+    PR = -1;
     if (Diag_map)
     {
         PRLEVEL(PR, ("Forthwith Diag_map =\n"));
@@ -527,7 +532,7 @@ paru_symbolic *paru_analyze(
     // Making Super data structure
     // like SPQR: Super[f]<= pivotal columns of (f) < Super[f+1]
     Int *Super = LUsym->Super = NULL;
-    Int *Depth= LUsym->Depth = NULL;
+    Int *Depth = LUsym->Depth = NULL;
     if (nf > 0)
     {
         Super = LUsym->Super = (Int *)paru_alloc((nf + 1), sizeof(Int));
@@ -729,7 +734,6 @@ paru_symbolic *paru_analyze(
     for (Int k = 0; k < newNf; k++) PRLEVEL(PR, ("  %ld", newParent[k]));
     PRLEVEL(PR, ("\n"));
 
-
 #endif
 
     paru_free(nf + 1, sizeof(Int), LUsym->Parent);
@@ -742,44 +746,43 @@ paru_symbolic *paru_analyze(
 
     //////////////////////end of relaxed amalgamation//////////////////////////
 
-    
     //////////////////////computing the depth of each front ///////////////////
     //
 #ifndef NDEBUG
-PR = 1;
+    PR = 1;
 #endif
 
     for (Int f = 0; f < nf; f++)
     {
-        if (Parent[f] != -1 && Depth[f] == 0) //not computed so far
+        if (Parent[f] != -1 && Depth[f] == 0)  // not computed so far
         {
-            PRLEVEL(PR, ("%% Precompute Depth[%ld]=%ld\n",f,Depth[f]));
+            PRLEVEL(PR, ("%% Precompute Depth[%ld]=%ld\n", f, Depth[f]));
             Int d = 1;
             Int p = Parent[f];
-            while( Parent[p] != -1 && Depth[p] == 0)
+            while (Parent[p] != -1 && Depth[p] == 0)
             {
                 p = Parent[p];
                 d++;
-                PRLEVEL(PR, ("%% Up Depth[%ld]=%ld d=%ld\n",p,Depth[p],d));
+                PRLEVEL(PR, ("%% Up Depth[%ld]=%ld d=%ld\n", p, Depth[p], d));
             }
-            Depth[f] = d + Depth[p]; //depth is computed
-            PRLEVEL(PR, ("%% Depth[%ld]=%ld Depth[%ld]=%ld\n",
-                        p,Depth[p],f,Depth[f]));
+            Depth[f] = d + Depth[p];  // depth is computed
+            PRLEVEL(PR, ("%% Depth[%ld]=%ld Depth[%ld]=%ld\n", p, Depth[p], f,
+                         Depth[f]));
             // updating ancestors
             d = Depth[f];
             p = Parent[f];
-            while( Parent[p] != -1 && Depth[p] == 0)
+            while (Parent[p] != -1 && Depth[p] == 0)
             {
                 Depth[p] = --d;
                 p = Parent[p];
-                PRLEVEL(PR, ("%% down Depth[%ld]=%ld d=%ld\n",p,Depth[p],d));
+                PRLEVEL(PR, ("%% down Depth[%ld]=%ld d=%ld\n", p, Depth[p], d));
             }
         }
-        PRLEVEL(PR, ("%% Postcompute Depth[%ld]=%ld\n",f,Depth[f]));
+        PRLEVEL(PR, ("%% Postcompute Depth[%ld]=%ld\n", f, Depth[f]));
     }
 
     // depth of each non leave node is the max of depth of its children
-    //for (Int f = 0; f < nf; f++)
+    // for (Int f = 0; f < nf; f++)
     //{
     //    Int p = f;
     //    while (Parent[p] != -1 && Depth[Parent[p]] < Depth[p])
@@ -789,11 +792,10 @@ PR = 1;
     //    }
     //}
 #ifndef NDEBUG
-PR = 1;
+    PR = 1;
 #endif
 
     //////////////////////end of computing the depth of each front ////////////
-
 
     // Making Children list and computing the bound sizes
     Int *Childp = (Int *)paru_calloc((nf + 2), sizeof(Int));
@@ -836,7 +838,7 @@ PR = 1;
     LUsym->col_Int_bound = col_Int_bound;
     PR = 1;
     PRLEVEL(PR, ("%%row_Int_bound=%ld, col_Int_bound=%ld", row_Int_bound,
-                col_Int_bound));
+                 col_Int_bound));
     PRLEVEL(PR,
             ("%%-Us_bound_size = %ld LUs_bound_size = %ld sum = %ld\n",
              Us_bound_size, LUs_bound_size,
@@ -908,8 +910,8 @@ PR = 1;
         return NULL;
     }
 
-    //-------- computing the inverse permutation for P and Diag_map
-    #pragma omp taskloop default(none) shared(m, Pinv, Pinit) grainsize(512)
+//-------- computing the inverse permutation for P and Diag_map
+#pragma omp taskloop default(none) shared(m, Pinv, Pinit) grainsize(512)
     for (Int i = 0; i < m; i++)
     {
         Pinv[Pinit[i]] = i;
@@ -917,8 +919,8 @@ PR = 1;
 
     if (Diag_map)
     {
-        #pragma omp taskloop default(none) \
-        shared(m, Diag_map, inv_Diag_map) grainsize(512)
+#pragma omp taskloop default(none) shared(m, Diag_map, inv_Diag_map) \
+    grainsize(512)
         for (Int i = 0; i < m; i++)
         {
             Int newrow = Diag_map[i];  // Diag_map[newcol] = newrow
@@ -1089,7 +1091,7 @@ PR = 1;
                         ASSERT(diag_col >= n1);
                         // row of s ~~~~~~> col Qfill confusing be aware
                         Diag_map[diag_col] = rowcount + n1;  // updating
-                                                             // diag_map
+                        // diag_map
                     }
 
                     rowcount++;
@@ -1196,8 +1198,8 @@ PR = 1;
     PRLEVEL(PR, ("\n"));
 #endif
 
-    // update Pinv
-    #pragma omp taskloop default(none) shared(m, n1, Pinv, Pinit) grainsize(512)
+// update Pinv
+#pragma omp taskloop default(none) shared(m, n1, Pinv, Pinit) grainsize(512)
     for (Int i = n1; i < m; i++)
     {
         Pinv[Pinit[i]] = i;
@@ -1205,11 +1207,11 @@ PR = 1;
 
     ///////////////////////////////////////////////////////////////
     Int *cSp = Work;
-    #pragma omp taskloop default(none) shared(m, n1, cSp, Sp, Ps) grainsize(512)
+#pragma omp taskloop default(none) shared(m, n1, cSp, Sp, Ps) grainsize(512)
     for (Int i = n1; i < m; i++)
     {
         Int row = i - n1;
-        //printf ("Permutation row = %ld, Ps[row]= %ld, Sp[row]=%ld\n", row,
+        // printf ("Permutation row = %ld, Ps[row]= %ld, Sp[row]=%ld\n", row,
         //            Ps[row], Sp[row]);
         cSp[row + 1] = Sp[Ps[row] + 1];
     }
@@ -1548,7 +1550,7 @@ PR = 1;
         Int fp = Super[f + 1] - Super[f];  // k
         Int fm = LUsym->Fm[f];             // m
         Int fn = LUsym->Cm[f];             // n Upper bound number of cols of f
-        if(Parent[f] == -1) roots[root_count++] = f;
+        if (Parent[f] == -1) roots[root_count++] = f;
         front_flop_bound[f] = (double)(fp * fm * fn + fp * fm + fp * fn);
         stree_flop_bound[f] += front_flop_bound[f];
         for (Int i = Childp[f]; i <= Childp[f + 1] - 1; i++)
@@ -1692,7 +1694,6 @@ PR = 1;
     PRLEVEL(PR, ("%%%% Depth:\n"));
     for (Int k = 0; k < nf; k++) PRLEVEL(PR, ("  %ld", Depth[k]));
     PRLEVEL(PR, ("\n"));
-
 
 #endif
     LUsym->my_time = omp_get_wtime() - my_start_time;
