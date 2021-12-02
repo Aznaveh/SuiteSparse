@@ -170,6 +170,7 @@ ParU_ResultCode paru_front(Int f,  // front need to be assembled
         PRLEVEL(1, ("%% Structural Problem\n"));
         printf("Paru: singular, structural problem on %ld: %ldx%ld\n", 
                 f, rowCount, fp);
+        #pragma omp critical
         paruMatInfo->res = PARU_SINGULAR;
         return PARU_SINGULAR;
     }
