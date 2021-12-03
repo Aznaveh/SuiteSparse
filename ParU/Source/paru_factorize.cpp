@@ -16,7 +16,7 @@
 Int ntasks = 0;
 Int ntasks_bar = 16;
 #endif
-Int nbranches= 0;
+Int nbranches = 0;
 
 ParU_ResultCode paru_do_fronts(Int f, paru_matrix *paruMatInfo)
 // This routine call paru_front from first(f)...f including f
@@ -82,34 +82,34 @@ ParU_ResultCode paru_do_fronts(Int f, paru_matrix *paruMatInfo)
             PRLEVEL(1, ("%% At least 2 children, creating tasks for %ld\n", f));
             // at least 2 children
 #ifndef NDEBUG
-            #pragma omp atomic
+#pragma omp atomic
             ntasks += nchild;
 
-            #pragma omp critical
+#pragma omp critical
             {
                 PRLEVEL(1, ("%% ntasks=%ld\n", ntasks));
-                if( ntasks > ntasks_bar) 
+                if (ntasks > ntasks_bar)
                 {
                     printf("%% ntasks=%ld\n", ntasks);
-                    ntasks_bar<<=1;
+                    ntasks_bar <<= 1;
                 }
             }
 #endif
-           if (nbranches> 64*64)
-           //if(0)
+            if (nbranches > 64 * 64)
+            // if(0)
             {
                 for (Int i = Childp[f]; i <= Childp[f + 1] - 1; i++)
-                    //for (Int i = Childp[f+1] -1 ; i >= Childp[f]; i--)
+                // for (Int i = Childp[f+1] -1 ; i >= Childp[f]; i--)
                 {
                     ParU_ResultCode myInfo =
                         paru_do_fronts(Child[i], paruMatInfo);
                     if (myInfo != PARU_SUCCESS)
                     {
-                        #pragma omp critical
+#pragma omp critical
                         info = myInfo;
                     }
                 }
-                if (info != PARU_SUCCESS) 
+                if (info != PARU_SUCCESS)
                 {
                     return info;
                 }
@@ -119,40 +119,67 @@ ParU_ResultCode paru_do_fronts(Int f, paru_matrix *paruMatInfo)
             else
             {
                 Int *Depth = LUsym->Depth;
-                #pragma omp atomic
-                nbranches+= nchild;
+#pragma omp atomic
+                nbranches += nchild;
 
-                //#pragma omp taskloop default(none)\
+//#pragma omp taskloop default(none)\
                 //shared(info, f, Child, Childp, paruMatInfo)
-                #pragma omp taskgroup 
+#pragma omp taskgroup
                 for (Int i = Childp[f]; i <= Childp[f + 1] - 1; i++)
-                    //for (Int i = Childp[f+1] -1 ; i >= Childp[f]; i--)
+                // for (Int i = Childp[f+1] -1 ; i >= Childp[f]; i--)
                 {
                     Int d = Depth[Child[i]];
-                    #pragma omp task priority(d)
+#pragma omp task priority(d)
                     {
-                        //printf ("subtree of %ld with priority %ld\n",
+                        // printf ("subtree of %ld with priority %ld\n",
                         //        Child[i], d);
                         ParU_ResultCode myInfo =
                             paru_do_fronts(Child[i], paruMatInfo);
                         if (myInfo != PARU_SUCCESS)
                         {
-                            #pragma omp critical
+#pragma omp critical
                             info = myInfo;
                         }
                     }
                 }
-                if (info != PARU_SUCCESS) 
+                if (info != PARU_SUCCESS)
                 {
                     return info;
                 }
                 info = paru_front(f, paruMatInfo);
                 if (info != PARU_SUCCESS) return info;
-
             }
         }
     }
     return info;
+}
+
+ParU_ResultCode paru_exec(Int f, std::vector<Int> &num_children, 
+        paru_matrix *paruMatInfo)
+{
+    // printf("executing front %ld\n", f);
+    //
+    paru_symbolic *LUsym = paruMatInfo->LUsym;
+    Int *Parent = LUsym->Parent;
+    ParU_ResultCode myInfo = paru_front(f, paruMatInfo);
+    if (myInfo != PARU_SUCCESS)
+    {
+        return myInfo;
+    }
+    Int num_remained_children;
+    Int daddy = Parent[f];
+    if (daddy != -1)
+    {
+        #pragma omp critical
+        num_remained_children = --num_children[daddy];
+        //printf("finished %ld  Parent has %ld left\n", f, num_children[daddy]);
+        if (num_remained_children == 0)
+        {
+            return myInfo = 
+                paru_exec(Parent[f], num_children, paruMatInfo);
+        }
+    }
+    return myInfo;
 }
 
 ParU_ResultCode paru_factorize(cholmod_sparse *A, paru_symbolic *LUsym,
@@ -193,69 +220,93 @@ ParU_ResultCode paru_factorize(cholmod_sparse *A, paru_symbolic *LUsym,
         return info;
     }
 
-
     //////////////// Queue based ///////////////////////////////////////////////
     Int nf = LUsym->nf;
     Int *Parent = LUsym->Parent;
-    std::vector<Int> num_children(nf,0);
+    std::vector<Int> num_children(nf, 0);
     for (Int f = 0; f < nf; f++)
-        if (Parent[f]  != -1) num_children[Parent[f]]++;
+        if (Parent[f] != -1) num_children[Parent[f]]++;
 
-    //printf ("Number of children:\n");
-    //for (Int f = 0; f < nf; f++)
+    // printf ("Number of children:\n");
+    // for (Int f = 0; f < nf; f++)
     //    printf ("%ld ",num_children[f]);
-    //printf ("\n");
+    // printf ("\n");
 
     std::vector<Int> Q;
     for (Int f = 0; f < nf; f++)
         if (num_children[f] == 0) Q.push_back(f);
     Int *Depth = LUsym->Depth;
-    #pragma omp parallel
-    #pragma omp single
-    {
-        Int next = 0;
-        while (next < nf)
-        {
-            //printf("1 next = %ld\n",next);
-            #pragma omp taskgroup
-            for (Int i = next ; i < (Int) Q.size(); i++)
-            {
-                next = Q.size();
-                Int f = Q[i];
-                //printf("poping %ld \n", f);
-                Int d = Depth[f];
-                #pragma omp task default(none)\
-                shared(info, f, paruMatInfo, Parent, num_children, Q)  priority(d)
-                {
-                    ParU_ResultCode myInfo = paru_front(f, paruMatInfo);
-                    if (myInfo != PARU_SUCCESS)
-                    {
-                        #pragma omp critical
-                        info = myInfo;
-                    }
+    std::sort(Q.begin(), Q.end(), 
+            [&Depth](const Int &a, const Int &b)-> bool 
+            {return Depth[a] > Depth[b];});
+    //printf("\n");
+    //for (auto l: Q) printf("%ld(%ld) ",l, Depth[l]);
+    //printf("\n");
 
-                    #pragma omp critical
-                    {
-                        if (Parent[f] != -1) 
-                        {
-                            num_children[Parent[f]] --;
-                            //printf("finished %ld  Parent has %ld left\n", 
-                            //        f,  num_children[Parent[f]]); 
-                        }
-                        if (num_children[Parent[f]] == 0)
-                        {
-                            Q.push_back(Parent[f]);
-                            //printf("size %ld \n", Q.size());
-                        }
-                    }
-                }
+    //#pragma omp parallel
+    //#pragma omp single
+    //{
+    //    Int next = 0;
+    //    while (next < nf)
+    //    {
+    //        //printf("1 next = %ld\n",next);
+    //        #pragma omp taskgroup
+    //        for (Int i = next ; i < (Int) Q.size(); i++)
+    //        {
+    //            next = Q.size();
+    //            Int f = Q[i];
+    //            //printf("poping %ld \n", f);
+    //            Int d = Depth[f];
+    //            #pragma omp task default(none)\
+    //            shared(info, f, paruMatInfo, Parent, num_children, Q)  priority(d)
+    //            {
+    //                ParU_ResultCode myInfo = paru_front(f, paruMatInfo);
+    //                if (myInfo != PARU_SUCCESS)
+    //                {
+    //                    #pragma omp critical
+    //                    info = myInfo;
+    //                }
+
+    //                #pragma omp critical
+    //                {
+    //                    if (Parent[f] != -1)
+    //                    {
+    //                        num_children[Parent[f]] --;
+    //                        //printf("finished %ld  Parent has %ld left\n",
+    //                        //        f,  num_children[Parent[f]]);
+    //                    }
+    //                    if (num_children[Parent[f]] == 0)
+    //                    {
+    //                        Q.push_back(Parent[f]);
+    //                        //printf("size %ld \n", Q.size());
+    //                    }
+    //                }
+    //            }
+    //        }
+    //        //printf("2 next = %ld\n",next);
+    //    }
+    //}
+
+    #pragma omp parallel
+    #pragma omp single nowait
+    #pragma omp taskgroup 
+    for (Int i = 0; i < (Int)Q.size(); i++)
+    {
+        Int f = Q[i];
+        //printf("poping %ld \n", f);
+        Int d = Depth[f];
+        #pragma omp task priority(d)
+        {
+            ParU_ResultCode myInfo =
+                paru_exec(f, num_children, paruMatInfo);
+            if (myInfo != PARU_SUCCESS)
+            {
+                #pragma omp critical
+                info = myInfo;
             }
-            //printf("2 next = %ld\n",next);
         }
     }
-
     //////////////// Queue based ///END/////////////////////////////////////////
-
 
     //    #pragma omp parallel
     //    #pragma omp single
@@ -287,9 +338,9 @@ ParU_ResultCode paru_factorize(cholmod_sparse *A, paru_symbolic *LUsym,
     if (info != PARU_SUCCESS)
     {
         PRLEVEL(1, ("%% factorization has some problem\n"));
-        if  (info == PARU_OUT_OF_MEMORY)
+        if (info == PARU_OUT_OF_MEMORY)
             printf("Paru: out of memory during factorization\n");
-        else if  (info == PARU_SINGULAR)
+        else if (info == PARU_SINGULAR)
             printf("Paru: Input matrix is singular\n");
         return info;
     }
