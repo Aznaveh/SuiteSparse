@@ -17,8 +17,9 @@ ParU_ResultCode paru_exec(Int f,
         Int* num_active_children, 
         paru_matrix *paruMatInfo)
 {
-    // printf("executing front %ld\n", f);
-    //
+    DEBUGLEVEL(1);
+    PRLEVEL(1, ("executing front %ld\n", f));
+
     paru_symbolic *LUsym = paruMatInfo->LUsym;
     Int *Parent = LUsym->Parent;
     ParU_ResultCode myInfo = paru_front(f, paruMatInfo);
@@ -33,14 +34,14 @@ ParU_ResultCode paru_exec(Int f,
         #pragma omp critical
         num_rem_children = --num_active_children[daddy];
         
-        //These two operations are possible but race can happen
+        //These two operations are possible with atomic but race can happen
         //#pragma omp atomic 
         //num_active_children[daddy]--;
         //#pragma omp atomic read
         //num_rem_children = num_active_children[daddy];
 
-        //printf("finished %ld  Parent has %ld left\n", 
-        //  f, num_active_children[daddy]);
+        PRLEVEL(1, ("%% finished %ld  Parent has %ld left\n", 
+        f, num_active_children[daddy]));
         if (num_rem_children == 0)
         {
             return myInfo = 
@@ -92,8 +93,13 @@ ParU_ResultCode paru_factorize(cholmod_sparse *A, paru_symbolic *LUsym,
     Int nf = LUsym->nf;
     Int *Parent = LUsym->Parent;
     std::vector<Int> num_active_children (nf, 0);
+    #pragma omp parallel for
     for (Int f = 0; f < nf; f++)
-        if (Parent[f] != -1) num_active_children[Parent[f]]++;
+        if (Parent[f] != -1) 
+        {
+            #pragma omp atomic
+            num_active_children[Parent[f]]++;
+        }
 
     // printf ("Number of children:\n");
     // for (Int f = 0; f < nf; f++)
