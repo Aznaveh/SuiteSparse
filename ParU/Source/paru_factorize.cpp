@@ -22,6 +22,7 @@ ParU_ResultCode paru_exec(Int f,
 
     paru_symbolic *LUsym = paruMatInfo->LUsym;
     Int *Parent = LUsym->Parent;
+    Int *Childp = LUsym->Childp;
     ParU_ResultCode myInfo = paru_front(f, paruMatInfo);
     if (myInfo != PARU_SUCCESS)
     {
@@ -29,20 +30,29 @@ ParU_ResultCode paru_exec(Int f,
     }
     Int num_rem_children;
     Int daddy = Parent[f];
+    Int num_original_children = Childp[daddy+1] - Childp[daddy];
     if (daddy != -1) //if it is not a root
     {
-        #pragma omp critical
-        num_rem_children = --num_active_children[daddy];
-        
-        //These two operations are possible with atomic but race can happen
-        //#pragma omp atomic 
-        //num_active_children[daddy]--;
-        //#pragma omp atomic read
-        //num_rem_children = num_active_children[daddy];
+        if (num_original_children != 1)
+        {
+            #pragma omp critical
+            num_rem_children = --num_active_children[daddy];
 
-        PRLEVEL(1, ("%% finished %ld  Parent has %ld left\n", 
-        f, num_active_children[daddy]));
-        if (num_rem_children == 0)
+            //These two operations are possible with atomic but race can happen
+            //#pragma omp atomic 
+            //num_active_children[daddy]--;
+            //#pragma omp atomic read
+            //num_rem_children = num_active_children[daddy];
+
+            PRLEVEL(1, ("%% finished %ld  Parent has %ld left\n", 
+                        f, num_active_children[daddy]));
+            if (num_rem_children == 0)
+            {
+                return myInfo = 
+                    paru_exec(Parent[f], num_active_children, paruMatInfo);
+            }
+        }
+        else //I was the only spoiled kid in the family; no need for critical
         {
             return myInfo = 
                 paru_exec(Parent[f], num_active_children, paruMatInfo);
@@ -92,19 +102,17 @@ ParU_ResultCode paru_factorize(cholmod_sparse *A, paru_symbolic *LUsym,
     //////////////// Queue based ///////////////////////////////////////////////
     Int nf = LUsym->nf;
     Int *Parent = LUsym->Parent;
+    Int *Childp = LUsym->Childp;
     std::vector<Int> num_active_children (nf, 0);
     #pragma omp parallel for
     for (Int f = 0; f < nf; f++)
-        if (Parent[f] != -1) 
-        {
-            #pragma omp atomic
-            num_active_children[Parent[f]]++;
-        }
+        num_active_children[f] = Childp[f+1] - Childp[f];
 #ifndef NDEBUG
     Int PR = 1;
     PRLEVEL(PR, ("Number of children:\n"));
     for (Int f = 0; f < nf; f++)
     PRLEVEL(PR, ("%ld ",num_active_children[f]));
+    PRLEVEL(PR, ("\n"));
     PR = 1;
 #endif
     std::vector<Int> Q;
@@ -115,7 +123,7 @@ ParU_ResultCode paru_factorize(cholmod_sparse *A, paru_symbolic *LUsym,
             {return Depth[a] > Depth[b];});
 
 #ifndef NDEBUG
-    Int PR = 0;
+    PR = 0;
     PRLEVEL(PR, ("Leaves with their depth:\n"));
     for (auto l: Q) 
         PRLEVEL(PR, ("%ld(%ld) ",l, Depth[l]));
