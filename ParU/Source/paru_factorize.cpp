@@ -100,12 +100,13 @@ ParU_ResultCode paru_factorize(cholmod_sparse *A, paru_symbolic *LUsym,
             #pragma omp atomic
             num_active_children[Parent[f]]++;
         }
-
-    // printf ("Number of children:\n");
-    // for (Int f = 0; f < nf; f++)
-    //    printf ("%ld ",num_active_children[f]);
-    // printf ("\n");
-
+#ifndef NDEBUG
+    Int PR = 1;
+    PRLEVEL(PR, ("Number of children:\n"));
+    for (Int f = 0; f < nf; f++)
+    PRLEVEL(PR, ("%ld ",num_active_children[f]));
+    PR = 1;
+#endif
     std::vector<Int> Q;
     for (Int f = 0; f < nf; f++)
         if (num_active_children[f] == 0) Q.push_back(f);
@@ -113,19 +114,24 @@ ParU_ResultCode paru_factorize(cholmod_sparse *A, paru_symbolic *LUsym,
     std::sort(Q.begin(), Q.end(), [&Depth](const Int &a, const Int &b)-> bool 
             {return Depth[a] > Depth[b];});
 
-    //printf("\n");
-    //for (auto l: Q) printf("%ld(%ld) ",l, Depth[l]);
-    //printf("\n");
+#ifndef NDEBUG
+    Int PR = 0;
+    PRLEVEL(PR, ("Leaves with their depth:\n"));
+    for (auto l: Q) 
+        PRLEVEL(PR, ("%ld(%ld) ",l, Depth[l]));
+    PRLEVEL(PR, ("\n"));
+    PR = 1;
+#endif
     
     #pragma omp parallel
     #pragma omp single nowait
-    #pragma omp taskgroup 
+    #pragma omp task untied
     for (Int i = 0; i < (Int)Q.size(); i++)
     {
         Int f = Q[i];
         //printf("poping %ld \n", f);
         Int d = Depth[f];
-        #pragma omp task priority(d)
+        #pragma omp task priority(d) 
         {
             ParU_ResultCode myInfo =
                 paru_exec(f, &num_active_children[0], paruMatInfo);
