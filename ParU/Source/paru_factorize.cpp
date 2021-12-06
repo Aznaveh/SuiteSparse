@@ -35,14 +35,11 @@ ParU_ResultCode paru_exec(Int f,
     {
         if (num_original_children != 1)
         {
-            #pragma omp critical
-            num_rem_children = --num_active_children[daddy];
-
-            //These two operations are possible with atomic but race can happen
-            //#pragma omp atomic 
-            //num_active_children[daddy]--;
-            //#pragma omp atomic read
-            //num_rem_children = num_active_children[daddy];
+            #pragma omp atomic capture
+            { 
+                num_active_children[daddy]--;
+                num_rem_children = num_active_children[daddy];
+            }
 
             PRLEVEL(1, ("%% finished %ld  Parent has %ld left\n", 
                         f, num_active_children[daddy]));
@@ -101,7 +98,6 @@ ParU_ResultCode paru_factorize(cholmod_sparse *A, paru_symbolic *LUsym,
 
     //////////////// Queue based ///////////////////////////////////////////////
     Int nf = LUsym->nf;
-    Int *Parent = LUsym->Parent;
     Int *Childp = LUsym->Childp;
     std::vector<Int> num_active_children (nf, 0);
     #pragma omp parallel for
