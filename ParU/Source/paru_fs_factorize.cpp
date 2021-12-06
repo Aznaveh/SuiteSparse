@@ -385,9 +385,9 @@ Int paru_factorize_full_summed(Int f, Int start_fac,
         #pragma omp single
         {
             // update row degree and dgeem can be done in parallel
-            #pragma omp task default(none) \
+            #pragma omp task default(none) mergeable\
             shared(paruMatInfo, pivotal_elements, stl_colSet) \
-            firstprivate(panel_num, row_end, f, start_fac)
+            shared(panel_num, row_end, f, start_fac)
             if (paruMatInfo->LUsym->Cm[f] !=0)  
             {  // if there is potential column left
                 paru_update_rowDeg(panel_num, row_end, f, start_fac,
@@ -421,12 +421,7 @@ Int paru_factorize_full_summed(Int f, Int start_fac,
              *
              */
             #pragma omp task  shared(F) \
-            firstprivate(panel_width, j1, j2, fp, f, rowCount)
-
-            // I cannot use defualt none or it will have problem with my 
-            // debug code. I can use it in production though:
-            //default(none) firstprivate(print_level) shared(frowList)
-
+            shared(panel_width, j1, j2, fp, f, rowCount)
             if (j2 < fp)  // if it is not the last
             {
                 BLAS_INT M = (BLAS_INT)panel_width;
