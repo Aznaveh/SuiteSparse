@@ -16,7 +16,7 @@
 ParU_ResultCode paru_front(Int f,  // front need to be assembled
                            paru_matrix *paruMatInfo)
 {
-    DEBUGLEVEL(-3);
+    DEBUGLEVEL(-2);
     /*
      * -2 Print Nothing
      * -1 Just Matlab
@@ -371,6 +371,10 @@ ParU_ResultCode paru_front(Int f,  // front need to be assembled
     // TODO: consider using parallel tasks for this loop,
     // or a #pragma omp parallel for
     tupleList *RowList = paruMatInfo->RowList;
+    /// #pragma omp parallel for
+    #pragma omp parallel 
+    #pragma omp single
+    #pragma omp taskloop
     for (Int i = 0; i < fp; i++)
     {
         Int curFsRowIndex = i;  // current fully summed row index
