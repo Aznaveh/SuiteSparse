@@ -371,7 +371,6 @@ ParU_ResultCode paru_front(Int f,  // front need to be assembled
     // TODO: consider using parallel tasks for this loop,
     // or a #pragma omp parallel for
     tupleList *RowList = paruMatInfo->RowList;
-    /// #pragma omp parallel for
     #pragma omp parallel 
     #pragma omp single
     #pragma omp taskloop

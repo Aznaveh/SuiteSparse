@@ -16,6 +16,7 @@
  *             |     \
  *             1(1)   3(1)
  *                     \
+
  *                     2(1)
  *
  **********  Relaxed tree:  threshold=3  front(number of pivotal cols)##oldfront
@@ -447,7 +448,7 @@ paru_symbolic *paru_analyze(
             k++;
         }
     }
-    PR = 1;
+    PR = -1;
 
     PRLEVEL(PR, ("\nTotal number of pivot columns "
                  "in frontal matrices: %ld\n",
@@ -465,16 +466,16 @@ paru_symbolic *paru_analyze(
     //    }
 
     PRLEVEL(PR, ("Forthwith Pinit =\n"));
-    for (Int i = 0; i < MIN(64, m); i++) PRLEVEL(PR, ("%ld ", Pinit[i]));
+    for (Int i = 0; i < MIN(77, m); i++) PRLEVEL(PR, ("%ld ", Pinit[i]));
     PRLEVEL(PR, ("\n"));
     PRLEVEL(PR, ("Forthwith Qinit =\n"));
-    for (Int i = 0; i < MIN(64, m); i++) PRLEVEL(PR, ("%ld ", Qinit[i]));
+    for (Int i = 0; i < MIN(77, m); i++) PRLEVEL(PR, ("%ld ", Qinit[i]));
     PRLEVEL(PR, ("\n"));
     PR = -1;
     if (Diag_map)
     {
         PRLEVEL(PR, ("Forthwith Diag_map =\n"));
-        for (Int i = 0; i < MIN(64, n); i++) PRLEVEL(PR, ("%ld ", Diag_map[i]));
+        for (Int i = 0; i < MIN(77, n); i++) PRLEVEL(PR, ("%ld ", Diag_map[i]));
         PRLEVEL(PR, ("\n"));
     }
     PR = 1;
@@ -591,7 +592,7 @@ paru_symbolic *paru_analyze(
     //
     Int threshold = 32;
     Int newF = 0;
-    Int num_roots = 0;
+    //Int num_roots = 0;
 
     for (Int f = 0; f < nf; f++)
     {  // finding representative for each front
@@ -610,7 +611,7 @@ paru_symbolic *paru_analyze(
             PRLEVEL(PR, ("%%number of pivot cols if Parent collapsed= %ld\n",
                          Super[Parent[repr] + 1] - Super[f]));
         }
-        if (Parent[repr] == -1) num_roots++;
+        //if (Parent[repr] == -1) num_roots++;
 
         PRLEVEL(PR, ("%% newF = %ld for:\n", newF));
         for (Int k = f; k <= repr; k++)
@@ -622,7 +623,7 @@ paru_symbolic *paru_analyze(
         newF++;
         f = repr;
     }
-    LUsym->num_roots = num_roots;
+    //LUsym->num_roots = num_roots;
 
 #ifndef NDEBUG
     PR = 1;
@@ -655,12 +656,13 @@ paru_symbolic *paru_analyze(
     LUsym->Cm = NULL;  // Upper bound on number of columns excluding pivots
     Int *Fm = (Int *)paru_calloc((newNf + 1), sizeof(Int));
     Int *Cm = (Int *)paru_alloc((newNf + 1), sizeof(Int));
-    Int *roots = (Int *)paru_alloc((num_roots), sizeof(Int));
+    //Int *roots = (Int *)paru_alloc((num_roots), sizeof(Int));
     LUsym->Fm = Fm;
     LUsym->Cm = Cm;
-    LUsym->roots = roots;
+    //LUsym->roots = roots;
 
-    if (Fm == NULL || Cm == NULL || roots == NULL)
+    //if (Fm == NULL || Cm == NULL || roots == NULL)
+    if (Fm == NULL || Cm == NULL )
     {
         printf("Paru: memory problem\n");
         paru_free(n, sizeof(Int), inv_Diag_map);
@@ -1089,6 +1091,8 @@ paru_symbolic *paru_analyze(
                     if (Diag_map)
                     {
                         Int diag_col = inv_Diag_map[newrow];
+                        if (diag_col < n1)
+                            PRLEVEL(0, ("diag_col= %ld\n", diag_col));
                         ASSERT(diag_col >= n1);
                         // row of s ~~~~~~> col Qfill confusing be aware
                         Diag_map[diag_col] = rowcount + n1;  // updating
@@ -1551,7 +1555,7 @@ paru_symbolic *paru_analyze(
         Int fp = Super[f + 1] - Super[f];  // k
         Int fm = LUsym->Fm[f];             // m
         Int fn = LUsym->Cm[f];             // n Upper bound number of cols of f
-        if (Parent[f] == -1) roots[root_count++] = f;
+        //if (Parent[f] == -1) roots[root_count++] = f;
         front_flop_bound[f] = (double)(fp * fm * fn + fp * fm + fp * fn);
         stree_flop_bound[f] += front_flop_bound[f];
         for (Int i = Childp[f]; i <= Childp[f + 1] - 1; i++)
@@ -1624,8 +1628,8 @@ paru_symbolic *paru_analyze(
         else
             lastChildFlag = 0;
     }
-    PRLEVEL(1, ("%% root_count=%ld, num_roots=%ld\n ", root_count, num_roots));
-    ASSERT(root_count == num_roots);
+//    PRLEVEL(1, ("%% root_count=%ld, num_roots=%ld\n ", root_count, num_roots));
+//    ASSERT(root_count == num_roots);
 
     // Initialize first descendent of the etree
     PRLEVEL(PR, ("%% computing first of\n "));
@@ -1688,9 +1692,9 @@ paru_symbolic *paru_analyze(
     PRLEVEL(PR, ("\n"));
 
     PR = -1;
-    PRLEVEL(PR, ("%%%% roots:\n"));
-    for (Int k = 0; k < num_roots; k++) PRLEVEL(PR, ("  %ld", roots[k]));
-    PRLEVEL(PR, ("\n"));
+//    PRLEVEL(PR, ("%%%% roots:\n"));
+//    for (Int k = 0; k < num_roots; k++) PRLEVEL(PR, ("  %ld", roots[k]));
+//    PRLEVEL(PR, ("\n"));
 
     PRLEVEL(PR, ("%%%% Depth:\n"));
     for (Int k = 0; k < nf; k++) PRLEVEL(PR, ("  %ld", Depth[k]));
