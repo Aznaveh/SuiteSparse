@@ -114,7 +114,10 @@ void paru_assemble_all(Int e, Int f, std::vector<Int> &colHash,
                 if (ii == el->nrowsleft) break;
             }
         }
-
+        Int *Depth = LUsym->Depth;
+        #pragma omp parallel 
+        #pragma omp single
+        #pragma omp taskgroup
         for (Int j = el->lac; j < nEl; j++)
         {
             PRLEVEL(1, ("%% j =%ld \n", j));
@@ -126,6 +129,7 @@ void paru_assemble_all(Int e, Int f, std::vector<Int> &colHash,
 
             double *dC = curEl_Num + fcolind * curEl->nrows;
 
+            #pragma omp task priority(Depth[f])
             for (Int iii = 0; iii < el->nrowsleft; iii++)
             {
                 Int i = tempRow[iii];
@@ -151,7 +155,7 @@ void paru_assemble_all(Int e, Int f, std::vector<Int> &colHash,
 // fit
 
 void paru_assemble_cols(Int e, Int f, std::vector<Int> &colHash,
-                        paru_matrix *paruMatInfo)
+        paru_matrix *paruMatInfo)
 
 {
     DEBUGLEVEL(0);
@@ -209,6 +213,10 @@ void paru_assemble_cols(Int e, Int f, std::vector<Int> &colHash,
     Int toll = 8;  // number of times it continue when do not find anything
 
     // TOLL FREE zone
+    Int *Depth = LUsym->Depth;
+    #pragma omp parallel 
+    #pragma omp single
+    #pragma omp taskgroup
     while (paru_find_hash(el_colIndex[el->lac], colHash, fcolList) != -1)
     {
         PRLEVEL(p, ("%% Toll free\n"));
@@ -241,6 +249,7 @@ void paru_assemble_cols(Int e, Int f, std::vector<Int> &colHash,
 
         double *dC = curEl_Num + fcolind * curEl->nrows;
 
+        #pragma omp task priority(Depth[f])
         for (Int ii = 0; ii < el->nrowsleft; ii++)
         {
             Int i = tempRow[ii];
@@ -265,7 +274,9 @@ void paru_assemble_cols(Int e, Int f, std::vector<Int> &colHash,
     lacList[e] = el_colIndex[el->lac];
 
     // TOLL Zone
-
+    #pragma omp parallel 
+    #pragma omp single
+    #pragma omp taskgroup
     for (Int j = el->lac + 1; j < nEl && el->ncolsleft > 0 && toll > 0; j++)
     {
         PRLEVEL(p, ("%% Toll zone\n"));
@@ -299,6 +310,7 @@ void paru_assemble_cols(Int e, Int f, std::vector<Int> &colHash,
         toll++;  // if found
         double *dC = curEl_Num + fcolind * curEl->nrows;
 
+        #pragma omp task priority(Depth[f])
         for (Int ii = 0; ii < el->nrowsleft; ii++)
         {
             Int i = tempRow[ii];
@@ -672,6 +684,10 @@ void paru_assemble_el_with0rows(Int e, Int f, std::vector<Int> &colHash,
         PRLEVEL(p, ("%% \n"));
 #endif
         Int ncols2bSeen = el->ncolsleft;
+        Int *Depth = LUsym->Depth;
+        #pragma omp parallel 
+        #pragma omp single
+        #pragma omp taskgroup
         for (Int j = el->lac; j < nEl; j++)
         {
             PRLEVEL(1, ("%% j =%ld \n", j));
@@ -683,6 +699,7 @@ void paru_assemble_el_with0rows(Int e, Int f, std::vector<Int> &colHash,
 
             double *dC = curEl_Num + fcolind * curEl->nrows;
 
+            #pragma omp task priority(Depth[f])
             for (Int iii = 0; iii < nrows2assembl; iii++)
             {
                 Int i = tempRow[iii];
