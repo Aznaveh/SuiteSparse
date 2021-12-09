@@ -140,6 +140,10 @@ void paru_full_summed(Int e, Int f, paru_matrix *paruMatInfo)
             PRLEVEL(p, ("%ld ", el_rowIndex[tempRow[i]]));
         PRLEVEL(p, ("%% \n"));
 #endif
+        Int *Depth = LUsym->Depth;
+        #pragma omp parallel 
+        #pragma omp single
+        #pragma omp taskgroup
         for (; j < nEl; j++)
         {  // j already defined out of this scope while it is needed
             PRLEVEL(1, ("%% j =%ld \n", j));
@@ -153,6 +157,7 @@ void paru_full_summed(Int e, Int f, paru_matrix *paruMatInfo)
 
             double *dC = pivotalFront + fcolInd * rowCount;
 
+            #pragma omp task priority(Depth[f])
             for (Int iii = 0; iii < nrows2assembl; iii++)
             {
                 Int i = tempRow[iii];
