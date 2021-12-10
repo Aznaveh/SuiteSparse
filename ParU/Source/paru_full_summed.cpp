@@ -157,7 +157,7 @@ void paru_full_summed(Int e, Int f, paru_matrix *paruMatInfo)
 
             double *dC = pivotalFront + fcolInd * rowCount;
 
-            #pragma omp task priority(Depth[f])
+            #pragma omp task priority(Depth[f]) if(nrows2assembl > TASK_MIN)
             for (Int iii = 0; iii < nrows2assembl; iii++)
             {
                 Int i = tempRow[iii];

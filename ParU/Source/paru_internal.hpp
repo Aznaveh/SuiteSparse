@@ -87,6 +87,9 @@ static int print_level = 0;
 #endif
 
 #define Size_max ((size_t)(-1))  // the largest value of size_t
+
+#define TASK_MIN  256 // Minimum row size to generate a task for a single column
+                      //  in assembly
 //------------------------------------------------------------------------------
 // inline internal functions
 

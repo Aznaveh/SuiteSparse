@@ -129,7 +129,7 @@ void paru_assemble_all(Int e, Int f, std::vector<Int> &colHash,
 
             double *dC = curEl_Num + fcolind * curEl->nrows;
 
-            #pragma omp task priority(Depth[f])
+            #pragma omp task priority(Depth[f]) if(el->nrowsleft > TASK_MIN)
             for (Int iii = 0; iii < el->nrowsleft; iii++)
             {
                 Int i = tempRow[iii];
@@ -249,7 +249,7 @@ void paru_assemble_cols(Int e, Int f, std::vector<Int> &colHash,
 
         double *dC = curEl_Num + fcolind * curEl->nrows;
 
-        #pragma omp task priority(Depth[f])
+        #pragma omp task priority(Depth[f]) if(el->nrowsleft > TASK_MIN)
         for (Int ii = 0; ii < el->nrowsleft; ii++)
         {
             Int i = tempRow[ii];
@@ -310,7 +310,7 @@ void paru_assemble_cols(Int e, Int f, std::vector<Int> &colHash,
         toll++;  // if found
         double *dC = curEl_Num + fcolind * curEl->nrows;
 
-        #pragma omp task priority(Depth[f])
+        #pragma omp task priority(Depth[f]) if(el->nrowsleft > TASK_MIN)
         for (Int ii = 0; ii < el->nrowsleft; ii++)
         {
             Int i = tempRow[ii];
@@ -699,7 +699,7 @@ void paru_assemble_el_with0rows(Int e, Int f, std::vector<Int> &colHash,
 
             double *dC = curEl_Num + fcolind * curEl->nrows;
 
-            #pragma omp task priority(Depth[f])
+            #pragma omp task priority(Depth[f]) if(nrows2assembl > TASK_MIN)
             for (Int iii = 0; iii < nrows2assembl; iii++)
             {
                 Int i = tempRow[iii];

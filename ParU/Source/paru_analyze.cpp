@@ -1543,7 +1543,7 @@ paru_symbolic *paru_analyze(
     // rows
     Int lastChildFlag = 0;
     Int childpointer = 0;
-    Int root_count = 0;
+    //Int root_count = 0;
 
     for (Int f = 0; f < nf; f++)
     {
