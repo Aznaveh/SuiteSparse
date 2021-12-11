@@ -120,7 +120,7 @@ ParU_ResultCode paru_factorize(cholmod_sparse *A, paru_symbolic *LUsym,
 
 #ifndef NDEBUG
     PR = 0;
-    PRLEVEL(PR, ("Leaves with their depth:\n"));
+    PRLEVEL(PR, ("%ld Leaves with their depth:\n", Q.size()));
     for (auto l: Q) 
         PRLEVEL(PR, ("%ld(%ld) ",l, Depth[l]));
     PRLEVEL(PR, ("\n"));
@@ -157,6 +157,11 @@ ParU_ResultCode paru_factorize(cholmod_sparse *A, paru_symbolic *LUsym,
         return info;
     }
 
+#ifdef COUNT_FLOPS
+    double flop_count = paruMatInfo->flp_cnt_dgemm + paruMatInfo->flp_cnt_dger +
+        paruMatInfo->flp_cnt_trsm;
+    PRLEVEL (-1, ("Flop count = %.17g\n",flop_count));
+#endif
     // The following code can be substituted in a sequential case
     // Int nf = LUsym->nf;
     // for (Int i = 0; i < nf; i++)

@@ -256,7 +256,8 @@ paru_symbolic *paru_analyze(
     umfpack_dl_defaults(Control);
     Control[UMFPACK_ORDERING] = UMFPACK_ORDERING_METIS;
     Control[UMFPACK_FIXQ] = -1;
-    Control[UMFPACK_STRATEGY] = UMFPACK_STRATEGY_UNSYMMETRIC;
+    //Control[UMFPACK_STRATEGY] = UMFPACK_STRATEGY_UNSYMMETRIC;
+    //Control[UMFPACK_STRATEGY] = UMFPACK_STRATEGY_SYMMETRIC;
 
 #ifndef NDEBUG
     /* print the control parameters */
@@ -289,8 +290,8 @@ paru_symbolic *paru_analyze(
     /* ---------------------------------------------------------------------- */
 
     Int strategy = Info[UMFPACK_STRATEGY_USED];
-    //LUsym->strategy = strategy;
-    LUsym->strategy = PARU_STRATEGY_SYMMETRIC;
+    LUsym->strategy = strategy;
+    //LUsym->strategy = PARU_STRATEGY_SYMMETRIC;
 
 #ifndef NDEBUG
     PR = 0;
@@ -367,11 +368,10 @@ paru_symbolic *paru_analyze(
     Int *fmap = (Int *)paru_alloc((n + 1), sizeof(Int));
     Int *newParent = (Int *)paru_alloc((n + 1), sizeof(Int));
     // TODO: unsymmetric strategy and Diag_map is not working good together
-    //if (strategy == PARU_STRATEGY_SYMMETRIC)
-    //    Diag_map = Sym_umf->Diagonal_map;
-    //else
-    //    Diag_map = NULL;
-    Diag_map = Sym_umf->Diagonal_map;
+    if (LUsym->strategy == PARU_STRATEGY_SYMMETRIC)
+        Diag_map = Sym_umf->Diagonal_map;
+    else
+        Diag_map = NULL;
 
     if (Diag_map)
         inv_Diag_map = (Int *)paru_alloc(n, sizeof(Int));
@@ -1567,6 +1567,8 @@ paru_symbolic *paru_analyze(
         PRLEVEL(PR, ("%% flops bound= %lf\n ", front_flop_bound[f]));
         PRLEVEL(PR, ("%% %ld %ld %ld\n ", fp, fm, fn));
         PRLEVEL(PR, ("%% stree bound= %lf\n ", stree_flop_bound[f]));
+        if (Parent[f] == -1) 
+            PRLEVEL(-1, ("%% stree bound= %lf\n ", stree_flop_bound[f]));
 
         ASSERT(Super[f + 1] <= ns);
         Int numRow = Sleft[Super[f + 1]] - Sleft[Super[f]];
