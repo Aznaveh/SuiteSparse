@@ -89,7 +89,7 @@ clean:
 	- $(RM) -r $(CLEAN)
 
 az:
-	(cd ..; $(MAKE) )
+	(cd ..; $(MAKE) -j 8)
 	(cd Demo; $(MAKE) run )
 rev:
 	$(foreach var,$(.VARIABLES),$(info $(var) = $($(var)))) #print all var

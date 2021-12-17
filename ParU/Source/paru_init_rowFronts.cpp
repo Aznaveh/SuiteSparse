@@ -158,8 +158,9 @@ ParU_ResultCode paru_init_rowFronts(
 
 #ifdef COUNT_FLOPS
     // flop count info init
-    paruMatInfo->flp_cnt_dgemm = paruMatInfo->flp_cnt_trsm =
-        paruMatInfo->flp_cnt_dger = 0.0;
+    paruMatInfo->flp_cnt_dgemm = 0.0;
+    paruMatInfo->flp_cnt_trsm = 0.0;
+    paruMatInfo->flp_cnt_dger = 0.0;
     paruMatInfo->flp_cnt_real_dgemm = 0.0;
 #endif
 

@@ -29,8 +29,8 @@ ParU_ResultCode paru_front(Int f,  // front need to be assembled
     /* get the front F  */
     /* ---------------------------------------------------------------------- */
 
-    PRLEVEL(-2, ("%%~~~~~~~  Assemble Front %ld start ~~~~(%d)\n", f, 
-                omp_get_thread_num() ));
+    PRLEVEL(-2, ("%%~~~~~~~  Assemble Front %ld start ~~%.0lf~~~~~~~(%d)\n", f, 
+               LUsym->stree_flop_bound[f], omp_get_thread_num() ));
     /* pivotal columns Super [f] ... Super [f+1]-1 */
     Int col1 = Super[f]; /* fornt F has columns col1:col2-1 */
     Int col2 = Super[f + 1];
