@@ -1093,7 +1093,9 @@ paru_symbolic *paru_analyze(
                         Int diag_col = inv_Diag_map[newrow];
                         if (diag_col < n1)
                             PRLEVEL(0, ("diag_col= %ld\n", diag_col));
-                        ASSERT(diag_col >= n1);
+                        //XXX  This assertions is not correct;
+                        // sometimes singltones steal diagonals
+                        // ASSERT(diag_col >= n1);
                         // row of s ~~~~~~> col Qfill confusing be aware
                         Diag_map[diag_col] = rowcount + n1;  // updating
                         // diag_map

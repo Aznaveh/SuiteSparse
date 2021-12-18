@@ -17,7 +17,7 @@ ParU_ResultCode paru_exec(Int f,
         Int* num_active_children, 
         paru_matrix *paruMatInfo)
 {
-    DEBUGLEVEL(1);
+    DEBUGLEVEL(0);
     PRLEVEL(1, ("executing front %ld\n", f));
 
     paru_symbolic *LUsym = paruMatInfo->LUsym;
@@ -96,9 +96,78 @@ ParU_ResultCode paru_factorize(cholmod_sparse *A, paru_symbolic *LUsym,
         return info;
     }
 
-    //////////////// Queue based ///////////////////////////////////////////////
     Int nf = LUsym->nf;
     Int *Childp = LUsym->Childp;
+ 
+    //////////////// Making task tree //////////////////////////////////////////
+    //TODO fix jungles
+    Int *Parent = LUsym->Parent;
+    std::vector<Int> task_helper(nf, 0);
+    std::vector<Int> task_map;
+    //double *front_flop_bound = LUsym->front_flop_bound;
+    double *stree_flop_bound = LUsym->stree_flop_bound;
+    const double flop_thresh = 1024;
+    Int num_nodes = 0;
+ 
+    
+    for (Int f = 0; f < nf; f++)
+    {
+        Int daddy = Parent[f];
+        Int num_sibl = Childp[daddy+1] - Childp[daddy]-1;
+        if (Parent[f] == -1)
+        { 
+            num_nodes++;
+            task_map.push_back(f);
+            continue;
+        }
+        if (num_sibl == 0 ) //getting rid of chains
+        {
+            task_helper[f] = -1;
+            continue;
+        }
+        Int num_child = Childp[f+1] - Childp[f];
+        if ( num_child == 0 || stree_flop_bound[f] < flop_thresh)
+        {//getting rid of  small tasks
+            task_helper[f] = -1;
+        }
+        else
+        {
+            task_helper[f] = num_nodes++;
+            task_map.push_back(f);
+        }
+    }
+    std::vector<Int> task_tree(num_nodes,-1);
+    for (Int i = 0; i < num_nodes ; i++) 
+    {
+        Int node = task_map[i];
+        Int parent = Parent[node];
+        //printf("i=%ld node=%ld parent=%ld\n",i,node,parent);
+        if (parent == -1)  
+        {
+            task_tree[i] = -1;
+            continue;
+        }
+        while (task_helper[parent] < 0 )
+            parent = Parent[parent];
+        task_tree[i] = task_helper[parent];
+    }
+    
+    printf("%% Task tree helper:\n");
+    for (Int i = 0; i < (Int)task_helper.size(); i++) 
+        printf("%ld)%ld ", i, task_helper[i]);
+    printf("\n%% tasknodes map (%ld):\n",num_nodes);
+    for (Int i = 0; i < (Int)task_map.size(); i++) 
+        printf("%ld ", task_map[i]);
+    printf("\n%% tasktree :\n");
+    for (Int i = 0; i < (Int)task_tree.size(); i++) 
+        printf("%ld ", task_tree[i]);
+    printf("\n");
+
+
+
+    //////////////// Making task tree ///End////////////////////////////////////
+
+    //////////////// Queue based ///////////////////////////////////////////////
     std::vector<Int> num_active_children (nf, 0);
     #pragma omp parallel for
     for (Int f = 0; f < nf; f++)
@@ -107,7 +176,7 @@ ParU_ResultCode paru_factorize(cholmod_sparse *A, paru_symbolic *LUsym,
     Int PR = 1;
     PRLEVEL(PR, ("Number of children:\n"));
     for (Int f = 0; f < nf; f++)
-    PRLEVEL(PR, ("%ld ",num_active_children[f]));
+        PRLEVEL(PR, ("%ld ",num_active_children[f]));
     PRLEVEL(PR, ("\n"));
     PR = 1;
 #endif
