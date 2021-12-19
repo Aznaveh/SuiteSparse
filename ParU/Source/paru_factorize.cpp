@@ -116,7 +116,7 @@ ParU_ResultCode paru_factorize(cholmod_sparse *A, paru_symbolic *LUsym,
         Int num_sibl = Childp[daddy+1] - Childp[daddy]-1;
         if (Parent[f] == -1)
         { 
-            num_nodes++;
+            task_helper[f] = num_nodes++;
             task_map.push_back(f);
             continue;
         }
