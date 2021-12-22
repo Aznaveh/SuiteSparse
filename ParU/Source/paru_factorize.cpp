@@ -172,6 +172,7 @@ ParU_ResultCode paru_factorize(cholmod_sparse *A, paru_symbolic *LUsym,
             [&Depth, &task_map](const Int &t1, const Int &t2)-> bool 
             {return Depth[task_map[t1]+1] > Depth[task_map[t2]+1];});
     
+#ifndef NDEBUG
     PRLEVEL(1, ("\n%% task_Q:\n"));
     for (Int i = 0; i < (Int)task_Q.size(); i++) 
     {
@@ -179,6 +180,7 @@ ParU_ResultCode paru_factorize(cholmod_sparse *A, paru_symbolic *LUsym,
         PRLEVEL(1, ("%ld[%ld-%ld] ",t, task_map[t]+1, task_map[t+1]));
     }
     PRLEVEL(1, ("\n"));
+#endif
 
     #pragma omp parallel
     #pragma omp single nowait
