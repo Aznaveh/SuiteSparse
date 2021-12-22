@@ -87,6 +87,7 @@ paru_symbolic *paru_analyze(
     LUsym->ustons.Sup = LUsym->lstons.Slp = NULL;
     LUsym->ustons.Suj = LUsym->lstons.Sli = NULL;
     LUsym->ustons.Sux = LUsym->lstons.Slx = NULL;
+    LUsym->task_map = LUsym->task_parent = LUsym->task_num_child = NULL;
 
     //############  Calling UMFPACK and retrieving data structure ##############
 
@@ -1646,6 +1647,111 @@ paru_symbolic *paru_analyze(
         }
     }
 
+    ////////////////    computing task tree and such ///////////////////////////
+    std::vector<Int> task_helper(nf);
+    const double flop_thresh = 1024;
+    Int ntasks = 0;
+ 
+    for (Int f = 0; f < nf; f++)
+    {
+        Int par = Parent[f];
+        if (par == -1) 
+        {
+            task_helper[f] = ntasks++;
+        }
+        else
+        {
+            Int num_sibl = Childp[par+1] - Childp[par] - 1;
+            if (num_sibl == 0 ) //getting rid of chains
+            {
+                task_helper[f] = -1;
+            }
+            else
+            {
+                //Int num_child = Childp[f+1] - Childp[f];
+                if (stree_flop_bound[f] < flop_thresh)
+                {//getting rid of  small tasks
+                    task_helper[f] = -1;
+                }
+                else
+                {
+                    task_helper[f] = ntasks++;
+                }
+            }
+        }
+    }
+
+    PRLEVEL(1, ("%% ntasks = %ld\n",ntasks));
+    LUsym->ntasks = ntasks;
+    Int *task_map;
+    Int *task_parent;
+    Int *task_num_child;
+    LUsym->task_map = task_map = (Int *)paru_alloc(ntasks+1, sizeof(Int));
+    LUsym->task_parent = task_parent = (Int *)paru_alloc(ntasks, sizeof(Int));
+    LUsym->task_num_child = task_num_child =
+        (Int *)paru_calloc(ntasks, sizeof(Int));
+    if ( task_map == NULL || task_parent == NULL || task_num_child == NULL)
+    {
+        printf("Paru: Out of memory in symbolic phase");
+        paru_free(m, sizeof(Int), Pinv);
+        paru_freesym(&LUsym);
+        return NULL;
+    }
+    task_map[0] = -1;
+    Int i = 0;
+    for (Int f = 0; f < nf; f++)
+    {
+        if (task_helper[f] != -1)
+            task_map[++i] = f;
+    }
+
+    for (Int i = 0; i < ntasks; i++) 
+    {
+        Int node = task_map[i+1];
+        Int parent = Parent[node];
+        //printf("i=%ld node=%ld parent=%ld\n",i,node,parent);
+        if (parent == -1)  
+        {
+            task_parent[i] = -1;
+        }
+        else
+        {
+            while (task_helper[parent] < 0 )
+                parent = Parent[parent];
+            task_parent[i] = task_helper[parent];
+        }
+    }
+
+    for (Int t = 0; t < ntasks; t++) 
+    {
+        Int par = task_parent[t];
+        if (par != -1)
+            task_num_child[par]++;
+    }
+
+#ifndef NDEBUG
+
+    PR = 0;
+    PRLEVEL(PR, ("%% Task tree helper:\n"));
+    for (Int i = 0; i < (Int)task_helper.size(); i++) 
+        PRLEVEL(PR, ("%ld)%ld ", i, task_helper[i]));
+    PRLEVEL(PR, ("\n%% tasknodes map (%ld):\n",ntasks));
+    for (Int i = 0; i <= ntasks ; i++) 
+        PRLEVEL(PR, ("%ld ", task_map[i]));
+    PRLEVEL(PR, ("\n%% tasktree :\n"));
+    for (Int i = 0; i < ntasks; i++) 
+        PRLEVEL(PR, ("%ld ", task_parent[i]));
+    PRLEVEL(PR, ("\n"));
+    PRLEVEL(PR, ("\n%% task_num_child:\n"));
+    for (Int i = 0; i < ntasks; i++) 
+        PRLEVEL(PR, ("%ld ", task_num_child[i]));
+    PRLEVEL(PR, ("\n%% tasks\n"));
+    for (Int t = 0; t < ntasks; t++)
+    {
+        PRLEVEL(PR, ("%ld[%ld-%ld] ",t, task_map[t]+1, task_map[t+1]));
+    }
+#endif
+    ///////////////////////////////////////////////////////////////////////////
 #ifndef NDEBUG
     PR = 1;
     PRLEVEL(PR, ("%% super node mapping ,snM (and rows): "));

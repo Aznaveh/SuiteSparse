@@ -60,14 +60,16 @@ ParU_ResultCode paru_exec(Int f,
 
 ParU_ResultCode paru_exec_tasks(Int t, 
         Int* task_num_child, 
-        Int* task_map, 
-        Int* task_parent,
-        Int* task_num_child_nochange, 
         paru_matrix *paruMatInfo)
 {
-    DEBUGLEVEL(0);
+    DEBUGLEVEL(1);
+    PRLEVEL(1, ("executing task %ld\n", t));
+    paru_symbolic *LUsym = paruMatInfo->LUsym;
+    Int *task_parent = LUsym->task_parent;
     Int daddy = task_parent[t];
-    Int num_original_children = task_num_child_nochange[daddy];
+    Int num_original_children = LUsym->task_num_child[daddy];
+
+    Int *task_map= LUsym->task_map;
     PRLEVEL(1, ("executing task %ld fronts %ld-%ld (%ld children)\n",t+1, 
                 task_map[t]+1+1,task_map[t+1]+1, num_original_children));
     ParU_ResultCode myInfo;
@@ -101,17 +103,13 @@ ParU_ResultCode paru_exec_tasks(Int t,
             if (num_rem_children == 0)
             {
                 PRLEVEL(1, ("%% task %ld executing its parent %ld\n", t+1, task_parent[t]+1));
-                return myInfo = 
-                    paru_exec_tasks(task_parent[t], task_num_child, task_map, task_parent, 
-                            task_num_child_nochange, paruMatInfo);
+                return myInfo = paru_exec_tasks(task_parent[t], task_num_child, paruMatInfo);
             }
         }
         else //I was the only spoiled kid in the family; no need for critical
         {
             PRLEVEL(1, ("%% task %ld only child executing its parent %ld\n", t+1, task_parent[t]+1));
-            return myInfo = 
-                    paru_exec_tasks(task_parent[t], task_num_child, task_map, task_parent, 
-                            task_num_child_nochange, paruMatInfo);
+            return myInfo = paru_exec_tasks(task_parent[t], task_num_child, paruMatInfo);
         }
     }
     return myInfo;
@@ -154,77 +152,18 @@ ParU_ResultCode paru_factorize(cholmod_sparse *A, paru_symbolic *LUsym,
         return info;
     }
 
-    Int nf = LUsym->nf;
-    Int *Childp = LUsym->Childp;
     Int *Depth = LUsym->Depth;
  
-    //////////////// Making task tree //////////////////////////////////////////
-    //TODO fix jungles
-    Int *Parent = LUsym->Parent;
-    std::vector<Int> task_helper(nf, 0);
-    std::vector<Int> task_map;
-    task_map.push_back(-1);
-    //double *front_flop_bound = LUsym->front_flop_bound;
-    double *stree_flop_bound = LUsym->stree_flop_bound;
-    const double flop_thresh = 1024;
-    Int num_task_nodes = 0;
- 
-    
-    for (Int f = 0; f < nf; f++)
-    {
-        Int daddy = Parent[f];
-        if (daddy == -1) 
-        {
-            task_helper[f] = num_task_nodes++;
-            task_map.push_back(f);
-            continue;
-        }
-        Int num_sibl = Childp[daddy+1] - Childp[daddy] - 1;
-        if (num_sibl == 0 ) //getting rid of chains
-        {
-            task_helper[f] = -1;
-            continue;
-        }
-        //Int num_child = Childp[f+1] - Childp[f];
-        if (stree_flop_bound[f] < flop_thresh)
-        {//getting rid of  small tasks
-            task_helper[f] = -1;
-        }
-        else
-        {
-            task_helper[f] = num_task_nodes++;
-            task_map.push_back(f);
-        }
-    }
-    std::vector<Int> task_parent(num_task_nodes,-1);
-    for (Int i = 0; i < num_task_nodes; i++) 
-    {
-        Int node = task_map[i+1];
-        Int parent = Parent[node];
-        //printf("i=%ld node=%ld parent=%ld\n",i,node,parent);
-        if (parent == -1)  
-        {
-            task_parent[i] = -1;
-            continue;
-        }
-        while (task_helper[parent] < 0 )
-            parent = Parent[parent];
-        task_parent[i] = task_helper[parent];
-    }
-    std::vector<Int> task_num_child(num_task_nodes,0);
-    for (Int t = 0; t < num_task_nodes; t++)
-    {
-        Int par = task_parent[t];
-        if (par != -1)
-            task_num_child[par]++;
-    }
-    //std::vector<Int> task_num_child_nochange(task_num_child);
-    std::vector<Int> task_num_child_nochange(num_task_nodes);
-    for (Int i = 0; i < (Int)task_num_child.size(); i++) 
-        task_num_child_nochange[i] = task_num_child[i];
-
+    //////////////// Using task tree //////////////////////////////////////////
+    Int ntasks = LUsym->ntasks;
+    Int *task_map = LUsym->task_map;
     std::vector<Int> task_Q;
-    for (Int t = 0; t < num_task_nodes; t++)
+    //This vector changes during factorization
+    std::vector<Int> task_num_child(ntasks); 
+    paru_memcpy ( &task_num_child[0] , LUsym->task_num_child, 
+            ntasks * sizeof(Int));
+   
+    for (Int t = 0; t < ntasks ; t++)
     {
         if (task_num_child[t] == 0) task_Q.push_back(t);
     }
@@ -232,31 +171,14 @@ ParU_ResultCode paru_factorize(cholmod_sparse *A, paru_symbolic *LUsym,
     std::sort(task_Q.begin(), task_Q.end(), 
             [&Depth, &task_map](const Int &t1, const Int &t2)-> bool 
             {return Depth[task_map[t1]+1] > Depth[task_map[t2]+1];});
-
-//    printf("%% Task tree helper:\n");
-//    for (Int i = 0; i < (Int)task_helper.size(); i++) 
-//        printf("%ld)%ld ", i, task_helper[i]);
-//    printf("\n%% tasknodes map (%ld):\n",num_task_nodes);
-//    for (Int i = 0; i < (Int)task_map.size(); i++) 
-//        printf("%ld ", task_map[i]);
-//    printf("\n%% tasktree :\n");
-//    for (Int i = 0; i < (Int)task_parent.size(); i++) 
-//        printf("%ld ", task_parent[i]);
-//    printf("\n%% task_num_child:\n");
-//    for (Int i = 0; i < (Int)task_num_child.size(); i++) 
-//        printf("%ld ", task_num_child[i]);
-//    printf("\n%% tasks\n");
-//    for (Int t = 0; t < num_task_nodes; t++)
-//    {
-//        printf("%ld[%ld-%ld] ",t, task_map[t]+1, task_map[t+1]);
-//    }
-//    printf("\n%% task_Q:\n");
-//    for (Int i = 0; i < (Int)task_Q.size(); i++) 
-//    {
-//        Int t = task_Q[i];
-//        printf("%ld[%ld-%ld] ",t, task_map[t]+1, task_map[t+1]);
-//    }
-//    printf("\n");
+    
+    PRLEVEL(1, ("\n%% task_Q:\n"));
+    for (Int i = 0; i < (Int)task_Q.size(); i++) 
+    {
+        Int t = task_Q[i];
+        PRLEVEL(1, ("%ld[%ld-%ld] ",t, task_map[t]+1, task_map[t+1]));
+    }
+    PRLEVEL(1, ("\n"));
 
     #pragma omp parallel
     #pragma omp single nowait
@@ -269,9 +191,7 @@ ParU_ResultCode paru_factorize(cholmod_sparse *A, paru_symbolic *LUsym,
         #pragma omp task priority(d) 
         {
             ParU_ResultCode myInfo =
-                paru_exec_tasks(t, &task_num_child[0], &task_map[0],
-                        &task_parent[0], &task_num_child_nochange[0],
-                        paruMatInfo);
+                paru_exec_tasks(t, &task_num_child[0], paruMatInfo);
             if (myInfo != PARU_SUCCESS)
             {
                 #pragma omp critical
@@ -284,6 +204,8 @@ ParU_ResultCode paru_factorize(cholmod_sparse *A, paru_symbolic *LUsym,
     //////////////// Making task tree ///End////////////////////////////////////
 
     //////////////// Queue based ///////////////////////////////////////////////
+//    Int nf = LUsym->nf;
+//    Int *Childp = LUsym->Childp;
 //    std::vector<Int> num_active_children (nf, 0);
 //    #pragma omp parallel for
 //    for (Int f = 0; f < nf; f++)
@@ -349,6 +271,7 @@ ParU_ResultCode paru_factorize(cholmod_sparse *A, paru_symbolic *LUsym,
     PRLEVEL (-1, ("Flop count = %.17g\n",flop_count));
 #endif
     // The following code can be substituted in a sequential case
+    // Int nf = LUsym->nf;
     //for (Int i = 0; i < nf; i++)
     //{
     //    if (i %1000 == 0) PRLEVEL(1, ("%% Wroking on front %ld\n", i));

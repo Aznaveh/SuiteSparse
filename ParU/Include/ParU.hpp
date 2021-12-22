@@ -220,10 +220,18 @@ typedef struct
     double *front_flop_bound;  // bound on m*n*k for each front size nf+1
     double *stree_flop_bound;  // flop bound for front and descendents size nf+1
 
+    //data structure related to tasks
+    Int ntasks; // number of tasks; at most nf
+    Int *task_map; // each task does the fronts 
+                   // from task_map[i]+1 to task_map[i+1]; task_map[0] is -1
+    Int *task_parent; //tree data structure for tasks
+    Int *task_num_child; //number of children of each task
+
     // symbolic analysis time
     double my_time;
 
 } paru_symbolic;
+
 
 // =============================================================================
 //      paru_Tuple, Row and Column data structure
