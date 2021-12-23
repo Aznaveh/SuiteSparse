@@ -272,6 +272,7 @@ void paru_freesym(paru_symbolic **LUsym_handle)
     paru_free(ntasks+1, sizeof(Int), LUsym->task_map);
     paru_free(ntasks, sizeof(Int), LUsym->task_parent);
     paru_free(ntasks, sizeof(Int), LUsym->task_num_child);
+    paru_free(ntasks, sizeof(Int), LUsym->task_depth);
 
     paru_free(1, sizeof(paru_symbolic), LUsym);
 

@@ -1570,9 +1570,6 @@ paru_symbolic *paru_analyze(
         PRLEVEL(PR, ("%% flops bound= %lf\n ", front_flop_bound[f]));
         PRLEVEL(PR, ("%% %ld %ld %ld\n ", fp, fm, fn));
         PRLEVEL(PR, ("%% stree bound= %lf\n ", stree_flop_bound[f]));
-        if (Parent[f] == -1) 
-            PRLEVEL(-1, ("%% stree bound= %lf\n ", stree_flop_bound[f]));
-
         ASSERT(Super[f + 1] <= ns);
         Int numRow = Sleft[Super[f + 1]] - Sleft[Super[f]];
 
@@ -1686,11 +1683,16 @@ paru_symbolic *paru_analyze(
     Int *task_map;
     Int *task_parent;
     Int *task_num_child;
+    Int *task_depth;
     LUsym->task_map = task_map = (Int *)paru_alloc(ntasks+1, sizeof(Int));
     LUsym->task_parent = task_parent = (Int *)paru_alloc(ntasks, sizeof(Int));
     LUsym->task_num_child = task_num_child =
         (Int *)paru_calloc(ntasks, sizeof(Int));
-    if ( task_map == NULL || task_parent == NULL || task_num_child == NULL)
+    LUsym->task_depth = task_depth =
+        (Int *)paru_calloc(ntasks, sizeof(Int));
+ 
+    if ( task_map == NULL || task_parent == NULL || task_num_child == NULL || 
+            task_depth == NULL)
     {
         printf("Paru: Out of memory in symbolic phase");
         paru_free(m, sizeof(Int), Pinv);
@@ -1705,20 +1707,22 @@ paru_symbolic *paru_analyze(
             task_map[++i] = f;
     }
 
-    for (Int i = 0; i < ntasks; i++) 
+    for (Int t = 0; t < ntasks; t++) 
     {
-        Int node = task_map[i+1];
+        Int node = task_map[t+1];
         Int parent = Parent[node];
-        //printf("i=%ld node=%ld parent=%ld\n",i,node,parent);
+        //printf("t=%ld node=%ld parent=%ld\n",t,node,parent);
         if (parent == -1)  
         {
-            task_parent[i] = -1;
+            // task_depth[t] = 0;
+            task_parent[t] = -1;
         }
         else
         {
+            task_depth[t] = MAX(Depth[node], task_depth[t]);
             while (task_helper[parent] < 0 )
                 parent = Parent[parent];
-            task_parent[i] = task_helper[parent];
+            task_parent[t] = task_helper[parent];
         }
     }
 
@@ -1731,7 +1735,7 @@ paru_symbolic *paru_analyze(
 
 #ifndef NDEBUG
 
-    PR = 0;
+    PR = 1;
     PRLEVEL(PR, ("%% Task tree helper:\n"));
     for (Int i = 0; i < (Int)task_helper.size(); i++) 
         PRLEVEL(PR, ("%ld)%ld ", i, task_helper[i]));
@@ -1745,11 +1749,18 @@ paru_symbolic *paru_analyze(
     PRLEVEL(PR, ("\n%% task_num_child:\n"));
     for (Int i = 0; i < ntasks; i++) 
         PRLEVEL(PR, ("%ld ", task_num_child[i]));
-    PRLEVEL(PR, ("\n%% tasks\n"));
+    PR = 0;
+    PRLEVEL(PR, ("\n%% %ld tasks:\n", ntasks));
     for (Int t = 0; t < ntasks; t++)
     {
         PRLEVEL(PR, ("%ld[%ld-%ld] ",t, task_map[t]+1, task_map[t+1]));
     }
+    PRLEVEL(PR, ("\n%% task depth:\n"));
+    for (Int t = 0; t < ntasks; t++)
+    {
+        PRLEVEL(PR, ("%ld ", task_depth[t]));
+    }
+    PRLEVEL(PR, ("\n"));
 #endif
     ///////////////////////////////////////////////////////////////////////////
 #ifndef NDEBUG
@@ -1801,7 +1812,7 @@ paru_symbolic *paru_analyze(
         PRLEVEL(PR, ("first[%ld]=%ld ", i, first[i]));
     PRLEVEL(PR, ("\n"));
 
-    PR = -1;
+    PR = 1;
 //    PRLEVEL(PR, ("%%%% roots:\n"));
 //    for (Int k = 0; k < num_roots; k++) PRLEVEL(PR, ("  %ld", roots[k]));
 //    PRLEVEL(PR, ("\n"));

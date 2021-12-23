@@ -152,11 +152,12 @@ ParU_ResultCode paru_factorize(cholmod_sparse *A, paru_symbolic *LUsym,
         return info;
     }
 
-    Int *Depth = LUsym->Depth;
+    //Int *Depth = LUsym->Depth;
  
     //////////////// Using task tree //////////////////////////////////////////
     Int ntasks = LUsym->ntasks;
-    Int *task_map = LUsym->task_map;
+    //Int *task_map = LUsym->task_map;
+    Int *task_depth= LUsym->task_depth;
     std::vector<Int> task_Q;
     //This vector changes during factorization
     std::vector<Int> task_num_child(ntasks); 
@@ -169,8 +170,12 @@ ParU_ResultCode paru_factorize(cholmod_sparse *A, paru_symbolic *LUsym,
     }
     
     std::sort(task_Q.begin(), task_Q.end(), 
-            [&Depth, &task_map](const Int &t1, const Int &t2)-> bool 
-            {return Depth[task_map[t1]+1] > Depth[task_map[t2]+1];});
+            [&task_depth](const Int &t1, const Int &t2)-> bool 
+            {return task_depth[t1] > task_depth[t2];});
+ 
+//    std::sort(task_Q.begin(), task_Q.end(), 
+//            [&Depth, &task_map](const Int &t1, const Int &t2)-> bool 
+//            {return Depth[task_map[t1]+1] > Depth[task_map[t2]+1];});
     
 #ifndef NDEBUG
     PRLEVEL(1, ("\n%% task_Q:\n"));
@@ -189,7 +194,8 @@ ParU_ResultCode paru_factorize(cholmod_sparse *A, paru_symbolic *LUsym,
     {
         Int t = task_Q[i];
         //printf("poping %ld \n", f);
-        Int d = Depth[task_map[t]+1];
+        //Int d = Depth[task_map[t]+1];
+        Int d = task_depth[t];
         #pragma omp task priority(d) 
         {
             ParU_ResultCode myInfo =

@@ -226,6 +226,7 @@ typedef struct
                    // from task_map[i]+1 to task_map[i+1]; task_map[0] is -1
     Int *task_parent; //tree data structure for tasks
     Int *task_num_child; //number of children of each task
+    Int *task_depth; //max depth of each task
 
     // symbolic analysis time
     double my_time;
