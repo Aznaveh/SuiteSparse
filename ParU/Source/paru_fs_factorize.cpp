@@ -88,23 +88,23 @@ Int paru_panel_factorize(Int f, Int m, Int n, const Int panel_width,
         PRLEVEL(1, ("%%curCol=%ld row_diag=%ld\n", j + col1 + n1, row_diag));
         PRLEVEL(1, ("%%##j=%ld value= %2.4lf\n", j, F[j * m + j]));
 
-        //for (Int i = j + 1; i < row_end; i++)
-        //{  // find max
-        //    PRLEVEL(1, ("%%i=%ld value= %2.4lf", i, F[j * m + i]));
-        //    PRLEVEL(1, (" deg = %ld \n", row_degree_bound[frowList[i]]));
-        //    if (fabs(maxval) < fabs(F[j * m + i]))
-        //    {
-        //        row_max = i;
-        //        maxval = F[j * m + i];
-        //    }
-        //    if (frowList[i] == row_diag)  // find diag
-        //    {
-        //        PRLEVEL(1, ("%%Found it %2.4lf\n", F[j * m + i]));
-        //        // row_diag = i;
-        //        diag_found = i;
-        //        diag_val = F[j * m + i];
-        //    }
-        //}
+        for (Int i = j + 1; i < row_end; i++)
+        {  // find max
+            PRLEVEL(1, ("%%i=%ld value= %2.4lf", i, F[j * m + i]));
+            PRLEVEL(1, (" deg = %ld \n", row_degree_bound[frowList[i]]));
+            if (fabs(maxval) < fabs(F[j * m + i]))
+            {
+                row_max = i;
+                maxval = F[j * m + i];
+            }
+            if (frowList[i] == row_diag)  // find diag
+            {
+                PRLEVEL(1, ("%%Found it %2.4lf\n", F[j * m + i]));
+                // row_diag = i;
+                diag_found = i;
+                diag_val = F[j * m + i];
+            }
+        }
 
 
         /*** ATTENTION: IT FACES A NUMERICAL PROBLEM HOWEVER I USE REDUCTION**/
@@ -113,29 +113,29 @@ Int paru_panel_factorize(Int f, Int m, Int n, const Int panel_width,
         //   omp_out = fabs(omp_in) > fabs(omp_out) ? omp_in : omp_out )
         */
 
-        #pragma omp taskloop default(none)\
-        shared(maxval, F,row_max, row_end, j,\
-                row_diag, diag_val, diag_found, m, frowList) grainsize(512)
-        for (Int i = j + 1; i < row_end; i++)
-        {  // find max
-            double value = F[j * m + i];
-            if (fabs(maxval) < fabs(value))
-            {
-                #pragma omp critical
-                {
-                    maxval = value;
-                    row_max = i;
-                }
-            }
-            if (frowList[i] == row_diag)  // find diag
-            {
-                #pragma omp critical
-                {//actually this will be seen at most one time
-                    diag_found = i;
-                    diag_val = value;
-                }
-            }
-        }
+        //#pragma omp taskloop default(none)\
+        //shared(maxval, F,row_max, row_end, j,\
+        //        row_diag, diag_val, diag_found, m, frowList) grainsize(512)
+        //for (Int i = j + 1; i < row_end; i++)
+        //{  // find max
+        //    double value = F[j * m + i];
+        //    if (fabs(maxval) < fabs(value))
+        //    {
+        //        #pragma omp critical
+        //        {
+        //            maxval = value;
+        //            row_max = i;
+        //        }
+        //    }
+        //    if (frowList[i] == row_diag)  // find diag
+        //    {
+        //        #pragma omp critical
+        //        {//actually this will be seen at most one time
+        //            diag_found = i;
+        //            diag_val = value;
+        //        }
+        //    }
+        //}
 
 #ifndef NDEBUG
         row_deg_max = row_degree_bound[frowList[row_max]];
@@ -146,7 +146,7 @@ Int paru_panel_factorize(Int f, Int m, Int n, const Int panel_width,
         if (maxval == 0)
         {
             PRLEVEL(-1, ("%% NO pivot found in %ld\n", n1 + col1 + j));
-            #pragma omp critical
+            #pragma omp atomic write
             paruMatInfo->res = PARU_SINGULAR;
             continue;
         }
@@ -192,16 +192,16 @@ Int paru_panel_factorize(Int f, Int m, Int n, const Int panel_width,
         if (chose_diag == 0)
         {
             Int row_sp = row_max;
-            #pragma omp taskloop  default(none) shared(maxval, F, row_sp, j, \
-            row_end, m, piv, frowList, row_degree_bound, row_deg_sp)\
-            grainsize(512)
+            //#pragma omp taskloop  default(none) shared(maxval, F, row_sp, j, \
+            //row_end, m, piv, frowList, row_degree_bound, row_deg_sp)\
+            //grainsize(512)
             for (Int i = j; i < row_end; i++)
             {
                 double value = F[j * m + i];
                 if (fabs(PIV_TOLER * maxval) < fabs(value) &&
                         row_degree_bound[frowList[i]] < row_deg_sp)
                 {  // numerically acceptalbe and sparser
-                    #pragma omp critical
+                    //#pragma omp critical
                     {
                         piv = value;
                         row_deg_sp = row_degree_bound[frowList[i]];

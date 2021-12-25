@@ -49,7 +49,7 @@ ParU_ResultCode paru_exec(Int f,
                     paru_exec(Parent[f], num_active_children, paruMatInfo);
             }
         }
-        else //I was the only spoiled kid in the family; no need for critical
+        else //I was the only spoiled kid in the family 
         {
             return myInfo = 
                 paru_exec(Parent[f], num_active_children, paruMatInfo);
@@ -108,7 +108,7 @@ ParU_ResultCode paru_exec_tasks(Int t,
                 return myInfo = paru_exec_tasks(task_parent[t], task_num_child, paruMatInfo);
             }
         }
-        else //I was the only spoiled kid in the family; no need for critical
+        else //I was the only spoiled kid in the family; 
         {
             PRLEVEL(1, ("%% task %ld only child executing its parent %ld\n", t+1, task_parent[t]+1));
             return myInfo = paru_exec_tasks(task_parent[t], task_num_child, paruMatInfo);
@@ -204,7 +204,7 @@ ParU_ResultCode paru_factorize(cholmod_sparse *A, paru_symbolic *LUsym,
                 paru_exec_tasks(t, &task_num_child[0], paruMatInfo);
             if (myInfo != PARU_SUCCESS)
             {
-                #pragma omp critical
+                #pragma omp atomic write
                 info = myInfo;
             }
         }
@@ -258,7 +258,7 @@ ParU_ResultCode paru_factorize(cholmod_sparse *A, paru_symbolic *LUsym,
 //                paru_exec(f, &num_active_children[0], paruMatInfo);
 //            if (myInfo != PARU_SUCCESS)
 //            {
-//                #pragma omp critical
+//                #pragma omp atomic write
 //                info = myInfo;
 //            }
 //        }
