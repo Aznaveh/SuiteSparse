@@ -16,7 +16,7 @@ void swap_rows(double *F, Int *frowList, Int m, Int n, Int r1, Int r2)
     // This function also swap rows r1 and r2 wholly and indices
     if (r1 == r2) return;
     std::swap(frowList[r1], frowList[r2]);
-    #pragma omp taskloop default(none) shared(F, m, r1, r2, n) grainsize(512)
+    #pragma omp taskloop if(n>1024)
     for (Int j = 0; j < n; j++)
         // each column
         std::swap(F[j * m + r1], F[j * m + r2]);
@@ -247,7 +247,7 @@ Int paru_panel_factorize(Int f, Int m, Int n, const Int panel_width,
         {
             PRLEVEL(1, ("%% dscal\n"));
             #pragma omp taskloop simd default(none)\
-            shared(j, row_end, F, m, piv) grainsize(512)
+            shared(j, row_end, F, m, piv) if(row_end-j > 1024)
             for (Int i = j + 1; i < row_end; i++)
             {
                 //printf("%%i=%ld value= %2.4lf", i, F[j * m + i]);
@@ -389,7 +389,7 @@ Int paru_factorize_full_summed(Int f, Int start_fac,
             // update row degree and dgeem can be done in parallel
             #pragma omp task default(none) mergeable\
             shared(paruMatInfo, pivotal_elements, stl_colSet) \
-            shared(panel_num, row_end, f, start_fac)
+            shared(panel_num, row_end, f, start_fac) 
             if (paruMatInfo->LUsym->Cm[f] !=0)  
             {  // if there is potential column left
                 paru_update_rowDeg(panel_num, row_end, f, start_fac,
@@ -423,7 +423,7 @@ Int paru_factorize_full_summed(Int f, Int start_fac,
              *
              */
             #pragma omp task  shared(F) \
-            shared(panel_width, j1, j2, fp, f, rowCount)
+            shared(panel_width, j1, j2, fp, f, rowCount) 
             if (j2 < fp)  // if it is not the last
             {
                 BLAS_INT M = (BLAS_INT)panel_width;
