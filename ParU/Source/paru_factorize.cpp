@@ -67,9 +67,11 @@ ParU_ResultCode paru_exec_tasks(Int t,
     paru_symbolic *LUsym = paruMatInfo->LUsym;
     Int *task_parent = LUsym->task_parent;
     Int daddy = task_parent[t];
-    Int num_original_children = LUsym->task_num_child[daddy];
-
     Int *task_map= LUsym->task_map;
+
+    Int num_original_children = 0;
+    if (daddy != -1)
+        num_original_children = LUsym->task_num_child[daddy];
     PRLEVEL(1, ("executing task %ld fronts %ld-%ld (%ld children)\n",t+1, 
                 task_map[t]+1+1,task_map[t+1]+1, num_original_children));
     ParU_ResultCode myInfo;
@@ -156,7 +158,6 @@ ParU_ResultCode paru_factorize(cholmod_sparse *A, paru_symbolic *LUsym,
  
     //////////////// Using task tree //////////////////////////////////////////
     Int ntasks = LUsym->ntasks;
-    //Int *task_map = LUsym->task_map;
     Int *task_depth= LUsym->task_depth;
     std::vector<Int> task_Q;
     //This vector changes during factorization
@@ -178,6 +179,7 @@ ParU_ResultCode paru_factorize(cholmod_sparse *A, paru_symbolic *LUsym,
 //            {return Depth[task_map[t1]+1] > Depth[task_map[t2]+1];});
     
 #ifndef NDEBUG
+    Int *task_map = LUsym->task_map;
     PRLEVEL(1, ("\n%% task_Q:\n"));
     for (Int i = 0; i < (Int)task_Q.size(); i++) 
     {
