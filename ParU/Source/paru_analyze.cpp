@@ -455,7 +455,7 @@ paru_symbolic *paru_analyze(
                  "in frontal matrices: %ld\n",
                  k));
 
-    PRLEVEL(PR, ("\nFrontal matrix chains:\n"));
+    //PRLEVEL(PR, ("\nFrontal matrix chains:\n"));
     //    for (Int j = 0; j < nchains; j++)
     //    {
     //        PRLEVEL(PR, ("Frontal matrices %ld to %ld in chain\n",
@@ -1742,14 +1742,16 @@ paru_symbolic *paru_analyze(
     PRLEVEL(PR, ("\n%% tasknodes map (%ld):\n",ntasks));
     for (Int i = 0; i <= ntasks ; i++) 
         PRLEVEL(PR, ("%ld ", task_map[i]));
+    PR = -1;
     PRLEVEL(PR, ("\n%% tasktree :\n"));
     for (Int i = 0; i < ntasks; i++) 
         PRLEVEL(PR, ("%ld ", task_parent[i]));
     PRLEVEL(PR, ("\n"));
+    PR = 1;
     PRLEVEL(PR, ("\n%% task_num_child:\n"));
     for (Int i = 0; i < ntasks; i++) 
         PRLEVEL(PR, ("%ld ", task_num_child[i]));
-    PR = 0;
+    PRLEVEL(PR, ("\n"));
     PRLEVEL(PR, ("\n%% %ld tasks:\n", ntasks));
     for (Int t = 0; t < ntasks; t++)
     {
