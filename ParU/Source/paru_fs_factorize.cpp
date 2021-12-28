@@ -383,13 +383,14 @@ Int paru_factorize_full_summed(Int f, Int start_fac,
         paru_panel_factorize(f, rowCount, fp, panel_width, panel_num, row_end,
                 paruMatInfo);
 
-        #pragma omp parallel
-        #pragma omp single
+        //FIXME THIS IS CAUSING SLOW DOWN
+        //#pragma omp parallel
+        //#pragma omp single
         {
             // update row degree and dgeem can be done in parallel
-            #pragma omp task default(none) mergeable\
-            shared(paruMatInfo, pivotal_elements, stl_colSet) \
-            shared(panel_num, row_end, f, start_fac) 
+            //#pragma omp task default(none) mergeable\
+            //shared(paruMatInfo, pivotal_elements, stl_colSet) \
+            //shared(panel_num, row_end, f, start_fac) 
             if (paruMatInfo->LUsym->Cm[f] !=0)  
             {  // if there is potential column left
                 paru_update_rowDeg(panel_num, row_end, f, start_fac,
@@ -422,7 +423,7 @@ Int paru_factorize_full_summed(Int f, Int start_fac,
              * v              |___....____________________..._____|
              *
              */
-            #pragma omp task  shared(F) \
+            //#pragma omp task  shared(F) \
             shared(panel_width, j1, j2, fp, f, rowCount) 
             if (j2 < fp)  // if it is not the last
             {
