@@ -20,8 +20,8 @@ ParU_ResultCode paru_init_rowFronts(
     // symbolic analysis
     paru_symbolic *LUsym)
 {
-    mallopt(M_TRIM_THRESHOLD, -1);         // disable sbrk trimming
-    mallopt(M_TOP_PAD, 16 * 1024 * 1024);  // increase padding to speedup malloc
+    //mallopt(M_TRIM_THRESHOLD, -1);         // disable sbrk trimming
+    //mallopt(M_TOP_PAD, 16 * 1024 * 1024);  // increase padding to speedup malloc
 
     DEBUGLEVEL(-1);
     if (!A->packed)

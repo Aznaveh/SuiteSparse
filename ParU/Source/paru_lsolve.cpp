@@ -93,6 +93,7 @@ Int paru_lsolve(paru_matrix *paruMatInfo, double *x)
         BLAS_INT Incx = (BLAS_INT)1;
 
         PRLEVEL(1, ("%% Working on DTRSV\n"));
+        /*
         BLAS_DTRSV("L",     // UPLO lower triangular
                    "N",     // TRANS A*X=b not the A**T
                    "U",     // DIAG A is assumed to be unit traingular
@@ -101,6 +102,9 @@ Int paru_lsolve(paru_matrix *paruMatInfo, double *x)
                    &lda,    // LDA leading demension
                    X,       // X
                    &Incx);  // INCX the increment of elements of X.
+         */
+        cblas_dtrsv (CblasColMajor, CblasLower, CblasNoTrans, 
+                CblasUnit, N, A, lda, X, Incx);
         PRLEVEL(1, ("%% DTRSV is just finished\n"));
 #ifndef NDEBUG
         PR = 2;

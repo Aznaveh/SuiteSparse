@@ -140,8 +140,8 @@ void paru_full_summed(Int e, Int f, paru_matrix *paruMatInfo)
             PRLEVEL(p, ("%ld ", el_rowIndex[tempRow[i]]));
         PRLEVEL(p, ("%% \n"));
 #endif
-        Int *Depth = LUsym->Depth;
         //FIXME SLOW DOWN
+        //Int *Depth = LUsym->Depth;
         //#pragma omp parallel 
         //#pragma omp single
         //#pragma omp taskgroup

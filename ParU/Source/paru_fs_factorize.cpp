@@ -113,7 +113,7 @@ Int paru_panel_factorize(Int f, Int m, Int n, const Int panel_width,
         //   omp_out = fabs(omp_in) > fabs(omp_out) ? omp_in : omp_out )
         */
 
-        //#pragma omp taskloop default(none)\
+        /*#pragma omp taskloop default(none)\
         //shared(maxval, F,row_max, row_end, j,\
         //        row_diag, diag_val, diag_found, m, frowList) grainsize(512)
         //for (Int i = j + 1; i < row_end; i++)
@@ -136,6 +136,7 @@ Int paru_panel_factorize(Int f, Int m, Int n, const Int panel_width,
         //        }
         //    }
         //}
+        */
 
 #ifndef NDEBUG
         row_deg_max = row_degree_bound[frowList[row_max]];
@@ -192,9 +193,10 @@ Int paru_panel_factorize(Int f, Int m, Int n, const Int panel_width,
         if (chose_diag == 0)
         {
             Int row_sp = row_max;
-            //#pragma omp taskloop  default(none) shared(maxval, F, row_sp, j, \
+            /*#pragma omp taskloop  default(none) shared(maxval, F, row_sp, j, \
             //row_end, m, piv, frowList, row_degree_bound, row_deg_sp)\
             //grainsize(512)
+            */
             for (Int i = j; i < row_end; i++)
             {
                 double value = F[j * m + i];
@@ -311,7 +313,8 @@ Int paru_panel_factorize(Int f, Int m, Int n, const Int panel_width,
             PRLEVEL(PR, ("\n"));
 
 #endif
-            BLAS_DGER(&M, &N, &alpha, X, &Incx, Y, &Incy, A, &lda);
+            //BLAS_DGER(&M, &N, &alpha, X, &Incx, Y, &Incy, A, &lda);
+            cblas_dger(CblasColMajor, M, N, alpha, X, Incx, Y, Incy, A, lda);
 #ifdef COUNT_FLOPS
             //printf("dger adding to flop count %ld\n", M*N*2);
             #pragma omp atomic
@@ -388,9 +391,10 @@ Int paru_factorize_full_summed(Int f, Int start_fac,
         //#pragma omp single
         {
             // update row degree and dgeem can be done in parallel
-            //#pragma omp task default(none) mergeable\
+            /*#pragma omp task default(none) mergeable\
             //shared(paruMatInfo, pivotal_elements, stl_colSet) \
             //shared(panel_num, row_end, f, start_fac) 
+            */
             if (paruMatInfo->LUsym->Cm[f] !=0)  
             {  // if there is potential column left
                 paru_update_rowDeg(panel_num, row_end, f, start_fac,
@@ -423,8 +427,9 @@ Int paru_factorize_full_summed(Int f, Int start_fac,
              * v              |___....____________________..._____|
              *
              */
-            //#pragma omp task  shared(F) \
+            /*#pragma omp task  shared(F) \
             shared(panel_width, j1, j2, fp, f, rowCount) 
+            */
             if (j2 < fp)  // if it is not the last
             {
                 BLAS_INT M = (BLAS_INT)panel_width;

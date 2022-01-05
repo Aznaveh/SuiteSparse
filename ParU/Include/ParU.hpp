@@ -17,23 +17,32 @@
 #include <set>
 #include <vector>
 
-#include <malloc.h>
+//#include <malloc.h> // mallopt used in paru_init_rowFronts.cpp
 
 #include <omp.h>
 
-extern "C"
-{
-#include "cholmod.h"
-#include "umfpack.h"
-}
+// Not using definitions in /CHOLMOD/Include/cholmod_blas.h
+// using cbals instead
+#define CHOLMOD_BLAS_H 
+#ifdef BLAS_INT 
+#undef BLAS_INT
+#endif
+#define BLAS_INT int32_t
 
 #ifdef MKLROOT
+#define CHOLMOD_BLAS_H
 #include <mkl.h>
 #define BLAS_set_num_threads(n) mkl_set_num_threads(n)
 #else
 #include <cblas.h>
 #define BLAS_set_num_threads(n) openblas_set_num_threads(n)
 #endif
+
+extern "C"
+{
+#include "cholmod.h"
+#include "umfpack.h"
+}
 
 #ifdef Int  // defined in amd
 #undef Int
