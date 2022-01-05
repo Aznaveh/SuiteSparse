@@ -86,8 +86,8 @@ Int paru_dgemm(Int f, double *pF, double *uPart, double *el, Int fp,
     //BLAS_DGEMM("N", "N", &mA, &nB, &nA, &alpha, pF + fp, &lda, uPart, &ldb,
     //           &beta, el, &ldc);
 
-    paru_tasked_dgemm(f, "N", "N", &mA, &nB, &nA, &alpha, pF + fp, &lda, 
-            uPart, &ldb, &beta, el, &ldc);
+    paru_tasked_dgemm(f, &mA, &nB, &nA, &alpha, pF + fp, &lda, uPart, &ldb, 
+            &beta, el, &ldc);
 
 #ifndef NDEBUG
     PRLEVEL(1, ("%%After DGEMM C =\n"));

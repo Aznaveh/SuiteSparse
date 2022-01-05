@@ -454,8 +454,7 @@ Int paru_factorize_full_summed(Int f, Int start_fac,
                     }
 
 #endif
-                    paru_tasked_trsm(f, "L", "L", "N", "U", &M, &N, &alpha, A,
-                            &lda, B, &ldb);
+                    paru_tasked_trsm(f, &M, &N, &alpha, A, &lda, B, &ldb);
 #ifdef COUNT_FLOPS
                     #pragma omp atomic
                     paruMatInfo->flp_cnt_trsm += (double)(M + 1) * M * N;
@@ -535,11 +534,10 @@ Int paru_factorize_full_summed(Int f, Int start_fac,
 
             // double start_time = omp_get_wtime();
             // BLAS_DGEMM("N", "N", &M, &N, &K, &alpha, A, &lda, B, &ldb, &beta,
-            // C,
-            //           &ldc);
+            // C, &ldc);
 
-            paru_tasked_dgemm(f, "N", "N", &M, &N, &K, &alpha, A, &lda, B, &ldb,
-                    &beta, C, &ldc);
+            paru_tasked_dgemm(f, &M, &N, &K, &alpha, A, &lda, B, &ldb, &beta, 
+                    C, &ldc);
 
             // double tot_time = omp_get_wtime() - start_time;
             // printf ("%ld  %lf ",f, tot_time);

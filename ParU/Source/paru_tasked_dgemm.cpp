@@ -8,17 +8,15 @@
  */
 #include "paru_internal.hpp"
 #define L 4096
-void paru_tasked_dgemm(Int f, char *transa, char *transb, BLAS_INT *M,
-                       BLAS_INT *N, BLAS_INT *K, double *alpha, double *A,
-                       BLAS_INT *lda, double *B, BLAS_INT *ldb, double *beta,
-                       double *C, BLAS_INT *ldc)
+void paru_tasked_dgemm(Int f,  BLAS_INT *M, BLAS_INT *N, BLAS_INT *K, 
+        double *alpha, double *A, BLAS_INT *lda, double *B, BLAS_INT *ldb, 
+        double *beta, double *C, BLAS_INT *ldc)
 {
-    //TODO no need for transa and transb they are always "N"
     DEBUGLEVEL(1);
     if (*M < L && *N < L)
     { //TODO use a nested loop for very small dgemms?
         PRLEVEL(1, ("%% No tasking for DGEMM (%dx%d) in %ld\n", *M, *N, f));
-        //BLAS_DGEMM(transa, transb, M, N, K, alpha, A, lda, B, ldb, beta, C,
+        //BLAS_DGEMM("N", "N", M, N, K, alpha, A, lda, B, ldb, beta, C,
         //           ldc);
         cblas_dgemm(CblasColMajor, CblasNoTrans, CblasNoTrans, 
                 *M, *N, *K, *alpha, A, *lda,
@@ -33,7 +31,7 @@ void paru_tasked_dgemm(Int f, char *transa, char *transb, BLAS_INT *M,
 
         Int len_col = *N / num_col_blocks;
         Int len_row = *M / num_row_blocks;
- 
+
         PRLEVEL(1, ("%% col-blocks=%ld,row-blocks=%ld) \n", num_col_blocks,
                     num_row_blocks));
         #pragma omp parallel proc_bind(close)
@@ -53,7 +51,7 @@ void paru_tasked_dgemm(Int f, char *transa, char *transb, BLAS_INT *M,
                     PRLEVEL(1, ("%% I=%ld J=%ld m=%d n=%d in %ld\n", I, J,
                                 m, n, f));
                     #pragma omp task
-                    //BLAS_DGEMM(transa, transb, &m, &n, K, alpha,
+                    //BLAS_DGEMM("N", "N", &m, &n, K, alpha,
                     //   A + (I * len_row), lda, B + (J * len_col * *ldb), ldb,
                     //   beta, C + (J * *ldc * len_col + I * len_row), ldc);
                     cblas_dgemm(CblasColMajor, CblasNoTrans, CblasNoTrans, 

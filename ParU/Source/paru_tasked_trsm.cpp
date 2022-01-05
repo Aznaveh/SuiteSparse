@@ -8,15 +8,14 @@
  */
 #include "paru_internal.hpp"
 #define L 4096
-void paru_tasked_trsm(Int f, char *side, char *uplo, char *transa, char *diag,
-                      int *m, int *n, double *alpha, double *a, int *lda,
+void paru_tasked_trsm(Int f, int *m, int *n, double *alpha, double *a, int *lda,
                       double *b, int *ldb)
 {
     DEBUGLEVEL(1);
     if (*n < L)
     {
         PRLEVEL(1, ("%% No tasking for TRSM (%dx%d) in %ld\n", *m, *n, f));
-        //BLAS_DTRSM (side, uplo, transa, diag, m, n, alpha, a, lda, b, ldb);
+        //BLAS_DTRSM ("L", "L", "N", "U", m, n, alpha, a, lda, b, ldb);
         cblas_dtrsm (CblasColMajor, CblasLeft, CblasLower, CblasNoTrans, 
                 CblasUnit,
                 *m, *n, *alpha, a, *lda, b, *ldb);
@@ -36,7 +35,7 @@ void paru_tasked_trsm(Int f, char *side, char *uplo, char *transa, char *diag,
                     (*n - J * len_bloc) : len_bloc;
                 PRLEVEL(1, ("%%  n_b= %d\n", n_b));
                 #pragma omp task 
-                //BLAS_DTRSM(side, uplo, transa, diag, m, &n_b, alpha, a, lda, 
+                //BLAS_DTRSM("L", "L", "N", "U", m, &n_b, alpha, a, lda, 
                 //        (b + J * len_bloc* *ldb), ldb);
                 cblas_dtrsm (CblasColMajor, CblasLeft, CblasLower, 
                         CblasNoTrans, CblasUnit,
