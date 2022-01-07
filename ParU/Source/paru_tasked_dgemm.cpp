@@ -35,7 +35,7 @@ void paru_tasked_dgemm(Int f,  BLAS_INT *M, BLAS_INT *N, BLAS_INT *K,
         PRLEVEL(1, ("%% col-blocks=%ld,row-blocks=%ld) \n", num_col_blocks,
                     num_row_blocks));
         #pragma omp parallel proc_bind(close)
-        #pragma omp single
+        #pragma omp single nowait
         {
             for (Int I = 0; I < num_row_blocks; I++)
             {

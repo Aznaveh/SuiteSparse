@@ -27,7 +27,7 @@ void paru_tasked_trsm(Int f, int *m, int *n, double *alpha, double *a, int *lda,
         Int len_bloc = *n / num_blocks;
         PRLEVEL(1, ("%%  num_blocks = %ld", num_blocks));
         #pragma omp parallel proc_bind(close)
-        #pragma omp single
+        #pragma omp single nowait
         {
             for (Int J = 0; J < num_blocks; J++)
             {

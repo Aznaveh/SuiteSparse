@@ -101,17 +101,23 @@ ParU_ResultCode paru_exec_tasks(Int t,
             }
 
             PRLEVEL(1, ("%% finished task %ld(%ld,%ld)  Parent has %ld left\n", 
-                        t+1, task_map[t]+1+1,task_map[t+1]+1,task_num_child[daddy]));
+                        t+1, task_map[t]+1+1,task_map[t+1]+1,t
+                        ask_num_child[daddy]));
             if (num_rem_children == 0)
             {
-                PRLEVEL(1, ("%% task %ld executing its parent %ld\n", t+1, task_parent[t]+1));
-                return myInfo = paru_exec_tasks(task_parent[t], task_num_child, paruMatInfo);
+                PRLEVEL(1, ("%% task %ld executing its parent %ld\n", 
+                            t+1, task_parent[t]+1));
+                return myInfo = 
+                    paru_exec_tasks(task_parent[t], 
+                            task_num_child, paruMatInfo);
             }
         }
         else //I was the only spoiled kid in the family; 
         {
-            PRLEVEL(1, ("%% task %ld only child executing its parent %ld\n", t+1, task_parent[t]+1));
-            return myInfo = paru_exec_tasks(task_parent[t], task_num_child, paruMatInfo);
+            PRLEVEL(1, ("%% task %ld only child executing its parent %ld\n", 
+                        t+1, task_parent[t]+1));
+            return myInfo = 
+                paru_exec_tasks(task_parent[t], task_num_child, paruMatInfo);
         }
     }
     return myInfo;
@@ -265,7 +271,7 @@ ParU_ResultCode paru_factorize(cholmod_sparse *A, paru_symbolic *LUsym,
 //            }
 //        }
 //    }
-//    //////////////// Queue based ///END/////////////////////////////////////////
+//    ////////////// Queue based ///END/////////////////////////////////////////
 
     if (info != PARU_SUCCESS)
     {
