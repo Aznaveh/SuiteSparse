@@ -12,9 +12,9 @@ void paru_tasked_dgemm(Int f,  BLAS_INT *M, BLAS_INT *N, BLAS_INT *K,
         double *alpha, double *A, BLAS_INT *lda, double *B, BLAS_INT *ldb, 
         double *beta, double *C, BLAS_INT *ldc)
 {
-    DEBUGLEVEL(1);
-    //if (*M < L && *N < L)
-    if(1)
+    DEBUGLEVEL(0);
+    if (*M < L && *N < L)
+    //if(1)
     { //TODO use a nested loop for very small dgemms?
         PRLEVEL(1, ("%% No tasking for DGEMM (%dx%d) in %ld\n", *M, *N, f));
         //BLAS_DGEMM("N", "N", M, N, K, alpha, A, lda, B, ldb, beta, C,
@@ -35,8 +35,8 @@ void paru_tasked_dgemm(Int f,  BLAS_INT *M, BLAS_INT *N, BLAS_INT *K,
 
         PRLEVEL(1, ("%% col-blocks=%ld,row-blocks=%ld) \n", num_col_blocks,
                     num_row_blocks));
-        //**//#pragma omp parallel proc_bind(close)
-        //**//#pragma omp single nowait
+        #pragma omp parallel proc_bind(close)
+        #pragma omp single nowait
         {
             for (Int I = 0; I < num_row_blocks; I++)
             {
@@ -51,7 +51,7 @@ void paru_tasked_dgemm(Int f,  BLAS_INT *M, BLAS_INT *N, BLAS_INT *K,
                         (*N - J * len_col) : len_col;
                     PRLEVEL(1, ("%% I=%ld J=%ld m=%d n=%d in %ld\n", I, J,
                                 m, n, f));
-                    //**//#pragma omp task
+                    #pragma omp task
                     //BLAS_DGEMM("N", "N", &m, &n, K, alpha,
                     //   A + (I * len_row), lda, B + (J * len_col * *ldb), ldb,
                     //   beta, C + (J * *ldc * len_col + I * len_row), ldc);

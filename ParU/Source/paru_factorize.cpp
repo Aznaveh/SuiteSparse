@@ -63,7 +63,6 @@ ParU_ResultCode paru_exec_tasks(Int t,
         paru_matrix *paruMatInfo)
 {
     DEBUGLEVEL(1);
-    PRLEVEL(1, ("executing task %ld\n", t));
     paru_symbolic *LUsym = paruMatInfo->LUsym;
     Int *task_parent = LUsym->task_parent;
     Int daddy = task_parent[t];
@@ -72,8 +71,8 @@ ParU_ResultCode paru_exec_tasks(Int t,
     Int num_original_children = 0;
     if (daddy != -1)
         num_original_children = LUsym->task_num_child[daddy];
-    PRLEVEL(1, ("executing task %ld fronts %ld-%ld (%ld children)\n",t+1, 
-                task_map[t]+1+1,task_map[t+1]+1, num_original_children));
+    PRLEVEL(1, ("executing task %ld fronts %ld-%ld (%ld children)\n",t, 
+                task_map[t]+1,task_map[t+1], num_original_children));
     ParU_ResultCode myInfo;
     for (Int f = task_map[t]+1; f <= task_map[t+1]; f++)
     {
@@ -101,12 +100,12 @@ ParU_ResultCode paru_exec_tasks(Int t,
             }
 
             PRLEVEL(1, ("%% finished task %ld(%ld,%ld)  Parent has %ld left\n", 
-                        t+1, task_map[t]+1+1,task_map[t+1]+1,
+                        t, task_map[t]+1,task_map[t+1],
                         task_num_child[daddy]));
             if (num_rem_children == 0)
             {
                 PRLEVEL(1, ("%% task %ld executing its parent %ld\n", 
-                            t+1, task_parent[t]+1));
+                            t, task_parent[t]));
                 return myInfo = 
                     paru_exec_tasks(task_parent[t], 
                             task_num_child, paruMatInfo);
@@ -115,7 +114,7 @@ ParU_ResultCode paru_exec_tasks(Int t,
         else //I was the only spoiled kid in the family; 
         {
             PRLEVEL(1, ("%% task %ld only child executing its parent %ld\n", 
-                        t+1, task_parent[t]+1));
+                        t, task_parent[t]));
             return myInfo = 
                 paru_exec_tasks(task_parent[t], task_num_child, paruMatInfo);
         }
