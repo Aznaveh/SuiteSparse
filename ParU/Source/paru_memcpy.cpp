@@ -20,8 +20,8 @@ void paru_memcpy(void *destination, const void *source, size_t num)
         size_t nchunks = 1 + (num / MEM_CHUNK);
 
         int64_t k;
-        #pragma omp parallel for default(none)\
-        shared(nchunks, destination, source, num)  schedule(dynamic,1)
+       //**// #pragma omp parallel for default(none)\
+       //**// shared(nchunks, destination, source, num)  schedule(dynamic,1)
         for (k = 0; k < (int64_t)nchunks; k++)
         {
             size_t start = k * MEM_CHUNK;

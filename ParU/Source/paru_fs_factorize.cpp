@@ -16,7 +16,7 @@ void swap_rows(double *F, Int *frowList, Int m, Int n, Int r1, Int r2)
     // This function also swap rows r1 and r2 wholly and indices
     if (r1 == r2) return;
     std::swap(frowList[r1], frowList[r2]);
-    #pragma omp taskloop if(n>1024)
+    //**//#pragma omp taskloop if(n>1024)
     for (Int j = 0; j < n; j++)
         // each column
         std::swap(F[j * m + r1], F[j * m + r2]);
@@ -248,8 +248,8 @@ Int paru_panel_factorize(Int f, Int m, Int n, const Int panel_width,
         if (j < row_end - 1)
         {
             PRLEVEL(1, ("%% dscal\n"));
-            #pragma omp taskloop simd default(none)\
-            shared(j, row_end, F, m, piv) if(row_end-j > 1024)
+            //**//#pragma omp taskloop simd default(none)\
+            //**//shared(j, row_end, F, m, piv) if(row_end-j > 1024)
             for (Int i = j + 1; i < row_end; i++)
             {
                 //printf("%%i=%ld value= %2.4lf", i, F[j * m + i]);

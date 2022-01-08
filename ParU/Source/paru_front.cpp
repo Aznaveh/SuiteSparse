@@ -16,7 +16,7 @@
 ParU_ResultCode paru_front(Int f,  // front need to be assembled
                            paru_matrix *paruMatInfo)
 {
-    DEBUGLEVEL(-2);
+    DEBUGLEVEL(-3);
     /*
      * -2 Print Nothing
      * -1 Just Matlab
@@ -371,9 +371,9 @@ ParU_ResultCode paru_front(Int f,  // front need to be assembled
     tupleList *RowList = paruMatInfo->RowList;
 
     Int *Depth = LUsym->Depth;
-    #pragma omp parallel 
-    #pragma omp single nowait
-    #pragma omp taskgroup
+    //**//#pragma omp parallel 
+    //**//#pragma omp single nowait
+    //**//#pragma omp taskgroup
     for (Int i = 0; i < fp; i++)
     {
         Int curFsRowIndex = i;  // current fully summed row index
@@ -410,10 +410,10 @@ ParU_ResultCode paru_front(Int f,  // front need to be assembled
 
             PRLEVEL(1, ("%% element= %ld  nEl =%ld \n", e, nEl));
 
-            #pragma omp task priority(Depth[f]) if(mEl > 128)
+            //**//#pragma omp task priority(Depth[f]) if(mEl > 1024)
             paru_assemble_row_2U(e, f, curRowIndex, curFsRowIndex, colHash,
                                  paruMatInfo);
-            #pragma omp taskwait
+            //**//#pragma omp taskwait
 
             // FLIP(el_rowIndex[curRowIndex]); //marking row assembled
             el_rowIndex[curRowIndex] = -1;

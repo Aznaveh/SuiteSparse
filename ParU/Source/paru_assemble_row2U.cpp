@@ -52,7 +52,7 @@ void paru_assemble_row_2U(Int e, Int f, Int sR, Int dR,
                     ("%% sM [%ld] =%2.5lf \n", mEl * j + sR, sM[mEl * j + sR]));
             PRLEVEL(1, ("%% uPart [%ld] =%2.5lf \n", rj * fp + dR,
                         uPart[rj * fp + dR]));
-            #pragma omp atomic
+            //**//#pragma omp atomic
             uPart[rj * fp + dR] += sM[mEl * j + sR];
             PRLEVEL(1, ("%% uPart [%ld] =%2.5lf \n", rj * fp + dR,
                         uPart[rj * fp + dR]));

@@ -101,8 +101,8 @@ ParU_ResultCode paru_exec_tasks(Int t,
             }
 
             PRLEVEL(1, ("%% finished task %ld(%ld,%ld)  Parent has %ld left\n", 
-                        t+1, task_map[t]+1+1,task_map[t+1]+1,t
-                        ask_num_child[daddy]));
+                        t+1, task_map[t]+1+1,task_map[t+1]+1,
+                        task_num_child[daddy]));
             if (num_rem_children == 0)
             {
                 PRLEVEL(1, ("%% task %ld executing its parent %ld\n", 
