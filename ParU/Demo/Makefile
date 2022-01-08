@@ -44,7 +44,7 @@ val:
 	
 	#compling everything with -g
 debug:
-	(cd ../Lib; $(MAKE) purge; $(MAKE) DEBUG=yes)
+	(cd ../Lib; $(MAKE) purge; $(MAKE) -j 8 DEBUG=yes)
 	(cd ../Demo;)
 	$(C) $(FLAG) -g paru_demo.cpp -o x_paru_demo $(LIBS)
 
