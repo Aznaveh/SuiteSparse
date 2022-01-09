@@ -10,53 +10,52 @@
  */
 
 #include "paru_internal.hpp"
-#define TASK_FL_THRESHOLD (double(1024 * 1024))
 
 
-ParU_ResultCode paru_exec(Int f, 
-        Int* num_active_children, 
-        paru_matrix *paruMatInfo)
-{
-    DEBUGLEVEL(0);
-    PRLEVEL(1, ("executing front %ld\n", f));
-
-    paru_symbolic *LUsym = paruMatInfo->LUsym;
-    Int *Parent = LUsym->Parent;
-    Int *Childp = LUsym->Childp;
-    ParU_ResultCode myInfo = paru_front(f, paruMatInfo);
-    if (myInfo != PARU_SUCCESS)
-    {
-        return myInfo;
-    }
-    Int num_rem_children;
-    Int daddy = Parent[f];
-    Int num_original_children = Childp[daddy+1] - Childp[daddy];
-    if (daddy != -1) //if it is not a root
-    {
-        if (num_original_children != 1)
-        {
-            #pragma omp atomic capture
-            { 
-                num_active_children[daddy]--;
-                num_rem_children = num_active_children[daddy];
-            }
-
-            PRLEVEL(1, ("%% finished %ld  Parent has %ld left\n", 
-                        f, num_active_children[daddy]));
-            if (num_rem_children == 0)
-            {
-                return myInfo = 
-                    paru_exec(Parent[f], num_active_children, paruMatInfo);
-            }
-        }
-        else //I was the only spoiled kid in the family 
-        {
-            return myInfo = 
-                paru_exec(Parent[f], num_active_children, paruMatInfo);
-        }
-    }
-    return myInfo;
-}
+//ParU_ResultCode paru_exec(Int f, 
+//        Int* num_active_children, 
+//        paru_matrix *paruMatInfo)
+//{
+//    DEBUGLEVEL(0);
+//    PRLEVEL(1, ("executing front %ld\n", f));
+//
+//    paru_symbolic *LUsym = paruMatInfo->LUsym;
+//    Int *Parent = LUsym->Parent;
+//    Int *Childp = LUsym->Childp;
+//    ParU_ResultCode myInfo = paru_front(f, paruMatInfo);
+//    if (myInfo != PARU_SUCCESS)
+//    {
+//        return myInfo;
+//    }
+//    Int num_rem_children;
+//    Int daddy = Parent[f];
+//    Int num_original_children = Childp[daddy+1] - Childp[daddy];
+//    if (daddy != -1) //if it is not a root
+//    {
+//        if (num_original_children != 1)
+//        {
+//            #pragma omp atomic capture
+//            { 
+//                num_active_children[daddy]--;
+//                num_rem_children = num_active_children[daddy];
+//            }
+//
+//            PRLEVEL(1, ("%% finished %ld  Parent has %ld left\n", 
+//                        f, num_active_children[daddy]));
+//            if (num_rem_children == 0)
+//            {
+//                return myInfo = 
+//                    paru_exec(Parent[f], num_active_children, paruMatInfo);
+//            }
+//        }
+//        else //I was the only spoiled kid in the family 
+//        {
+//            return myInfo = 
+//                paru_exec(Parent[f], num_active_children, paruMatInfo);
+//        }
+//    }
+//    return myInfo;
+//}
 
 ParU_ResultCode paru_exec_tasks(Int t, 
         Int* task_num_child, 
@@ -184,7 +183,7 @@ ParU_ResultCode paru_factorize(cholmod_sparse *A, paru_symbolic *LUsym,
 //            {return Depth[task_map[t1]+1] > Depth[task_map[t2]+1];});
     
 #ifndef NDEBUG
-    Int PR = 0;
+    Int PR = -1;
     Int *task_map = LUsym->task_map;
     PRLEVEL(PR, ("\n%% task_Q:\n"));
     for (Int i = 0; i < (Int)task_Q.size(); i++) 
@@ -196,59 +195,72 @@ ParU_ResultCode paru_factorize(cholmod_sparse *A, paru_symbolic *LUsym,
     PRLEVEL(PR, ("\n"));
 #endif
 
-    #pragma omp parallel
-    #pragma omp single nowait
-    #pragma omp task untied
-    for (Int i = 0; i < (Int)task_Q.size(); i++)
+    const Int  size = (Int)task_Q.size(); 
+    const Int steps = 3;
+    const Int stages = size / steps + 1;
+    Int start = 0;
+    PRLEVEL(1, ("%% size=%ld, steps =%ld, stages =%ld\n", size, steps, stages));
+
+    for (Int ii = 0; ii < stages; ii++)
     {
-        Int t = task_Q[i];
-        //printf("poping %ld \n", f);
-        //Int d = Depth[task_map[t]+1];
-        Int d = task_depth[t];
-        #pragma omp task priority(d) 
+        if (start >= size) break;
+        Int end = start + steps > size ? size : start + steps;
+        PRLEVEL(-1, ("%% doing tasks %ld to %ld\n", start, end));
+        #pragma omp parallel
+        #pragma omp single nowait
+        #pragma omp task untied
+        for (Int i = start; i < end ; i++)
         {
-            ParU_ResultCode myInfo =
-                paru_exec_tasks(t, &task_num_child[0], paruMatInfo);
-            if (myInfo != PARU_SUCCESS)
+            Int t = task_Q[i];
+            //printf("poping %ld \n", f);
+            //Int d = Depth[task_map[t]+1];
+            Int d = task_depth[t];
+            #pragma omp task priority(d) 
             {
-                #pragma omp atomic write
-                info = myInfo;
+                ParU_ResultCode myInfo =
+                    paru_exec_tasks(t, &task_num_child[0], paruMatInfo);
+                if (myInfo != PARU_SUCCESS)
+                {
+                    #pragma omp atomic write
+                    info = myInfo;
+                }
             }
         }
+        start += steps;
     }
 
 
     //////////////// Making task tree ///End////////////////////////////////////
 
     //////////////// Queue based ///////////////////////////////////////////////
-//    Int nf = LUsym->nf;
-//    Int *Childp = LUsym->Childp;
-//    std::vector<Int> num_active_children (nf, 0);
-//    #pragma omp parallel for
-//    for (Int f = 0; f < nf; f++)
-//        num_active_children[f] = Childp[f+1] - Childp[f];
-//#ifndef NDEBUG
-//    Int PR = 1;
-//    PRLEVEL(PR, ("Number of children:\n"));
-//    for (Int f = 0; f < nf; f++)
-//        PRLEVEL(PR, ("%ld ",num_active_children[f]));
-//    PRLEVEL(PR, ("\n"));
-//    PR = 1;
-//#endif
-//    std::vector<Int> Q;
-//    for (Int f = 0; f < nf; f++)
-//        if (num_active_children[f] == 0) Q.push_back(f);
-//    //Int *Depth = LUsym->Depth;
-//    std::sort(Q.begin(), Q.end(), [&Depth](const Int &a, const Int &b)-> bool 
-//            {return Depth[a] > Depth[b];});
-//
-//#ifndef NDEBUG
-//    PR = 0;
-//    PRLEVEL(PR, ("%ld Leaves with their depth:\n", Q.size()));
-//    for (auto l: Q) 
-//        PRLEVEL(PR, ("%ld(%ld) ",l, Depth[l]));
-//    PRLEVEL(PR, ("\n"));
-//    PR = 1;
+    //    Int nf = LUsym->nf;
+    //    Int *Childp = LUsym->Childp;
+    //    std::vector<Int> num_active_children (nf, 0);
+    //    #pragma omp parallel for
+    //    for (Int f = 0; f < nf; f++)
+    //        num_active_children[f] = Childp[f+1] - Childp[f];
+    //#ifndef NDEBUG
+    //    Int PR = 1;
+    //    PRLEVEL(PR, ("Number of children:\n"));
+    //    for (Int f = 0; f < nf; f++)
+    //        PRLEVEL(PR, ("%ld ",num_active_children[f]));
+    //    PRLEVEL(PR, ("\n"));
+    //    PR = 1;
+    //#endif
+    //    std::vector<Int> Q;
+    //    for (Int f = 0; f < nf; f++)
+    //        if (num_active_children[f] == 0) Q.push_back(f);
+    //    //Int *Depth = LUsym->Depth;
+    //    std::sort(Q.begin(), Q.end(), [&Depth](const Int &a, const Int &b)-> bool 
+    //            {return Depth[a] > Depth[b];});
+    //
+    //#ifndef NDEBUG
+    //    PR = 0;
+    //    PRLEVEL(PR, ("%ld Leaves with their depth:\n", Q.size()));
+    //    for (auto l: Q) 
+    //        PRLEVEL(PR, ("%ld(%ld) ",l, Depth[l]));
+    //    PRLEVEL(PR, ("\n"));
+    //    PR = 1;
 //#endif
 //    
 //    #pragma omp parallel
