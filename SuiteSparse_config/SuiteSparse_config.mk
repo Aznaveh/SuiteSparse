@@ -66,7 +66,7 @@ SUITESPARSE_VERSION = 5.5.0
     #---------------------------------------------------------------------------
 
     # sequential make's by default
-    JOBS ?= 1
+    JOBS ?= 40
 
     #---------------------------------------------------------------------------
     # optimization level
@@ -111,21 +111,21 @@ SUITESPARSE_VERSION = 5.5.0
     # use the $(CC), $(CXX), and $(F77) compilers, use 'make AUTOCC=no'
 
 	#Aznaveh use yes or no for icpc 
-    AUTOCC ?= no
+    AUTOCC ?= yes
 
     ifneq ($(AUTOCC),no)
-        ifneq ($(shell which icc 2>/dev/null),)
-            # use the Intel icc compiler for C codes, and -qopenmp for OpenMP
-            CC = icc
+        ifneq ($(shell which icx 2>/dev/null),)
+            # use the Intel icx compiler
+            CC = icx
             CFLAGS += -D_GNU_SOURCE
-            CXX = icpc
-            CFOPENMP = -qopenmp -I$(MKLROOT)/include
-            LDFLAGS += -qopenmp
-            LDLIBS += -lm -lirc
+            CXX = icpx
+            CFOPENMP = -DMKL_ILP64 -I$(MKLROOT)/include
+            LDFLAGS += -L${MKLROOT}/lib/intel64 -liomp5 -lpthread -lm -ldl
+            LDLIBS += -liomp5 -lpthread -lm -ldl
         endif
-        ifneq ($(shell which ifort 2>/dev/null),)
-            # use the Intel ifort compiler for Fortran codes
-            F77 = ifort
+        ifneq ($(shell which ifx 2>/dev/null),)
+            # use the Intel ifx compiler for Fortran codes
+            F77 = ifx
         endif
     endif
 
@@ -175,7 +175,7 @@ SUITESPARSE_VERSION = 5.5.0
             #   $(MKLROOT)/lib/intel64/libmkl_intel_thread.a \
             #   -Wl,--end-group -lpthread -lm
             # using dynamic linking:
-            CFLAGS += -DMKLROOT -I/usr/include/mkl
+            CFLAGS += -DMKLROOT  -DMKL_ILP64  -I"${MKLROOT}/include"
             BLAS = -lmkl_intel_lp64 -lmkl_core -lmkl_intel_thread -liomp5 -lpthread -lm
             LAPACK =
 #       else
