@@ -11,6 +11,12 @@
 
 #include "paru_internal.hpp"
 
+#define PAR 1
+#define SEQ 0
+
+//#define PAR 0
+//#define SEQ 1
+
 
 //ParU_ResultCode paru_exec(Int f, 
 //        Int* num_active_children, 
@@ -161,6 +167,7 @@ ParU_ResultCode paru_factorize(cholmod_sparse *A, paru_symbolic *LUsym,
     //Int *Depth = LUsym->Depth;
  
     //////////////// Using task tree //////////////////////////////////////////
+#if PAR
     Int ntasks = LUsym->ntasks;
     Int *task_depth= LUsym->task_depth;
     std::vector<Int> task_Q;
@@ -181,7 +188,11 @@ ParU_ResultCode paru_factorize(cholmod_sparse *A, paru_symbolic *LUsym,
 //    std::sort(task_Q.begin(), task_Q.end(), 
 //            [&Depth, &task_map](const Int &t1, const Int &t2)-> bool 
 //            {return Depth[task_map[t1]+1] > Depth[task_map[t2]+1];});
-    
+
+    if (ntasks > 0)
+        printf("nf = %ld, deepest = %ld, chainess = %lf\n", 
+            LUsym->nf, task_depth[task_Q[0]], 
+            task_depth[task_Q[0]] / double(LUsym->nf) );
 #ifndef NDEBUG
     Int PR = -1;
     Int *task_map = LUsym->task_map;
@@ -196,7 +207,7 @@ ParU_ResultCode paru_factorize(cholmod_sparse *A, paru_symbolic *LUsym,
 #endif
 
     const Int  size = (Int)task_Q.size(); 
-    const Int steps = 3;
+    const Int steps = size == 0 ? 1 : size;
     const Int stages = size / steps + 1;
     Int start = 0;
     PRLEVEL(1, ("%% size=%ld, steps =%ld, stages =%ld\n", size, steps, stages));
@@ -210,6 +221,7 @@ ParU_ResultCode paru_factorize(cholmod_sparse *A, paru_symbolic *LUsym,
         #pragma omp single nowait
         #pragma omp task untied
         for (Int i = start; i < end ; i++)
+        //for (Int i = 0; i < (Int)task_Q.size(); i++)
         {
             Int t = task_Q[i];
             //printf("poping %ld \n", f);
@@ -229,7 +241,7 @@ ParU_ResultCode paru_factorize(cholmod_sparse *A, paru_symbolic *LUsym,
         start += steps;
     }
 
-
+#endif
     //////////////// Making task tree ///End////////////////////////////////////
 
     //////////////// Queue based ///////////////////////////////////////////////
@@ -261,29 +273,30 @@ ParU_ResultCode paru_factorize(cholmod_sparse *A, paru_symbolic *LUsym,
     //        PRLEVEL(PR, ("%ld(%ld) ",l, Depth[l]));
     //    PRLEVEL(PR, ("\n"));
     //    PR = 1;
-//#endif
-//    
-//    #pragma omp parallel
-//    #pragma omp single nowait
-//    #pragma omp task untied
-//    for (Int i = 0; i < (Int)Q.size(); i++)
-//    {
-//        Int f = Q[i];
-//        //printf("poping %ld \n", f);
-//        Int d = Depth[f];
-//        #pragma omp task priority(d) 
-//        {
-//            ParU_ResultCode myInfo =
-//                paru_exec(f, &num_active_children[0], paruMatInfo);
-//            if (myInfo != PARU_SUCCESS)
-//            {
-//                #pragma omp atomic write
-//                info = myInfo;
-//            }
-//        }
-//    }
-//    ////////////// Queue based ///END/////////////////////////////////////////
+    //#endif
+    //    
+    //    #pragma omp parallel
+    //    #pragma omp single nowait
+    //    #pragma omp task untied
+    //    for (Int i = 0; i < (Int)Q.size(); i++)
+    //    {
+    //        Int f = Q[i];
+    //        //printf("poping %ld \n", f);
+    //        Int d = Depth[f];
+    //        #pragma omp task priority(d) 
+    //        {
+    //            ParU_ResultCode myInfo =
+    //                paru_exec(f, &num_active_children[0], paruMatInfo);
+    //            if (myInfo != PARU_SUCCESS)
+    //            {
+    //                #pragma omp atomic write
+    //                info = myInfo;
+    //            }
+    //        }
+    //    }
+    //    ////////////// Queue based ///END/////////////////////////////////////////
 
+#if PAR 
     if (info != PARU_SUCCESS)
     {
         PRLEVEL(1, ("%% factorization has some problem\n"));
@@ -293,6 +306,7 @@ ParU_ResultCode paru_factorize(cholmod_sparse *A, paru_symbolic *LUsym,
             printf("Paru: Input matrix is singular\n");
         return info;
     }
+#endif
 
 #ifdef COUNT_FLOPS
     double flop_count = paruMatInfo->flp_cnt_dgemm + paruMatInfo->flp_cnt_dger +
@@ -300,18 +314,20 @@ ParU_ResultCode paru_factorize(cholmod_sparse *A, paru_symbolic *LUsym,
     PRLEVEL (-1, ("Flop count = %.17g\n",flop_count));
 #endif
     // The following code can be substituted in a sequential case
-    // Int nf = LUsym->nf;
-    //for (Int i = 0; i < nf; i++)
-    //{
-    //    if (i %1000 == 0) PRLEVEL(1, ("%% Wroking on front %ld\n", i));
+#if SEQ
+    Int nf = LUsym->nf;
+    for (Int i = 0; i < nf; i++)
+    {
+        if (i %1000 == 0) PRLEVEL(1, ("%% Wroking on front %ld\n", i));
 
-    //    info = paru_front(i, paruMatInfo);
-    //    if (info != PARU_SUCCESS)
-    //    {
-    //        PRLEVEL(1, ("%% A problem happend in %ld\n", i));
-    //        return info;
-    //    }
-    //}
+        info = paru_front(i, paruMatInfo);
+        if (info != PARU_SUCCESS)
+        {
+            PRLEVEL(1, ("%% A problem happend in %ld\n", i));
+            return info;
+        }
+    }
+#endif
 
     info = paru_perm(paruMatInfo);  // to form the final permutation
 
