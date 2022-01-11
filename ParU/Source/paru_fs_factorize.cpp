@@ -514,7 +514,7 @@ Int paru_factorize_full_summed(Int f, Int start_fac,
 
             BLAS_INT N = (BLAS_INT)fp - j2;
             BLAS_INT K = (BLAS_INT)panel_width;
-            double alpha = -1;
+            // alpha = -1;
             double *A = F + j1 * rowCount + j2;
             BLAS_INT lda = (BLAS_INT)rowCount;
             double *B = F + j2 * rowCount + j1;
@@ -526,17 +526,17 @@ Int paru_factorize_full_summed(Int f, Int start_fac,
             Int PR = 1;
             PRLEVEL(PR, ("%% DGEMM "));
             PRLEVEL(PR,
-                    ("%% M =%d K = %d N = %d alpha = %f \n", M, K, N, alpha));
+                    ("%% M =%d K = %d N = %d \n", M, K, N));
             PRLEVEL(PR, ("%% lda =%d ldb =%d\n", lda, ldb));
             PRLEVEL(PR, ("%% j2 =%ld j1=%ld\n", j2, j1));
             PRLEVEL(PR, ("\n %%"));
 #endif
 
             // double start_time = omp_get_wtime();
-            // BLAS_DGEMM("N", "N", &M, &N, &K, &alpha, A, &lda, B, &ldb, &beta,
+            // BLAS_DGEMM("N", "N", &M, &N, &K, -1, A, &lda, B, &ldb, &beta,
             // C, &ldc);
 
-            paru_tasked_dgemm(f, &M, &N, &K, &alpha, A, &lda, B, &ldb, &beta, 
+            paru_tasked_dgemm(f, &M, &N, &K, A, &lda, B, &ldb, &beta, 
                     C, &ldc);
 
             // double tot_time = omp_get_wtime() - start_time;

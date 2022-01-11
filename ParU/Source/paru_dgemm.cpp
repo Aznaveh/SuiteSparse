@@ -71,31 +71,31 @@ Int paru_dgemm(Int f, double *pF, double *uPart, double *el, Int fp,
     }
 #endif
 
-    double alpha = -1;
+    // alpha = -1;
     BLAS_INT lda = (BLAS_INT)rowCount;
     BLAS_INT ldb = (BLAS_INT)fp;
     BLAS_INT ldc = (BLAS_INT)(rowCount - fp);
 
-    PRLEVEL(1, ("%% alpha =%lf  ", alpha));
     PRLEVEL(1, ("%% lda =%d  ", lda));
     PRLEVEL(1, ("%% ldb =%d  ", ldb));
     PRLEVEL(1, ("%% ldc =%d\n", ldc));
 
     double beta = 0;  // U part is not initialized
 
-    //BLAS_DGEMM("N", "N", &mA, &nB, &nA, &alpha, pF + fp, &lda, uPart, &ldb,
+    //BLAS_DGEMM("N", "N", &mA, &nB, &nA, -1, pF + fp, &lda, uPart, &ldb,
     //           &beta, el, &ldc);
 
-    paru_tasked_dgemm(f, &mA, &nB, &nA, &alpha, pF + fp, &lda, uPart, &ldb, 
+    paru_tasked_dgemm(f, &mA, &nB, &nA, pF + fp, &lda, uPart, &ldb, 
             &beta, el, &ldc);
 
 #ifndef NDEBUG
-    PRLEVEL(1, ("%%After DGEMM C =\n"));
+    Int PR = 1;
+    PRLEVEL(PR, ("%%After DGEMM C =\n"));
     for (Int i = 0; i < mA; i++)
     {
-        PRLEVEL(1, ("%% "));
-        for (Int j = 0; j < nB; j++) PRLEVEL(1, ("%2.4lf\t", Cp[j * mA + i]));
-        PRLEVEL(1, ("\n"));
+        PRLEVEL(PR, ("%% "));
+        for (Int j = 0; j < nB; j++) PRLEVEL(PR, ("%2.4lf\t", Cp[j * mA + i]));
+        PRLEVEL(PR, ("\n"));
     }
 #endif
 
