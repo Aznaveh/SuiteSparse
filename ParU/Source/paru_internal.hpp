@@ -169,7 +169,7 @@ void paru_assemble_row_2U(Int e, Int f, Int sR, Int dR,
 Int paru_trsm(Int f, double *pF, double *uPart, Int fp, Int rowCount,
               Int colCount);
 Int paru_dgemm(Int f, double *pF, double *uPart, double *el, Int fp,
-               Int rowCount, Int colCount);
+               Int rowCount, Int colCount, paru_matrix *paruMatInfo);
 
 void paru_print_element(paru_matrix *paruMatInfo, Int e);
 void paru_print_tupleList(tupleList *listSet, Int index);
@@ -249,7 +249,7 @@ double paru_vec_1norm(const double *x, Int n);
 void paru_Diag_update(Int pivcol, Int pivrow, paru_matrix *paruMatInfo);
 void paru_tasked_dgemm(Int f, BLAS_INT *m, BLAS_INT *n, BLAS_INT *k, 
         double *A, BLAS_INT *lda, double *B, BLAS_INT *ldb, 
-        double *beta, double *C, BLAS_INT *ldc);
+        double *beta, double *C, BLAS_INT *ldc, paru_matrix *paruMatInfo);
 void paru_tasked_trsm(Int f, int *m, int *n, double *alpha, double *a, int *lda,
         double *b, int *ldb);
 #endif

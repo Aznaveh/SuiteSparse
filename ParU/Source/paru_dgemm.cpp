@@ -22,7 +22,7 @@
 //
 
 Int paru_dgemm(Int f, double *pF, double *uPart, double *el, Int fp, 
-        Int rowCount, Int colCount)
+        Int rowCount, Int colCount, paru_matrix *paruMatInfo)
 {
     DEBUGLEVEL(0);
     PRLEVEL(1, ("%% rowCount =%ld  ", rowCount));
@@ -86,7 +86,7 @@ Int paru_dgemm(Int f, double *pF, double *uPart, double *el, Int fp,
     //           &beta, el, &ldc);
 
     paru_tasked_dgemm(f, &mA, &nB, &nA, pF + fp, &lda, uPart, &ldb, 
-            &beta, el, &ldc);
+            &beta, el, &ldc, paruMatInfo);
 
 #ifndef NDEBUG
     Int PR = 1;

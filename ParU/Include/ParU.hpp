@@ -394,6 +394,8 @@ typedef struct
     double flp_cnt_dger;
     double flp_cnt_real_dgemm;
     // #endif
+
+    Int num_active_tasks; //keep track of number of active task in frontal level
     ParU_ResultCode res;
 
 } paru_matrix;

@@ -537,7 +537,7 @@ Int paru_factorize_full_summed(Int f, Int start_fac,
             // C, &ldc);
 
             paru_tasked_dgemm(f, &M, &N, &K, A, &lda, B, &ldb, &beta, 
-                    C, &ldc);
+                    C, &ldc, paruMatInfo);
 
             // double tot_time = omp_get_wtime() - start_time;
             // printf ("%ld  %lf ",f, tot_time);

@@ -156,6 +156,7 @@ ParU_ResultCode paru_factorize(cholmod_sparse *A, paru_symbolic *LUsym,
     info = paru_init_rowFronts(&paruMatInfo, A, LUsym);
     // printf ("Finishing init row\n");
     *paruMatInfo_handle = paruMatInfo;
+    
 
     PRLEVEL(1, ("%% init_row is done\n"));
     if (info != PARU_SUCCESS)
@@ -163,6 +164,7 @@ ParU_ResultCode paru_factorize(cholmod_sparse *A, paru_symbolic *LUsym,
         PRLEVEL(1, ("%% init_row has a problem\n"));
         return info;
     }
+    paruMatInfo->num_active_tasks = 0;
 
     //Int *Depth = LUsym->Depth;
  
@@ -229,6 +231,9 @@ ParU_ResultCode paru_factorize(cholmod_sparse *A, paru_symbolic *LUsym,
             Int d = task_depth[t];
             #pragma omp task priority(d) 
             {
+                #pragma omp atomic update
+                paruMatInfo->num_active_tasks++;
+
                 ParU_ResultCode myInfo =
                     paru_exec_tasks(t, &task_num_child[0], paruMatInfo);
                 if (myInfo != PARU_SUCCESS)
@@ -236,6 +241,9 @@ ParU_ResultCode paru_factorize(cholmod_sparse *A, paru_symbolic *LUsym,
                     #pragma omp atomic write
                     info = myInfo;
                 }
+
+                #pragma omp atomic update
+                paruMatInfo->num_active_tasks--;
             }
         }
         start += steps;
@@ -316,6 +324,7 @@ ParU_ResultCode paru_factorize(cholmod_sparse *A, paru_symbolic *LUsym,
     // The following code can be substituted in a sequential case
 #if SEQ
     Int nf = LUsym->nf;
+    paruMatInfo->num_active_tasks = 1;
     for (Int i = 0; i < nf; i++)
     {
         if (i %1000 == 0) PRLEVEL(1, ("%% Wroking on front %ld\n", i));

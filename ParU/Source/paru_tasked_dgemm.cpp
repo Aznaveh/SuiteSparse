@@ -7,15 +7,17 @@
  * @author Aznaveh
  */
 #include "paru_internal.hpp"
-#define L 128
-#define SMALL 32
+#define L 512
+#define SMALL 8
 void paru_tasked_dgemm(Int f,  BLAS_INT *M, BLAS_INT *N, BLAS_INT *K, 
         double *A, BLAS_INT *lda, double *B, BLAS_INT *ldb, 
-        double *beta, double *C, BLAS_INT *ldc)
+        double *beta, double *C, BLAS_INT *ldc, paru_matrix *paruMatInfo)
 {
     DEBUGLEVEL(1);
     //alpha is always -1  in my DGEMMs
-    PRLEVEL(1, ("%% DGEMM (%d,%d,%d)%1.1f in %ld\n", *M, *N, *K, *beta, f));
+    Int num_active_tasks = paruMatInfo->num_active_tasks;
+    PRLEVEL(1, ("%% XXX DGEMM (%d,%d,%d)%1.1f in %ld {%ld}\n", 
+                *M, *N, *K, *beta, f, num_active_tasks));
     if (*M < SMALL && *N < SMALL && *K < SMALL)
     //if(0)
     {
@@ -41,6 +43,17 @@ void paru_tasked_dgemm(Int f,  BLAS_INT *M, BLAS_INT *N, BLAS_INT *K,
         cblas_dgemm(CblasColMajor, CblasNoTrans, CblasNoTrans, 
                 *M, *N, *K, -1, A, *lda,
                 B, *ldb, *beta, C, *ldc);
+    }
+    else if (num_active_tasks == 1)
+    {
+        Int max_threads = omp_get_max_threads();
+        BLAS_set_num_threads(max_threads);
+        PRLEVEL(1, ("%% A single task DGEMM (%dx%d) in %ld\n", *M, *N, f));
+        cblas_dgemm(CblasColMajor, CblasNoTrans, CblasNoTrans, 
+                *M, *N, *K, -1, A, *lda,
+                B, *ldb, *beta, C, *ldc);
+        BLAS_set_num_threads(1);
+ 
     }
     else
     {
