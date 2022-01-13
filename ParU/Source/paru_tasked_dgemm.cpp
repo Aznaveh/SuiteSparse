@@ -16,6 +16,7 @@ void paru_tasked_dgemm(Int f,  BLAS_INT *M, BLAS_INT *N, BLAS_INT *K,
     DEBUGLEVEL(1);
     //alpha is always -1  in my DGEMMs
     Int num_active_tasks = paruMatInfo->num_active_tasks;
+    Int max_threads = omp_get_max_threads();
     PRLEVEL(1, ("%% XXX DGEMM (%d,%d,%d)%1.1f in %ld {%ld}\n", 
                 *M, *N, *K, *beta, f, num_active_tasks));
     if (*M < SMALL && *N < SMALL && *K < SMALL)
@@ -45,8 +46,7 @@ void paru_tasked_dgemm(Int f,  BLAS_INT *M, BLAS_INT *N, BLAS_INT *K,
                 B, *ldb, *beta, C, *ldc);
     }
     else if (num_active_tasks == 1)
-    {
-        Int max_threads = omp_get_max_threads();
+    { //using all the threads
         BLAS_set_num_threads(max_threads);
         PRLEVEL(1, ("%% A single task DGEMM (%dx%d) in %ld\n", *M, *N, f));
         cblas_dgemm(CblasColMajor, CblasNoTrans, CblasNoTrans, 
@@ -57,8 +57,17 @@ void paru_tasked_dgemm(Int f,  BLAS_INT *M, BLAS_INT *N, BLAS_INT *K,
     }
     else
     {
+        Int my_share = max_threads / num_active_tasks;
         PRLEVEL(1, ("%% YES tasking for DGEMM (%dx%d) in %ld", *M, *N, f));
-
+        if (my_share == 0 ) my_share = 1;
+        #ifdef MKLROOT
+        //using my share of threads
+        mkl_set_num_threads_local(my_share);
+        cblas_dgemm(CblasColMajor, CblasNoTrans, CblasNoTrans, 
+                *M, *N, *K, -1, A, *lda,
+                B, *ldb, *beta, C, *ldc);
+        mkl_set_num_threads_local(0);
+        #else
         Int num_col_blocks =  *N / L + 1 ;
         Int num_row_blocks =  *M / L + 1 ;
 
@@ -96,5 +105,6 @@ void paru_tasked_dgemm(Int f,  BLAS_INT *M, BLAS_INT *N, BLAS_INT *K,
                 }
             }
         }  
+        #endif
     }
 }
