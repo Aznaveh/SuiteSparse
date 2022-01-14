@@ -55,9 +55,10 @@ void paru_tasked_dgemm(Int f,  BLAS_INT *M, BLAS_INT *N, BLAS_INT *K,
     }
     else
     {
-        Int my_share = max_threads / num_active_tasks;
-        PRLEVEL(1, ("%% YES tasking for DGEMM (%dx%d) in %ld", *M, *N, f));
+        Int my_share = max_threads / (num_active_tasks+1);
         if (my_share == 0 ) my_share = 1;
+        PRLEVEL(1, ("%% )-( tasking for DGEMM (%dx%d) in %ld [[%ld]]\n", 
+                    *M, *N, f, my_share));
         #ifdef MKLROOT
         //using my share of threads
         mkl_set_num_threads_local(my_share);
