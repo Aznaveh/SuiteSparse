@@ -444,7 +444,7 @@ ParU_ResultCode paru_front(Int f,  // front need to be assembled
 
     /**** 6 ****                     TRSM and DGEMM                         ***/
 
-    paru_trsm(f, pivotalFront, uPart, fp, rowCount, colCount);
+    paru_trsm(f, pivotalFront, uPart, fp, rowCount, colCount, paruMatInfo);
 
 #ifdef COUNT_FLOPS
     #pragma omp atomic

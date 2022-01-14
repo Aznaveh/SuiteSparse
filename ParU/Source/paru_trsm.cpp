@@ -30,7 +30,7 @@
 //                                                         double *b, int *ldb);
 
 Int paru_trsm(Int f, double *pF, double *uPart, Int fp, Int rowCount,
-              Int colCount)
+              Int colCount, paru_matrix *paruMatInfo)
 {
     DEBUGLEVEL(0);
     BLAS_INT mB = (BLAS_INT)fp;
@@ -54,7 +54,7 @@ Int paru_trsm(Int f, double *pF, double *uPart, Int fp, Int rowCount,
 #endif
 
     // BLAS_DTRSM("L", "L", "N", "U", &mB, &nB, &alpha, pF, &lda, uPart, &ldb);
-    paru_tasked_trsm(f, &mB, &nB, &alpha, pF, &lda, uPart, &ldb);
+    paru_tasked_trsm(f, &mB, &nB, &alpha, pF, &lda, uPart, &ldb, paruMatInfo);
 
 #ifndef NDEBUG  // Printing the  U part
     PRLEVEL(p, ("(I)U After Trsm: %ld x %ld\n", fp, colCount));

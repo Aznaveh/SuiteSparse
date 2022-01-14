@@ -55,11 +55,11 @@ void paru_tasked_dgemm(Int f,  BLAS_INT *M, BLAS_INT *N, BLAS_INT *K,
     }
     else
     {
+       #ifdef MKLROOT
         Int my_share = max_threads / (num_active_tasks+1);
         if (my_share == 0 ) my_share = 1;
-        PRLEVEL(1, ("%% )-( tasking for DGEMM (%dx%d) in %ld [[%ld]]\n", 
+        PRLEVEL(1, ("%% MKL local threads for DGEMM (%dx%d) in %ld [[%ld]]\n", 
                     *M, *N, f, my_share));
-        #ifdef MKLROOT
         //using my share of threads
         mkl_set_num_threads_local(my_share);
         cblas_dgemm(CblasColMajor, CblasNoTrans, CblasNoTrans, 
@@ -67,6 +67,7 @@ void paru_tasked_dgemm(Int f,  BLAS_INT *M, BLAS_INT *N, BLAS_INT *K,
                 B, *ldb, *beta, C, *ldc);
         mkl_set_num_threads_local(0);
         #else
+        PRLEVEL(1, ("%%YES tasking for DGEMM (%dx%d) in %ld \n", *M, *N, f));
         Int num_col_blocks =  *N / L + 1 ;
         Int num_row_blocks =  *M / L + 1 ;
 

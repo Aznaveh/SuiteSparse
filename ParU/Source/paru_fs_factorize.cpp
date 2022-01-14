@@ -454,7 +454,8 @@ Int paru_factorize_full_summed(Int f, Int start_fac,
                     }
 
 #endif
-                    paru_tasked_trsm(f, &M, &N, &alpha, A, &lda, B, &ldb);
+                    paru_tasked_trsm(f, &M, &N, &alpha, 
+                            A, &lda, B, &ldb, paruMatInfo);
 #ifdef COUNT_FLOPS
                     #pragma omp atomic
                     paruMatInfo->flp_cnt_trsm += (double)(M + 1) * M * N;
