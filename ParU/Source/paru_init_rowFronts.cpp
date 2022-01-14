@@ -200,8 +200,8 @@ ParU_ResultCode paru_init_rowFronts(
     // copying Diag_map
     if (Diag_map)
     {
-        //**//#pragma omp taskloop default(none)\
-        //**//shared(LUsym, Diag_map, inv_Diag_map) grainsize(512)
+        #pragma omp taskloop default(none)\
+        shared(LUsym, Diag_map, inv_Diag_map) grainsize(512)
         for (Int i = 0; i < LUsym->n; i++)
         {
             // paru_memcpy(Diag_map, LUsym->Diag_map, (LUsym->n) * sizeof(Int));
@@ -240,9 +240,7 @@ ParU_ResultCode paru_init_rowFronts(
 
     ParU_ResultCode info;
     Int out_of_memory = 0;
-    //#pragma omp parallel for shared(out_of_memory)
-    //
-    //**//#pragma omp taskloop default(none) \
+    #pragma omp taskloop default(none) \
     shared(out_of_memory, LUsym, Sp, row_degree_bound, elementList, m, \
             paruMatInfo, rowMark, RowList, Sj, Sx) grainsize(512)
     for (Int row = 0; row < m; row++)
@@ -261,7 +259,7 @@ ParU_ResultCode paru_init_rowFronts(
         {  // out of memory
             paru_freemat(&paruMatInfo);
             printf("Paru: Out of memory: curEl\n");
-            #pragma omp atomic
+            #pragma omp atomic update
             out_of_memory += 1;
         }
 
@@ -277,7 +275,7 @@ ParU_ResultCode paru_init_rowFronts(
         {  // out of memory
             paru_freemat(&paruMatInfo);
             printf("Paru: Out of memory: curHeap\n");
-            #pragma omp atomic
+            #pragma omp atomic update
             out_of_memory += 1;
         }
         //printf("%%Heap allocated %p id=%ld \n", curHeap, e);
@@ -301,7 +299,7 @@ ParU_ResultCode paru_init_rowFronts(
         {  // out of memory
             paru_freemat(&paruMatInfo);
             printf("Paru: out of memory, RowList[row].list \n");
-            #pragma omp atomic
+            #pragma omp atomic update
             out_of_memory += 1;
         }
         RowList[row].numTuple = 0;
@@ -314,7 +312,7 @@ ParU_ResultCode paru_init_rowFronts(
         {
             paru_freemat(&paruMatInfo);
             printf("Paru: out of memory, add_rowTuple \n");
-            #pragma omp atomic
+            #pragma omp atomic update
             out_of_memory += 1;
         }
 

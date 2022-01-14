@@ -39,8 +39,6 @@ void paru_tasked_dgemm(Int f,  BLAS_INT *M, BLAS_INT *N, BLAS_INT *K,
         //if(1)
     { 
         PRLEVEL(1, ("%% No tasking for DGEMM (%dx%d) in %ld\n", *M, *N, f));
-        //BLAS_DGEMM("N", "N", M, N, K, -1, A, lda, B, ldb, beta, C,
-        //           ldc);
         cblas_dgemm(CblasColMajor, CblasNoTrans, CblasNoTrans, 
                 *M, *N, *K, -1, A, *lda,
                 B, *ldb, *beta, C, *ldc);
@@ -52,7 +50,7 @@ void paru_tasked_dgemm(Int f,  BLAS_INT *M, BLAS_INT *N, BLAS_INT *K,
         cblas_dgemm(CblasColMajor, CblasNoTrans, CblasNoTrans, 
                 *M, *N, *K, -1, A, *lda,
                 B, *ldb, *beta, C, *ldc);
-        BLAS_set_num_threads(1);
+      //  BLAS_set_num_threads(1);
  
     }
     else
@@ -82,21 +80,16 @@ void paru_tasked_dgemm(Int f,  BLAS_INT *M, BLAS_INT *N, BLAS_INT *K,
         {
             for (Int I = 0; I < num_row_blocks; I++)
             {
-                //BLAS_INT m = (I + 1) * L > *M ? (*M - I * L) : L;
                 BLAS_INT m = (I + 1) == num_row_blocks ? 
                     (*M - I * len_row) : len_row;
 
                 for (Int J = 0; J < num_col_blocks; J++)
                 {
-                    //BLAS_INT n = (J + 1) * L > *N ? (*N - J * L) : L;
                     BLAS_INT n = (J + 1) == num_col_blocks ? 
                         (*N - J * len_col) : len_col;
                     PRLEVEL(1, ("%% I=%ld J=%ld m=%d n=%d in %ld\n", I, J,
                                 m, n, f));
                     #pragma omp task
-                    //BLAS_DGEMM("N", "N", &m, &n, K, -1,
-                    //   A + (I * len_row), lda, B + (J * len_col * *ldb), ldb,
-                    //   beta, C + (J * *ldc * len_col + I * len_row), ldc);
                     cblas_dgemm(CblasColMajor, CblasNoTrans, CblasNoTrans, 
                             m, n, *K, -1, 
                             A + (I * len_row), *lda,
