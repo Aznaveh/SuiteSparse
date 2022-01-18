@@ -145,10 +145,11 @@ ParU_ResultCode paru_factorize(cholmod_sparse *A, paru_symbolic *LUsym,
 //            [&Depth, &task_map](const Int &t1, const Int &t2)-> bool 
 //            {return Depth[task_map[t1]+1] > Depth[task_map[t2]+1];});
 
-    if (ntasks > 0)
+    printf("ntasks=%ld task_Q.size=%ld\n",ntasks, task_Q.size());
+    if (ntasks > 0) 
         printf("nf = %ld, deepest = %ld, chainess = %lf\n", 
-            LUsym->nf, task_depth[task_Q[0]], 
-            task_depth[task_Q[0]] / double(LUsym->nf) );
+                LUsym->nf, task_depth[task_Q[0]], 
+                (task_depth[task_Q[0]]+1) / double(LUsym->nf) );
 #ifndef NDEBUG
     Int PR = -1;
     Int *task_map = LUsym->task_map;
@@ -172,12 +173,12 @@ ParU_ResultCode paru_factorize(cholmod_sparse *A, paru_symbolic *LUsym,
     {
         if (start >= size) break;
         Int end = start + steps > size ? size : start + steps;
-        PRLEVEL(-1, ("%% doing tasks %ld to %ld\n", start, end));
+        PRLEVEL(-1, ("%% doing Queue tasks <%ld,%ld>\n", start, end));
         #pragma omp parallel
         #pragma omp single nowait
         #pragma omp task untied
         for (Int i = start; i < end ; i++)
-        //for (Int i = 0; i < (Int)task_Q.size(); i++)
+            //for (Int i = 0; i < (Int)task_Q.size(); i++)
         {
             Int t = task_Q[i];
             //printf("poping %ld \n", f);

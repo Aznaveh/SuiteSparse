@@ -1663,17 +1663,13 @@ paru_symbolic *paru_analyze(
             {
                 task_helper[f] = -1;
             }
+            else if (stree_flop_bound[f] < flop_thresh)
+            {//getting rid of  small tasks
+                task_helper[f] = -1;
+            }
             else
             {
-                //Int num_child = Childp[f+1] - Childp[f];
-                if (stree_flop_bound[f] < flop_thresh)
-                {//getting rid of  small tasks
-                    task_helper[f] = -1;
-                }
-                else
-                {
-                    task_helper[f] = ntasks++;
-                }
+                task_helper[f] = ntasks++;
             }
         }
     }
@@ -1690,7 +1686,7 @@ paru_symbolic *paru_analyze(
         (Int *)paru_calloc(ntasks, sizeof(Int));
     LUsym->task_depth = task_depth =
         (Int *)paru_calloc(ntasks, sizeof(Int));
- 
+
     if ( task_map == NULL || task_parent == NULL || task_num_child == NULL || 
             task_depth == NULL)
     {
@@ -1710,19 +1706,24 @@ paru_symbolic *paru_analyze(
     for (Int t = 0; t < ntasks; t++) 
     {
         Int node = task_map[t+1];
-        Int parent = Parent[node];
-        //printf("t=%ld node=%ld parent=%ld\n",t,node,parent);
-        if (parent == -1)  
+        Int rep = Parent[node];
+        PRLEVEL(1, ("t=%ld node=%ld rep =%ld\n",t,node,rep));
+        if (rep == -1)  
         {
-            // task_depth[t] = 0;
             task_parent[t] = -1;
+            if (t == 0 && nf > 1)
+            {
+                task_depth[t] = Depth[0];
+            }
         }
         else
         {
             task_depth[t] = MAX(Depth[node], task_depth[t]);
-            while (task_helper[parent] < 0 )
-                parent = Parent[parent];
-            task_parent[t] = task_helper[parent];
+            while (task_helper[rep] < 0 )
+                rep = Parent[rep];
+            PRLEVEL(1, ("After a while t=%ld node=%ld rep =%ld\n",
+                        t,node,rep));
+            task_parent[t] = task_helper[rep];
         }
     }
 
