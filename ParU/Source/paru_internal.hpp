@@ -247,9 +247,9 @@ Int paru_gaxpy(cholmod_sparse *A, const double *x, double *y, double alpha);
 double paru_spm_1norm(cholmod_sparse *A);
 double paru_vec_1norm(const double *x, Int n);
 void paru_Diag_update(Int pivcol, Int pivrow, paru_matrix *paruMatInfo);
-void paru_tasked_dgemm(Int f, BLAS_INT *m, BLAS_INT *n, BLAS_INT *k, 
-        double *A, BLAS_INT *lda, double *B, BLAS_INT *ldb, 
-        double *beta, double *C, BLAS_INT *ldc, paru_matrix *paruMatInfo);
-void paru_tasked_trsm(Int f, int *m, int *n, double *alpha, double *a, int *lda,
-        double *b, int *ldb, paru_matrix *paruMatInfo);
+void paru_tasked_dgemm(Int f, BLAS_INT m, BLAS_INT n, BLAS_INT k, 
+        double *A, BLAS_INT lda, double *B, BLAS_INT ldb, 
+        double beta, double *C, BLAS_INT ldc, paru_matrix *paruMatInfo);
+void paru_tasked_trsm(Int f, int m, int n, double alpha, double *a, int lda,
+        double *b, int ldb, paru_matrix *paruMatInfo);
 #endif

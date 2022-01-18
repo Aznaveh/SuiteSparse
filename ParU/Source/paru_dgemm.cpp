@@ -80,13 +80,11 @@ Int paru_dgemm(Int f, double *pF, double *uPart, double *el, Int fp,
     PRLEVEL(1, ("%% ldb =%d  ", ldb));
     PRLEVEL(1, ("%% ldc =%d\n", ldc));
 
-    double beta = 0;  // U part is not initialized
+    //double beta = 0;  // U part is not initialized
 
-    //BLAS_DGEMM("N", "N", &mA, &nB, &nA, -1, pF + fp, &lda, uPart, &ldb,
-    //           &beta, el, &ldc);
 
-    paru_tasked_dgemm(f, &mA, &nB, &nA, pF + fp, &lda, uPart, &ldb, 
-            &beta, el, &ldc, paruMatInfo);
+    paru_tasked_dgemm(f, mA, nB, nA, pF + fp, lda, uPart, ldb, 0, 
+            el, ldc, paruMatInfo);
 
 #ifndef NDEBUG
     Int PR = 1;
