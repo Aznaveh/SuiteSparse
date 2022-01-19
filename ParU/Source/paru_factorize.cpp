@@ -11,10 +11,10 @@
 
 #include "paru_internal.hpp"
 
-#define PAR 1
+//#define PAR 1
 //#define PAR 0
 
-#define SEQ !(PAR)
+//#define SEQ !(PAR)
 
 
 ParU_ResultCode paru_exec_tasks(Int t, 
@@ -123,13 +123,17 @@ ParU_ResultCode paru_factorize(cholmod_sparse *A, paru_symbolic *LUsym,
     //Int *Depth = LUsym->Depth;
  
     //////////////// Using task tree //////////////////////////////////////////
-#if PAR
+//#if PAR
     Int ntasks = LUsym->ntasks;
     Int *task_depth= LUsym->task_depth;
     std::vector<Int> task_Q;
     //This vector changes during factorization
-    std::vector<Int> task_num_child(ntasks); 
-    paru_memcpy ( &task_num_child[0] , LUsym->task_num_child, 
+    //std::vector<Int> task_num_child(ntasks); 
+    //paru_memcpy ( &task_num_child[0] , LUsym->task_num_child, 
+    //        ntasks * sizeof(Int));
+
+     Int task_num_child[ntasks]; 
+    paru_memcpy (task_num_child, LUsym->task_num_child, 
             ntasks * sizeof(Int));
    
     for (Int t = 0; t < ntasks ; t++)
@@ -150,6 +154,7 @@ ParU_ResultCode paru_factorize(cholmod_sparse *A, paru_symbolic *LUsym,
         printf("nf = %ld, deepest = %ld, chainess = %lf\n", 
                 LUsym->nf, task_depth[task_Q[0]], 
                 (task_depth[task_Q[0]]+1) / double(LUsym->nf) );
+    double chainess = (task_depth[task_Q[0]]+1) / double(LUsym->nf);
 #ifndef NDEBUG
     Int PR = -1;
     Int *task_map = LUsym->task_map;
@@ -163,79 +168,85 @@ ParU_ResultCode paru_factorize(cholmod_sparse *A, paru_symbolic *LUsym,
     PRLEVEL(PR, ("\n"));
 #endif
 
-    const Int  size = (Int)task_Q.size(); 
-    const Int steps = size == 0 ? 1 : size;
-    const Int stages = size / steps + 1;
-    Int start = 0;
-    PRLEVEL(1, ("%% size=%ld, steps =%ld, stages =%ld\n", size, steps, stages));
 
-    for (Int ii = 0; ii < stages; ii++)
+    if (chainess < .4) 
     {
-        if (start >= size) break;
-        Int end = start + steps > size ? size : start + steps;
-        PRLEVEL(-1, ("%% doing Queue tasks <%ld,%ld>\n", start, end));
-        #pragma omp parallel
-        #pragma omp single nowait
-        #pragma omp task untied
-        for (Int i = start; i < end ; i++)
-            //for (Int i = 0; i < (Int)task_Q.size(); i++)
+        printf("Parallel\n");
+        const Int  size = (Int)task_Q.size(); 
+        const Int steps = size == 0 ? 1 : size;
+        const Int stages = size / steps + 1;
+        Int start = 0;
+        PRLEVEL(1, ("%% size=%ld, steps =%ld, stages =%ld\n", 
+                    size, steps, stages));
+
+        for (Int ii = 0; ii < stages; ii++)
         {
-            Int t = task_Q[i];
-            //printf("poping %ld \n", f);
-            //Int d = Depth[task_map[t]+1];
-            Int d = task_depth[t];
-            #pragma omp task priority(d) 
+            if (start >= size) break;
+            Int end = start + steps > size ? size : start + steps;
+            PRLEVEL(-1, ("%% doing Queue tasks <%ld,%ld>\n", start, end));
+            #pragma omp parallel
+            #pragma omp single nowait
+            #pragma omp task 
+            for (Int i = start; i < end ; i++)
+                //for (Int i = 0; i < (Int)task_Q.size(); i++)
             {
-                #pragma omp atomic update
-                paruMatInfo->num_active_tasks++;
-
-                ParU_ResultCode myInfo =
-                    paru_exec_tasks(t, &task_num_child[0], paruMatInfo);
-                if (myInfo != PARU_SUCCESS)
+                Int t = task_Q[i];
+                //printf("poping %ld \n", f);
+                //Int d = Depth[task_map[t]+1];
+                Int d = task_depth[t];
+                #pragma omp task priority(d) 
                 {
-                    #pragma omp atomic write
-                    info = myInfo;
+                    #pragma omp atomic update
+                    paruMatInfo->num_active_tasks++;
+
+                    ParU_ResultCode myInfo =
+                        // paru_exec_tasks(t, &task_num_child[0], paruMatInfo);
+                        paru_exec_tasks(t, task_num_child, paruMatInfo);
+                    if (myInfo != PARU_SUCCESS)
+                    {
+                        #pragma omp atomic write
+                        info = myInfo;
+                    }
+
+                    #pragma omp atomic update
+                    paruMatInfo->num_active_tasks--;
                 }
-
-                #pragma omp atomic update
-                paruMatInfo->num_active_tasks--;
             }
+            start += steps;
         }
-        start += steps;
-    }
-    if (info != PARU_SUCCESS)
-    {
-        PRLEVEL(1, ("%% factorization has some problem\n"));
-        if (info == PARU_OUT_OF_MEMORY)
-            printf("Paru: out of memory during factorization\n");
-        else if (info == PARU_SINGULAR)
-            printf("Paru: Input matrix is singular\n");
-        return info;
-    }
-#endif
-
-    //////////////// Making task tree ///End////////////////////////////////////
-#ifdef COUNT_FLOPS
-    double flop_count = paruMatInfo->flp_cnt_dgemm + paruMatInfo->flp_cnt_dger +
-        paruMatInfo->flp_cnt_trsm;
-    PRLEVEL (-1, ("Flop count = %.17g\n",flop_count));
-#endif
-    // The following code can be substituted in a sequential case
-#if SEQ
-    Int nf = LUsym->nf;
-    paruMatInfo->num_active_tasks = 1;
-    for (Int i = 0; i < nf; i++)
-    {
-        if (i %1000 == 0) PRLEVEL(1, ("%% Wroking on front %ld\n", i));
-
-        info = paru_front(i, paruMatInfo);
         if (info != PARU_SUCCESS)
         {
-            PRLEVEL(1, ("%% A problem happend in %ld\n", i));
+            PRLEVEL(1, ("%% factorization has some problem\n"));
+            if (info == PARU_OUT_OF_MEMORY)
+                printf("Paru: out of memory during factorization\n");
+            else if (info == PARU_SINGULAR)
+                printf("Paru: Input matrix is singular\n");
             return info;
         }
     }
-#endif
+//#endif
+
+    //////////////// Making task tree ///End////////////////////////////////////
+    // The following code can be substituted in a sequential case
+    else
+    {
+        printf("Sequential\n");
+        //#if SEQ
+        Int nf = LUsym->nf;
+        paruMatInfo->num_active_tasks = 1;
+        for (Int i = 0; i < nf; i++)
+        {
+            //if (i %1000 == 0) PRLEVEL(1, ("%% Wroking on front %ld\n", i));
+
+            info = paru_front(i, paruMatInfo);
+            if (info != PARU_SUCCESS)
+            {
+                PRLEVEL(1, ("%% A problem happend in %ld\n", i));
+                return info;
+            }
+        }
+    }
+    //#endif
 
     info = paru_perm(paruMatInfo);  // to form the final permutation
 
@@ -245,6 +256,11 @@ ParU_ResultCode paru_factorize(cholmod_sparse *A, paru_symbolic *LUsym,
         return info;
     }
 
+#ifdef COUNT_FLOPS
+    double flop_count = paruMatInfo->flp_cnt_dgemm + paruMatInfo->flp_cnt_dger +
+        paruMatInfo->flp_cnt_trsm;
+    PRLEVEL (-1, ("Flop count = %.17g\n",flop_count));
+#endif
     paruMatInfo->my_time = omp_get_wtime() - my_start_time;
 
     return PARU_SUCCESS;
