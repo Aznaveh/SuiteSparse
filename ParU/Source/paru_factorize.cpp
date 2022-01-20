@@ -133,14 +133,20 @@ ParU_ResultCode paru_factorize(cholmod_sparse *A, paru_symbolic *LUsym,
     //            {return Depth[task_map[t1]+1] > Depth[task_map[t2]+1];});
 
     Int max_chain = LUsym->max_chain;
+    double chainess = 2;
+    double maxchain_ratio = 2;
     printf("ntasks=%ld task_Q.size=%ld\n", ntasks, task_Q.size());
     if (ntasks > 0)
-        printf("nf = %ld, deepest = %ld, chainess = %lf max_chain=%ld L%lf\n", 
+    {
+        chainess = (task_depth[task_Q[0]] + 1) / (double)nf;
+        maxchain_ratio = (((double)max_chain+1)/nf);
+        printf("nf = %ld, deepest = %ld, chainess = %lf max_chain=%ld" 
+                " maxchain_ratio =%lf\n", 
                 nf,
                task_depth[task_Q[0]],
-               (task_depth[task_Q[0]] + 1) / double(nf),
-               max_chain , (double(max_chain)/nf));
-    double chainess = (task_depth[task_Q[0]] + 1) / double(nf);
+               chainess,
+               max_chain , maxchain_ratio);
+    } 
 #ifndef NDEBUG
     Int PR = -1;
     Int *task_map = LUsym->task_map;
@@ -154,7 +160,7 @@ ParU_ResultCode paru_factorize(cholmod_sparse *A, paru_symbolic *LUsym,
     PRLEVEL(PR, ("\n"));
 #endif
 
-    if (chainess < .6 && (double(max_chain)/nf) < .25)
+    if (chainess < .6 && maxchain_ratio < .25)
     //if (1)
     {
         printf("Parallel\n");
