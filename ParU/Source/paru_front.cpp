@@ -446,16 +446,6 @@ ParU_ResultCode paru_front(Int f,  // front need to be assembled
 
     paru_trsm(f, pivotalFront, uPart, fp, rowCount, colCount, paruMatInfo);
 
-#ifdef COUNT_FLOPS
-    #pragma omp atomic
-    paruMatInfo->flp_cnt_trsm += (double)(fp + 1) * fp * colCount;
-#ifndef NDEBUG
-    p = 0;
-    PRLEVEL(p, ("\n%% FlopCount Trsm front %ld %ld ", fp, colCount));
-    PRLEVEL(p, ("cnt = %lf\n ", paruMatInfo->flp_cnt_trsm));
-#endif
-#endif
-
 #ifndef NDEBUG  // Printing the  U part
     p = -1;
     PRLEVEL(p, ("%% rowCount=%ld;\n", rowCount));
@@ -558,8 +548,6 @@ ParU_ResultCode paru_front(Int f,  // front need to be assembled
     // printf ("%ld %ld %ld \n",rowCount, fp, rowCount-fp);
 
 #ifdef COUNT_FLOPS
-    #pragma omp atomic
-    paruMatInfo->flp_cnt_dgemm += (double)2 * (rowCount - fp) * fp * colCount;
 #if 0
     for (Int ii = 0; ii < fp; ii++)
         for (Int jj = 0; jj < colCount; jj++)
@@ -574,9 +562,6 @@ ParU_ResultCode paru_front(Int f,  // front need to be assembled
     PRLEVEL(p, ("\n%% FlopCount Dgemm front %ld %ld %ld \n", rowCount - fp, fp,
                 colCount));
     PRLEVEL(p, ("%ld %ld %ld \n", rowCount - fp, fp, colCount));
-
-    PRLEVEL(p, ("cnt = %lf\n ", paruMatInfo->flp_cnt_dgemm));
-    //ASSERT(paruMatInfo->flp_cnt_real_dgemm <= paruMatInfo->flp_cnt_dgemm);
 #endif
 
 #ifndef NDEBUG

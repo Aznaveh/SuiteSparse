@@ -61,4 +61,9 @@ void paru_tasked_trsm(Int f, int m, int n, double alpha, double *a, int lda,
         }  
         #endif
     }
+
+#ifdef COUNT_FLOPS
+    #pragma omp atomic update
+    paruMatInfo->flp_cnt_trsm += (double)(m + 1) * m * n;
+#endif
 }

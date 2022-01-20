@@ -99,4 +99,9 @@ void paru_tasked_dgemm(Int f,  BLAS_INT M, BLAS_INT N, BLAS_INT K,
         }  
         #endif
     }
+
+#ifdef COUNT_FLOPS
+    #pragma omp atomic update
+    paruMatInfo->flp_cnt_dgemm += (double)2 * M * N * K;
+#endif
 }

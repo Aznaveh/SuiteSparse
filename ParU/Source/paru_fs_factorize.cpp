@@ -317,7 +317,7 @@ Int paru_panel_factorize(Int f, Int m, Int n, const Int panel_width,
             cblas_dger(CblasColMajor, M, N, alpha, X, Incx, Y, Incy, A, lda);
 #ifdef COUNT_FLOPS
             //printf("dger adding to flop count %ld\n", M*N*2);
-            #pragma omp atomic
+            #pragma omp atomic update
             paruMatInfo->flp_cnt_dger += (double)2 * M * N;
 #ifndef NDEBUG
             PRLEVEL(PR, ("\n%% FlopCount Dger fac %d %d ", M, N));
@@ -456,16 +456,6 @@ Int paru_factorize_full_summed(Int f, Int start_fac,
 #endif
                     paru_tasked_trsm(f, M, N, alpha, 
                             A, lda, B, ldb, paruMatInfo);
-#ifdef COUNT_FLOPS
-                    #pragma omp atomic
-                    paruMatInfo->flp_cnt_trsm += (double)(M + 1) * M * N;
-#ifndef NDEBUG
-                    PRLEVEL(PR, ("\n%% FlopCount Trsm factorize %d %d ", M, N));
-                    PRLEVEL(PR, ("cnt = %lf\n ", paruMatInfo->flp_cnt_trsm));
-#endif
-
-#endif
-
 #ifndef NDEBUG
                     PRLEVEL(PR, ("%% Pivotal Front After Trsm: %ld x %ld\n %%",
                                 fp, rowCount));
@@ -543,14 +533,11 @@ Int paru_factorize_full_summed(Int f, Int start_fac,
             // printf ("%d %d %d\n ",lda ,ldb, ldc);
 #ifdef COUNT_FLOPS
             //printf("dgemm adding to flop count %ld\n", M*N*2);
-            #pragma omp atomic
-            paruMatInfo->flp_cnt_dgemm += (double)2 * M * N * K;
             //#pragma omp atomic
             //paruMatInfo->flp_cnt_real_dgemm += (double)2 * M * N * K;
 #ifndef NDEBUG
             PRLEVEL(PR, ("\n%% FlopCount Dgemm factorize %d %d %d ", M, N, K));
             PRLEVEL(PR, ("%d %d %d \n", M, N, K));
-            PRLEVEL(PR, ("cnt = %lf\n ", paruMatInfo->flp_cnt_dgemm));
 #endif
 #endif
         }
