@@ -1734,6 +1734,26 @@ paru_symbolic *paru_analyze(
             task_num_child[par]++;
     }
 
+    //finding max size of chain
+    Int max_chain = 0;
+    Int ii = 0;
+    while (ii < nf)
+    {
+        int chain_size = 0;
+        PRLEVEL(1,("ii = %ld\n",ii));
+        while (ii < nf && Childp[Parent[ii]+1]-Childp[Parent[ii]] == 1)
+        {
+            chain_size++;
+            ii++;
+        }
+        PRLEVEL(1,("after ii = %ld\n",ii));
+        max_chain = MAX( chain_size, max_chain);
+        PRLEVEL(-1,("max_chain = %ld\n",max_chain));
+        ii++;
+    }
+    LUsym->max_chain = max_chain;
+    PRLEVEL(1,("max_chain = %ld\n", max_chain));
+
 #ifndef NDEBUG
 
     PR = 1;

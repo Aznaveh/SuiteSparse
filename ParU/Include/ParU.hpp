@@ -240,6 +240,8 @@ typedef struct
     // symbolic analysis time
     double my_time;
 
+    Int max_chain; //maximum size of the chains in final tree
+
 } paru_symbolic;
 
 
