@@ -739,6 +739,11 @@ paru_symbolic *paru_analyze(
     PRLEVEL(PR, ("\n"));
 
 #endif
+    //printf("%%%% newParent:\n");
+    //for (Int k = 0; k < newNf; k++) printf("  %ld", newParent[k]);
+    //printf("\n");
+
+
 
     paru_free(nf + 1, sizeof(Int), LUsym->Parent);
     LUsym->Parent = Parent = newParent;
@@ -1785,6 +1790,11 @@ paru_symbolic *paru_analyze(
     }
     PRLEVEL(PR, ("\n"));
 #endif
+    //printf("%% tasktree :\n");
+    //for (Int i = 0; i < ntasks; i++) 
+    //    printf("%ld ", task_parent[i]);
+    //printf("\n");
+ 
     ///////////////////////////////////////////////////////////////////////////
 #ifndef NDEBUG
     PR = 1;
