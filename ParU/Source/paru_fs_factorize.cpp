@@ -16,7 +16,7 @@ void swap_rows(double *F, Int *frowList, Int m, Int n, Int r1, Int r2)
     // This function also swap rows r1 and r2 wholly and indices
     if (r1 == r2) return;
     std::swap(frowList[r1], frowList[r2]);
-    //**//#pragma omp taskloop if(n>1024)
+    ///pragma omp taskloop if(n>16384) grainsize(16384)
     for (Int j = 0; j < n; j++)
         // each column
         std::swap(F[j * m + r1], F[j * m + r2]);
@@ -108,12 +108,12 @@ Int paru_panel_factorize(Int f, Int m, Int n, const Int panel_width,
 
 
         /*** ATTENTION: IT FACES A NUMERICAL PROBLEM HOWEVER I USE REDUCTION**/
-        /*  #pragma omp declare reduction\
+        /*  pragma omp declare reduction\
         //  (maxfabs : double: \
         //   omp_out = fabs(omp_in) > fabs(omp_out) ? omp_in : omp_out )
         */
 
-        /*#pragma omp taskloop default(none)\
+        /* pragma omp taskloop default(none)\
         //shared(maxval, F,row_max, row_end, j,\
         //        row_diag, diag_val, diag_found, m, frowList) grainsize(512)
         //for (Int i = j + 1; i < row_end; i++)
@@ -121,7 +121,7 @@ Int paru_panel_factorize(Int f, Int m, Int n, const Int panel_width,
         //    double value = F[j * m + i];
         //    if (fabs(maxval) < fabs(value))
         //    {
-        //        #pragma omp critical
+        //        pragma omp critical
         //        {
         //            maxval = value;
         //            row_max = i;
@@ -129,7 +129,7 @@ Int paru_panel_factorize(Int f, Int m, Int n, const Int panel_width,
         //    }
         //    if (frowList[i] == row_diag)  // find diag
         //    {
-        //        #pragma omp critical
+        //        pragma omp critical
         //        {//actually this will be seen at most one time
         //            diag_found = i;
         //            diag_val = value;
@@ -193,17 +193,17 @@ Int paru_panel_factorize(Int f, Int m, Int n, const Int panel_width,
         if (chose_diag == 0)
         {
             Int row_sp = row_max;
-            /*#pragma omp taskloop  default(none) shared(maxval, F, row_sp, j, \
+            //pragma omp taskloop  default(none) shared(maxval, F, row_sp, j, \
             //row_end, m, piv, frowList, row_degree_bound, row_deg_sp)\
             //grainsize(512)
-            */
+            
             for (Int i = j; i < row_end; i++)
             {
                 double value = F[j * m + i];
                 if (fabs(PIV_TOLER * maxval) < fabs(value) &&
                         row_degree_bound[frowList[i]] < row_deg_sp)
                 {  // numerically acceptalbe and sparser
-                    //#pragma omp critical
+                    //pragma omp critical
                     {
                         piv = value;
                         row_deg_sp = row_degree_bound[frowList[i]];
@@ -248,8 +248,9 @@ Int paru_panel_factorize(Int f, Int m, Int n, const Int panel_width,
         if (j < row_end - 1)
         {
             PRLEVEL(1, ("%% dscal\n"));
-            //**//#pragma omp taskloop simd default(none)\
-            //**//shared(j, row_end, F, m, piv) if(row_end-j > 1024)
+            //pragma omp taskloop simd default(none)\
+            //shared(j, row_end, F, m, piv) if(row_end-j > 1024)
+            #pragma omp simd 
             for (Int i = j + 1; i < row_end; i++)
             {
                 //printf("%%i=%ld value= %2.4lf", i, F[j * m + i]);
@@ -386,15 +387,14 @@ Int paru_factorize_full_summed(Int f, Int start_fac,
         paru_panel_factorize(f, rowCount, fp, panel_width, panel_num, row_end,
                 paruMatInfo);
 
-        //FIXME THIS IS CAUSING SLOW DOWN
-        //#pragma omp parallel
-        //#pragma omp single
+        //pragma omp parallel
+        //pragma omp single
         {
             // update row degree and dgeem can be done in parallel
-            /*#pragma omp task default(none) mergeable\
+            //pragma omp task default(none) mergeable\
             //shared(paruMatInfo, pivotal_elements, stl_colSet) \
             //shared(panel_num, row_end, f, start_fac) 
-            */
+            
             if (paruMatInfo->LUsym->Cm[f] !=0)  
             {  // if there is potential column left
                 paru_update_rowDeg(panel_num, row_end, f, start_fac,
@@ -427,9 +427,8 @@ Int paru_factorize_full_summed(Int f, Int start_fac,
              * v              |___....____________________..._____|
              *
              */
-            /*#pragma omp task  shared(F) \
-            shared(panel_width, j1, j2, fp, f, rowCount) 
-            */
+            //pragma omp task  shared(F)\
+            //shared(panel_width, j1, j2, fp, f, rowCount) 
             if (j2 < fp)  // if it is not the last
             {
                 BLAS_INT M = (BLAS_INT)panel_width;
