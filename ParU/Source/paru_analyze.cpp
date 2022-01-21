@@ -920,7 +920,7 @@ paru_symbolic *paru_analyze(
     }
 
 //-------- computing the inverse permutation for P and Diag_map
-//**//#pragma omp taskloop default(none) shared(m, Pinv, Pinit) grainsize(512)
+    #pragma omp taskloop default(none) shared(m, Pinv, Pinit) grainsize(512)
     for (Int i = 0; i < m; i++)
     {
         Pinv[Pinit[i]] = i;
@@ -928,8 +928,8 @@ paru_symbolic *paru_analyze(
 
     if (Diag_map)
     {
-//**//#pragma omp taskloop default(none) shared(m, Diag_map, inv_Diag_map) \
-    //**//grainsize(512)
+        #pragma omp taskloop default(none) shared(m, Diag_map, inv_Diag_map) \
+        grainsize(512)
         for (Int i = 0; i < m; i++)
         {
             Int newrow = Diag_map[i];  // Diag_map[newcol] = newrow
@@ -1212,7 +1212,7 @@ paru_symbolic *paru_analyze(
 #endif
 
 // update Pinv
-//**//#pragma omp taskloop default(none) shared(m, n1, Pinv, Pinit) grainsize(512)
+    #pragma omp taskloop default(none) shared(m, n1, Pinv, Pinit) grainsize(512)
     for (Int i = n1; i < m; i++)
     {
         Pinv[Pinit[i]] = i;
@@ -1220,7 +1220,7 @@ paru_symbolic *paru_analyze(
 
     ///////////////////////////////////////////////////////////////
     Int *cSp = Work;
-//**//#pragma omp taskloop default(none) shared(m, n1, cSp, Sp, Ps) grainsize(512)
+    #pragma omp taskloop default(none) shared(m, n1, cSp, Sp, Ps) grainsize(512)
     for (Int i = n1; i < m; i++)
     {
         Int row = i - n1;
