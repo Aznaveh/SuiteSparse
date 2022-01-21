@@ -427,7 +427,7 @@ Int paru_factorize_full_summed(Int f, Int start_fac,
              * v              |___....____________________..._____|
              *
              */
-            //pragma omp task  shared(F)\
+            //pragma omp task  shared(F)
             //shared(panel_width, j1, j2, fp, f, rowCount) 
             if (j2 < fp)  // if it is not the last
             {
