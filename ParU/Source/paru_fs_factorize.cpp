@@ -108,13 +108,13 @@ Int paru_panel_factorize(Int f, Int m, Int n, const Int panel_width,
 
 
         /*** ATTENTION: IT FACES A NUMERICAL PROBLEM HOWEVER I USE REDUCTION**/
-        /*  pragma omp declare reduction\
-        //  (maxfabs : double: \
+        /*  pragma omp declare reduction
+        //  (maxfabs : double: 
         //   omp_out = fabs(omp_in) > fabs(omp_out) ? omp_in : omp_out )
         */
 
-        /* pragma omp taskloop default(none)\
-        //shared(maxval, F,row_max, row_end, j,\
+        /* pragma omp taskloop default(none)
+        //shared(maxval, F,row_max, row_end, j,
         //        row_diag, diag_val, diag_found, m, frowList) grainsize(512)
         //for (Int i = j + 1; i < row_end; i++)
         //{  // find max
@@ -193,8 +193,8 @@ Int paru_panel_factorize(Int f, Int m, Int n, const Int panel_width,
         if (chose_diag == 0)
         {
             Int row_sp = row_max;
-            //pragma omp taskloop  default(none) shared(maxval, F, row_sp, j, \
-            //row_end, m, piv, frowList, row_degree_bound, row_deg_sp)\
+            //pragma omp taskloop  default(none) shared(maxval, F, row_sp, j,
+            //row_end, m, piv, frowList, row_degree_bound, row_deg_sp)
             //grainsize(512)
             
             for (Int i = j; i < row_end; i++)
@@ -248,7 +248,7 @@ Int paru_panel_factorize(Int f, Int m, Int n, const Int panel_width,
         if (j < row_end - 1)
         {
             PRLEVEL(1, ("%% dscal\n"));
-            //pragma omp taskloop simd default(none)\
+            //pragma omp taskloop simd default(none)
             //shared(j, row_end, F, m, piv) if(row_end-j > 1024)
             #pragma omp simd 
             for (Int i = j + 1; i < row_end; i++)
@@ -391,8 +391,8 @@ Int paru_factorize_full_summed(Int f, Int start_fac,
         //pragma omp single
         {
             // update row degree and dgeem can be done in parallel
-            //pragma omp task default(none) mergeable\
-            //shared(paruMatInfo, pivotal_elements, stl_colSet) \
+            //pragma omp task default(none) mergeable
+            //shared(paruMatInfo, pivotal_elements, stl_colSet) 
             //shared(panel_num, row_end, f, start_fac) 
             
             if (paruMatInfo->LUsym->Cm[f] !=0)  
