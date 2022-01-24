@@ -160,8 +160,8 @@ ParU_ResultCode paru_factorize(cholmod_sparse *A, paru_symbolic *LUsym,
     PRLEVEL(PR, ("\n"));
 #endif
 
-    if (chainess < .6 && maxchain_ratio < .25)
-    //if (1)
+    //if (chainess < .6 && maxchain_ratio < .25)
+    if (1)
     {
         printf("Parallel\n");
         const Int size = (Int)task_Q.size();
@@ -176,9 +176,9 @@ ParU_ResultCode paru_factorize(cholmod_sparse *A, paru_symbolic *LUsym,
             if (start >= size) break;
             Int end = start + steps > size ? size : start + steps;
             PRLEVEL(-1, ("%% doing Queue tasks <%ld,%ld>\n", start, end));
-            #pragma omp parallel
-            #pragma omp single nowait
-            #pragma omp task //untied  //clang seg fault on untied
+            #pragma omp parallel for
+            //#pragma omp single nowait
+            //#pragma omp task //untied  //clang seg fault on untied
             for (Int i = start; i < end; i++)
             // for (Int i = 0; i < (Int)task_Q.size(); i++)
             {
@@ -186,7 +186,7 @@ ParU_ResultCode paru_factorize(cholmod_sparse *A, paru_symbolic *LUsym,
                 // printf("poping %ld \n", f);
                 // Int d = Depth[task_map[t]+1];
                 Int d = task_depth[t];
-                #pragma omp task priority(d)
+                // #pragma omp task priority(d)
                 {
                     #pragma omp atomic update
                     paruMatInfo->num_active_tasks++;
