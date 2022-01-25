@@ -13,7 +13,7 @@ void paru_tasked_dgemm(Int f,  BLAS_INT M, BLAS_INT N, BLAS_INT K,
         double *A, BLAS_INT lda, double *B, BLAS_INT ldb, 
         double beta, double *C, BLAS_INT ldc, paru_matrix *paruMatInfo)
 {
-    DEBUGLEVEL(1);
+    DEBUGLEVEL(0);
     //alpha is always -1  in my DGEMMs
     Int num_active_tasks = paruMatInfo->num_active_tasks;
     Int max_threads = omp_get_max_threads();
@@ -38,6 +38,7 @@ void paru_tasked_dgemm(Int f,  BLAS_INT M, BLAS_INT N, BLAS_INT K,
     else if (M < L && N < L)
         //if(1)
     { 
+        BLAS_set_num_threads(1);
         PRLEVEL(1, ("%% No tasking for DGEMM (%dx%d) in %ld\n", M, N, f));
         cblas_dgemm(CblasColMajor, CblasNoTrans, CblasNoTrans, 
                 M, N, K, -1, A, lda, B, ldb, beta, C, ldc);
@@ -48,7 +49,7 @@ void paru_tasked_dgemm(Int f,  BLAS_INT M, BLAS_INT N, BLAS_INT K,
         PRLEVEL(1, ("%% A single task DGEMM (%dx%d) in %ld\n", M, N, f));
         cblas_dgemm(CblasColMajor, CblasNoTrans, CblasNoTrans, 
                 M, N, K, -1, A, lda, B, ldb, beta, C, ldc);
-      //  BLAS_set_num_threads(1);
+        BLAS_set_num_threads(1);
  
     }
     else

@@ -24,6 +24,7 @@ ParU_ResultCode paru_exec_tasks(Int t, Int *task_num_child,
     PRLEVEL(1, ("executing task %ld fronts %ld-%ld (%ld children)\n", t,
                 task_map[t] + 1, task_map[t + 1], num_original_children));
     ParU_ResultCode myInfo;
+    double start_time_t = omp_get_wtime();
     for (Int f = task_map[t] + 1; f <= task_map[t + 1]; f++)
     {
         myInfo = paru_front(f, paruMatInfo);
@@ -33,6 +34,9 @@ ParU_ResultCode paru_exec_tasks(Int t, Int *task_num_child,
         }
     }
     Int num_rem_children;
+    double finish_time_t = omp_get_wtime();
+    double t_time = finish_time_t - start_time_t;  
+    //printf("task time task %ld is %lf\n",t, t_time);
 
 #ifndef NDEBUG
     if (daddy == -1) PRLEVEL(1, ("%% finished task root(%ld)\n", t));
@@ -55,8 +59,11 @@ ParU_ResultCode paru_exec_tasks(Int t, Int *task_num_child,
             {
                 PRLEVEL(1,
                         ("%% task %ld executing its parent %ld\n", t, daddy));
+                double decition_time = omp_get_wtime() - finish_time_t;  
+                //printf("decision time in %ld is %lf\n",t, decition_time);
+
                 return myInfo =
-                           paru_exec_tasks(daddy, task_num_child, paruMatInfo);
+                    paru_exec_tasks(daddy, task_num_child, paruMatInfo);
             }
         }
         else  // I was the only spoiled kid in the family;
@@ -69,7 +76,7 @@ ParU_ResultCode paru_exec_tasks(Int t, Int *task_num_child,
     return myInfo;
 }
 ParU_ResultCode paru_factorize(cholmod_sparse *A, paru_symbolic *LUsym,
-                               paru_matrix **paruMatInfo_handle)
+        paru_matrix **paruMatInfo_handle)
 {
     DEBUGLEVEL(1);
     double my_start_time = omp_get_wtime();
@@ -160,8 +167,8 @@ ParU_ResultCode paru_factorize(cholmod_sparse *A, paru_symbolic *LUsym,
     PRLEVEL(PR, ("\n"));
 #endif
 
-    if (chainess < .6 && maxchain_ratio < .25)
-    //if (1)
+    //if (chainess < .6 && maxchain_ratio < .25)
+   if (1)
     {
         printf("Parallel\n");
         const Int size = (Int)task_Q.size();
@@ -200,6 +207,7 @@ ParU_ResultCode paru_factorize(cholmod_sparse *A, paru_symbolic *LUsym,
                     }
                     #pragma omp atomic update
                     paruMatInfo->num_active_tasks--;
+
                 }
             }
             start += steps;
