@@ -1753,7 +1753,7 @@ paru_symbolic *paru_analyze(
         }
         PRLEVEL(1,("after ii = %ld\n",ii));
         max_chain = MAX( chain_size, max_chain);
-        PRLEVEL(-1,("max_chain = %ld\n",max_chain));
+        PRLEVEL(1,("max_chain = %ld\n",max_chain));
         ii++;
     }
     LUsym->max_chain = max_chain;
