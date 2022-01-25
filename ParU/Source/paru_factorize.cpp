@@ -185,7 +185,7 @@ ParU_ResultCode paru_factorize(cholmod_sparse *A, paru_symbolic *LUsym,
                 Int t = task_Q[i];
                 // printf("poping %ld \n", f);
                 Int d = task_depth[t];
-                #pragma omp task priority(d)
+                #pragma omp task mergeable priority(d)
                 {
                     #pragma omp atomic update
                     paruMatInfo->num_active_tasks++;

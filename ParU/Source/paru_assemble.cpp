@@ -114,7 +114,7 @@ void paru_assemble_all(Int e, Int f, std::vector<Int> &colHash,
                 if (ii == el->nrowsleft) break;
             }
         }
-        Int *Depth = LUsym->Depth;
+        //Int *Depth = LUsym->Depth;
         //**//pragma omp parallel 
         //**//pragma omp single nowait
         //**//pragma omp taskgroup
@@ -213,7 +213,7 @@ void paru_assemble_cols(Int e, Int f, std::vector<Int> &colHash,
     Int toll = 8;  // number of times it continue when do not find anything
 
     // TOLL FREE zone
-    Int *Depth = LUsym->Depth;
+    //Int *Depth = LUsym->Depth;
     //**//pragma omp parallel 
     //**//pragma omp single nowait
     //**//pragma omp taskgroup
@@ -684,7 +684,7 @@ void paru_assemble_el_with0rows(Int e, Int f, std::vector<Int> &colHash,
         PRLEVEL(p, ("%% \n"));
 #endif
         Int ncols2bSeen = el->ncolsleft;
-        Int *Depth = LUsym->Depth;
+        //Int *Depth = LUsym->Depth;
         //**//pragma omp parallel 
         //**//pragma omp single nowait
         //**//pragma omp taskgroup

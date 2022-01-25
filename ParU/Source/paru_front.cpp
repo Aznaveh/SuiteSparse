@@ -370,7 +370,7 @@ ParU_ResultCode paru_front(Int f,  // front need to be assembled
 
     tupleList *RowList = paruMatInfo->RowList;
 
-    Int *Depth = LUsym->Depth;
+    //Int *Depth = LUsym->Depth;
     //**//pragma omp parallel 
     //**//pragma omp single nowait
     //**//pragma omp taskgroup
