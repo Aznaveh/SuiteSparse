@@ -24,7 +24,9 @@ ParU_ResultCode paru_exec_tasks(Int t, Int *task_num_child,
     PRLEVEL(1, ("executing task %ld fronts %ld-%ld (%ld children)\n", t,
                 task_map[t] + 1, task_map[t + 1], num_original_children));
     ParU_ResultCode myInfo;
+#ifndef NDEBUG
     double start_time_t = omp_get_wtime();
+#endif
     for (Int f = task_map[t] + 1; f <= task_map[t + 1]; f++)
     {
         myInfo = paru_front(f, paruMatInfo);
@@ -34,11 +36,11 @@ ParU_ResultCode paru_exec_tasks(Int t, Int *task_num_child,
         }
     }
     Int num_rem_children;
+#ifndef NDEBUG
     double finish_time_t = omp_get_wtime();
     double t_time = finish_time_t - start_time_t;  
-    //printf("task time task %ld is %lf\n",t, t_time);
+    PRLEVEL(-1, ("task time task %ld is %lf\n",t, t_time));
 
-#ifndef NDEBUG
     if (daddy == -1) PRLEVEL(1, ("%% finished task root(%ld)\n", t));
 #endif
 
@@ -59,8 +61,10 @@ ParU_ResultCode paru_exec_tasks(Int t, Int *task_num_child,
             {
                 PRLEVEL(1,
                         ("%% task %ld executing its parent %ld\n", t, daddy));
+                #ifndef NDEBUG
                 double decition_time = omp_get_wtime() - finish_time_t;  
-                //printf("decision time in %ld is %lf\n",t, decition_time);
+                PRLEVEL(-1, ("decision time in %ld is %lf\n",t, decition_time));
+                #endif
 
                 return myInfo =
                     paru_exec_tasks(daddy, task_num_child, paruMatInfo);
@@ -171,6 +175,7 @@ ParU_ResultCode paru_factorize(cholmod_sparse *A, paru_symbolic *LUsym,
    if (1)
     {
         printf("Parallel\n");
+        const Int max_threads = omp_get_max_threads();
         const Int size = (Int)task_Q.size();
         const Int steps = size == 0 ? 1 : size;
         const Int stages = size / steps + 1;
@@ -194,8 +199,20 @@ ParU_ResultCode paru_factorize(cholmod_sparse *A, paru_symbolic *LUsym,
                 Int d = task_depth[t];
                 #pragma omp task mergeable priority(d)
                 {
-                    #pragma omp atomic update
-                    paruMatInfo->num_active_tasks++;
+                    Int num_at;
+                    #pragma omp atomic capture
+                    {
+                        paruMatInfo->num_active_tasks++;
+                        num_at = paruMatInfo->num_active_tasks;
+                    } 
+                    if (num_at == 1)
+                    {
+                        BLAS_set_num_threads(max_threads);
+                    }
+                    else
+                    {
+                        BLAS_set_num_threads(1);
+                    }
 
                     ParU_ResultCode myInfo =
                         // paru_exec_tasks(t, &task_num_child[0], paruMatInfo);

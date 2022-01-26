@@ -16,8 +16,9 @@ void paru_tasked_dgemm(Int f,  BLAS_INT M, BLAS_INT N, BLAS_INT K,
     DEBUGLEVEL(1);
     //alpha is always -1  in my DGEMMs
     Int num_active_tasks = paruMatInfo->num_active_tasks;
-    Int max_threads = omp_get_max_threads();
+#ifndef NDEBUG
     double start_time_d = omp_get_wtime();
+#endif
     if (M < SMALL && N < SMALL && K < SMALL)
     //if(0)
     {
@@ -37,23 +38,24 @@ void paru_tasked_dgemm(Int f,  BLAS_INT M, BLAS_INT N, BLAS_INT K,
     else if (M < L && N < L)
         //if(1)
     { 
-        BLAS_set_num_threads(1);
+        //BLAS_set_num_threads(1);
         PRLEVEL(1, ("%% No tasking for DGEMM (%dx%d) in %ld\n", M, N, f));
         cblas_dgemm(CblasColMajor, CblasNoTrans, CblasNoTrans, 
                 M, N, K, -1, A, lda, B, ldb, beta, C, ldc);
     }
     else if (num_active_tasks == 1)
     { //using all the threads
-        BLAS_set_num_threads(max_threads);
+        //BLAS_set_num_threads(max_threads);
         PRLEVEL(1, ("%% A single task DGEMM (%dx%d) in %ld\n", M, N, f));
         cblas_dgemm(CblasColMajor, CblasNoTrans, CblasNoTrans, 
                 M, N, K, -1, A, lda, B, ldb, beta, C, ldc);
-        BLAS_set_num_threads(1);
+        //BLAS_set_num_threads(1);
  
     }
     else
     {
        #ifdef MKLROOT
+        Int max_threads = omp_get_max_threads();
         Int my_share = max_threads / (num_active_tasks+1);
         if (my_share == 0 ) my_share = 1;
         PRLEVEL(1, ("%% MKL local threads for DGEMM (%dx%d) in %ld [[%ld]]\n", 
@@ -99,9 +101,11 @@ void paru_tasked_dgemm(Int f,  BLAS_INT M, BLAS_INT N, BLAS_INT K,
         }  
         #endif
     }
+#ifndef NDEBUG
     double d_time = omp_get_wtime() - start_time_d;  
     PRLEVEL(1, ("%% XXX DGEMM (%d,%d,%d)%1.1f in %ld {%ld} in %lf seconds\n", 
                 M, N, K, beta, f, num_active_tasks, d_time));
+#endif
 
 
 #ifdef COUNT_FLOPS
