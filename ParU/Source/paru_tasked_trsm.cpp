@@ -23,11 +23,9 @@ void paru_tasked_trsm(Int f, int m, int n, double alpha, double *a, int lda,
     }
     else if (num_active_tasks == 1)
     { //using all the threads
-        BLAS_set_num_threads(max_threads);
         PRLEVEL(1, ("%% A single task trsm(%dx%d) in %ld\n", m, n, f));
         cblas_dtrsm (CblasColMajor, CblasLeft, CblasLower, CblasNoTrans, 
                 CblasUnit, m, n, alpha, a, lda, b, ldb);
-        //  BLAS_set_num_threads(1);
     }
     else
     {

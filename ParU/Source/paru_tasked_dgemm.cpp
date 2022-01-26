@@ -38,19 +38,15 @@ void paru_tasked_dgemm(Int f,  BLAS_INT M, BLAS_INT N, BLAS_INT K,
     else if (M < L && N < L)
         //if(1)
     { 
-        //BLAS_set_num_threads(1);
         PRLEVEL(1, ("%% No tasking for DGEMM (%dx%d) in %ld\n", M, N, f));
         cblas_dgemm(CblasColMajor, CblasNoTrans, CblasNoTrans, 
                 M, N, K, -1, A, lda, B, ldb, beta, C, ldc);
     }
     else if (num_active_tasks == 1)
     { //using all the threads
-        //BLAS_set_num_threads(max_threads);
         PRLEVEL(1, ("%% A single task DGEMM (%dx%d) in %ld\n", M, N, f));
         cblas_dgemm(CblasColMajor, CblasNoTrans, CblasNoTrans, 
                 M, N, K, -1, A, lda, B, ldb, beta, C, ldc);
-        //BLAS_set_num_threads(1);
- 
     }
     else
     {
