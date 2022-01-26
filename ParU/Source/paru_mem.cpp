@@ -150,8 +150,9 @@ void *paru_realloc(
 void paru_free(size_t n, size_t size, void *p)
 {
     DEBUGLEVEL(0);
-    static Int free_count = 0;
-    free_count += n * size;
+
+    // static Int free_count = 0;
+    // free_count += n * size;
 
     // Valgrind is unhappy about some part here
     //    PRLEVEL (1, ("%% free %ld in %p total= %ld\n",
