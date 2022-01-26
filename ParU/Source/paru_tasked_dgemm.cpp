@@ -35,16 +35,16 @@ void paru_tasked_dgemm(Int f,  BLAS_INT M, BLAS_INT N, BLAS_INT K,
             }
 
     }
-    else if (M < L && N < L)
+    else if ( (M < L && N < L) || (num_active_tasks == 1) ) 
+        //if small or no other tasks competing
         //if(1)
     { 
-        PRLEVEL(1, ("%% No tasking for DGEMM (%dx%d) in %ld\n", M, N, f));
-        cblas_dgemm(CblasColMajor, CblasNoTrans, CblasNoTrans, 
-                M, N, K, -1, A, lda, B, ldb, beta, C, ldc);
-    }
-    else if (num_active_tasks == 1)
-    { //using all the threads
-        PRLEVEL(1, ("%% A single task DGEMM (%dx%d) in %ld\n", M, N, f));
+#ifndef NDEBUG
+        if (M < L && N < L)
+            PRLEVEL(1, ("%% No tasking for DGEMM (%dx%d) in %ld\n", M, N, f));
+        if (num_active_tasks == 1)
+            PRLEVEL(1, ("%% A single task DGEMM (%dx%d) in %ld\n", M, N, f));
+#endif
         cblas_dgemm(CblasColMajor, CblasNoTrans, CblasNoTrans, 
                 M, N, K, -1, A, lda, B, ldb, beta, C, ldc);
     }
