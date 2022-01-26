@@ -13,12 +13,11 @@ void paru_tasked_dgemm(Int f,  BLAS_INT M, BLAS_INT N, BLAS_INT K,
         double *A, BLAS_INT lda, double *B, BLAS_INT ldb, 
         double beta, double *C, BLAS_INT ldc, paru_matrix *paruMatInfo)
 {
-    DEBUGLEVEL(0);
+    DEBUGLEVEL(1);
     //alpha is always -1  in my DGEMMs
     Int num_active_tasks = paruMatInfo->num_active_tasks;
     Int max_threads = omp_get_max_threads();
-    PRLEVEL(1, ("%% XXX DGEMM (%d,%d,%d)%1.1f in %ld {%ld}\n", 
-                M, N, K, beta, f, num_active_tasks));
+    double start_time_d = omp_get_wtime();
     if (M < SMALL && N < SMALL && K < SMALL)
     //if(0)
     {
@@ -100,6 +99,10 @@ void paru_tasked_dgemm(Int f,  BLAS_INT M, BLAS_INT N, BLAS_INT K,
         }  
         #endif
     }
+    double d_time = omp_get_wtime() - start_time_d;  
+    PRLEVEL(1, ("%% XXX DGEMM (%d,%d,%d)%1.1f in %ld {%ld} in %lf seconds\n", 
+                M, N, K, beta, f, num_active_tasks, d_time));
+
 
 #ifdef COUNT_FLOPS
     #pragma omp atomic update
