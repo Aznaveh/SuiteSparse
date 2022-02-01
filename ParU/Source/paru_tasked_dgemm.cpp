@@ -15,12 +15,19 @@ void paru_tasked_dgemm(Int f,  BLAS_INT M, BLAS_INT N, BLAS_INT K,
 {
     DEBUGLEVEL(1);
     //alpha is always -1  in my DGEMMs
-    Int num_active_tasks = paruMatInfo->num_active_tasks;
+    Int num_active_tasks;
+    #pragma omp atomic read
+    num_active_tasks = paruMatInfo->num_active_tasks;
+    const Int max_threads = omp_get_max_threads();
+    if (num_active_tasks == 1)
+        BLAS_set_num_threads(max_threads);
+    else
+        BLAS_set_num_threads(1);
 #ifndef NDEBUG
     double start_time_d = omp_get_wtime();
 #endif
     if (M < SMALL && N < SMALL && K < SMALL)
-    //if(0)
+        //if(0)
     {
         PRLEVEL(1, ("%% SMALL DGEMM (%d,%d,%d) in %ld\n", M, N, K, f));
         for (Int i = 0 ; i < M; i++)
@@ -50,7 +57,7 @@ void paru_tasked_dgemm(Int f,  BLAS_INT M, BLAS_INT N, BLAS_INT K,
     }
     else
     {
-       #ifdef MKLROOT
+        #ifdef MKLROOT
         Int max_threads = omp_get_max_threads();
         Int my_share = max_threads / (num_active_tasks+1);
         if (my_share == 0 ) my_share = 1;

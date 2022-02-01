@@ -175,7 +175,8 @@ ParU_ResultCode paru_factorize(cholmod_sparse *A, paru_symbolic *LUsym,
    if (1)
     {
         printf("Parallel\n");
-        const Int max_threads = omp_get_max_threads();
+        //omp_set_dynamic(0);
+        omp_set_max_active_levels(16);
         const Int size = (Int)task_Q.size();
         const Int steps = size == 0 ? 1 : size;
         const Int stages = size / steps + 1;
@@ -199,20 +200,8 @@ ParU_ResultCode paru_factorize(cholmod_sparse *A, paru_symbolic *LUsym,
                 Int d = task_depth[t];
                 #pragma omp task mergeable priority(d)
                 {
-                    Int num_at;
-                    #pragma omp atomic capture
-                    {
-                        paruMatInfo->num_active_tasks++;
-                        num_at = paruMatInfo->num_active_tasks;
-                    } 
-                    if (num_at == 1)
-                    {
-                        BLAS_set_num_threads(max_threads);
-                    }
-                    else
-                    {
-                        BLAS_set_num_threads(1);
-                    }
+                    #pragma omp atomic update
+                    paruMatInfo->num_active_tasks++;
 
                     ParU_ResultCode myInfo =
                         // paru_exec_tasks(t, &task_num_child[0], paruMatInfo);
