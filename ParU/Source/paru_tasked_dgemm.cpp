@@ -48,9 +48,13 @@ void paru_tasked_dgemm(Int f,  BLAS_INT M, BLAS_INT N, BLAS_INT K,
     { 
 #ifndef NDEBUG
         if (M < L && N < L)
-            PRLEVEL(1, ("%% No tasking for DGEMM (%dx%d) in %ld\n", M, N, f));
-        if (num_active_tasks == 1)
-            PRLEVEL(1, ("%% A single task DGEMM (%dx%d) in %ld\n", M, N, f));
+        {
+           PRLEVEL(1, ("%% small for tasking DGEMM (%dx%d) in %ld\n", M, N, f));
+        }
+        else if (num_active_tasks == 1)
+        {
+            PRLEVEL(1, ("%% A max_threads DGEMM (%dx%d) in %ld\n", M, N, f));
+        }
 #endif
         cblas_dgemm(CblasColMajor, CblasNoTrans, CblasNoTrans, 
                 M, N, K, -1, A, lda, B, ldb, beta, C, ldc);

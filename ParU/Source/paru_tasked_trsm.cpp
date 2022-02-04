@@ -12,18 +12,23 @@ void paru_tasked_trsm(Int f, int m, int n, double alpha, double *a, int lda,
                       double *b, int ldb, paru_matrix *paruMatInfo)
 {
     DEBUGLEVEL(0);
-    Int num_active_tasks = paruMatInfo->num_active_tasks;
-    Int max_threads = omp_get_max_threads();
-    if (n < L)
+    Int num_active_tasks;
+    #pragma omp atomic read
+    num_active_tasks = paruMatInfo->num_active_tasks;
+    const Int max_threads = omp_get_max_threads();
+    if (num_active_tasks == 1)
+        BLAS_set_num_threads(max_threads);
+    else
+        BLAS_set_num_threads(1);
+    if ( n < L || (num_active_tasks == 1) ) 
     //if(1)
     {
-        PRLEVEL(1, ("%% No tasking for TRSM (%dx%d) in %ld\n", m, n, f));
-        cblas_dtrsm (CblasColMajor, CblasLeft, CblasLower, CblasNoTrans, 
-                CblasUnit, m, n, alpha, a, lda, b, ldb);
-    }
-    else if (num_active_tasks == 1)
-    { //using all the threads
-        PRLEVEL(1, ("%% A single task trsm(%dx%d) in %ld\n", m, n, f));
+#ifndef NDEBUG
+        if (n < L)
+            PRLEVEL(1, ("%% Small TRSM (%dx%d) in %ld\n", m, n, f));
+        if (num_active_tasks == 1)
+            PRLEVEL(1, ("%% All threads for trsm(%dx%d) in %ld\n", m, n, f));
+#endif
         cblas_dtrsm (CblasColMajor, CblasLeft, CblasLower, CblasNoTrans, 
                 CblasUnit, m, n, alpha, a, lda, b, ldb);
     }
