@@ -176,6 +176,9 @@ ParU_ResultCode paru_factorize(cholmod_sparse *A, paru_symbolic *LUsym,
     {
         printf("Parallel\n");
         //omp_set_dynamic(0);
+        #ifdef MKLROOT
+        mkl_set_dynamic(0);
+        #endif
         omp_set_max_active_levels(16);
         const Int size = (Int)task_Q.size();
         const Int steps = size == 0 ? 1 : size;
