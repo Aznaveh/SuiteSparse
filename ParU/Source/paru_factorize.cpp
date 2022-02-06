@@ -63,7 +63,7 @@ ParU_ResultCode paru_exec_tasks(Int t, Int *task_num_child,
                         ("%% task %ld executing its parent %ld\n", t, daddy));
                 #ifndef NDEBUG
                 double decition_time = omp_get_wtime() - finish_time_t;  
-                PRLEVEL(-1, ("decision time in %ld is %lf\n",t, decition_time));
+                PRLEVEL(2, ("decision time in %ld is %lf\n",t, decition_time));
                 #endif
 
                 return myInfo =
@@ -175,10 +175,11 @@ ParU_ResultCode paru_factorize(cholmod_sparse *A, paru_symbolic *LUsym,
    if (1)
     {
         printf("Parallel\n");
-        //omp_set_dynamic(0);
         #ifdef MKLROOT
+        omp_set_dynamic(0);
         mkl_set_dynamic(0);
         #endif
+        BLAS_set_num_threads(1);
         omp_set_max_active_levels(16);
         const Int size = (Int)task_Q.size();
         const Int steps = size == 0 ? 1 : size;

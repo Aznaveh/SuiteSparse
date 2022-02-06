@@ -8,7 +8,7 @@
  */
 #include "paru_internal.hpp"
 #define L 512
-#define SMALL 8
+#define SMALL 4
 void paru_tasked_dgemm(Int f,  BLAS_INT M, BLAS_INT N, BLAS_INT K, 
         double *A, BLAS_INT lda, double *B, BLAS_INT ldb, 
         double beta, double *C, BLAS_INT ldc, paru_matrix *paruMatInfo)
@@ -19,6 +19,10 @@ void paru_tasked_dgemm(Int f,  BLAS_INT M, BLAS_INT N, BLAS_INT K,
     #pragma omp atomic read
     num_active_tasks = paruMatInfo->num_active_tasks;
     const Int max_threads = omp_get_max_threads();
+    //#ifdef MKLROOT
+    //omp_set_dynamic(0);
+    //mkl_set_dynamic(0);
+    //#endif
     if (num_active_tasks == 1)
         BLAS_set_num_threads(max_threads);
     else
@@ -47,13 +51,13 @@ void paru_tasked_dgemm(Int f,  BLAS_INT M, BLAS_INT N, BLAS_INT K,
         //if(1)
     { 
 #ifndef NDEBUG
-        if (M < L && N < L)
-        {
-           PRLEVEL(1, ("%% small for tasking DGEMM (%dx%d) in %ld\n", M, N, f));
-        }
-        else if (num_active_tasks == 1)
+        if (num_active_tasks == 1)
         {
             PRLEVEL(1, ("%% A max_threads DGEMM (%dx%d) in %ld\n", M, N, f));
+        }
+        else if  (M < L && N < L)
+        {
+            PRLEVEL(1, ("%% Single call DGEMM (%dx%d) in %ld\n", M, N, f));
         }
 #endif
         cblas_dgemm(CblasColMajor, CblasNoTrans, CblasNoTrans, 
