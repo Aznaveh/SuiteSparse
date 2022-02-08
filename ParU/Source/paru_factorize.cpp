@@ -30,7 +30,7 @@ ParU_ResultCode paru_exec_tasks_seq(Int t, Int *task_num_child,
 #endif
     for (Int f = task_map[t] + 1; f <= task_map[t + 1]; f++)
     {
-        PRLEVEL(2, ("Seq: calling %ld\n"f));
+        PRLEVEL(2, ("Seq: calling %ld\n",f));
         myInfo = paru_front(f, paruMatInfo);
         if (myInfo != PARU_SUCCESS)
         {
@@ -314,6 +314,14 @@ ParU_ResultCode paru_factorize(cholmod_sparse *A, paru_symbolic *LUsym,
             }
             start += steps;
         }
+        // chain break
+        if (chain_task != -1 && info == PARU_SUCCESS)
+        {
+            paruMatInfo->num_active_tasks = 1; 
+            PRLEVEL(1, ("Chain_taskd %ld has remained\n",chain_task));
+            info  = 
+                paru_exec_tasks_seq(chain_task, task_num_child, paruMatInfo);
+        }
         if (info != PARU_SUCCESS)
         {
             PRLEVEL(1, ("%% factorization has some problem\n"));
@@ -324,12 +332,7 @@ ParU_ResultCode paru_factorize(cholmod_sparse *A, paru_symbolic *LUsym,
             return info;
         }
         
-        if (chain_task != -1)
-        {
-            paruMatInfo->num_active_tasks = 1; 
-            PRLEVEL(1, ("Chain_taskd %ld has remained\n",chain_task));
-            paru_exec_tasks_seq(chain_task, task_num_child, paruMatInfo);
-        }
+        
     }
 
     //////////////// Making task tree ///End////////////////////////////////////
