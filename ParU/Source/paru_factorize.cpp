@@ -9,6 +9,72 @@
  * @author Aznaveh
  */
 #include "paru_internal.hpp"
+Int chain_task = -1;
+
+ParU_ResultCode paru_exec_tasks_seq(Int t, Int *task_num_child,
+                                paru_matrix *paruMatInfo)
+{
+    DEBUGLEVEL(1);
+    paru_symbolic *LUsym = paruMatInfo->LUsym;
+    Int *task_parent = LUsym->task_parent;
+    Int daddy = task_parent[t];
+    Int *task_map = LUsym->task_map;
+
+    Int num_original_children = 0;
+    if (daddy != -1) num_original_children = LUsym->task_num_child[daddy];
+    PRLEVEL(1, ("Seq: executing task %ld fronts %ld-%ld (%ld children)\n", t,
+                task_map[t] + 1, task_map[t + 1], num_original_children));
+    ParU_ResultCode myInfo;
+#ifndef NDEBUG
+    double start_time_t = omp_get_wtime();
+#endif
+    for (Int f = task_map[t] + 1; f <= task_map[t + 1]; f++)
+    {
+        PRLEVEL(2, ("Seq: calling %ld\n"f));
+        myInfo = paru_front(f, paruMatInfo);
+        if (myInfo != PARU_SUCCESS)
+        {
+            return myInfo;
+        }
+    }
+    Int num_rem_children;
+#ifndef NDEBUG
+    double finish_time_t = omp_get_wtime();
+    double t_time = finish_time_t - start_time_t;  
+    PRLEVEL(-1, ("task time task %ld is %lf\n",t, t_time));
+
+    if (daddy == -1) PRLEVEL(1, ("%% finished task root(%ld)\n", t));
+#endif
+
+    if (daddy != -1)  // if it is not a root
+    {
+        if (num_original_children != 1)
+        {
+            task_num_child[daddy]--;
+            num_rem_children = task_num_child[daddy];
+
+            PRLEVEL(1,
+                    ("%%Seq finished task %ld(%ld,%ld)Parent has %ld left\n", t,
+                     task_map[t] + 1, task_map[t + 1], task_num_child[daddy]));
+            if (num_rem_children == 0)
+            {
+                PRLEVEL(1,
+                        ("%%Seq task %ld executing its parent %ld\n", 
+                         t, daddy));
+                return myInfo =
+                    paru_exec_tasks_seq(daddy, task_num_child, paruMatInfo);
+            }
+        }
+        else  // I was the only spoiled kid in the family;
+        {
+            PRLEVEL(1, ("%% Seq task %ld only child executing its parent %ld\n", 
+                        t, daddy));
+            return myInfo = 
+                paru_exec_tasks_seq(daddy, task_num_child, paruMatInfo);
+        }
+    }
+    return myInfo;
+}
 
 ParU_ResultCode paru_exec_tasks(Int t, Int *task_num_child,
                                 paru_matrix *paruMatInfo)
@@ -65,16 +131,40 @@ ParU_ResultCode paru_exec_tasks(Int t, Int *task_num_child,
                 double decition_time = omp_get_wtime() - finish_time_t;  
                 PRLEVEL(2, ("decision time in %ld is %lf\n",t, decition_time));
                 #endif
-
-                return myInfo =
-                    paru_exec_tasks(daddy, task_num_child, paruMatInfo);
+                Int num_active_tasks;
+                #pragma omp atomic read
+                num_active_tasks = paruMatInfo->num_active_tasks;
+                if (num_active_tasks ==1) 
+                {
+                    chain_task = daddy;
+                    PRLEVEL(2,
+                         ("%% CHAIN ALERT1: task %ld calling %ld\n", t, daddy));
+                }
+                else
+                {
+                    return myInfo =
+                        paru_exec_tasks(daddy, task_num_child, paruMatInfo);
+                }
             }
         }
         else  // I was the only spoiled kid in the family;
         {
             PRLEVEL(1, ("%% task %ld only child executing its parent %ld\n", t,
                         daddy));
-            return myInfo = paru_exec_tasks(daddy, task_num_child, paruMatInfo);
+            Int num_active_tasks;
+            #pragma omp atomic read
+            num_active_tasks = paruMatInfo->num_active_tasks;
+            if (num_active_tasks ==1) 
+            {
+                chain_task = daddy;
+                PRLEVEL(2, 
+                        ("%% CHAIN ALERT2: task %ld calling%ld\n", t, daddy));
+            }
+            else
+            {
+                return myInfo = 
+                    paru_exec_tasks(daddy, task_num_child, paruMatInfo);
+            }
         }
     }
     return myInfo;
@@ -178,6 +268,8 @@ ParU_ResultCode paru_factorize(cholmod_sparse *A, paru_symbolic *LUsym,
         #ifdef MKLROOT
         omp_set_dynamic(0);
         mkl_set_dynamic(0);
+        //mkl_set_threading_layer(MKL_THREADING_INTEL);
+        //mkl_set_interface_layer(MKL_INTERFACE_ILP64);
         #endif
         BLAS_set_num_threads(1);
         omp_set_max_active_levels(16);
@@ -194,7 +286,7 @@ ParU_ResultCode paru_factorize(cholmod_sparse *A, paru_symbolic *LUsym,
             Int end = start + steps > size ? size : start + steps;
             PRLEVEL(-1, ("%% doing Queue tasks <%ld,%ld>\n", start, end));
             #pragma omp parallel 
-            #pragma omp single nowait
+            #pragma omp single 
             #pragma omp task //untied  //clang seg fault on untied
             for (Int i = start; i < end; i++)
             // for (Int i = 0; i < (Int)task_Q.size(); i++)
@@ -230,6 +322,13 @@ ParU_ResultCode paru_factorize(cholmod_sparse *A, paru_symbolic *LUsym,
             else if (info == PARU_SINGULAR)
                 printf("Paru: Input matrix is singular\n");
             return info;
+        }
+        
+        if (chain_task != -1)
+        {
+            paruMatInfo->num_active_tasks = 1; 
+            PRLEVEL(1, ("Chain_taskd %ld has remained\n",chain_task));
+            paru_exec_tasks_seq(chain_task, task_num_child, paruMatInfo);
         }
     }
 
