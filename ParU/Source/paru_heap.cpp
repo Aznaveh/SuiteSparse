@@ -283,9 +283,6 @@ ParU_ResultCode paru_make_heap_empty_el(Int f,
             {
                 Int e = pivotal_elements[i];
                 paru_Element *el = elementList[e];
-#ifndef NDEBUG
-                ASSERT(el != NULL);
-#endif
                 if (el == NULL) continue;
                 PRLEVEL(p, ("%ld  ", e));
                 curHeap->push_back(e);
