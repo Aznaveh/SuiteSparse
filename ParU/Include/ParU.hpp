@@ -398,6 +398,8 @@ typedef struct
     // #endif
 
     Int num_active_tasks; //keep track of number of active task in frontal level
+    Int paru_max_threads; //I want to call omp_get_max_threads just once
+                         // or user can give me a value less than that
     ParU_ResultCode res;
 
 } paru_matrix;

@@ -15,7 +15,7 @@ void paru_tasked_trsm(Int f, int m, int n, double alpha, double *a, int lda,
     Int num_active_tasks;
     #pragma omp atomic read
     num_active_tasks = paruMatInfo->num_active_tasks;
-    const Int max_threads = omp_get_max_threads();
+    const Int max_threads = paruMatInfo->paru_max_threads;
     if (num_active_tasks == 1)
         BLAS_set_num_threads(max_threads);
     else

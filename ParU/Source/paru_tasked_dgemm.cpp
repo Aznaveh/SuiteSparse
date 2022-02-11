@@ -18,7 +18,7 @@ void paru_tasked_dgemm(Int f,  BLAS_INT M, BLAS_INT N, BLAS_INT K,
     Int num_active_tasks;
     #pragma omp atomic read
     num_active_tasks = paruMatInfo->num_active_tasks;
-    const Int max_threads = omp_get_max_threads();
+    const Int max_threads = paruMatInfo->paru_max_threads;
     //#ifdef MKLROOT
     //omp_set_dynamic(0);
     //mkl_set_dynamic(0);

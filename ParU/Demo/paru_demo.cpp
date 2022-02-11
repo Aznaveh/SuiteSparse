@@ -84,7 +84,7 @@ int main(int argc, char **argv)
 #endif
 
     //~~~~~~~~~~~~~~~~~~~End computation~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    Int max_threads = omp_get_max_threads();
+    Int max_threads = paruMatInfo->paru_max_threads;
     BLAS_set_num_threads(max_threads);
 
     //~~~~~~~~~~~~~~~~~~~Calling umfpack~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

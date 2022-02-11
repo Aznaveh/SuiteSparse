@@ -262,6 +262,8 @@ ParU_ResultCode paru_factorize(cholmod_sparse *A, paru_symbolic *LUsym,
 #endif
 
     //if (chainess < .6 && maxchain_ratio < .25)
+
+   paruMatInfo->paru_max_threads = omp_get_max_threads();
    if (1)
     {
         printf("Parallel\n");
