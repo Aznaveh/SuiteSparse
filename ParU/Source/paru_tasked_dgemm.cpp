@@ -46,8 +46,9 @@ void paru_tasked_dgemm(Int f,  BLAS_INT M, BLAS_INT N, BLAS_INT K,
             }
 
     }
-    else if ( (M < L && N < L) || (num_active_tasks == 1) ) 
-        //if small or no other tasks competing
+    else if ( (M < L && N < L) || (num_active_tasks == 1) || 
+            (num_active_tasks >= max_threads) ) 
+        //if small or no other tasks competing or there are lots of other tasks
         //if(1)
     { 
 #ifndef NDEBUG
