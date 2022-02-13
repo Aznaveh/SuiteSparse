@@ -114,10 +114,18 @@ void paru_assemble_all(Int e, Int f, std::vector<Int> &colHash,
                 if (ii == el->nrowsleft) break;
             }
         }
-        //Int *Depth = LUsym->Depth;
-        //**//pragma omp parallel 
-        //**//pragma omp single nowait
-        //**//pragma omp taskgroup
+        Int nat;
+        #pragma omp atomic read
+        nat = paruMatInfo->num_active_tasks;
+        const Int max_threads = paruMatInfo->paru_max_threads;
+        Int *Depth = LUsym->Depth;
+        //if (max_threads > nat) 
+        //{
+        //    printf ("%ld ", nat);
+        //}
+        #pragma omp parallel if ( nat < max_threads/8 && el->nrowsleft > TASK_MIN) 
+        #pragma omp single 
+        //#pragma omp task if ( nat == 1)
         for (Int j = el->lac; j < nEl; j++)
         {
             PRLEVEL(1, ("%% j =%ld \n", j));
@@ -129,7 +137,8 @@ void paru_assemble_all(Int e, Int f, std::vector<Int> &colHash,
 
             double *dC = curEl_Num + fcolind * curEl->nrows;
 
-            //**//pragma omp task priority(Depth[f]) if(el->nrowsleft > TASK_MIN)
+            /////pragma omp task priority(Depth[f]) if(el->nrowsleft > TASK_MIN)
+            #pragma omp task priority(Depth[f])  mergeable 
             for (Int iii = 0; iii < el->nrowsleft; iii++)
             {
                 Int i = tempRow[iii];
