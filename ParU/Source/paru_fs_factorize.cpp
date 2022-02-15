@@ -11,19 +11,28 @@
 #define PIV_TOLER 0.1     // pivot tolerance
 #define DIAG_TOLER 0.001  // pivot tolerance
 
-void swap_rows(double *F, Int *frowList, Int m, Int n, Int r1, Int r2)
+void swap_rows(double *F, Int *frowList, Int m, Int n, Int r1, Int r2, 
+        paru_matrix *paruMatInfo)
 {
     // This function also swap rows r1 and r2 wholly and indices
     if (r1 == r2) return;
     std::swap(frowList[r1], frowList[r2]);
-    ///pragma omp taskloop if(n>16384) grainsize(16384)
+    Int naft; //number of active frontal tasks
+    #pragma omp atomic read
+    naft = paruMatInfo->num_active_tasks;
+    const Int max_threads = paruMatInfo->paru_max_threads;
+    //printf ("naft=%ld, max_threads=%ld num_tasks=%ld\n", naft, max_threads,
+    //        max_threads/(naft) );
+    #pragma omp parallel if ( naft = 1 && n> 512) 
+    #pragma omp single 
+    #pragma omp taskloop num_tasks(max_threads/(naft+1))
     for (Int j = 0; j < n; j++)
         // each column
         std::swap(F[j * m + r1], F[j * m + r2]);
 }
 
 Int paru_panel_factorize(Int f, Int m, Int n, const Int panel_width,
-                         Int panel_num, Int row_end, paru_matrix *paruMatInfo)
+        Int panel_num, Int row_end, paru_matrix *paruMatInfo)
 {
     // works like dgetf2f.f in netlib v3.0  here is a link:
     // https://github.com/xianyi/OpenBLAS/blob/develop/reference/dgetf2f.f
@@ -227,7 +236,7 @@ Int paru_panel_factorize(Int f, Int m, Int n, const Int panel_width,
 
         // swap rows
         PRLEVEL(1, ("%% Swaping rows j=%ld, row_piv=%ld\n", j, row_piv));
-        swap_rows(F, frowList, m, n, j, row_piv);
+        swap_rows(F, frowList, m, n, j, row_piv, paruMatInfo);
 
 #ifndef NDEBUG  // Printing the pivotal front
         PR = 1;
