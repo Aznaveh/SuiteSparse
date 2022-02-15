@@ -23,7 +23,7 @@ void swap_rows(double *F, Int *frowList, Int m, Int n, Int r1, Int r2,
     const Int max_threads = paruMatInfo->paru_max_threads;
     //printf ("naft=%ld, max_threads=%ld num_tasks=%ld\n", naft, max_threads,
     //        max_threads/(naft) );
-    #pragma omp parallel if ( naft = 1 && n> 512) 
+    #pragma omp parallel if ( (naft == 1) && (n > 512) ) 
     #pragma omp single 
     #pragma omp taskloop num_tasks(max_threads/(naft+1))
     for (Int j = 0; j < n; j++)

@@ -123,7 +123,7 @@ void paru_assemble_all(Int e, Int f, std::vector<Int> &colHash,
         //{
         //    printf ("%ld ", naft);
         //}
-        #pragma omp parallel if ( naft == 1  && el->nrowsleft > TASK_MIN) 
+        #pragma omp parallel if ( (naft == 1)  && (el->nrowsleft > TASK_MIN) )
         #pragma omp single 
         for (Int j = el->lac; j < nEl; j++)
         {
