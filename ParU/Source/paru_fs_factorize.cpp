@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 //////////////////////////  paru_fs_factorize  /////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
-/*! @brief Doing the BLAS factorization in different panels and call degree
+/*! @brief Doing the BLAS factorization in different panels and call degre////e
  * update when it is necessary.
  *
  * @author Aznaveh
@@ -17,15 +17,19 @@ void swap_rows(double *F, Int *frowList, Int m, Int n, Int r1, Int r2,
     // This function also swap rows r1 and r2 wholly and indices
     if (r1 == r2) return;
     std::swap(frowList[r1], frowList[r2]);
-    Int naft; //number of active frontal tasks
-    #pragma omp atomic read
-    naft = paruMatInfo->naft;
-    const Int max_threads = paruMatInfo->paru_max_threads;
-    //printf ("naft=%ld, max_threads=%ld num_tasks=%ld\n", naft, max_threads,
-    //        max_threads/(naft) );
-    #pragma omp parallel if ( (naft == 1) && (n > 512) ) 
-    #pragma omp single 
-    #pragma omp taskloop num_tasks(max_threads/(naft+1))
+    //So dissappointed in parallelism this part; SLOWDOWNN
+
+    //Int naft; //number of active frontal tasks
+    //pragma omp atomic read
+    //naft = paruMatInfo->naft;
+    //const Int max_threads = paruMatInfo->paru_max_threads;
+    //if ( (naft == 1) && (n > 1024) ) 
+    //printf ("naft=%ld, max_threads=%ld num_tasks=%ld n =%ld \n", 
+    //        naft, max_threads, max_threads/(naft), n);
+    //pragma omp parallel if ( (naft == 1) && (n > 1024) ) 
+    //pragma omp single 
+    //pragma omp taskloop num_tasks(max_threads/(naft+1))
+    
     for (Int j = 0; j < n; j++)
         // each column
         std::swap(F[j * m + r1], F[j * m + r2]);
