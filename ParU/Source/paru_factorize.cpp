@@ -131,10 +131,10 @@ ParU_ResultCode paru_exec_tasks(Int t, Int *task_num_child,
                 double decition_time = omp_get_wtime() - finish_time_t;  
                 PRLEVEL(2, ("decision time in %ld is %lf\n",t, decition_time));
                 #endif
-                Int num_active_tasks;
+                Int naft;
                 #pragma omp atomic read
-                num_active_tasks = paruMatInfo->num_active_tasks;
-                if (num_active_tasks ==1) 
+                naft = paruMatInfo->naft;
+                if (naft ==1) 
                 {
                     chain_task = daddy;
                     PRLEVEL(2,
@@ -151,10 +151,10 @@ ParU_ResultCode paru_exec_tasks(Int t, Int *task_num_child,
         {
             PRLEVEL(1, ("%% task %ld only child executing its parent %ld\n", t,
                         daddy));
-            Int num_active_tasks;
+            Int naft;
             #pragma omp atomic read
-            num_active_tasks = paruMatInfo->num_active_tasks;
-            if (num_active_tasks ==1) 
+            naft = paruMatInfo->naft;
+            if (naft ==1) 
             {
                 chain_task = daddy;
                 PRLEVEL(2, 
@@ -204,7 +204,7 @@ ParU_ResultCode paru_factorize(cholmod_sparse *A, paru_symbolic *LUsym,
         PRLEVEL(1, ("%% init_row has a problem\n"));
         return info;
     }
-    paruMatInfo->num_active_tasks = 0;
+    paruMatInfo->naft = 0;
     Int nf = LUsym->nf;
     //////////////// Using task tree //////////////////////////////////////////
     Int ntasks = LUsym->ntasks;
@@ -274,7 +274,7 @@ ParU_ResultCode paru_factorize(cholmod_sparse *A, paru_symbolic *LUsym,
         //mkl_set_interface_layer(MKL_INTERFACE_ILP64);
         #endif
         BLAS_set_num_threads(1);
-        omp_set_max_active_levels(16);
+        omp_set_max_active_levels(4);
         const Int size = (Int)task_Q.size();
         const Int steps = size == 0 ? 1 : size;
         const Int stages = size / steps + 1;
@@ -299,7 +299,7 @@ ParU_ResultCode paru_factorize(cholmod_sparse *A, paru_symbolic *LUsym,
                 #pragma omp task mergeable priority(d)
                 {
                     #pragma omp atomic update
-                    paruMatInfo->num_active_tasks++;
+                    paruMatInfo->naft++;
 
                     ParU_ResultCode myInfo =
                         // paru_exec_tasks(t, &task_num_child[0], paruMatInfo);
@@ -310,7 +310,7 @@ ParU_ResultCode paru_factorize(cholmod_sparse *A, paru_symbolic *LUsym,
                         info = myInfo;
                     }
                     #pragma omp atomic update
-                    paruMatInfo->num_active_tasks--;
+                    paruMatInfo->naft--;
 
                 }
             }
@@ -319,7 +319,7 @@ ParU_ResultCode paru_factorize(cholmod_sparse *A, paru_symbolic *LUsym,
         // chain break
         if (chain_task != -1 && info == PARU_SUCCESS)
         {
-            paruMatInfo->num_active_tasks = 1; 
+            paruMatInfo->naft = 1; 
             PRLEVEL(1, ("Chain_taskd %ld has remained\n",chain_task));
             info  = 
                 paru_exec_tasks_seq(chain_task, task_num_child, paruMatInfo);
@@ -342,7 +342,7 @@ ParU_ResultCode paru_factorize(cholmod_sparse *A, paru_symbolic *LUsym,
     else
     {
         printf("Sequential\n");
-        paruMatInfo->num_active_tasks = 1;
+        paruMatInfo->naft = 1;
         for (Int i = 0; i < nf; i++)
         {
             // if (i %1000 == 0) PRLEVEL(1, ("%% Wroking on front %ld\n", i));

@@ -397,7 +397,7 @@ typedef struct
     double flp_cnt_real_dgemm;
     // #endif
 
-    Int num_active_tasks; //keep track of number of active task in frontal level
+    Int naft; //number of actvie frontal tasks
     Int paru_max_threads; //I want to call omp_get_max_threads just once
                          // or user can give me a value less than that
     ParU_ResultCode res;

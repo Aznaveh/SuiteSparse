@@ -15,15 +15,15 @@ void paru_tasked_dgemm(Int f,  BLAS_INT M, BLAS_INT N, BLAS_INT K,
 {
     DEBUGLEVEL(1);
     //alpha is always -1  in my DGEMMs
-    Int num_active_tasks;
+    Int naft;
     #pragma omp atomic read
-    num_active_tasks = paruMatInfo->num_active_tasks;
+    naft= paruMatInfo->naft;
     const Int max_threads = paruMatInfo->paru_max_threads;
     //#ifdef MKLROOT
     //omp_set_dynamic(0);
     //mkl_set_dynamic(0);
     //#endif
-    if (num_active_tasks == 1)
+    if (naft == 1)
         BLAS_set_num_threads(max_threads);
     else
         BLAS_set_num_threads(1);
@@ -46,13 +46,12 @@ void paru_tasked_dgemm(Int f,  BLAS_INT M, BLAS_INT N, BLAS_INT K,
             }
 
     }
-    else if ( (M < L && N < L) || (num_active_tasks == 1) || 
-            (num_active_tasks >= max_threads) ) 
+    else if ( (M < L && N < L) || (naft == 1) ||  (naft >= max_threads) ) 
         //if small or no other tasks competing or there are lots of other tasks
         //if(1)
     { 
 #ifndef NDEBUG
-        if (num_active_tasks == 1)
+        if (naft == 1)
         {
             PRLEVEL(1, ("%% A max_threads DGEMM (%dx%d) in %ld\n", M, N, f));
         }
@@ -68,7 +67,7 @@ void paru_tasked_dgemm(Int f,  BLAS_INT M, BLAS_INT N, BLAS_INT K,
     {
         #ifdef MKLROOT
         Int max_threads = omp_get_max_threads();
-        Int my_share = max_threads / num_active_tasks;
+        Int my_share = max_threads / naft;
         if (my_share == 0 ) my_share = 1;
         PRLEVEL(1, ("%% MKL local threads for DGEMM (%dx%d) in %ld [[%ld]]\n", 
                     M, N, f, my_share));
@@ -116,7 +115,7 @@ void paru_tasked_dgemm(Int f,  BLAS_INT M, BLAS_INT N, BLAS_INT K,
 #ifndef NDEBUG
     double d_time = omp_get_wtime() - start_time_d;  
     PRLEVEL(1, ("%% XXX DGEMM (%d,%d,%d)%1.1f in %ld {%ld} in %lf seconds\n", 
-                M, N, K, beta, f, num_active_tasks, d_time));
+                M, N, K, beta, f, naft, d_time));
 #endif
 
 

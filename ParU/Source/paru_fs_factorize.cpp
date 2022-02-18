@@ -19,7 +19,7 @@ void swap_rows(double *F, Int *frowList, Int m, Int n, Int r1, Int r2,
     std::swap(frowList[r1], frowList[r2]);
     Int naft; //number of active frontal tasks
     #pragma omp atomic read
-    naft = paruMatInfo->num_active_tasks;
+    naft = paruMatInfo->naft;
     const Int max_threads = paruMatInfo->paru_max_threads;
     //printf ("naft=%ld, max_threads=%ld num_tasks=%ld\n", naft, max_threads,
     //        max_threads/(naft) );

@@ -12,21 +12,21 @@ void paru_tasked_trsm(Int f, int m, int n, double alpha, double *a, int lda,
                       double *b, int ldb, paru_matrix *paruMatInfo)
 {
     DEBUGLEVEL(0);
-    Int num_active_tasks;
+    Int naft;
     #pragma omp atomic read
-    num_active_tasks = paruMatInfo->num_active_tasks;
+    naft = paruMatInfo->naft;
     const Int max_threads = paruMatInfo->paru_max_threads;
-    if (num_active_tasks == 1)
+    if (naft == 1)
         BLAS_set_num_threads(max_threads);
     else
         BLAS_set_num_threads(1);
-    if ( n < L || (num_active_tasks == 1) || (num_active_tasks >= max_threads)) 
+    if ( n < L || (naft == 1) || (naft >= max_threads)) 
     //if(1)
     {
 #ifndef NDEBUG
         if (n < L)
             PRLEVEL(1, ("%% Small TRSM (%dx%d) in %ld\n", m, n, f));
-        if (num_active_tasks == 1)
+        if (naft == 1)
             PRLEVEL(1, ("%% All threads for trsm(%dx%d) in %ld\n", m, n, f));
 #endif
         cblas_dtrsm (CblasColMajor, CblasLeft, CblasLower, CblasNoTrans, 
@@ -35,7 +35,7 @@ void paru_tasked_trsm(Int f, int m, int n, double alpha, double *a, int lda,
     else
     {
        #ifdef MKLROOT
-        Int my_share = max_threads / num_active_tasks;
+        Int my_share = max_threads / naft;
         if (my_share == 0 ) my_share = 1;
         PRLEVEL(1, ("%% MKL local threads for trsm(%dx%d) in %ld [[%ld]]\n", 
                     m, n, f, my_share));
