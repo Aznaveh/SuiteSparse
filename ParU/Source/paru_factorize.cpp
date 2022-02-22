@@ -275,6 +275,7 @@ ParU_ResultCode paru_factorize(cholmod_sparse *A, paru_symbolic *LUsym,
         #endif
         BLAS_set_num_threads(1);
         omp_set_max_active_levels(4);
+        // to get the level use this function: omp_get_active_level()
         const Int size = (Int)task_Q.size();
         const Int steps = size == 0 ? 1 : size;
         const Int stages = size / steps + 1;

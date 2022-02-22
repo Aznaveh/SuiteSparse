@@ -399,15 +399,17 @@ Int paru_factorize_full_summed(Int f, Int start_fac,
         // factorize current panel
         paru_panel_factorize(f, rowCount, fp, panel_width, panel_num, row_end,
                 paruMatInfo);
-
-        //pragma omp parallel
+        //Int naft; //number of active frontal tasks
+        //pragma omp atomic read
+        //naft = paruMatInfo->naft;
+        //pragma omp parallel  proc_bind(close) if(naft == 1)
         //pragma omp single
         {
             // update row degree and dgeem can be done in parallel
-            //pragma omp task default(none) mergeable
+            //pragma omp task default(none) mergeable 
             //shared(paruMatInfo, pivotal_elements, stl_colSet) 
             //shared(panel_num, row_end, f, start_fac) 
-            
+
             if (paruMatInfo->LUsym->Cm[f] !=0)  
             {  // if there is potential column left
                 paru_update_rowDeg(panel_num, row_end, f, start_fac,
@@ -440,7 +442,7 @@ Int paru_factorize_full_summed(Int f, Int start_fac,
              * v              |___....____________________..._____|
              *
              */
-            //pragma omp task  shared(F)
+            //pragma omp task  shared(F) 
             //shared(panel_width, j1, j2, fp, f, rowCount) 
             if (j2 < fp)  // if it is not the last
             {
@@ -480,7 +482,7 @@ Int paru_factorize_full_summed(Int f, Int start_fac,
                     }
 #endif
                 }
-        }      // end of parallel region
+        }      // end of parallel region; it doesn't show good performance
 
         /*               dgemm   C := alpha*op(A)*op(B) + beta*C
          *

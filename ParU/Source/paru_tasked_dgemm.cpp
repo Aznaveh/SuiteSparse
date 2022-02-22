@@ -66,7 +66,6 @@ void paru_tasked_dgemm(Int f,  BLAS_INT M, BLAS_INT N, BLAS_INT K,
     else
     {
         #ifdef MKLROOT
-        Int max_threads = omp_get_max_threads();
         Int my_share = max_threads / naft;
         if (my_share == 0 ) my_share = 1;
         PRLEVEL(1, ("%% MKL local threads for DGEMM (%dx%d) in %ld [[%ld]]\n", 
