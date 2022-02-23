@@ -120,8 +120,8 @@ void paru_assemble_all(Int e, Int f, std::vector<Int> &colHash,
         naft = paruMatInfo->naft;
         const Int max_threads = paruMatInfo->paru_max_threads;
 
-        if (naft != 1  || el->nrowsleft*el->ncolsleft < 4096)
-        //if (1)
+        if (naft < max_threads/2  || el->nrowsleft*el->ncolsleft < 4096 || 
+                el->nrowsleft < 1024)
         {   //not enoght threads or very small assembly
             //sequential
             for (Int j = el->lac; j < nEl; j++)
@@ -134,8 +134,6 @@ void paru_assemble_all(Int e, Int f, std::vector<Int> &colHash,
                 Int fcolind = colRelIndex[j];
 
                 double *dC = curEl_Num + fcolind * curEl->nrows;
-
-                //#pragma omp task priority(Depth[f])  mergeable 
                 for (Int iii = 0; iii < el->nrowsleft; iii++)
                 {
                     Int i = tempRow[iii];
@@ -156,22 +154,14 @@ void paru_assemble_all(Int e, Int f, std::vector<Int> &colHash,
         { 
             //enoght threads and big assembly
             // parallel
-
-            //Int *Depth = LUsym->Depth;
-
-            //printf("Parallel Assembly naft=%ld colsleft=%ld"
-            //        " rowsleft=%ld loop_length=%ld \n",
-            //        naft, el->ncolsleft, el->nrowsleft, el->ncols-el->lac);
             PRLEVEL(1, ("Parallel Assembly naft=%ld colsleft=%ld rowsleft=%ld \n",
                     naft, el->ncolsleft, el->nrowsleft));
             
-
-
             #pragma omp parallel proc_bind(close)
-            #pragma omp taskloop num_tasks(max_threads) 
+            #pragma omp single nowait
+            #pragma omp task untied
             for (Int j = el->lac; j < nEl; j++)
             {
-                if (el->ncolsleft == 0) continue;
                 PRLEVEL(1, ("%% j =%ld \n", j));
                 double *sC = el_Num + mEl * j;  // source column pointer
                 Int colInd = el_colIndex[j];
@@ -184,6 +174,7 @@ void paru_assemble_all(Int e, Int f, std::vector<Int> &colHash,
 
                 double *dC = curEl_Num + fcolind * curEl->nrows;
 
+                #pragma omp task 
                 for (Int iii = 0; iii < el->nrowsleft; iii++)
                 {
                     Int i = tempRow[iii];
@@ -195,10 +186,7 @@ void paru_assemble_all(Int e, Int f, std::vector<Int> &colHash,
                     dC[ri] += sC[i];
                     PRLEVEL(1, ("%% dC [%ld] =%2.5lf \n", i, dC[ri]));
                 }
-
-                #pragma omp atomic update
-                el->ncolsleft--; 
-
+                if (--el->ncolsleft == 0) break;
                 PRLEVEL(1, ("\n"));
             }
         }
