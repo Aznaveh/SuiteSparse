@@ -10,6 +10,7 @@
  */
 #include "paru_internal.hpp"
 Int chain_task = -1;
+Int rem_tasks;
 
 ParU_ResultCode paru_exec_tasks_seq(Int t, Int *task_num_child,
                                 paru_matrix *paruMatInfo)
@@ -131,10 +132,10 @@ ParU_ResultCode paru_exec_tasks(Int t, Int *task_num_child,
                 double decition_time = omp_get_wtime() - finish_time_t;  
                 PRLEVEL(2, ("decision time in %ld is %lf\n",t, decition_time));
                 #endif
-                Int naft;
+                Int rem;
                 #pragma omp atomic read
-                naft = paruMatInfo->naft;
-                if (naft ==1) 
+                rem = rem_tasks;
+                if (rem ==1) 
                 {
                     chain_task = daddy;
                     PRLEVEL(2,
@@ -151,10 +152,10 @@ ParU_ResultCode paru_exec_tasks(Int t, Int *task_num_child,
         {
             PRLEVEL(1, ("%% task %ld only child executing its parent %ld\n", t,
                         daddy));
-            Int naft;
+            Int rem;
             #pragma omp atomic read
-            naft = paruMatInfo->naft;
-            if (naft ==1) 
+            rem = rem_tasks;
+            if (rem ==1) 
             {
                 chain_task = daddy;
                 PRLEVEL(2, 
@@ -236,6 +237,7 @@ ParU_ResultCode paru_factorize(cholmod_sparse *A, paru_symbolic *LUsym,
     Int max_chain = LUsym->max_chain;
     double chainess = 2;
     double maxchain_ratio = 2;
+    rem_tasks = task_Q.size();
     printf("ntasks=%ld task_Q.size=%ld\n", ntasks, task_Q.size());
     if (ntasks > 0)
     {
@@ -312,6 +314,8 @@ ParU_ResultCode paru_factorize(cholmod_sparse *A, paru_symbolic *LUsym,
                     }
                     #pragma omp atomic update
                     paruMatInfo->naft--;
+                    #pragma omp atomic update
+                    rem_tasks--;
 
                 }
             }
