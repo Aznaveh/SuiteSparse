@@ -398,6 +398,7 @@ typedef struct
     // #endif
 
     Int naft; //number of actvie frontal tasks
+    Int resq; //number of remainig ready tasks in the queue
     Int paru_max_threads; //I want to call omp_get_max_threads just once
                          // or user can give me a value less than that
     ParU_ResultCode res;

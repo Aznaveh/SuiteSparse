@@ -9,8 +9,6 @@
  * @author Aznaveh
  */
 #include "paru_internal.hpp"
-Int chain_task = -1;
-Int rem_tasks;
 
 ParU_ResultCode paru_exec_tasks_seq(Int t, Int *task_num_child,
                                 paru_matrix *paruMatInfo)
@@ -77,7 +75,7 @@ ParU_ResultCode paru_exec_tasks_seq(Int t, Int *task_num_child,
     return myInfo;
 }
 
-ParU_ResultCode paru_exec_tasks(Int t, Int *task_num_child,
+ParU_ResultCode paru_exec_tasks (Int t, Int *task_num_child, Int &chain_task,
                                 paru_matrix *paruMatInfo)
 {
     DEBUGLEVEL(1);
@@ -132,19 +130,24 @@ ParU_ResultCode paru_exec_tasks(Int t, Int *task_num_child,
                 double decition_time = omp_get_wtime() - finish_time_t;  
                 PRLEVEL(2, ("decision time in %ld is %lf\n",t, decition_time));
                 #endif
-                Int rem;
+                Int resq;
                 #pragma omp atomic read
-                rem = rem_tasks;
-                if (rem ==1) 
+                resq = paruMatInfo->resq;
+                Int naft;
+                #pragma omp atomic read
+                naft= paruMatInfo->naft;
+
+                if (resq == 0 && naft == 1) 
                 {
                     chain_task = daddy;
-                    PRLEVEL(2,
-                         ("%% CHAIN ALERT1: task %ld calling %ld\n", t, daddy));
+                    PRLEVEL(2, ("%% CHAIN ALERT1: task %ld calling %ld"
+                                " resq = %ld\n", t, daddy, resq));
                 }
                 else
                 {
                     return myInfo =
-                        paru_exec_tasks(daddy, task_num_child, paruMatInfo);
+                        paru_exec_tasks(daddy, task_num_child, chain_task, 
+                                paruMatInfo);
                 }
             }
         }
@@ -152,19 +155,24 @@ ParU_ResultCode paru_exec_tasks(Int t, Int *task_num_child,
         {
             PRLEVEL(1, ("%% task %ld only child executing its parent %ld\n", t,
                         daddy));
-            Int rem;
+            Int resq;
             #pragma omp atomic read
-            rem = rem_tasks;
-            if (rem ==1) 
+            resq = paruMatInfo->resq;
+            Int naft;
+            #pragma omp atomic read
+            naft= paruMatInfo->naft;
+
+            if (resq == 0 && naft == 1) 
             {
                 chain_task = daddy;
-                PRLEVEL(2, 
-                        ("%% CHAIN ALERT2: task %ld calling%ld\n", t, daddy));
+                    PRLEVEL(2, ("%% CHAIN ALERT1: task %ld calling %ld"
+                                " resq = %ld\n", t, daddy, resq));
             }
             else
             {
                 return myInfo = 
-                    paru_exec_tasks(daddy, task_num_child, paruMatInfo);
+                    paru_exec_tasks(daddy, task_num_child, chain_task, 
+                            paruMatInfo);
             }
         }
     }
@@ -237,7 +245,7 @@ ParU_ResultCode paru_factorize(cholmod_sparse *A, paru_symbolic *LUsym,
     Int max_chain = LUsym->max_chain;
     double chainess = 2;
     double maxchain_ratio = 2;
-    rem_tasks = task_Q.size();
+    paruMatInfo->resq = task_Q.size();
     printf("ntasks=%ld task_Q.size=%ld\n", ntasks, task_Q.size());
     if (ntasks > 0)
     {
@@ -281,6 +289,7 @@ ParU_ResultCode paru_factorize(cholmod_sparse *A, paru_symbolic *LUsym,
         const Int size = (Int)task_Q.size();
         const Int steps = size == 0 ? 1 : size;
         const Int stages = size / steps + 1;
+        Int chain_task = -1;
         Int start = 0;
         PRLEVEL(
             1, ("%% size=%ld, steps =%ld, stages =%ld\n", size, steps, stages));
@@ -302,11 +311,15 @@ ParU_ResultCode paru_factorize(cholmod_sparse *A, paru_symbolic *LUsym,
                 #pragma omp task mergeable priority(d)
                 {
                     #pragma omp atomic update
+                    paruMatInfo->resq--;
+
+                    #pragma omp atomic update
                     paruMatInfo->naft++;
 
                     ParU_ResultCode myInfo =
                         // paru_exec_tasks(t, &task_num_child[0], paruMatInfo);
-                        paru_exec_tasks(t, task_num_child, paruMatInfo);
+                        paru_exec_tasks(t, task_num_child, chain_task, 
+                                paruMatInfo);
                     if (myInfo != PARU_SUCCESS)
                     {
                         #pragma omp atomic write
@@ -314,9 +327,6 @@ ParU_ResultCode paru_factorize(cholmod_sparse *A, paru_symbolic *LUsym,
                     }
                     #pragma omp atomic update
                     paruMatInfo->naft--;
-                    #pragma omp atomic update
-                    rem_tasks--;
-
                 }
             }
             start += steps;
