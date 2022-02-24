@@ -157,7 +157,7 @@ void paru_assemble_all(Int e, Int f, std::vector<Int> &colHash,
             PRLEVEL(1, ("Parallel Assembly naft=%ld colsleft=%ld rowsleft=%ld \n",
                     naft, el->ncolsleft, el->nrowsleft));
             
-            #pragma omp parallel proc_bind(close)
+            #pragma omp parallel proc_bind(close) num_threads(max_threads/naft)
             #pragma omp single nowait
             #pragma omp task untied
             for (Int j = el->lac; j < nEl; j++)
@@ -256,11 +256,18 @@ void paru_assemble_cols(Int e, Int f, std::vector<Int> &colHash,
     Int tempRow_ready = 0;
     Int toll = 8;  // number of times it continue when do not find anything
 
+    //Int naft; //number of active frontal tasks
+    //pragma omp atomic read
+    //naft = paruMatInfo->naft;
+    //const Int max_threads = paruMatInfo->paru_max_threads;
+    ////Int *Depth = LUsym->Depth;
+    //pragma omp parallel proc_bind(close) num_threads(max_threads/naft) 
+    //if (naft < max_threads/2 && 
+    //        el->nrowsleft*el->ncolsleft < 4096 && el->nrowsleft < 1024 )
+    //pragma omp single nowait
+    //pragma omp task untied
+    
     // TOLL FREE zone
-    //Int *Depth = LUsym->Depth;
-    //**//pragma omp parallel 
-    //**//pragma omp single nowait
-    //**//pragma omp taskgroup
     while (paru_find_hash(el_colIndex[el->lac], colHash, fcolList) != -1)
     {
         PRLEVEL(p, ("%% Toll free\n"));
@@ -292,8 +299,8 @@ void paru_assemble_cols(Int e, Int f, std::vector<Int> &colHash,
         ASSERT(colInd >= 0);
 
         double *dC = curEl_Num + fcolind * curEl->nrows;
-
-        //**//pragma omp task priority(Depth[f]) if(el->nrowsleft > TASK_MIN)
+        
+        //pragma omp task 
         for (Int ii = 0; ii < el->nrowsleft; ii++)
         {
             Int i = tempRow[ii];
