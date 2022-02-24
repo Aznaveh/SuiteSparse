@@ -130,14 +130,11 @@ ParU_ResultCode paru_exec_tasks (Int t, Int *task_num_child, Int &chain_task,
                 double decition_time = omp_get_wtime() - finish_time_t;  
                 PRLEVEL(2, ("decision time in %ld is %lf\n",t, decition_time));
                 #endif
+
                 Int resq;
                 #pragma omp atomic read
                 resq = paruMatInfo->resq;
-                Int naft;
-                #pragma omp atomic read
-                naft= paruMatInfo->naft;
-
-                if (resq == 0 && naft == 1) 
+                if (resq == 1) 
                 {
                     chain_task = daddy;
                     PRLEVEL(2, ("%% CHAIN ALERT1: task %ld calling %ld"
@@ -158,11 +155,7 @@ ParU_ResultCode paru_exec_tasks (Int t, Int *task_num_child, Int &chain_task,
             Int resq;
             #pragma omp atomic read
             resq = paruMatInfo->resq;
-            Int naft;
-            #pragma omp atomic read
-            naft= paruMatInfo->naft;
-
-            if (resq == 0 && naft == 1) 
+            if (resq == 1) 
             {
                 chain_task = daddy;
                     PRLEVEL(2, ("%% CHAIN ALERT1: task %ld calling %ld"
@@ -311,9 +304,6 @@ ParU_ResultCode paru_factorize(cholmod_sparse *A, paru_symbolic *LUsym,
                 #pragma omp task mergeable priority(d)
                 {
                     #pragma omp atomic update
-                    paruMatInfo->resq--;
-
-                    #pragma omp atomic update
                     paruMatInfo->naft++;
 
                     ParU_ResultCode myInfo =
@@ -327,6 +317,11 @@ ParU_ResultCode paru_factorize(cholmod_sparse *A, paru_symbolic *LUsym,
                     }
                     #pragma omp atomic update
                     paruMatInfo->naft--;
+
+                    #pragma omp atomic update
+                    paruMatInfo->resq--;
+
+
                 }
             }
             start += steps;
