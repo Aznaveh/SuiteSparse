@@ -5,7 +5,8 @@
  * 
  *
  ********    The final result is something like this (nf = 4)                     
- *     ___________________________________________                          
+ *     col1    col2
+ *      ___________________________________________                          
  *     |\       |                                 |       c                 
  *     |*\      |         U1                      |       c                 
  *     |****\   |                                 |       c  DTRSV on here  
@@ -34,7 +35,7 @@
 #include "paru_internal.hpp"
 Int paru_lsolve(paru_matrix *paruMatInfo, double *x)
 {
-    DEBUGLEVEL(0);
+    DEBUGLEVEL(1);
     if (!x) return (0);
     paru_symbolic *LUsym = paruMatInfo->LUsym;
     Int nf = LUsym->nf;
@@ -75,6 +76,10 @@ Int paru_lsolve(paru_matrix *paruMatInfo, double *x)
     }
     PRLEVEL(PR, ("%%lsove singletons finished.\n"));
 
+    const Int max_threads = paruMatInfo->paru_max_threads;
+    BLAS_set_num_threads(max_threads);
+    double work[LUsym->m]; //gather scatter space for dgemv 
+
     paru_fac *LUs = paruMatInfo->partial_LUs;
     Int *Super = LUsym->Super;
 
@@ -88,24 +93,27 @@ Int paru_lsolve(paru_matrix *paruMatInfo, double *x)
         double *A = LUs[f].p;
         double *X = x + col1 + n1;
 
-        BLAS_INT N = (BLAS_INT)fp;
         BLAS_INT lda = (BLAS_INT)rowCount;
-        BLAS_INT Incx = (BLAS_INT)1;
+        {
 
-        PRLEVEL(1, ("%% Working on DTRSV\n"));
-        /*
-        BLAS_DTRSV("L",     // UPLO lower triangular
-                   "N",     // TRANS A*X=b not the A**T
-                   "U",     // DIAG A is assumed to be unit traingular
-                   &N,      // N is order of the matrix A
-                   A,       // A
-                   &lda,    // LDA leading demension
-                   X,       // X
-                   &Incx);  // INCX the increment of elements of X.
-         */
-        cblas_dtrsv (CblasColMajor, CblasLower, CblasNoTrans, 
-                CblasUnit, N, A, lda, X, Incx);
-        PRLEVEL(1, ("%% DTRSV is just finished\n"));
+            BLAS_INT N = (BLAS_INT)fp;
+            BLAS_INT Incx = (BLAS_INT)1;
+
+            PRLEVEL(1, ("%% Working on DTRSV\n"));
+            /*
+               BLAS_DTRSV("L",     // UPLO lower triangular
+               "N",     // TRANS A*X=b not the A**T
+               "U",     // DIAG A is assumed to be unit traingular
+               &N,      // N is order of the matrix A
+               A,       // A
+               &lda,    // LDA leading demension
+               X,       // X
+               &Incx);  // INCX the increment of elements of X.
+               */
+            cblas_dtrsv (CblasColMajor, CblasLower, CblasNoTrans, 
+                    CblasUnit, N, A, lda, X, Incx);
+            PRLEVEL(1, ("%% DTRSV is just finished\n"));
+        }
 #ifndef NDEBUG
         PR = 2;
         PRLEVEL(PR, ("%% LUs:\n%%"));
@@ -117,29 +125,43 @@ Int paru_lsolve(paru_matrix *paruMatInfo, double *x)
             PRLEVEL(PR, ("\n"));
         }
 
-        PRLEVEL(2, ("%% lda = %d\n%%", lda));
-        PRLEVEL(2, ("%% during lsolve x [%ld-%ld)is:\n%%", col1, col2));
+        PRLEVEL(PR, ("%% lda = %d\n%%", lda));
+        PRLEVEL(PR, ("%% during lsolve x [%ld-%ld)is:\n%%", col1, col2));
         // for (Int k = col1; k < col2; k++)
         Int m = LUsym->m;
         for (Int k = 0; k < m; k++)
         {
-            PRLEVEL(1, (" %.2lf, ", x[k]));
+            PRLEVEL(PR, (" %.2lf, ", x[k]));
         }
-        PRLEVEL(1, (" \n"));
+        PRLEVEL(PR, (" \n"));
 #endif
 
-        // I am not calling BLAS_DGEMV for now
+        PRLEVEL(1, ("%% Working on DGEMV\n%%"));
+        PRLEVEL(1, ("fp=%ld  rowCount=%ld\n", fp, rowCount));
 
+        if (rowCount > fp)
+        {
+            BLAS_INT m = (BLAS_INT)(rowCount-fp);
+            BLAS_INT n = (BLAS_INT)fp;
+            cblas_dgemv (CblasColMajor, CblasNoTrans, m, n, 1, A+fp, lda, 
+                    x+n1+col1, 1, 0, work, 1);
+        }
+
+        #pragma omp parallel for
         for (Int i = fp; i < rowCount; i++)
         {
-            PRLEVEL(1, ("%% Working on DGEMV\n%%"));
-            // computing the inner product
-            double i_prod = 0.0;  // innter product
-            for (Int j = col1; j < col2; j++)
-            {
-                i_prod += A[(j - col1) * rowCount + i] * x[j + n1];
-            }
+            //alternative to dgemv; do not need work if using this
+                // computing the inner product
+            //double i_prod = 0.0;  // inner product
+            //for (Int j = col1; j < col2; j++)
+            //{
+            //    i_prod += A[(j - col1) * rowCount + i] * x[j + n1];
+            //}
+
+            double i_prod = work[i-fp];
             Int r = Ps[frowList[i]] + n1;
+            PRLEVEL(2, ("i_prod[%ld]=%lf  work=%lf r=%ld\n", 
+                        i, i_prod,  work[i-fp], r));
             x[r] -= i_prod;
         }
     }
