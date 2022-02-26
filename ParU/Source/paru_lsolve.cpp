@@ -35,13 +35,14 @@
 #include "paru_internal.hpp"
 Int paru_lsolve(paru_matrix *paruMatInfo, double *x)
 {
-    DEBUGLEVEL(1);
+    DEBUGLEVEL(0);
     if (!x) return (0);
     paru_symbolic *LUsym = paruMatInfo->LUsym;
     Int nf = LUsym->nf;
 
 #ifndef NDEBUG
     Int PR = 1;
+    double start_time = omp_get_wtime();
 #endif
     Int n1 = LUsym->n1;   // row+col singletons
     Int *Ps = LUsym->Ps;  // row permutation S->LU
@@ -136,22 +137,22 @@ Int paru_lsolve(paru_matrix *paruMatInfo, double *x)
         PRLEVEL(PR, (" \n"));
 #endif
 
-        PRLEVEL(1, ("%% Working on DGEMV\n%%"));
-        PRLEVEL(1, ("fp=%ld  rowCount=%ld\n", fp, rowCount));
-
         if (rowCount > fp)
         {
+            PRLEVEL(1, ("%% lsolve: Working on DGEMV\n%%"));
+            PRLEVEL(1, ("fp=%ld  rowCount=%ld\n", fp, rowCount));
             BLAS_INT m = (BLAS_INT)(rowCount-fp);
             BLAS_INT n = (BLAS_INT)fp;
             cblas_dgemv (CblasColMajor, CblasNoTrans, m, n, 1, A+fp, lda, 
                     x+n1+col1, 1, 0, work, 1);
         }
 
-        #pragma omp parallel for
+        //don't use parallel loop if using dgemv
+        //pragma omp parallel for
         for (Int i = fp; i < rowCount; i++)
         {
             //alternative to dgemv; do not need work if using this
-                // computing the inner product
+            // computing the inner product
             //double i_prod = 0.0;  // inner product
             //for (Int j = col1; j < col2; j++)
             //{
@@ -167,8 +168,9 @@ Int paru_lsolve(paru_matrix *paruMatInfo, double *x)
     }
 
 #ifndef NDEBUG
+    double time = omp_get_wtime() - start_time;  
     Int m = LUsym->m;
-    PRLEVEL(1, ("%% after lsolve x is:\n%%"));
+    PRLEVEL(1, ("%% lsolve took %1.1lf s; after lsolve x is:\n%%", time));
     for (Int k = 0; k < m; k++)
     {
         PRLEVEL(1, (" %.2lf, ", x[k]));

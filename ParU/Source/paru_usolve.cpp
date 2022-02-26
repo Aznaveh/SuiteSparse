@@ -5,7 +5,7 @@
  *
  *
  ********       The final result is something like this (nf = 4)
- *        ___________________________________________
+ *         ___________________________________________
  *        |\*******|                                 |       x
  *        | \*DTRSV|         U1   DGEMV              |       x
  *        |    \***|                                 |       x
@@ -37,6 +37,10 @@ Int paru_usolve(paru_matrix *paruMatInfo, double *x)
     DEBUGLEVEL(0);
     // check if input is read
     if (!x) return (0);
+#ifndef NDEBUG
+    Int PR = 1;
+    double start_time = omp_get_wtime();
+#endif
     paru_symbolic *LUsym = paruMatInfo->LUsym;
     Int nf = LUsym->nf;
 
@@ -47,6 +51,9 @@ Int paru_usolve(paru_matrix *paruMatInfo, double *x)
     paru_fac *LUs = paruMatInfo->partial_LUs;
     paru_fac *Us = paruMatInfo->partial_Us;
     Int *Super = LUsym->Super;
+
+    const Int max_threads = paruMatInfo->paru_max_threads;
+    BLAS_set_num_threads(max_threads);
 
     for (Int f = nf - 1; f >= 0; --f)
     {
@@ -59,11 +66,13 @@ Int paru_usolve(paru_matrix *paruMatInfo, double *x)
 
         // do dgemv
         // performed on Us
-        // I am not calling BLAS_DGEMV
+        //I am not calling BLAS_DGEMV while the column permutation is different
 
         double *A2 = Us[f].p;
         if (A2 != NULL)
         {
+            PRLEVEL(1, ("%% usolve: Working on DGEMV\n%%"));
+            #pragma omp parallel for
             for (Int i = 0; i < fp; i++)
             {
                 PRLEVEL(1, ("%% Usolve: Working on DGEMV\n"));
@@ -74,6 +83,7 @@ Int paru_usolve(paru_matrix *paruMatInfo, double *x)
                     i_prod += A2[fp * j + i] * x[fcolList[j] + n1];
                 }
                 Int r = Ps[frowList[i]] + n1;
+                PRLEVEL(2, ("i_prod[%ld]=%lf  r=%ld\n", i, i_prod,  r));
                 x[r] -= i_prod;
             }
         }
@@ -89,23 +99,22 @@ Int paru_usolve(paru_matrix *paruMatInfo, double *x)
         // performed on LUs
         PRLEVEL(1, ("%% Usolve: Working on DTRSV\n"));
         /*
-        BLAS_DTRSV("U",     // UPLO upper triangular
-                   "N",     // TRANS A1*X=b not the A1**T
-                   "N",     // DIAG A1 is assumed not to be unit traingular
-                   &N,      // N is order of the matrix A1
-                   A1,      // A1
-                   &lda,    // LDA leading demension
-                   X,       // X
-                   &Incx);  // INCX the increment of elements of X.
-        */
+           BLAS_DTRSV("U",     // UPLO upper triangular
+           "N",     // TRANS A1*X=b not the A1**T
+           "N",     // DIAG A1 is assumed not to be unit traingular
+           &N,      // N is order of the matrix A1
+           A1,      // A1
+           &lda,    // LDA leading demension
+           X,       // X
+           &Incx);  // INCX the increment of elements of X.
+           */
         cblas_dtrsv (CblasColMajor, CblasUpper, CblasNoTrans, 
                 CblasNonUnit, N, A1, lda, X, Incx);
- 
+
         PRLEVEL(1, ("%% DTRSV is just finished\n"));
     }
 
 #ifndef NDEBUG
-    Int PR = 1;
     Int m = LUsym->m;
     PRLEVEL(1, ("%% before singleton x is:\n%%"));
     for (Int k = 0; k < m; k++)
@@ -141,7 +150,8 @@ Int paru_usolve(paru_matrix *paruMatInfo, double *x)
         }
     }
 #ifndef NDEBUG
-    PRLEVEL(1, ("%% after usolve x is:\n%%"));
+    double time = omp_get_wtime() - start_time;  
+    PRLEVEL(-1, ("%% usolve took %1.1lf s; after usolve x is:\n%%", time));
     for (Int k = 0; k < m; k++)
     {
         PRLEVEL(1, (" %.2lf, ", x[k]));

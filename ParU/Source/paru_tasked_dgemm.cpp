@@ -13,7 +13,7 @@ void paru_tasked_dgemm(Int f,  BLAS_INT M, BLAS_INT N, BLAS_INT K,
         double *A, BLAS_INT lda, double *B, BLAS_INT ldb, 
         double beta, double *C, BLAS_INT ldc, paru_matrix *paruMatInfo)
 {
-    DEBUGLEVEL(1);
+    DEBUGLEVEL(0);
     //alpha is always -1  in my DGEMMs
     Int naft;
     #pragma omp atomic read
