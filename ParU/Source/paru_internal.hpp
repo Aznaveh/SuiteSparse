@@ -238,9 +238,11 @@ ParU_ResultCode paru_perm(paru_matrix *paruMatInfo);
 Int paru_apply_inv_perm(const Int *P, const double *b, double *x, Int m);
 Int paru_apply_perm_scale(const Int *P, const double *s, const double *b,
                           double *x, Int m);
-
+Int paru_apply_perm_scale(const Int *P, const double *s, const double *b,
+                          double *x, Int m, Int n);
 // lsolve and usolve
 Int paru_lsolve(paru_matrix *paruMatInfo, double *x);
+Int paru_lsolve(paru_matrix *paruMatInfo, double *x, Int n);
 Int paru_usolve(paru_matrix *paruMatInfo, double *x);
 
 Int paru_gaxpy(cholmod_sparse *A, const double *x, double *y, double alpha);

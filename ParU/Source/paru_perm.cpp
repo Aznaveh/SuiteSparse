@@ -189,6 +189,7 @@ Int paru_apply_perm_scale(const Int *P, const double *s, const double *b,
     }
     PRLEVEL(1, (" \n"));
 #endif
+    #pragma omp parallel for
     for (Int k = 0; k < m; k++)
     {
         Int j = P[k];  // k-new and j-old; P(new) = old
@@ -205,6 +206,70 @@ Int paru_apply_perm_scale(const Int *P, const double *s, const double *b,
     for (Int k = 0; k < m; k++)
     {
         PRLEVEL(1, (" %.2lf, ", x[k]));
+    }
+    PRLEVEL(1, (" \n"));
+#endif
+    return (1);
+}
+///////////////apply perm and scale X = sB(P) //////////////////////////////////
+Int paru_apply_perm_scale(const Int *P, const double *s, const double *B,
+                          double *X, Int m, Int n)
+{
+    DEBUGLEVEL(1);
+    if (!X || !B) return (0);
+
+#ifndef NDEBUG
+    PRLEVEL(1, ("%% RHS Inside apply Permutaion and scale P is:\n%%"));
+    for (Int k = 0; k < m; k++)
+    {
+        PRLEVEL(1, (" %ld, ", P[k]));
+    }
+    PRLEVEL(1, (" \n"));
+
+    PRLEVEL(1, ("%% and B is:\n")); //B is row major
+    for (Int k = 0; k < m; k++)
+    {
+        PRLEVEL(1, ("%%"));
+        for (Int l = 0; l < n; l++)
+        {
+            PRLEVEL(1, (" %.2lf, ", B[l*m+k]));
+            // PRLEVEL(1, (" %.2lf, ", B[k*n+l])); B row-major
+        }
+        PRLEVEL(1, (" \n"));
+    }
+    PRLEVEL(1, (" \n"));
+
+    PRLEVEL(1, ("%% and s is\n%%"));
+
+    for (Int k = 0; k < m; k++)
+    {
+        PRLEVEL(1, (" %lf, ", s[k]));
+    }
+    PRLEVEL(1, (" \n"));
+#endif
+
+    #pragma omp parallel for
+    for (Int k = 0; k < m; k++)
+    {
+        Int j = P[k];  // k-new and j-old; P(new) = old
+        for (Int l = 0; l < n; l++)
+        {
+          // X[k*n+l] = (s == NULL) ? B[j*n+l] : B[j*n+l] / s[j];
+           X[l*m+k] = (s == NULL) ? B[l*m+j] : B[l*m+j] / s[j];
+        }
+    }
+
+#ifndef NDEBUG
+    PRLEVEL(1, ("\n%% after applying permutaion X is:\n"));
+    for (Int k = 0; k < m; k++)
+    {
+        PRLEVEL(1, ("%%"));
+        for (Int l = 0; l < n; l++)
+        {
+            PRLEVEL(1, (" %.2lf, ", X[l*m+k]));
+            // PRLEVEL(1, (" %.2lf, ", X[k*n+l])); X row major
+        }
+        PRLEVEL(1, (" \n"));
     }
     PRLEVEL(1, (" \n"));
 #endif

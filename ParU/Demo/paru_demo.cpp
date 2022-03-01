@@ -71,7 +71,6 @@ int main(int argc, char **argv)
 
     //~~~~~~~~~~~~~~~~~~~Test the results ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #if 1
-    // double *b = (double *)paru_alloc(m, sizeof(double));
     Int m = LUsym->m;
     double *b = (double *)malloc(m * sizeof(double));
     for (Int i = 0; i < m; ++i) b[i] = i + 1;
@@ -79,8 +78,14 @@ int main(int argc, char **argv)
     paru_residual(A, paruMatInfo, b, Res);
     for (Int i = 0; i < m; ++i) b[i] = i + 1;
     paru_backward(A, paruMatInfo, b, Res);
-    // paru_free (m, sizeof(double), b);
     free(b);
+
+    Int nn = 2; //number of right handsides
+    double *B = (double *)malloc(m*nn * sizeof(double));
+    for (Int i = 0; i < m; ++i) 
+        for (Int j = 0; j < nn; ++j) B[j*m+i] = (double) (i + 1);
+    paru_solve(paruMatInfo, B, nn); //multiple right hand sides
+    free(B);
 #endif
 
     //~~~~~~~~~~~~~~~~~~~End computation~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
