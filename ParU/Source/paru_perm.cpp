@@ -215,7 +215,7 @@ Int paru_apply_perm_scale(const Int *P, const double *s, const double *b,
 Int paru_apply_perm_scale(const Int *P, const double *s, const double *B,
                           double *X, Int m, Int n)
 {
-    DEBUGLEVEL(1);
+    DEBUGLEVEL(0);
     if (!X || !B) return (0);
 
 #ifndef NDEBUG
