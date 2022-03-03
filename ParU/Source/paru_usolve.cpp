@@ -46,7 +46,6 @@ Int paru_usolve(paru_matrix *paruMatInfo, double *x)
 
     Int n1 = LUsym->n1;   // row+col singletons
     Int *Ps = LUsym->Ps;  // row permutation
-    // Int *Qfill = LUsym->Qfill;
 
     paru_fac *LUs = paruMatInfo->partial_LUs;
     paru_fac *Us = paruMatInfo->partial_Us;
@@ -93,23 +92,10 @@ Int paru_usolve(paru_matrix *paruMatInfo, double *x)
         double *A1 = LUs[f].p;
         BLAS_INT N = (BLAS_INT)fp;
         BLAS_INT lda = (BLAS_INT)rowCount;
-        BLAS_INT Incx = (BLAS_INT)1;
-        double *X = x + col1 + n1;
-
         // performed on LUs
         PRLEVEL(1, ("%% Usolve: Working on DTRSV\n"));
-        /*
-           BLAS_DTRSV("U",     // UPLO upper triangular
-           "N",     // TRANS A1*X=b not the A1**T
-           "N",     // DIAG A1 is assumed not to be unit traingular
-           &N,      // N is order of the matrix A1
-           A1,      // A1
-           &lda,    // LDA leading demension
-           X,       // X
-           &Incx);  // INCX the increment of elements of X.
-           */
         cblas_dtrsv (CblasColMajor, CblasUpper, CblasNoTrans, 
-                CblasNonUnit, N, A1, lda, X, Incx);
+                CblasNonUnit, N, A1, lda, x+col1+n1, 1);
 
         PRLEVEL(1, ("%% DTRSV is just finished\n"));
     }
@@ -155,6 +141,139 @@ Int paru_usolve(paru_matrix *paruMatInfo, double *x)
     for (Int k = 0; k < m; k++)
     {
         PRLEVEL(1, (" %.2lf, ", x[k]));
+    }
+    PRLEVEL(1, (" \n"));
+#endif
+    return (1);
+}
+///////////////////////////////// paru_usolve ///multiple mRHS///////////////////
+Int paru_usolve(paru_matrix *paruMatInfo, double *X, Int n)
+{
+    DEBUGLEVEL(1);
+    // check if input is read
+    if (!X) return (0);
+    paru_symbolic *LUsym = paruMatInfo->LUsym;
+    Int m = paruMatInfo->m;
+    Int nf = LUsym->nf;
+#ifndef NDEBUG
+    Int PR = 1;
+    double start_time = omp_get_wtime();
+    PRLEVEL(1, ("%% mRHS inside USolve X is:\n"));
+    for (Int k = 0; k < m; k++)
+    {
+        PRLEVEL(1, ("%%"));
+        for (Int l = 0; l < n; l++)
+        {
+            PRLEVEL(1, (" %.2lf, ", X[l*m+k]));
+            // PRLEVEL(1, (" %.2lf, ", X[k*n+l])); X row major
+        }
+        PRLEVEL(1, (" \n"));
+    }
+    PRLEVEL(1, (" \n"));
+#endif
+    Int n1 = LUsym->n1;   // row+col singletons
+    Int *Ps = LUsym->Ps;  // row permutation
+
+    paru_fac *LUs = paruMatInfo->partial_LUs;
+    paru_fac *Us = paruMatInfo->partial_Us;
+    Int *Super = LUsym->Super;
+
+    const Int max_threads = paruMatInfo->paru_max_threads;
+    BLAS_set_num_threads(max_threads);
+
+    for (Int f = nf - 1; f >= 0; --f)
+    {
+        Int *frowList = paruMatInfo->frowList[f];
+        Int *fcolList = paruMatInfo->fcolList[f];
+        Int col1 = Super[f];
+        Int col2 = Super[f + 1];
+        Int fp = col2 - col1;
+        Int colCount = paruMatInfo->fcolCount[f];
+
+        // do dgemm
+        // performed on Us
+        //I cannot call BLAS_DGEMM while the column permutation is different
+
+        double *A2 = Us[f].p;
+        if (A2 != NULL)
+        {
+            PRLEVEL(1, ("%% mRHS usolve: Working on DGEMM f=%ld\n%%", f));
+            #pragma omp parallel for
+            for (Int i = 0; i < fp; i++)
+            {
+                // computing the inner product
+                double i_prod[n] = {0.0};  // inner product
+                for (Int j = 0; j < colCount; j++)
+                {
+                    for (Int l = 0; l < n; l++)
+                        i_prod[l] += A2[fp * j + i] * X[l*m + fcolList[j] + n1];
+                }
+                Int r = Ps[frowList[i]] + n1;
+                for (Int l = 0; l < n; l++)
+                {
+                    PRLEVEL(2, ("i_prod[%ld]=%lf  r=%ld\n", i, i_prod[i],  r));
+                    X[l*m+r] -= i_prod[l];
+                }
+            }
+        }
+
+        Int rowCount = paruMatInfo->frowCount[f];
+
+        double *A1 = LUs[f].p;
+        BLAS_INT mm = (BLAS_INT)fp;
+        BLAS_INT lda = (BLAS_INT)rowCount;
+        BLAS_INT nn = (BLAS_INT)n;
+
+        PRLEVEL(1, ("%% mRHS Usolve: Working on DTRSM\n"));
+        cblas_dtrsm(CblasColMajor, CblasLeft, CblasUpper, 
+                CblasNoTrans,  CblasNonUnit, 
+                mm, nn, 1, A1, lda, X+col1+n1, mm);
+        PRLEVEL(1, ("%% mRHS DTRSM is just finished\n"));
+    }
+
+    PRLEVEL(1, ("%% mRHS Usolve working on singletons \n"));
+    Int cs1 = LUsym->cs1;
+    if (cs1 > 0)
+    {
+        for (Int i = cs1 - 1; i >= 0; i--)
+        {
+            PRLEVEL(PR, ("i = %ld\n", i));
+            Int *Sup = LUsym->ustons.Sup;
+            Int *Suj = LUsym->ustons.Suj;
+            double *Sux = LUsym->ustons.Sux;
+            ASSERT(Suj != NULL && Sux != NULL && Sup != NULL);
+            for (Int p = Sup[i] + 1; p < Sup[i + 1]; p++)
+            {
+                Int r = Suj[p];
+                PRLEVEL(PR, (" r=%ld\n", r));
+                #pragma omp simd
+                for (Int l = 0; l < n; l++)
+                {
+                    X[l*m+i] -= Sux[p] * X[l*m+r];
+                }
+ 
+            }
+            Int diag = Sup[i];
+            #pragma omp simd
+            for (Int l = 0; l < n; l++)
+            {
+                X[l*m+i] /= Sux[diag];
+            }
+        }
+    }
+#ifndef NDEBUG
+    double time = omp_get_wtime() - start_time;  
+    PRLEVEL(1, 
+            ("%% mRHS usolve took %1.1lfs; after usolve X is:\n", time));
+    for (Int k = 0; k < m; k++)
+    {
+        PRLEVEL(1, ("%%"));
+        for (Int l = 0; l < n; l++)
+        {
+            PRLEVEL(1, (" %.2lf, ", X[l*m+k]));
+            // PRLEVEL(1, (" %.2lf, ", X[k*n+l])); X row major
+        }
+        PRLEVEL(1, (" \n"));
     }
     PRLEVEL(1, (" \n"));
 #endif

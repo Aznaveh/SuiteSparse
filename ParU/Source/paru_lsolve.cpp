@@ -38,10 +38,10 @@ Int paru_lsolve(paru_matrix *paruMatInfo, double *x)
     DEBUGLEVEL(1);
     if (!x) return (0);
     paru_symbolic *LUsym = paruMatInfo->LUsym;
-    Int m = paruMatInfo->m;
     Int nf = LUsym->nf;
 
 #ifndef NDEBUG
+    Int m = paruMatInfo->m;
     Int PR = 1;
     double start_time = omp_get_wtime();
     PRLEVEL(1, ("%%inside lsolve x is:\n%%"));
@@ -112,21 +112,9 @@ Int paru_lsolve(paru_matrix *paruMatInfo, double *x)
         {
 
             BLAS_INT N = (BLAS_INT)fp;
-            BLAS_INT Incx = (BLAS_INT)1;
-
             PRLEVEL(1, ("%% Working on DTRSV\n"));
-            /*
-               BLAS_DTRSV("L",     // UPLO lower triangular
-               "N",     // TRANS A*X=b not the A**T
-               "U",     // DIAG A is assumed to be unit traingular
-               &N,      // N is order of the matrix A
-               A,       // A
-               &lda,    // LDA leading demension
-               X,       // X
-               &Incx);  // INCX the increment of elements of X.
-               */
             cblas_dtrsv (CblasColMajor, CblasLower, CblasNoTrans, 
-                    CblasUnit, N, A, lda, X, Incx);
+                    CblasUnit, N, A, lda, X, 1);
             PRLEVEL(1, ("%% DTRSV is just finished\n"));
         }
 #ifndef NDEBUG
@@ -288,16 +276,11 @@ Int paru_lsolve(paru_matrix *paruMatInfo, double *X, Int n)
         Int fp = col2 - col1;
         double *A = LUs[f].p;
         //double *Xp = X + (col1 + n1)*n; row major
-        double *Xp = X + (col1 + n1);
-
         BLAS_INT lda = (BLAS_INT)rowCount;
         BLAS_INT ldb = (BLAS_INT)m;
         {
-
             BLAS_INT mm = (BLAS_INT)fp;
             BLAS_INT nn = (BLAS_INT)n;
-            BLAS_INT Incx = (BLAS_INT)1;
-
             PRLEVEL(1, ("%% mRHS Working on DTRSM f=%ld\n", f));
             cblas_dtrsm (CblasColMajor, CblasLeft, CblasLower, 
                     CblasNoTrans,  CblasUnit, 
@@ -343,11 +326,11 @@ Int paru_lsolve(paru_matrix *paruMatInfo, double *X, Int n)
  
         }
 
-        //don't use parallel loop if using dgemv
+        //don't use parallel loop if using dgemm
         //pragma omp parallel for
         for (Int i = fp; i < rowCount; i++)
         {
-            //alternative to dgemv; do not need work if using this
+            //alternative to dgemm; do not need work if using this
             // computing the inner product
             //double i_prod[n] = 0.0;  // inner product
             //for (Int j = col1; j < col2; j++)
@@ -362,7 +345,7 @@ Int paru_lsolve(paru_matrix *paruMatInfo, double *X, Int n)
             for (Int l = 0; l < n; l++)
             {
                 PRLEVEL(2, ("i_prod[%ld]=%lf  work=%lf r=%ld\n", 
-                            i, i_prod,  work[i-fp], r));
+                            i, i_prod[i],  work[i-fp], r));
                 X[l*m+r] -= i_prod[l];
             }
 
@@ -372,7 +355,7 @@ Int paru_lsolve(paru_matrix *paruMatInfo, double *X, Int n)
     #ifndef NDEBUG
     double time = omp_get_wtime() - start_time;  
     PRLEVEL(1, 
-            ("%% mRHS lsolve took %1.1lfs; after lsolve x is:\n%%", time));
+            ("%% mRHS lsolve took %1.1lfs; after lsolve X is:\n", time));
     for (Int k = 0; k < m; k++)
     {
         PRLEVEL(1, ("%%"));

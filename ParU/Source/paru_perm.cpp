@@ -134,7 +134,7 @@ Int paru_apply_inv_perm(const Int *P, const double *b, double *x, Int m)
     }
     PRLEVEL(1, (" \n"));
 
-    PRLEVEL(1, ("%% before applying inverse permutaion b is:\n%%"));
+    PRLEVEL(1, ("%% before applying inverse permutaion b is:\n"));
     for (Int k = 0; k < m; k++)
     {
         PRLEVEL(1, (" %.2lf, ", b[k]));
@@ -142,6 +142,7 @@ Int paru_apply_inv_perm(const Int *P, const double *b, double *x, Int m)
     PRLEVEL(1, (" \n"));
 #endif
 
+    #pragma omp parallel for
     for (Int k = 0; k < m; k++)
     {
         Int j = P[k];  // k-new and j-old; P(new) = old
@@ -149,7 +150,7 @@ Int paru_apply_inv_perm(const Int *P, const double *b, double *x, Int m)
     }
 
 #ifndef NDEBUG
-    PRLEVEL(1, ("%% after applying inverse permutaion x is:\n%%"));
+    PRLEVEL(1, ("%% after applying inverse permutaion x is:\n"));
     for (Int k = 0; k < m; k++)
     {
         PRLEVEL(1, (" %.8lf, ", x[k]));
@@ -158,7 +159,62 @@ Int paru_apply_inv_perm(const Int *P, const double *b, double *x, Int m)
 #endif
     return (1);
 }
+///////////////apply inverse perm x = b(pinv) ////////several mRHS ////////////
+Int paru_apply_inv_perm(const Int *P, const double *B, double *X, Int m, Int n)
+{
+    DEBUGLEVEL(1);
+    if (!X || !B) return (0);
+#ifndef NDEBUG
+    Int PR=2;
+    PRLEVEL(PR, ("%% mRHS Inside apply inv permutaion P is:\n%%"));
+    for (Int k = 0; k < m; k++)
+    {
+        PRLEVEL(PR, (" %ld, ", P[k]));
+    }
+    PRLEVEL(PR, (" \n"));
 
+    PR = 1;
+    PRLEVEL(PR, ("%% mRHS before applying inverse permutaion B is:\n"));
+    for (Int k = 0; k < m; k++)
+    {
+        PRLEVEL(PR, ("%%"));
+        for (Int l = 0; l < n; l++)
+        {
+            PRLEVEL(PR, (" %.2lf, ", B[l*m+k]));
+            // PRLEVEL(1, (" %.2lf, ", B[k*n+l])); B row-major
+        }
+        PRLEVEL(PR, (" \n"));
+    }
+    PRLEVEL(PR, (" \n"));
+#endif
+
+    #pragma omp parallel for
+    for (Int k = 0; k < m; k++)
+    {
+        Int j = P[k];  // k-new and j-old; P(new) = old
+
+        for (Int l = 0; l < n; l++)
+        {
+            X[l*m+j] = B[l*m+k]; // Pinv(old) = new
+        }
+    }
+
+#ifndef NDEBUG
+    PRLEVEL(1, ("%% mRHS after applying inverse permutaion X is:\n"));
+    for (Int k = 0; k < m; k++)
+    {
+        PRLEVEL(1, ("%%"));
+        for (Int l = 0; l < n; l++)
+        {
+            PRLEVEL(1, (" %.2lf, ", X[l*m+k]));
+            // PRLEVEL(1, (" %.2lf, ", X[k*n+l])); X row major
+        }
+        PRLEVEL(1, (" \n"));
+    }
+    PRLEVEL(1, (" \n"));
+#endif
+    return (1);
+}
 ///////////////apply perm and scale x = sb(P) //////////////////////////////////
 Int paru_apply_perm_scale(const Int *P, const double *s, const double *b,
                           double *x, Int m)
@@ -211,7 +267,7 @@ Int paru_apply_perm_scale(const Int *P, const double *s, const double *b,
 #endif
     return (1);
 }
-///////////////apply perm and scale X = sB(P) //////////////////////////////////
+///////////////apply perm and scale X = sB(P) /////////several mRHS ///////////
 Int paru_apply_perm_scale(const Int *P, const double *s, const double *B,
                           double *X, Int m, Int n)
 {
@@ -219,7 +275,7 @@ Int paru_apply_perm_scale(const Int *P, const double *s, const double *B,
     if (!X || !B) return (0);
 
 #ifndef NDEBUG
-    PRLEVEL(1, ("%% RHS Inside apply Permutaion and scale P is:\n%%"));
+    PRLEVEL(1, ("%% mRHS Inside apply Permutaion and scale P is:\n%%"));
     for (Int k = 0; k < m; k++)
     {
         PRLEVEL(1, (" %ld, ", P[k]));

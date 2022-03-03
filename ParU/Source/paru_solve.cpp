@@ -49,11 +49,11 @@ ParU_ResultCode paru_solve(paru_matrix *paruMatInfo, double *b)
 //#ifndef NDEBUG
     double time = omp_get_wtime() - start_time;  
     PRLEVEL(1, ("%%solve has been finished in %lf seconds\n", time));
-    //printf ("%%solve has been finished in %lf seconds\n", time);
+    printf ("%%solve has been finished in %lf seconds\n", time);
 //#endif
     return PARU_SUCCESS;
 }
-//////////////////////////  paru_solve ///////several right hand sides//////////
+//////////////////////////  paru_solve ///////several mRHS /////////////////////
 /*!  @brief  sovle AX = B
  *      get a factorized matrix and several right hand sides
  *      returns X
@@ -66,7 +66,7 @@ ParU_ResultCode paru_solve(paru_matrix *paruMatInfo, double *b)
 ParU_ResultCode paru_solve(paru_matrix *paruMatInfo, double *B, Int n)
 {
     DEBUGLEVEL(1);
-    PRLEVEL(1, ("%% RHS inside Solve\n"));
+    PRLEVEL(1, ("%% mRHS inside Solve\n"));
     paru_symbolic *LUsym = paruMatInfo->LUsym;
     Int m = LUsym->m;
     if (paruMatInfo->res == PARU_SINGULAR)
@@ -89,18 +89,17 @@ ParU_ResultCode paru_solve(paru_matrix *paruMatInfo, double *B, Int n)
 
     paru_apply_perm_scale(LUsym->Pfin, LUsym->scale_row, B, X, m, n);
 
-    PRLEVEL(1, ("%%RHS lsolve\n"));
+    PRLEVEL(1, ("%%mRHS lsolve\n"));
     paru_lsolve(paruMatInfo, X, n);  // X = L\X
-    // PRLEVEL(1, ("%% usolve\n"));
-    // paru_usolve(paruMatInfo, x);                 // x = U\x
-    // paru_apply_inv_perm(LUsym->Qfill, x, b, m);  // b(q) = x
+    PRLEVEL(1, ("%% usolve\n"));
+    paru_usolve(paruMatInfo, X, n);                 // X = U\X
+    paru_apply_inv_perm(LUsym->Qfill, X, B, m, n);     // B(q) = X
 
     paru_free(m*n, sizeof(Int), X);
 //#ifndef NDEBUG
     double time = omp_get_wtime() - start_time;  
-    PRLEVEL(1, ("%%RHS solve has been finished in %lf seconds\n", time));
-    //printf ("%%RHS solve has been finished in %lf seconds\n", time);
+    PRLEVEL(1, ("%% mRHS solve has been finished in %lf seconds\n", time));
+    printf ("%%RHS solve has been finished in %lf seconds\n", time);
 //#endif
- 
     return PARU_SUCCESS;
 }

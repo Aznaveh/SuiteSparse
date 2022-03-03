@@ -69,13 +69,13 @@ ParU_ResultCode paru_backward(cholmod_sparse *A, paru_matrix *paruMatInfo,
     double res = paru_vec_1norm(b, m);
     PRLEVEL(1, ("%% res=%lf\n", res));
     double weighted_res = res / (paru_spm_1norm(A) * paru_vec_1norm(x1, m));
-    //    PRLEVEL(1, ("backward erroris |%.2lf| and weigheted backward error is
+    //    PRLEVEL(1, ("backward error is |%.2lf| and weigheted backward error is
     //    |%.2f|.\n",
     //                res == 0 ? 0 : log10(res),
     //                res == 0 ? 0 :log10(weighted_res)));
     //
-    printf("backward error is |%.2lf| and weigheted backward erroris |%.2f|.\n",
-           res == 0 ? 0 : log10(res), res == 0 ? 0 : log10(weighted_res));
+    printf("backward error is |%.2lf| and weigheted backward error is |%.2f|.\n"
+            , res == 0 ? 0 : log10(res), res == 0 ? 0 : log10(weighted_res));
 
     paru_free(m, sizeof(Int), b);
     Results[0] = res;
