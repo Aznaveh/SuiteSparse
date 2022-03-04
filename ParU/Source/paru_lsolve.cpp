@@ -183,7 +183,7 @@ Int paru_lsolve(paru_matrix *paruMatInfo, double *x)
 ///////////////////////////////// paru_lsolve ///multiple mRHS///////////////////
 Int paru_lsolve(paru_matrix *paruMatInfo, double *X, Int n)
 {
-    DEBUGLEVEL(1);
+    DEBUGLEVEL(0);
     if (!X) return (0);
     paru_symbolic *LUsym = paruMatInfo->LUsym;
     Int m = LUsym->m;

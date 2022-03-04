@@ -162,7 +162,7 @@ Int paru_apply_inv_perm(const Int *P, const double *b, double *x, Int m)
 ///////////////apply inverse perm x = b(pinv) ////////several mRHS ////////////
 Int paru_apply_inv_perm(const Int *P, const double *B, double *X, Int m, Int n)
 {
-    DEBUGLEVEL(1);
+    DEBUGLEVEL(0);
     if (!X || !B) return (0);
 #ifndef NDEBUG
     Int PR=2;

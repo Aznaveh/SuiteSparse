@@ -3,7 +3,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 /*!  @brief  sovle Ax = b
  *      get a factorized matrix and a right hand side
- *      returns x
+ *      returns x; overwrites it on b
  *
  * @author Aznaveh
  * */
@@ -56,7 +56,7 @@ ParU_ResultCode paru_solve(paru_matrix *paruMatInfo, double *b)
 //////////////////////////  paru_solve ///////several mRHS /////////////////////
 /*!  @brief  sovle AX = B
  *      get a factorized matrix and several right hand sides
- *      returns X
+ *      returns X; overwrites it on B
  *
  * @author Aznaveh
  * */
@@ -91,7 +91,7 @@ ParU_ResultCode paru_solve(paru_matrix *paruMatInfo, double *B, Int n)
 
     PRLEVEL(1, ("%%mRHS lsolve\n"));
     paru_lsolve(paruMatInfo, X, n);  // X = L\X
-    PRLEVEL(1, ("%% usolve\n"));
+    PRLEVEL(1, ("%%mRHS usolve\n"));
     paru_usolve(paruMatInfo, X, n);                 // X = U\X
     paru_apply_inv_perm(LUsym->Qfill, X, B, m, n);     // B(q) = X
 

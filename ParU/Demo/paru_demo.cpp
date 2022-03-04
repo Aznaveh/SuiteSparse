@@ -76,15 +76,16 @@ int main(int argc, char **argv)
     for (Int i = 0; i < m; ++i) b[i] = i + 1;
     double Res[4];
     paru_residual(A, paruMatInfo, b, Res);
-    for (Int i = 0; i < m; ++i) b[i] = i + 1;
-    paru_backward(A, paruMatInfo, b, Res);
+    //for (Int i = 0; i < m; ++i) b[i] = i + 1;
+    //paru_backward(A, paruMatInfo, b, Res);
     free(b);
 
-    Int nn = 2; //number of right handsides
+    const Int nn = 8; //number of right handsides
     double *B = (double *)malloc(m*nn * sizeof(double));
     for (Int i = 0; i < m; ++i) 
-        for (Int j = 0; j < nn; ++j) B[j*m+i] = (double) (i + 1);
-    paru_solve(paruMatInfo, B, nn); //multiple right hand sides
+        for (Int j = 0; j < nn; ++j) B[j*m+i] = (double) (i+j + 1);
+    //paru_solve(paruMatInfo, B, nn); //multiple right hand sides
+    paru_residual(A, paruMatInfo, B, Res, nn);
     free(B);
 #endif
 

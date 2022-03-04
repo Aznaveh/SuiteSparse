@@ -429,6 +429,10 @@ void paru_freemat(paru_matrix **paruMatInfo_handle);
 
 ParU_ResultCode paru_residual(cholmod_sparse *A, paru_matrix *paruMatInfo,
                               double *b, double *Results);
+ParU_ResultCode paru_residual(cholmod_sparse *A, paru_matrix *paruMatInfo,
+                              double *b, double *Results, Int n);
+
+
 ParU_ResultCode paru_backward(cholmod_sparse *A, paru_matrix *paruMatInfo,
                               double *x1, double *Results);
 #endif
