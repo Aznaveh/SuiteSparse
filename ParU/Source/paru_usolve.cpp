@@ -34,7 +34,7 @@
 #include "paru_internal.hpp"
 Int paru_usolve(paru_matrix *paruMatInfo, double *x)
 {
-    DEBUGLEVEL(0);
+    DEBUGLEVEL(1);
     // check if input is read
     if (!x) return (0);
 #ifndef NDEBUG
@@ -70,11 +70,11 @@ Int paru_usolve(paru_matrix *paruMatInfo, double *x)
         double *A2 = Us[f].p;
         if (A2 != NULL)
         {
-            PRLEVEL(1, ("%% usolve: Working on DGEMV\n%%"));
+            PRLEVEL(2, ("%% usolve: Working on DGEMV\n%%"));
             #pragma omp parallel for
             for (Int i = 0; i < fp; i++)
             {
-                PRLEVEL(1, ("%% Usolve: Working on DGEMV\n"));
+                PRLEVEL(2, ("%% Usolve: Working on DGEMV\n"));
                 // computing the inner product
                 double i_prod = 0.0;  // innter product
                 for (Int j = 0; j < colCount; j++)
@@ -93,11 +93,11 @@ Int paru_usolve(paru_matrix *paruMatInfo, double *x)
         BLAS_INT N = (BLAS_INT)fp;
         BLAS_INT lda = (BLAS_INT)rowCount;
         // performed on LUs
-        PRLEVEL(1, ("%% Usolve: Working on DTRSV\n"));
+        PRLEVEL(2, ("%% Usolve: Working on DTRSV\n"));
         cblas_dtrsv (CblasColMajor, CblasUpper, CblasNoTrans, 
                 CblasNonUnit, N, A1, lda, x+col1+n1, 1);
 
-        PRLEVEL(1, ("%% DTRSV is just finished\n"));
+        PRLEVEL(2, ("%% DTRSV is just finished\n"));
     }
 
 #ifndef NDEBUG
@@ -153,7 +153,7 @@ Int paru_usolve(paru_matrix *paruMatInfo, double *X, Int n)
     // check if input is read
     if (!X) return (0);
     paru_symbolic *LUsym = paruMatInfo->LUsym;
-    Int m = paruMatInfo->m;
+    Int m = LUsym->m;
     Int nf = LUsym->nf;
 #ifndef NDEBUG
     Int PR = 1;
@@ -197,7 +197,7 @@ Int paru_usolve(paru_matrix *paruMatInfo, double *X, Int n)
         double *A2 = Us[f].p;
         if (A2 != NULL)
         {
-            PRLEVEL(1, ("%% mRHS usolve: Working on DGEMM f=%ld\n%%", f));
+            PRLEVEL(2, ("%% mRHS usolve: Working on DGEMM f=%ld\n%%", f));
             #pragma omp parallel for
             for (Int i = 0; i < fp; i++)
             {
@@ -223,12 +223,13 @@ Int paru_usolve(paru_matrix *paruMatInfo, double *X, Int n)
         BLAS_INT mm = (BLAS_INT)fp;
         BLAS_INT lda = (BLAS_INT)rowCount;
         BLAS_INT nn = (BLAS_INT)n;
+        BLAS_INT ldb = (BLAS_INT)m;
 
-        PRLEVEL(1, ("%% mRHS Usolve: Working on DTRSM\n"));
+        PRLEVEL(2, ("%% mRHS Usolve: Working on DTRSM\n"));
         cblas_dtrsm(CblasColMajor, CblasLeft, CblasUpper, 
                 CblasNoTrans,  CblasNonUnit, 
-                mm, nn, 1, A1, lda, X+col1+n1, mm);
-        PRLEVEL(1, ("%% mRHS DTRSM is just finished\n"));
+                mm, nn, 1, A1, lda, X+col1+n1, ldb);
+        PRLEVEL(2, ("%% mRHS DTRSM is just finished\n"));
     }
 
     PRLEVEL(1, ("%% mRHS Usolve working on singletons \n"));

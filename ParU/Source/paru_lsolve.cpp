@@ -41,7 +41,7 @@ Int paru_lsolve(paru_matrix *paruMatInfo, double *x)
     Int nf = LUsym->nf;
 
 #ifndef NDEBUG
-    Int m = paruMatInfo->m;
+    Int m = LUsym->m;
     Int PR = 1;
     double start_time = omp_get_wtime();
     PRLEVEL(1, ("%%inside lsolve x is:\n%%"));
@@ -112,10 +112,10 @@ Int paru_lsolve(paru_matrix *paruMatInfo, double *x)
         {
 
             BLAS_INT N = (BLAS_INT)fp;
-            PRLEVEL(1, ("%% Working on DTRSV\n"));
+            PRLEVEL(2, ("%% Working on DTRSV\n"));
             cblas_dtrsv (CblasColMajor, CblasLower, CblasNoTrans, 
                     CblasUnit, N, A, lda, X, 1);
-            PRLEVEL(1, ("%% DTRSV is just finished\n"));
+            PRLEVEL(2, ("%% DTRSV is just finished\n"));
         }
 #ifndef NDEBUG
         PR = 2;
@@ -141,8 +141,8 @@ Int paru_lsolve(paru_matrix *paruMatInfo, double *x)
 
         if (rowCount > fp)
         {
-            PRLEVEL(1, ("%% lsolve: Working on DGEMV\n%%"));
-            PRLEVEL(1, ("fp=%ld  rowCount=%ld\n", fp, rowCount));
+            PRLEVEL(2, ("%% lsolve: Working on DGEMV\n%%"));
+            PRLEVEL(2, ("fp=%ld  rowCount=%ld\n", fp, rowCount));
             BLAS_INT m = (BLAS_INT)(rowCount-fp);
             BLAS_INT n = (BLAS_INT)fp;
             cblas_dgemv (CblasColMajor, CblasNoTrans, m, n, 1, A+fp, lda, 
@@ -186,7 +186,7 @@ Int paru_lsolve(paru_matrix *paruMatInfo, double *X, Int n)
     DEBUGLEVEL(1);
     if (!X) return (0);
     paru_symbolic *LUsym = paruMatInfo->LUsym;
-    Int m = paruMatInfo->m;
+    Int m = LUsym->m;
     Int nf = LUsym->nf;
 
 #ifndef NDEBUG
@@ -281,11 +281,11 @@ Int paru_lsolve(paru_matrix *paruMatInfo, double *X, Int n)
         {
             BLAS_INT mm = (BLAS_INT)fp;
             BLAS_INT nn = (BLAS_INT)n;
-            PRLEVEL(1, ("%% mRHS Working on DTRSM f=%ld\n", f));
+            PRLEVEL(2, ("%% mRHS Working on DTRSM f=%ld\n", f));
             cblas_dtrsm (CblasColMajor, CblasLeft, CblasLower, 
                     CblasNoTrans,  CblasUnit, 
                     mm, nn, 1, A, lda,  X+n1+col1, ldb);
-            PRLEVEL(1, ("%% mRHS DTRSM is just finished f=%ld\n",f));
+            PRLEVEL(2, ("%% mRHS DTRSM is just finished f=%ld\n",f));
         }
         #ifndef NDEBUG
         PR = 2;
@@ -299,8 +299,9 @@ Int paru_lsolve(paru_matrix *paruMatInfo, double *X, Int n)
         }
 
         PRLEVEL(PR, ("%% lda = %d\n%%", lda));
-        PRLEVEL(PR, ("%% during lsolve X [%ld-%ld)is:\n%%", 
-                    col1, col2));
+        PR = 1;
+        PRLEVEL(PR, ("%% during lsolve X f=%ld[%ld-%ld)is:\n%%", 
+                    f, col1, col2));
         for (Int k = 0; k < m; k++)
         {
             PRLEVEL(1, ("%%"));
@@ -316,8 +317,8 @@ Int paru_lsolve(paru_matrix *paruMatInfo, double *X, Int n)
 
         if (rowCount > fp)
         {
-            PRLEVEL(1, ("%% mRHS lsolve: Working on DGEMM\n%%"));
-            PRLEVEL(1, ("fp=%ld  rowCount=%ld\n", fp, rowCount));
+            PRLEVEL(2, ("%% mRHS lsolve: Working on DGEMM\n%%"));
+            PRLEVEL(2, ("fp=%ld  rowCount=%ld\n", fp, rowCount));
             BLAS_INT mm = (BLAS_INT)(rowCount-fp);
             BLAS_INT kk = (BLAS_INT)fp;
             BLAS_INT nn = (BLAS_INT)n;
@@ -332,7 +333,7 @@ Int paru_lsolve(paru_matrix *paruMatInfo, double *X, Int n)
         {
             //alternative to dgemm; do not need work if using this
             // computing the inner product
-            //double i_prod[n] = 0.0;  // inner product
+            //double i_prod[n] = {0.0};  // inner product
             //for (Int j = col1; j < col2; j++)
             //{
             //    for (Int l = 0; l < n; l++)
@@ -346,7 +347,7 @@ Int paru_lsolve(paru_matrix *paruMatInfo, double *X, Int n)
             {
                 PRLEVEL(2, ("i_prod[%ld]=%lf  work=%lf r=%ld\n", 
                             i, i_prod[i],  work[i-fp], r));
-                X[l*m+r] -= i_prod[l];
+                X[l*m+r] -= i_prod[l*m];
             }
 
         }
