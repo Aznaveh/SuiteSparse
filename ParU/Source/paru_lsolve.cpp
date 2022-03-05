@@ -35,25 +35,27 @@
 #include "paru_internal.hpp"
 Int paru_lsolve(paru_matrix *paruMatInfo, double *x)
 {
-    DEBUGLEVEL(1);
+    DEBUGLEVEL(0);
     if (!x) return (0);
     paru_symbolic *LUsym = paruMatInfo->LUsym;
     Int nf = LUsym->nf;
 
 #ifndef NDEBUG
     Int m = LUsym->m;
-    Int PR = 1;
+    Int PR = 2;
     double start_time = omp_get_wtime();
     PRLEVEL(1, ("%%inside lsolve x is:\n%%"));
     for (Int k = 0; k < m; k++)
     {
-        PRLEVEL(1, (" %.2lf, ", x[k]));
+        PRLEVEL(PR, (" %.2lf, ", x[k]));
     }
-    PRLEVEL(1, (" \n"));
+    PRLEVEL(PR, (" \n"));
 #endif
     Int n1 = LUsym->n1;   // row+col singletons
     Int *Ps = LUsym->Ps;  // row permutation S->LU
 
+
+    PRLEVEL(1, ("%%Working on singletons if any\n%%"));
     // singletons
     Int rs1 = LUsym->rs1;
     if (rs1 > 0)
@@ -183,7 +185,7 @@ Int paru_lsolve(paru_matrix *paruMatInfo, double *x)
 ///////////////////////////////// paru_lsolve ///multiple mRHS///////////////////
 Int paru_lsolve(paru_matrix *paruMatInfo, double *X, Int n)
 {
-    DEBUGLEVEL(0);
+    DEBUGLEVEL(1);
     if (!X) return (0);
     paru_symbolic *LUsym = paruMatInfo->LUsym;
     Int m = LUsym->m;
@@ -262,7 +264,7 @@ Int paru_lsolve(paru_matrix *paruMatInfo, double *X, Int n)
 #endif
     const Int max_threads = paruMatInfo->paru_max_threads;
     BLAS_set_num_threads(max_threads);
-    double work[m*n]; //gather scatter space for dgemm
+    std::vector<double> work(m*n); //gather scatter space for dgemm
 
     paru_fac *LUs = paruMatInfo->partial_LUs;
     Int *Super = LUsym->Super;
@@ -315,17 +317,17 @@ Int paru_lsolve(paru_matrix *paruMatInfo, double *X, Int n)
         PRLEVEL(1, (" \n"));
         #endif
 
-        if (rowCount > fp)
-        {
-            PRLEVEL(2, ("%% mRHS lsolve: Working on DGEMM\n%%"));
-            PRLEVEL(2, ("fp=%ld  rowCount=%ld\n", fp, rowCount));
-            BLAS_INT mm = (BLAS_INT)(rowCount-fp);
-            BLAS_INT kk = (BLAS_INT)fp;
-            BLAS_INT nn = (BLAS_INT)n;
-            cblas_dgemm (CblasColMajor, CblasNoTrans, CblasNoTrans, mm, nn, kk,
-                    1, A+fp, lda, X+n1+col1, ldb, 0, work, ldb);
+       if (rowCount > fp)
+       {
+           PRLEVEL(2, ("%% mRHS lsolve: Working on DGEMM\n%%"));
+           PRLEVEL(2, ("fp=%ld  rowCount=%ld\n", fp, rowCount));
+           BLAS_INT mm = (BLAS_INT)(rowCount-fp);
+           BLAS_INT kk = (BLAS_INT)fp;
+           BLAS_INT nn = (BLAS_INT)n;
+           cblas_dgemm (CblasColMajor, CblasNoTrans, CblasNoTrans, mm, nn, kk,
+                   1, A+fp, lda, X+n1+col1, ldb, 0, &work[0], ldb);
  
-        }
+       }
 
         //don't use parallel loop if using dgemm
         //pragma omp parallel for
@@ -341,13 +343,14 @@ Int paru_lsolve(paru_matrix *paruMatInfo, double *X, Int n)
             //}
         
 
-            double* i_prod = work+i-fp;
+            //double* i_prod = work+i-fp;
             Int r = Ps[frowList[i]] + n1;
             for (Int l = 0; l < n; l++)
             {
-                PRLEVEL(2, ("i_prod[%ld]=%lf  work=%lf r=%ld\n", 
-                            i, i_prod[i],  work[i-fp], r));
-                X[l*m+r] -= i_prod[l*m];
+                //PRLEVEL(2, ("i_prod[%ld]=%lf  work=%lf r=%ld\n", 
+                //            i, i_prod[i],  work[i-fp], r));
+                X[l*m+r] -= work[i-fp+l*m];
+                //X[l*m+r] -= i_prod[l];
             }
 
         }
