@@ -161,7 +161,8 @@ ParU_ResultCode paru_residual(cholmod_sparse *A, paru_matrix *paruMatInfo,
 
 #endif
 
-    double res, weighted_res;
+    double res = 2000.0;  //They don't need to be initialized; just for some 
+    double weighted_res = 2000.0; //compiler warinings
     for (Int l = 0; l < n; l++)
     {
         PRLEVEL(1, ("%% gaxpy\n"));
