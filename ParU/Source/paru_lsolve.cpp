@@ -95,7 +95,8 @@ Int paru_lsolve(paru_matrix *paruMatInfo, double *x)
  
     const Int max_threads = paruMatInfo->paru_max_threads;
     BLAS_set_num_threads(max_threads);
-    double work[LUsym->m]; //gather scatter space for dgemv 
+    //double work[LUsym->m]; //gather scatter space for dgemv 
+    std::vector<double> work(LUsym->m); //gather scatter space for dgemm
 
     paru_fac *LUs = paruMatInfo->partial_LUs;
     Int *Super = LUsym->Super;
@@ -148,7 +149,7 @@ Int paru_lsolve(paru_matrix *paruMatInfo, double *x)
             BLAS_INT m = (BLAS_INT)(rowCount-fp);
             BLAS_INT n = (BLAS_INT)fp;
             cblas_dgemv (CblasColMajor, CblasNoTrans, m, n, 1, A+fp, lda, 
-                    x+n1+col1, 1, 0, work, 1);
+                    x+n1+col1, 1, 0, &work[0], 1);
         }
 
         //don't use parallel loop if using dgemv

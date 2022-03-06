@@ -80,7 +80,7 @@ int main(int argc, char **argv)
     //paru_backward(A, paruMatInfo, b, Res);
     free(b);
 
-    const Int nn = 8; //number of right handsides
+    const Int nn = 16; //number of right handsides
     double *B = (double *)malloc(m*nn * sizeof(double));
     for (Int i = 0; i < m; ++i) 
         for (Int j = 0; j < nn; ++j) B[j*m+i] = (double) (i+j + 1);

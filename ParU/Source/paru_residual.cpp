@@ -171,10 +171,11 @@ ParU_ResultCode paru_residual(cholmod_sparse *A, paru_matrix *paruMatInfo,
         PRLEVEL(1, ("%% res=%lf\n", res));
         weighted_res = 
             res / (paru_spm_1norm(A) * paru_vec_1norm(X+m*l, m));
-        printf("RHS=%ld Residual is |%.2lf| and weigheted residual is |%.2f|.\n"
-                , l,
+        printf("%ld |%.2lf| |%.2f|,", l,
                 res == 0 ? 0 : log10(res), res == 0 ? 0 : log10(weighted_res));
+        if ((l+1)%20 == 0) printf("\n");
     }
+    printf("\n");
     paru_free(m*n, sizeof(Int), X);
     Results[0] = res;
     Results[1] = weighted_res;

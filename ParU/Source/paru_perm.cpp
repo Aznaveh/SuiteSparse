@@ -142,7 +142,7 @@ Int paru_apply_inv_perm(const Int *P, const double *b, double *x, Int m)
     PRLEVEL(1, (" \n"));
 #endif
 
-    #pragma omp parallel for
+    //pragma omp parallel for
     for (Int k = 0; k < m; k++)
     {
         Int j = P[k];  // k-new and j-old; P(new) = old
@@ -188,7 +188,7 @@ Int paru_apply_inv_perm(const Int *P, const double *B, double *X, Int m, Int n)
     PRLEVEL(PR, (" \n"));
 #endif
 
-    #pragma omp parallel for
+    //pragma omp parallel for
     for (Int k = 0; k < m; k++)
     {
         Int j = P[k];  // k-new and j-old; P(new) = old
@@ -304,7 +304,7 @@ Int paru_apply_perm_scale(const Int *P, const double *s, const double *B,
     PRLEVEL(1, (" \n"));
 #endif
 
-    #pragma omp parallel for
+    //#pragma omp parallel for
     for (Int k = 0; k < m; k++)
     {
         Int j = P[k];  // k-new and j-old; P(new) = old
