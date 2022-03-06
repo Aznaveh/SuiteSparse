@@ -227,7 +227,7 @@ Int paru_lsolve(paru_matrix *paruMatInfo, double *X, Int n)
             Int diag = Slp[j - cs1];
             PRLEVEL(PR, (" X[%ld]=%.2lf Slx[%ld]=%.2lf\n", j, X[j*n], diag,
                         Slx[diag]));
-            #pragma omp simd
+            //pragma omp simd
             for (Int l = 0; l < n; l++)
             {
                 //  X[j*n+l] /= Slx[diag]; row major
@@ -239,7 +239,7 @@ Int paru_lsolve(paru_matrix *paruMatInfo, double *X, Int n)
             {
                 Int r = Sli[p] < n1 ? Sli[p] : Ps[Sli[p] - n1] + n1;
                 PRLEVEL(PR, (" r=%ld\n", r));
-                #pragma omp simd
+                //pragma omp simd
                 for (Int l = 0; l < n; l++)
                 {
                     //X[r*n+l] -= Slx[p] * X[j*n+l];   row major
@@ -327,7 +327,6 @@ Int paru_lsolve(paru_matrix *paruMatInfo, double *X, Int n)
            BLAS_INT nn = (BLAS_INT)n;
            cblas_dgemm (CblasColMajor, CblasNoTrans, CblasNoTrans, mm, nn, kk,
                    1, A+fp, lda, X+n1+col1, ldb, 0, &work[0], ldb);
- 
        }
 
         //don't use parallel loop if using dgemm
@@ -350,6 +349,8 @@ Int paru_lsolve(paru_matrix *paruMatInfo, double *X, Int n)
             {
                 //PRLEVEL(2, ("i_prod[%ld]=%lf  work=%lf r=%ld\n", 
                 //            i, i_prod[i],  work[i-fp], r));
+                
+                
                 X[l*m+r] -= work[i-fp+l*m];
                 //X[l*m+r] -= i_prod[l];
             }

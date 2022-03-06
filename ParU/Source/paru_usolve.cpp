@@ -34,7 +34,7 @@
 #include "paru_internal.hpp"
 Int paru_usolve(paru_matrix *paruMatInfo, double *x)
 {
-    DEBUGLEVEL(1);
+    DEBUGLEVEL(0);
     // check if input is read
     if (!x) return (0);
 #ifndef NDEBUG
@@ -198,7 +198,7 @@ Int paru_usolve(paru_matrix *paruMatInfo, double *X, Int n)
         if (A2 != NULL)
         {
             PRLEVEL(2, ("%% mRHS usolve: Working on DGEMM f=%ld\n%%", f));
-            #pragma omp parallel for
+            //pragma omp parallel for schedule(static)
             for (Int i = 0; i < fp; i++)
             {
                 // computing the inner product
