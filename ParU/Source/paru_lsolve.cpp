@@ -186,7 +186,7 @@ Int paru_lsolve(paru_matrix *paruMatInfo, double *x)
 ///////////////////////////////// paru_lsolve ///multiple mRHS///////////////////
 Int paru_lsolve(paru_matrix *paruMatInfo, double *X, Int n)
 {
-    DEBUGLEVEL(1);
+    DEBUGLEVEL(0);
     if (!X) return (0);
     paru_symbolic *LUsym = paruMatInfo->LUsym;
     Int m = LUsym->m;
@@ -194,7 +194,6 @@ Int paru_lsolve(paru_matrix *paruMatInfo, double *X, Int n)
 
 #ifndef NDEBUG
     Int PR = 1;
-    double start_time = omp_get_wtime();
     PRLEVEL(1, ("%% mRHS inside LSolve X is:\n"));
     for (Int k = 0; k < m; k++)
     {
@@ -207,6 +206,7 @@ Int paru_lsolve(paru_matrix *paruMatInfo, double *X, Int n)
         PRLEVEL(1, (" \n"));
     }
     PRLEVEL(1, (" \n"));
+    double start_time = omp_get_wtime();
 #endif
     Int n1 = LUsym->n1;   // row+col singletons
     Int *Ps = LUsym->Ps;  // row permutation S->LU
@@ -359,8 +359,8 @@ Int paru_lsolve(paru_matrix *paruMatInfo, double *X, Int n)
 
     #ifndef NDEBUG
     double time = omp_get_wtime() - start_time;  
-    PRLEVEL(1, 
-            ("%% mRHS lsolve took %1.1lfs; after lsolve X is:\n", time));
+    PRLEVEL(-1,("%% mRHS lsolve took %1.1lfs\n", time));
+    PRLEVEL(1,("%% after lsolve X is:\n"));
     for (Int k = 0; k < m; k++)
     {
         PRLEVEL(1, ("%%"));

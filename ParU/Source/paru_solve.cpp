@@ -21,9 +21,9 @@ ParU_ResultCode paru_solve(paru_matrix *paruMatInfo, double *b)
         printf("Paru: the matrix is singular; cannot be solved.\n");
         return PARU_SINGULAR;
     }
-//#ifndef NDEBUG
+#ifndef NDEBUG
     double start_time = omp_get_wtime();
-//#endif
+#endif
 
     double *x = (double *)paru_alloc(m, sizeof(double));
     if (x == NULL)
@@ -46,11 +46,11 @@ ParU_ResultCode paru_solve(paru_matrix *paruMatInfo, double *b)
     paru_apply_inv_perm(LUsym->Qfill, x, b, m);  // b(q) = x
 
     paru_free(m, sizeof(Int), x);
-//#ifndef NDEBUG
+#ifndef NDEBUG
     double time = omp_get_wtime() - start_time;  
     PRLEVEL(1, ("%%solve has been finished in %lf seconds\n", time));
     printf ("%%solve has been finished in %lf seconds\n", time);
-//#endif
+#endif
     return PARU_SUCCESS;
 }
 //////////////////////////  paru_solve ///////several mRHS /////////////////////
@@ -74,9 +74,9 @@ ParU_ResultCode paru_solve(paru_matrix *paruMatInfo, double *B, Int n)
         printf("Paru: the matrix is singular; cannot be solved.\n");
         return PARU_SINGULAR;
     }
-//#ifndef NDEBUG
+#ifndef NDEBUG
     double start_time = omp_get_wtime();
-//#endif
+#endif
 
 
     double *X = (double *)paru_alloc(m*n, sizeof(double));
@@ -96,10 +96,10 @@ ParU_ResultCode paru_solve(paru_matrix *paruMatInfo, double *B, Int n)
     paru_apply_inv_perm(LUsym->Qfill, X, B, m, n);     // B(q) = X
 
     paru_free(m*n, sizeof(Int), X);
-//#ifndef NDEBUG
+#ifndef NDEBUG
     double time = omp_get_wtime() - start_time;  
-    PRLEVEL(1, ("%% mRHS solve has been finished in %lf seconds\n", time));
+    PRLEVEL(-1, ("%% mRHS solve has been finished in %lf seconds\n", time));
     printf ("%%RHS solve has been finished in %lf seconds\n", time);
-//#endif
+#endif
     return PARU_SUCCESS;
 }
