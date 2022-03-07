@@ -53,7 +53,7 @@ ParU_ResultCode paru_solve(paru_matrix *paruMatInfo, double *b)
 #endif
     return PARU_SUCCESS;
 }
-//////////////////////////  paru_solve ///////several mRHS /////////////////////
+//////////////////////////  paru_solve ////////////// mRHS /////////////////////
 /*!  @brief  sovle AX = B
  *      get a factorized matrix and several right hand sides
  *      returns X; overwrites it on B
