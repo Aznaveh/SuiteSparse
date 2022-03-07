@@ -2,6 +2,8 @@
 // ======================= ParU.hpp ===========================================/
 // ============================================================================/
 
+// FIXME: add some documentation
+
 #ifndef PARU_H
 #define PARU_H
 
@@ -19,23 +21,29 @@
 
 //#include <malloc.h> // mallopt used in paru_init_rowFronts.cpp
 
+#ifdef _OPENMP
 #include <omp.h>
+#endif
 
+// FIXME: what is the integer for cblas?
 // Not using definitions in /CHOLMOD/Include/cholmod_blas.h
 // using cbals instead
 #define CHOLMOD_BLAS_H 
 #ifdef BLAS_INT 
 #undef BLAS_INT
 #endif
-#define BLAS_INT int32_t
 
 #ifdef MKLROOT
+// MKL BLAS
 #define CHOLMOD_BLAS_H
 #include <mkl.h>
 #define BLAS_set_num_threads(n) mkl_set_num_threads(n)
+#define BLAS_INT MKL_INT
 #else
+// assume OpenBLAS
 #include <cblas.h>
 #define BLAS_set_num_threads(n) openblas_set_num_threads(n)
+#define BLAS_INT int
 #endif
 
 extern "C"
@@ -78,7 +86,7 @@ struct U_singleton
 };
 
 // typedef struct L_singleton
-struct L_singleton
+struct L_singleton  // rename ParU_L_singleton
 {
     // CSC format for U singletons
     Int nnz;      // nnz in submatrix
@@ -86,6 +94,12 @@ struct L_singleton
     Int *Sli;     // size ?
     double *Slx;  // size ?
 };
+
+//------------------------------------------------------------------------------
+// paru_symbolic object: ...
+//------------------------------------------------------------------------------
+
+// describe me here
 
 typedef struct
 { /* paru_symbolic*/
@@ -238,7 +252,7 @@ typedef struct
     Int *task_depth; //max depth of each task
 
     // symbolic analysis time
-    double my_time;
+    double my_time; // FIXME remove this?
 
     Int max_chain; //maximum size of the chains in final tree
 
@@ -246,7 +260,7 @@ typedef struct
 
 
 // =============================================================================
-//      paru_Tuple, Row and Column data structure
+//      paru_Tuple, Row data structure
 // =============================================================================
 typedef struct
 { /* paru_Tuple */
@@ -295,7 +309,7 @@ typedef struct
 typedef struct
 {
     Int sum_size, biggest_Child_size, biggest_Child_id;
-} heaps_info;
+} heaps_info;   // rename or move to paru_internal.hpp
 
 // internal:
 
@@ -307,7 +321,7 @@ typedef struct
         len;          /*  length of allocated space for current list*/
     paru_Tuple *list; /* list of tuples regarding to this element */
 
-} tupleList;
+} tupleList;    // rename ParU_tupleList
 
 typedef struct
 { /*work_struct*/
@@ -389,13 +403,11 @@ typedef struct
     double my_time;  // factorization time
     double umf_time;
 
-    // #ifdef COUNT_FLOPS
     // flop count info
     double flp_cnt_dgemm;
     double flp_cnt_trsm;
     double flp_cnt_dger;
     double flp_cnt_real_dgemm;
-    // #endif
 
     Int naft; //number of actvie frontal tasks
     Int resq; //number of remainig ready tasks in the queue
@@ -403,36 +415,60 @@ typedef struct
                          // or user can give me a value less than that
     ParU_ResultCode res;
 
-} paru_matrix;
+} paru_matrix;  // rename this  ParU_factorization, or ParU_numeric?
 
 //------------------------------------------------------------------------------
 // user:
 
+
+typedef struct
+{
+    double tol1, tol2 ;
+    int nthreads ;          // -1: default, otherwise: max # of threads
+    int scale ;
+
+} ParU_options ;
+
+ParU_ResultCode ParU_defaults (ParU_options opts) ;
+ParU_ResultCode ParU_settings (ParU_settings *settings) ;
+
+// change this:
 paru_symbolic *paru_analyze(Int scale, cholmod_sparse *A);
 
-/* usage:
-   S = paru_analyse (A) ;
-   LU = paru_factoriz (A,S) ;
-info: an enum: PARU_SUCCESS, PARU_OUT_OF_MEMORY, PARU_INVALID, PARU_SINGULAR,
-... info = paru_analyse (&S, A) ; info = paru_factoriz (&LU, A,S) ;
-*/
+// to this:
+ParU_ResultCode paru_analyze (cholmod_sparse *A) ;
+ParU_ResultCode paru_analyze (cholmod_sparse *A, ParU_options opts) ;
+
+ParU_ResultCode paru_analyze (cholmod_sparse *A)
+{
+    ParU_options opts ;
+    ParU_defaults (opts) ;
+    return (paru_analyze (A, opts)) ;
+}
 
 // a routine that does init_row and also factorization
-ParU_ResultCode paru_factorize(cholmod_sparse *A, paru_symbolic *LUsym,
+ParU_ResultCode paru_factorize(cholmod_sparse *A, paru_symbolic *S,
                                paru_matrix **paruMatInfo_handle);
-ParU_ResultCode paru_solve(paru_matrix *paruMatInfo, double *b);
-ParU_ResultCode paru_solve(paru_matrix *paruMatInfo, double *b, Int n);
-void paru_write(paru_matrix *paruMatInfo, int scale, char *id);
+ParU_ResultCode paru_factorize(cholmod_sparse *A, paru_symbolic *S,
+                               paru_matrix **F_handle,
+                               ParU_options opts);
 
-void paru_freesym(paru_symbolic **LUsym_handle);
-void paru_freemat(paru_matrix **paruMatInfo_handle);
+ParU_ResultCode paru_solve(paru_matrix *F, double *b);
+ParU_ResultCode paru_solve(paru_matrix *F, double *b, Int n);
 
-ParU_ResultCode paru_residual(cholmod_sparse *A, paru_matrix *paruMatInfo,
+// remove this: (keep as internal)
+ParU_ResultCode paru_write(paru_matrix *F, int scale, char *id);
+
+ParU_ResultCode paru_freesym(paru_symbolic **S_handle);
+ParU_ResultCode paru_freemat(paru_matrix **F_handle);
+
+// FIXME: reconsider this design: internal? user-available?
+ParU_ResultCode paru_residual(cholmod_sparse *A, paru_matrix *F,
                               double *b, double *Results);
-ParU_ResultCode paru_residual(cholmod_sparse *A, paru_matrix *paruMatInfo,
-                              double *b, double *Results, Int n);
+ParU_ResultCode paru_residual(cholmod_sparse *A, paru_matrix *F,
+                              double *b, Int n, double *Results);
 
-
-ParU_ResultCode paru_backward(cholmod_sparse *A, paru_matrix *paruMatInfo,
+// FIXME: reconsider this design: internal? user-available?
+ParU_ResultCode paru_backward(cholmod_sparse *A, paru_matrix *F,
                               double *x1, double *Results);
 #endif
