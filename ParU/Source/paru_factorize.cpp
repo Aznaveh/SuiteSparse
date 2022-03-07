@@ -379,6 +379,18 @@ ParU_ResultCode paru_factorize(cholmod_sparse *A, paru_symbolic *LUsym,
         paruMatInfo->flp_cnt_trsm;
     PRLEVEL(-1, ("Flop count = %.17g\n", flop_count));
     #endif
+    Int max_rc = 0,  max_cc = 0;
+    for (Int f = 0; f < nf; f++)
+    {
+        Int rowCount = paruMatInfo->frowCount[f];
+        Int colCount = paruMatInfo->fcolCount[f];
+        max_rc = MAX(max_rc , rowCount);
+        max_cc = MAX(max_cc , colCount);
+    }
+    printf ("max_rc=%ld max_cc=%ld\n",max_rc, max_cc);
+    paruMatInfo->max_row_count = max_rc;
+    paruMatInfo->max_col_count = max_cc;
+
     paruMatInfo->my_time = omp_get_wtime() - my_start_time;
     return PARU_SUCCESS;
 }

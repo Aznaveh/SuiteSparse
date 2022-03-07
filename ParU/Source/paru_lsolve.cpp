@@ -95,8 +95,8 @@ Int paru_lsolve(paru_matrix *paruMatInfo, double *x)
  
     const Int max_threads = paruMatInfo->paru_max_threads;
     BLAS_set_num_threads(max_threads);
-    //double work[LUsym->m]; //gather scatter space for dgemv 
-    std::vector<double> work(LUsym->m); //gather scatter space for dgemm
+    //gather scatter space for dgemm
+    std::vector<double> work(paruMatInfo->max_row_count); 
 
     paru_fac *LUs = paruMatInfo->partial_LUs;
     Int *Super = LUsym->Super;
@@ -265,7 +265,8 @@ Int paru_lsolve(paru_matrix *paruMatInfo, double *X, Int n)
 #endif
     const Int max_threads = paruMatInfo->paru_max_threads;
     BLAS_set_num_threads(max_threads);
-    std::vector<double> work(m*n); //gather scatter space for dgemm
+    //gather scatter space for dgemm
+    std::vector<double> work(paruMatInfo->max_row_count*n); 
 
     paru_fac *LUs = paruMatInfo->partial_LUs;
     Int *Super = LUsym->Super;
@@ -280,8 +281,8 @@ Int paru_lsolve(paru_matrix *paruMatInfo, double *X, Int n)
         double *A = LUs[f].p;
         //double *Xp = X + (col1 + n1)*n; row major
         BLAS_INT lda = (BLAS_INT)rowCount;
-        BLAS_INT ldb = (BLAS_INT)m;
         {
+            BLAS_INT ldb = (BLAS_INT)m;
             BLAS_INT mm = (BLAS_INT)fp;
             BLAS_INT nn = (BLAS_INT)n;
             PRLEVEL(2, ("%% mRHS Working on DTRSM f=%ld\n", f));
@@ -325,8 +326,9 @@ Int paru_lsolve(paru_matrix *paruMatInfo, double *X, Int n)
            BLAS_INT mm = (BLAS_INT)(rowCount-fp);
            BLAS_INT kk = (BLAS_INT)fp;
            BLAS_INT nn = (BLAS_INT)n;
+           BLAS_INT ldb = (BLAS_INT)m;
            cblas_dgemm (CblasColMajor, CblasNoTrans, CblasNoTrans, mm, nn, kk,
-                   1, A+fp, lda, X+n1+col1, ldb, 0, &work[0], ldb);
+                   1, A+fp, lda, X+n1+col1, ldb, 0, &work[0], mm);
        }
 
         //don't use parallel loop if using dgemm
@@ -347,11 +349,7 @@ Int paru_lsolve(paru_matrix *paruMatInfo, double *X, Int n)
             Int r = Ps[frowList[i]] + n1;
             for (Int l = 0; l < n; l++)
             {
-                //PRLEVEL(2, ("i_prod[%ld]=%lf  work=%lf r=%ld\n", 
-                //            i, i_prod[i],  work[i-fp], r));
-                
-                
-                X[l*m+r] -= work[i-fp+l*m];
+                X[l*m+r] -= work[i-fp+l*(rowCount-fp)];
                 //X[l*m+r] -= i_prod[l];
             }
 

@@ -90,6 +90,14 @@ static int print_level = 0;
 
 #define TASK_MIN  256 // Minimum row size to generate a task for a single column
                       //  in assembly
+
+// internal data structures 
+typedef struct
+{
+    Int sum_size, biggest_Child_size, biggest_Child_id;
+} heaps_info;
+
+
 //------------------------------------------------------------------------------
 // inline internal functions
 
