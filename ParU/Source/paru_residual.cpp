@@ -49,7 +49,7 @@ ParU_ResultCode paru_residual(cholmod_sparse *A, paru_matrix *paruMatInfo,
 #endif
 
     ParU_ResultCode info;
-    info = paru_solve(paruMatInfo, x);
+    info = paru_solve(x, paruMatInfo);
     if (info != PARU_SUCCESS)
     {
         PRLEVEL(1, ("%% A problem happend during factorization\n"));
@@ -138,7 +138,7 @@ ParU_ResultCode paru_residual(cholmod_sparse *A, paru_matrix *paruMatInfo,
 #endif
 
     ParU_ResultCode info;
-    info = paru_solve(paruMatInfo, X, n);
+    info = paru_solve(X, n, paruMatInfo);
     if (info != PARU_SUCCESS)
     {
         PRLEVEL(1, ("%% A problem happend during factorization\n"));

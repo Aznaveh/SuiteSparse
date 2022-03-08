@@ -33,7 +33,7 @@
  * @author Aznaveh
  * */
 #include "paru_internal.hpp"
-Int paru_lsolve(paru_matrix *paruMatInfo, double *x)
+Int paru_lsolve(double *x, paru_matrix *paruMatInfo) 
 {
     DEBUGLEVEL(0);
     if (!x) return (0);
@@ -184,7 +184,7 @@ Int paru_lsolve(paru_matrix *paruMatInfo, double *x)
     return (1);
 }
 ///////////////////////////////// paru_lsolve ///multiple mRHS///////////////////
-Int paru_lsolve(paru_matrix *paruMatInfo, double *X, Int n)
+Int paru_lsolve(double *X, Int n, paru_matrix *paruMatInfo)
 {
     DEBUGLEVEL(0);
     if (!X) return (0);
@@ -324,11 +324,12 @@ Int paru_lsolve(paru_matrix *paruMatInfo, double *X, Int n)
            PRLEVEL(2, ("%% mRHS lsolve: Working on DGEMM\n%%"));
            PRLEVEL(2, ("fp=%ld  rowCount=%ld\n", fp, rowCount));
            BLAS_INT mm = (BLAS_INT)(rowCount-fp);
-           BLAS_INT kk = (BLAS_INT)fp;
            BLAS_INT nn = (BLAS_INT)n;
+           BLAS_INT kk = (BLAS_INT)fp;
            BLAS_INT ldb = (BLAS_INT)m;
+           BLAS_INT ldc = (BLAS_INT)(rowCount-fp);
            cblas_dgemm (CblasColMajor, CblasNoTrans, CblasNoTrans, mm, nn, kk,
-                   1, A+fp, lda, X+n1+col1, ldb, 0, &work[0], mm);
+                   1, A+fp, lda, X+n1+col1, ldb, 0, &work[0], ldc);
        }
 
         //don't use parallel loop if using dgemm

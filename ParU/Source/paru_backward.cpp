@@ -50,7 +50,7 @@ ParU_ResultCode paru_backward(cholmod_sparse *A, paru_matrix *paruMatInfo,
 #endif
 
     ParU_ResultCode info;
-    info = paru_solve(paruMatInfo, b);
+    info = paru_solve(b, paruMatInfo);
     if (info != PARU_SUCCESS)
     {
         PRLEVEL(1, ("%% A problem happend during factorization\n"));

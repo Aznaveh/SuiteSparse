@@ -384,10 +384,14 @@ ParU_ResultCode paru_factorize(cholmod_sparse *A, paru_symbolic *LUsym,
     {
         Int rowCount = paruMatInfo->frowCount[f];
         Int colCount = paruMatInfo->fcolCount[f];
+        Int *Super = LUsym->Super;
+        Int col1 = Super[f];
+        Int col2 = Super[f + 1];
+        Int fp = col2 - col1;
         max_rc = MAX(max_rc , rowCount);
-        max_cc = MAX(max_cc , colCount);
+        max_cc = MAX(max_cc , colCount+fp);
     }
-    printf ("max_rc=%ld max_cc=%ld\n",max_rc, max_cc);
+    PRLEVEL(1, ("max_rc=%ld max_cc=%ld\n",max_rc, max_cc));
     paruMatInfo->max_row_count = max_rc;
     paruMatInfo->max_col_count = max_cc;
 

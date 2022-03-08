@@ -250,10 +250,10 @@ Int paru_apply_perm_scale(const Int *P, const double *s, const double *b,
 Int paru_apply_perm_scale(const Int *P, const double *s, const double *b,
                           double *x, Int m, Int n);
 // lsolve and usolve
-Int paru_lsolve(paru_matrix *paruMatInfo, double *x);
-Int paru_lsolve(paru_matrix *paruMatInfo, double *x, Int n);
-Int paru_usolve(paru_matrix *paruMatInfo, double *x);
-Int paru_usolve(paru_matrix *paruMatInfo, double *x, Int n);
+Int paru_lsolve(double *x, paru_matrix *paruMatInfo); 
+Int paru_lsolve(double *X, Int n, paru_matrix *paruMatInfo);
+Int paru_usolve(double *x, paru_matrix *paruMatInfo);
+Int paru_usolve(double *X, Int n, paru_matrix *paruMatInfo);
 
 Int paru_gaxpy(cholmod_sparse *A, const double *x, double *y, double alpha);
 double paru_spm_1norm(cholmod_sparse *A);
@@ -264,4 +264,6 @@ void paru_tasked_dgemm(Int f, BLAS_INT m, BLAS_INT n, BLAS_INT k,
         double beta, double *C, BLAS_INT ldc, paru_matrix *paruMatInfo);
 void paru_tasked_trsm(Int f, int m, int n, double alpha, double *a, int lda,
         double *b, int ldb, paru_matrix *paruMatInfo);
+
+void paru_write(paru_matrix *paruMatInfo, int scale, char *id);
 #endif

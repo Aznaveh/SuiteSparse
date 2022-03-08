@@ -84,7 +84,6 @@ int main(int argc, char **argv)
     double *B = (double *)malloc(m*nn * sizeof(double));
     for (Int i = 0; i < m; ++i) 
         for (Int j = 0; j < nn; ++j) B[j*m+i] = (double) (i+j + 1);
-    //paru_solve(paruMatInfo, B, nn); //multiple right hand sides
     paru_residual(A, paruMatInfo, B, Res, nn);
     free(B);
 #endif

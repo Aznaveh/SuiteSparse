@@ -32,7 +32,7 @@
  * @author Aznaveh
  * */
 #include "paru_internal.hpp"
-Int paru_usolve(paru_matrix *paruMatInfo, double *x)
+Int paru_usolve(double *x, paru_matrix *paruMatInfo)
 {
     DEBUGLEVEL(0);
     // check if input is read
@@ -71,7 +71,7 @@ Int paru_usolve(paru_matrix *paruMatInfo, double *x)
         if (A2 != NULL)
         {
             PRLEVEL(2, ("%% usolve: Working on DGEMV\n%%"));
-            #pragma omp parallel for
+            //pragma omp parallel for
             for (Int i = 0; i < fp; i++)
             {
                 PRLEVEL(2, ("%% Usolve: Working on DGEMV\n"));
@@ -147,7 +147,7 @@ Int paru_usolve(paru_matrix *paruMatInfo, double *x)
     return (1);
 }
 ///////////////////////////////// paru_usolve ///multiple mRHS///////////////////
-Int paru_usolve(paru_matrix *paruMatInfo, double *X, Int n)
+Int paru_usolve(double *X, Int n, paru_matrix *paruMatInfo)
 {
     DEBUGLEVEL(0);
     // check if input is read
@@ -180,6 +180,7 @@ Int paru_usolve(paru_matrix *paruMatInfo, double *X, Int n)
 
     const Int max_threads = paruMatInfo->paru_max_threads;
     BLAS_set_num_threads(max_threads);
+    std::vector<double> work(paruMatInfo->max_col_count*n); 
 
     for (Int f = nf - 1; f >= 0; --f)
     {
@@ -192,29 +193,55 @@ Int paru_usolve(paru_matrix *paruMatInfo, double *X, Int n)
 
         // do dgemm
         // performed on Us
-        //I cannot call BLAS_DGEMM while the column permutation is different
 
         double *A2 = Us[f].p;
         if (A2 != NULL)
         {
             PRLEVEL(2, ("%% mRHS usolve: Working on DGEMM f=%ld\n%%", f));
-            //pragma omp parallel for schedule(static)
-            for (Int i = 0; i < fp; i++)
+            double *Xg = &work[0] + fp*n; // size Xg is colCount x n
+            for (Int j = 0; j < colCount; j++) //gathering X in Xg
             {
-                // computing the inner product
-                double i_prod[n] = {0.0};  // inner product
-                for (Int j = 0; j < colCount; j++)
+                for (Int l = 0; l < n; l++)
                 {
-                    for (Int l = 0; l < n; l++)
-                        i_prod[l] += A2[fp * j + i] * X[l*m + fcolList[j] + n1];
+                    Xg[l*colCount+j] = X[l*m + fcolList[j] + n1];
                 }
+            }
+
+           BLAS_INT mm = (BLAS_INT)fp;
+           BLAS_INT nn = (BLAS_INT)n;
+           BLAS_INT kk = (BLAS_INT)colCount;
+           BLAS_INT lda = (BLAS_INT)fp;
+           BLAS_INT ldb = (BLAS_INT)colCount;
+           BLAS_INT ldc = (BLAS_INT)fp;
+           cblas_dgemm (CblasColMajor, CblasNoTrans, CblasNoTrans, mm, nn, kk,
+                   1, A2, lda, Xg, ldb, 0, &work[0], ldc);
+            for (Int i = 0; i < fp; i++) //scattering the back in to X
+            {
                 Int r = Ps[frowList[i]] + n1;
                 for (Int l = 0; l < n; l++)
                 {
-                    PRLEVEL(2, ("i_prod[%ld]=%lf  r=%ld\n", i, i_prod[i],  r));
-                    X[l*m+r] -= i_prod[l];
+                    X[l*m+r] -= work[l*fp+i];
                 }
             }
+
+            //algternative way for dgemm
+            //pragma omp parallel for schedule(static)
+            //for (Int i = 0; i < fp; i++)
+            //{
+            //    // computing the inner product
+            //    double i_prod[n] = {0.0};  // inner product
+            //    for (Int j = 0; j < colCount; j++)
+            //    {
+            //        for (Int l = 0; l < n; l++)
+            //            i_prod[l] += A2[fp * j + i] * X[l*m + fcolList[j] + n1];
+            //    }
+            //    Int r = Ps[frowList[i]] + n1;
+            //    for (Int l = 0; l < n; l++)
+            //    {
+            //        PRLEVEL(2, ("i_prod[%ld]=%lf  r=%ld\n", i, i_prod[i],  r));
+            //        X[l*m+r] -= i_prod[l];
+            //    }
+            //}
         }
 
         Int rowCount = paruMatInfo->frowCount[f];

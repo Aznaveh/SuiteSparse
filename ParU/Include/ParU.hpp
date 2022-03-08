@@ -27,15 +27,18 @@
 #ifdef BLAS_INT 
 #undef BLAS_INT
 #endif
-#define BLAS_INT int32_t
 
 #ifdef MKLROOT
+// MKL BLAS
 #define CHOLMOD_BLAS_H
 #include <mkl.h>
 #define BLAS_set_num_threads(n) mkl_set_num_threads(n)
+#define BLAS_INT MKL_INT
 #else
+// assume OpenBLAS
 #include <cblas.h>
 #define BLAS_set_num_threads(n) openblas_set_num_threads(n)
+#define BLAS_INT int
 #endif
 
 extern "C"
@@ -417,9 +420,8 @@ info: an enum: PARU_SUCCESS, PARU_OUT_OF_MEMORY, PARU_INVALID, PARU_SINGULAR,
 // a routine that does init_row and also factorization
 ParU_ResultCode paru_factorize(cholmod_sparse *A, paru_symbolic *LUsym,
                                paru_matrix **paruMatInfo_handle);
-ParU_ResultCode paru_solve(paru_matrix *paruMatInfo, double *b);
-ParU_ResultCode paru_solve(paru_matrix *paruMatInfo, double *b, Int n);
-void paru_write(paru_matrix *paruMatInfo, int scale, char *id);
+ParU_ResultCode paru_solve(double *b, paru_matrix *paruMatInfo);
+ParU_ResultCode paru_solve(double *B, Int n, paru_matrix *paruMatInfo);
 
 void paru_freesym(paru_symbolic **LUsym_handle);
 void paru_freemat(paru_matrix **paruMatInfo_handle);

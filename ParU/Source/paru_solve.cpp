@@ -10,7 +10,7 @@
 
 #include "paru_internal.hpp"
 
-ParU_ResultCode paru_solve(paru_matrix *paruMatInfo, double *b)
+ParU_ResultCode paru_solve(double *b, paru_matrix *paruMatInfo)
 {
     DEBUGLEVEL(0);
     PRLEVEL(1, ("%% inside solve\n"));
@@ -40,9 +40,9 @@ ParU_ResultCode paru_solve(paru_matrix *paruMatInfo, double *b)
     paru_apply_perm_scale(LUsym->Pfin, LUsym->scale_row, b, x, m);
 
     PRLEVEL(1, ("%% lsolve\n"));
-    paru_lsolve(paruMatInfo, x);  // x = L\x
+    paru_lsolve(x, paruMatInfo);  // x = L\x
     PRLEVEL(1, ("%% usolve\n"));
-    paru_usolve(paruMatInfo, x);                 // x = U\x
+    paru_usolve(x, paruMatInfo);                 // x = U\x
     paru_apply_inv_perm(LUsym->Qfill, x, b, m);  // b(q) = x
 
     paru_free(m, sizeof(Int), x);
@@ -63,7 +63,7 @@ ParU_ResultCode paru_solve(paru_matrix *paruMatInfo, double *b)
 
 #include "paru_internal.hpp"
 
-ParU_ResultCode paru_solve(paru_matrix *paruMatInfo, double *B, Int n)
+ParU_ResultCode paru_solve(double *B, Int n, paru_matrix *paruMatInfo)
 {
     DEBUGLEVEL(1);
     PRLEVEL(1, ("%% mRHS inside Solve\n"));
@@ -90,9 +90,9 @@ ParU_ResultCode paru_solve(paru_matrix *paruMatInfo, double *B, Int n)
     paru_apply_perm_scale(LUsym->Pfin, LUsym->scale_row, B, X, m, n);
 
     PRLEVEL(1, ("%%mRHS lsolve\n"));
-    paru_lsolve(paruMatInfo, X, n);  // X = L\X
+    paru_lsolve(X, n, paruMatInfo);  // X = L\X
     PRLEVEL(1, ("%%mRHS usolve\n"));
-    paru_usolve(paruMatInfo, X, n);                 // X = U\X
+    paru_usolve(X, n, paruMatInfo);                 // X = U\X
     paru_apply_inv_perm(LUsym->Qfill, X, B, m, n);     // B(q) = X
 
     paru_free(m*n, sizeof(Int), X);
