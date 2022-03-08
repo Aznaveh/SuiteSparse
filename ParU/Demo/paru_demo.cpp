@@ -6,6 +6,7 @@
  * @author Aznaveh
  * */
 #include "ParU.hpp"
+#include <omp.h>
 
 int main(int argc, char **argv)
 {

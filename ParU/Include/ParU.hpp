@@ -19,8 +19,6 @@
 
 //#include <malloc.h> // mallopt used in paru_init_rowFronts.cpp
 
-#include <omp.h>
-
 // Not using definitions in /CHOLMOD/Include/cholmod_blas.h
 // using cbals instead
 #define CHOLMOD_BLAS_H 

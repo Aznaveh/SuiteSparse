@@ -8,6 +8,7 @@
 //  @author Aznaveh
 //
 #include "ParU.hpp"
+#include "paru_omp.hpp"
 
 // -----------------------------------------------------------------------------
 // debugging and printing macros

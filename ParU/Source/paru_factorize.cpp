@@ -25,7 +25,7 @@ ParU_ResultCode paru_exec_tasks_seq(Int t, Int *task_num_child,
                 task_map[t] + 1, task_map[t + 1], num_original_children));
     ParU_ResultCode myInfo;
 #ifndef NDEBUG
-    double start_time_t = omp_get_wtime();
+    double start_time_t = PARU_OPENMP_GET_WTIME;
 #endif
     for (Int f = task_map[t] + 1; f <= task_map[t + 1]; f++)
     {
@@ -38,7 +38,7 @@ ParU_ResultCode paru_exec_tasks_seq(Int t, Int *task_num_child,
     }
     Int num_rem_children;
 #ifndef NDEBUG
-    double finish_time_t = omp_get_wtime();
+    double finish_time_t = PARU_OPENMP_GET_WTIME;
     double t_time = finish_time_t - start_time_t;  
     PRLEVEL(-1, ("task time task %ld is %lf\n",t, t_time));
 
@@ -90,7 +90,7 @@ ParU_ResultCode paru_exec_tasks (Int t, Int *task_num_child, Int &chain_task,
                 task_map[t] + 1, task_map[t + 1], num_original_children));
     ParU_ResultCode myInfo;
 #ifndef NDEBUG
-    double start_time_t = omp_get_wtime();
+    double start_time_t = PARU_OPENMP_GET_WTIME;
 #endif
     for (Int f = task_map[t] + 1; f <= task_map[t + 1]; f++)
     {
@@ -102,7 +102,7 @@ ParU_ResultCode paru_exec_tasks (Int t, Int *task_num_child, Int &chain_task,
     }
     Int num_rem_children;
 #ifndef NDEBUG
-    double finish_time_t = omp_get_wtime();
+    double finish_time_t = PARU_OPENMP_GET_WTIME;
     double t_time = finish_time_t - start_time_t;  
     PRLEVEL(-1, ("task time task %ld is %lf\n",t, t_time));
 
@@ -126,11 +126,6 @@ ParU_ResultCode paru_exec_tasks (Int t, Int *task_num_child, Int &chain_task,
             {
                 PRLEVEL(1,
                         ("%% task %ld executing its parent %ld\n", t, daddy));
-                #ifndef NDEBUG
-                double decition_time = omp_get_wtime() - finish_time_t;  
-                PRLEVEL(2, ("decision time in %ld is %lf\n",t, decition_time));
-                #endif
-
                 Int resq;
                 #pragma omp atomic read
                 resq = paruMatInfo->resq;
@@ -175,7 +170,7 @@ ParU_ResultCode paru_factorize(cholmod_sparse *A, paru_symbolic *LUsym,
         paru_matrix **paruMatInfo_handle)
 {
     DEBUGLEVEL(1);
-    double my_start_time = omp_get_wtime();
+    double my_start_time = PARU_OPENMP_GET_WTIME;
     if (A == NULL)
     {
         printf("Paru: input matrix is invalid\n");
@@ -266,19 +261,18 @@ ParU_ResultCode paru_factorize(cholmod_sparse *A, paru_symbolic *LUsym,
 
     //if (chainess < .6 && maxchain_ratio < .25)
 
-   paruMatInfo->paru_max_threads = omp_get_max_threads();
+   paruMatInfo->paru_max_threads = PARU_OPENMP_MAX_THREADS;
    if (ntasks > 1)
     {
         printf("Parallel\n");
         #ifdef MKLROOT
-        omp_set_dynamic(0);
+        PARU_OPENMP_SET_DYNAMIC(0);
         mkl_set_dynamic(0);
         //mkl_set_threading_layer(MKL_THREADING_INTEL);
         //mkl_set_interface_layer(MKL_INTERFACE_ILP64);
         #endif
         BLAS_set_num_threads(1);
-        omp_set_max_active_levels(4);
-        // to get the level use this function: omp_get_active_level()
+        PARU_OPENMP_SET_MAX_ACTIVE_LEVELS(4);
         const Int size = (Int)task_Q.size();
         const Int steps = size == 0 ? 1 : size;
         const Int stages = size / steps + 1;
@@ -394,7 +388,7 @@ ParU_ResultCode paru_factorize(cholmod_sparse *A, paru_symbolic *LUsym,
     PRLEVEL(1, ("max_rc=%ld max_cc=%ld\n",max_rc, max_cc));
     paruMatInfo->max_row_count = max_rc;
     paruMatInfo->max_col_count = max_cc;
-
-    paruMatInfo->my_time = omp_get_wtime() - my_start_time;
+    Int time = PARU_OPENMP_GET_WTIME;
+    paruMatInfo->my_time = time - my_start_time;
     return PARU_SUCCESS;
 }
