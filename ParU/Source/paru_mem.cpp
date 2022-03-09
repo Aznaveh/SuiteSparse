@@ -174,9 +174,9 @@ void *operator new(size_t size)
 #ifndef NDEBUG
     static Int cpp_count = 0;
     cpp_count += size;
+    PRLEVEL(1, ("global op new called, size = %zu tot=%ld\n", size, cpp_count));
 #endif
 
-    PRLEVEL(1, ("global op new called, size = %zu tot=%ld\n", size, cpp_count));
     if (size == 0)
         ++size;  // avoid malloc(0) which may return nullptr on success
 

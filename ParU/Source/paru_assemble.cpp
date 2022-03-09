@@ -13,14 +13,12 @@ void paru_assemble_all(Int e, Int f, std::vector<Int> &colHash,
 
 {
     DEBUGLEVEL(0);
-#ifndef NDEBUG
-    Int p = 1;
-#endif
+    PARU_DEFINE_PRLEVEL;
 
     paru_symbolic *LUsym = paruMatInfo->LUsym;
     Int *snM = LUsym->super2atree;
     Int eli = snM[f];
-    PRLEVEL(p, ("%% Eliminat all of %ld in %ld\n", e, eli));
+    PRLEVEL(PR, ("%% Eliminat all of %ld in %ld\n", e, eli));
 
     paru_Element **elementList = paruMatInfo->elementList;
 
@@ -63,12 +61,12 @@ void paru_assemble_all(Int e, Int f, std::vector<Int> &colHash,
     ASSERT(el_colIndex[nEl - 1] <= 0 || fcolList[0] <= el_colIndex[nEl - 1]);
 #endif
 
-    PRLEVEL(p, ("%% newColSet.size = %ld\n", colCount));
-    PRLEVEL(p, ("%% nEl = %ld\n", nEl));
+    PRLEVEL(PR, ("%% newColSet.size = %ld\n", colCount));
+    PRLEVEL(PR, ("%% nEl = %ld\n", nEl));
 
     if (el->ncolsleft == 1)
     {
-        PRLEVEL(p, ("%% 1 col left\n %%"));
+        PRLEVEL(PR, ("%% 1 col left\n %%"));
         double *sC = el_Num + mEl * el->lac;  // source column pointer
 #ifndef NDEBUG
         Int colInd = el_colIndex[el->lac];
@@ -96,7 +94,7 @@ void paru_assemble_all(Int e, Int f, std::vector<Int> &colHash,
     }
     else
     {
-        PRLEVEL(p, ("%% more than 1 col left\n %%"));
+        PRLEVEL(PR, ("%% more than 1 col left\n %%"));
 
         // save the structure of the rows once at first
         // Int tempRow[el->nrowsleft];  // C99
@@ -203,23 +201,23 @@ void paru_assemble_cols(Int e, Int f, std::vector<Int> &colHash,
 
 {
     DEBUGLEVEL(0);
+    PARU_DEFINE_PRLEVEL;
 #ifndef NDEBUG
-    Int p = 1;
     Int c = 0;  // number of columns assembled
 #endif
     paru_symbolic *LUsym = paruMatInfo->LUsym;
     Int *snM = LUsym->super2atree;
     Int eli = snM[f];
 
-    PRLEVEL(p, ("%% Eliminat some cols of %ld in %ld\n", e, eli));
+    PRLEVEL(PR, ("%% Eliminat some cols of %ld in %ld\n", e, eli));
 #ifndef NDEBUG
-    p = 1;
+    PR = 1;
 
-    PRLEVEL(p, ("%% %ld :\n", eli));
-    if (p <= 0) paru_print_element(paruMatInfo, eli);
+    PRLEVEL(PR, ("%% %ld :\n", eli));
+    if (PR <= 0) paru_print_element(paruMatInfo, eli);
 
-    PRLEVEL(p, ("%% %ld :\n", e));
-    if (p <= 0) paru_print_element(paruMatInfo, e);
+    PRLEVEL(PR, ("%% %ld :\n", e));
+    if (PR <= 0) paru_print_element(paruMatInfo, e);
 #endif
 
     paru_Element **elementList = paruMatInfo->elementList;
@@ -270,7 +268,7 @@ void paru_assemble_cols(Int e, Int f, std::vector<Int> &colHash,
     // TOLL FREE zone
     while (paru_find_hash(el_colIndex[el->lac], colHash, fcolList) != -1)
     {
-        PRLEVEL(p, ("%% Toll free\n"));
+        PRLEVEL(PR, ("%% Toll free\n"));
         if (tempRow_ready == 0)
         {
             // save the structure of the rows once at first
@@ -330,7 +328,7 @@ void paru_assemble_cols(Int e, Int f, std::vector<Int> &colHash,
     //**//pragma omp taskgroup
     for (Int j = el->lac + 1; j < nEl && el->ncolsleft > 0 && toll > 0; j++)
     {
-        PRLEVEL(p, ("%% Toll zone\n"));
+        PRLEVEL(PR, ("%% Toll zone\n"));
         toll--;
         if (tempRow_ready == 0)
         {
@@ -394,15 +392,13 @@ void paru_assemble_rows(Int e, Int f, std::vector<Int> &colHash,
 
 {
     DEBUGLEVEL(0);
-#ifndef NDEBUG
-    Int p = 1;
-#endif
+    PARU_DEFINE_PRLEVEL;
 
     paru_symbolic *LUsym = paruMatInfo->LUsym;
     Int *snM = LUsym->super2atree;
     Int eli = snM[f];
 
-    PRLEVEL(p, ("%% Eliminat some rows of %ld in %ld\n", e, eli));
+    PRLEVEL(PR, ("%% Eliminat some rows of %ld in %ld\n", e, eli));
 
     paru_Element **elementList = paruMatInfo->elementList;
 
@@ -471,7 +467,7 @@ void paru_assemble_rows(Int e, Int f, std::vector<Int> &colHash,
 
 #ifndef NDEBUG
     if (tempRow.size() > 0)
-        PRLEVEL(p, ("%% Toll free zone: %ld rows has been found: \n%%",
+        PRLEVEL(PR, ("%% Toll free zone: %ld rows has been found: \n%%",
                     tempRow.size()));
 #endif
 
@@ -508,20 +504,20 @@ void paru_assemble_rows(Int e, Int f, std::vector<Int> &colHash,
 
     if (tempRow.empty()) return;
 
-    PRLEVEL(p,
+    PRLEVEL(PR,
             ("%% %ld rows has been found, toll %ld\n%%", tempRow.size(), toll));
 #ifndef NDEBUG
     for (Int ii = 0; ii < (Int)tempRow.size(); ii++)
-        PRLEVEL(p, ("%ld ", tempRow[ii]));
-    PRLEVEL(p, ("\n "));
+        PRLEVEL(PR, ("%ld ", tempRow[ii]));
+    PRLEVEL(PR, ("\n "));
 #endif
 #ifndef NDEBUG
-    p = 1;
-    PRLEVEL(p, ("%% Before eliminiatine some rows %ld :\n", eli));
-    if (p <= 0) paru_print_element(paruMatInfo, eli);
+    PR = 1;
+    PRLEVEL(PR, ("%% Before eliminiatine some rows %ld :\n", eli));
+    if (PR <= 0) paru_print_element(paruMatInfo, eli);
 
-    PRLEVEL(p, ("%% %ld :\n", e));
-    if (p <= 0) paru_print_element(paruMatInfo, e);
+    PRLEVEL(PR, ("%% %ld :\n", e));
+    if (PR <= 0) paru_print_element(paruMatInfo, e);
 #endif
 
     if (el->cValid != paruMatInfo->time_stamp[f])
@@ -573,12 +569,12 @@ void paru_assemble_rows(Int e, Int f, std::vector<Int> &colHash,
         paru_free_el(e, elementList);
     }
 #ifndef NDEBUG
-    p = 1;
-    PRLEVEL(p, ("%% After Eliminate some rows %ld :\n", eli));
-    if (p <= 0) paru_print_element(paruMatInfo, eli);
+    PR = 1;
+    PRLEVEL(PR, ("%% After Eliminate some rows %ld :\n", eli));
+    if (PR <= 0) paru_print_element(paruMatInfo, eli);
 
-    PRLEVEL(p, ("%% %ld :\n", e));
-    if (p <= 0) paru_print_element(paruMatInfo, e);
+    PRLEVEL(PR, ("%% %ld :\n", e));
+    if (PR <= 0) paru_print_element(paruMatInfo, e);
 #endif
 }
 
@@ -604,22 +600,21 @@ void paru_assemble_el_with0rows(Int e, Int f, std::vector<Int> &colHash,
     //
     //
     DEBUGLEVEL(0);
-#ifndef NDEBUG
-    Int p = 1;
-#endif
+    PARU_DEFINE_PRLEVEL;
+
     paru_symbolic *LUsym = paruMatInfo->LUsym;
     Int *snM = LUsym->super2atree;
     Int eli = snM[f];
-    PRLEVEL(p, ("%% \n+++++++++++++++++++++++++++++++++++++++\n"));
-    PRLEVEL(p, ("%% Eliminat elment %ld  with0rows in %ld\n", e, eli));
+    PRLEVEL(PR, ("%% \n+++++++++++++++++++++++++++++++++++++++\n"));
+    PRLEVEL(PR, ("%% Eliminat elment %ld  with0rows in %ld\n", e, eli));
 
 #ifndef NDEBUG
-    p = 1;
-    PRLEVEL(p, ("%% %ld :\n", eli));
-    if (p <= 0) paru_print_element(paruMatInfo, eli);
+    PR = 1;
+    PRLEVEL(PR, ("%% %ld :\n", eli));
+    if (PR <= 0) paru_print_element(paruMatInfo, eli);
 
-    PRLEVEL(p, ("%% %ld :\n", e));
-    if (p <= 0) paru_print_element(paruMatInfo, e);
+    PRLEVEL(PR, ("%% %ld :\n", e));
+    if (PR <= 0) paru_print_element(paruMatInfo, e);
 
 #endif
 
@@ -666,12 +661,12 @@ void paru_assemble_el_with0rows(Int e, Int f, std::vector<Int> &colHash,
     ASSERT(el_colIndex[nEl - 1] <= 0 || fcolList[0] <= el_colIndex[nEl - 1]);
 #endif
 
-    PRLEVEL(p, ("%% newColSet.size = %ld\n", colCount));
-    PRLEVEL(p, ("%% nEl = %ld\n", nEl));
+    PRLEVEL(PR, ("%% newColSet.size = %ld\n", colCount));
+    PRLEVEL(PR, ("%% nEl = %ld\n", nEl));
 
     if (el->ncolsleft == 1)
     {
-        PRLEVEL(p, ("%% 1 col left\n %%"));
+        PRLEVEL(PR, ("%% 1 col left\n %%"));
         double *sC = el_Num + mEl * el->lac;  // source column pointer
 #ifndef NDEBUG
         Int colInd = el_colIndex[el->lac];
@@ -702,7 +697,7 @@ void paru_assemble_el_with0rows(Int e, Int f, std::vector<Int> &colHash,
     }
     else
     {
-        PRLEVEL(p, ("%% more than 1 col left\n %%"));
+        PRLEVEL(PR, ("%% more than 1 col left\n %%"));
 
         // save the structure of the rows once at first
         Int nrows2assembl = el->nrowsleft - el->nzr_pc;
@@ -728,11 +723,11 @@ void paru_assemble_el_with0rows(Int e, Int f, std::vector<Int> &colHash,
         }
 
 #ifndef NDEBUG
-        p = 1;
-        PRLEVEL(p, ("%% list of the rows to be assembled:\n%%"));
+        PR = 1;
+        PRLEVEL(PR, ("%% list of the rows to be assembled:\n%%"));
         for (Int i = 0; i < nrows2assembl; i++)
-            PRLEVEL(p, ("%ld ", el_rowIndex[tempRow[i]]));
-        PRLEVEL(p, ("%% \n"));
+            PRLEVEL(PR, ("%ld ", el_rowIndex[tempRow[i]]));
+        PRLEVEL(PR, ("%% \n"));
 #endif
         Int ncols2bSeen = el->ncolsleft;
         //Int *Depth = LUsym->Depth;
@@ -830,28 +825,28 @@ void paru_assemble_el_with0rows(Int e, Int f, std::vector<Int> &colHash,
     Int *Super = LUsym->Super;
     Int col1 = Super[f]; /* fornt F has columns col1:col2-1 */
     Int col2 = Super[f + 1];
-    p = 1;
-    PRLEVEL(p, ("%% %ld(%ld) %ld-%ld :\n", f, eli, col1, col2));
-    PRLEVEL(p, ("%%Finally new-lac is %ld ", el->lac));
-    PRLEVEL(p, ("nEl=%ld\n lacList[%ld]=%ld nrowsleft=%ld\n", nEl, e,
+    PR = 1;
+    PRLEVEL(PR, ("%% %ld(%ld) %ld-%ld :\n", f, eli, col1, col2));
+    PRLEVEL(PR, ("%%Finally new-lac is %ld ", el->lac));
+    PRLEVEL(PR, ("nEl=%ld\n lacList[%ld]=%ld nrowsleft=%ld\n", nEl, e,
                 lacList[e], el->nrowsleft));
 
-    p = 1;
-    if (nEl != new_lac && el_colIndex[new_lac] < col2) p = -2;
+    PR = 1;
+    if (nEl != new_lac && el_colIndex[new_lac] < col2) PR = -2;
 
-    PRLEVEL(p, ("%% %ld :\n", eli));
-    if (p <= 0) paru_print_element(paruMatInfo, eli);
+    PRLEVEL(PR, ("%% %ld :\n", eli));
+    if (PR <= 0) paru_print_element(paruMatInfo, eli);
 
-    PRLEVEL(p, ("%% %ld :\n", e));
-    if (p <= 0) paru_print_element(paruMatInfo, e);
-    p = 1;
+    PRLEVEL(PR, ("%% %ld :\n", e));
+    if (PR <= 0) paru_print_element(paruMatInfo, e);
+    PR = 1;
     ASSERT(nEl == new_lac || col2 <= el_colIndex[new_lac]);
 
 #endif
     if (new_lac == nEl)
     {
 #ifndef NDEBUG
-        PRLEVEL(p, ("%% %ld is freed inside with0\n", eli));
+        PRLEVEL(PR, ("%% %ld is freed inside with0\n", eli));
 #endif
         paru_free_el(e, elementList);
     }

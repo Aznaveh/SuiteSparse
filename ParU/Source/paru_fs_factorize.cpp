@@ -41,6 +41,7 @@ Int paru_panel_factorize(Int f, Int m, Int n, const Int panel_width,
     // works like dgetf2f.f in netlib v3.0  here is a link:
     // https://github.com/xianyi/OpenBLAS/blob/develop/reference/dgetf2f.f
     DEBUGLEVEL(0);
+    PARU_DEFINE_PRLEVEL;
     PRLEVEL(1, ("%% Inside panel factorization %ld \n", panel_num));
 
     Int *row_degree_bound = paruMatInfo->row_degree_bound;
@@ -61,7 +62,6 @@ Int paru_panel_factorize(Int f, Int m, Int n, const Int panel_width,
 
 #ifndef NDEBUG  // Printing the panel
     Int num_col_panel = j2 - j1;
-    Int PR = 1;
     PRLEVEL(PR, ("%% Starting the factorization\n"));
     PRLEVEL(PR, ("%% This Panel:\n"));
     for (Int r = j1; r < row_end; r++)
@@ -87,13 +87,14 @@ Int paru_panel_factorize(Int f, Int m, Int n, const Int panel_width,
 
         // Initializing maximum element in the column
         Int row_max = j;
-#ifndef NDEBUG
 
-        Int row_deg_max = row_degree_bound[frowList[row_max]];
-#endif
         double maxval = F[j * m + row_max];
+
+#ifndef NDEBUG
+        Int row_deg_max = row_degree_bound[frowList[row_max]];
         PRLEVEL(1, ("%% before search max value= %2.4lf row_deg = %ld\n",
                     maxval, row_deg_max));
+#endif
 
         Int row_diag = (Diag_map) ? Diag_map[col1 + j + n1] - n1 : -1;
         double diag_val = maxval;  // initialization
@@ -362,6 +363,7 @@ Int paru_factorize_full_summed(Int f, Int start_fac,
         paru_matrix *paruMatInfo)
 {
     DEBUGLEVEL(0);
+    PARU_DEFINE_PRLEVEL;
 
     Int *Super = paruMatInfo->LUsym->Super;
     Int col1 = Super[f]; /* fornt F has columns col1:col2-1 */
@@ -379,7 +381,6 @@ Int paru_factorize_full_summed(Int f, Int start_fac,
     {
 #ifndef NDEBUG  // Printing the pivotal front
         Int *frowList = paruMatInfo->frowList[f];
-        Int PR = 1;
         PRLEVEL(PR, ("%%Pivotal Front Before %ld\n", panel_num));
 
         for (Int r = 0; r < rowCount; r++)

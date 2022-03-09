@@ -66,9 +66,11 @@ static int print_level = 0;
     {                        \
         print_level = level; \
     }
+#define PARU_DEFINE_PRLEVEL int PR=1
 #else
 #define PRLEVEL(level, param)
 #define DEBUGLEVEL(level)
+#define PARU_DEFINE_PRLEVEL 
 #endif
 
 // -----------------------------------------------------------------------------

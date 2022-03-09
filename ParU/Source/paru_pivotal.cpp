@@ -17,6 +17,7 @@ ParU_ResultCode paru_pivotal(std::vector<Int> &pivotal_elements,
                              Int f, heaps_info &hi, paru_matrix *paruMatInfo)
 {
     DEBUGLEVEL(0);
+    PARU_DEFINE_PRLEVEL;
     paru_symbolic *LUsym = paruMatInfo->LUsym;
     Int *snM = LUsym->super2atree;
     std::vector<Int> **heapList = paruMatInfo->heapList;
@@ -28,9 +29,6 @@ ParU_ResultCode paru_pivotal(std::vector<Int> &pivotal_elements,
     Int *aChild = LUsym->aChild;
     Int *aChildp = LUsym->aChildp;
 
-#ifndef NPR
-    Int PR = 1;
-#endif
 #ifndef NDEBUG
     Int m = paruMatInfo->m;
     PRLEVEL(PR, ("%%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n"));

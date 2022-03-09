@@ -55,6 +55,7 @@ paru_symbolic *paru_analyze(
     cholmod_sparse *A)
 {
     DEBUGLEVEL(0);
+    PARU_DEFINE_PRLEVEL;
     double my_start_time = omp_get_wtime();
     paru_symbolic *LUsym;
 
@@ -262,7 +263,6 @@ paru_symbolic *paru_analyze(
 
 #ifndef NDEBUG
     /* print the control parameters */
-    Int PR = 1;
     if (PR <= 0) umfpack_dl_report_control(Control);
 #endif
 
@@ -1555,9 +1555,11 @@ paru_symbolic *paru_analyze(
 
     for (Int f = 0; f < nf; f++)
     {
+#ifndef NDEBUG
         PRLEVEL(PR, ("%% Front %ld\n", f));
         PRLEVEL(PR, ("%% pivot columns [ %ld to %ld ] n: %ld \n", Super[f],
                      Super[f + 1] - 1, ns));
+#endif
 
         // computing works in each front
         Int fp = Super[f + 1] - Super[f];  // k

@@ -38,9 +38,7 @@ ParU_ResultCode paru_make_heap(Int f, Int start_fac,
                                paru_matrix *paruMatInfo)
 {
     DEBUGLEVEL(0);
-#ifndef NDEBUG
-    Int PR = 1;
-#endif
+    PARU_DEFINE_PRLEVEL;
 
     paru_symbolic *LUsym = paruMatInfo->LUsym;
     Int *aChild = LUsym->aChild;
@@ -209,9 +207,7 @@ ParU_ResultCode paru_make_heap_empty_el(Int f,
                                         paru_matrix *paruMatInfo)
 {
     DEBUGLEVEL(0);
-#ifndef NDEBUG
-    Int PR = 1;
-#endif
+    PARU_DEFINE_PRLEVEL;
 
     paru_symbolic *LUsym = paruMatInfo->LUsym;
     Int *aChild = LUsym->aChild;

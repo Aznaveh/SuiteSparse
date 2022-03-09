@@ -17,6 +17,7 @@ ParU_ResultCode paru_front(Int f,  // front need to be assembled
                            paru_matrix *paruMatInfo)
 {
     DEBUGLEVEL(-3);
+    PARU_DEFINE_PRLEVEL;
     /*
      * -2 Print Nothing
      * -1 Just Matlab
@@ -152,11 +153,10 @@ ParU_ResultCode paru_front(Int f,  // front need to be assembled
     PRLEVEL(1, ("%% rowCount =%ld\n", rowCount));
 
 #ifndef NDEBUG  // Printing the list of rows
-    Int p = 1;
-    PRLEVEL(p, ("%% Befor factorization (inside assemble): \n"));
+    PRLEVEL(PR, ("%% Befor factorization (inside assemble): \n"));
     for (Int i = 0; i < rowCount; i++)
-        PRLEVEL(p, ("%% frowList [%ld] =%ld\n", i, frowList[i]));
-    PRLEVEL(p, ("\n"));
+        PRLEVEL(PR, ("%% frowList [%ld] =%ld\n", i, frowList[i]));
+    PRLEVEL(PR, ("\n"));
 
 #endif
 
@@ -201,55 +201,51 @@ ParU_ResultCode paru_front(Int f,  // front need to be assembled
     }
 
 #ifndef NDEBUG  // Printing the list of rows
-    p = 1;
-    PRLEVEL(p, ("%% After factorization (inside assemble): \n"));
+    PRLEVEL(PR, ("%% After factorization (inside assemble): \n"));
     for (Int i = 0; i < rowCount; i++)
-        PRLEVEL(p, ("%% frowList [%ld] =%ld\n", i, frowList[i]));
-    PRLEVEL(p, ("\n"));
+        PRLEVEL(PR, ("%% frowList [%ld] =%ld\n", i, frowList[i]));
+    PRLEVEL(PR, ("\n"));
 #endif
 
 #ifndef NDEBUG  // Printing the permutation
-    p = 1;
-    PRLEVEL(p, ("%% pivotal rows:\n"));
+    PRLEVEL(PR, ("%% pivotal rows:\n"));
     for (Int i = 0; i < fp; i++)
-        PRLEVEL(p, ("%% frowList[%ld] =%ld\n", i, frowList[i]));
-    PRLEVEL(p, ("%% =======\n"));
+        PRLEVEL(PR, ("%% frowList[%ld] =%ld\n", i, frowList[i]));
+    PRLEVEL(PR, ("%% =======\n"));
     for (Int i = fp; i < rowCount; i++)
-        PRLEVEL(p, ("%% frowList[%ld] =%ld\n", i, frowList[i]));
-    PRLEVEL(p, ("\n"));
+        PRLEVEL(PR, ("%% frowList[%ld] =%ld\n", i, frowList[i]));
+    PRLEVEL(PR, ("\n"));
 #endif
 
 #ifndef NDEBUG  // Printing the pivotal front
-    p = -1;
-    PRLEVEL(p, ("%%L part:\n"));
+    PRLEVEL(PR, ("%%L part:\n"));
 
     // col permutatin
-    PRLEVEL(p, ("cols{%ld} = [", f + 1));
-    for (Int c = col1; c < col2; c++) PRLEVEL(p, ("%ld ", c + 1));
-    PRLEVEL(p, ("];\n"));
+    PRLEVEL(PR, ("cols{%ld} = [", f + 1));
+    for (Int c = col1; c < col2; c++) PRLEVEL(PR, ("%ld ", c + 1));
+    PRLEVEL(PR, ("];\n"));
 
     // row permutatin
-    PRLEVEL(p, ("rows{%ld} = [", f + 1));
+    PRLEVEL(PR, ("rows{%ld} = [", f + 1));
     for (Int r = 0; r < rowCount; r++)
-        PRLEVEL(p, ("%ld ", frowList[r] + 1));  // Matlab is base 1
-    PRLEVEL(p, ("];\n"));
+        PRLEVEL(PR, ("%ld ", frowList[r] + 1));  // Matlab is base 1
+    PRLEVEL(PR, ("];\n"));
 
     // inv row permutatin
 
-    PRLEVEL(p, ("Luf{%ld}= [", f + 1));
+    PRLEVEL(PR, ("Luf{%ld}= [", f + 1));
     for (Int r = 0; r < rowCount; r++)
     {
-        PRLEVEL(p, (" "));
+        PRLEVEL(PR, (" "));
         for (Int c = col1; c < col2; c++)
-            PRLEVEL(p, (" %.16g ", pivotalFront[(c - col1) * rowCount + r]));
-        PRLEVEL(p, (";\n   "));
+            PRLEVEL(PR, (" %.16g ", pivotalFront[(c - col1) * rowCount + r]));
+        PRLEVEL(PR, (";\n   "));
     }
-    PRLEVEL(p, ("];\n"));
+    PRLEVEL(PR, ("];\n"));
     // just in cases that there is no U for MATLAB
-    PRLEVEL(p, ("Us{%ld} =[];\n", f + 1));
-    PRLEVEL(p, ("Ucols{%ld}=[];\n", f + 1));
-    PRLEVEL(p, ("Urows{%ld}=[];\n", f + 1));
-    p = 1;
+    PRLEVEL(PR, ("Us{%ld} =[];\n", f + 1));
+    PRLEVEL(PR, ("Ucols{%ld}=[];\n", f + 1));
+    PRLEVEL(PR, ("Urows{%ld}=[];\n", f + 1));
 #endif
 
     Int colCount = stl_colSet.size();
@@ -311,7 +307,7 @@ ParU_ResultCode paru_front(Int f,  // front need to be assembled
     Int ii = 0;
     if (hash_size == LUsym->n)
     {
-        PRLEVEL(p,
+        PRLEVEL(PR,
                 ("%% colHash LOOKUP size = %ld LU %ld\n", hash_size, LUsym->n));
         for (it = stl_colSet.begin(); it != stl_colSet.end(); it++)
         {
@@ -324,8 +320,8 @@ ParU_ResultCode paru_front(Int f,  // front need to be assembled
         // hash_bits is a bit mask to compute the result modulo the hash table
         // size, which is always a power of 2.
 
-        PRLEVEL(p, ("%% colHash HASH hash_size=%ld\n", hash_size));
-        PRLEVEL(p, ("%% colCount=%ld\n", colCount));
+        PRLEVEL(PR, ("%% colHash HASH hash_size=%ld\n", hash_size));
+        PRLEVEL(PR, ("%% colCount=%ld\n", colCount));
         for (it = stl_colSet.begin(); it != stl_colSet.end(); it++)
         {
             paru_insert_hash(*it, ii, colHash);
@@ -334,10 +330,9 @@ ParU_ResultCode paru_front(Int f,  // front need to be assembled
         colHash[hash_size] = colCount;
     }
 #ifndef NDEBUG
-    p = 1;
-    PRLEVEL(p, ("%% colHash %%"));
-    for (auto i : colHash) PRLEVEL(p, (" %ld ", i));
-    PRLEVEL(p, ("\n"));
+    PRLEVEL(PR, ("%% colHash %%"));
+    for (auto i : colHash) PRLEVEL(PR, (" %ld ", i));
+    PRLEVEL(PR, ("\n"));
 #endif
 
     /**** 5 ** assemble U part         Row by Row                          ****/
@@ -354,11 +349,10 @@ ParU_ResultCode paru_front(Int f,  // front need to be assembled
 #ifndef NDEBUG
     if (f == LUsym->nf - 1)
     {
-        p = 3;
+        PR = 3;
     }
-    if (fn != colCount) PRLEVEL(p, ("%% fn=%ld colCount=%ld ", fn, colCount));
-    PRLEVEL(p, ("%% uPart = %p size=%ld", uPart, colCount * fp));
-    p = 1;
+    if (fn != colCount) PRLEVEL(PR, ("%% fn=%ld colCount=%ld ", fn, colCount));
+    PRLEVEL(PR, ("%% uPart = %p size=%ld", uPart, colCount * fp));
 #endif
 
     paru_fac *Us = paruMatInfo->partial_Us;
@@ -427,17 +421,16 @@ ParU_ResultCode paru_front(Int f,  // front need to be assembled
     }
 
 #ifndef NDEBUG  // Printing the  U part
-    p = 0;
-    PRLEVEL(p, ("%% U part Before TRSM: %ld x %ld\n", fp, colCount));
-    PRLEVEL(p, ("%% U\t"));
-    for (Int i = 0; i < colCount; i++) PRLEVEL(p, ("%ld\t\t", fcolList[i]));
-    PRLEVEL(p, ("\n"));
+    PRLEVEL(PR, ("%% U part Before TRSM: %ld x %ld\n", fp, colCount));
+    PRLEVEL(PR, ("%% U\t"));
+    for (Int i = 0; i < colCount; i++) PRLEVEL(PR, ("%ld\t\t", fcolList[i]));
+    PRLEVEL(PR, ("\n"));
     for (Int i = 0; i < fp; i++)
     {
-        PRLEVEL(p, ("%% %ld\t", frowList[i]));
+        PRLEVEL(PR, ("%% %ld\t", frowList[i]));
         for (Int j = 0; j < colCount; j++)
-            PRLEVEL(p, (" %2.5lf\t", uPart[j * fp + i]));
-        PRLEVEL(p, ("\n"));
+            PRLEVEL(PR, (" %2.5lf\t", uPart[j * fp + i]));
+        PRLEVEL(PR, ("\n"));
     }
 
 #endif
@@ -447,28 +440,28 @@ ParU_ResultCode paru_front(Int f,  // front need to be assembled
     paru_trsm(f, pivotalFront, uPart, fp, rowCount, colCount, paruMatInfo);
 
 #ifndef NDEBUG  // Printing the  U part
-    p = -1;
-    PRLEVEL(p, ("%% rowCount=%ld;\n", rowCount));
-    PRLEVEL(p, ("%% U part After TRSM: %ld x %ld\n", fp, colCount));
+    PR = -1;
+    PRLEVEL(PR, ("%% rowCount=%ld;\n", rowCount));
+    PRLEVEL(PR, ("%% U part After TRSM: %ld x %ld\n", fp, colCount));
 
-    PRLEVEL(p, ("Ucols{%ld} = [", f + 1));
-    for (Int i = 0; i < colCount; i++) PRLEVEL(p, ("%ld ", fcolList[i] + 1));
-    PRLEVEL(p, ("];\n"));
+    PRLEVEL(PR, ("Ucols{%ld} = [", f + 1));
+    for (Int i = 0; i < colCount; i++) PRLEVEL(PR, ("%ld ", fcolList[i] + 1));
+    PRLEVEL(PR, ("];\n"));
 
-    PRLEVEL(p, ("Urows{%ld} = [", f + 1));
-    for (Int i = 0; i < fp; i++) PRLEVEL(p, ("%ld ", frowList[i] + 1));
-    PRLEVEL(p, ("];\n"));
+    PRLEVEL(PR, ("Urows{%ld} = [", f + 1));
+    for (Int i = 0; i < fp; i++) PRLEVEL(PR, ("%ld ", frowList[i] + 1));
+    PRLEVEL(PR, ("];\n"));
 
-    PRLEVEL(p, ("Us{%ld} = [", f + 1));
+    PRLEVEL(PR, ("Us{%ld} = [", f + 1));
 
     for (Int i = 0; i < fp; i++)
     {
         for (Int j = 0; j < colCount; j++)
-            PRLEVEL(p, (" %.16g ", uPart[j * fp + i]));
-        PRLEVEL(p, (";\n    "));
+            PRLEVEL(PR, (" %.16g ", uPart[j * fp + i]));
+        PRLEVEL(PR, (";\n    "));
     }
-    PRLEVEL(p, ("];\n"));
-    p = 1;
+    PRLEVEL(PR, ("];\n"));
+    PR = 1;
 #endif
 
     paru_Element *curEl;
@@ -559,16 +552,16 @@ ParU_ResultCode paru_front(Int f,  // front need to be assembled
             }
 #endif
 
-    PRLEVEL(p, ("\n%% FlopCount Dgemm front %ld %ld %ld \n", rowCount - fp, fp,
+    PRLEVEL(PR, ("\n%% FlopCount Dgemm front %ld %ld %ld \n", rowCount - fp, fp,
                 colCount));
-    PRLEVEL(p, ("%ld %ld %ld \n", rowCount - fp, fp, colCount));
+    PRLEVEL(PR, ("%ld %ld %ld \n", rowCount - fp, fp, colCount));
 #endif
 
 #ifndef NDEBUG
     // Printing the contribution block after dgemm
-    p = 1;
-    PRLEVEL(p, ("\n%%After DGEMM:"));
-    if (p <= 0) paru_print_element(paruMatInfo, eli);
+    PR = 1;
+    PRLEVEL(PR, ("\n%%After DGEMM:"));
+    if (PR <= 0) paru_print_element(paruMatInfo, eli);
 #endif
 
     /**** 7 **** Count number of rows and columsn of prior CBs to asslemble ***/
