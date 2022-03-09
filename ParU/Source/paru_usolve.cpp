@@ -37,8 +37,8 @@ Int paru_usolve(double *x, paru_matrix *paruMatInfo)
     DEBUGLEVEL(0);
     // check if input is read
     if (!x) return (0);
+    PARU_DEFINE_PRLEVEL;
 #ifndef NDEBUG
-    Int PR = 1;
     double start_time = omp_get_wtime();
 #endif
     paru_symbolic *LUsym = paruMatInfo->LUsym;
@@ -152,11 +152,11 @@ Int paru_usolve(double *X, Int n, paru_matrix *paruMatInfo)
     DEBUGLEVEL(0);
     // check if input is read
     if (!X) return (0);
+    PARU_DEFINE_PRLEVEL;
     paru_symbolic *LUsym = paruMatInfo->LUsym;
     Int m = LUsym->m;
     Int nf = LUsym->nf;
 #ifndef NDEBUG
-    Int PR = 1;
     PRLEVEL(1, ("%% mRHS inside USolve X is:\n"));
     for (Int k = 0; k < m; k++)
     {

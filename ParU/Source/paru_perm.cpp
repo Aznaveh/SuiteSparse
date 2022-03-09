@@ -41,6 +41,7 @@
 ParU_ResultCode paru_perm(paru_matrix *paruMatInfo)
 {
     DEBUGLEVEL(0);
+    PARU_DEFINE_PRLEVEL;
     paru_symbolic *LUsym = paruMatInfo->LUsym;
 
     if (LUsym->Pfin != NULL)  // it must have been computed
@@ -67,8 +68,6 @@ ParU_ResultCode paru_perm(paru_matrix *paruMatInfo)
     }
 
 #ifndef NDEBUG
-    Int PR = 1;
-
     PRLEVEL(PR, ("%% Initial row permutaion is:\n%%"));
     for (Int k = 0; k < m; k++)
     {
@@ -164,8 +163,8 @@ Int paru_apply_inv_perm(const Int *P, const double *B, double *X, Int m, Int n)
 {
     DEBUGLEVEL(0);
     if (!X || !B) return (0);
+    PARU_DEFINE_PRLEVEL;
 #ifndef NDEBUG
-    Int PR=2;
     PRLEVEL(PR, ("%% mRHS Inside apply inv permutaion P is:\n%%"));
     for (Int k = 0; k < m; k++)
     {

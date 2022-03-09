@@ -18,10 +18,6 @@ void paru_Diag_update(Int pivcol, Int pivrow, paru_matrix *paruMatInfo)
 
 {
     DEBUGLEVEL(0);
-#ifndef NDEBUG
-    Int PR = 1;
-#endif
-
     Int *Diag_map = paruMatInfo->Diag_map;
     Int *inv_Diag_map = paruMatInfo->inv_Diag_map;
 
@@ -34,7 +30,7 @@ void paru_Diag_update(Int pivcol, Int pivrow, paru_matrix *paruMatInfo)
     Int col2 = inv_Diag_map[pivrow];
     Diag_map[col2] = diag_row;
 
-    PRLEVEL(PR, ("%% Inside Diag update pivcol=%ld pivrow=%ld"
+    PRLEVEL(1, ("%% Inside Diag update pivcol=%ld pivrow=%ld"
                 " diag_row=%ld col2=%ld\n",
                 pivcol, pivrow, diag_row, col2));
 

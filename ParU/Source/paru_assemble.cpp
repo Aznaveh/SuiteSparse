@@ -59,10 +59,9 @@ void paru_assemble_all(Int e, Int f, std::vector<Int> &colHash,
     Int colCount = Us[f].n;
     ASSERT(el_colIndex[el->lac] <= fcolList[colCount - 1]);
     ASSERT(el_colIndex[nEl - 1] <= 0 || fcolList[0] <= el_colIndex[nEl - 1]);
-#endif
-
     PRLEVEL(PR, ("%% newColSet.size = %ld\n", colCount));
     PRLEVEL(PR, ("%% nEl = %ld\n", nEl));
+#endif
 
     if (el->ncolsleft == 1)
     {
@@ -378,8 +377,10 @@ void paru_assemble_cols(Int e, Int f, std::vector<Int> &colHash,
         if (--el->ncolsleft == 0) break;
     }
 
+#ifndef NDEBUG
     PRLEVEL(1, ("%%  %ld has found and assembled, ncolsleft %ld\n", c,
                 el->ncolsleft));
+#endif
 
     if (el->ncolsleft == 0)
     {
@@ -659,10 +660,9 @@ void paru_assemble_el_with0rows(Int e, Int f, std::vector<Int> &colHash,
     Int colCount = Us[f].n;
     ASSERT(el_colIndex[el->lac] <= fcolList[colCount - 1]);
     ASSERT(el_colIndex[nEl - 1] <= 0 || fcolList[0] <= el_colIndex[nEl - 1]);
-#endif
-
     PRLEVEL(PR, ("%% newColSet.size = %ld\n", colCount));
     PRLEVEL(PR, ("%% nEl = %ld\n", nEl));
+#endif
 
     if (el->ncolsleft == 1)
     {

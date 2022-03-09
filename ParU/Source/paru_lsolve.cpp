@@ -37,12 +37,12 @@ Int paru_lsolve(double *x, paru_matrix *paruMatInfo)
 {
     DEBUGLEVEL(0);
     if (!x) return (0);
+    PARU_DEFINE_PRLEVEL;
     paru_symbolic *LUsym = paruMatInfo->LUsym;
     Int nf = LUsym->nf;
 
 #ifndef NDEBUG
     Int m = LUsym->m;
-    Int PR = 2;
     double start_time = omp_get_wtime();
     PRLEVEL(1, ("%%inside lsolve x is:\n%%"));
     for (Int k = 0; k < m; k++)
@@ -187,13 +187,13 @@ Int paru_lsolve(double *x, paru_matrix *paruMatInfo)
 Int paru_lsolve(double *X, Int n, paru_matrix *paruMatInfo)
 {
     DEBUGLEVEL(0);
+    PARU_DEFINE_PRLEVEL;
     if (!X) return (0);
     paru_symbolic *LUsym = paruMatInfo->LUsym;
     Int m = LUsym->m;
     Int nf = LUsym->nf;
 
 #ifndef NDEBUG
-    Int PR = 1;
     PRLEVEL(1, ("%% mRHS inside LSolve X is:\n"));
     for (Int k = 0; k < m; k++)
     {

@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////////////////////
-//////////////////////////  paru_prior_assemble ///////////////////////////////
+//////////////////////////  paru_prior_assemble ////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 /*! @brief numerical assemble of prior fronts
  *
@@ -14,6 +14,7 @@ ParU_ResultCode paru_prior_assemble(Int f, Int start_fac,
                                     paru_matrix *paruMatInfo)
 {
     DEBUGLEVEL(0);
+    PARU_DEFINE_PRLEVEL;
 
     work_struct *Work = paruMatInfo->Work;
     Int *elCol = Work->elCol;
@@ -25,11 +26,10 @@ ParU_ResultCode paru_prior_assemble(Int f, Int start_fac,
     Int pMark = start_fac;
 
 #ifndef NDEBUG
-    Int p = 1;
     Int *elRow = Work->elRow;
     Int el_ind = snM[f];
-    PRLEVEL(p, ("%%Inside prior\n"));
-    PRLEVEL(p, ("%% pivotal size is %ld ", pivotal_elements.size()));
+    PRLEVEL(PR, ("%%Inside prior\n"));
+    PRLEVEL(PR, ("%% pivotal size is %ld ", pivotal_elements.size()));
 
 #endif
     Int ii = 0;
@@ -38,14 +38,14 @@ ParU_ResultCode paru_prior_assemble(Int f, Int start_fac,
     {
         Int e = pivotal_elements[i];
         paru_Element *el = elementList[e];
-        PRLEVEL(p, ("%% element= %ld  \n", e));
+        PRLEVEL(PR, ("%% element= %ld  \n", e));
         if (el == NULL)
         {
-            PRLEVEL(p, ("%% element= %ld is NULL ii=%ld \n", e, ii));
+            PRLEVEL(PR, ("%% element= %ld is NULL ii=%ld \n", e, ii));
             continue;
         }
 #ifndef NDEBUG
-        PRLEVEL(p, ("%%elRow[%ld]=%ld \n", e, elRow[e]));
+        PRLEVEL(PR, ("%%elRow[%ld]=%ld \n", e, elRow[e]));
         // if (elRow[e] != 0) PRLEVEL(-1, ("%%elRow[%ld]=%ld \n", e, elRow[e]));
         // ASSERT (elRow[e] == 0);
 #endif
@@ -56,16 +56,24 @@ ParU_ResultCode paru_prior_assemble(Int f, Int start_fac,
             // it can be fully assembled
             // both a pivotal column and pivotal row
             {
-                PRLEVEL(p, ("%%assembling %ld in %ld\n", e, el_ind));
-                PRLEVEL(p, ("%% size %ld x %ld\n", el->nrows, el->ncols));
+                #ifndef NDEBUG
+                PRLEVEL(PR, ("%%assembling %ld in %ld\n", e, el_ind));
+                PRLEVEL(PR, ("%% size %ld x %ld\n", el->nrows, el->ncols));
+                #endif
                 paru_assemble_all(e, f, colHash, paruMatInfo);
-                PRLEVEL(p, ("%%assembling %ld in %ld done\n", e, el_ind));
+                #ifndef NDEBUG
+                PRLEVEL(PR, ("%%assembling %ld in %ld done\n", e, el_ind));
+                #endif
                 continue;
             }
 
-            PRLEVEL(p, ("%%assembling %ld in %ld\n", e, el_ind));
+            #ifndef NDEBUG
+            PRLEVEL(PR, ("%%assembling %ld in %ld\n", e, el_ind));
+            #endif
             paru_assemble_cols(e, f, colHash, paruMatInfo);
-            PRLEVEL(p, ("%%partial col assembly%ld in %ld done\n", e, el_ind));
+            #ifndef NDEBUG
+            PRLEVEL(PR, ("%%partial col assembly%ld in %ld done\n", e, el_ind));
+            #endif
             if (elementList[e] == NULL) continue;
         }
         else
@@ -90,7 +98,9 @@ ParU_ResultCode paru_prior_assemble(Int f, Int start_fac,
             {
                 paru_assemble_el_with0rows(e, f, colHash, paruMatInfo);
                 if (elementList[e] == NULL) continue;
-                PRLEVEL(p, ("%%assembling %ld in %ld done\n", e, el_ind));
+                #ifndef NDEBUG
+                PRLEVEL(PR, ("%%assembling %ld in %ld done\n", e, el_ind));
+                #endif
             }
             // keeping current element
         }
@@ -100,8 +110,8 @@ ParU_ResultCode paru_prior_assemble(Int f, Int start_fac,
 
     if (ii < (Int)pivotal_elements.size())
     {
-        PRLEVEL(p, ("%% Prior: size was %ld ", pivotal_elements.size()));
-        PRLEVEL(p, (" and now is %ld\n ", ii));
+        PRLEVEL(PR, ("%% Prior: size was %ld ", pivotal_elements.size()));
+        PRLEVEL(PR, (" and now is %ld\n ", ii));
         pivotal_elements.resize(ii);
     }
 
@@ -121,27 +131,27 @@ ParU_ResultCode paru_prior_assemble(Int f, Int start_fac,
     if (curHeap->empty()) return PARU_SUCCESS;
 
 #ifndef NDEBUG
-    p = 1;
+    PR = 1;
 #endif
 
 #ifndef NDEBUG
     Int *lacList = paruMatInfo->lacList;
-    PRLEVEL(p, ("%% current heap:\n %%"));
+    PRLEVEL(PR, ("%% current heap:\n %%"));
     for (Int k = 0; k < (Int)curHeap->size(); k++)
     {
         Int ee = (*curHeap)[k];
         paru_Element *ell = elementList[ee];
-        PRLEVEL(p, ("%ld-%ld", k, ee));
+        PRLEVEL(PR, ("%ld-%ld", k, ee));
         if (ell != NULL)
         {
-            PRLEVEL(p, ("(%ld) ", lacList[ee]));
+            PRLEVEL(PR, ("(%ld) ", lacList[ee]));
         }
         else
         {
-            PRLEVEL(p, ("(*%ld) ", lacList[ee]));
+            PRLEVEL(PR, ("(*%ld) ", lacList[ee]));
         }
     }
-    PRLEVEL(p, ("\n"));
+    PRLEVEL(PR, ("\n"));
 #endif
 
 #ifndef NDEBUG
@@ -152,8 +162,8 @@ ParU_ResultCode paru_prior_assemble(Int f, Int start_fac,
         Int pelid = (*curHeap)[(i - 1) / 2];  // parent id
         if (lacList[pelid] > lacList[elid])
         {
-            PRLEVEL(p, ("%ld-%ld(%ld) <", (i - 1) / 2, pelid, lacList[pelid]));
-            PRLEVEL(p, ("%ld-%ld(%ld) \n", i, elid, lacList[elid]));
+            PRLEVEL(PR, ("%ld-%ld(%ld) <", (i - 1) / 2, pelid, lacList[pelid]));
+            PRLEVEL(PR, ("%ld-%ld(%ld) \n", i, elid, lacList[elid]));
         }
         ASSERT(lacList[pelid] <= lacList[elid]);
     }

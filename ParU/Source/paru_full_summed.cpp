@@ -34,20 +34,18 @@ void paru_full_summed(Int e, Int f, paru_matrix *paruMatInfo)
 
 {
     DEBUGLEVEL(0);
-#ifndef NDEBUG
-    Int p = 1;
-#endif
+    PARU_DEFINE_PRLEVEL;
     paru_symbolic *LUsym = paruMatInfo->LUsym;
 #ifndef NDEBUG
     Int *snM = LUsym->super2atree;
     Int eli = snM[f];
-    PRLEVEL(p, ("%% Fully summing %ld in %ld(%ld)\n", e, f, eli));
+    PRLEVEL(PR, ("%% Fully summing %ld in %ld(%ld)\n", e, f, eli));
 #endif
 
     Int *Super = LUsym->Super;
     Int col1 = Super[f]; /* fornt F has columns col1:col2-1 */
     Int col2 = Super[f + 1];
-    PRLEVEL(p, ("%% col1=%ld, col2=%ld\n", col1, col2));
+    PRLEVEL(PR, ("%% col1=%ld, col2=%ld\n", col1, col2));
 
     paru_Element **elementList = paruMatInfo->elementList;
 
@@ -73,9 +71,9 @@ void paru_full_summed(Int e, Int f, paru_matrix *paruMatInfo)
     double *el_Num = (double *)((Int *)(el + 1) + 2 * nEl + 2 * mEl);
 
 #ifndef NDEBUG  // print the element which is going to be assembled from
-    p = 2;
-    PRLEVEL(p, ("%% ASSEMBL element= %ld  mEl =%ld ", e, mEl));
-    if (p <= 0) paru_print_element(paruMatInfo, e);
+    PR = 2;
+    PRLEVEL(PR, ("%% ASSEMBL element= %ld  mEl =%ld ", e, mEl));
+    if (PR <= 0) paru_print_element(paruMatInfo, e);
 #endif
 
     Int j = el->lac;  // keep record of latest lac
@@ -85,7 +83,7 @@ void paru_full_summed(Int e, Int f, paru_matrix *paruMatInfo)
     // However it requires searching through columns; I will just waste a
     // temp space
     {  // No need for a temp space for active rows; no reuse
-        PRLEVEL(p, ("%% 1 col left\n %%"));
+        PRLEVEL(PR, ("%% 1 col left\n %%"));
         double *sC = el_Num + mEl * el->lac;  // source column pointer
         Int fcolInd = el_colIndex[el->lac] - col1;
 #ifndef NDEBUG
@@ -115,7 +113,7 @@ void paru_full_summed(Int e, Int f, paru_matrix *paruMatInfo)
     }
     else
     {
-        PRLEVEL(p, ("%% more than 1 col left\n %%"));
+        PRLEVEL(PR, ("%% more than 1 col left\n %%"));
 
         // save the structure of the rows once at first
         Int nrows2assembl = el->nrowsleft - el->nzr_pc;
@@ -134,11 +132,11 @@ void paru_full_summed(Int e, Int f, paru_matrix *paruMatInfo)
         }
 
 #ifndef NDEBUG
-        p = 1;
-        PRLEVEL(p, ("%% list of the rows to be assembled:\n%%"));
+        PR = 1;
+        PRLEVEL(PR, ("%% list of the rows to be assembled:\n%%"));
         for (Int i = 0; i < nrows2assembl; i++)
-            PRLEVEL(p, ("%ld ", el_rowIndex[tempRow[i]]));
-        PRLEVEL(p, ("%% \n"));
+            PRLEVEL(PR, ("%ld ", el_rowIndex[tempRow[i]]));
+        PRLEVEL(PR, ("%% \n"));
 #endif
         //FIXME SLOW DOWN
         //Int *Depth = LUsym->Depth;
@@ -183,7 +181,7 @@ void paru_full_summed(Int e, Int f, paru_matrix *paruMatInfo)
 
     if (el->ncolsleft == 0)
     {  // free el
-        PRLEVEL(p, ("%% element %ld is freed after pivotal assembly\n", e));
+        PRLEVEL(PR, ("%% element %ld is freed after pivotal assembly\n", e));
         paru_free_el(e, elementList);
     }
 
@@ -197,25 +195,24 @@ void paru_full_summed(Int e, Int f, paru_matrix *paruMatInfo)
         ASSERT(j < nEl);
     }
 #ifndef NDEBUG  // print the element which has been assembled from
-    p = 1;
-    PRLEVEL(p, ("%% ASSEMBLED element= %ld  mEl =%ld ", e, mEl));
-    if (p <= 0) paru_print_element(paruMatInfo, e);
+    PR = 1;
+    PRLEVEL(PR, ("%% ASSEMBLED element= %ld  mEl =%ld ", e, mEl));
+    if (PR <= 0) paru_print_element(paruMatInfo, e);
 
     // Printing the pivotal front
-    p = 2;
-    PRLEVEL(p, ("%% After Assemble element %ld\n", e));
-    PRLEVEL(p, ("%% x =  \t"));
-    for (Int c = col1; c < col2; c++) PRLEVEL(p, ("%ld\t\t", c));
-    PRLEVEL(p, (" ;\n"));
+    PR = 2;
+    PRLEVEL(PR, ("%% After Assemble element %ld\n", e));
+    PRLEVEL(PR, ("%% x =  \t"));
+    for (Int c = col1; c < col2; c++) PRLEVEL(PR, ("%ld\t\t", c));
+    PRLEVEL(PR, (" ;\n"));
 
     Int *frowList = paruMatInfo->frowList[f];
     for (Int r = 0; r < rowCount; r++)
     {
-        PRLEVEL(p, ("%% %ld\t", frowList[r]));
+        PRLEVEL(PR, ("%% %ld\t", frowList[r]));
         for (Int c = col1; c < col2; c++)
-            PRLEVEL(p, (" %2.5lf\t", pivotalFront[(c - col1) * rowCount + r]));
-        PRLEVEL(p, ("\n"));
+            PRLEVEL(PR, (" %2.5lf\t", pivotalFront[(c - col1) * rowCount + r]));
+        PRLEVEL(PR, ("\n"));
     }
-    p = 1;
 #endif
 }
