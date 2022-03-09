@@ -136,9 +136,9 @@ void *paru_realloc(
         {
 #ifndef NDEBUG
             realloc_count += newsize * size_Entry - *size;
-#endif
             PRLEVEL(1, ("%% reallocated %ld in %p and freed %p total= %ld\n",
                         newsize * size_Entry, p, oldP, realloc_count));
+#endif
             *size = newsize;
         }
     }

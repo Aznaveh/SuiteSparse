@@ -39,7 +39,7 @@ ParU_ResultCode paru_make_heap(Int f, Int start_fac,
 {
     DEBUGLEVEL(0);
 #ifndef NDEBUG
-    Int p = 1;
+    Int PR = 1;
 #endif
 
     paru_symbolic *LUsym = paruMatInfo->LUsym;
@@ -65,11 +65,11 @@ ParU_ResultCode paru_make_heap(Int f, Int start_fac,
     Int *lacList = paruMatInfo->lacList;
     auto greater = [&lacList](Int a, Int b) { return lacList[a] > lacList[b]; };
 
-    PRLEVEL(p, ("%% tot_size =  %ld\n", tot_size));
-    PRLEVEL(p + 1, ("%% biggest_Child_id = %ld ", biggest_Child_id));
-    PRLEVEL(p, ("%% biggest_Child_size = %ld\n", biggest_Child_size));
+    PRLEVEL(PR, ("%% tot_size =  %ld\n", tot_size));
+    PRLEVEL(PR, ("%% biggest_Child_id = %ld ", biggest_Child_id));
+    PRLEVEL(PR, ("%% biggest_Child_size = %ld\n", biggest_Child_size));
     Int size_of_rest = tot_size - biggest_Child_size + pivotal_elements.size();
-    PRLEVEL(p, ("%% the rest size = %ld\n", size_of_rest));
+    PRLEVEL(PR, ("%% the rest size = %ld\n", size_of_rest));
 
     if (biggest_Child_id != -1)
     // There are still elements remained in the heaps
@@ -82,7 +82,7 @@ ParU_ResultCode paru_make_heap(Int f, Int start_fac,
         if (log2(biggest_Child_size) >
             (biggest_Child_size / (size_of_rest + 1)) + 1)
         {  // klogn
-            PRLEVEL(p, ("%% klogn algorhtm\n"));
+            PRLEVEL(PR, ("%% klogn algorhtm\n"));
             for (Int i = aChildp[eli]; i <= aChildp[eli + 1] - 1; i++)
             {
                 Int chelid = aChild[i];  // element id of the child
@@ -116,17 +116,17 @@ ParU_ResultCode paru_make_heap(Int f, Int start_fac,
                 ASSERT(el != NULL);
 #endif
                 if (el == NULL) continue;
-                PRLEVEL(p, ("%ld  ", e));
+                PRLEVEL(PR, ("%ld  ", e));
                 curHeap->push_back(e);
                 std::push_heap(curHeap->begin(), curHeap->end(), greater);
             }
             curHeap->push_back(eli);
             std::push_heap(curHeap->begin(), curHeap->end(), greater);
-            PRLEVEL(p, ("%% %ld pushed ", eli));
+            PRLEVEL(PR, ("%% %ld pushed ", eli));
         }
         else
         {  // heapify
-            PRLEVEL(p, ("%%heapify with the size %ld\n", tot_size));
+            PRLEVEL(PR, ("%%heapify with the size %ld\n", tot_size));
             for (Int i = aChildp[eli]; i <= aChildp[eli + 1] - 1; i++)
             {
                 Int chelid = aChild[i];  // element id of the child
@@ -161,7 +161,7 @@ ParU_ResultCode paru_make_heap(Int f, Int start_fac,
     }
     else
     {
-        PRLEVEL(p, ("Nothing in the heap. size of pivotal %ld \n",
+        PRLEVEL(PR, ("Nothing in the heap. size of pivotal %ld \n",
                     pivotal_elements.size()));
         std::vector<Int> *curHeap; 
         try
@@ -182,21 +182,21 @@ ParU_ResultCode paru_make_heap(Int f, Int start_fac,
 
 #ifndef NDEBUG
     std::vector<Int> *curHeap = heapList[eli];
-    PRLEVEL(p, ("After everything eli %ld has %ld elements\n", eli,
+    PRLEVEL(PR, ("After everything eli %ld has %ld elements\n", eli,
                 curHeap->size()));
-    PRLEVEL(p, ("%%Heap after making it(size = %ld) \n", curHeap->size()));
+    PRLEVEL(PR, ("%%Heap after making it(size = %ld) \n", curHeap->size()));
     for (Int i = 0; i < (Int)curHeap->size(); i++)
     {
         Int elid = (*curHeap)[i];
-        PRLEVEL(p, (" %ld(%ld) ", elid, lacList[elid]));
+        PRLEVEL(PR, (" %ld(%ld) ", elid, lacList[elid]));
     }
-    PRLEVEL(p, ("\n"));
+    PRLEVEL(PR, ("\n"));
     for (Int i = curHeap->size() - 1; i > 0; i--)
     {
         Int elid = (*curHeap)[i];
         Int pelid = (*curHeap)[(i - 1) / 2];  // parent id
         if (lacList[pelid] > lacList[elid])
-            PRLEVEL(p, ("ATT %ld(%ld)\n\n ", elid, lacList[elid]));
+            PRLEVEL(PR, ("ATT %ld(%ld)\n\n ", elid, lacList[elid]));
         ASSERT(lacList[pelid] <= lacList[elid]);
     }
 #endif
@@ -210,7 +210,7 @@ ParU_ResultCode paru_make_heap_empty_el(Int f,
 {
     DEBUGLEVEL(0);
 #ifndef NDEBUG
-    Int p = 1;
+    Int PR = 1;
 #endif
 
     paru_symbolic *LUsym = paruMatInfo->LUsym;
@@ -236,11 +236,11 @@ ParU_ResultCode paru_make_heap_empty_el(Int f,
     Int *lacList = paruMatInfo->lacList;
     auto greater = [&lacList](Int a, Int b) { return lacList[a] > lacList[b]; };
 
-    PRLEVEL(p, ("%% tot_size =  %ld\n", tot_size));
-    PRLEVEL(p + 1, ("%% biggest_Child_id = %ld ", biggest_Child_id));
-    PRLEVEL(p, ("%% biggest_Child_size = %ld\n", biggest_Child_size));
+    PRLEVEL(PR, ("%% tot_size =  %ld\n", tot_size));
+    PRLEVEL(PR, ("%% biggest_Child_id = %ld ", biggest_Child_id));
+    PRLEVEL(PR, ("%% biggest_Child_size = %ld\n", biggest_Child_size));
     Int size_of_rest = tot_size - biggest_Child_size + pivotal_elements.size();
-    PRLEVEL(p, ("%% the rest size = %ld\n", size_of_rest));
+    PRLEVEL(PR, ("%% the rest size = %ld\n", size_of_rest));
 
     if (biggest_Child_id != -1)
     // There are still elements remained in the heaps
@@ -253,7 +253,7 @@ ParU_ResultCode paru_make_heap_empty_el(Int f,
         if (log2(biggest_Child_size) >
             (biggest_Child_size / (size_of_rest + 1)) + 1)
         {  // klogn
-            PRLEVEL(p, ("%% klogn algorhtm\n"));
+            PRLEVEL(PR, ("%% klogn algorhtm\n"));
             for (Int i = aChildp[eli]; i <= aChildp[eli + 1] - 1; i++)
             {
                 Int chelid = aChild[i];  // element id of the child
@@ -284,16 +284,16 @@ ParU_ResultCode paru_make_heap_empty_el(Int f,
                 Int e = pivotal_elements[i];
                 paru_Element *el = elementList[e];
                 if (el == NULL) continue;
-                PRLEVEL(p, ("%ld  ", e));
+                PRLEVEL(PR, ("%ld  ", e));
                 curHeap->push_back(e);
                 std::push_heap(curHeap->begin(), curHeap->end(), greater);
             }
             std::push_heap(curHeap->begin(), curHeap->end(), greater);
-            PRLEVEL(p, ("%% %ld pushed ", eli));
+            PRLEVEL(PR, ("%% %ld pushed ", eli));
         }
         else
         {  // heapify
-            PRLEVEL(p, ("%%heapify with the size %ld\n", tot_size));
+            PRLEVEL(PR, ("%%heapify with the size %ld\n", tot_size));
             for (Int i = aChildp[eli]; i <= aChildp[eli + 1] - 1; i++)
             {
                 Int chelid = aChild[i];  // element id of the child
@@ -325,7 +325,7 @@ ParU_ResultCode paru_make_heap_empty_el(Int f,
     }
     else
     {
-        PRLEVEL(p, ("Nothing in the heap. size of pivotal %ld \n",
+        PRLEVEL(PR, ("Nothing in the heap. size of pivotal %ld \n",
                     pivotal_elements.size()));
         std::vector<Int> *curHeap; 
         try
@@ -345,21 +345,21 @@ ParU_ResultCode paru_make_heap_empty_el(Int f,
 
 #ifndef NDEBUG
     std::vector<Int> *curHeap = heapList[eli];
-    PRLEVEL(p, ("After everything eli %ld has %ld elements\n", eli,
+    PRLEVEL(PR, ("After everything eli %ld has %ld elements\n", eli,
                 curHeap->size()));
-    PRLEVEL(p, ("%%Heap after making it(size = %ld) \n", curHeap->size()));
+    PRLEVEL(PR, ("%%Heap after making it(size = %ld) \n", curHeap->size()));
     for (Int i = 0; i < (Int)curHeap->size(); i++)
     {
         Int elid = (*curHeap)[i];
-        PRLEVEL(p, (" %ld(%ld) ", elid, lacList[elid]));
+        PRLEVEL(PR, (" %ld(%ld) ", elid, lacList[elid]));
     }
-    PRLEVEL(p, ("\n"));
+    PRLEVEL(PR, ("\n"));
     for (Int i = curHeap->size() - 1; i > 0; i--)
     {
         Int elid = (*curHeap)[i];
         Int pelid = (*curHeap)[(i - 1) / 2];  // parent id
         if (lacList[pelid] > lacList[elid])
-            PRLEVEL(p, ("ATT %ld(%ld)\n\n ", elid, lacList[elid]));
+            PRLEVEL(PR, ("ATT %ld(%ld)\n\n ", elid, lacList[elid]));
         ASSERT(lacList[pelid] <= lacList[elid]);
     }
 #endif

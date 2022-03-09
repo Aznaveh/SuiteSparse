@@ -22,12 +22,12 @@ void paru_insert_hash(Int key, Int value, std::vector<Int> &colHash)
     DEBUGLEVEL(0);
 
 #ifndef NDEBUG
-    Int p = 1;
-    PRLEVEL(p, ("%% Insert hash key=%ld value=%ld ", key, value));
-    PRLEVEL(p, ("size=%ld \n", colHash.size()));
-    PRLEVEL(p, ("%% before insertion"));
-    for (auto i : colHash) PRLEVEL(p, (" %ld ", i));
-    PRLEVEL(p, ("\n"));
+    Int PR = 1;
+    PRLEVEL(PR, ("%% Insert hash key=%ld value=%ld ", key, value));
+    PRLEVEL(PR, ("size=%ld \n", colHash.size()));
+    PRLEVEL(PR, ("%% before insertion"));
+    for (auto i : colHash) PRLEVEL(PR, (" %ld ", i));
+    PRLEVEL(PR, ("\n"));
 
 #endif
 
@@ -38,18 +38,18 @@ void paru_insert_hash(Int key, Int value, std::vector<Int> &colHash)
     while (colHash[index] != -1)
     {  // finding an empty spot
         index = (index + 1) & hash_bits;
-        PRLEVEL(p, ("index =%ld colHash=%ld\n", index, colHash[index]));
+        PRLEVEL(PR, ("index =%ld colHash=%ld\n", index, colHash[index]));
         loop_cnt++;
         ASSERT(loop_cnt < hash_bits);
     }
     colHash[index] = value;
 
 #ifndef NDEBUG
-    p = 1;
-    PRLEVEL(p, ("%% hash_bits == %lx ", hash_bits));
-    PRLEVEL(p, ("%%"));
-    for (auto i : colHash) PRLEVEL(p, (" %ld ", i));
-    PRLEVEL(p, ("\n"));
+    PR = 1;
+    PRLEVEL(PR, ("%% hash_bits == %lx ", hash_bits));
+    PRLEVEL(PR, ("%%"));
+    for (auto i : colHash) PRLEVEL(PR, (" %ld ", i));
+    PRLEVEL(PR, ("\n"));
 #endif
 }
 
@@ -57,13 +57,13 @@ Int paru_find_hash(Int key, std::vector<Int> &colHash, Int *fcolList)
 {
     DEBUGLEVEL(0);
 #ifndef NDEBUG
-    Int p = 1;
-    PRLEVEL(p, ("%% find for hash key=%ld \n", key));
+    Int PR = 1;
+    PRLEVEL(PR, ("%% find for hash key=%ld \n", key));
 #endif
     // lookup table
     if (colHash.back() == -1)
     {
-        PRLEVEL(p, ("%% LOOKUP key =%ld colHash=%ld \n", key, colHash[key]));
+        PRLEVEL(PR, ("%% LOOKUP key =%ld colHash=%ld \n", key, colHash[key]));
         return colHash[key];
     }
 
@@ -75,25 +75,25 @@ Int paru_find_hash(Int key, std::vector<Int> &colHash, Int *fcolList)
     while (value != -1 && fcolList[value] != key)
     {
         index = (index + 1) & hash_bits;
-        PRLEVEL(p, ("%% index =%ld \n", index));
+        PRLEVEL(PR, ("%% index =%ld \n", index));
         value = colHash[index];
         if (loop_cnt++ > log2(hash_bits))
         {  // take a long time in the hash;
             //  guarantees that find takes at most log time
-            PRLEVEL(p, ("%% binary search for hash\n"));
+            PRLEVEL(PR, ("%% binary search for hash\n"));
             value = bin_srch(fcolList, 0, size - 1, key);
             break;
         }
     }
 
 #ifndef NDEBUG
-    p = 1;
-    PRLEVEL(p, ("%%"));
-    for (auto i : colHash) PRLEVEL(p, (" %ld ", i));
-    PRLEVEL(p, ("\n"));
-    PRLEVEL(p, ("%% value is =%ld \n", value));
+    PR = 1;
+    PRLEVEL(PR, ("%%"));
+    for (auto i : colHash) PRLEVEL(PR, (" %ld ", i));
+    PRLEVEL(PR, ("\n"));
+    PRLEVEL(PR, ("%% value is =%ld \n", value));
     Int bsRes = bin_srch(fcolList, 0, size - 1, key);
-    PRLEVEL(p, ("%% binSearch=%ld \n", bsRes));
+    PRLEVEL(PR, ("%% binSearch=%ld \n", bsRes));
 #endif
     return value;
 }
