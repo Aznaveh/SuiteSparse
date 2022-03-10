@@ -49,10 +49,7 @@
  * @author Aznaveh
  * */
 #include "paru_internal.hpp"
-paru_symbolic *paru_analyze(
-    // inputs, not modified
-    Int scale,  // if scale == 1 the S will be scaled by max_row
-    cholmod_sparse *A)
+ParU_ResultCode paru_analyze(cholmod_sparse *A, paru_symbolic **S_handle)
 {
     DEBUGLEVEL(0);
     PARU_DEFINE_PRLEVEL;
@@ -61,14 +58,15 @@ paru_symbolic *paru_analyze(
 #endif
     paru_symbolic *LUsym;
     LUsym = (paru_symbolic *)paru_alloc(1, sizeof(paru_symbolic));
-    if (!LUsym) return NULL;
+    if (!LUsym) return PARU_INVALID;
+    *S_handle = LUsym;
 
     Int m = A->nrow;
     Int n = A->ncol;
     if (m != n)
     {
         printf("Paru: Input matrix is not square!\n");
-        return NULL;
+        return PARU_INVALID;
     }
 
     Int *Ap = (Int *)A->p;
@@ -285,7 +283,7 @@ paru_symbolic *paru_analyze(
         printf("Paru: umfpack_dl_symbolic failed\n");
         umfpack_dl_free_symbolic(&Symbolic);
         paru_free(1, sizeof(paru_symbolic), LUsym);
-        return NULL;
+        return PARU_INVALID;
     }
     /* ---------------------------------------------------------------------- */
     /* startegy UMFPACK used*/
@@ -388,7 +386,7 @@ paru_symbolic *paru_analyze(
         paru_freesym(&LUsym);
         umfpack_dl_free_symbolic(&Symbolic);
         umfpack_dl_azn_free_sw(&SW);
-        return NULL;
+        return PARU_OUT_OF_MEMORY;
     }
 
     nr = Sym_umf->n_row;
@@ -529,7 +527,7 @@ paru_symbolic *paru_analyze(
         paru_free(n, sizeof(Int), inv_Diag_map);
         paru_freesym(&LUsym);
         umfpack_dl_azn_free_sw(&SW);
-        return NULL;
+        return PARU_OUT_OF_MEMORY;
     }
     LUsym->Parent = Parent;
 
@@ -548,7 +546,7 @@ paru_symbolic *paru_analyze(
             paru_free(n, sizeof(Int), inv_Diag_map);
             paru_freesym(&LUsym);
             umfpack_dl_azn_free_sw(&SW);
-            return NULL;
+            return PARU_OUT_OF_MEMORY;
         }
 
         Super[0] = 0;
@@ -670,7 +668,7 @@ paru_symbolic *paru_analyze(
         paru_free(n, sizeof(Int), inv_Diag_map);
         paru_freesym(&LUsym);
         umfpack_dl_azn_free_sw(&SW);
-        return NULL;
+        return PARU_OUT_OF_MEMORY;
     }
 
     // after relaxed amalgamation
@@ -817,7 +815,7 @@ paru_symbolic *paru_analyze(
         paru_freesym(&LUsym);
         paru_free(n, sizeof(Int), inv_Diag_map);
         // umfpack_dl_azn_free_sw (&SW);
-        return NULL;
+        return PARU_OUT_OF_MEMORY;
     }
 
 #ifndef NDEBUG
@@ -867,7 +865,7 @@ paru_symbolic *paru_analyze(
         paru_freesym(&LUsym);
         paru_free(n, sizeof(Int), inv_Diag_map);
         // umfpack_dl_azn_free_sw (&SW);
-        return NULL;
+        return PARU_OUT_OF_MEMORY;
     }
 
     // copy of Childp using Work for other places also
@@ -881,7 +879,7 @@ paru_symbolic *paru_analyze(
         paru_freesym(&LUsym);
         paru_free(n, sizeof(Int), inv_Diag_map);
         // umfpack_dl_azn_free_sw (&SW);
-        return NULL;
+        return PARU_OUT_OF_MEMORY;
     }
 
     paru_memcpy(cChildp, Childp, (nf + 2) * sizeof(Int));
@@ -917,7 +915,7 @@ paru_symbolic *paru_analyze(
 
         paru_free(n, sizeof(Int), inv_Diag_map);
         paru_free(m, sizeof(Int), Pinv);
-        return NULL;
+        return PARU_OUT_OF_MEMORY;
     }
 
 //-------- computing the inverse permutation for P and Diag_map
@@ -974,7 +972,9 @@ paru_symbolic *paru_analyze(
     Int *cSlp = NULL;   // copy Singlton l p
     double *Rs = NULL;  // row scaling
     Ps = (Int *)paru_calloc(m - n1, sizeof(Int));
-    scale = 1;
+    //XXX scale should come from the settings
+    //Int scale,  // if scale == 1 the S will be scaled by max_row
+    Int scale = 1;
     if (scale == 1) Rs = (double *)paru_calloc(m, sizeof(double));
     if (cs1 > 0)
     {
@@ -1005,7 +1005,7 @@ paru_symbolic *paru_analyze(
         paru_free(n, sizeof(Int), inv_Diag_map);
         // umfpack_dl_azn_free_sw (&SW);
         paru_freesym(&LUsym);
-        return NULL;
+        return PARU_OUT_OF_MEMORY;
     }
     Int sunz = 0;  // U nnz: singlteton nnzero of s
     Int slnz = 0;  // L nnz: singlteton nnzero of s
@@ -1142,7 +1142,7 @@ paru_symbolic *paru_analyze(
                 if (cs1 > 0) paru_free((cs1 + 1), sizeof(Int), cSup);
                 if (rs1 > 0) paru_free((rs1 + 1), sizeof(Int), cSlp);
                 paru_freesym(&LUsym);
-                return NULL;  // Free memory
+                return PARU_OUT_OF_MEMORY;
             }
         }
     }
@@ -1200,7 +1200,7 @@ paru_symbolic *paru_analyze(
         paru_free(m, sizeof(Int), Pinv);
         paru_freesym(&LUsym);
         // umfpack_dl_azn_free_sw (&SW);
-        return NULL;  // Free memory
+        return PARU_OUT_OF_MEMORY;
     }
     ASSERT(rowcount == m - n1);
 
@@ -1344,7 +1344,7 @@ paru_symbolic *paru_analyze(
         paru_free(m, sizeof(Int), Pinv);
         paru_freesym(&LUsym);
         // umfpack_dl_azn_free_sw (&SW);
-        return NULL;
+        return PARU_OUT_OF_MEMORY;
     }
 
     // construct Sj, Sx and singltons
@@ -1536,7 +1536,7 @@ paru_symbolic *paru_analyze(
         printf("Paru: Out of memory in symbolic phase");
         paru_free(m, sizeof(Int), Pinv);
         paru_freesym(&LUsym);
-        return NULL;
+        return PARU_OUT_OF_MEMORY;
     }
     // initialization
     paru_memset(aParent, -1, (ms + nf) * sizeof(Int));
@@ -1701,7 +1701,7 @@ paru_symbolic *paru_analyze(
         printf("Paru: Out of memory in symbolic phase");
         paru_free(m, sizeof(Int), Pinv);
         paru_freesym(&LUsym);
-        return NULL;
+        return PARU_OUT_OF_MEMORY;
     }
     task_map[0] = -1;
     Int i = 0;
@@ -1865,5 +1865,5 @@ paru_symbolic *paru_analyze(
     PRLEVEL(1, ("%% mRHS paru_apply_inv_perm %lf seconds\n", time));
 #endif
     paru_free(m, sizeof(Int), Pinv);
-    return (LUsym);
+    return PARU_SUCCESS;
 }

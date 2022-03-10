@@ -43,20 +43,19 @@ int main(int argc, char **argv)
     //~~~~~~~~~~~~~~~~~~~Starting computation~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     BLAS_set_num_threads(1);
-    int scale = 0;
-    Int NoProblem = 0;
 
     double my_start_time = omp_get_wtime();
 
-    LUsym = paru_analyze(scale, A);
-    if (LUsym == NULL)
+    ParU_ResultCode info;
+
+    info = paru_analyze(A, &LUsym);
+    if (info != PARU_SUCCESS)
     {
         cholmod_l_free_sparse(&A, cc);
         cholmod_l_finish(cc);
-        return PARU_INVALID;
+        return info;
     }
     printf ("Paru: Symbolic factorization is done!\n");
-    ParU_ResultCode info;
     paru_matrix *paruMatInfo;
     info = paru_factorize(A, LUsym, &paruMatInfo);
     double my_time = omp_get_wtime() - my_start_time;

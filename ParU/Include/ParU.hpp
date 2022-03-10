@@ -68,25 +68,38 @@ extern "C"
 // have access to this object without synchronization.
 //
 
-// typedef struct ParU_U_singleton
-struct ParU_U_singleton
+// ParU_U_singleton and ParU_L_singleton are datastructures for singletons
+//  
+//              ParU_L_singleton is CSC 
+//                                    l
+//                                    v 
+// 	  ParU_U_singleton is CSR -> L U U U U U U U U
+// 	                             . L U U U U U U U
+// 	                             . . L U U U U U U
+// 	                             . . . L . . . . .
+// 	                             . . . L L . . . .
+// 	                             . . . L L x x x x
+// 	                             . . . L L x x x x
+// 	                             . . . L L x x x x
+// 	                             . . . L L x x x x
+ 
+typedef struct 
 {
     // CSR format for U singletons
     Int nnz;      // nnz in submatrix
     Int *Sup;     // size cs1
     Int *Suj;     // size is computed 
     double *Sux;  
-};
+} ParU_U_singleton;
 
-// typedef struct L_singleton
-struct ParU_L_singleton
+typedef struct 
 {
     // CSC format for U singletons
     Int nnz;      // nnz in submatrix
     Int *Slp;     // size rs1
     Int *Sli;     // size is computed 
     double *Slx; 
-};
+} ParU_L_singleton;
 
 typedef struct
 { /* paru_symbolic*/
@@ -406,7 +419,7 @@ typedef struct
 //------------------------------------------------------------------------------
 // user:
 
-paru_symbolic *paru_analyze(Int scale, cholmod_sparse *A);
+ParU_ResultCode paru_analyze(cholmod_sparse *A, paru_symbolic **S_handle);
 
 /* usage:
    S = paru_analyse (A) ;
