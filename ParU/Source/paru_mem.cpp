@@ -191,12 +191,12 @@ void operator delete(void *ptr) noexcept
 }
 
 //  freeing symbolic analysis data structure
-void paru_freesym(paru_symbolic **LUsym_handle)
+ParU_ResultCode paru_freesym(paru_symbolic **LUsym_handle)
 {
     DEBUGLEVEL(0);
     if (LUsym_handle == NULL || *LUsym_handle == NULL)
         // nothing to do; caller probably ran out of memory
-        return;
+        return PARU_OUT_OF_MEMORY;
 
     paru_symbolic *LUsym;
     LUsym = *LUsym_handle;
@@ -278,6 +278,7 @@ void paru_freesym(paru_symbolic **LUsym_handle)
     paru_free(1, sizeof(paru_symbolic), LUsym);
 
     *LUsym_handle = NULL;
+    return PARU_SUCCESS;
 }
 
 // free element e from elementList
@@ -297,10 +298,11 @@ void paru_free_el(Int e, paru_Element **elementList)
 }
 
 // It uses LUsym, Do not free LUsym before
-void paru_freemat(paru_matrix **paruMatInfo_handle)
+ParU_ResultCode paru_freemat(paru_matrix **paruMatInfo_handle)
 {
     DEBUGLEVEL(0);
-    if (paruMatInfo_handle == NULL || *paruMatInfo_handle == NULL) return;
+    if (paruMatInfo_handle == NULL || *paruMatInfo_handle == NULL) 
+        return PARU_INVALID;
 
     paru_matrix *paruMatInfo;
     paruMatInfo = *paruMatInfo_handle;
@@ -331,7 +333,7 @@ void paru_freemat(paru_matrix **paruMatInfo_handle)
         if (LUsym == NULL)
         {
             printf("Paru: probably LUsym has been freed before! Wrong usage\n");
-            return;
+            return PARU_INVALID;
         }
         Int e = LUsym->row2atree[i];  // element number in augmented tree
         PRLEVEL(1, ("%% e =%ld\t", e));
@@ -439,4 +441,5 @@ void paru_freemat(paru_matrix **paruMatInfo_handle)
     paru_free(m, sizeof(Int), paruMatInfo->row_degree_bound);
     paru_free(1, sizeof(paru_matrix), paruMatInfo);
     *paruMatInfo_handle = NULL;
+    return PARU_SUCCESS;
 }

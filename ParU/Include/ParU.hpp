@@ -419,7 +419,6 @@ typedef struct
 //------------------------------------------------------------------------------
 // user:
 
-ParU_ResultCode paru_analyze(cholmod_sparse *A, paru_symbolic **S_handle);
 
 /* usage:
    S = paru_analyse (A) ;
@@ -429,13 +428,14 @@ info: an enum: PARU_SUCCESS, PARU_OUT_OF_MEMORY, PARU_INVALID, PARU_SINGULAR,
 */
 
 // a routine that does init_row and also factorization
+ParU_ResultCode paru_analyze(cholmod_sparse *A, paru_symbolic **S_handle);
 ParU_ResultCode paru_factorize(cholmod_sparse *A, paru_symbolic *LUsym,
                                paru_matrix **paruMatInfo_handle);
 ParU_ResultCode paru_solve(double *b, paru_matrix *paruMatInfo);
 ParU_ResultCode paru_solve(double *B, Int n, paru_matrix *paruMatInfo);
 
-void paru_freesym(paru_symbolic **LUsym_handle);
-void paru_freemat(paru_matrix **paruMatInfo_handle);
+ParU_ResultCode paru_freesym(paru_symbolic **LUsym_handle);
+ParU_ResultCode paru_freemat(paru_matrix **paruMatInfo_handle);
 
 ParU_ResultCode paru_residual(cholmod_sparse *A, paru_matrix *paruMatInfo,
                               double *b, double *Results);
