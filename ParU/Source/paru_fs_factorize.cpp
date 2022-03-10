@@ -537,13 +537,8 @@ Int paru_factorize_full_summed(Int f, Int start_fac,
             PRLEVEL(PR, ("%% j2 =%ld j1=%ld\n", j2, j1));
             PRLEVEL(PR, ("\n %%"));
 #endif
-
-            // double start_time = omp_get_wtime();
             paru_tasked_dgemm(f, M, N, K, A, lda, B, ldb, 
                     1, C, ldc, paruMatInfo);
-
-            // double tot_time = omp_get_wtime() - start_time;
-            // printf ("%ld  %lf ",f, tot_time);
             // printf ("%d %d %d ",M ,N, K);
             // printf ("%d %d %d\n ",lda ,ldb, ldc);
 #ifdef COUNT_FLOPS

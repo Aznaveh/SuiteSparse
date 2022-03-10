@@ -532,11 +532,8 @@ ParU_ResultCode paru_front(Int f,  // front need to be assembled
     double *el_numbers =
         (double *)((Int *)(curEl + 1) + 2 * colCount + 2 * (rowCount - fp));
 
-    // double start_time = omp_get_wtime();
     paru_dgemm(f, pivotalFront, uPart, el_numbers, 
             fp, rowCount, colCount, paruMatInfo);
-    // double tot_time = omp_get_wtime() - start_time;
-    // printf ("%ld  %lf ",f, tot_time);
     // printf ("%ld %ld %ld ",rowCount-fp, colCount, fp);
     // printf ("%ld %ld %ld \n",rowCount, fp, rowCount-fp);
 

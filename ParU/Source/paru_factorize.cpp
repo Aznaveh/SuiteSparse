@@ -13,7 +13,7 @@
 ParU_ResultCode paru_exec_tasks_seq(Int t, Int *task_num_child,
                                 paru_matrix *paruMatInfo)
 {
-    DEBUGLEVEL(1);
+    DEBUGLEVEL(0);
     paru_symbolic *LUsym = paruMatInfo->LUsym;
     Int *task_parent = LUsym->task_parent;
     Int daddy = task_parent[t];
@@ -24,8 +24,8 @@ ParU_ResultCode paru_exec_tasks_seq(Int t, Int *task_num_child,
     PRLEVEL(1, ("Seq: executing task %ld fronts %ld-%ld (%ld children)\n", t,
                 task_map[t] + 1, task_map[t + 1], num_original_children));
     ParU_ResultCode myInfo;
-#ifndef NDEBUG
-    double start_time_t = PARU_OPENMP_GET_WTIME;
+#ifndef NTIME
+    double start_time = PARU_OPENMP_GET_WTIME;
 #endif
     for (Int f = task_map[t] + 1; f <= task_map[t + 1]; f++)
     {
@@ -37,11 +37,13 @@ ParU_ResultCode paru_exec_tasks_seq(Int t, Int *task_num_child,
         }
     }
     Int num_rem_children;
-#ifndef NDEBUG
-    double finish_time_t = PARU_OPENMP_GET_WTIME;
-    double t_time = finish_time_t - start_time_t;  
-    PRLEVEL(-1, ("task time task %ld is %lf\n",t, t_time));
+#ifndef NTIME
+    double time = PARU_OPENMP_GET_WTIME;
+    time -= start_time;  
+    PRLEVEL(1, ("task time task %ld is %lf\n",t, time));
+#endif
 
+#ifndef NDEBUG
     if (daddy == -1) PRLEVEL(1, ("%% finished task root(%ld)\n", t));
 #endif
 
@@ -78,7 +80,7 @@ ParU_ResultCode paru_exec_tasks_seq(Int t, Int *task_num_child,
 ParU_ResultCode paru_exec_tasks (Int t, Int *task_num_child, Int &chain_task,
                                 paru_matrix *paruMatInfo)
 {
-    DEBUGLEVEL(1);
+    DEBUGLEVEL(0);
     paru_symbolic *LUsym = paruMatInfo->LUsym;
     Int *task_parent = LUsym->task_parent;
     Int daddy = task_parent[t];
@@ -89,8 +91,8 @@ ParU_ResultCode paru_exec_tasks (Int t, Int *task_num_child, Int &chain_task,
     PRLEVEL(1, ("executing task %ld fronts %ld-%ld (%ld children)\n", t,
                 task_map[t] + 1, task_map[t + 1], num_original_children));
     ParU_ResultCode myInfo;
-#ifndef NDEBUG
-    double start_time_t = PARU_OPENMP_GET_WTIME;
+#ifndef NTIME
+    double start_time = PARU_OPENMP_GET_WTIME;
 #endif
     for (Int f = task_map[t] + 1; f <= task_map[t + 1]; f++)
     {
@@ -101,11 +103,13 @@ ParU_ResultCode paru_exec_tasks (Int t, Int *task_num_child, Int &chain_task,
         }
     }
     Int num_rem_children;
-#ifndef NDEBUG
-    double finish_time_t = PARU_OPENMP_GET_WTIME;
-    double t_time = finish_time_t - start_time_t;  
-    PRLEVEL(-1, ("task time task %ld is %lf\n",t, t_time));
+#ifndef NTIME
+    double time = PARU_OPENMP_GET_WTIME;
+    time -= start_time;  
+    PRLEVEL(1, ("task time task %ld is %lf\n",t, time));
+#endif
 
+#ifndef NDEBUG
     if (daddy == -1) PRLEVEL(1, ("%% finished task root(%ld)\n", t));
 #endif
 
@@ -169,8 +173,10 @@ ParU_ResultCode paru_exec_tasks (Int t, Int *task_num_child, Int &chain_task,
 ParU_ResultCode paru_factorize(cholmod_sparse *A, paru_symbolic *LUsym,
         paru_matrix **paruMatInfo_handle)
 {
-    DEBUGLEVEL(1);
+    DEBUGLEVEL(0);
+#ifndef NTIME
     double my_start_time = PARU_OPENMP_GET_WTIME;
+#endif
     if (A == NULL)
     {
         printf("Paru: input matrix is invalid\n");
@@ -285,7 +291,7 @@ ParU_ResultCode paru_factorize(cholmod_sparse *A, paru_symbolic *LUsym,
         {
             if (start >= size) break;
             Int end = start + steps > size ? size : start + steps;
-            PRLEVEL(-1, ("%% doing Queue tasks <%ld,%ld>\n", start, end));
+            PRLEVEL(1, ("%% doing Queue tasks <%ld,%ld>\n", start, end));
             #pragma omp parallel proc_bind(spread)
             #pragma omp single nowait
             #pragma omp task untied  //clang might seg fault on untied
@@ -388,7 +394,9 @@ ParU_ResultCode paru_factorize(cholmod_sparse *A, paru_symbolic *LUsym,
     PRLEVEL(1, ("max_rc=%ld max_cc=%ld\n",max_rc, max_cc));
     paruMatInfo->max_row_count = max_rc;
     paruMatInfo->max_col_count = max_cc;
+#ifndef NTIME
     Int time = PARU_OPENMP_GET_WTIME;
     paruMatInfo->my_time = time - my_start_time;
+#endif
     return PARU_SUCCESS;
 }

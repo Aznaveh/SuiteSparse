@@ -56,9 +56,10 @@ paru_symbolic *paru_analyze(
 {
     DEBUGLEVEL(0);
     PARU_DEFINE_PRLEVEL;
-    double my_start_time = omp_get_wtime();
+#ifndef NTIME
+    double start_time = PARU_OPENMP_GET_WTIME;
+#endif
     paru_symbolic *LUsym;
-
     LUsym = (paru_symbolic *)paru_alloc(1, sizeof(paru_symbolic));
     if (!LUsym) return NULL;
 
@@ -1857,7 +1858,12 @@ paru_symbolic *paru_analyze(
     PRLEVEL(PR, ("\n"));
 
 #endif
-    LUsym->my_time = omp_get_wtime() - my_start_time;
+#ifndef NTIME
+    double time = PARU_OPENMP_GET_WTIME;
+    time -= start_time;  
+    LUsym->my_time = time;
+    PRLEVEL(1, ("%% mRHS paru_apply_inv_perm %lf seconds\n", time));
+#endif
     paru_free(m, sizeof(Int), Pinv);
     return (LUsym);
 }

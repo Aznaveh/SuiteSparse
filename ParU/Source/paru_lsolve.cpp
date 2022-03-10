@@ -43,7 +43,6 @@ Int paru_lsolve(double *x, paru_matrix *paruMatInfo)
 
 #ifndef NDEBUG
     Int m = LUsym->m;
-    double start_time = omp_get_wtime();
     PRLEVEL(1, ("%%inside lsolve x is:\n%%"));
     for (Int k = 0; k < m; k++)
     {
@@ -51,9 +50,11 @@ Int paru_lsolve(double *x, paru_matrix *paruMatInfo)
     }
     PRLEVEL(PR, (" \n"));
 #endif
+#ifndef NTIME
+    double start_time = PARU_OPENMP_GET_WTIME;
+#endif
     Int n1 = LUsym->n1;   // row+col singletons
     Int *Ps = LUsym->Ps;  // row permutation S->LU
-
 
     PRLEVEL(1, ("%%Working on singletons if any\n%%"));
     // singletons
@@ -171,10 +172,13 @@ Int paru_lsolve(double *x, paru_matrix *paruMatInfo)
             x[r] -= i_prod;
         }
     }
-
+#ifndef NTIME
+    double time = PARU_OPENMP_GET_WTIME;
+    time -= start_time;  
+    PRLEVEL(-1, ("%% lsolve took %1.1lf\n", time));
+#endif
 #ifndef NDEBUG
-    double time = omp_get_wtime() - start_time;  
-    PRLEVEL(1, ("%% lsolve took %1.1lf s; after lsolve x is:\n%%", time));
+    PRLEVEL(1, ("%%after lsolve x is:\n%%", time));
     for (Int k = 0; k < m; k++)
     {
         PRLEVEL(1, (" %.2lf, ", x[k]));
@@ -206,8 +210,11 @@ Int paru_lsolve(double *X, Int n, paru_matrix *paruMatInfo)
         PRLEVEL(1, (" \n"));
     }
     PRLEVEL(1, (" \n"));
-    double start_time = omp_get_wtime();
 #endif
+#ifndef NTIME
+    double start_time = PARU_OPENMP_GET_WTIME;
+#endif
+
     Int n1 = LUsym->n1;   // row+col singletons
     Int *Ps = LUsym->Ps;  // row permutation S->LU
 
@@ -319,18 +326,18 @@ Int paru_lsolve(double *X, Int n, paru_matrix *paruMatInfo)
         PRLEVEL(1, (" \n"));
         #endif
 
-       if (rowCount > fp)
-       {
-           PRLEVEL(2, ("%% mRHS lsolve: Working on DGEMM\n%%"));
-           PRLEVEL(2, ("fp=%ld  rowCount=%ld\n", fp, rowCount));
-           BLAS_INT mm = (BLAS_INT)(rowCount-fp);
-           BLAS_INT nn = (BLAS_INT)n;
-           BLAS_INT kk = (BLAS_INT)fp;
-           BLAS_INT ldb = (BLAS_INT)m;
-           BLAS_INT ldc = (BLAS_INT)(rowCount-fp);
-           cblas_dgemm (CblasColMajor, CblasNoTrans, CblasNoTrans, mm, nn, kk,
-                   1, A+fp, lda, X+n1+col1, ldb, 0, &work[0], ldc);
-       }
+        if (rowCount > fp)
+        {
+            PRLEVEL(2, ("%% mRHS lsolve: Working on DGEMM\n%%"));
+            PRLEVEL(2, ("fp=%ld  rowCount=%ld\n", fp, rowCount));
+            BLAS_INT mm = (BLAS_INT)(rowCount-fp);
+            BLAS_INT nn = (BLAS_INT)n;
+            BLAS_INT kk = (BLAS_INT)fp;
+            BLAS_INT ldb = (BLAS_INT)m;
+            BLAS_INT ldc = (BLAS_INT)(rowCount-fp);
+            cblas_dgemm (CblasColMajor, CblasNoTrans, CblasNoTrans, mm, nn, kk,
+                    1, A+fp, lda, X+n1+col1, ldb, 0, &work[0], ldc);
+        }
 
         //don't use parallel loop if using dgemm
         //pragma omp parallel for
@@ -344,7 +351,7 @@ Int paru_lsolve(double *X, Int n, paru_matrix *paruMatInfo)
             //    for (Int l = 0; l < n; l++)
             //        i_prod[l] += A[(j - col1) * rowCount + i] * X[l*m +j+n1];
             //}
-        
+
 
             //double* i_prod = work+i-fp;
             Int r = Ps[frowList[i]] + n1;
@@ -356,10 +363,12 @@ Int paru_lsolve(double *X, Int n, paru_matrix *paruMatInfo)
 
         }
     }
-
-    #ifndef NDEBUG
-    double time = omp_get_wtime() - start_time;  
+#ifndef NTIME
+    double time = PARU_OPENMP_GET_WTIME;
+    time -= start_time;  
     PRLEVEL(-1,("%% mRHS lsolve took %1.1lfs\n", time));
+#endif
+#ifndef NDEBUG
     PRLEVEL(1,("%% after lsolve X is:\n"));
     for (Int k = 0; k < m; k++)
     {
@@ -372,6 +381,6 @@ Int paru_lsolve(double *X, Int n, paru_matrix *paruMatInfo)
         PRLEVEL(1, (" \n"));
     }
     PRLEVEL(1, (" \n"));
-    #endif
+#endif
     return (1);
 }

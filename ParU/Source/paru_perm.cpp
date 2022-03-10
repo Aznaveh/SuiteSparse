@@ -185,9 +185,11 @@ Int paru_apply_inv_perm(const Int *P, const double *B, double *X, Int m, Int n)
         PRLEVEL(PR, (" \n"));
     }
     PRLEVEL(PR, (" \n"));
-    double start_time = omp_get_wtime();
 #endif
 
+#ifndef NTIME
+    double start_time = PARU_OPENMP_GET_WTIME;
+#endif
     //pragma omp parallel for
     for (Int k = 0; k < m; k++)
     {
@@ -199,9 +201,12 @@ Int paru_apply_inv_perm(const Int *P, const double *B, double *X, Int m, Int n)
         }
     }
 
+#ifndef NTIME
+    double time = PARU_OPENMP_GET_WTIME;
+    time -= start_time;  
+    PRLEVEL(1, ("%% mRHS paru_apply_inv_perm %lf seconds\n", time));
+#endif
 #ifndef NDEBUG
-    double time = omp_get_wtime() - start_time;  
-    PRLEVEL(-1, ("%% mRHS paru_apply_inv_perm %lf seconds\n", time));
     PRLEVEL(1, ("%% mRHS after applying inverse permutaion X is:\n"));
     for (Int k = 0; k < m; k++)
     {
@@ -304,9 +309,11 @@ Int paru_apply_perm_scale(const Int *P, const double *s, const double *B,
         PRLEVEL(1, (" %lf, ", s[k]));
     }
     PRLEVEL(1, (" \n"));
-    double start_time = omp_get_wtime();
 #endif
 
+#ifndef NTIME
+    double start_time = PARU_OPENMP_GET_WTIME;
+#endif
     //#pragma omp parallel for
     for (Int k = 0; k < m; k++)
     {
@@ -318,9 +325,13 @@ Int paru_apply_perm_scale(const Int *P, const double *s, const double *B,
         }
     }
 
+#ifndef NTIME
+    double time = PARU_OPENMP_GET_WTIME;
+    time -= start_time;  
+    PRLEVEL(1, ("%% mRHS paru_apply_perm_scale %lf seconds\n", time));
+#endif
+
 #ifndef NDEBUG
-    double time = omp_get_wtime() - start_time;  
-    PRLEVEL(-1, ("%% mRHS paru_apply_perm_scale %lf seconds\n", time));
     PRLEVEL(1, ("\n%% after applying permutaion X is:\n"));
     for (Int k = 0; k < m; k++)
     {

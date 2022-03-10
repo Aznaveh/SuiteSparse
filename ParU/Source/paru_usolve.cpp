@@ -38,8 +38,8 @@ Int paru_usolve(double *x, paru_matrix *paruMatInfo)
     // check if input is read
     if (!x) return (0);
     PARU_DEFINE_PRLEVEL;
-#ifndef NDEBUG
-    double start_time = omp_get_wtime();
+#ifndef NTIME
+    double start_time = PARU_OPENMP_GET_WTIME;
 #endif
     paru_symbolic *LUsym = paruMatInfo->LUsym;
     Int nf = LUsym->nf;
@@ -135,9 +135,14 @@ Int paru_usolve(double *x, paru_matrix *paruMatInfo)
             PRLEVEL(PR, ("\n"));
         }
     }
+
+#ifndef NTIME
+    double time = PARU_OPENMP_GET_WTIME;
+    time -= start_time;  
+    PRLEVEL(-1, ("%% usolve took %1.1lf\n", time));
+#endif
 #ifndef NDEBUG
-    double time = omp_get_wtime() - start_time;  
-    PRLEVEL(-1, ("%% usolve took %1.1lf s; after usolve x is:\n%%", time));
+    PRLEVEL(-1, ("%%after usolve x is:\n%%"));
     for (Int k = 0; k < m; k++)
     {
         PRLEVEL(1, (" %.2lf, ", x[k]));
@@ -169,7 +174,9 @@ Int paru_usolve(double *X, Int n, paru_matrix *paruMatInfo)
         PRLEVEL(1, (" \n"));
     }
     PRLEVEL(1, (" \n"));
-    double start_time = omp_get_wtime();
+#endif
+#ifndef NTIME
+    double start_time = PARU_OPENMP_GET_WTIME;
 #endif
     Int n1 = LUsym->n1;   // row+col singletons
     Int *Ps = LUsym->Ps;  // row permutation
@@ -289,9 +296,12 @@ Int paru_usolve(double *X, Int n, paru_matrix *paruMatInfo)
             }
         }
     }
-#ifndef NDEBUG
-    double time = omp_get_wtime() - start_time;  
+#ifndef NTIME
+    double time = PARU_OPENMP_GET_WTIME;
+    time -= start_time;  
     PRLEVEL(-1,("%% mRHS usolve took %1.1lfs\n", time));
+#endif
+#ifndef NDEBUG
     PRLEVEL(1,("%%after usolve X is:\n"));
     for (Int k = 0; k < m; k++)
     {

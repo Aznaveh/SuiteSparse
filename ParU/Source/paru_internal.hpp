@@ -22,6 +22,11 @@
 #define NPR
 #endif
 
+#ifndef NTIME
+#define NTIME
+#endif
+
+
 #ifdef Int  // defined in amd
 #undef Int
 #endif
@@ -36,11 +41,10 @@ extern "C"
 
 // for printing information uncomment this; to activate assertions uncomment
 //#undef NPR  //<<1>>
-
-// from spqr.hpp
-// Aznaveh For MATLAB OUTPUT UNCOMMENT HERE
-// uncomment the following line to turn on debugging
+// uncomment the following line to turn on debugging mode
 //#undef NDEBUG  //<<2>>
+// uncomment the following line to turn on OpenMP timing
+//#undef NTIME   //<<3>>
 
 // uncomment if you want to count hardware flops
 //#define COUNT_FLOPS

@@ -27,8 +27,8 @@ void paru_tasked_dgemm(Int f,  BLAS_INT M, BLAS_INT N, BLAS_INT K,
         BLAS_set_num_threads(max_threads);
     else
         BLAS_set_num_threads(1);
-#ifndef NDEBUG
-    double start_time_d = omp_get_wtime();
+#ifndef NTIME
+    double start_time = PARU_OPENMP_GET_WTIME;
 #endif
     if (M < SMALL && N < SMALL && K < SMALL)
         //if(0)
@@ -111,10 +111,12 @@ void paru_tasked_dgemm(Int f,  BLAS_INT M, BLAS_INT N, BLAS_INT K,
         }  
         #endif
     }
-#ifndef NDEBUG
-    double d_time = omp_get_wtime() - start_time_d;  
+
+#ifndef NTIME
+    double time = PARU_OPENMP_GET_WTIME;
+    time -= start_time;  
     PRLEVEL(1, ("%% XXX DGEMM (%d,%d,%d)%1.1f in %ld {%ld} in %lf seconds\n", 
-                M, N, K, beta, f, naft, d_time));
+                M, N, K, beta, f, naft, time));
 #endif
 
 

@@ -21,8 +21,8 @@ ParU_ResultCode paru_solve(double *b, paru_matrix *paruMatInfo)
         printf("Paru: the matrix is singular; cannot be solved.\n");
         return PARU_SINGULAR;
     }
-#ifndef NDEBUG
-    double start_time = omp_get_wtime();
+#ifndef NTIME
+    double start_time = PARU_OPENMP_GET_WTIME;
 #endif
 
     double *x = (double *)paru_alloc(m, sizeof(double));
@@ -46,10 +46,10 @@ ParU_ResultCode paru_solve(double *b, paru_matrix *paruMatInfo)
     paru_apply_inv_perm(LUsym->Qfill, x, b, m);  // b(q) = x
 
     paru_free(m, sizeof(Int), x);
-#ifndef NDEBUG
-    double time = omp_get_wtime() - start_time;  
+#ifndef NTIME
+    double time = PARU_OPENMP_GET_WTIME;
+    time -= start_time;  
     PRLEVEL(1, ("%%solve has been finished in %lf seconds\n", time));
-    printf ("%%solve has been finished in %lf seconds\n", time);
 #endif
     return PARU_SUCCESS;
 }
@@ -65,7 +65,7 @@ ParU_ResultCode paru_solve(double *b, paru_matrix *paruMatInfo)
 
 ParU_ResultCode paru_solve(double *B, Int n, paru_matrix *paruMatInfo)
 {
-    DEBUGLEVEL(1);
+    DEBUGLEVEL(0);
     PRLEVEL(1, ("%% mRHS inside Solve\n"));
     paru_symbolic *LUsym = paruMatInfo->LUsym;
     Int m = LUsym->m;
@@ -74,11 +74,9 @@ ParU_ResultCode paru_solve(double *B, Int n, paru_matrix *paruMatInfo)
         printf("Paru: the matrix is singular; cannot be solved.\n");
         return PARU_SINGULAR;
     }
-#ifndef NDEBUG
-    double start_time = omp_get_wtime();
+#ifndef NTIME
+    double start_time = PARU_OPENMP_GET_WTIME;
 #endif
-
-
     double *X = (double *)paru_alloc(m*n, sizeof(double));
     if (X == NULL)
     {
@@ -96,10 +94,11 @@ ParU_ResultCode paru_solve(double *B, Int n, paru_matrix *paruMatInfo)
     paru_apply_inv_perm(LUsym->Qfill, X, B, m, n);     // B(q) = X
 
     paru_free(m*n, sizeof(Int), X);
-#ifndef NDEBUG
-    double time = omp_get_wtime() - start_time;  
+
+#ifndef NTIME
+    double time = PARU_OPENMP_GET_WTIME;
+    time -= start_time;  
     PRLEVEL(-1, ("%% mRHS solve has been finished in %lf seconds\n", time));
-    printf ("%%RHS solve has been finished in %lf seconds\n", time);
 #endif
     return PARU_SUCCESS;
 }
