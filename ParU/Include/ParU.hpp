@@ -68,24 +68,24 @@ extern "C"
 // have access to this object without synchronization.
 //
 
-// typedef struct U_singleton
-struct U_singleton
+// typedef struct ParU_U_singleton
+struct ParU_U_singleton
 {
     // CSR format for U singletons
     Int nnz;      // nnz in submatrix
     Int *Sup;     // size cs1
-    Int *Suj;     // size ?
-    double *Sux;  // size ?
+    Int *Suj;     // size is computed 
+    double *Sux;  
 };
 
 // typedef struct L_singleton
-struct L_singleton
+struct ParU_L_singleton
 {
     // CSC format for U singletons
     Int nnz;      // nnz in submatrix
     Int *Slp;     // size rs1
-    Int *Sli;     // size ?
-    double *Slx;  // size ?
+    Int *Sli;     // size is computed 
+    double *Slx; 
 };
 
 typedef struct
@@ -114,8 +114,8 @@ typedef struct
                         // size = m
 
     // Usingletons and Lsingltons
-    U_singleton ustons;
-    L_singleton lstons;
+    ParU_U_singleton ustons;
+    ParU_L_singleton lstons;
 
     Int *Qfill;  // size n, fill-reducing column permutation.
     // Qfill [k] = j if column k of A is column j of S.
