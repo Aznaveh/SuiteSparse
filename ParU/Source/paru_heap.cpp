@@ -32,7 +32,8 @@ void paru_check_prior_element(Int e, Int f, Int start_fac,
         paru_assemble_rows(e, f, colHash, paruMatInfo);
     }
 }
-ParU_ResultCode paru_make_heap(Int f, Int start_fac,
+
+ParU_Res paru_make_heap(Int f, Int start_fac,
                                std::vector<Int> &pivotal_elements,
                                heaps_info &hi, std::vector<Int> &colHash,
                                paru_matrix *paruMatInfo)
@@ -201,7 +202,7 @@ ParU_ResultCode paru_make_heap(Int f, Int start_fac,
     return PARU_SUCCESS;
 }
 
-ParU_ResultCode paru_make_heap_empty_el(Int f,
+ParU_Res paru_make_heap_empty_el(Int f,
                                         std::vector<Int> &pivotal_elements,
                                         heaps_info &hi,
                                         paru_matrix *paruMatInfo)

@@ -191,7 +191,7 @@ void operator delete(void *ptr) noexcept
 }
 
 //  freeing symbolic analysis data structure
-ParU_ResultCode paru_freesym(paru_symbolic **LUsym_handle)
+ParU_Res paru_freesym(paru_symbolic **LUsym_handle)
 {
     DEBUGLEVEL(0);
     if (LUsym_handle == NULL || *LUsym_handle == NULL)
@@ -298,7 +298,7 @@ void paru_free_el(Int e, paru_Element **elementList)
 }
 
 // It uses LUsym, Do not free LUsym before
-ParU_ResultCode paru_freemat(paru_matrix **paruMatInfo_handle)
+ParU_Res paru_freemat(paru_matrix **paruMatInfo_handle)
 {
     DEBUGLEVEL(0);
     if (paruMatInfo_handle == NULL || *paruMatInfo_handle == NULL) 

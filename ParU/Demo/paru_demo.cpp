@@ -46,7 +46,7 @@ int main(int argc, char **argv)
 
     double my_start_time = omp_get_wtime();
 
-    ParU_ResultCode info;
+    ParU_Res info;
 
     info = paru_analyze(A, &LUsym);
     if (info != PARU_SUCCESS)

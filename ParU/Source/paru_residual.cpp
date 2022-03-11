@@ -11,7 +11,7 @@
 
 #include "paru_internal.hpp"
 
-ParU_ResultCode paru_residual(double *b, double &resid, double &norm,        
+ParU_Res paru_residual(double *b, double &resid, double &norm,        
         cholmod_sparse *A, paru_matrix *paruMatInfo)
 {
     DEBUGLEVEL(0);
@@ -44,7 +44,7 @@ ParU_ResultCode paru_residual(double *b, double &resid, double &norm,
     PRLEVEL(1, (" \n"));
 #endif
 
-    ParU_ResultCode info;
+    ParU_Res info;
     info = paru_solve(x, paruMatInfo);
     if (info != PARU_SUCCESS)
     {
@@ -82,7 +82,7 @@ ParU_ResultCode paru_residual(double *b, double &resid, double &norm,
  *
  * @author Aznaveh  XXX for testing only
  * */
-ParU_ResultCode paru_residual(cholmod_sparse *A, paru_matrix *paruMatInfo,
+ParU_Res paru_residual(cholmod_sparse *A, paru_matrix *paruMatInfo,
                               double *B,
                               double *Results, Int n)  // output
                                                 //  0 residual
@@ -131,7 +131,7 @@ ParU_ResultCode paru_residual(cholmod_sparse *A, paru_matrix *paruMatInfo,
     PRLEVEL(1, (" \n"));
 #endif
 
-    ParU_ResultCode info;
+    ParU_Res info;
     info = paru_solve(X, n, paruMatInfo);
     if (info != PARU_SUCCESS)
     {

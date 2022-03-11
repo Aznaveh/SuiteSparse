@@ -8,12 +8,12 @@
  *
  *
  * @param  the front that is going to be computed
- * @return  ParU_ResultCode
+ * @return  ParU_Res
  *
  *  @author Aznaveh
  */
 #include "paru_internal.hpp"
-ParU_ResultCode paru_front(Int f,  // front need to be assembled
+ParU_Res paru_front(Int f,  // front need to be assembled
                            paru_matrix *paruMatInfo)
 {
     DEBUGLEVEL(-3);
@@ -116,7 +116,7 @@ ParU_ResultCode paru_front(Int f,  // front need to be assembled
     Int zero_piv_rows = 0;  // If there are zero rows is
                             // importiant for Exit point
     PRLEVEL(1, ("%% Next: work on pivotal column assembly\n"));
-    ParU_ResultCode res_pivotal;
+    ParU_Res res_pivotal;
     res_pivotal = paru_pivotal(pivotal_elements, panel_row, zero_piv_rows, f,
                                hi, paruMatInfo);
     if (res_pivotal == PARU_OUT_OF_MEMORY)
@@ -565,7 +565,7 @@ ParU_ResultCode paru_front(Int f,  // front need to be assembled
 
     // paruMatInfo->time_stamp[f]++; //invalidating all the marks
     PRLEVEL(-1, ("\n%%||||  Start Finalize %ld ||||\n", f));
-    ParU_ResultCode res_prior;
+    ParU_Res res_prior;
     res_prior = paru_prior_assemble(f, start_fac, pivotal_elements, colHash, hi,
                         paruMatInfo);
     if (res_prior != PARU_SUCCESS) return res_prior;

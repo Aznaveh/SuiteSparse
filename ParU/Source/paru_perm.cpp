@@ -38,7 +38,7 @@
  * @author Aznaveh
  * */
 #include "paru_internal.hpp"
-ParU_ResultCode paru_perm(paru_matrix *paruMatInfo)
+ParU_Res paru_perm(paru_matrix *paruMatInfo)
 {
     DEBUGLEVEL(0);
     PARU_DEFINE_PRLEVEL;

@@ -13,7 +13,7 @@
  */
 #include "paru_internal.hpp"
 
-ParU_ResultCode paru_init_rowFronts(
+ParU_Res paru_init_rowFronts(
     paru_matrix **paruMatInfo_handle,  // in/out
                                        // inputs, not modified
     cholmod_sparse *A,
@@ -238,7 +238,7 @@ ParU_ResultCode paru_init_rowFronts(
     // Activating comments after this parts will break the matlab input matrix
     // allocating row tuples, elements and updating column tuples
 
-    ParU_ResultCode info;
+    ParU_Res info;
     Int out_of_memory = 0;
     #pragma omp taskloop default(none) \
     shared(out_of_memory, LUsym, Sp, row_degree_bound, elementList, m, \

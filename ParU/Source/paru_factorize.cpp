@@ -10,7 +10,7 @@
  */
 #include "paru_internal.hpp"
 
-ParU_ResultCode paru_exec_tasks_seq(Int t, Int *task_num_child,
+ParU_Res paru_exec_tasks_seq(Int t, Int *task_num_child,
                                 paru_matrix *paruMatInfo)
 {
     DEBUGLEVEL(0);
@@ -23,7 +23,7 @@ ParU_ResultCode paru_exec_tasks_seq(Int t, Int *task_num_child,
     if (daddy != -1) num_original_children = LUsym->task_num_child[daddy];
     PRLEVEL(1, ("Seq: executing task %ld fronts %ld-%ld (%ld children)\n", t,
                 task_map[t] + 1, task_map[t + 1], num_original_children));
-    ParU_ResultCode myInfo;
+    ParU_Res myInfo;
 #ifndef NTIME
     double start_time = PARU_OPENMP_GET_WTIME;
 #endif
@@ -77,7 +77,7 @@ ParU_ResultCode paru_exec_tasks_seq(Int t, Int *task_num_child,
     return myInfo;
 }
 
-ParU_ResultCode paru_exec_tasks (Int t, Int *task_num_child, Int &chain_task,
+ParU_Res paru_exec_tasks (Int t, Int *task_num_child, Int &chain_task,
                                 paru_matrix *paruMatInfo)
 {
     DEBUGLEVEL(0);
@@ -90,7 +90,7 @@ ParU_ResultCode paru_exec_tasks (Int t, Int *task_num_child, Int &chain_task,
     if (daddy != -1) num_original_children = LUsym->task_num_child[daddy];
     PRLEVEL(1, ("executing task %ld fronts %ld-%ld (%ld children)\n", t,
                 task_map[t] + 1, task_map[t + 1], num_original_children));
-    ParU_ResultCode myInfo;
+    ParU_Res myInfo;
 #ifndef NTIME
     double start_time = PARU_OPENMP_GET_WTIME;
 #endif
@@ -170,7 +170,7 @@ ParU_ResultCode paru_exec_tasks (Int t, Int *task_num_child, Int &chain_task,
     }
     return myInfo;
 }
-ParU_ResultCode paru_factorize(cholmod_sparse *A, paru_symbolic *LUsym,
+ParU_Res paru_factorize(cholmod_sparse *A, paru_symbolic *LUsym,
         paru_matrix **paruMatInfo_handle)
 {
     DEBUGLEVEL(0);
@@ -197,7 +197,7 @@ ParU_ResultCode paru_factorize(cholmod_sparse *A, paru_symbolic *LUsym,
     paru_matrix *paruMatInfo;
     paruMatInfo = *paruMatInfo_handle;
 
-    ParU_ResultCode info;
+    ParU_Res info;
     info = paru_init_rowFronts(&paruMatInfo, A, LUsym);
     *paruMatInfo_handle = paruMatInfo;
 
@@ -306,7 +306,7 @@ ParU_ResultCode paru_factorize(cholmod_sparse *A, paru_symbolic *LUsym,
                     #pragma omp atomic update
                     paruMatInfo->naft++;
 
-                    ParU_ResultCode myInfo =
+                    ParU_Res myInfo =
                         // paru_exec_tasks(t, &task_num_child[0], paruMatInfo);
                         paru_exec_tasks(t, task_num_child, chain_task, 
                                 paruMatInfo);

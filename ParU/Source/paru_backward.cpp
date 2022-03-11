@@ -13,7 +13,7 @@
 
 #include "paru_internal.hpp"
 
-ParU_ResultCode paru_backward (double *x1, double &resid, double &norm,
+ParU_Res paru_backward (double *x1, double &resid, double &norm,
         cholmod_sparse *A, paru_matrix *paruMatInfo)
 {
     DEBUGLEVEL(0);
@@ -45,7 +45,7 @@ ParU_ResultCode paru_backward (double *x1, double &resid, double &norm,
     PRLEVEL(1, (" \n"));
 #endif
 
-    ParU_ResultCode info;
+    ParU_Res info;
     info = paru_solve(b, paruMatInfo);
     if (info != PARU_SUCCESS)
     {

@@ -49,7 +49,7 @@
  * @author Aznaveh
  * */
 #include "paru_internal.hpp"
-ParU_ResultCode paru_analyze(cholmod_sparse *A, paru_symbolic **S_handle)
+ParU_Res paru_analyze(cholmod_sparse *A, paru_symbolic **S_handle)
 {
     DEBUGLEVEL(0);
     PARU_DEFINE_PRLEVEL;

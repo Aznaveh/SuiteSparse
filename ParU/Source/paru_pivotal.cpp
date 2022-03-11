@@ -12,7 +12,7 @@
  */
 #include "paru_internal.hpp"
 
-ParU_ResultCode paru_pivotal(std::vector<Int> &pivotal_elements,
+ParU_Res paru_pivotal(std::vector<Int> &pivotal_elements,
                              std::vector<Int> &panel_row, Int &zero_piv_rows,
                              Int f, heaps_info &hi, paru_matrix *paruMatInfo)
 {

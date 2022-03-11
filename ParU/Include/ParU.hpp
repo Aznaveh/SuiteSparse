@@ -337,7 +337,7 @@ typedef struct
     double *p; /* point to factorized parts */
 } paru_fac;
 
-enum ParU_ResultCode
+enum ParU_Res
 {
     PARU_SUCCESS,
     PARU_OUT_OF_MEMORY,
@@ -412,7 +412,7 @@ typedef struct
     Int paru_max_threads; //I want to call omp_get_max_threads just once
                          // or user can give me a value less than that
 
-    ParU_ResultCode res;
+    ParU_Res res;
 
 } paru_matrix;
 
@@ -428,21 +428,21 @@ info: an enum: PARU_SUCCESS, PARU_OUT_OF_MEMORY, PARU_INVALID, PARU_SINGULAR,
 */
 
 // a routine that does init_row and also factorization
-ParU_ResultCode paru_analyze(cholmod_sparse *A, paru_symbolic **S_handle);
-ParU_ResultCode paru_factorize(cholmod_sparse *A, paru_symbolic *LUsym,
+ParU_Res paru_analyze(cholmod_sparse *A, paru_symbolic **S_handle);
+ParU_Res paru_factorize(cholmod_sparse *A, paru_symbolic *LUsym,
                                paru_matrix **paruMatInfo_handle);
-ParU_ResultCode paru_solve(double *b, paru_matrix *paruMatInfo);
-ParU_ResultCode paru_solve(double *B, Int n, paru_matrix *paruMatInfo);
+ParU_Res paru_solve(double *b, paru_matrix *paruMatInfo);
+ParU_Res paru_solve(double *B, Int n, paru_matrix *paruMatInfo);
 
-ParU_ResultCode paru_freesym(paru_symbolic **LUsym_handle);
-ParU_ResultCode paru_freemat(paru_matrix **paruMatInfo_handle);
+ParU_Res paru_freesym(paru_symbolic **LUsym_handle);
+ParU_Res paru_freemat(paru_matrix **paruMatInfo_handle);
 
-ParU_ResultCode paru_residual(double *b, double &resid, double &norm,
+ParU_Res paru_residual(double *b, double &resid, double &norm,
         cholmod_sparse *A, paru_matrix *paruMatInfo);
                               
-ParU_ResultCode paru_residual(cholmod_sparse *A, paru_matrix *paruMatInfo,
+ParU_Res paru_residual(cholmod_sparse *A, paru_matrix *paruMatInfo,
                               double *b, double *Results, Int n);
 
-ParU_ResultCode paru_backward (double *x1, double &resid, double &norm,
+ParU_Res paru_backward (double *x1, double &resid, double &norm,
         cholmod_sparse *A, paru_matrix *paruMatInfo);
 #endif
