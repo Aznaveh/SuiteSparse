@@ -443,7 +443,6 @@ ParU_ResultCode paru_residual(double *b, double &resid, double &norm,
 ParU_ResultCode paru_residual(cholmod_sparse *A, paru_matrix *paruMatInfo,
                               double *b, double *Results, Int n);
 
-
-ParU_ResultCode paru_backward(cholmod_sparse *A, paru_matrix *paruMatInfo,
-                              double *x1, double *Results);
+ParU_ResultCode paru_backward (double *x1, double &resid, double &norm,
+        cholmod_sparse *A, paru_matrix *paruMatInfo);
 #endif

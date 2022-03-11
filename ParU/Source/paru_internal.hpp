@@ -40,11 +40,11 @@ extern "C"
 
 
 // for printing information uncomment this; to activate assertions uncomment
-//#undef NPR  //<<1>>
+#undef NPR  //<<1>>
 // uncomment the following line to turn on debugging mode
 //#undef NDEBUG  //<<2>>
 // uncomment the following line to turn on OpenMP timing
-//#undef NTIME   //<<3>>
+#undef NTIME   //<<3>>
 
 // uncomment if you want to count hardware flops
 //#define COUNT_FLOPS

@@ -76,8 +76,8 @@ int main(int argc, char **argv)
     for (Int i = 0; i < m; ++i) b[i] = i + 1;
     double resid, norm;
     paru_residual(b, resid, norm, A, paruMatInfo);
-    //for (Int i = 0; i < m; ++i) b[i] = i + 1;
-    //paru_backward(A, paruMatInfo, b, Res);
+    for (Int i = 0; i < m; ++i) b[i] = i + 1;
+    paru_backward(b, resid, norm, A, paruMatInfo);
     free(b);
 
     const Int nn = 16; //number of right handsides
@@ -130,8 +130,22 @@ int main(int argc, char **argv)
         umfpack_dl_report_status(Control, status);
         printf("umfpack_dl_numeric failed\n");
     }
-
+    
+    
     umf_time = omp_get_wtime() - umf_start_time;
+
+    b = (double *)malloc(m * sizeof(double));
+    double *x = (double *)malloc(m * sizeof(double));
+    for (Int i = 0; i < m; ++i) b[i] = i + 1;
+
+    double solve_start =  omp_get_wtime();
+    status = umfpack_dl_solve(UMFPACK_A, Ap, Ai, Ax, x, b, 
+            Numeric, Control, Info);
+    double solve_time =   omp_get_wtime() - solve_start ;
+    free(x);
+    free(b);
+
+
     umfpack_dl_free_symbolic(&Symbolic);
     umfpack_dl_free_numeric(&Numeric);
 
@@ -153,8 +167,8 @@ int main(int argc, char **argv)
                 my_time, umf_time, my_time / umf_time);
         fclose(res_file);
     }
-    printf("my_time = %lf umf_time=%lf ratio = %lf\n", my_time, umf_time,
-           my_time / umf_time);
+    printf("my_time = %lf umf_time=%lf umf_solv_t = %lf ratio = %lf\n", 
+            my_time, umf_time, solve_time, my_time / umf_time);
 
 #endif
     //~~~~~~~~~~~~~~~~~~~Free Everything~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
