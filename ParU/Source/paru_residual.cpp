@@ -11,12 +11,8 @@
 
 #include "paru_internal.hpp"
 
-ParU_ResultCode paru_residual(cholmod_sparse *A, paru_matrix *paruMatInfo,
-                              double *b,
-                              double *Results)  // output
-                                                //  0 residual
-                                                //  1 weighted residual
-                                                //  2 time
+ParU_ResultCode paru_residual(double *b, double &resid, double &norm,        
+        cholmod_sparse *A, paru_matrix *paruMatInfo)
 {
     DEBUGLEVEL(0);
     PRLEVEL(1, ("%% inside residual\n"));
@@ -65,19 +61,17 @@ ParU_ResultCode paru_residual(cholmod_sparse *A, paru_matrix *paruMatInfo,
 
     PRLEVEL(1, ("%% gaxpy\n"));
     paru_gaxpy(A, x, b, -1);
-    double res = paru_vec_1norm(b, m);
-    PRLEVEL(1, ("%% res=%lf\n", res));
-    double weighted_res = res / (paru_spm_1norm(A) * paru_vec_1norm(x, m));
+    resid = paru_vec_1norm(b, m);
+    PRLEVEL(1, ("%% resid=%lf\n", resid));
+    norm = resid / (paru_spm_1norm(A) * paru_vec_1norm(x, m));
     //    PRLEVEL(1, ("Residual is |%.2lf| and weigheted residual is |%.2f|.\n",
-    //                res == 0 ? 0 : log10(res),
-    //                res == 0 ? 0 :log10(weighted_res)));
+    //                resid == 0 ? 0 : log10(resid),
+    //                resid == 0 ? 0 :log10(norm)));
     //
     printf("Residual is |%.2lf| and weigheted residual is |%.2f|.\n",
-           res == 0 ? 0 : log10(res), res == 0 ? 0 : log10(weighted_res));
+           resid == 0 ? 0 : log10(resid), resid == 0 ? 0 : log10(norm));
 
     paru_free(m, sizeof(Int), x);
-    Results[0] = res;
-    Results[1] = weighted_res;
     return PARU_SUCCESS;
 }
 

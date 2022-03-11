@@ -74,14 +74,15 @@ int main(int argc, char **argv)
     Int m = LUsym->m;
     double *b = (double *)malloc(m * sizeof(double));
     for (Int i = 0; i < m; ++i) b[i] = i + 1;
-    double Res[4];
-    paru_residual(A, paruMatInfo, b, Res);
+    double resid, norm;
+    paru_residual(b, resid, norm, A, paruMatInfo);
     //for (Int i = 0; i < m; ++i) b[i] = i + 1;
     //paru_backward(A, paruMatInfo, b, Res);
     free(b);
 
     const Int nn = 16; //number of right handsides
     double *B = (double *)malloc(m*nn * sizeof(double));
+    double Res[4];
     for (Int i = 0; i < m; ++i) 
         for (Int j = 0; j < nn; ++j) B[j*m+i] = (double) (i+j + 1);
     paru_residual(A, paruMatInfo, B, Res, nn);

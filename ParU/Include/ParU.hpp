@@ -437,8 +437,9 @@ ParU_ResultCode paru_solve(double *B, Int n, paru_matrix *paruMatInfo);
 ParU_ResultCode paru_freesym(paru_symbolic **LUsym_handle);
 ParU_ResultCode paru_freemat(paru_matrix **paruMatInfo_handle);
 
-ParU_ResultCode paru_residual(cholmod_sparse *A, paru_matrix *paruMatInfo,
-                              double *b, double *Results);
+ParU_ResultCode paru_residual(double *b, double &resid, double &norm,
+        cholmod_sparse *A, paru_matrix *paruMatInfo);
+                              
 ParU_ResultCode paru_residual(cholmod_sparse *A, paru_matrix *paruMatInfo,
                               double *b, double *Results, Int n);
 
