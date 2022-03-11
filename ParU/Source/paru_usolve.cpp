@@ -53,6 +53,7 @@ Int paru_usolve(double *x, paru_matrix *paruMatInfo)
 
     const Int max_threads = paruMatInfo->paru_max_threads;
     BLAS_set_num_threads(max_threads);
+    std::vector<double> work(paruMatInfo->max_col_count); 
 
     for (Int f = nf - 1; f >= 0; --f)
     {
@@ -71,20 +72,40 @@ Int paru_usolve(double *x, paru_matrix *paruMatInfo)
         if (A2 != NULL)
         {
             PRLEVEL(2, ("%% usolve: Working on DGEMV\n%%"));
-            //pragma omp parallel for
-            for (Int i = 0; i < fp; i++)
+
+            double *xg = &work[0] + fp; // size Xg is colCount 
+            for (Int j = 0; j < colCount; j++) //gathering x in Xg
             {
-                PRLEVEL(2, ("%% Usolve: Working on DGEMV\n"));
-                // computing the inner product
-                double i_prod = 0.0;  // innter product
-                for (Int j = 0; j < colCount; j++)
-                {
-                    i_prod += A2[fp * j + i] * x[fcolList[j] + n1];
-                }
-                Int r = Ps[frowList[i]] + n1;
-                PRLEVEL(2, ("i_prod[%ld]=%lf  r=%ld\n", i, i_prod,  r));
-                x[r] -= i_prod;
+                    xg[j] = x[ fcolList[j] + n1];
             }
+
+           BLAS_INT mm = (BLAS_INT)fp;
+           BLAS_INT nn = (BLAS_INT)colCount;
+           BLAS_INT lda = (BLAS_INT)fp;
+           cblas_dgemv (CblasColMajor, CblasNoTrans, mm, nn, 
+                   1, A2, lda, xg, 1, 0, &work[0], 1);
+ 
+            for (Int i = 0; i < fp; i++) //scattering the back in to x
+            {
+                Int r = Ps[frowList[i]] + n1;
+                    x[r] -= work[i];
+            }
+
+
+            //pragma omp parallel for
+            //for (Int i = 0; i < fp; i++)
+            //{
+            //    PRLEVEL(2, ("%% Usolve: Working on DGEMV\n"));
+            //    // computing the inner product
+            //    double i_prod = 0.0;  // innter product
+            //    for (Int j = 0; j < colCount; j++)
+            //    {
+            //        i_prod += A2[fp * j + i] * x[fcolList[j] + n1];
+            //    }
+            //    Int r = Ps[frowList[i]] + n1;
+            //    PRLEVEL(2, ("i_prod[%ld]=%lf  r=%ld\n", i, i_prod,  r));
+            //    x[r] -= i_prod;
+            //}
         }
 
         Int rowCount = paruMatInfo->frowCount[f];

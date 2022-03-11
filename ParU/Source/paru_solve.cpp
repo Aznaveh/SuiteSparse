@@ -49,7 +49,7 @@ ParU_ResultCode paru_solve(double *b, paru_matrix *paruMatInfo)
 #ifndef NTIME
     double time = PARU_OPENMP_GET_WTIME;
     time -= start_time;  
-    PRLEVEL(1, ("%%solve has been finished in %lf seconds\n", time));
+    PRLEVEL(-1, ("%%solve has been finished in %lf seconds\n", time));
 #endif
     return PARU_SUCCESS;
 }
