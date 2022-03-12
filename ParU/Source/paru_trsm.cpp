@@ -23,12 +23,6 @@
  */
 #include "paru_internal.hpp"
 
-/// Already defined in /SuiteSparse/CHOLMOD/Include/cholmod_blas.h
-//          use BLAS_DTRSM insted
-// extern "C"  int dtrsm_(char *side, char *uplo, char *transa, char *diag,
-//                           int *m, int *n, double *alpha, double *a, int *lda,
-//                                                         double *b, int *ldb);
-
 Int paru_trsm(Int f, double *pF, double *uPart, Int fp, Int rowCount,
               Int colCount, paru_matrix *paruMatInfo)
 {

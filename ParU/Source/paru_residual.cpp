@@ -80,7 +80,7 @@ ParU_Res paru_residual(double *b, double &resid, double &norm,
  *
  *          compute ||Ax -B||
  *
- * @author Aznaveh  XXX for testing only
+ * @author Aznaveh  for testing now
  * */
 ParU_Res paru_residual(cholmod_sparse *A, paru_matrix *paruMatInfo,
                               double *B,

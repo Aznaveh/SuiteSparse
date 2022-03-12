@@ -9,7 +9,7 @@
  */
 #include "paru_internal.hpp"
 #define base (1024 * 1024 * 256)
-//TODO: test it more
+//XXX
 Int paru_cumsum(Int n, Int *X)
 {  // n is size, X is size n and in/out
     Int tot = 0;

@@ -7,7 +7,7 @@
  * @author Aznaveh
  */
 #include "paru_internal.hpp"
-#define L 4096
+#define L 4096 //XXX
 void paru_tasked_trsm(Int f, int m, int n, double alpha, double *a, int lda,
                       double *b, int ldb, paru_matrix *paruMatInfo)
 {

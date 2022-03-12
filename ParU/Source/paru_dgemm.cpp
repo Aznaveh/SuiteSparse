@@ -13,14 +13,6 @@
  */
 #include "paru_internal.hpp"
 
-/// Already defined in /SuiteSparse/CHOLMOD/Include/cholmod_blas.h
-//          use BLAS_dgemm_
-//
-// void BLAS_DGEMM (char *transa, char *transb, BLAS_INT *m, BLAS_INT *n,
-//	BLAS_INT *k, double *alpha, double *A, BLAS_INT *lda, double *B,
-//	BLAS_INT *ldb, double *beta, double *C, BLAS_INT *ldc) ;
-//
-
 Int paru_dgemm(Int f, double *pF, double *uPart, double *el, Int fp, 
         Int rowCount, Int colCount, paru_matrix *paruMatInfo)
 {

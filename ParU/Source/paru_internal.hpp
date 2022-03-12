@@ -84,8 +84,9 @@ static int print_level = 0;
 #define MIN(a, b) (((a) < (b)) ? (a) : (b))
 #define MAX(a, b) (((a) > (b)) ? (a) : (b))
 #define EMPTY (-1)
-// defined in amd #define TRUE 1
-// defined in amd #define FALSE 0
+// already defined in amd
+//define TRUE 1
+//define FALSE 0
 #define IMPLIES(p, q) (!(p) || (q))
 
 // NULL should already be defined, but ensure it is here.
@@ -96,7 +97,7 @@ static int print_level = 0;
 #define Size_max ((size_t)(-1))  // the largest value of size_t
 
 #define TASK_MIN  256 // Minimum row size to generate a task for a single column
-                      //  in assembly
+                      //  in assembly  //XXX
 
 // internal data structures 
 typedef struct

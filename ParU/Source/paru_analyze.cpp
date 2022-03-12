@@ -1100,8 +1100,8 @@ ParU_Res paru_analyze(cholmod_sparse *A, paru_symbolic **S_handle)
                         Int diag_col = inv_Diag_map[newrow];
                         if (diag_col < n1)
                             PRLEVEL(0, ("diag_col= %ld\n", diag_col));
-                        //XXX  This assertions is not correct;
-                        // sometimes singltones steal diagonals
+                        // This assertions is not correct because
+                        // sometimes singltones can steal diagonals
                         // ASSERT(diag_col >= n1);
                         // row of s ~~~~~~> col Qfill confusing be aware
                         Diag_map[diag_col] = rowcount + n1;  // updating

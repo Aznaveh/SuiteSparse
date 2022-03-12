@@ -8,7 +8,7 @@
  */
 
 #include "paru_internal.hpp"
-#define PIV_TOLER 0.1     // pivot tolerance
+#define PIV_TOLER 0.1     // pivot tolerance  //XXX
 #define DIAG_TOLER 0.001  // pivot tolerance
 
 void swap_rows(double *F, Int *frowList, Int m, Int n, Int r1, Int r2, 

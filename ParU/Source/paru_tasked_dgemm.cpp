@@ -7,8 +7,9 @@
  * @author Aznaveh
  */
 #include "paru_internal.hpp"
-#define L 512
-#define SMALL 4
+#define L 512    //XXX
+#define SMALL 4  //XXX
+
 void paru_tasked_dgemm(Int f,  BLAS_INT M, BLAS_INT N, BLAS_INT K, 
         double *A, BLAS_INT lda, double *B, BLAS_INT ldb, 
         double beta, double *C, BLAS_INT ldc, paru_matrix *paruMatInfo)
@@ -115,7 +116,7 @@ void paru_tasked_dgemm(Int f,  BLAS_INT M, BLAS_INT N, BLAS_INT K,
 #ifndef NTIME
     double time = PARU_OPENMP_GET_WTIME;
     time -= start_time;  
-    PRLEVEL(1, ("%% XXX DGEMM (%d,%d,%d)%1.1f in %ld {%ld} in %lf seconds\n", 
+    PRLEVEL(1, ("%% DGEMM (%d,%d,%d)%1.1f in %ld {%ld} in %lf seconds\n", 
                 M, N, K, beta, f, naft, time));
 #endif
 
