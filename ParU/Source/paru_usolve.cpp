@@ -41,15 +41,15 @@ Int paru_usolve(double *x, paru_matrix *paruMatInfo)
 #ifndef NTIME
     double start_time = PARU_OPENMP_GET_WTIME;
 #endif
-    paru_symbolic *LUsym = paruMatInfo->LUsym;
-    Int nf = LUsym->nf;
+    paru_symbolic *Sym = paruMatInfo->Sym;
+    Int nf = Sym->nf;
 
-    Int n1 = LUsym->n1;   // row+col singletons
-    Int *Ps = LUsym->Ps;  // row permutation
+    Int n1 = Sym->n1;   // row+col singletons
+    Int *Ps = Sym->Ps;  // row permutation
 
     paru_fac *LUs = paruMatInfo->partial_LUs;
     paru_fac *Us = paruMatInfo->partial_Us;
-    Int *Super = LUsym->Super;
+    Int *Super = Sym->Super;
 
     const Int max_threads = paruMatInfo->paru_max_threads;
     BLAS_set_num_threads(max_threads);
@@ -122,7 +122,7 @@ Int paru_usolve(double *x, paru_matrix *paruMatInfo)
     }
 
 #ifndef NDEBUG
-    Int m = LUsym->m;
+    Int m = Sym->m;
     PRLEVEL(1, ("%% before singleton x is:\n%%"));
     for (Int k = 0; k < m; k++)
     {
@@ -131,15 +131,15 @@ Int paru_usolve(double *x, paru_matrix *paruMatInfo)
     PRLEVEL(1, (" \n"));
     PR = 1;
 #endif
-    Int cs1 = LUsym->cs1;
+    Int cs1 = Sym->cs1;
     if (cs1 > 0)
     {
         for (Int i = cs1 - 1; i >= 0; i--)
         {
             PRLEVEL(PR, ("i = %ld\n", i));
-            Int *Sup = LUsym->ustons.Sup;
-            Int *Suj = LUsym->ustons.Suj;
-            double *Sux = LUsym->ustons.Sux;
+            Int *Sup = Sym->ustons.Sup;
+            Int *Suj = Sym->ustons.Suj;
+            double *Sux = Sym->ustons.Sux;
             ASSERT(Suj != NULL && Sux != NULL && Sup != NULL);
             PRLEVEL(PR, (" Before computation x[%ld]=%.2lf \n", i, x[i]))
             for (Int p = Sup[i] + 1; p < Sup[i + 1]; p++)
@@ -179,9 +179,9 @@ Int paru_usolve(double *X, Int n, paru_matrix *paruMatInfo)
     // check if input is read
     if (!X) return (0);
     PARU_DEFINE_PRLEVEL;
-    paru_symbolic *LUsym = paruMatInfo->LUsym;
-    Int m = LUsym->m;
-    Int nf = LUsym->nf;
+    paru_symbolic *Sym = paruMatInfo->Sym;
+    Int m = Sym->m;
+    Int nf = Sym->nf;
 #ifndef NDEBUG
     PRLEVEL(1, ("%% mRHS inside USolve X is:\n"));
     for (Int k = 0; k < m; k++)
@@ -199,12 +199,12 @@ Int paru_usolve(double *X, Int n, paru_matrix *paruMatInfo)
 #ifndef NTIME
     double start_time = PARU_OPENMP_GET_WTIME;
 #endif
-    Int n1 = LUsym->n1;   // row+col singletons
-    Int *Ps = LUsym->Ps;  // row permutation
+    Int n1 = Sym->n1;   // row+col singletons
+    Int *Ps = Sym->Ps;  // row permutation
 
     paru_fac *LUs = paruMatInfo->partial_LUs;
     paru_fac *Us = paruMatInfo->partial_Us;
-    Int *Super = LUsym->Super;
+    Int *Super = Sym->Super;
 
     const Int max_threads = paruMatInfo->paru_max_threads;
     BLAS_set_num_threads(max_threads);
@@ -288,15 +288,15 @@ Int paru_usolve(double *X, Int n, paru_matrix *paruMatInfo)
     }
 
     PRLEVEL(1, ("%% mRHS Usolve working on singletons \n"));
-    Int cs1 = LUsym->cs1;
+    Int cs1 = Sym->cs1;
     if (cs1 > 0)
     {
         for (Int i = cs1 - 1; i >= 0; i--)
         {
             PRLEVEL(PR, ("i = %ld\n", i));
-            Int *Sup = LUsym->ustons.Sup;
-            Int *Suj = LUsym->ustons.Suj;
-            double *Sux = LUsym->ustons.Sux;
+            Int *Sup = Sym->ustons.Sup;
+            Int *Suj = Sym->ustons.Suj;
+            double *Sux = Sym->ustons.Sux;
             ASSERT(Suj != NULL && Sux != NULL && Sup != NULL);
             for (Int p = Sup[i] + 1; p < Sup[i + 1]; p++)
             {

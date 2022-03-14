@@ -10,18 +10,18 @@ void paru_write(paru_matrix *paruMatInfo, int scale, char *id)
 {
     DEBUGLEVEL(0);
     PRLEVEL(1, ("%% Start Writing\n"));
-    paru_symbolic *LUsym = paruMatInfo->LUsym;
-    Int nf = LUsym->nf;
+    paru_symbolic *Sym = paruMatInfo->Sym;
+    Int nf = Sym->nf;
 
-    Int m = LUsym->m;
-    Int n = LUsym->n;
-    Int n1 = LUsym->n1;  // row+col singletons
+    Int m = Sym->m;
+    Int n = Sym->n;
+    Int n1 = Sym->n1;  // row+col singletons
 
-    Int *Qfill = LUsym->Qfill;
+    Int *Qfill = Sym->Qfill;
 
     paru_fac *LUs = paruMatInfo->partial_LUs;
     paru_fac *Us = paruMatInfo->partial_Us;
-    Int *Super = LUsym->Super;
+    Int *Super = Sym->Super;
 
     char default_name[] = "0";
     char *name;
@@ -65,7 +65,7 @@ void paru_write(paru_matrix *paruMatInfo, int scale, char *id)
     // some working memory that is freed in this function
     Int *oldRofS = NULL;
     Int *newRofS = NULL;
-    Int *Pinit = LUsym->Pinit;
+    Int *Pinit = Sym->Pinit;
 
     oldRofS = (Int *)paru_alloc(m, sizeof(Int));  // S -> LU P
     newRofS = (Int *)paru_alloc(m, sizeof(Int));  // Pinv of S
@@ -137,7 +137,7 @@ void paru_write(paru_matrix *paruMatInfo, int scale, char *id)
     //-------------------- writing row scales to a file
     if (scale)
     {
-        double *scale_row = LUsym->scale_row;
+        double *scale_row = Sym->scale_row;
         FILE *scalefptr;
         char fname[100] = "";
         strcat(fname, dpath);
@@ -170,7 +170,7 @@ void paru_write(paru_matrix *paruMatInfo, int scale, char *id)
             printf("Error in opening a file");
             return;
         }
-        fprintf(infofptr, "%.17g\n", paruMatInfo->my_time + LUsym->my_time);
+        fprintf(infofptr, "%.17g\n", paruMatInfo->my_time + Sym->my_time);
         fprintf(infofptr, "%.17g\n", paruMatInfo->umf_time);
 
 #ifdef COUNT_FLOPS
@@ -226,7 +226,7 @@ void paru_write(paru_matrix *paruMatInfo, int scale, char *id)
                 }
             }
     }
-    nnz += LUsym->anz - LUsym->snz;  // adding singletons
+    nnz += Sym->anz - Sym->snz;  // adding singletons
 
     fprintf(LUfptr, "%%%%MatrixMarket matrix coordinate real general\n");
     fprintf(LUfptr, "%%-----------produced by ParU ---------------\n");

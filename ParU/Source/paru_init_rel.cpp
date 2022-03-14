@@ -15,11 +15,11 @@
 void paru_init_rel(Int f, paru_matrix *paruMatInfo)
 {
     DEBUGLEVEL(0);
-    paru_symbolic *LUsym = paruMatInfo->LUsym;
+    paru_symbolic *Sym = paruMatInfo->Sym;
     Int *time_stamp = paruMatInfo->time_stamp;
 
-    Int *Child = LUsym->Child;
-    Int *Childp = LUsym->Childp;
+    Int *Child = Sym->Child;
+    Int *Childp = Sym->Childp;
     Int max_time = 0;
 
     PRLEVEL(1, ("%% begining=%ld end=%ld \n", Childp[f], Childp[f + 1]));

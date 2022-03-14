@@ -18,8 +18,8 @@ ParU_Res paru_backward (double *x1, double &resid, double &norm,
 {
     DEBUGLEVEL(0);
     PRLEVEL(1, ("%% inside backward\n"));
-    paru_symbolic *LUsym = paruMatInfo->LUsym;
-    Int m = LUsym->m;
+    paru_symbolic *Sym = paruMatInfo->Sym;
+    Int m = Sym->m;
 #ifndef NDEBUG
     Int PR = 1;
     PRLEVEL(PR, ("%% before everything x1 is:\n%%"));

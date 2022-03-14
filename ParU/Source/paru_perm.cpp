@@ -42,23 +42,23 @@ ParU_Res paru_perm(paru_matrix *paruMatInfo)
 {
     DEBUGLEVEL(0);
     PARU_DEFINE_PRLEVEL;
-    paru_symbolic *LUsym = paruMatInfo->LUsym;
+    paru_symbolic *Sym = paruMatInfo->Sym;
 
-    if (LUsym->Pfin != NULL)  // it must have been computed
+    if (Sym->Pfin != NULL)  // it must have been computed
         return PARU_SUCCESS;
-    Int nf = LUsym->nf;
+    Int nf = Sym->nf;
 
-    Int m = LUsym->m;
+    Int m = Sym->m;
 
-    Int *Super = LUsym->Super;
+    Int *Super = Sym->Super;
 
     // some working memory that is freed in this function
     Int *Pfin = NULL;
     Int *Ps = NULL;
-    Int *Pinit = LUsym->Pinit;
+    Int *Pinit = Sym->Pinit;
 
-    LUsym->Pfin = Pfin = (Int *)paru_alloc(m, sizeof(Int));
-    LUsym->Ps = Ps = (Int *)paru_alloc(m, sizeof(Int));
+    Sym->Pfin = Pfin = (Int *)paru_alloc(m, sizeof(Int));
+    Sym->Ps = Ps = (Int *)paru_alloc(m, sizeof(Int));
 
     PRLEVEL(1, ("%% Inside Perm\n"));
     if (Pfin == NULL || Ps == NULL)
@@ -76,7 +76,7 @@ ParU_Res paru_perm(paru_matrix *paruMatInfo)
     PRLEVEL(PR, (" \n"));
 #endif
 
-    Int n1 = LUsym->n1;  // row+col singletons
+    Int n1 = Sym->n1;  // row+col singletons
     Int ip = 0;          // number of rows seen so far
     PRLEVEL(PR, ("%% singlton part"));
     for (Int k = 0; k < n1; k++)

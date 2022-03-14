@@ -41,10 +41,10 @@ ParU_Res paru_make_heap(Int f, Int start_fac,
     DEBUGLEVEL(0);
     PARU_DEFINE_PRLEVEL;
 
-    paru_symbolic *LUsym = paruMatInfo->LUsym;
-    Int *aChild = LUsym->aChild;
-    Int *aChildp = LUsym->aChildp;
-    Int *snM = LUsym->super2atree;
+    paru_symbolic *Sym = paruMatInfo->Sym;
+    Int *aChild = Sym->aChild;
+    Int *aChildp = Sym->aChildp;
+    Int *snM = Sym->super2atree;
     paru_Element **elementList = paruMatInfo->elementList;
     // Int m = paruMatInfo-> m;
 
@@ -210,10 +210,10 @@ ParU_Res paru_make_heap_empty_el(Int f,
     DEBUGLEVEL(0);
     PARU_DEFINE_PRLEVEL;
 
-    paru_symbolic *LUsym = paruMatInfo->LUsym;
-    Int *aChild = LUsym->aChild;
-    Int *aChildp = LUsym->aChildp;
-    Int *snM = LUsym->super2atree;
+    paru_symbolic *Sym = paruMatInfo->Sym;
+    Int *aChild = Sym->aChild;
+    Int *aChildp = Sym->aChildp;
+    Int *snM = Sym->super2atree;
     paru_Element **elementList = paruMatInfo->elementList;
     // Int m = paruMatInfo-> m;
 

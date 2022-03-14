@@ -18,7 +18,7 @@ ParU_Res paru_init_rowFronts(
                                        // inputs, not modified
     cholmod_sparse *A,
     // symbolic analysis
-    paru_symbolic *LUsym)
+    paru_symbolic *Sym)
 {
     //mallopt(M_TRIM_THRESHOLD, -1);         // disable sbrk trimming
     //mallopt(M_TOP_PAD, 16 * 1024 * 1024);  // increase padding to speedup malloc
@@ -30,9 +30,9 @@ ParU_Res paru_init_rowFronts(
         return PARU_INVALID;
     }
 
-    if (LUsym == NULL)
+    if (Sym == NULL)
     {
-        printf("Paru: LUsym is NULL\n");
+        printf("Paru: Sym is NULL\n");
         return PARU_INVALID;
     }
 
@@ -48,10 +48,10 @@ ParU_Res paru_init_rowFronts(
     *paruMatInfo_handle = paruMatInfo;
 
     Int m, n, nf;
-    paruMatInfo->LUsym = LUsym;
-    m = paruMatInfo->m = LUsym->m - LUsym->n1;
-    n = paruMatInfo->n = LUsym->n - LUsym->n1;
-    nf = LUsym->nf;
+    paruMatInfo->Sym = Sym;
+    m = paruMatInfo->m = Sym->m - Sym->n1;
+    n = paruMatInfo->n = Sym->n - Sym->n1;
+    nf = Sym->nf;
     paruMatInfo->panel_width = 32;
     paruMatInfo->res = PARU_SUCCESS;
 
@@ -114,15 +114,15 @@ ParU_Res paru_init_rowFronts(
         (paru_Element **)paru_calloc(1, (m + nf + 1) * sizeof(paru_Element));
     Int *Diag_map = paruMatInfo->Diag_map = NULL;
     Int *inv_Diag_map = paruMatInfo->inv_Diag_map = NULL;
-    if (LUsym->strategy == PARU_STRATEGY_SYMMETRIC)
+    if (Sym->strategy == PARU_STRATEGY_SYMMETRIC)
     {
         Diag_map = paruMatInfo->Diag_map =
-            (Int *)paru_alloc(LUsym->n, sizeof(Int));
+            (Int *)paru_alloc(Sym->n, sizeof(Int));
         inv_Diag_map = paruMatInfo->inv_Diag_map =
-            (Int *)paru_alloc(LUsym->n, sizeof(Int));
+            (Int *)paru_alloc(Sym->n, sizeof(Int));
 #ifndef NDEBUG
-        paru_memset(Diag_map, 0, LUsym->n * sizeof(Int));
-        paru_memset(inv_Diag_map, 0, LUsym->n * sizeof(Int));
+        paru_memset(Diag_map, 0, Sym->n * sizeof(Int));
+        paru_memset(inv_Diag_map, 0, Sym->n * sizeof(Int));
 #endif
     }
 
@@ -133,7 +133,7 @@ ParU_Res paru_init_rowFronts(
         paruMatInfo->frowList == NULL || paruMatInfo->fcolList == NULL ||
         paruMatInfo->partial_Us == NULL || paruMatInfo->partial_LUs == NULL ||
         paruMatInfo->time_stamp == NULL || heapList == NULL ||
-        (LUsym->strategy == PARU_STRATEGY_SYMMETRIC &&
+        (Sym->strategy == PARU_STRATEGY_SYMMETRIC &&
          (Diag_map == NULL || inv_Diag_map == NULL)))
     {
         paru_freemat(&paruMatInfo);
@@ -174,10 +174,10 @@ ParU_Res paru_init_rowFronts(
         return PARU_INVALID;
     }
 
-    Int snz = LUsym->snz;
-    double *Sx = LUsym->Sx;
-    Int *Sp = LUsym->Sp;
-    Int *Sj = LUsym->Sj;
+    Int snz = Sym->snz;
+    double *Sx = Sym->Sx;
+    Int *Sp = Sym->Sp;
+    Int *Sj = Sym->Sj;
 
     /// ------------------------------------------------------------------------
     // create S = A (p,q)', or S=A(p,q) if S is considered to be in row-form
@@ -201,24 +201,24 @@ ParU_Res paru_init_rowFronts(
     if (Diag_map)
     {
         #pragma omp taskloop default(none)\
-        shared(LUsym, Diag_map, inv_Diag_map) grainsize(512)
-        for (Int i = 0; i < LUsym->n; i++)
+        shared(Sym, Diag_map, inv_Diag_map) grainsize(512)
+        for (Int i = 0; i < Sym->n; i++)
         {
-            // paru_memcpy(Diag_map, LUsym->Diag_map, (LUsym->n) * sizeof(Int));
-            Diag_map[i] = LUsym->Diag_map[i];
+            // paru_memcpy(Diag_map, Sym->Diag_map, (Sym->n) * sizeof(Int));
+            Diag_map[i] = Sym->Diag_map[i];
             inv_Diag_map[Diag_map[i]] = i;
         }
 #ifndef NDEBUG
         PR = -1;
-        PRLEVEL(PR, ("init_row Diag_map (%ld) =\n", LUsym->n));
-        for (Int i = 0; i < MIN(64, LUsym->n); i++)
+        PRLEVEL(PR, ("init_row Diag_map (%ld) =\n", Sym->n));
+        for (Int i = 0; i < MIN(64, Sym->n); i++)
             PRLEVEL(PR, ("%ld ", Diag_map[i]));
         PRLEVEL(PR, ("\n"));
         PRLEVEL(PR, ("inv_Diag_map =\n"));
-        for (Int i = 0; i < MIN(64, LUsym->n); i++)
+        for (Int i = 0; i < MIN(64, Sym->n); i++)
             PRLEVEL(PR, ("%ld ", inv_Diag_map[i]));
         PRLEVEL(PR, ("\n"));
-        for (Int i = 0; i < LUsym->n; i++)
+        for (Int i = 0; i < Sym->n; i++)
         {
             if (Diag_map[i] == -1)
                 PRLEVEL(PR,
@@ -241,11 +241,11 @@ ParU_Res paru_init_rowFronts(
     ParU_Res info;
     Int out_of_memory = 0;
     #pragma omp taskloop default(none) \
-    shared(out_of_memory, LUsym, Sp, row_degree_bound, elementList, m, \
+    shared(out_of_memory, Sym, Sp, row_degree_bound, elementList, m, \
             paruMatInfo, rowMark, RowList, Sj, Sx) grainsize(512)
     for (Int row = 0; row < m; row++)
     {
-        Int e = LUsym->row2atree[row];
+        Int e = Sym->row2atree[row];
         Int nrows = 1,
             ncols =
                 Sp[row + 1] - Sp[row];  // nrows and ncols of current front/row
@@ -349,7 +349,7 @@ ParU_Res paru_init_rowFronts(
     // Free here or if not wil be freed in paru_mem anyway
     paru_free(snz, sizeof(double), Sx);
     paru_free(snz, sizeof(Int), Sj);
-    LUsym->Sx = NULL;
-    LUsym->Sj = NULL;
+    Sym->Sx = NULL;
+    Sym->Sj = NULL;
     return info;
 }

@@ -15,8 +15,8 @@ void paru_assemble_all(Int e, Int f, std::vector<Int> &colHash,
     DEBUGLEVEL(0);
     PARU_DEFINE_PRLEVEL;
 
-    paru_symbolic *LUsym = paruMatInfo->LUsym;
-    Int *snM = LUsym->super2atree;
+    paru_symbolic *Sym = paruMatInfo->Sym;
+    Int *snM = Sym->super2atree;
     Int eli = snM[f];
     PRLEVEL(PR, ("%% Eliminat all of %ld in %ld\n", e, eli));
 
@@ -204,8 +204,8 @@ void paru_assemble_cols(Int e, Int f, std::vector<Int> &colHash,
 #ifndef NDEBUG
     Int c = 0;  // number of columns assembled
 #endif
-    paru_symbolic *LUsym = paruMatInfo->LUsym;
-    Int *snM = LUsym->super2atree;
+    paru_symbolic *Sym = paruMatInfo->Sym;
+    Int *snM = Sym->super2atree;
     Int eli = snM[f];
 
     PRLEVEL(PR, ("%% Eliminat some cols of %ld in %ld\n", e, eli));
@@ -257,7 +257,7 @@ void paru_assemble_cols(Int e, Int f, std::vector<Int> &colHash,
     //pragma omp atomic read
     //naft = paruMatInfo->naft;
     //const Int max_threads = paruMatInfo->paru_max_threads;
-    ////Int *Depth = LUsym->Depth;
+    ////Int *Depth = Sym->Depth;
     //pragma omp parallel proc_bind(close) num_threads(max_threads/naft) 
     //if (naft < max_threads/2 && 
     //        el->nrowsleft*el->ncolsleft < 4096 && el->nrowsleft < 1024 )
@@ -395,8 +395,8 @@ void paru_assemble_rows(Int e, Int f, std::vector<Int> &colHash,
     DEBUGLEVEL(0);
     PARU_DEFINE_PRLEVEL;
 
-    paru_symbolic *LUsym = paruMatInfo->LUsym;
-    Int *snM = LUsym->super2atree;
+    paru_symbolic *Sym = paruMatInfo->Sym;
+    Int *snM = Sym->super2atree;
     Int eli = snM[f];
 
     PRLEVEL(PR, ("%% Eliminat some rows of %ld in %ld\n", e, eli));
@@ -603,8 +603,8 @@ void paru_assemble_el_with0rows(Int e, Int f, std::vector<Int> &colHash,
     DEBUGLEVEL(0);
     PARU_DEFINE_PRLEVEL;
 
-    paru_symbolic *LUsym = paruMatInfo->LUsym;
-    Int *snM = LUsym->super2atree;
+    paru_symbolic *Sym = paruMatInfo->Sym;
+    Int *snM = Sym->super2atree;
     Int eli = snM[f];
     PRLEVEL(PR, ("%% \n+++++++++++++++++++++++++++++++++++++++\n"));
     PRLEVEL(PR, ("%% Eliminat elment %ld  with0rows in %ld\n", e, eli));
@@ -730,7 +730,7 @@ void paru_assemble_el_with0rows(Int e, Int f, std::vector<Int> &colHash,
         PRLEVEL(PR, ("%% \n"));
 #endif
         Int ncols2bSeen = el->ncolsleft;
-        //Int *Depth = LUsym->Depth;
+        //Int *Depth = Sym->Depth;
         //**//pragma omp parallel 
         //**//pragma omp single nowait
         //**//pragma omp taskgroup
@@ -822,7 +822,7 @@ void paru_assemble_el_with0rows(Int e, Int f, std::vector<Int> &colHash,
     Int *lacList = paruMatInfo->lacList;
     lacList[e] = el_colIndex[el->lac];
 #ifndef NDEBUG
-    Int *Super = LUsym->Super;
+    Int *Super = Sym->Super;
     Int col1 = Super[f]; /* fornt F has columns col1:col2-1 */
     Int col2 = Super[f + 1];
     PR = 1;

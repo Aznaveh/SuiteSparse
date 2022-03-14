@@ -14,7 +14,7 @@ void paru_print_element(paru_matrix *paruMatInfo, Int e)
     paru_Element *curEl = elementList[e];
 
     Int morign = paruMatInfo->m;
-    Int nf = paruMatInfo->LUsym->nf;
+    Int nf = paruMatInfo->Sym->nf;
 
     if (e > morign + nf + 1)
     {

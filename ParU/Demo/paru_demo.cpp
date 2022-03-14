@@ -12,7 +12,7 @@ int main(int argc, char **argv)
 {
     cholmod_common Common, *cc;
     cholmod_sparse *A;
-    paru_symbolic *LUsym = NULL;
+    paru_symbolic *Sym = NULL;
 
     //~~~~~~~~~Reading the input matrix and test if the format is OK~~~~~~~~~~~~
     // start CHOLMOD
@@ -48,7 +48,7 @@ int main(int argc, char **argv)
 
     ParU_Res info;
 
-    info = paru_analyze(A, &LUsym);
+    info = paru_analyze(A, &Sym);
     if (info != PARU_SUCCESS)
     {
         cholmod_l_free_sparse(&A, cc);
@@ -57,12 +57,12 @@ int main(int argc, char **argv)
     }
     printf ("Paru: Symbolic factorization is done!\n");
     paru_matrix *paruMatInfo;
-    info = paru_factorize(A, LUsym, &paruMatInfo);
+    info = paru_factorize(A, Sym, &paruMatInfo);
     double my_time = omp_get_wtime() - my_start_time;
     if (info != PARU_SUCCESS)
     {
         paru_freemat(&paruMatInfo);
-        paru_freesym(&LUsym);
+        paru_freesym(&Sym);
         cholmod_l_free_sparse(&A, cc);
         cholmod_l_finish(cc);
         return info;
@@ -71,7 +71,7 @@ int main(int argc, char **argv)
 
     //~~~~~~~~~~~~~~~~~~~Test the results ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #if 1
-    Int m = LUsym->m;
+    Int m = Sym->m;
     double *b = (double *)malloc(m * sizeof(double));
     for (Int i = 0; i < m; ++i) b[i] = i + 1;
     double resid, norm;
@@ -163,7 +163,7 @@ int main(int argc, char **argv)
             printf("Par: error in making %s to write the results!\n",
                    res_name);
         }
-        fprintf(res_file, "%ld %ld %lf %lf %lf\n", LUsym->m, LUsym->anz,
+        fprintf(res_file, "%ld %ld %lf %lf %lf\n", Sym->m, Sym->anz,
                 my_time, umf_time, my_time / umf_time);
         fclose(res_file);
     }
@@ -173,7 +173,7 @@ int main(int argc, char **argv)
 #endif
     //~~~~~~~~~~~~~~~~~~~Free Everything~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     paru_freemat(&paruMatInfo);
-    paru_freesym(&LUsym);
+    paru_freesym(&Sym);
 
     cholmod_l_free_sparse(&A, cc);
     cholmod_l_finish(cc);

@@ -38,11 +38,11 @@ Int paru_lsolve(double *x, paru_matrix *paruMatInfo)
     DEBUGLEVEL(0);
     if (!x) return (0);
     PARU_DEFINE_PRLEVEL;
-    paru_symbolic *LUsym = paruMatInfo->LUsym;
-    Int nf = LUsym->nf;
+    paru_symbolic *Sym = paruMatInfo->Sym;
+    Int nf = Sym->nf;
 
 #ifndef NDEBUG
-    Int m = LUsym->m;
+    Int m = Sym->m;
     PRLEVEL(1, ("%%inside lsolve x is:\n%%"));
     for (Int k = 0; k < m; k++)
     {
@@ -53,22 +53,22 @@ Int paru_lsolve(double *x, paru_matrix *paruMatInfo)
 #ifndef NTIME
     double start_time = PARU_OPENMP_GET_WTIME;
 #endif
-    Int n1 = LUsym->n1;   // row+col singletons
-    Int *Ps = LUsym->Ps;  // row permutation S->LU
+    Int n1 = Sym->n1;   // row+col singletons
+    Int *Ps = Sym->Ps;  // row permutation S->LU
 
     PRLEVEL(1, ("%%Working on singletons if any\n%%"));
     // singletons
-    Int rs1 = LUsym->rs1;
+    Int rs1 = Sym->rs1;
     if (rs1 > 0)
     {
-        Int cs1 = LUsym->cs1;
+        Int cs1 = Sym->cs1;
 
         for (Int j = cs1; j < n1; j++)
         {
             PRLEVEL(PR, ("j = %ld\n", j));
-            Int *Slp = LUsym->lstons.Slp;
-            Int *Sli = LUsym->lstons.Sli;
-            double *Slx = LUsym->lstons.Slx;
+            Int *Slp = Sym->lstons.Slp;
+            Int *Sli = Sym->lstons.Sli;
+            double *Slx = Sym->lstons.Slx;
             ASSERT(Sli != NULL && Slx != NULL && Slp != NULL);
             Int diag = Slp[j - cs1];
             PRLEVEL(PR, (" x[%ld]=%.2lf Slx[%ld]=%.2lf\n", j, x[j], diag,
@@ -100,7 +100,7 @@ Int paru_lsolve(double *x, paru_matrix *paruMatInfo)
     std::vector<double> work(paruMatInfo->max_row_count); 
 
     paru_fac *LUs = paruMatInfo->partial_LUs;
-    Int *Super = LUsym->Super;
+    Int *Super = Sym->Super;
 
     for (Int f = 0; f < nf; f++)
     {
@@ -135,7 +135,7 @@ Int paru_lsolve(double *x, paru_matrix *paruMatInfo)
         PRLEVEL(PR, ("%% lda = %d\n%%", lda));
         PRLEVEL(PR, ("%% during lsolve x [%ld-%ld)is:\n%%", col1, col2));
         // for (Int k = col1; k < col2; k++)
-        Int m = LUsym->m;
+        Int m = Sym->m;
         for (Int k = 0; k < m; k++)
         {
             PRLEVEL(PR, (" %.2lf, ", x[k]));
@@ -193,9 +193,9 @@ Int paru_lsolve(double *X, Int n, paru_matrix *paruMatInfo)
     DEBUGLEVEL(0);
     PARU_DEFINE_PRLEVEL;
     if (!X) return (0);
-    paru_symbolic *LUsym = paruMatInfo->LUsym;
-    Int m = LUsym->m;
-    Int nf = LUsym->nf;
+    paru_symbolic *Sym = paruMatInfo->Sym;
+    Int m = Sym->m;
+    Int nf = Sym->nf;
 
 #ifndef NDEBUG
     PRLEVEL(1, ("%% mRHS inside LSolve X is:\n"));
@@ -215,21 +215,21 @@ Int paru_lsolve(double *X, Int n, paru_matrix *paruMatInfo)
     double start_time = PARU_OPENMP_GET_WTIME;
 #endif
 
-    Int n1 = LUsym->n1;   // row+col singletons
-    Int *Ps = LUsym->Ps;  // row permutation S->LU
+    Int n1 = Sym->n1;   // row+col singletons
+    Int *Ps = Sym->Ps;  // row permutation S->LU
 
     // singletons
-    Int rs1 = LUsym->rs1;
+    Int rs1 = Sym->rs1;
     if (rs1 > 0)
     {
-        Int cs1 = LUsym->cs1;
+        Int cs1 = Sym->cs1;
 
         for (Int j = cs1; j < n1; j++)
         {
             PRLEVEL(PR, ("j = %ld\n", j));
-            Int *Slp = LUsym->lstons.Slp;
-            Int *Sli = LUsym->lstons.Sli;
-            double *Slx = LUsym->lstons.Slx;
+            Int *Slp = Sym->lstons.Slp;
+            Int *Sli = Sym->lstons.Sli;
+            double *Slx = Sym->lstons.Slx;
             ASSERT(Sli != NULL && Slx != NULL && Slp != NULL);
             Int diag = Slp[j - cs1];
             PRLEVEL(PR, (" X[%ld]=%.2lf Slx[%ld]=%.2lf\n", j, X[j*n], diag,
@@ -276,7 +276,7 @@ Int paru_lsolve(double *X, Int n, paru_matrix *paruMatInfo)
     std::vector<double> work(paruMatInfo->max_row_count*n); 
 
     paru_fac *LUs = paruMatInfo->partial_LUs;
-    Int *Super = LUsym->Super;
+    Int *Super = Sym->Super;
 
     for (Int f = 0; f < nf; f++)
     {

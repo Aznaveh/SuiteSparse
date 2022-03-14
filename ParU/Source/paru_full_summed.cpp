@@ -35,14 +35,14 @@ void paru_full_summed(Int e, Int f, paru_matrix *paruMatInfo)
 {
     DEBUGLEVEL(0);
     PARU_DEFINE_PRLEVEL;
-    paru_symbolic *LUsym = paruMatInfo->LUsym;
+    paru_symbolic *Sym = paruMatInfo->Sym;
 #ifndef NDEBUG
-    Int *snM = LUsym->super2atree;
+    Int *snM = Sym->super2atree;
     Int eli = snM[f];
     PRLEVEL(PR, ("%% Fully summing %ld in %ld(%ld)\n", e, f, eli));
 #endif
 
-    Int *Super = LUsym->Super;
+    Int *Super = Sym->Super;
     Int col1 = Super[f]; /* fornt F has columns col1:col2-1 */
     Int col2 = Super[f + 1];
     PRLEVEL(PR, ("%% col1=%ld, col2=%ld\n", col1, col2));
@@ -139,7 +139,7 @@ void paru_full_summed(Int e, Int f, paru_matrix *paruMatInfo)
         PRLEVEL(PR, ("%% \n"));
 #endif
         //FIXME SLOW DOWN
-        //Int *Depth = LUsym->Depth;
+        //Int *Depth = Sym->Depth;
         //#pragma omp parallel 
         //#pragma omp single
         //#pragma omp taskgroup

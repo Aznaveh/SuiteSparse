@@ -14,13 +14,13 @@ ParU_Res paru_exec_tasks_seq(Int t, Int *task_num_child,
                                 paru_matrix *paruMatInfo)
 {
     DEBUGLEVEL(0);
-    paru_symbolic *LUsym = paruMatInfo->LUsym;
-    Int *task_parent = LUsym->task_parent;
+    paru_symbolic *Sym = paruMatInfo->Sym;
+    Int *task_parent = Sym->task_parent;
     Int daddy = task_parent[t];
-    Int *task_map = LUsym->task_map;
+    Int *task_map = Sym->task_map;
 
     Int num_original_children = 0;
-    if (daddy != -1) num_original_children = LUsym->task_num_child[daddy];
+    if (daddy != -1) num_original_children = Sym->task_num_child[daddy];
     PRLEVEL(1, ("Seq: executing task %ld fronts %ld-%ld (%ld children)\n", t,
                 task_map[t] + 1, task_map[t + 1], num_original_children));
     ParU_Res myInfo;
@@ -81,13 +81,13 @@ ParU_Res paru_exec_tasks (Int t, Int *task_num_child, Int &chain_task,
                                 paru_matrix *paruMatInfo)
 {
     DEBUGLEVEL(0);
-    paru_symbolic *LUsym = paruMatInfo->LUsym;
-    Int *task_parent = LUsym->task_parent;
+    paru_symbolic *Sym = paruMatInfo->Sym;
+    Int *task_parent = Sym->task_parent;
     Int daddy = task_parent[t];
-    Int *task_map = LUsym->task_map;
+    Int *task_map = Sym->task_map;
 
     Int num_original_children = 0;
-    if (daddy != -1) num_original_children = LUsym->task_num_child[daddy];
+    if (daddy != -1) num_original_children = Sym->task_num_child[daddy];
     PRLEVEL(1, ("executing task %ld fronts %ld-%ld (%ld children)\n", t,
                 task_map[t] + 1, task_map[t + 1], num_original_children));
     ParU_Res myInfo;
@@ -170,7 +170,7 @@ ParU_Res paru_exec_tasks (Int t, Int *task_num_child, Int &chain_task,
     }
     return myInfo;
 }
-ParU_Res paru_factorize(cholmod_sparse *A, paru_symbolic *LUsym,
+ParU_Res paru_factorize(cholmod_sparse *A, paru_symbolic *Sym,
         paru_matrix **paruMatInfo_handle)
 {
     DEBUGLEVEL(0);
@@ -189,7 +189,7 @@ ParU_Res paru_factorize(cholmod_sparse *A, paru_symbolic *LUsym,
         return PARU_INVALID;
     }
 
-    if (LUsym == NULL)
+    if (Sym == NULL)
     {
         return PARU_INVALID;
     }
@@ -198,7 +198,7 @@ ParU_Res paru_factorize(cholmod_sparse *A, paru_symbolic *LUsym,
     paruMatInfo = *paruMatInfo_handle;
 
     ParU_Res info;
-    info = paru_init_rowFronts(&paruMatInfo, A, LUsym);
+    info = paru_init_rowFronts(&paruMatInfo, A, Sym);
     *paruMatInfo_handle = paruMatInfo;
 
     PRLEVEL(1, ("%% init_row is done\n"));
@@ -208,18 +208,18 @@ ParU_Res paru_factorize(cholmod_sparse *A, paru_symbolic *LUsym,
         return info;
     }
     paruMatInfo->naft = 0;
-    Int nf = LUsym->nf;
+    Int nf = Sym->nf;
     //////////////// Using task tree //////////////////////////////////////////
-    Int ntasks = LUsym->ntasks;
-    Int *task_depth = LUsym->task_depth;
+    Int ntasks = Sym->ntasks;
+    Int *task_depth = Sym->task_depth;
     std::vector<Int> task_Q;
     // This vector changes during factorization
     // std::vector<Int> task_num_child(ntasks);
-    // paru_memcpy ( &task_num_child[0] , LUsym->task_num_child,
+    // paru_memcpy ( &task_num_child[0] , Sym->task_num_child,
     //        ntasks * sizeof(Int));
 
     Int task_num_child[ntasks];
-    paru_memcpy(task_num_child, LUsym->task_num_child, ntasks * sizeof(Int));
+    paru_memcpy(task_num_child, Sym->task_num_child, ntasks * sizeof(Int));
 
     for (Int t = 0; t < ntasks; t++)
     {
@@ -231,12 +231,12 @@ ParU_Res paru_factorize(cholmod_sparse *A, paru_symbolic *LUsym,
                   return task_depth[t1] > task_depth[t2];
               });
 
-    // Int *Depth = LUsym->Depth;
+    // Int *Depth = Sym->Depth;
     //    std::sort(task_Q.begin(), task_Q.end(),
     //            [&Depth, &task_map](const Int &t1, const Int &t2)-> bool
     //            {return Depth[task_map[t1]+1] > Depth[task_map[t2]+1];});
 
-    Int max_chain = LUsym->max_chain;
+    Int max_chain = Sym->max_chain;
     double chainess = 2;
     double maxchain_ratio = 2;
     paruMatInfo->resq = task_Q.size();
@@ -254,7 +254,7 @@ ParU_Res paru_factorize(cholmod_sparse *A, paru_symbolic *LUsym,
     } 
 #ifndef NDEBUG
     Int PR = -1;
-    Int *task_map = LUsym->task_map;
+    Int *task_map = Sym->task_map;
     PRLEVEL(PR, ("\n%% task_Q:\n"));
     for (Int i = 0; i < (Int)task_Q.size(); i++)
     {
@@ -384,7 +384,7 @@ ParU_Res paru_factorize(cholmod_sparse *A, paru_symbolic *LUsym,
     {
         Int rowCount = paruMatInfo->frowCount[f];
         Int colCount = paruMatInfo->fcolCount[f];
-        Int *Super = LUsym->Super;
+        Int *Super = Sym->Super;
         Int col1 = Super[f];
         Int col2 = Super[f + 1];
         Int fp = col2 - col1;

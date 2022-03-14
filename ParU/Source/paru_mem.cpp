@@ -191,93 +191,93 @@ void operator delete(void *ptr) noexcept
 }
 
 //  freeing symbolic analysis data structure
-ParU_Res paru_freesym(paru_symbolic **LUsym_handle)
+ParU_Res paru_freesym(paru_symbolic **Sym_handle)
 {
     DEBUGLEVEL(0);
-    if (LUsym_handle == NULL || *LUsym_handle == NULL)
+    if (Sym_handle == NULL || *Sym_handle == NULL)
         // nothing to do; caller probably ran out of memory
         return PARU_OUT_OF_MEMORY;
 
-    paru_symbolic *LUsym;
-    LUsym = *LUsym_handle;
+    paru_symbolic *Sym;
+    Sym = *Sym_handle;
 
-    Int m = LUsym->m;
-    Int n = LUsym->n;
-    Int n1 = LUsym->n1;
-    Int nf = LUsym->nf;
-    Int snz = LUsym->snz;
+    Int m = Sym->m;
+    Int n = Sym->n;
+    Int n1 = Sym->n1;
+    Int nf = Sym->nf;
+    Int snz = Sym->snz;
     PRLEVEL(1, ("%% In free sym: m=%ld n=%ld\n nf=%ld "
-                "LUsym->anz=%ld \n",
-                m, n, nf, LUsym->anz));
+                "Sym->anz=%ld \n",
+                m, n, nf, Sym->anz));
 
-    paru_free(nf + 1, sizeof(Int), LUsym->Parent);
-    paru_free(nf + 1, sizeof(Int), LUsym->Child);
-    paru_free(nf + 2, sizeof(Int), LUsym->Childp);
-    paru_free(nf + 1, sizeof(Int), LUsym->Super);
-    paru_free(nf, sizeof(Int), LUsym->Depth);
-    paru_free(n, sizeof(Int), LUsym->Qfill);
-    paru_free(n, sizeof(Int), LUsym->Diag_map);
-    paru_free(m, sizeof(Int), LUsym->Ps);
-    paru_free(m, sizeof(Int), LUsym->Pfin);
-    paru_free((m + 1), sizeof(Int), LUsym->Pinit);
-    paru_free(nf + 1, sizeof(Int), LUsym->Fm);
-    paru_free(nf + 1, sizeof(Int), LUsym->Cm);
+    paru_free(nf + 1, sizeof(Int), Sym->Parent);
+    paru_free(nf + 1, sizeof(Int), Sym->Child);
+    paru_free(nf + 2, sizeof(Int), Sym->Childp);
+    paru_free(nf + 1, sizeof(Int), Sym->Super);
+    paru_free(nf, sizeof(Int), Sym->Depth);
+    paru_free(n, sizeof(Int), Sym->Qfill);
+    paru_free(n, sizeof(Int), Sym->Diag_map);
+    paru_free(m, sizeof(Int), Sym->Ps);
+    paru_free(m, sizeof(Int), Sym->Pfin);
+    paru_free((m + 1), sizeof(Int), Sym->Pinit);
+    paru_free(nf + 1, sizeof(Int), Sym->Fm);
+    paru_free(nf + 1, sizeof(Int), Sym->Cm);
 
-    //paru_free(LUsym->num_roots, sizeof(Int), LUsym->roots);
+    //paru_free(Sym->num_roots, sizeof(Int), Sym->roots);
 
-    paru_free(m + 1 - n1, sizeof(Int), LUsym->Sp);
-    paru_free(snz, sizeof(Int), LUsym->Sj);
-    paru_free(snz, sizeof(double), LUsym->Sx);
-    paru_free(n + 2 - n1, sizeof(Int), LUsym->Sleft);
+    paru_free(m + 1 - n1, sizeof(Int), Sym->Sp);
+    paru_free(snz, sizeof(Int), Sym->Sj);
+    paru_free(snz, sizeof(double), Sym->Sx);
+    paru_free(n + 2 - n1, sizeof(Int), Sym->Sleft);
 
-    //paru_free((n + 1), sizeof(Int), LUsym->Chain_start);
-    //paru_free((n + 1), sizeof(Int), LUsym->Chain_maxrows);
-    //paru_free((n + 1), sizeof(Int), LUsym->Chain_maxcols);
+    //paru_free((n + 1), sizeof(Int), Sym->Chain_start);
+    //paru_free((n + 1), sizeof(Int), Sym->Chain_maxrows);
+    //paru_free((n + 1), sizeof(Int), Sym->Chain_maxcols);
 
-    paru_free(nf + 1, sizeof(double), LUsym->front_flop_bound);
-    paru_free(nf + 1, sizeof(double), LUsym->stree_flop_bound);
+    paru_free(nf + 1, sizeof(double), Sym->front_flop_bound);
+    paru_free(nf + 1, sizeof(double), Sym->stree_flop_bound);
 
     Int ms = m - n1;  // submatrix is msxns
 
-    paru_free(ms + nf, sizeof(Int), LUsym->aParent);
-    paru_free(ms + nf + 1, sizeof(Int), LUsym->aChild);
-    paru_free(ms + nf + 2, sizeof(Int), LUsym->aChildp);
-    paru_free(ms, sizeof(Int), LUsym->row2atree);
-    paru_free(nf, sizeof(Int), LUsym->super2atree);
-    paru_free(nf + 1, sizeof(Int), LUsym->first);
-    paru_free(m, sizeof(Int), LUsym->scale_row);
+    paru_free(ms + nf, sizeof(Int), Sym->aParent);
+    paru_free(ms + nf + 1, sizeof(Int), Sym->aChild);
+    paru_free(ms + nf + 2, sizeof(Int), Sym->aChildp);
+    paru_free(ms, sizeof(Int), Sym->row2atree);
+    paru_free(nf, sizeof(Int), Sym->super2atree);
+    paru_free(nf + 1, sizeof(Int), Sym->first);
+    paru_free(m, sizeof(Int), Sym->scale_row);
 
     if (n1 > 0)
     {  // freeing singletons
-        Int cs1 = LUsym->cs1;
+        Int cs1 = Sym->cs1;
         if (cs1 > 0)
         {
-            ParU_U_singleton ustons = LUsym->ustons;
+            ParU_U_singleton ustons = Sym->ustons;
             paru_free(cs1 + 1, sizeof(Int), ustons.Sup);
             Int nnz = ustons.nnz;
             paru_free(nnz, sizeof(Int), ustons.Suj);
             paru_free(nnz, sizeof(Int), ustons.Sux);
         }
 
-        Int rs1 = LUsym->rs1;
+        Int rs1 = Sym->rs1;
         if (rs1 > 0)
         {
-            ParU_L_singleton lstons = LUsym->lstons;
+            ParU_L_singleton lstons = Sym->lstons;
             paru_free(rs1 + 1, sizeof(Int), lstons.Slp);
             Int nnz = lstons.nnz;
             paru_free(nnz, sizeof(Int), lstons.Sli);
             paru_free(nnz, sizeof(double), lstons.Slx);
         }
     }
-    Int ntasks = LUsym->ntasks;
-    paru_free(ntasks+1, sizeof(Int), LUsym->task_map);
-    paru_free(ntasks, sizeof(Int), LUsym->task_parent);
-    paru_free(ntasks, sizeof(Int), LUsym->task_num_child);
-    paru_free(ntasks, sizeof(Int), LUsym->task_depth);
+    Int ntasks = Sym->ntasks;
+    paru_free(ntasks+1, sizeof(Int), Sym->task_map);
+    paru_free(ntasks, sizeof(Int), Sym->task_parent);
+    paru_free(ntasks, sizeof(Int), Sym->task_num_child);
+    paru_free(ntasks, sizeof(Int), Sym->task_depth);
 
-    paru_free(1, sizeof(paru_symbolic), LUsym);
+    paru_free(1, sizeof(paru_symbolic), Sym);
 
-    *LUsym_handle = NULL;
+    *Sym_handle = NULL;
     return PARU_SUCCESS;
 }
 
@@ -297,7 +297,7 @@ void paru_free_el(Int e, paru_Element **elementList)
     elementList[e] = NULL;
 }
 
-// It uses LUsym, Do not free LUsym before
+// It uses Sym, Do not free Sym before
 ParU_Res paru_freemat(paru_matrix **paruMatInfo_handle)
 {
     DEBUGLEVEL(0);
@@ -307,14 +307,14 @@ ParU_Res paru_freemat(paru_matrix **paruMatInfo_handle)
     paru_matrix *paruMatInfo;
     paruMatInfo = *paruMatInfo_handle;
 
-    Int m = paruMatInfo->m;  // m and n is different than LUsym
+    Int m = paruMatInfo->m;  // m and n is different than Sym
     Int n = paruMatInfo->n;  // Here there are submatrix size
 
     tupleList *RowList = paruMatInfo->RowList;
     PRLEVEL(1, ("%% RowList =%p\n", RowList));
 
-    paru_symbolic *LUsym = paruMatInfo->LUsym;
-    Int nf = LUsym->nf;
+    paru_symbolic *Sym = paruMatInfo->Sym;
+    Int nf = Sym->nf;
 
     for (Int row = 0; row < m; row++)
     {
@@ -326,16 +326,16 @@ ParU_Res paru_freemat(paru_matrix **paruMatInfo_handle)
     paru_Element **elementList;
     elementList = paruMatInfo->elementList;
 
-    PRLEVEL(1, ("%% LUsym = %p\n", LUsym));
+    PRLEVEL(1, ("%% Sym = %p\n", Sym));
     PRLEVEL(1, ("%% freeing initialized elements:\n"));
     for (Int i = 0; i < m; i++)
     {  // freeing all row elements
-        if (LUsym == NULL)
+        if (Sym == NULL)
         {
-            printf("Paru: probably LUsym has been freed before! Wrong usage\n");
+            printf("Paru: probably Sym has been freed before! Wrong usage\n");
             return PARU_INVALID;
         }
-        Int e = LUsym->row2atree[i];  // element number in augmented tree
+        Int e = Sym->row2atree[i];  // element number in augmented tree
         PRLEVEL(1, ("%% e =%ld\t", e));
         paru_free_el(e, elementList);
     }
@@ -343,7 +343,7 @@ ParU_Res paru_freemat(paru_matrix **paruMatInfo_handle)
     PRLEVEL(1, ("\n%% freeing CB elements:\n"));
     for (Int i = 0; i < nf; i++)
     {                                   // freeing all other elements
-        Int e = LUsym->super2atree[i];  // element number in augmented tree
+        Int e = Sym->super2atree[i];  // element number in augmented tree
         paru_free_el(e, elementList);
     }
 
@@ -391,11 +391,11 @@ ParU_Res paru_freemat(paru_matrix **paruMatInfo_handle)
         paru_free(n, sizeof(Int), paruMatInfo->inv_Diag_map);
     }
 #ifndef NDEBUG
-    Int Us_bound_size = LUsym->Us_bound_size;
-    Int LUs_bound_size = LUsym->LUs_bound_size;
+    Int Us_bound_size = Sym->Us_bound_size;
+    Int LUs_bound_size = Sym->LUs_bound_size;
     Int double_size = LUs_bound_size + Us_bound_size;
-    Int row_Int_bound = LUsym->row_Int_bound;
-    Int col_Int_bound = LUsym->col_Int_bound;
+    Int row_Int_bound = Sym->row_Int_bound;
+    Int col_Int_bound = Sym->col_Int_bound;
     Int int_size = row_Int_bound + col_Int_bound;
     Int upperBoundSize = double_size * sizeof(double) + int_size * sizeof(Int);
     PRLEVEL(1, ("%% FREE upperBoundSize =%ld \n", upperBoundSize));

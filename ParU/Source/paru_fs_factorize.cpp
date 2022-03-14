@@ -71,11 +71,11 @@ Int paru_panel_factorize(Int f, Int m, Int n, const Int panel_width,
         PRLEVEL(PR, ("\n"));
     }
 #endif
-    Int *Super = paruMatInfo->LUsym->Super;
+    Int *Super = paruMatInfo->Sym->Super;
     Int col1 = Super[f]; /* fornt F has columns col1:col2-1 */
-    paru_symbolic *LUsym = paruMatInfo->LUsym;
+    paru_symbolic *Sym = paruMatInfo->Sym;
     Int *Diag_map = paruMatInfo->Diag_map;
-    Int n1 = LUsym->n1;
+    Int n1 = Sym->n1;
 
     // column jth of the panel
     for (Int j = j1; j < j2; j++)
@@ -171,7 +171,7 @@ Int paru_panel_factorize(Int f, Int m, Int n, const Int panel_width,
         Int row_piv = row_max;
         Int chose_diag = 0;
 
-        if (LUsym->strategy == PARU_STRATEGY_SYMMETRIC)
+        if (Sym->strategy == PARU_STRATEGY_SYMMETRIC)
         {
             if (diag_found != -1)
             {
@@ -228,7 +228,7 @@ Int paru_panel_factorize(Int f, Int m, Int n, const Int panel_width,
             row_piv = row_sp;
         }
 
-        if (LUsym->strategy == PARU_STRATEGY_SYMMETRIC && chose_diag == 0)
+        if (Sym->strategy == PARU_STRATEGY_SYMMETRIC && chose_diag == 0)
         {
             Int pivcol = col1 + j + n1;      // S col index + n1
             Int pivrow = frowList[row_piv];  // S row index
@@ -365,7 +365,7 @@ Int paru_factorize_full_summed(Int f, Int start_fac,
     DEBUGLEVEL(0);
     PARU_DEFINE_PRLEVEL;
 
-    Int *Super = paruMatInfo->LUsym->Super;
+    Int *Super = paruMatInfo->Sym->Super;
     Int col1 = Super[f]; /* fornt F has columns col1:col2-1 */
     Int col2 = Super[f + 1];
     Int fp = col2 - col1; /* first fp columns are pivotal */
@@ -411,7 +411,7 @@ Int paru_factorize_full_summed(Int f, Int start_fac,
             //shared(paruMatInfo, pivotal_elements, stl_colSet) 
             //shared(panel_num, row_end, f, start_fac) 
 
-            if (paruMatInfo->LUsym->Cm[f] !=0)  
+            if (paruMatInfo->Sym->Cm[f] !=0)  
             {  // if there is potential column left
                 paru_update_rowDeg(panel_num, row_end, f, start_fac,
                         stl_colSet, pivotal_elements,

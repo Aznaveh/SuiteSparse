@@ -56,10 +56,10 @@ ParU_Res paru_analyze(cholmod_sparse *A, paru_symbolic **S_handle)
 #ifndef NTIME
     double start_time = PARU_OPENMP_GET_WTIME;
 #endif
-    paru_symbolic *LUsym;
-    LUsym = (paru_symbolic *)paru_alloc(1, sizeof(paru_symbolic));
-    if (!LUsym) return PARU_INVALID;
-    *S_handle = LUsym;
+    paru_symbolic *Sym;
+    Sym = (paru_symbolic *)paru_alloc(1, sizeof(paru_symbolic));
+    if (!Sym) return PARU_INVALID;
+    *S_handle = Sym;
 
     Int m = A->nrow;
     Int n = A->ncol;
@@ -75,19 +75,19 @@ ParU_Res paru_analyze(cholmod_sparse *A, paru_symbolic **S_handle)
 
     // Initializaing pointers with NULL; just in case for an early exit
     // not to free an uninitialized space
-    // LUsym->Chain_start = LUsym->Chain_maxrows = LUsym->Chain_maxcols = NULL;
-    LUsym->Parent = LUsym->Super = LUsym->Child = LUsym->Childp = NULL;
-    LUsym->Qfill = LUsym->Pfin = LUsym->Pinit = LUsym->Diag_map = NULL;
-    LUsym->Sp = LUsym->Sj = LUsym->Sleft = LUsym->Ps = NULL;
-    LUsym->Sx = NULL;
-    LUsym->Fm = LUsym->Cm = NULL;
-    LUsym->aParent = LUsym->aChildp = LUsym->aChild = LUsym->row2atree = NULL;
-    LUsym->super2atree = LUsym->first = NULL;
-    LUsym->stree_flop_bound = LUsym->front_flop_bound = NULL;
-    LUsym->ustons.Sup = LUsym->lstons.Slp = NULL;
-    LUsym->ustons.Suj = LUsym->lstons.Sli = NULL;
-    LUsym->ustons.Sux = LUsym->lstons.Slx = NULL;
-    LUsym->task_map = LUsym->task_parent = LUsym->task_num_child = NULL;
+    // Sym->Chain_start = Sym->Chain_maxrows = Sym->Chain_maxcols = NULL;
+    Sym->Parent = Sym->Super = Sym->Child = Sym->Childp = NULL;
+    Sym->Qfill = Sym->Pfin = Sym->Pinit = Sym->Diag_map = NULL;
+    Sym->Sp = Sym->Sj = Sym->Sleft = Sym->Ps = NULL;
+    Sym->Sx = NULL;
+    Sym->Fm = Sym->Cm = NULL;
+    Sym->aParent = Sym->aChildp = Sym->aChild = Sym->row2atree = NULL;
+    Sym->super2atree = Sym->first = NULL;
+    Sym->stree_flop_bound = Sym->front_flop_bound = NULL;
+    Sym->ustons.Sup = Sym->lstons.Slp = NULL;
+    Sym->ustons.Suj = Sym->lstons.Sli = NULL;
+    Sym->ustons.Sux = Sym->lstons.Slx = NULL;
+    Sym->task_map = Sym->task_parent = Sym->task_num_child = NULL;
 
     //############  Calling UMFPACK and retrieving data structure ##############
 
@@ -282,7 +282,7 @@ ParU_Res paru_analyze(cholmod_sparse *A, paru_symbolic **S_handle)
         umfpack_dl_report_status(Control, status);
         printf("Paru: umfpack_dl_symbolic failed\n");
         umfpack_dl_free_symbolic(&Symbolic);
-        paru_free(1, sizeof(paru_symbolic), LUsym);
+        paru_free(1, sizeof(paru_symbolic), Sym);
         return PARU_INVALID;
     }
     /* ---------------------------------------------------------------------- */
@@ -290,8 +290,8 @@ ParU_Res paru_analyze(cholmod_sparse *A, paru_symbolic **S_handle)
     /* ---------------------------------------------------------------------- */
 
     Int strategy = Info[UMFPACK_STRATEGY_USED];
-    LUsym->strategy = strategy;
-    //LUsym->strategy = PARU_STRATEGY_SYMMETRIC;
+    Sym->strategy = strategy;
+    //Sym->strategy = PARU_STRATEGY_SYMMETRIC;
 
 #ifndef NDEBUG
     PR = 0;
@@ -368,7 +368,7 @@ ParU_Res paru_analyze(cholmod_sparse *A, paru_symbolic **S_handle)
     Int *fmap = (Int *)paru_alloc((n + 1), sizeof(Int));
     Int *newParent = (Int *)paru_alloc((n + 1), sizeof(Int));
     // TODO: unsymmetric strategy and Diag_map is not working good together
-    if (LUsym->strategy == PARU_STRATEGY_SYMMETRIC)
+    if (Sym->strategy == PARU_STRATEGY_SYMMETRIC)
         Diag_map = Sym_umf->Diagonal_map;
     else
         Diag_map = NULL;
@@ -383,7 +383,7 @@ ParU_Res paru_analyze(cholmod_sparse *A, paru_symbolic **S_handle)
         paru_free((n + 1), sizeof(Int), newParent);
         paru_free(n, sizeof(Int), inv_Diag_map);
         printf("Paru: out of memory\n");
-        paru_freesym(&LUsym);
+        paru_freesym(&Sym);
         umfpack_dl_free_symbolic(&Symbolic);
         umfpack_dl_azn_free_sw(&SW);
         return PARU_OUT_OF_MEMORY;
@@ -489,19 +489,19 @@ ParU_Res paru_analyze(cholmod_sparse *A, paru_symbolic **S_handle)
     ASSERT(m == nr);
     ASSERT(n == nc);
 
-    LUsym->m = m;
-    LUsym->n = n;
-    LUsym->n1 = n1;
-    LUsym->rs1 = rs1;
-    LUsym->cs1 = cs1;
-    LUsym->anz = anz;
-    Int nf = LUsym->nf = nfr;
+    Sym->m = m;
+    Sym->n = n;
+    Sym->n1 = n1;
+    Sym->rs1 = rs1;
+    Sym->cs1 = cs1;
+    Sym->anz = anz;
+    Int nf = Sym->nf = nfr;
 
-    // LUsym->Chain_start = Chain_start;
-    // LUsym->Chain_maxrows = Chain_maxrows;
-    // LUsym->Chain_maxcols = Chain_maxcols;
-    LUsym->Qfill = Qinit;
-    LUsym->Diag_map = Diag_map;
+    // Sym->Chain_start = Chain_start;
+    // Sym->Chain_maxrows = Chain_maxrows;
+    // Sym->Chain_maxcols = Chain_maxcols;
+    Sym->Qfill = Qinit;
+    Sym->Diag_map = Diag_map;
 
     PRLEVEL(0, ("%% A  is  %ld x %ld \n", m, n));
     PRLEVEL(1, ("LU = zeros(%ld,%ld);\n", m, n));
@@ -525,26 +525,26 @@ ParU_Res paru_analyze(cholmod_sparse *A, paru_symbolic **S_handle)
         paru_free((n + 1), sizeof(Int), Front_parent);
         paru_free((m + 1), sizeof(Int), Pinit);
         paru_free(n, sizeof(Int), inv_Diag_map);
-        paru_freesym(&LUsym);
+        paru_freesym(&Sym);
         umfpack_dl_azn_free_sw(&SW);
         return PARU_OUT_OF_MEMORY;
     }
-    LUsym->Parent = Parent;
+    Sym->Parent = Parent;
 
     // Making Super data structure
     // like SPQR: Super[f]<= pivotal columns of (f) < Super[f+1]
-    Int *Super = LUsym->Super = NULL;
-    Int *Depth = LUsym->Depth = NULL;
+    Int *Super = Sym->Super = NULL;
+    Int *Depth = Sym->Depth = NULL;
     if (nf > 0)
     {
-        Super = LUsym->Super = (Int *)paru_alloc((nf + 1), sizeof(Int));
-        Depth = LUsym->Depth = (Int *)paru_calloc(nf, sizeof(Int));
+        Super = Sym->Super = (Int *)paru_alloc((nf + 1), sizeof(Int));
+        Depth = Sym->Depth = (Int *)paru_calloc(nf, sizeof(Int));
         if (Super == NULL || Depth == NULL)
         {
             printf("Paru: memory problem\n");
             paru_free((m + 1), sizeof(Int), Pinit);
             paru_free(n, sizeof(Int), inv_Diag_map);
-            paru_freesym(&LUsym);
+            paru_freesym(&Sym);
             umfpack_dl_azn_free_sw(&SW);
             return PARU_OUT_OF_MEMORY;
         }
@@ -623,7 +623,7 @@ ParU_Res paru_analyze(cholmod_sparse *A, paru_symbolic **S_handle)
         newF++;
         f = repr;
     }
-    //LUsym->num_roots = num_roots;
+    //Sym->num_roots = num_roots;
 
 #ifndef NDEBUG
     PR = 1;
@@ -652,21 +652,21 @@ ParU_Res paru_analyze(cholmod_sparse *A, paru_symbolic **S_handle)
     Int *Front_nrows = (Int *)mySW->Front_nrows;
     Int *Front_ncols = (Int *)mySW->Front_ncols;
 
-    LUsym->Fm = NULL;  // Upper bound on number of rows including pivots
-    LUsym->Cm = NULL;  // Upper bound on number of columns excluding pivots
+    Sym->Fm = NULL;  // Upper bound on number of rows including pivots
+    Sym->Cm = NULL;  // Upper bound on number of columns excluding pivots
     Int *Fm = (Int *)paru_calloc((newNf + 1), sizeof(Int));
     Int *Cm = (Int *)paru_alloc((newNf + 1), sizeof(Int));
     //Int *roots = (Int *)paru_alloc((num_roots), sizeof(Int));
-    LUsym->Fm = Fm;
-    LUsym->Cm = Cm;
-    //LUsym->roots = roots;
+    Sym->Fm = Fm;
+    Sym->Cm = Cm;
+    //Sym->roots = roots;
 
     //if (Fm == NULL || Cm == NULL || roots == NULL)
     if (Fm == NULL || Cm == NULL )
     {
         printf("Paru: memory problem\n");
         paru_free(n, sizeof(Int), inv_Diag_map);
-        paru_freesym(&LUsym);
+        paru_freesym(&Sym);
         umfpack_dl_azn_free_sw(&SW);
         return PARU_OUT_OF_MEMORY;
     }
@@ -744,9 +744,9 @@ ParU_Res paru_analyze(cholmod_sparse *A, paru_symbolic **S_handle)
 
 
 
-    paru_free(nf + 1, sizeof(Int), LUsym->Parent);
-    LUsym->Parent = Parent = newParent;
-    nf = LUsym->nf = newNf;
+    paru_free(nf + 1, sizeof(Int), Sym->Parent);
+    Sym->Parent = Parent = newParent;
+    nf = Sym->nf = newNf;
 
     umfpack_dl_azn_free_sw(&SW);
     paru_free((n + 1), sizeof(Int), Front_npivcol);
@@ -807,12 +807,12 @@ ParU_Res paru_analyze(cholmod_sparse *A, paru_symbolic **S_handle)
 
     // Making Children list and computing the bound sizes
     Int *Childp = (Int *)paru_calloc((nf + 2), sizeof(Int));
-    LUsym->Childp = Childp;
+    Sym->Childp = Childp;
     if (Childp == NULL)
     {
         printf("Paru: memory problem\n");
         paru_free((m + 1), sizeof(Int), Pinit);
-        paru_freesym(&LUsym);
+        paru_freesym(&Sym);
         paru_free(n, sizeof(Int), inv_Diag_map);
         // umfpack_dl_azn_free_sw (&SW);
         return PARU_OUT_OF_MEMORY;
@@ -828,8 +828,8 @@ ParU_Res paru_analyze(cholmod_sparse *A, paru_symbolic **S_handle)
     {
 #ifndef NDEBUG
         Int fp = Super[f + 1] - Super[f];
-        Int fm = LUsym->Fm[f];
-        Int fn = LUsym->Cm[f]; /* Upper bound number of cols of F */
+        Int fm = Sym->Fm[f];
+        Int fn = Sym->Cm[f]; /* Upper bound number of cols of F */
         Us_bound_size += fp * fn;
         LUs_bound_size += fp * fm;
         row_Int_bound += fm;
@@ -840,10 +840,10 @@ ParU_Res paru_analyze(cholmod_sparse *A, paru_symbolic **S_handle)
     // see GraphBLAS/Source/GB_cumsum.c
     paru_cumsum(nf + 2, Childp);
 #ifndef NDEBUG
-    LUsym->Us_bound_size = Us_bound_size;
-    LUsym->LUs_bound_size = LUs_bound_size;
-    LUsym->row_Int_bound = row_Int_bound;
-    LUsym->col_Int_bound = col_Int_bound;
+    Sym->Us_bound_size = Us_bound_size;
+    Sym->LUs_bound_size = LUs_bound_size;
+    Sym->row_Int_bound = row_Int_bound;
+    Sym->col_Int_bound = col_Int_bound;
     PR = 1;
     PRLEVEL(PR, ("%%row_Int_bound=%ld, col_Int_bound=%ld", row_Int_bound,
                  col_Int_bound));
@@ -857,12 +857,12 @@ ParU_Res paru_analyze(cholmod_sparse *A, paru_symbolic **S_handle)
     PRLEVEL(PR, ("\n"));
 #endif
     Int *Child = (Int *)paru_calloc((nf + 1), sizeof(Int));
-    LUsym->Child = Child;
+    Sym->Child = Child;
     if (Child == NULL)
     {
         printf("Paru: memory problem\n");
         paru_free((m + 1), sizeof(Int), Pinit);
-        paru_freesym(&LUsym);
+        paru_freesym(&Sym);
         paru_free(n, sizeof(Int), inv_Diag_map);
         // umfpack_dl_azn_free_sw (&SW);
         return PARU_OUT_OF_MEMORY;
@@ -876,7 +876,7 @@ ParU_Res paru_analyze(cholmod_sparse *A, paru_symbolic **S_handle)
         printf("Paru: memory problem\n");
         paru_free((m + 1), sizeof(Int), Pinit);
         paru_free((MAX(m, n) + 2), sizeof(Int), Work);
-        paru_freesym(&LUsym);
+        paru_freesym(&Sym);
         paru_free(n, sizeof(Int), inv_Diag_map);
         // umfpack_dl_azn_free_sw (&SW);
         return PARU_OUT_OF_MEMORY;
@@ -899,8 +899,8 @@ ParU_Res paru_analyze(cholmod_sparse *A, paru_symbolic **S_handle)
     /*                   computing the Staircase structures                   */
     /* ---------------------------------------------------------------------- */
 
-    Int *Sp = LUsym->Sp = (Int *)paru_calloc(m + 1 - n1, sizeof(Int));
-    Int *Sleft = LUsym->Sleft = (Int *)paru_alloc(n + 2 - n1, sizeof(Int));
+    Int *Sp = Sym->Sp = (Int *)paru_calloc(m + 1 - n1, sizeof(Int));
+    Int *Sleft = Sym->Sleft = (Int *)paru_alloc(n + 2 - n1, sizeof(Int));
     Int *Pinv = (Int *)paru_alloc(m + 1, sizeof(Int));
 
     if (Sp == NULL || Sleft == NULL || Pinv == NULL)
@@ -910,7 +910,7 @@ ParU_Res paru_analyze(cholmod_sparse *A, paru_symbolic **S_handle)
         paru_free((m + 1), sizeof(Int), Pinit);
         paru_free((MAX(m, n) + 2), sizeof(Int), Work);
 
-        paru_freesym(&LUsym);
+        paru_freesym(&Sym);
         // umfpack_dl_azn_free_sw (&SW);
 
         paru_free(n, sizeof(Int), inv_Diag_map);
@@ -978,12 +978,12 @@ ParU_Res paru_analyze(cholmod_sparse *A, paru_symbolic **S_handle)
     if (scale == 1) Rs = (double *)paru_calloc(m, sizeof(double));
     if (cs1 > 0)
     {
-        Sup = LUsym->ustons.Sup = (Int *)paru_calloc(cs1 + 1, sizeof(Int));
+        Sup = Sym->ustons.Sup = (Int *)paru_calloc(cs1 + 1, sizeof(Int));
         cSup = (Int *)paru_alloc(cs1 + 1, sizeof(Int));
     }
     if (rs1 > 0)
     {
-        Slp = LUsym->lstons.Slp = (Int *)paru_calloc(rs1 + 1, sizeof(Int));
+        Slp = Sym->lstons.Slp = (Int *)paru_calloc(rs1 + 1, sizeof(Int));
         cSlp = (Int *)paru_alloc(rs1 + 1, sizeof(Int));
     }
 
@@ -1004,7 +1004,7 @@ ParU_Res paru_analyze(cholmod_sparse *A, paru_symbolic **S_handle)
         paru_free(m, sizeof(Int), Pinv);
         paru_free(n, sizeof(Int), inv_Diag_map);
         // umfpack_dl_azn_free_sw (&SW);
-        paru_freesym(&LUsym);
+        paru_freesym(&Sym);
         return PARU_OUT_OF_MEMORY;
     }
     Int sunz = 0;  // U nnz: singlteton nnzero of s
@@ -1057,8 +1057,8 @@ ParU_Res paru_analyze(cholmod_sparse *A, paru_symbolic **S_handle)
             }
         }
     }
-    LUsym->ustons.nnz = sunz;
-    LUsym->lstons.nnz = slnz;
+    Sym->ustons.nnz = sunz;
+    Sym->lstons.nnz = slnz;
 #ifndef NDEBUG
     PR = 1;
     PRLEVEL(PR, ("Sup and Slp in the middle\n"));
@@ -1122,8 +1122,8 @@ ParU_Res paru_analyze(cholmod_sparse *A, paru_symbolic **S_handle)
         Sleft[newcol - n1 + 1] = rowcount;
     }
     Sleft[n - n1 + 1] = m - n1 - rowcount;  // empty rows of S if any
-    LUsym->snz = snz;
-    LUsym->scale_row = Rs;
+    Sym->snz = snz;
+    Sym->scale_row = Rs;
     paru_free(n, sizeof(Int), inv_Diag_map);
 
     PRLEVEL(PR, ("%% scale_row:\n["));
@@ -1141,7 +1141,7 @@ ParU_Res paru_analyze(cholmod_sparse *A, paru_symbolic **S_handle)
                 paru_free(m, sizeof(Int), Pinv);
                 if (cs1 > 0) paru_free((cs1 + 1), sizeof(Int), cSup);
                 if (rs1 > 0) paru_free((rs1 + 1), sizeof(Int), cSlp);
-                paru_freesym(&LUsym);
+                paru_freesym(&Sym);
                 return PARU_OUT_OF_MEMORY;
             }
         }
@@ -1198,7 +1198,7 @@ ParU_Res paru_analyze(cholmod_sparse *A, paru_symbolic **S_handle)
         paru_free((MAX(m, n) + 2), sizeof(Int), Work);
 
         paru_free(m, sizeof(Int), Pinv);
-        paru_freesym(&LUsym);
+        paru_freesym(&Sym);
         // umfpack_dl_azn_free_sw (&SW);
         return PARU_OUT_OF_MEMORY;
     }
@@ -1301,7 +1301,7 @@ ParU_Res paru_analyze(cholmod_sparse *A, paru_symbolic **S_handle)
 #endif
 
     // PofA
-    LUsym->Pinit = Pinit;
+    Sym->Pinit = Pinit;
     ///////////////////////////////////////////////////////////////
 #ifndef NDEBUG
     PR = 1;
@@ -1317,8 +1317,8 @@ ParU_Res paru_analyze(cholmod_sparse *A, paru_symbolic **S_handle)
         Suj = (Int *)paru_alloc(sunz, sizeof(Int));
         Sux = (double *)paru_alloc(sunz, sizeof(double));
     }
-    LUsym->ustons.Sux = Sux;
-    LUsym->ustons.Suj = Suj;
+    Sym->ustons.Sux = Sux;
+    Sym->ustons.Suj = Suj;
 
     Int *Sli = NULL;
     double *Slx = NULL;
@@ -1327,22 +1327,22 @@ ParU_Res paru_analyze(cholmod_sparse *A, paru_symbolic **S_handle)
         Sli = (Int *)paru_alloc(slnz, sizeof(Int));
         Slx = (double *)paru_alloc(slnz, sizeof(double));
     }
-    LUsym->lstons.Slx = Slx;
-    LUsym->lstons.Sli = Sli;
+    Sym->lstons.Slx = Slx;
+    Sym->lstons.Sli = Sli;
 
     // Updating Sj and Sx using copy of Sp
     Int *Sj = (Int *)paru_alloc(snz, sizeof(Int));
     double *Sx = (double *)paru_alloc(snz, sizeof(double));
 
-    LUsym->Sj = Sj;
-    LUsym->Sx = Sx;
+    Sym->Sj = Sj;
+    Sym->Sx = Sx;
 
     if (Sj == NULL || Sx == NULL || (cs1 > 0 && (Suj == NULL || Sux == NULL)) ||
         (rs1 > 0 && (Sli == NULL || Slx == NULL)))
     {
         printf("Paru: memory problem\n");
         paru_free(m, sizeof(Int), Pinv);
-        paru_freesym(&LUsym);
+        paru_freesym(&Sym);
         // umfpack_dl_azn_free_sw (&SW);
         return PARU_OUT_OF_MEMORY;
     }
@@ -1483,12 +1483,12 @@ ParU_Res paru_analyze(cholmod_sparse *A, paru_symbolic **S_handle)
     /* ---------------------------------------------------------------------- */
 
     /*Computing augmented tree */
-    Int *aParent = LUsym->aParent = NULL;  // augmented tree size m+nf
-    Int *aChildp = LUsym->aChildp = NULL;  // size m+nf+2
-    Int *aChild = LUsym->aChild = NULL;    // size m+nf+1
-    Int *rM = LUsym->row2atree = NULL;     // row map
-    Int *snM = LUsym->super2atree = NULL;  // and supernode map
-    Int *first = LUsym->first = NULL;      // first descendent in the tree
+    Int *aParent = Sym->aParent = NULL;  // augmented tree size m+nf
+    Int *aChildp = Sym->aChildp = NULL;  // size m+nf+2
+    Int *aChild = Sym->aChild = NULL;    // size m+nf+1
+    Int *rM = Sym->row2atree = NULL;     // row map
+    Int *snM = Sym->super2atree = NULL;  // and supernode map
+    Int *first = Sym->first = NULL;      // first descendent in the tree
     // augmented tree size nf+1
 
 #ifndef NDEBUG
@@ -1515,18 +1515,18 @@ ParU_Res paru_analyze(cholmod_sparse *A, paru_symbolic **S_handle)
     Int ns = n - n1;
 #endif
 
-    LUsym->aParent = aParent = (Int *)paru_alloc(ms + nf, sizeof(Int));
-    LUsym->aChild = aChild = (Int *)paru_alloc(ms + nf + 1, sizeof(Int));
-    LUsym->aChildp = aChildp = (Int *)paru_alloc(ms + nf + 2, sizeof(Int));
-    LUsym->first = first = (Int *)paru_alloc(nf + 1, sizeof(Int));
-    LUsym->row2atree = rM = (Int *)paru_alloc(ms, sizeof(Int));
-    LUsym->super2atree = snM = (Int *)paru_alloc(nf, sizeof(Int));
+    Sym->aParent = aParent = (Int *)paru_alloc(ms + nf, sizeof(Int));
+    Sym->aChild = aChild = (Int *)paru_alloc(ms + nf + 1, sizeof(Int));
+    Sym->aChildp = aChildp = (Int *)paru_alloc(ms + nf + 2, sizeof(Int));
+    Sym->first = first = (Int *)paru_alloc(nf + 1, sizeof(Int));
+    Sym->row2atree = rM = (Int *)paru_alloc(ms, sizeof(Int));
+    Sym->super2atree = snM = (Int *)paru_alloc(nf, sizeof(Int));
 
     double *front_flop_bound = NULL;
     double *stree_flop_bound = NULL;
-    LUsym->front_flop_bound = front_flop_bound =
+    Sym->front_flop_bound = front_flop_bound =
         (double *)paru_alloc(nf + 1, sizeof(double));
-    LUsym->stree_flop_bound = stree_flop_bound =
+    Sym->stree_flop_bound = stree_flop_bound =
         (double *)paru_calloc(nf + 1, sizeof(double));
 
     if (aParent == NULL || aChild == NULL || aChildp == NULL || rM == NULL ||
@@ -1535,7 +1535,7 @@ ParU_Res paru_analyze(cholmod_sparse *A, paru_symbolic **S_handle)
     {
         printf("Paru: Out of memory in symbolic phase");
         paru_free(m, sizeof(Int), Pinv);
-        paru_freesym(&LUsym);
+        paru_freesym(&Sym);
         return PARU_OUT_OF_MEMORY;
     }
     // initialization
@@ -1564,8 +1564,8 @@ ParU_Res paru_analyze(cholmod_sparse *A, paru_symbolic **S_handle)
 
         // computing works in each front
         Int fp = Super[f + 1] - Super[f];  // k
-        Int fm = LUsym->Fm[f];             // m
-        Int fn = LUsym->Cm[f];             // n Upper bound number of cols of f
+        Int fm = Sym->Fm[f];             // m
+        Int fn = Sym->Cm[f];             // n Upper bound number of cols of f
         //if (Parent[f] == -1) roots[root_count++] = f;
         front_flop_bound[f] = (double)(fp * fm * fn + fp * fm + fp * fn);
         stree_flop_bound[f] += front_flop_bound[f];
@@ -1683,16 +1683,16 @@ ParU_Res paru_analyze(cholmod_sparse *A, paru_symbolic **S_handle)
     }
 
     PRLEVEL(1, ("%% ntasks = %ld\n",ntasks));
-    LUsym->ntasks = ntasks;
+    Sym->ntasks = ntasks;
     Int *task_map;
     Int *task_parent;
     Int *task_num_child;
     Int *task_depth;
-    LUsym->task_map = task_map = (Int *)paru_alloc(ntasks+1, sizeof(Int));
-    LUsym->task_parent = task_parent = (Int *)paru_alloc(ntasks, sizeof(Int));
-    LUsym->task_num_child = task_num_child =
+    Sym->task_map = task_map = (Int *)paru_alloc(ntasks+1, sizeof(Int));
+    Sym->task_parent = task_parent = (Int *)paru_alloc(ntasks, sizeof(Int));
+    Sym->task_num_child = task_num_child =
         (Int *)paru_calloc(ntasks, sizeof(Int));
-    LUsym->task_depth = task_depth =
+    Sym->task_depth = task_depth =
         (Int *)paru_calloc(ntasks, sizeof(Int));
 
     if ( task_map == NULL || task_parent == NULL || task_num_child == NULL || 
@@ -1700,7 +1700,7 @@ ParU_Res paru_analyze(cholmod_sparse *A, paru_symbolic **S_handle)
     {
         printf("Paru: Out of memory in symbolic phase");
         paru_free(m, sizeof(Int), Pinv);
-        paru_freesym(&LUsym);
+        paru_freesym(&Sym);
         return PARU_OUT_OF_MEMORY;
     }
     task_map[0] = -1;
@@ -1759,7 +1759,7 @@ ParU_Res paru_analyze(cholmod_sparse *A, paru_symbolic **S_handle)
         PRLEVEL(1,("max_chain = %ld\n",max_chain));
         ii++;
     }
-    LUsym->max_chain = max_chain;
+    Sym->max_chain = max_chain;
     PRLEVEL(1,("max_chain = %ld\n", max_chain));
 
 #ifndef NDEBUG
@@ -1861,7 +1861,7 @@ ParU_Res paru_analyze(cholmod_sparse *A, paru_symbolic **S_handle)
 #ifndef NTIME
     double time = PARU_OPENMP_GET_WTIME;
     time -= start_time;  
-    LUsym->my_time = time;
+    Sym->my_time = time;
     PRLEVEL(1, ("%% mRHS paru_apply_inv_perm %lf seconds\n", time));
 #endif
     paru_free(m, sizeof(Int), Pinv);

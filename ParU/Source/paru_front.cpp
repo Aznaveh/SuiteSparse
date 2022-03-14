@@ -24,14 +24,14 @@ ParU_Res paru_front(Int f,  // front need to be assembled
      *  0 Detailed
      *  > 0 Everything
      */
-    paru_symbolic *LUsym = paruMatInfo->LUsym;
-    Int *Super = LUsym->Super;
+    paru_symbolic *Sym = paruMatInfo->Sym;
+    Int *Super = Sym->Super;
     /* ---------------------------------------------------------------------- */
     /* get the front F  */
     /* ---------------------------------------------------------------------- */
 
     PRLEVEL(-2, ("%%~~~~~~~  Assemble Front %ld start ~~%.0lf~~~~~~~(%d)\n", f, 
-               LUsym->stree_flop_bound[f], omp_get_thread_num() ));
+               Sym->stree_flop_bound[f], omp_get_thread_num() ));
     /* pivotal columns Super [f] ... Super [f+1]-1 */
     Int col1 = Super[f]; /* fornt F has columns col1:col2-1 */
     Int col2 = Super[f + 1];
@@ -53,12 +53,12 @@ ParU_Res paru_front(Int f,  // front need to be assembled
     // Needs to be initialized in my new algorithm
     std::vector<Int> panel_row(num_panels, 0);
 
-    Int *snM = LUsym->super2atree;
+    Int *snM = Sym->super2atree;
     Int eli = snM[f];
 
     Int *isRowInFront = Work->rowSize;
 
-    Int fm = LUsym->Fm[f]; /* Upper bound number of rows of F */
+    Int fm = Sym->Fm[f]; /* Upper bound number of rows of F */
     PRLEVEL(1, ("%% the size of fm is %ld\n", fm));
     Int *frowList = (Int *)paru_alloc(fm, sizeof(Int));
     if (frowList == NULL)
@@ -161,7 +161,7 @@ ParU_Res paru_front(Int f,  // front need to be assembled
 #endif
 
     // provide paru_alloc as the allocator
-    Int fn = LUsym->Cm[f];    /* Upper bound number of cols of F */
+    Int fn = Sym->Cm[f];    /* Upper bound number of cols of F */
     std::set<Int> stl_colSet; /* used in this scope */
 
     if (rowCount < fp)
@@ -298,17 +298,17 @@ ParU_Res paru_front(Int f,  // front need to be assembled
     // fcolList copy from the stl_colSet
     // hasing from fcolList indices to column index
     // the last elment of the hash shows if it is a lookup table
-    // Int hash_size = (colCount*2 > LUsym->n )? LUsym->n : colCount;
+    // Int hash_size = (colCount*2 > Sym->n )? Sym->n : colCount;
     Int hash_size = ((Int)2) << ((Int)floor(log2((double)colCount)) + 1);
     PRLEVEL(1, ("%% 1Front hash_size=%ld\n", hash_size));
-    hash_size = (hash_size > LUsym->n) ? LUsym->n : hash_size;
+    hash_size = (hash_size > Sym->n) ? Sym->n : hash_size;
     PRLEVEL(1, ("%% 2Front hash_size=%ld\n", hash_size));
     std::vector<Int> colHash(hash_size + 1, -1);
     Int ii = 0;
-    if (hash_size == LUsym->n)
+    if (hash_size == Sym->n)
     {
         PRLEVEL(PR,
-                ("%% colHash LOOKUP size = %ld LU %ld\n", hash_size, LUsym->n));
+                ("%% colHash LOOKUP size = %ld LU %ld\n", hash_size, Sym->n));
         for (it = stl_colSet.begin(); it != stl_colSet.end(); it++)
         {
             colHash[*it] = ii;
@@ -347,7 +347,7 @@ ParU_Res paru_front(Int f,  // front need to be assembled
     }
 
 #ifndef NDEBUG
-    if (f == LUsym->nf - 1)
+    if (f == Sym->nf - 1)
     {
         PR = 3;
     }
@@ -364,7 +364,7 @@ ParU_Res paru_front(Int f,  // front need to be assembled
 
     tupleList *RowList = paruMatInfo->RowList;
 
-    //Int *Depth = LUsym->Depth;
+    //Int *Depth = Sym->Depth;
     //**//pragma omp parallel 
     //**//pragma omp single nowait
     //**//pragma omp taskgroup
@@ -588,7 +588,7 @@ ParU_Res paru_front(Int f,  // front need to be assembled
 
 #ifndef NDEBUG /* chekcing if isRowInFront is correct */
     rowMark = rowMarkp[eli];
-    // Int *Sleft = LUsym->Sleft;
+    // Int *Sleft = Sym->Sleft;
     //    for (Int i = Sleft[col1]; i < Sleft[Super[f+1]]; i++)
     //        ASSERT ( isRowInFront [i] < rowMark);
 #endif

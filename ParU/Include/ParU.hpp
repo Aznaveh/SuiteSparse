@@ -348,7 +348,7 @@ enum ParU_Res
 typedef struct
 {             /*Matrix */
     Int m, n; /* size of the sumbatrix that is factorized */
-    paru_symbolic *LUsym;
+    paru_symbolic *Sym;
     tupleList *RowList; /* size n of dynamic list */
 
     paru_Element **elementList; /* pointers to all elements, size = m+nf+1 */
@@ -383,10 +383,10 @@ typedef struct
 
     Int *Diag_map;  // size n,
     // Both of these are NULL if the stratey is not symmetric
-    // copy of Diag_map from LUsym;
+    // copy of Diag_map from Sym;
     // this copy can be updated during the factorization
     Int *inv_Diag_map;  // size n,
-    // inverse of Diag_map from LUsym;
+    // inverse of Diag_map from Sym;
     // It helps editing the Diag_map
 
     // each active front owns and manage a heap list. The heap is based on the
@@ -428,13 +428,13 @@ info: an enum: PARU_SUCCESS, PARU_OUT_OF_MEMORY, PARU_INVALID, PARU_SINGULAR,
 */
 
 // a routine that does init_row and also factorization
-ParU_Res paru_analyze(cholmod_sparse *A, paru_symbolic **S_handle);
-ParU_Res paru_factorize(cholmod_sparse *A, paru_symbolic *LUsym,
+ParU_Res paru_analyze(cholmod_sparse *A, paru_symbolic **Sym_handle);
+ParU_Res paru_factorize(cholmod_sparse *A, paru_symbolic *Sym,
                                paru_matrix **paruMatInfo_handle);
 ParU_Res paru_solve(double *b, paru_matrix *paruMatInfo);
 ParU_Res paru_solve(double *B, Int n, paru_matrix *paruMatInfo);
 
-ParU_Res paru_freesym(paru_symbolic **LUsym_handle);
+ParU_Res paru_freesym(paru_symbolic **Sym_handle);
 ParU_Res paru_freemat(paru_matrix **paruMatInfo_handle);
 
 ParU_Res paru_residual(double *b, double &resid, double &norm,

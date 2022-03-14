@@ -20,8 +20,8 @@ ParU_Res paru_prior_assemble(Int f, Int start_fac,
     Int *elCol = Work->elCol;
 
     paru_Element **elementList = paruMatInfo->elementList;
-    paru_symbolic *LUsym = paruMatInfo->LUsym;
-    Int *snM = LUsym->super2atree;
+    paru_symbolic *Sym = paruMatInfo->Sym;
+    Int *snM = Sym->super2atree;
 
     Int pMark = start_fac;
 

@@ -14,8 +14,8 @@ ParU_Res paru_solve(double *b, paru_matrix *paruMatInfo)
 {
     DEBUGLEVEL(0);
     PRLEVEL(1, ("%% inside solve\n"));
-    paru_symbolic *LUsym = paruMatInfo->LUsym;
-    Int m = LUsym->m;
+    paru_symbolic *Sym = paruMatInfo->Sym;
+    Int m = Sym->m;
     if (paruMatInfo->res == PARU_SINGULAR)
     {
         printf("Paru: the matrix is singular; cannot be solved.\n");
@@ -33,17 +33,17 @@ ParU_Res paru_solve(double *b, paru_matrix *paruMatInfo)
     }
     paru_memcpy(x, b, m * sizeof(double));
 
-    // if (LUsym->scale_row)             // x = s.x
-    //    paru_apply_scale(LUsym->scale_row, x, m);
+    // if (Sym->scale_row)             // x = s.x
+    //    paru_apply_scale(Sym->scale_row, x, m);
     // paru_memcpy(b, x, m * sizeof(double));
-    // paru_apply_perm(LUsym->Pfin, b, x, m);  // x = b (p)
-    paru_apply_perm_scale(LUsym->Pfin, LUsym->scale_row, b, x, m);
+    // paru_apply_perm(Sym->Pfin, b, x, m);  // x = b (p)
+    paru_apply_perm_scale(Sym->Pfin, Sym->scale_row, b, x, m);
 
     PRLEVEL(1, ("%% lsolve\n"));
     paru_lsolve(x, paruMatInfo);  // x = L\x
     PRLEVEL(1, ("%% usolve\n"));
     paru_usolve(x, paruMatInfo);                 // x = U\x
-    paru_apply_inv_perm(LUsym->Qfill, x, b, m);  // b(q) = x
+    paru_apply_inv_perm(Sym->Qfill, x, b, m);  // b(q) = x
 
     paru_free(m, sizeof(Int), x);
 #ifndef NTIME
@@ -67,8 +67,8 @@ ParU_Res paru_solve(double *B, Int n, paru_matrix *paruMatInfo)
 {
     DEBUGLEVEL(0);
     PRLEVEL(1, ("%% mRHS inside Solve\n"));
-    paru_symbolic *LUsym = paruMatInfo->LUsym;
-    Int m = LUsym->m;
+    paru_symbolic *Sym = paruMatInfo->Sym;
+    Int m = Sym->m;
     if (paruMatInfo->res == PARU_SINGULAR)
     {
         printf("Paru: the matrix is singular; cannot be solved.\n");
@@ -85,13 +85,13 @@ ParU_Res paru_solve(double *B, Int n, paru_matrix *paruMatInfo)
     }
     paru_memcpy(X, B, m*n * sizeof(double));
 
-    paru_apply_perm_scale(LUsym->Pfin, LUsym->scale_row, B, X, m, n);
+    paru_apply_perm_scale(Sym->Pfin, Sym->scale_row, B, X, m, n);
 
     PRLEVEL(1, ("%%mRHS lsolve\n"));
     paru_lsolve(X, n, paruMatInfo);  // X = L\X
     PRLEVEL(1, ("%%mRHS usolve\n"));
     paru_usolve(X, n, paruMatInfo);                 // X = U\X
-    paru_apply_inv_perm(LUsym->Qfill, X, B, m, n);     // B(q) = X
+    paru_apply_inv_perm(Sym->Qfill, X, B, m, n);     // B(q) = X
 
     paru_free(m*n, sizeof(Int), X);
 

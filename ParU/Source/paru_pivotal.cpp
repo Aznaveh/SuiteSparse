@@ -18,16 +18,16 @@ ParU_Res paru_pivotal(std::vector<Int> &pivotal_elements,
 {
     DEBUGLEVEL(0);
     PARU_DEFINE_PRLEVEL;
-    paru_symbolic *LUsym = paruMatInfo->LUsym;
-    Int *snM = LUsym->super2atree;
+    paru_symbolic *Sym = paruMatInfo->Sym;
+    Int *snM = Sym->super2atree;
     std::vector<Int> **heapList = paruMatInfo->heapList;
     Int eli = snM[f];
 
-    Int *Super = LUsym->Super;
+    Int *Super = Sym->Super;
     Int col1 = Super[f]; /* fornt F has columns col1:col2-1 */
     Int col2 = Super[f + 1];
-    Int *aChild = LUsym->aChild;
-    Int *aChildp = LUsym->aChildp;
+    Int *aChild = Sym->aChild;
+    Int *aChildp = Sym->aChildp;
 
 #ifndef NDEBUG
     Int m = paruMatInfo->m;
@@ -116,7 +116,7 @@ ParU_Res paru_pivotal(std::vector<Int> &pivotal_elements,
     if (++rowMark < 0)
     // just look at the children
     {  // in rare case of overflow
-        Int *Sleft = LUsym->Sleft;
+        Int *Sleft = Sym->Sleft;
         // first column of current front until first column of next front
         for (Int i = Sleft[col1]; i < Sleft[Super[f + 1]]; i++)
             isRowInFront[i] = -1;
@@ -334,7 +334,7 @@ ParU_Res paru_pivotal(std::vector<Int> &pivotal_elements,
     ASSERT(rowCount == stl_rowSize);
 #endif
 
-    Int fm = LUsym->Fm[f]; /* Upper bound number of rows of F */
+    Int fm = Sym->Fm[f]; /* Upper bound number of rows of F */
     ASSERT(fm >= rowCount);
 
     // freeing extra space for rows
@@ -363,8 +363,8 @@ ParU_Res paru_pivotal(std::vector<Int> &pivotal_elements,
     PRLEVEL(PR, ("%% pivotalFront = %p size=%ld", pivotalFront, rowCount * fp));
     Int act = paruMatInfo->actual_alloc_LUs + paruMatInfo->actual_alloc_Us +
               paruMatInfo->actual_alloc_row_int;
-    Int upp = LUsym->Us_bound_size + LUsym->LUs_bound_size +
-              LUsym->row_Int_bound + LUsym->col_Int_bound;
+    Int upp = Sym->Us_bound_size + Sym->LUs_bound_size +
+              Sym->row_Int_bound + Sym->col_Int_bound;
     PRLEVEL(PR, ("%% MEM=%ld percent=%lf%%", act, 100.0 * act / upp));
     PRLEVEL(PR, ("%% MEM=%ld percent=%lf%%\n", act, 100.0 * act / upp));
 #endif
