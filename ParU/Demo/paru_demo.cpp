@@ -12,7 +12,7 @@ int main(int argc, char **argv)
 {
     cholmod_common Common, *cc;
     cholmod_sparse *A;
-    paru_symbolic *Sym = NULL;
+    ParU_symbolic *Sym = NULL;
 
     //~~~~~~~~~Reading the input matrix and test if the format is OK~~~~~~~~~~~~
     // start CHOLMOD

@@ -41,7 +41,7 @@ Int paru_usolve(double *x, paru_matrix *paruMatInfo)
 #ifndef NTIME
     double start_time = PARU_OPENMP_GET_WTIME;
 #endif
-    paru_symbolic *Sym = paruMatInfo->Sym;
+    ParU_symbolic *Sym = paruMatInfo->Sym;
     Int nf = Sym->nf;
 
     Int n1 = Sym->n1;   // row+col singletons
@@ -179,7 +179,7 @@ Int paru_usolve(double *X, Int n, paru_matrix *paruMatInfo)
     // check if input is read
     if (!X) return (0);
     PARU_DEFINE_PRLEVEL;
-    paru_symbolic *Sym = paruMatInfo->Sym;
+    ParU_symbolic *Sym = paruMatInfo->Sym;
     Int m = Sym->m;
     Int nf = Sym->nf;
 #ifndef NDEBUG

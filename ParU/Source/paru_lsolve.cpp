@@ -38,7 +38,7 @@ Int paru_lsolve(double *x, paru_matrix *paruMatInfo)
     DEBUGLEVEL(0);
     if (!x) return (0);
     PARU_DEFINE_PRLEVEL;
-    paru_symbolic *Sym = paruMatInfo->Sym;
+    ParU_symbolic *Sym = paruMatInfo->Sym;
     Int nf = Sym->nf;
 
 #ifndef NDEBUG
@@ -193,7 +193,7 @@ Int paru_lsolve(double *X, Int n, paru_matrix *paruMatInfo)
     DEBUGLEVEL(0);
     PARU_DEFINE_PRLEVEL;
     if (!X) return (0);
-    paru_symbolic *Sym = paruMatInfo->Sym;
+    ParU_symbolic *Sym = paruMatInfo->Sym;
     Int m = Sym->m;
     Int nf = Sym->nf;
 

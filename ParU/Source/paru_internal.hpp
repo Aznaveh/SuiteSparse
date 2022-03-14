@@ -205,7 +205,7 @@ Int bin_srch_col(Int *srt_lst, Int l, Int r, Int num);
 Int bin_srch(Int *srt_lst, Int l, Int r, Int num);
 
 ParU_Res paru_init_rowFronts(paru_matrix **paruMatInfo_handle,
-                                    cholmod_sparse *A, paru_symbolic *Sym);
+                                    cholmod_sparse *A, ParU_symbolic *Sym);
 ParU_Res paru_front(Int f, paru_matrix *paruMatInfo);
 
 ParU_Res paru_pivotal(std::vector<Int> &pivotal_elements,

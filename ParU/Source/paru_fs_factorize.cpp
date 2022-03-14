@@ -73,7 +73,7 @@ Int paru_panel_factorize(Int f, Int m, Int n, const Int panel_width,
 #endif
     Int *Super = paruMatInfo->Sym->Super;
     Int col1 = Super[f]; /* fornt F has columns col1:col2-1 */
-    paru_symbolic *Sym = paruMatInfo->Sym;
+    ParU_symbolic *Sym = paruMatInfo->Sym;
     Int *Diag_map = paruMatInfo->Diag_map;
     Int n1 = Sym->n1;
 

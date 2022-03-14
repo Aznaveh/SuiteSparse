@@ -49,15 +49,15 @@
  * @author Aznaveh
  * */
 #include "paru_internal.hpp"
-ParU_Res paru_analyze(cholmod_sparse *A, paru_symbolic **S_handle)
+ParU_Res paru_analyze(cholmod_sparse *A, ParU_symbolic **S_handle)
 {
     DEBUGLEVEL(0);
     PARU_DEFINE_PRLEVEL;
 #ifndef NTIME
     double start_time = PARU_OPENMP_GET_WTIME;
 #endif
-    paru_symbolic *Sym;
-    Sym = (paru_symbolic *)paru_alloc(1, sizeof(paru_symbolic));
+    ParU_symbolic *Sym;
+    Sym = (ParU_symbolic *)paru_alloc(1, sizeof(ParU_symbolic));
     if (!Sym) return PARU_INVALID;
     *S_handle = Sym;
 
@@ -282,7 +282,7 @@ ParU_Res paru_analyze(cholmod_sparse *A, paru_symbolic **S_handle)
         umfpack_dl_report_status(Control, status);
         printf("Paru: umfpack_dl_symbolic failed\n");
         umfpack_dl_free_symbolic(&Symbolic);
-        paru_free(1, sizeof(paru_symbolic), Sym);
+        paru_free(1, sizeof(ParU_symbolic), Sym);
         return PARU_INVALID;
     }
     /* ---------------------------------------------------------------------- */

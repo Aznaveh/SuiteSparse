@@ -28,7 +28,7 @@ void paru_update_rowDeg(Int panel_num, Int row_end, Int f, Int start_fac,
     Int *elRow = Work->elRow;
     Int *elCol = Work->elCol;
 
-    paru_symbolic *Sym = paruMatInfo->Sym;
+    ParU_symbolic *Sym = paruMatInfo->Sym;
     Int *Super = Sym->Super;
     Int col1 = Super[f];  // fornt F has columns col1:col2-1
     Int col2 = Super[f + 1];

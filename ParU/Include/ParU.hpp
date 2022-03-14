@@ -58,7 +58,7 @@ extern "C"
 #define PARU_STRATEGY_SYMMETRIC 3    // prefer diagonal
 
 // =============================================================================
-// === paru_symbolic ===========================================================
+// === ParU_symbolic ===========================================================
 // =============================================================================
 
 // The contents of this object do not change during numeric factorization.  The
@@ -83,26 +83,26 @@ extern "C"
 // 	                             . . . L L x x x x
 // 	                             . . . L L x x x x
  
-typedef struct 
+struct ParU_U_singleton
 {
     // CSR format for U singletons
     Int nnz;      // nnz in submatrix
     Int *Sup;     // size cs1
     Int *Suj;     // size is computed 
     double *Sux;  
-} ParU_U_singleton;
+};
 
-typedef struct 
+struct ParU_L_singleton
 {
     // CSC format for U singletons
     Int nnz;      // nnz in submatrix
     Int *Slp;     // size rs1
     Int *Sli;     // size is computed 
     double *Slx; 
-} ParU_L_singleton;
+};
 
-typedef struct
-{ /* paru_symbolic*/
+struct ParU_symbolic
+{ /* ParU_symbolic*/
 
     // -------------------------------------------------------------------------
     // row-form of the input matrix and its permutations
@@ -256,7 +256,7 @@ typedef struct
 
     Int max_chain; //maximum size of the chains in final tree
 
-} paru_symbolic;
+};
 
 
 // =============================================================================
@@ -348,7 +348,7 @@ enum ParU_Res
 typedef struct
 {             /*Matrix */
     Int m, n; /* size of the sumbatrix that is factorized */
-    paru_symbolic *Sym;
+    ParU_symbolic *Sym;
     tupleList *RowList; /* size n of dynamic list */
 
     paru_Element **elementList; /* pointers to all elements, size = m+nf+1 */
@@ -428,13 +428,13 @@ info: an enum: PARU_SUCCESS, PARU_OUT_OF_MEMORY, PARU_INVALID, PARU_SINGULAR,
 */
 
 // a routine that does init_row and also factorization
-ParU_Res paru_analyze(cholmod_sparse *A, paru_symbolic **Sym_handle);
-ParU_Res paru_factorize(cholmod_sparse *A, paru_symbolic *Sym,
+ParU_Res paru_analyze(cholmod_sparse *A, ParU_symbolic **Sym_handle);
+ParU_Res paru_factorize(cholmod_sparse *A, ParU_symbolic *Sym,
                                paru_matrix **paruMatInfo_handle);
 ParU_Res paru_solve(double *b, paru_matrix *paruMatInfo);
 ParU_Res paru_solve(double *B, Int n, paru_matrix *paruMatInfo);
 
-ParU_Res paru_freesym(paru_symbolic **Sym_handle);
+ParU_Res paru_freesym(ParU_symbolic **Sym_handle);
 ParU_Res paru_freemat(paru_matrix **paruMatInfo_handle);
 
 ParU_Res paru_residual(double *b, double &resid, double &norm,

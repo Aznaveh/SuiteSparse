@@ -14,7 +14,7 @@ ParU_Res paru_exec_tasks_seq(Int t, Int *task_num_child,
                                 paru_matrix *paruMatInfo)
 {
     DEBUGLEVEL(0);
-    paru_symbolic *Sym = paruMatInfo->Sym;
+    ParU_symbolic *Sym = paruMatInfo->Sym;
     Int *task_parent = Sym->task_parent;
     Int daddy = task_parent[t];
     Int *task_map = Sym->task_map;
@@ -81,7 +81,7 @@ ParU_Res paru_exec_tasks (Int t, Int *task_num_child, Int &chain_task,
                                 paru_matrix *paruMatInfo)
 {
     DEBUGLEVEL(0);
-    paru_symbolic *Sym = paruMatInfo->Sym;
+    ParU_symbolic *Sym = paruMatInfo->Sym;
     Int *task_parent = Sym->task_parent;
     Int daddy = task_parent[t];
     Int *task_map = Sym->task_map;
@@ -170,7 +170,7 @@ ParU_Res paru_exec_tasks (Int t, Int *task_num_child, Int &chain_task,
     }
     return myInfo;
 }
-ParU_Res paru_factorize(cholmod_sparse *A, paru_symbolic *Sym,
+ParU_Res paru_factorize(cholmod_sparse *A, ParU_symbolic *Sym,
         paru_matrix **paruMatInfo_handle)
 {
     DEBUGLEVEL(0);

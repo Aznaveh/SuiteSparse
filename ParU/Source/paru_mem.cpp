@@ -191,14 +191,14 @@ void operator delete(void *ptr) noexcept
 }
 
 //  freeing symbolic analysis data structure
-ParU_Res paru_freesym(paru_symbolic **Sym_handle)
+ParU_Res paru_freesym(ParU_symbolic **Sym_handle)
 {
     DEBUGLEVEL(0);
     if (Sym_handle == NULL || *Sym_handle == NULL)
         // nothing to do; caller probably ran out of memory
         return PARU_OUT_OF_MEMORY;
 
-    paru_symbolic *Sym;
+    ParU_symbolic *Sym;
     Sym = *Sym_handle;
 
     Int m = Sym->m;
@@ -275,7 +275,7 @@ ParU_Res paru_freesym(paru_symbolic **Sym_handle)
     paru_free(ntasks, sizeof(Int), Sym->task_num_child);
     paru_free(ntasks, sizeof(Int), Sym->task_depth);
 
-    paru_free(1, sizeof(paru_symbolic), Sym);
+    paru_free(1, sizeof(ParU_symbolic), Sym);
 
     *Sym_handle = NULL;
     return PARU_SUCCESS;
@@ -313,7 +313,7 @@ ParU_Res paru_freemat(paru_matrix **paruMatInfo_handle)
     tupleList *RowList = paruMatInfo->RowList;
     PRLEVEL(1, ("%% RowList =%p\n", RowList));
 
-    paru_symbolic *Sym = paruMatInfo->Sym;
+    ParU_symbolic *Sym = paruMatInfo->Sym;
     Int nf = Sym->nf;
 
     for (Int row = 0; row < m; row++)

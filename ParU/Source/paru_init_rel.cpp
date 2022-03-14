@@ -15,7 +15,7 @@
 void paru_init_rel(Int f, paru_matrix *paruMatInfo)
 {
     DEBUGLEVEL(0);
-    paru_symbolic *Sym = paruMatInfo->Sym;
+    ParU_symbolic *Sym = paruMatInfo->Sym;
     Int *time_stamp = paruMatInfo->time_stamp;
 
     Int *Child = Sym->Child;

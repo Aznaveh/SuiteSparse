@@ -16,7 +16,7 @@ ParU_Res paru_residual(double *b, double &resid, double &norm,
 {
     DEBUGLEVEL(0);
     PRLEVEL(1, ("%% inside residual\n"));
-    paru_symbolic *Sym = paruMatInfo->Sym;
+    ParU_symbolic *Sym = paruMatInfo->Sym;
     Int m = Sym->m;
 #ifndef NDEBUG
     Int PR = 1;
@@ -91,7 +91,7 @@ ParU_Res paru_residual(cholmod_sparse *A, paru_matrix *paruMatInfo,
 {
     DEBUGLEVEL(0);
     PRLEVEL(1, ("%% mRHS inside residual\n"));
-    paru_symbolic *Sym = paruMatInfo->Sym;
+    ParU_symbolic *Sym = paruMatInfo->Sym;
     Int m = Sym->m;
 #ifndef NDEBUG
     Int PR = 1;

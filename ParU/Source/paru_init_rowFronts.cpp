@@ -18,7 +18,7 @@ ParU_Res paru_init_rowFronts(
                                        // inputs, not modified
     cholmod_sparse *A,
     // symbolic analysis
-    paru_symbolic *Sym)
+    ParU_symbolic *Sym)
 {
     //mallopt(M_TRIM_THRESHOLD, -1);         // disable sbrk trimming
     //mallopt(M_TOP_PAD, 16 * 1024 * 1024);  // increase padding to speedup malloc

@@ -18,7 +18,7 @@ ParU_Res paru_pivotal(std::vector<Int> &pivotal_elements,
 {
     DEBUGLEVEL(0);
     PARU_DEFINE_PRLEVEL;
-    paru_symbolic *Sym = paruMatInfo->Sym;
+    ParU_symbolic *Sym = paruMatInfo->Sym;
     Int *snM = Sym->super2atree;
     std::vector<Int> **heapList = paruMatInfo->heapList;
     Int eli = snM[f];

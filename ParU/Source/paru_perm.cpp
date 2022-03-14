@@ -42,7 +42,7 @@ ParU_Res paru_perm(paru_matrix *paruMatInfo)
 {
     DEBUGLEVEL(0);
     PARU_DEFINE_PRLEVEL;
-    paru_symbolic *Sym = paruMatInfo->Sym;
+    ParU_symbolic *Sym = paruMatInfo->Sym;
 
     if (Sym->Pfin != NULL)  // it must have been computed
         return PARU_SUCCESS;

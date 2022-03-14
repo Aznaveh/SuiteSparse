@@ -15,7 +15,7 @@ void paru_assemble_all(Int e, Int f, std::vector<Int> &colHash,
     DEBUGLEVEL(0);
     PARU_DEFINE_PRLEVEL;
 
-    paru_symbolic *Sym = paruMatInfo->Sym;
+    ParU_symbolic *Sym = paruMatInfo->Sym;
     Int *snM = Sym->super2atree;
     Int eli = snM[f];
     PRLEVEL(PR, ("%% Eliminat all of %ld in %ld\n", e, eli));
@@ -204,7 +204,7 @@ void paru_assemble_cols(Int e, Int f, std::vector<Int> &colHash,
 #ifndef NDEBUG
     Int c = 0;  // number of columns assembled
 #endif
-    paru_symbolic *Sym = paruMatInfo->Sym;
+    ParU_symbolic *Sym = paruMatInfo->Sym;
     Int *snM = Sym->super2atree;
     Int eli = snM[f];
 
@@ -395,7 +395,7 @@ void paru_assemble_rows(Int e, Int f, std::vector<Int> &colHash,
     DEBUGLEVEL(0);
     PARU_DEFINE_PRLEVEL;
 
-    paru_symbolic *Sym = paruMatInfo->Sym;
+    ParU_symbolic *Sym = paruMatInfo->Sym;
     Int *snM = Sym->super2atree;
     Int eli = snM[f];
 
@@ -603,7 +603,7 @@ void paru_assemble_el_with0rows(Int e, Int f, std::vector<Int> &colHash,
     DEBUGLEVEL(0);
     PARU_DEFINE_PRLEVEL;
 
-    paru_symbolic *Sym = paruMatInfo->Sym;
+    ParU_symbolic *Sym = paruMatInfo->Sym;
     Int *snM = Sym->super2atree;
     Int eli = snM[f];
     PRLEVEL(PR, ("%% \n+++++++++++++++++++++++++++++++++++++++\n"));
