@@ -57,7 +57,7 @@ Int paru_panel_factorize(Int f, Int m, Int n, const Int panel_width,
     // ASSERT(row_end >= j2);
 
     Int *frowList = paruMatInfo->frowList[f];
-    paru_fac *LUs = paruMatInfo->partial_LUs;
+    ParU_Factors *LUs = paruMatInfo->partial_LUs;
     double *F = LUs[f].p;
 
 #ifndef NDEBUG  // Printing the panel
@@ -370,7 +370,7 @@ Int paru_factorize_full_summed(Int f, Int start_fac,
     Int col2 = Super[f + 1];
     Int fp = col2 - col1; /* first fp columns are pivotal */
 
-    paru_fac *LUs = paruMatInfo->partial_LUs;
+    ParU_Factors *LUs = paruMatInfo->partial_LUs;
     Int rowCount = paruMatInfo->frowCount[f];
     double *F = LUs[f].p;
 

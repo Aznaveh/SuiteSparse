@@ -19,8 +19,8 @@ void paru_write(paru_matrix *paruMatInfo, int scale, char *id)
 
     Int *Qfill = Sym->Qfill;
 
-    paru_fac *LUs = paruMatInfo->partial_LUs;
-    paru_fac *Us = paruMatInfo->partial_Us;
+    ParU_Factors *LUs = paruMatInfo->partial_LUs;
+    ParU_Factors *Us = paruMatInfo->partial_Us;
     Int *Super = Sym->Super;
 
     char default_name[] = "0";

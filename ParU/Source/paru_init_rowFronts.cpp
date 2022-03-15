@@ -55,8 +55,8 @@ ParU_Res paru_init_rowFronts(
     paruMatInfo->panel_width = 32;
     paruMatInfo->res = PARU_SUCCESS;
 
-    work_struct *Work = paruMatInfo->Work =
-        (work_struct *)paru_alloc(1, sizeof(work_struct));
+    Paru_Work *Work = paruMatInfo->Work =
+        (Paru_Work *)paru_alloc(1, sizeof(Paru_Work));
 
     if (Work == NULL)
     {  // out of memory
@@ -101,9 +101,9 @@ ParU_Res paru_init_rowFronts(
     paruMatInfo->frowList = (Int **)paru_calloc(1, nf * sizeof(Int *));
     paruMatInfo->fcolList = (Int **)paru_calloc(1, nf * sizeof(Int *));
     paruMatInfo->partial_Us =  // Initialize with NULL
-        (paru_fac *)paru_calloc(1, nf * sizeof(paru_fac));
+        (ParU_Factors *)paru_calloc(1, nf * sizeof(ParU_Factors));
     paruMatInfo->partial_LUs =  // Initialize with NULL
-        (paru_fac *)paru_calloc(1, nf * sizeof(paru_fac));
+        (ParU_Factors *)paru_calloc(1, nf * sizeof(ParU_Factors));
     paruMatInfo->time_stamp = (Int *)paru_alloc(1, nf * sizeof(Int));
 
     std::vector<Int> **heapList = paruMatInfo->heapList =

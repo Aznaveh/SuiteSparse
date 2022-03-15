@@ -99,7 +99,7 @@ Int paru_lsolve(double *x, paru_matrix *paruMatInfo)
     //gather scatter space for dgemm
     std::vector<double> work(paruMatInfo->max_row_count); 
 
-    paru_fac *LUs = paruMatInfo->partial_LUs;
+    ParU_Factors *LUs = paruMatInfo->partial_LUs;
     Int *Super = Sym->Super;
 
     for (Int f = 0; f < nf; f++)
@@ -275,7 +275,7 @@ Int paru_lsolve(double *X, Int n, paru_matrix *paruMatInfo)
     //gather scatter space for dgemm
     std::vector<double> work(paruMatInfo->max_row_count*n); 
 
-    paru_fac *LUs = paruMatInfo->partial_LUs;
+    ParU_Factors *LUs = paruMatInfo->partial_LUs;
     Int *Super = Sym->Super;
 
     for (Int f = 0; f < nf; f++)

@@ -23,13 +23,13 @@ void paru_assemble_row_2U(Int e, Int f, Int sR, Int dR,
         // if not updatated
         paru_update_rel_ind_col(e, f, colHash, paruMatInfo);
 
-    paru_fac *Us = paruMatInfo->partial_Us;
+    ParU_Factors *Us = paruMatInfo->partial_Us;
     double *uPart = Us[f].p;  // uPart
 
     Int nEl = el->ncols;
     Int mEl = el->nrows;
 
-    paru_fac *LUs = paruMatInfo->partial_LUs;
+    ParU_Factors *LUs = paruMatInfo->partial_LUs;
     Int fp = LUs[f].n;
 
     // Int *el_colIndex = colIndex_pointer (curEl);

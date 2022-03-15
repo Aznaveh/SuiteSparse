@@ -40,7 +40,7 @@ ParU_Res paru_pivotal(std::vector<Int> &pivotal_elements,
 
     Int *lacList = paruMatInfo->lacList;
 
-    work_struct *Work = paruMatInfo->Work;
+    Paru_Work *Work = paruMatInfo->Work;
     Int *rowMarkp = Work->rowMark;
     Int rowMark = 0;
 
@@ -368,7 +368,7 @@ ParU_Res paru_pivotal(std::vector<Int> &pivotal_elements,
     PRLEVEL(PR, ("%% MEM=%ld percent=%lf%%", act, 100.0 * act / upp));
     PRLEVEL(PR, ("%% MEM=%ld percent=%lf%%\n", act, 100.0 * act / upp));
 #endif
-    paru_fac *LUs = paruMatInfo->partial_LUs;
+    ParU_Factors *LUs = paruMatInfo->partial_LUs;
     paruMatInfo->frowCount[f] = rowCount;
 
     LUs[f].m = rowCount;

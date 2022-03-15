@@ -23,7 +23,7 @@ void paru_update_rowDeg(Int panel_num, Int row_end, Int f, Int start_fac,
                 panel_num, f));
     Int panel_width = paruMatInfo->panel_width;
     ParU_Element **elementList = paruMatInfo->elementList;
-    work_struct *Work = paruMatInfo->Work;
+    Paru_Work *Work = paruMatInfo->Work;
 
     Int *elRow = Work->elRow;
     Int *elCol = Work->elCol;

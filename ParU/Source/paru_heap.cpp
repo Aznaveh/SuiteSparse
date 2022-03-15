@@ -13,7 +13,7 @@ void paru_check_prior_element(Int e, Int f, Int start_fac,
                               paru_matrix *paruMatInfo)
 // check if e can be assembeld into f
 {
-    work_struct *Work = paruMatInfo->Work;
+    Paru_Work *Work = paruMatInfo->Work;
     Int *elRow = Work->elRow;
 
     ParU_Element **elementList = paruMatInfo->elementList;

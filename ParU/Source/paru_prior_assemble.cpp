@@ -16,7 +16,7 @@ ParU_Res paru_prior_assemble(Int f, Int start_fac,
     DEBUGLEVEL(0);
     PARU_DEFINE_PRLEVEL;
 
-    work_struct *Work = paruMatInfo->Work;
+    Paru_Work *Work = paruMatInfo->Work;
     Int *elCol = Work->elCol;
 
     ParU_Element **elementList = paruMatInfo->elementList;

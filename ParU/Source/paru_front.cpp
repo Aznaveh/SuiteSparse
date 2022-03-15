@@ -38,7 +38,7 @@ ParU_Res paru_front(Int f,  // front need to be assembled
     Int fp = col2 - col1; /* first fp columns are pivotal */
 
     ParU_Element **elementList = paruMatInfo->elementList;
-    work_struct *Work = paruMatInfo->Work;
+    Paru_Work *Work = paruMatInfo->Work;
 
     PRLEVEL(1, ("%% fp=%ld pivotal columns:clo1=%ld...col2=%ld\n", fp, col1,
                 col2 - 1));
@@ -143,7 +143,7 @@ ParU_Res paru_front(Int f,  // front need to be assembled
     }
 #endif
 
-    paru_fac *LUs = paruMatInfo->partial_LUs;
+    ParU_Factors *LUs = paruMatInfo->partial_LUs;
     double *pivotalFront = LUs[f].p;
     LUs[f].m = rowCount;
     LUs[f].n = fp;
@@ -355,7 +355,7 @@ ParU_Res paru_front(Int f,  // front need to be assembled
     PRLEVEL(PR, ("%% uPart = %p size=%ld", uPart, colCount * fp));
 #endif
 
-    paru_fac *Us = paruMatInfo->partial_Us;
+    ParU_Factors *Us = paruMatInfo->partial_Us;
     Us[f].m = fp;
     Us[f].n = colCount;
     paruMatInfo->fcolCount[f] = colCount;

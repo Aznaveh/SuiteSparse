@@ -348,8 +348,8 @@ ParU_Res paru_freemat(paru_matrix **paruMatInfo_handle)
     }
 
     // free the answer
-    paru_fac *LUs = paruMatInfo->partial_LUs;
-    paru_fac *Us = paruMatInfo->partial_Us;
+    ParU_Factors *LUs = paruMatInfo->partial_LUs;
+    ParU_Factors *Us = paruMatInfo->partial_Us;
 
     for (Int i = 0; i < nf; i++)
     {
@@ -382,8 +382,8 @@ ParU_Res paru_freemat(paru_matrix **paruMatInfo_handle)
     paru_free(1, nf * sizeof(Int *), paruMatInfo->frowList);
     paru_free(1, nf * sizeof(Int *), paruMatInfo->fcolList);
 
-    paru_free(1, nf * sizeof(paru_fac), LUs);
-    paru_free(1, nf * sizeof(paru_fac), Us);
+    paru_free(1, nf * sizeof(ParU_Factors), LUs);
+    paru_free(1, nf * sizeof(ParU_Factors), Us);
 
     if (paruMatInfo->Diag_map)
     {
@@ -426,14 +426,14 @@ ParU_Res paru_freemat(paru_matrix **paruMatInfo_handle)
 
     paru_free(1, (m + nf + 1) * sizeof(ParU_Element), elementList);
 
-    work_struct *Work = paruMatInfo->Work;
+    Paru_Work *Work = paruMatInfo->Work;
     if (Work != NULL)
     {
         paru_free(m, sizeof(Int), Work->rowSize);
         paru_free(m + nf + 1, sizeof(Int), Work->rowMark);
         paru_free(m + nf, sizeof(Int), Work->elRow);
         paru_free(m + nf, sizeof(Int), Work->elCol);
-        paru_free(1, sizeof(work_struct), paruMatInfo->Work);
+        paru_free(1, sizeof(Paru_Work), paruMatInfo->Work);
     }
 
     paru_free(m + nf, sizeof(Int), paruMatInfo->lacList);

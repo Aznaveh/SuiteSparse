@@ -47,8 +47,8 @@ Int paru_usolve(double *x, paru_matrix *paruMatInfo)
     Int n1 = Sym->n1;   // row+col singletons
     Int *Ps = Sym->Ps;  // row permutation
 
-    paru_fac *LUs = paruMatInfo->partial_LUs;
-    paru_fac *Us = paruMatInfo->partial_Us;
+    ParU_Factors *LUs = paruMatInfo->partial_LUs;
+    ParU_Factors *Us = paruMatInfo->partial_Us;
     Int *Super = Sym->Super;
 
     const Int max_threads = paruMatInfo->paru_max_threads;
@@ -202,8 +202,8 @@ Int paru_usolve(double *X, Int n, paru_matrix *paruMatInfo)
     Int n1 = Sym->n1;   // row+col singletons
     Int *Ps = Sym->Ps;  // row permutation
 
-    paru_fac *LUs = paruMatInfo->partial_LUs;
-    paru_fac *Us = paruMatInfo->partial_Us;
+    ParU_Factors *LUs = paruMatInfo->partial_LUs;
+    ParU_Factors *Us = paruMatInfo->partial_Us;
     Int *Super = Sym->Super;
 
     const Int max_threads = paruMatInfo->paru_max_threads;

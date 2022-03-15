@@ -50,11 +50,11 @@ void paru_assemble_all(Int e, Int f, std::vector<Int> &colHash,
     double *curEl_Num =
         (double *)((Int *)(curEl + 1) + 2 * curEl->nrows + 2 * curEl->ncols);
 
-    work_struct *Work = paruMatInfo->Work;
+    Paru_Work *Work = paruMatInfo->Work;
     Int *isRowInFront = Work->rowSize;
 
 #ifndef NDEBUG
-    paru_fac *Us = paruMatInfo->partial_Us;
+    ParU_Factors *Us = paruMatInfo->partial_Us;
     Int *fcolList = paruMatInfo->fcolList[f];
     Int colCount = Us[f].n;
     ASSERT(el_colIndex[el->lac] <= fcolList[colCount - 1]);
@@ -243,7 +243,7 @@ void paru_assemble_cols(Int e, Int f, std::vector<Int> &colHash,
     double *curEl_Num =
         (double *)((Int *)(curEl + 1) + 2 * curEl->nrows + 2 * curEl->ncols);
 
-    work_struct *Work = paruMatInfo->Work;
+    Paru_Work *Work = paruMatInfo->Work;
     Int *isRowInFront = Work->rowSize;
 
     Int *fcolList = paruMatInfo->fcolList[f];
@@ -431,7 +431,7 @@ void paru_assemble_rows(Int e, Int f, std::vector<Int> &colHash,
     double *curEl_Num =
         (double *)((Int *)(curEl + 1) + 2 * curEl->nrows + 2 * curEl->ncols);
 
-    work_struct *Work = paruMatInfo->Work;
+    Paru_Work *Work = paruMatInfo->Work;
     Int *isRowInFront = Work->rowSize;
 
     std::vector<Int> tempRow;
@@ -651,11 +651,11 @@ void paru_assemble_el_with0rows(Int e, Int f, std::vector<Int> &colHash,
     double *curEl_Num =
         (double *)((Int *)(curEl + 1) + 2 * curEl->nrows + 2 * curEl->ncols);
 
-    work_struct *Work = paruMatInfo->Work;
+    Paru_Work *Work = paruMatInfo->Work;
     Int *isRowInFront = Work->rowSize;
 
 #ifndef NDEBUG
-    paru_fac *Us = paruMatInfo->partial_Us;
+    ParU_Factors *Us = paruMatInfo->partial_Us;
     Int *fcolList = paruMatInfo->fcolList[f];
     Int colCount = Us[f].n;
     ASSERT(el_colIndex[el->lac] <= fcolList[colCount - 1]);

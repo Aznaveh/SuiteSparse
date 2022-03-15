@@ -297,9 +297,8 @@ struct ParU_TupleList
     ParU_Tuple *list; // list of tuples regarding to this element 
 };
 
-typedef struct
-{ /*work_struct*/
-
+struct Paru_Work
+{
     // gather scatter space for rows
     Int *rowSize;  // Initalized data structure, size of rows
     // Int rowMark;      // Work->rowSize[x] < rowMark[eli] for each front
@@ -308,14 +307,13 @@ typedef struct
     // gather scatter space for elements
     Int *elRow;  // Initalized data structure, size m+nf
     Int *elCol;  // Initalized data structure, size m+nf
+};
 
-} work_struct;
-
-typedef struct
-{              /*dense factorized part pointer*/
-    Int m, n;  /* mxn dense matrix */
-    double *p; /* point to factorized parts */
-} paru_fac;
+struct ParU_Factors
+{              // dense factorized part pointer
+    Int m, n;  //  mxn dense matrix 
+    double *p; //  point to factorized parts
+};
 
 enum ParU_Res
 {
@@ -332,7 +330,7 @@ typedef struct
     ParU_TupleList *RowList; /* size n of dynamic list */
 
     ParU_Element **elementList; /* pointers to all elements, size = m+nf+1 */
-    work_struct *Work;
+    Paru_Work *Work;
 
     Int *time_stamp; /* for relative index update
                         not initialized */
@@ -343,8 +341,8 @@ typedef struct
     Int **frowList;        /* size nf   frowList[f] is rows of the matrix S */
     Int **fcolList;        /* size nf   colList[f] is non pivotal cols of the
                               matrix S */
-    paru_fac *partial_Us;  /* size nf   size(Us)= fp*colCount[f]    */
-    paru_fac *partial_LUs; /* size nf   size(LUs)= rowCount[f]*fp   */
+    ParU_Factors *partial_Us;  /* size nf   size(Us)= fp*colCount[f]    */
+    ParU_Factors *partial_LUs; /* size nf   size(LUs)= rowCount[f]*fp   */
 
     // only used for statistics when debugging is enabled:
     Int actual_alloc_LUs;     /* actual memory allocated for LUs*/

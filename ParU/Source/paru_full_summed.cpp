@@ -63,7 +63,7 @@ void paru_full_summed(Int e, Int f, paru_matrix *paruMatInfo)
     // Int *el_rowIndex = rowIndex_pointer (el);
     Int *el_rowIndex = (Int *)(el + 1) + nEl;
 
-    paru_fac *LUs = paruMatInfo->partial_LUs;
+    ParU_Factors *LUs = paruMatInfo->partial_LUs;
     Int rowCount = LUs[f].m;
     double *pivotalFront = LUs[f].p;
 
