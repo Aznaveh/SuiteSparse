@@ -47,9 +47,9 @@ void paru_full_summed(Int e, Int f, paru_matrix *paruMatInfo)
     Int col2 = Super[f + 1];
     PRLEVEL(PR, ("%% col1=%ld, col2=%ld\n", col1, col2));
 
-    paru_Element **elementList = paruMatInfo->elementList;
+    ParU_Element **elementList = paruMatInfo->elementList;
 
-    paru_Element *el = elementList[e];
+    ParU_Element *el = elementList[e];
 
     Int nEl = el->ncols;
     Int mEl = el->nrows;

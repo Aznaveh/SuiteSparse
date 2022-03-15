@@ -17,8 +17,8 @@ void paru_update_rel_ind_col(Int e, Int f, std::vector<Int> &colHash,
     DEBUGLEVEL(0);
     PRLEVEL(1, ("%%update relative in %ld\n", f));
 
-    paru_Element **elementList = paruMatInfo->elementList;
-    paru_Element *el = elementList[e];
+    ParU_Element **elementList = paruMatInfo->elementList;
+    ParU_Element *el = elementList[e];
 
     // Int *el_Index = colIndex_pointer (el); //col global index of destination
     Int *el_Index = (Int *)(el + 1);  // col global index of destination
@@ -26,7 +26,7 @@ void paru_update_rel_ind_col(Int e, Int f, std::vector<Int> &colHash,
     Int nEl = el->ncols;
     Int mEl = el->nrows;
 
-    // Int *colRelIndex = relColInd (paru_Element *el);
+    // Int *colRelIndex = relColInd (ParU_Element *el);
     Int *colRelIndex = (Int *)(el + 1) + mEl + nEl;
 
     Int *fcolList = paruMatInfo->fcolList[f];

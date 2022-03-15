@@ -109,26 +109,26 @@ typedef struct
 //------------------------------------------------------------------------------
 // inline internal functions
 
-inline Int *colIndex_pointer(paru_Element *curEl) { return (Int *)(curEl + 1); }
+inline Int *colIndex_pointer(ParU_Element *curEl) { return (Int *)(curEl + 1); }
 // Never ever use these functions prior to initializing ncols and nrows
-inline Int *rowIndex_pointer(paru_Element *curEl)
+inline Int *rowIndex_pointer(ParU_Element *curEl)
 {
     return (Int *)(curEl + 1) + curEl->ncols;
 }
 
-inline Int *relColInd(paru_Element *curEl)
+inline Int *relColInd(ParU_Element *curEl)
 //{    return (Int*)(curEl+1) + curEl->ncols + curEl->nrows + 1;}
 {
     return (Int *)(curEl + 1) + curEl->ncols + curEl->nrows;
 }
 
-inline Int *relRowInd(paru_Element *curEl)
+inline Int *relRowInd(ParU_Element *curEl)
 //{    return (Int*)(curEl+1) + 2*curEl->ncols + curEl->nrows + 2;}
 {
     return (Int *)(curEl + 1) + 2 * curEl->ncols + curEl->nrows;
 }
 
-inline double *numeric_pointer(paru_Element *curEl)
+inline double *numeric_pointer(ParU_Element *curEl)
 // sizeof Int and double are same, but I keep it like this for clarity
 //{ return (double*)((Int*)(curEl+1) + 2*curEl->ncols + 2*curEl->nrows + 2);}
 {
@@ -137,7 +137,7 @@ inline double *numeric_pointer(paru_Element *curEl)
 
 inline Int flip(Int colInd) { return -colInd - 2; }
 
-inline Int lac_el(paru_Element **elementList, Int eli)
+inline Int lac_el(ParU_Element **elementList, Int eli)
 {  // return least numbered column of the element i (eli)
     if (elementList[eli] == NULL)
         return LONG_MAX;
@@ -158,7 +158,7 @@ void *paru_calloc(size_t n, size_t size);
 void *paru_realloc(size_t newsize, size_t size_Entry, void *oldP, size_t *size);
 
 void paru_free(size_t n, size_t size, void *p);
-void paru_free_el(Int e, paru_Element **elementList);
+void paru_free_el(Int e, ParU_Element **elementList);
 
 void *operator new(std::size_t sz);
 void operator delete(void *ptr) noexcept;
@@ -167,7 +167,7 @@ void paru_memset(void *ptr, Int value, size_t num);
 void paru_memcpy(void *destination, const void *source, size_t num);
 
 /* add tuple functions defintions */
-Int paru_add_rowTuple(tupleList *RowList, Int row, paru_Tuple T);
+Int paru_add_rowTuple(tupleList *RowList, Int row, ParU_Tuple T);
 
 Int paru_dgetrf(double *F, Int *frowList, Int m, Int n, BLAS_INT *ipiv);
 
@@ -177,7 +177,7 @@ Int paru_factorize_full_summed(Int f, Int start_fac,
                                std::vector<Int> &pivotal_elements,
                                paru_matrix *paruMatInfo);
 
-paru_Element *paru_create_element(Int nrows, Int ncols, Int init);
+ParU_Element *paru_create_element(Int nrows, Int ncols, Int init);
 
 void paru_assemble_row_2U(Int e, Int f, Int sR, Int dR,
                           std::vector<Int> &colHash, paru_matrix *paruMatInfo);
@@ -212,7 +212,7 @@ ParU_Res paru_pivotal(std::vector<Int> &pivotal_elements,
                              std::vector<Int> &panel_row, Int &zero_piv_rows,
                              Int f, heaps_info &hi, paru_matrix *paruMatInfo);
 
-int paru_intersection(Int e, paru_Element **elementList,
+int paru_intersection(Int e, ParU_Element **elementList,
                       std::set<Int> &stl_colSet);
 
 ParU_Res paru_prior_assemble(Int f, Int start_fac,

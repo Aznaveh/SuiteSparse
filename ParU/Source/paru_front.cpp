@@ -37,7 +37,7 @@ ParU_Res paru_front(Int f,  // front need to be assembled
     Int col2 = Super[f + 1];
     Int fp = col2 - col1; /* first fp columns are pivotal */
 
-    paru_Element **elementList = paruMatInfo->elementList;
+    ParU_Element **elementList = paruMatInfo->elementList;
     work_struct *Work = paruMatInfo->Work;
 
     PRLEVEL(1, ("%% fp=%ld pivotal columns:clo1=%ld...col2=%ld\n", fp, col1,
@@ -377,13 +377,13 @@ ParU_Res paru_front(Int f,  // front need to be assembled
         Int numTuple = curRowTupleList->numTuple;
         ASSERT(numTuple >= 0);
         ASSERT(numTuple <= m);
-        paru_Tuple *listRowTuples = curRowTupleList->list;
+        ParU_Tuple *listRowTuples = curRowTupleList->list;
         PRLEVEL(1, ("%% numTuple = %ld\n", numTuple));
         for (Int k = 0; k < numTuple; k++)
         {
-            paru_Tuple curTpl = listRowTuples[k];
+            ParU_Tuple curTpl = listRowTuples[k];
             Int e = curTpl.e;
-            paru_Element *el = elementList[e];
+            ParU_Element *el = elementList[e];
             if (el == NULL) continue;
 
             Int curRowIndex = curTpl.f;
@@ -464,7 +464,7 @@ ParU_Res paru_front(Int f,  // front need to be assembled
     PR = 1;
 #endif
 
-    paru_Element *curEl;
+    ParU_Element *curEl;
     PRLEVEL(
         1, ("%% rowCount=%ld, colCount=%ld, fp=%ld\n", rowCount, colCount, fp));
     PRLEVEL(1, ("%% curEl is %ld by %ld\n", rowCount - fp, colCount));
@@ -576,7 +576,7 @@ ParU_Res paru_front(Int f,  // front need to be assembled
     for (Int i = fp; i < rowCount; ++i)
     {
         Int locIndx = i - fp;
-        paru_Tuple rowTuple;
+        ParU_Tuple rowTuple;
         rowTuple.e = eli;
         rowTuple.f = locIndx;
         if (paru_add_rowTuple(RowList, frowList[i], rowTuple))

@@ -282,16 +282,16 @@ ParU_Res paru_freesym(ParU_symbolic **Sym_handle)
 }
 
 // free element e from elementList
-void paru_free_el(Int e, paru_Element **elementList)
+void paru_free_el(Int e, ParU_Element **elementList)
 {
     DEBUGLEVEL(0);
-    paru_Element *el = elementList[e];
+    ParU_Element *el = elementList[e];
     if (el == NULL) return;
     Int nrows = el->nrows, ncols = el->ncols;
     PRLEVEL(1, ("%%Free the element e =%ld\t", e));
     PRLEVEL(1, ("%% nrows =%ld ", nrows));
     PRLEVEL(1, ("%% ncols =%ld\n", ncols));
-    Int tot_size = sizeof(paru_Element) + sizeof(Int) * (2 * (nrows + ncols)) +
+    Int tot_size = sizeof(ParU_Element) + sizeof(Int) * (2 * (nrows + ncols)) +
                    sizeof(double) * nrows * ncols;
     paru_free(1, tot_size, el);
     elementList[e] = NULL;
@@ -319,11 +319,11 @@ ParU_Res paru_freemat(paru_matrix **paruMatInfo_handle)
     for (Int row = 0; row < m; row++)
     {
         Int len = RowList[row].len;
-        paru_free(len, sizeof(paru_Tuple), RowList[row].list);
+        paru_free(len, sizeof(ParU_Tuple), RowList[row].list);
     }
     paru_free(1, m * sizeof(tupleList), RowList);
 
-    paru_Element **elementList;
+    ParU_Element **elementList;
     elementList = paruMatInfo->elementList;
 
     PRLEVEL(1, ("%% Sym = %p\n", Sym));
@@ -424,7 +424,7 @@ ParU_Res paru_freemat(paru_matrix **paruMatInfo_handle)
     paru_free(1, (m + nf + 1) * sizeof(std::vector<Int> **),
               paruMatInfo->heapList);
 
-    paru_free(1, (m + nf + 1) * sizeof(paru_Element), elementList);
+    paru_free(1, (m + nf + 1) * sizeof(ParU_Element), elementList);
 
     work_struct *Work = paruMatInfo->Work;
     if (Work != NULL)

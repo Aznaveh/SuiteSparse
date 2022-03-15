@@ -109,9 +109,9 @@ ParU_Res paru_init_rowFronts(
     std::vector<Int> **heapList = paruMatInfo->heapList =
         (std::vector<Int> **)paru_calloc(
             1, (m + nf + 1) * sizeof(std::vector<Int> *));
-    paru_Element **elementList;
+    ParU_Element **elementList;
     elementList = paruMatInfo->elementList =  // Initialize with NULL
-        (paru_Element **)paru_calloc(1, (m + nf + 1) * sizeof(paru_Element));
+        (ParU_Element **)paru_calloc(1, (m + nf + 1) * sizeof(ParU_Element));
     Int *Diag_map = paruMatInfo->Diag_map = NULL;
     Int *inv_Diag_map = paruMatInfo->inv_Diag_map = NULL;
     if (Sym->strategy == PARU_STRATEGY_SYMMETRIC)
@@ -253,7 +253,7 @@ ParU_Res paru_init_rowFronts(
 
         row_degree_bound[row] = ncols;  // Initialzing row degree
 
-        paru_Element *curEl = elementList[e] =
+        ParU_Element *curEl = elementList[e] =
             paru_create_element(nrows, ncols, 0);
         if (curEl == NULL)
         {  // out of memory
@@ -284,7 +284,7 @@ ParU_Res paru_init_rowFronts(
 
 #ifndef NDEBUG  // Printing the pointers info
         //printf ("%% curEl = %p ", curEl);
-        //Int size = sizeof(paru_Element) + sizeof(Int) * (2 * (nrows + ncols)) 
+        //Int size = sizeof(ParU_Element) + sizeof(Int) * (2 * (nrows + ncols)) 
         //           + sizeof(double) * nrows * ncols;
         //printf("size= %ld\n", size);
 #endif
@@ -294,7 +294,7 @@ ParU_Res paru_init_rowFronts(
 
         // Allocating Rowlist and updating its tuples
         RowList[row].list =
-            (paru_Tuple *)paru_alloc(slackRow * nrows, sizeof(paru_Tuple));
+            (ParU_Tuple *)paru_alloc(slackRow * nrows, sizeof(ParU_Tuple));
         if (RowList[row].list == NULL)
         {  // out of memory
             paru_freemat(&paruMatInfo);
@@ -305,7 +305,7 @@ ParU_Res paru_init_rowFronts(
         RowList[row].numTuple = 0;
         RowList[row].len = slackRow;
 
-        paru_Tuple rowTuple;
+        ParU_Tuple rowTuple;
         rowTuple.e = e;
         rowTuple.f = 0;
         if (paru_add_rowTuple(RowList, row, rowTuple))

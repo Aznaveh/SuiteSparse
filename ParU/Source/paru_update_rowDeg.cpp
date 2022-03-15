@@ -22,7 +22,7 @@ void paru_update_rowDeg(Int panel_num, Int row_end, Int f, Int start_fac,
     PRLEVEL(1, ("%%-------ROW degree update of panel %ld of front %ld \n",
                 panel_num, f));
     Int panel_width = paruMatInfo->panel_width;
-    paru_Element **elementList = paruMatInfo->elementList;
+    ParU_Element **elementList = paruMatInfo->elementList;
     work_struct *Work = paruMatInfo->Work;
 
     Int *elRow = Work->elRow;
@@ -97,13 +97,13 @@ void paru_update_rowDeg(Int panel_num, Int row_end, Int f, Int start_fac,
         tupleList *curRowTupleList = &RowList[curFsRow];
         Int numTuple = curRowTupleList->numTuple;
         ASSERT(numTuple >= 0);
-        paru_Tuple *listRowTuples = curRowTupleList->list;
+        ParU_Tuple *listRowTuples = curRowTupleList->list;
         PRLEVEL(1, ("%% 4: numTuple = %ld\n", numTuple));
 
         Int pdst = 0, psrc;
         for (psrc = 0; psrc < numTuple; psrc++)
         {
-            paru_Tuple curTpl = listRowTuples[psrc];
+            ParU_Tuple curTpl = listRowTuples[psrc];
 
             Int e = curTpl.e;
             Int curRowIndex = curTpl.f;
@@ -112,7 +112,7 @@ void paru_update_rowDeg(Int panel_num, Int row_end, Int f, Int start_fac,
 #endif
             if (e < 0 || curRowIndex < 0) continue;
 
-            paru_Element *el = elementList[e];
+            ParU_Element *el = elementList[e];
 
             if (el == NULL) continue;
 
@@ -270,7 +270,7 @@ void paru_update_rowDeg(Int panel_num, Int row_end, Int f, Int start_fac,
     for (Int i = 0; i < (Int)pivotal_elements.size(); i++)
     {
         Int e = pivotal_elements[i];
-        paru_Element *el = elementList[e];
+        ParU_Element *el = elementList[e];
         if (el == NULL)
         {  // removing the  element from the list
             PRLEVEL(1, ("%% eli = %ld, element= %ld  \n", eli, e));
@@ -343,7 +343,7 @@ void paru_update_rowDeg(Int panel_num, Int row_end, Int f, Int start_fac,
             tupleList *curRowTupleList = &RowList[r];
             Int numTuple = curRowTupleList->numTuple;
             ASSERT(numTuple >= 0);
-            paru_Tuple *listRowTuples = curRowTupleList->list;
+            ParU_Tuple *listRowTuples = curRowTupleList->list;
 #ifndef NDEBUG
             Int PR = 1;
             PRLEVEL(PR, ("\n %%----r =%ld  numTuple = %ld\n", r, numTuple));
@@ -352,7 +352,7 @@ void paru_update_rowDeg(Int panel_num, Int row_end, Int f, Int start_fac,
             Int pdst = 0, psrc;
             for (psrc = 0; psrc < numTuple; psrc++)
             {
-                paru_Tuple curTpl = listRowTuples[psrc];
+                ParU_Tuple curTpl = listRowTuples[psrc];
                 Int e = curTpl.e;
 
 #ifndef NDEBUG
@@ -362,7 +362,7 @@ void paru_update_rowDeg(Int panel_num, Int row_end, Int f, Int start_fac,
 
                 if (e < 0 || curRowIndex < 0) continue;
 
-                paru_Element *el = elementList[e];
+                ParU_Element *el = elementList[e];
                 if (el == NULL) continue;
 
                 // Int *el_rowIndex = rowIndex_pointer (el);
@@ -443,7 +443,7 @@ void paru_update_rowDeg(Int panel_num, Int row_end, Int f, Int start_fac,
         tupleList *curRowTupleList = &RowList[r];
         Int numTuple = curRowTupleList->numTuple;
         ASSERT(numTuple >= 0);
-        paru_Tuple *listRowTuples = curRowTupleList->list;
+        ParU_Tuple *listRowTuples = curRowTupleList->list;
 #ifndef NDEBUG
         Int PR = 1;
         PRLEVEL(PR,
@@ -454,7 +454,7 @@ void paru_update_rowDeg(Int panel_num, Int row_end, Int f, Int start_fac,
         Int pdst = 0, psrc;
         for (psrc = 0; psrc < numTuple; psrc++)
         {
-            paru_Tuple curTpl = listRowTuples[psrc];
+            ParU_Tuple curTpl = listRowTuples[psrc];
             Int e = curTpl.e;
 
 #ifndef NDEBUG
@@ -462,7 +462,7 @@ void paru_update_rowDeg(Int panel_num, Int row_end, Int f, Int start_fac,
 #endif
             Int curRowIndex = curTpl.f;
 
-            paru_Element *el = elementList[e];
+            ParU_Element *el = elementList[e];
             // ASSERT (el != NULL);
             if (el == NULL) continue;
 

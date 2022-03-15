@@ -36,7 +36,7 @@ ParU_Res paru_pivotal(std::vector<Int> &pivotal_elements,
                 eli, col1, col2));
 #endif
 
-    paru_Element **elementList = paruMatInfo->elementList;
+    ParU_Element **elementList = paruMatInfo->elementList;
 
     Int *lacList = paruMatInfo->lacList;
 
@@ -146,7 +146,7 @@ ParU_Res paru_pivotal(std::vector<Int> &pivotal_elements,
     for (Int i = 0; i < (Int)pivotal_elements.size(); i++)
     {
         Int e = pivotal_elements[i];
-        paru_Element *el = elementList[e];
+        ParU_Element *el = elementList[e];
         ASSERT(el != NULL);
 
 #ifndef NDEBUG
@@ -426,7 +426,7 @@ ParU_Res paru_pivotal(std::vector<Int> &pivotal_elements,
     for (Int i = 0; i < (Int)pivotal_elements.size(); i++)
     {
         Int e = pivotal_elements[i];
-        paru_Element *el = elementList[e];
+        ParU_Element *el = elementList[e];
         if (el->nzr_pc > 0)  // an elemen that has at least one zero row
         {
             num_children_with0++;

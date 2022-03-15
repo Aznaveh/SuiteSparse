@@ -5,7 +5,7 @@
 #ifndef PARU_H
 #define PARU_H
 
-// These libraries are included probably in Suitesparse config
+// These libraries are included probably in Suitesparse_config
 //#include <stdlib.h>
 //#include <math.h>
 //#include <float.h>
@@ -19,8 +19,6 @@
 
 //#include <malloc.h> // mallopt used in paru_init_rowFronts.cpp
 
-// Not using definitions in /CHOLMOD/Include/cholmod_blas.h
-// using cbals instead
 #define CHOLMOD_BLAS_H 
 #ifdef BLAS_INT 
 #undef BLAS_INT
@@ -51,24 +49,17 @@ extern "C"
 #define Int int64_t
 
 //  Just like UMFPACK_STRATEGY defined in UMFPACK/Include/umfpack.h
-//  However I might use different strategies in symbolic analysis and
-//  factorization; they match with UMFPACK_STRATEGY
 #define PARU_STRATEGY_AUTO 0         // decided to use sym. or unsym. strategy
-#define PARU_STRATEGY_UNSYMMETRIC 1  // COLAMD(A), metis, hmetis(?)
+#define PARU_STRATEGY_UNSYMMETRIC 1  // COLAMD(A), metis, ...
 #define PARU_STRATEGY_SYMMETRIC 3    // prefer diagonal
 
 // =============================================================================
 // === ParU_symbolic ===========================================================
 // =============================================================================
-
-// The contents of this object do not change during numeric factorization.  The
-// Symbolic object depends only on the pattern of the input matrix, and not its
-// values.
-// This makes parallelism easier to manage, since all threads can
-// have access to this object without synchronization.
 //
-
-// ParU_U_singleton and ParU_L_singleton are datastructures for singletons
+// The contents of this object do not change during numeric factorization.  The
+// ParU_U_singleton and ParU_L_singleton are datastructures for singletons that 
+// has been borrowed from UMFPACK
 //  
 //              ParU_L_singleton is CSC 
 //                                    l
@@ -102,8 +93,7 @@ struct ParU_L_singleton
 };
 
 struct ParU_symbolic
-{ /* ParU_symbolic*/
-
+{ 
     // -------------------------------------------------------------------------
     // row-form of the input matrix and its permutations
     // -------------------------------------------------------------------------
@@ -255,28 +245,24 @@ struct ParU_symbolic
     double my_time;
 
     Int max_chain; //maximum size of the chains in final tree
-
 };
 
 
 // =============================================================================
-//      paru_Tuple, Row and Column data structure
+//      ParU_Tuple, Row and Column data structure
 // =============================================================================
-typedef struct
-{ /* paru_Tuple */
+struct ParU_Tuple
+{ 
+    // The (e,f) tuples for element lists 
+    Int e, //  element number 
+        f; //   offest 
+};
 
-    /* The (e,f) tuples for element lists */
-    Int e, /*  element number */
-        f; /*   offest */
-} paru_Tuple;
-
-/* -------------------------------------------------------------------------- */
-/* An element */
-/* -------------------------------------------------------------------------- */
-
-typedef struct
-{ /* paru_Element */
-
+// =============================================================================
+// An element, contribution block
+// =============================================================================
+struct ParU_Element
+{
     Int
 
         nrowsleft,  // number of rows remaining
@@ -302,9 +288,8 @@ typedef struct
        relRowInd [0..nrows-1],	relative indices of this element for
        current front
        double ncols*nrows; numeric values
-       */
-
-} paru_Element;  // contribution block
+     */
+};
 
 
 typedef struct
@@ -313,7 +298,7 @@ typedef struct
     /*element of a column or a row*/
     Int numTuple,     /*  number of Tuples in this element */
         len;          /*  length of allocated space for current list*/
-    paru_Tuple *list; /* list of tuples regarding to this element */
+    ParU_Tuple *list; /* list of tuples regarding to this element */
 
 } tupleList;
 
@@ -351,7 +336,7 @@ typedef struct
     ParU_symbolic *Sym;
     tupleList *RowList; /* size n of dynamic list */
 
-    paru_Element **elementList; /* pointers to all elements, size = m+nf+1 */
+    ParU_Element **elementList; /* pointers to all elements, size = m+nf+1 */
     work_struct *Work;
 
     Int *time_stamp; /* for relative index update

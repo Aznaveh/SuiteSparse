@@ -16,9 +16,9 @@ void paru_check_prior_element(Int e, Int f, Int start_fac,
     work_struct *Work = paruMatInfo->Work;
     Int *elRow = Work->elRow;
 
-    paru_Element **elementList = paruMatInfo->elementList;
+    ParU_Element **elementList = paruMatInfo->elementList;
 
-    paru_Element *el = elementList[e];
+    ParU_Element *el = elementList[e];
     if (elRow[e] == 0 && el->rValid > start_fac)
     {  // all the rows are inside he current front; maybe assemble some cols
         paru_assemble_cols(e, f, colHash, paruMatInfo);
@@ -45,7 +45,7 @@ ParU_Res paru_make_heap(Int f, Int start_fac,
     Int *aChild = Sym->aChild;
     Int *aChildp = Sym->aChildp;
     Int *snM = Sym->super2atree;
-    paru_Element **elementList = paruMatInfo->elementList;
+    ParU_Element **elementList = paruMatInfo->elementList;
     // Int m = paruMatInfo-> m;
 
     std::vector<Int> **heapList = paruMatInfo->heapList;
@@ -110,7 +110,7 @@ ParU_Res paru_make_heap(Int f, Int start_fac,
             for (Int i = 0; i < (Int)pivotal_elements.size(); i++)
             {
                 Int e = pivotal_elements[i];
-                paru_Element *el = elementList[e];
+                ParU_Element *el = elementList[e];
 #ifndef NDEBUG
                 ASSERT(el != NULL);
 #endif
@@ -214,7 +214,7 @@ ParU_Res paru_make_heap_empty_el(Int f,
     Int *aChild = Sym->aChild;
     Int *aChildp = Sym->aChildp;
     Int *snM = Sym->super2atree;
-    paru_Element **elementList = paruMatInfo->elementList;
+    ParU_Element **elementList = paruMatInfo->elementList;
     // Int m = paruMatInfo-> m;
 
     std::vector<Int> **heapList = paruMatInfo->heapList;
@@ -279,7 +279,7 @@ ParU_Res paru_make_heap_empty_el(Int f,
             for (Int i = 0; i < (Int)pivotal_elements.size(); i++)
             {
                 Int e = pivotal_elements[i];
-                paru_Element *el = elementList[e];
+                ParU_Element *el = elementList[e];
                 if (el == NULL) continue;
                 PRLEVEL(PR, ("%ld  ", e));
                 curHeap->push_back(e);

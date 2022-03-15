@@ -9,23 +9,23 @@
 void paru_print_element(paru_matrix *paruMatInfo, Int e)
 {
     // print out contribution blocks
-    paru_Element **elementList;
+    ParU_Element **elementList;
     elementList = paruMatInfo->elementList;
-    paru_Element *curEl = elementList[e];
+    ParU_Element *curEl = elementList[e];
 
     Int morign = paruMatInfo->m;
     Int nf = paruMatInfo->Sym->nf;
 
     if (e > morign + nf + 1)
     {
-        printf("%% paru_Element %ld is out of range; just %ld elements \n", e,
+        printf("%% ParU_Element %ld is out of range; just %ld elements \n", e,
                morign + nf + 1);
         return;
     }
 
     if (curEl == NULL)
     {
-        printf("%% paru_Element %ld is empty\n", e);
+        printf("%% ParU_Element %ld is empty\n", e);
         return;
     }
 
@@ -42,7 +42,7 @@ void paru_print_element(paru_matrix *paruMatInfo, Int e)
     double *el_colrowNum = numeric_pointer(curEl);
 
     printf("\n");
-    printf("%% paru_Element %ld is %ld x %ld:\n", e, m, n);
+    printf("%% ParU_Element %ld is %ld x %ld:\n", e, m, n);
 
     printf("\t");
     //    for (int j = 0; j < n; j++)
@@ -77,12 +77,12 @@ void paru_print_tupleList(tupleList *listSet, Int index)
 
     tupleList cur = listSet[index];
     Int numTuple = cur.numTuple;
-    paru_Tuple *l = cur.list;
+    ParU_Tuple *l = cur.list;
 
     printf("%% There are %ld tuples in this list:\n %%", numTuple);
     for (Int i = 0; i < numTuple; i++)
     {
-        paru_Tuple curTpl = l[i];
+        ParU_Tuple curTpl = l[i];
         printf(" (%ld,%ld)", curTpl.e, curTpl.f);
     }
     printf("\n");
