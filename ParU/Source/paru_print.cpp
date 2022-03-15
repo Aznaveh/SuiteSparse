@@ -64,7 +64,7 @@ void paru_print_element(paru_matrix *paruMatInfo, Int e)
     }
 }
 
-void paru_print_tupleList(tupleList *listSet, Int index)
+void paru_print_ParU_TupleList(ParU_TupleList *listSet, Int index)
 {
     DEBUGLEVEL(0);
     PRLEVEL(1, ("%% listSet =%p\n", listSet));
@@ -75,7 +75,7 @@ void paru_print_tupleList(tupleList *listSet, Int index)
         return;
     }
 
-    tupleList cur = listSet[index];
+    ParU_TupleList cur = listSet[index];
     Int numTuple = cur.numTuple;
     ParU_Tuple *l = cur.list;
 

@@ -12,12 +12,12 @@
  * @author Aznaveh
  */
 #include "paru_internal.hpp"
-Int paru_add_rowTuple(tupleList *RowList, Int row, ParU_Tuple T)
+Int paru_add_rowTuple(ParU_TupleList *RowList, Int row, ParU_Tuple T)
 {
     DEBUGLEVEL(0);
     PRLEVEL(1, ("row =%ld, (%ld,%ld)\n", row, T.e, T.f));
 
-    tupleList *cur = &RowList[row];
+    ParU_TupleList *cur = &RowList[row];
 
     if (cur->len > cur->numTuple)
         cur->list[cur->numTuple++] = T;

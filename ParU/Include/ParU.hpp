@@ -278,29 +278,24 @@ struct ParU_Element
     Int nzr_pc;  // number of zero rows in pivotal column of current front
 
     size_t size_allocated;
-    /* followed in memory by:
-       Int
-       col [0..ncols-1],	column indices of this element
-       row [0..nrows-1] ;	row indices of this element
-
-       relColInd [0..ncols-1];	relative indices of this element for
-       current front
-       relRowInd [0..nrows-1],	relative indices of this element for
-       current front
-       double ncols*nrows; numeric values
-     */
+    // followed in memory by:
+    //   Int
+    //   col [0..ncols-1],	column indices of this element
+    //   row [0..nrows-1] ;	row indices of this element
+    //
+    //   relColInd [0..ncols-1];	relative indices of this element for
+    //   current front
+    //   relRowInd [0..nrows-1],	relative indices of this element for
+    //   current front
+    //   double ncols*nrows; numeric values
 };
 
-
-typedef struct
-{ /*List of tuples */
-
-    /*element of a column or a row*/
-    Int numTuple,     /*  number of Tuples in this element */
-        len;          /*  length of allocated space for current list*/
-    ParU_Tuple *list; /* list of tuples regarding to this element */
-
-} tupleList;
+struct ParU_TupleList
+{ // List of tuples
+    Int numTuple,     //  number of Tuples in this element 
+        len;          //  length of allocated space for current list
+    ParU_Tuple *list; // list of tuples regarding to this element 
+};
 
 typedef struct
 { /*work_struct*/
@@ -334,7 +329,7 @@ typedef struct
 {             /*Matrix */
     Int m, n; /* size of the sumbatrix that is factorized */
     ParU_symbolic *Sym;
-    tupleList *RowList; /* size n of dynamic list */
+    ParU_TupleList *RowList; /* size n of dynamic list */
 
     ParU_Element **elementList; /* pointers to all elements, size = m+nf+1 */
     work_struct *Work;

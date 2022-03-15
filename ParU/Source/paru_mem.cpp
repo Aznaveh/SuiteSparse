@@ -310,7 +310,7 @@ ParU_Res paru_freemat(paru_matrix **paruMatInfo_handle)
     Int m = paruMatInfo->m;  // m and n is different than Sym
     Int n = paruMatInfo->n;  // Here there are submatrix size
 
-    tupleList *RowList = paruMatInfo->RowList;
+    ParU_TupleList *RowList = paruMatInfo->RowList;
     PRLEVEL(1, ("%% RowList =%p\n", RowList));
 
     ParU_symbolic *Sym = paruMatInfo->Sym;
@@ -321,7 +321,7 @@ ParU_Res paru_freemat(paru_matrix **paruMatInfo_handle)
         Int len = RowList[row].len;
         paru_free(len, sizeof(ParU_Tuple), RowList[row].list);
     }
-    paru_free(1, m * sizeof(tupleList), RowList);
+    paru_free(1, m * sizeof(ParU_TupleList), RowList);
 
     ParU_Element **elementList;
     elementList = paruMatInfo->elementList;

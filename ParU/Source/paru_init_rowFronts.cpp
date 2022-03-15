@@ -93,8 +93,8 @@ ParU_Res paru_init_rowFronts(
     Int *rowSize = Work->rowSize = (Int *)paru_alloc(m, sizeof(Int));
     Int *row_degree_bound = paruMatInfo->row_degree_bound =
         (Int *)paru_alloc(m, sizeof(Int));
-    tupleList *RowList = paruMatInfo->RowList =
-        (tupleList *)paru_alloc(1, m * sizeof(tupleList));
+    ParU_TupleList *RowList = paruMatInfo->RowList =
+        (ParU_TupleList *)paru_alloc(1, m * sizeof(ParU_TupleList));
     paruMatInfo->lacList = (Int *)paru_alloc(m + nf, sizeof(Int));
     paruMatInfo->frowCount = (Int *)paru_alloc(1, nf * sizeof(Int));
     paruMatInfo->fcolCount = (Int *)paru_alloc(1, nf * sizeof(Int));

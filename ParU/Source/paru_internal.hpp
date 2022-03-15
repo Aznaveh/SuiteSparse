@@ -167,7 +167,7 @@ void paru_memset(void *ptr, Int value, size_t num);
 void paru_memcpy(void *destination, const void *source, size_t num);
 
 /* add tuple functions defintions */
-Int paru_add_rowTuple(tupleList *RowList, Int row, ParU_Tuple T);
+Int paru_add_rowTuple(ParU_TupleList *RowList, Int row, ParU_Tuple T);
 
 Int paru_dgetrf(double *F, Int *frowList, Int m, Int n, BLAS_INT *ipiv);
 
@@ -188,7 +188,7 @@ Int paru_dgemm(Int f, double *pF, double *uPart, double *el, Int fp,
                Int rowCount, Int colCount, paru_matrix *paruMatInfo);
 
 void paru_print_element(paru_matrix *paruMatInfo, Int e);
-void paru_print_tupleList(tupleList *listSet, Int index);
+void paru_print_ParU_TupleList(ParU_TupleList *listSet, Int index);
 void paru_init_rel(Int f, paru_matrix *paruMatInfo);
 
 void paru_update_rel_ind_col(Int e, Int f, std::vector<Int> &colHash,
