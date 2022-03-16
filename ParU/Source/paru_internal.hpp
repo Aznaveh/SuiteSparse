@@ -202,7 +202,7 @@ Int bin_srch_col(Int *srt_lst, Int l, Int r, Int num);
 Int bin_srch(Int *srt_lst, Int l, Int r, Int num);
 
 ParU_Ret paru_init_rowFronts(ParU_Numeric **Num_handle, cholmod_sparse *A,
-                             ParU_Symbolic *Sym);
+                             ParU_Symbolic *Sym, ParU_Control Control);
 ParU_Ret paru_front(Int f, ParU_Numeric *Num);
 
 ParU_Ret paru_pivotal(std::vector<Int> &pivotal_elements,

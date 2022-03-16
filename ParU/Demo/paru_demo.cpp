@@ -5,8 +5,9 @@
  *
  * @author Aznaveh
  * */
-#include "ParU.hpp"
 #include <omp.h>
+
+#include "ParU.hpp"
 
 int main(int argc, char **argv)
 {
@@ -46,28 +47,29 @@ int main(int argc, char **argv)
 
     double my_start_time = omp_get_wtime();
 
+    ParU_Control Control;
     ParU_Ret info;
 
-    info = paru_analyze(A, &Sym);
+    info = paru_analyze(A, &Sym, Control);
     if (info != PARU_SUCCESS)
     {
         cholmod_l_free_sparse(&A, cc);
         cholmod_l_finish(cc);
         return info;
     }
-    printf ("Paru: Symbolic factorization is done!\n");
+    printf("Paru: Symbolic factorization is done!\n");
     ParU_Numeric *Num;
-    info = paru_factorize(A, Sym, &Num);
+    info = paru_factorize(A, Sym, &Num, Control);
     double my_time = omp_get_wtime() - my_start_time;
     if (info != PARU_SUCCESS)
     {
-        paru_freemat(&Num);
-        paru_freesym(&Sym);
+        paru_freemat(&Num, Control);
+        paru_freesym(&Sym, Control);
         cholmod_l_free_sparse(&A, cc);
         cholmod_l_finish(cc);
         return info;
     }
-    printf ("Paru: factorization was successfull in %lf seconds.\n",my_time);
+    printf("Paru: factorization was successfull in %lf seconds.\n", my_time);
 
     //~~~~~~~~~~~~~~~~~~~Test the results ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #if 1
@@ -75,17 +77,17 @@ int main(int argc, char **argv)
     double *b = (double *)malloc(m * sizeof(double));
     for (Int i = 0; i < m; ++i) b[i] = i + 1;
     double resid, norm;
-    paru_residual(b, resid, norm, A, Num);
+    paru_residual(b, resid, norm, A, Num, Control);
     for (Int i = 0; i < m; ++i) b[i] = i + 1;
-    paru_backward(b, resid, norm, A, Num);
+    paru_backward(b, resid, norm, A, Num, Control);
     free(b);
 
-    const Int nn = 16; //number of right handsides
-    double *B = (double *)malloc(m*nn * sizeof(double));
+    const Int nn = 16;  // number of right handsides
+    double *B = (double *)malloc(m * nn * sizeof(double));
     double Res[4];
-    for (Int i = 0; i < m; ++i) 
-        for (Int j = 0; j < nn; ++j) B[j*m+i] = (double) (i+j + 1);
-    paru_residual(A, Num, B, Res, nn);
+    for (Int i = 0; i < m; ++i)
+        for (Int j = 0; j < nn; ++j) B[j * m + i] = (double)(i + j + 1);
+    paru_residual(A, Num, B, Res, nn, Control);
     free(B);
 #endif
 
@@ -101,12 +103,12 @@ int main(int argc, char **argv)
     double status,           // Info [UMFPACK_STATUS]
         Info[UMFPACK_INFO],  // Contains statistics about the symbolic analysis
 
-        Control[UMFPACK_CONTROL];  // it is set in umfpack_dl_defaults and
+        umf_Control[UMFPACK_CONTROL];  // it is set in umfpack_dl_defaults and
     // is used in umfpack_dl_symbolic; if
     // passed NULL it will use the defaults
-    umfpack_dl_defaults(Control);
-    Control[UMFPACK_ORDERING] = UMFPACK_ORDERING_METIS;
-    // Control [UMFPACK_STRATEGY] =   UMFPACK_STRATEGY_UNSYMMETRIC;
+    umfpack_dl_defaults(umf_Control);
+    umf_Control[UMFPACK_ORDERING] = UMFPACK_ORDERING_METIS;
+    // umf_Control [UMFPACK_STRATEGY] =   UMFPACK_STRATEGY_UNSYMMETRIC;
 
     Int *Ap = (Int *)A->p;
     Int *Ai = (Int *)A->i;
@@ -115,36 +117,36 @@ int main(int argc, char **argv)
     Int n = A->ncol;
     void *Symbolic, *Numeric;  // Output argument in umf_dl_symbolc;
 
-    status = umfpack_dl_symbolic(n, n, Ap, Ai, Ax, &Symbolic, Control, Info);
+    status =
+        umfpack_dl_symbolic(n, n, Ap, Ai, Ax, &Symbolic, umf_Control, Info);
     if (status < 0)
     {
-        umfpack_dl_report_info(Control, Info);
-        umfpack_dl_report_status(Control, status);
+        umfpack_dl_report_info(umf_Control, Info);
+        umfpack_dl_report_status(umf_Control, status);
         printf("umfpack_dl_symbolic failed\n");
         exit(0);
     }
-    status = umfpack_dl_numeric(Ap, Ai, Ax, Symbolic, &Numeric, Control, Info);
+    status =
+        umfpack_dl_numeric(Ap, Ai, Ax, Symbolic, &Numeric, umf_Control, Info);
     if (status < 0)
     {
-        umfpack_dl_report_info(Control, Info);
-        umfpack_dl_report_status(Control, status);
+        umfpack_dl_report_info(umf_Control, Info);
+        umfpack_dl_report_status(umf_Control, status);
         printf("umfpack_dl_numeric failed\n");
     }
-    
-    
+
     umf_time = omp_get_wtime() - umf_start_time;
 
     b = (double *)malloc(m * sizeof(double));
     double *x = (double *)malloc(m * sizeof(double));
     for (Int i = 0; i < m; ++i) b[i] = i + 1;
 
-    double solve_start =  omp_get_wtime();
-    status = umfpack_dl_solve(UMFPACK_A, Ap, Ai, Ax, x, b, 
-            Numeric, Control, Info);
-    double solve_time =   omp_get_wtime() - solve_start ;
+    double solve_start = omp_get_wtime();
+    status = umfpack_dl_solve(UMFPACK_A, Ap, Ai, Ax, x, b, Numeric, umf_Control,
+                              Info);
+    double solve_time = omp_get_wtime() - solve_start;
     free(x);
     free(b);
-
 
     umfpack_dl_free_symbolic(&Symbolic);
     umfpack_dl_free_numeric(&Numeric);
@@ -160,20 +162,19 @@ int main(int argc, char **argv)
         res_file = fopen(res_name, "a");
         if (res_file == NULL)
         {
-            printf("Par: error in making %s to write the results!\n",
-                   res_name);
+            printf("Par: error in making %s to write the results!\n", res_name);
         }
-        fprintf(res_file, "%ld %ld %lf %lf %lf\n", Sym->m, Sym->anz,
-                my_time, umf_time, my_time / umf_time);
+        fprintf(res_file, "%ld %ld %lf %lf %lf\n", Sym->m, Sym->anz, my_time,
+                umf_time, my_time / umf_time);
         fclose(res_file);
     }
-    printf("my_time = %lf umf_time=%lf umf_solv_t = %lf ratio = %lf\n", 
-            my_time, umf_time, solve_time, my_time / umf_time);
+    printf("my_time = %lf umf_time=%lf umf_solv_t = %lf ratio = %lf\n", my_time,
+           umf_time, solve_time, my_time / umf_time);
 
 #endif
     //~~~~~~~~~~~~~~~~~~~Free Everything~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    paru_freemat(&Num);
-    paru_freesym(&Sym);
+    paru_freemat(&Num, Control);
+    paru_freesym(&Sym, Control);
 
     cholmod_l_free_sparse(&A, cc);
     cholmod_l_finish(cc);

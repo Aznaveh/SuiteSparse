@@ -12,7 +12,8 @@
 #include "paru_internal.hpp"
 
 ParU_Ret paru_residual(double *b, double &resid, double &norm,
-                       cholmod_sparse *A, ParU_Numeric *Num)
+                       cholmod_sparse *A, ParU_Numeric *Num,
+                       ParU_Control Control)
 {
     DEBUGLEVEL(0);
     PRLEVEL(1, ("%% inside residual\n"));
@@ -45,7 +46,7 @@ ParU_Ret paru_residual(double *b, double &resid, double &norm,
 #endif
 
     ParU_Ret info;
-    info = paru_solve(x, Num);
+    info = paru_solve(x, Num, Control);
     if (info != PARU_SUCCESS)
     {
         PRLEVEL(1, ("%% A problem happend during factorization\n"));
@@ -83,7 +84,7 @@ ParU_Ret paru_residual(double *b, double &resid, double &norm,
  * @author Aznaveh  for testing now
  * */
 ParU_Ret paru_residual(cholmod_sparse *A, ParU_Numeric *Num, double *B,
-                       double *Results, Int n)  // output
+                       double *Results, Int n, ParU_Control Control)  // output
                                                 //  0 residual
                                                 //  1 weighted residual
                                                 //  2 time
@@ -131,7 +132,7 @@ ParU_Ret paru_residual(cholmod_sparse *A, ParU_Numeric *Num, double *B,
 #endif
 
     ParU_Ret info;
-    info = paru_solve(X, n, Num);
+    info = paru_solve(X, n, Num, Control);
     if (info != PARU_SUCCESS)
     {
         PRLEVEL(1, ("%% A problem happend during factorization\n"));

@@ -14,7 +14,8 @@
 #include "paru_internal.hpp"
 
 ParU_Ret paru_backward(double *x1, double &resid, double &norm,
-                       cholmod_sparse *A, ParU_Numeric *Num)
+                       cholmod_sparse *A, ParU_Numeric *Num,
+                       ParU_Control Control)
 {
     DEBUGLEVEL(0);
     PRLEVEL(1, ("%% inside backward\n"));
@@ -46,7 +47,7 @@ ParU_Ret paru_backward(double *x1, double &resid, double &norm,
 #endif
 
     ParU_Ret info;
-    info = paru_solve(b, Num);
+    info = paru_solve(b, Num, Control);
     if (info != PARU_SUCCESS)
     {
         PRLEVEL(1, ("%% A problem happend during factorization\n"));

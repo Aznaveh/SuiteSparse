@@ -10,7 +10,7 @@
 
 #include "paru_internal.hpp"
 
-ParU_Ret paru_solve(double *b, ParU_Numeric *Num)
+ParU_Ret paru_solve(double *b, ParU_Numeric *Num, ParU_Control Control)
 {
     DEBUGLEVEL(0);
     PRLEVEL(1, ("%% inside solve\n"));
@@ -63,7 +63,7 @@ ParU_Ret paru_solve(double *b, ParU_Numeric *Num)
 
 #include "paru_internal.hpp"
 
-ParU_Ret paru_solve(double *B, Int n, ParU_Numeric *Num)
+ParU_Ret paru_solve(double *B, Int n, ParU_Numeric *Num, ParU_Control Control)
 {
     DEBUGLEVEL(0);
     PRLEVEL(1, ("%% mRHS inside Solve\n"));

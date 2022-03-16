@@ -167,7 +167,7 @@ ParU_Ret paru_exec_tasks(Int t, Int *task_num_child, Int &chain_task,
     return myInfo;
 }
 ParU_Ret paru_factorize(cholmod_sparse *A, ParU_Symbolic *Sym,
-                        ParU_Numeric **Num_handle)
+                        ParU_Numeric **Num_handle, ParU_Control Control)
 {
     DEBUGLEVEL(0);
 #ifndef NTIME
@@ -194,7 +194,7 @@ ParU_Ret paru_factorize(cholmod_sparse *A, ParU_Symbolic *Sym,
     Num = *Num_handle;
 
     ParU_Ret info;
-    info = paru_init_rowFronts(&Num, A, Sym);
+    info = paru_init_rowFronts(&Num, A, Sym, Control);
     *Num_handle = Num;
 
     PRLEVEL(1, ("%% init_row is done\n"));
