@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////////////////////
- /////////////////////////  paru_update_rel_ind ////////////////////////////////
+/////////////////////////  paru_update_rel_ind ////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 /*! @brief updating element's relative indices in regard to another element
  *      using my hash to find the columns and update relative indices
@@ -9,7 +9,7 @@
 
 #include "paru_internal.hpp"
 void paru_update_rel_ind_col(Int e, Int f, std::vector<Int> &colHash,
-                             paru_matrix *paruMatInfo)
+                             ParU_Numeric *Num)
 {
     // updating relative column index
     // it might be for curent element or for the Upart therefore we might even
@@ -17,7 +17,7 @@ void paru_update_rel_ind_col(Int e, Int f, std::vector<Int> &colHash,
     DEBUGLEVEL(0);
     PRLEVEL(1, ("%%update relative in %ld\n", f));
 
-    ParU_Element **elementList = paruMatInfo->elementList;
+    ParU_Element **elementList = Num->elementList;
     ParU_Element *el = elementList[e];
 
     // Int *el_Index = colIndex_pointer (el); //col global index of destination
@@ -29,7 +29,7 @@ void paru_update_rel_ind_col(Int e, Int f, std::vector<Int> &colHash,
     // Int *colRelIndex = relColInd (ParU_Element *el);
     Int *colRelIndex = (Int *)(el + 1) + mEl + nEl;
 
-    Int *fcolList = paruMatInfo->fcolList[f];
+    Int *fcolList = Num->fcolList[f];
 
     for (Int i = el->lac; i < nEl; i++)
     {
@@ -48,5 +48,5 @@ void paru_update_rel_ind_col(Int e, Int f, std::vector<Int> &colHash,
     PRLEVEL(1, ("%%update relative in %ld finished\n", f));
 
     // update the cVal of el
-    el->cValid = paruMatInfo->time_stamp[f];
+    el->cValid = Num->time_stamp[f];
 }

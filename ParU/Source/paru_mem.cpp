@@ -223,16 +223,16 @@ ParU_Ret paru_freesym(ParU_Symbolic **Sym_handle)
     paru_free(nf + 1, sizeof(Int), Sym->Fm);
     paru_free(nf + 1, sizeof(Int), Sym->Cm);
 
-    //paru_free(Sym->num_roots, sizeof(Int), Sym->roots);
+    // paru_free(Sym->num_roots, sizeof(Int), Sym->roots);
 
     paru_free(m + 1 - n1, sizeof(Int), Sym->Sp);
     paru_free(snz, sizeof(Int), Sym->Sj);
     paru_free(snz, sizeof(double), Sym->Sx);
     paru_free(n + 2 - n1, sizeof(Int), Sym->Sleft);
 
-    //paru_free((n + 1), sizeof(Int), Sym->Chain_start);
-    //paru_free((n + 1), sizeof(Int), Sym->Chain_maxrows);
-    //paru_free((n + 1), sizeof(Int), Sym->Chain_maxcols);
+    // paru_free((n + 1), sizeof(Int), Sym->Chain_start);
+    // paru_free((n + 1), sizeof(Int), Sym->Chain_maxrows);
+    // paru_free((n + 1), sizeof(Int), Sym->Chain_maxcols);
 
     paru_free(nf + 1, sizeof(double), Sym->front_flop_bound);
     paru_free(nf + 1, sizeof(double), Sym->stree_flop_bound);
@@ -270,7 +270,7 @@ ParU_Ret paru_freesym(ParU_Symbolic **Sym_handle)
         }
     }
     Int ntasks = Sym->ntasks;
-    paru_free(ntasks+1, sizeof(Int), Sym->task_map);
+    paru_free(ntasks + 1, sizeof(Int), Sym->task_map);
     paru_free(ntasks, sizeof(Int), Sym->task_parent);
     paru_free(ntasks, sizeof(Int), Sym->task_num_child);
     paru_free(ntasks, sizeof(Int), Sym->task_depth);
@@ -298,22 +298,21 @@ void paru_free_el(Int e, ParU_Element **elementList)
 }
 
 // It uses Sym, Do not free Sym before
-ParU_Ret paru_freemat(paru_matrix **paruMatInfo_handle)
+ParU_Ret paru_freemat(ParU_Numeric **Num_handle)
 {
     DEBUGLEVEL(0);
-    if (paruMatInfo_handle == NULL || *paruMatInfo_handle == NULL) 
-        return PARU_INVALID;
+    if (Num_handle == NULL || *Num_handle == NULL) return PARU_INVALID;
 
-    paru_matrix *paruMatInfo;
-    paruMatInfo = *paruMatInfo_handle;
+    ParU_Numeric *Num;
+    Num = *Num_handle;
 
-    Int m = paruMatInfo->m;  // m and n is different than Sym
-    Int n = paruMatInfo->n;  // Here there are submatrix size
+    Int m = Num->m;  // m and n is different than Sym
+    Int n = Num->n;  // Here there are submatrix size
 
-    ParU_TupleList *RowList = paruMatInfo->RowList;
+    ParU_TupleList *RowList = Num->RowList;
     PRLEVEL(1, ("%% RowList =%p\n", RowList));
 
-    ParU_Symbolic *Sym = paruMatInfo->Sym;
+    ParU_Symbolic *Sym = Num->Sym;
     Int nf = Sym->nf;
 
     for (Int row = 0; row < m; row++)
@@ -324,7 +323,7 @@ ParU_Ret paru_freemat(paru_matrix **paruMatInfo_handle)
     paru_free(1, m * sizeof(ParU_TupleList), RowList);
 
     ParU_Element **elementList;
-    elementList = paruMatInfo->elementList;
+    elementList = Num->elementList;
 
     PRLEVEL(1, ("%% Sym = %p\n", Sym));
     PRLEVEL(1, ("%% freeing initialized elements:\n"));
@@ -342,22 +341,20 @@ ParU_Ret paru_freemat(paru_matrix **paruMatInfo_handle)
 
     PRLEVEL(1, ("\n%% freeing CB elements:\n"));
     for (Int i = 0; i < nf; i++)
-    {                                   // freeing all other elements
+    {                                 // freeing all other elements
         Int e = Sym->super2atree[i];  // element number in augmented tree
         paru_free_el(e, elementList);
     }
 
     // free the answer
-    ParU_Factors *LUs = paruMatInfo->partial_LUs;
-    ParU_Factors *Us = paruMatInfo->partial_Us;
+    ParU_Factors *LUs = Num->partial_LUs;
+    ParU_Factors *Us = Num->partial_Us;
 
     for (Int i = 0; i < nf; i++)
     {
-        paru_free(paruMatInfo->frowCount[i], sizeof(Int),
-                  paruMatInfo->frowList[i]);
+        paru_free(Num->frowCount[i], sizeof(Int), Num->frowList[i]);
 
-        paru_free(paruMatInfo->fcolCount[i], sizeof(Int),
-                  paruMatInfo->fcolList[i]);
+        paru_free(Num->fcolCount[i], sizeof(Int), Num->fcolList[i]);
 
         PRLEVEL(1, ("%% Freeing Us=%p\n", Us[i].p));
         if (Us[i].p != NULL)
@@ -376,19 +373,19 @@ ParU_Ret paru_freemat(paru_matrix **paruMatInfo_handle)
     }
 
     PRLEVEL(1, ("%% Done LUs\n"));
-    paru_free(1, nf * sizeof(Int), paruMatInfo->frowCount);
-    paru_free(1, nf * sizeof(Int), paruMatInfo->fcolCount);
+    paru_free(1, nf * sizeof(Int), Num->frowCount);
+    paru_free(1, nf * sizeof(Int), Num->fcolCount);
 
-    paru_free(1, nf * sizeof(Int *), paruMatInfo->frowList);
-    paru_free(1, nf * sizeof(Int *), paruMatInfo->fcolList);
+    paru_free(1, nf * sizeof(Int *), Num->frowList);
+    paru_free(1, nf * sizeof(Int *), Num->fcolList);
 
     paru_free(1, nf * sizeof(ParU_Factors), LUs);
     paru_free(1, nf * sizeof(ParU_Factors), Us);
 
-    if (paruMatInfo->Diag_map)
+    if (Num->Diag_map)
     {
-        paru_free(n, sizeof(Int), paruMatInfo->Diag_map);
-        paru_free(n, sizeof(Int), paruMatInfo->inv_Diag_map);
+        paru_free(n, sizeof(Int), Num->Diag_map);
+        paru_free(n, sizeof(Int), Num->inv_Diag_map);
     }
 #ifndef NDEBUG
     Int Us_bound_size = Sym->Us_bound_size;
@@ -401,10 +398,10 @@ ParU_Ret paru_freemat(paru_matrix **paruMatInfo_handle)
     PRLEVEL(1, ("%% FREE upperBoundSize =%ld \n", upperBoundSize));
 #endif
 
-    paru_free(1, nf * sizeof(Int), paruMatInfo->time_stamp);
+    paru_free(1, nf * sizeof(Int), Num->time_stamp);
     // in practice each parent should deal with the memory for the children
 #ifndef NDEBUG
-    std::vector<Int> **heapList = paruMatInfo->heapList;
+    std::vector<Int> **heapList = Num->heapList;
     // freeing memory of heaps.
     if (heapList != NULL)
     {
@@ -421,25 +418,24 @@ ParU_Ret paru_freemat(paru_matrix **paruMatInfo_handle)
         }
     }
 #endif
-    paru_free(1, (m + nf + 1) * sizeof(std::vector<Int> **),
-              paruMatInfo->heapList);
+    paru_free(1, (m + nf + 1) * sizeof(std::vector<Int> **), Num->heapList);
 
     paru_free(1, (m + nf + 1) * sizeof(ParU_Element), elementList);
 
-    Paru_Work *Work = paruMatInfo->Work;
+    Paru_Work *Work = Num->Work;
     if (Work != NULL)
     {
         paru_free(m, sizeof(Int), Work->rowSize);
         paru_free(m + nf + 1, sizeof(Int), Work->rowMark);
         paru_free(m + nf, sizeof(Int), Work->elRow);
         paru_free(m + nf, sizeof(Int), Work->elCol);
-        paru_free(1, sizeof(Paru_Work), paruMatInfo->Work);
+        paru_free(1, sizeof(Paru_Work), Num->Work);
     }
 
-    paru_free(m + nf, sizeof(Int), paruMatInfo->lacList);
+    paru_free(m + nf, sizeof(Int), Num->lacList);
 
-    paru_free(m, sizeof(Int), paruMatInfo->row_degree_bound);
-    paru_free(1, sizeof(paru_matrix), paruMatInfo);
-    *paruMatInfo_handle = NULL;
+    paru_free(m, sizeof(Int), Num->row_degree_bound);
+    paru_free(1, sizeof(ParU_Numeric), Num);
+    *Num_handle = NULL;
     return PARU_SUCCESS;
 }

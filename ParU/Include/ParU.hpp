@@ -19,8 +19,8 @@
 
 //#include <malloc.h> // mallopt used in paru_init_rowFronts.cpp
 
-#define CHOLMOD_BLAS_H 
-#ifdef BLAS_INT 
+#define CHOLMOD_BLAS_H
+#ifdef BLAS_INT
 #undef BLAS_INT
 #endif
 
@@ -58,12 +58,12 @@ extern "C"
 // =============================================================================
 //
 // The contents of this object do not change during numeric factorization.  The
-// ParU_U_singleton and ParU_L_singleton are datastructures for singletons that 
+// ParU_U_singleton and ParU_L_singleton are datastructures for singletons that
 // has been borrowed from UMFPACK
-//  
-//              ParU_L_singleton is CSC 
+//
+//              ParU_L_singleton is CSC
 //                                    l
-//                                    v 
+//                                    v
 // 	  ParU_U_singleton is CSR -> L U U U U U U U U
 // 	                             . L U U U U U U U
 // 	                             . . L U U U U U U
@@ -73,27 +73,27 @@ extern "C"
 // 	                             . . . L L x x x x
 // 	                             . . . L L x x x x
 // 	                             . . . L L x x x x
- 
+
 struct ParU_U_singleton
 {
     // CSR format for U singletons
-    Int nnz;      // nnz in submatrix
-    Int *Sup;     // size cs1
-    Int *Suj;     // size is computed 
-    double *Sux;  
+    Int nnz;   // nnz in submatrix
+    Int *Sup;  // size cs1
+    Int *Suj;  // size is computed
+    double *Sux;
 };
 
 struct ParU_L_singleton
 {
     // CSC format for U singletons
-    Int nnz;      // nnz in submatrix
-    Int *Slp;     // size rs1
-    Int *Sli;     // size is computed 
-    double *Slx; 
+    Int nnz;   // nnz in submatrix
+    Int *Slp;  // size rs1
+    Int *Sli;  // size is computed
+    double *Slx;
 };
 
 struct ParU_Symbolic
-{ 
+{
     // -------------------------------------------------------------------------
     // row-form of the input matrix and its permutations
     // -------------------------------------------------------------------------
@@ -190,7 +190,7 @@ struct ParU_Symbolic
     // number of expected pivot columns in F is thus
     // Super [f+1] - Super [f].
 
-    //Int num_roots;  // number of roots
+    // Int num_roots;  // number of roots
     // it is at least one and can be more in case of forest
     Int *roots;
 
@@ -233,29 +233,28 @@ struct ParU_Symbolic
     double *front_flop_bound;  // bound on m*n*k for each front size nf+1
     double *stree_flop_bound;  // flop bound for front and descendents size nf+1
 
-    //data structure related to tasks
-    Int ntasks; // number of tasks; at most nf
-    Int *task_map; // each task does the fronts 
-                   // from task_map[i]+1 to task_map[i+1]; task_map[0] is -1
-    Int *task_parent; //tree data structure for tasks
-    Int *task_num_child; //number of children of each task
-    Int *task_depth; //max depth of each task
+    // data structure related to tasks
+    Int ntasks;        // number of tasks; at most nf
+    Int *task_map;     // each task does the fronts
+                       // from task_map[i]+1 to task_map[i+1]; task_map[0] is -1
+    Int *task_parent;  // tree data structure for tasks
+    Int *task_num_child;  // number of children of each task
+    Int *task_depth;      // max depth of each task
 
     // symbolic analysis time
     double my_time;
 
-    Int max_chain; //maximum size of the chains in final tree
+    Int max_chain;  // maximum size of the chains in final tree
 };
-
 
 // =============================================================================
 //      ParU_Tuple, Row and Column data structure
 // =============================================================================
 struct ParU_Tuple
-{ 
-    // The (e,f) tuples for element lists 
-    Int e, //  element number 
-        f; //   offest 
+{
+    // The (e,f) tuples for element lists
+    Int e,  //  element number
+        f;  //   offest
 };
 
 // =============================================================================
@@ -291,10 +290,10 @@ struct ParU_Element
 };
 
 struct ParU_TupleList
-{ // List of tuples
-    Int numTuple,     //  number of Tuples in this element 
-        len;          //  length of allocated space for current list
-    ParU_Tuple *list; // list of tuples regarding to this element 
+{                      // List of tuples
+    Int numTuple,      //  number of Tuples in this element
+        len;           //  length of allocated space for current list
+    ParU_Tuple *list;  // list of tuples regarding to this element
 };
 
 struct Paru_Work
@@ -310,9 +309,9 @@ struct Paru_Work
 };
 
 struct ParU_Factors
-{              // dense factorized part pointer
-    Int m, n;  //  mxn dense matrix 
-    double *p; //  point to factorized parts
+{               // dense factorized part pointer
+    Int m, n;   //  mxn dense matrix
+    double *p;  //  point to factorized parts
 };
 
 enum ParU_Ret
@@ -323,41 +322,40 @@ enum ParU_Ret
     PARU_SINGULAR
 };
 
-typedef struct
-{             /*Matrix */
-    Int m, n; /* size of the sumbatrix that is factorized */
+struct ParU_Numeric
+{
+    Int m, n;  // size of the sumbatrix that is factorized
     ParU_Symbolic *Sym;
-    ParU_TupleList *RowList; /* size n of dynamic list */
+    ParU_TupleList *RowList;  // size n of dynamic list
 
-    ParU_Element **elementList; /* pointers to all elements, size = m+nf+1 */
+    ParU_Element **elementList;  // pointers to all elements, size = m+nf+1
     Paru_Work *Work;
 
-    Int *time_stamp; /* for relative index update
-                        not initialized */
+    Int *time_stamp;  // for relative index update; not initialized
 
     // Computed parts of each front
-    Int *frowCount;        /* size nf   size(CB) = rowCount[f]x         */
-    Int *fcolCount;        /* size nf                        colCount[f]*/
-    Int **frowList;        /* size nf   frowList[f] is rows of the matrix S */
-    Int **fcolList;        /* size nf   colList[f] is non pivotal cols of the
-                              matrix S */
-    ParU_Factors *partial_Us;  /* size nf   size(Us)= fp*colCount[f]    */
-    ParU_Factors *partial_LUs; /* size nf   size(LUs)= rowCount[f]*fp   */
+    Int *frowCount;  // size nf   size(CB) = rowCount[f]x
+    Int *fcolCount;  // size nf                        colCount[f]
+    Int **frowList;  // size nf   frowList[f] is rows of the matrix S
+    Int **fcolList;  // size nf   colList[f] is non pivotal cols of the
+                     //   matrix S
+    ParU_Factors *partial_Us;   // size nf   size(Us)= fp*colCount[f]
+    ParU_Factors *partial_LUs;  // size nf   size(LUs)= rowCount[f]*fp
 
     // only used for statistics when debugging is enabled:
-    Int actual_alloc_LUs;     /* actual memory allocated for LUs*/
-    Int actual_alloc_Us;      /* actual memory allocated for Us*/
-    Int actual_alloc_row_int; /* actual memory allocated for rows*/
-    Int actual_alloc_col_int; /* actual memory allocated for cols*/
+    Int actual_alloc_LUs;      // actual memory allocated for LUs
+    Int actual_alloc_Us;       // actual memory allocated for Us
+    Int actual_alloc_row_int;  // actual memory allocated for rows
+    Int actual_alloc_col_int;  // actual memory allocated for cols
 
-    Int max_row_count;   /* maximum number of rows/cols for all the fronts*/
-    Int max_col_count;   /* it is initalized after factorization */
-    Int *row_degree_bound; /* row degree size number of rows */
-    Int panel_width;     //XXX  /* width of panel for dense factorizaiton*/
+    Int max_row_count;      // maximum number of rows/cols for all the fronts
+    Int max_col_count;      // it is initalized after factorization
+    Int *row_degree_bound;  // row degree size number of rows
+    Int panel_width;        // XXX  // width of panel for dense factorizaiton
 
-    Int *lacList; /* sieze m+nf least active column of each element
-                     el_colIndex[el->lac]  == lacList [e]
-                     number of element*/
+    Int *lacList;  // sieze m+nf least active column of each element
+                   //    el_colIndex[el->lac]  == lacList [e]
+                   //    number of element
 
     Int *Diag_map;  // size n,
     // Both of these are NULL if the stratey is not symmetric
@@ -371,7 +369,7 @@ typedef struct
     // least numbered column. The active front Takes the pointer of the biggest
     // child and release its other children after concatenating their list to
     // its own. The list of heaps are initialized by nullptr
-    std::vector<Int> **heapList; /* size m+nf+1, initialized with nullptr  */
+    std::vector<Int> **heapList;  // size m+nf+1, initialized with nullptr
 
     // analysis information
     double my_time;  // factorization time
@@ -385,18 +383,15 @@ typedef struct
     double flp_cnt_real_dgemm;
     // #endif
 
-    Int naft; //number of actvie frontal tasks
-    Int resq; //number of remainig ready tasks in the queue
-    Int paru_max_threads; //I want to call omp_get_max_threads just once
-                         // or user can give me a value less than that
-
-    ParU_Ret res;
-
-} paru_matrix;
+    Int naft;              // number of actvie frontal tasks
+    Int resq;              // number of remainig ready tasks in the queue
+    Int paru_max_threads;  // I want to call omp_get_max_threads just once
+                           // or user can give me a value less than that
+    ParU_Ret res;  // returning value of numeric phase
+};
 
 //------------------------------------------------------------------------------
 // user:
-
 
 /* usage:
    S = paru_analyse (A) ;
@@ -408,19 +403,19 @@ info: an enum: PARU_SUCCESS, PARU_OUT_OF_MEMORY, PARU_INVALID, PARU_SINGULAR,
 // a routine that does init_row and also factorization
 ParU_Ret paru_analyze(cholmod_sparse *A, ParU_Symbolic **Sym_handle);
 ParU_Ret paru_factorize(cholmod_sparse *A, ParU_Symbolic *Sym,
-                               paru_matrix **paruMatInfo_handle);
-ParU_Ret paru_solve(double *b, paru_matrix *paruMatInfo);
-ParU_Ret paru_solve(double *B, Int n, paru_matrix *paruMatInfo);
+                        ParU_Numeric **Num_handle);
+ParU_Ret paru_solve(double *b, ParU_Numeric *Num);
+ParU_Ret paru_solve(double *B, Int n, ParU_Numeric *Num);
 
 ParU_Ret paru_freesym(ParU_Symbolic **Sym_handle);
-ParU_Ret paru_freemat(paru_matrix **paruMatInfo_handle);
+ParU_Ret paru_freemat(ParU_Numeric **Num_handle);
 
 ParU_Ret paru_residual(double *b, double &resid, double &norm,
-        cholmod_sparse *A, paru_matrix *paruMatInfo);
-                              
-ParU_Ret paru_residual(cholmod_sparse *A, paru_matrix *paruMatInfo,
-                              double *b, double *Results, Int n);
+                       cholmod_sparse *A, ParU_Numeric *Num);
 
-ParU_Ret paru_backward (double *x1, double &resid, double &norm,
-        cholmod_sparse *A, paru_matrix *paruMatInfo);
+ParU_Ret paru_residual(cholmod_sparse *A, ParU_Numeric *Num, double *b,
+                       double *Results, Int n);
+
+ParU_Ret paru_backward(double *x1, double &resid, double &norm,
+                       cholmod_sparse *A, ParU_Numeric *Num);
 #endif

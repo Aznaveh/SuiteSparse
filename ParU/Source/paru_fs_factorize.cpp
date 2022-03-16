@@ -11,32 +11,32 @@
 #define PIV_TOLER 0.1     // pivot tolerance  //XXX
 #define DIAG_TOLER 0.001  // pivot tolerance
 
-void swap_rows(double *F, Int *frowList, Int m, Int n, Int r1, Int r2, 
-        paru_matrix *paruMatInfo)
+void swap_rows(double *F, Int *frowList, Int m, Int n, Int r1, Int r2,
+               ParU_Numeric *Num)
 {
     // This function also swap rows r1 and r2 wholly and indices
     if (r1 == r2) return;
     std::swap(frowList[r1], frowList[r2]);
-    //So dissappointed in parallelism this part; SLOWDOWNN
+    // So dissappointed in parallelism this part; SLOWDOWNN
 
-    //Int naft; //number of active frontal tasks
-    //pragma omp atomic read
-    //naft = paruMatInfo->naft;
-    //const Int max_threads = paruMatInfo->paru_max_threads;
-    //if ( (naft == 1) && (n > 1024) ) 
-    //printf ("naft=%ld, max_threads=%ld num_tasks=%ld n =%ld \n", 
+    // Int naft; //number of active frontal tasks
+    // pragma omp atomic read
+    // naft = Num->naft;
+    // const Int max_threads = Num->paru_max_threads;
+    // if ( (naft == 1) && (n > 1024) )
+    // printf ("naft=%ld, max_threads=%ld num_tasks=%ld n =%ld \n",
     //        naft, max_threads, max_threads/(naft), n);
-    //pragma omp parallel if ( (naft == 1) && (n > 1024) ) 
-    //pragma omp single 
-    //pragma omp taskloop num_tasks(max_threads/(naft+1))
-    
+    // pragma omp parallel if ( (naft == 1) && (n > 1024) )
+    // pragma omp single
+    // pragma omp taskloop num_tasks(max_threads/(naft+1))
+
     for (Int j = 0; j < n; j++)
         // each column
         std::swap(F[j * m + r1], F[j * m + r2]);
 }
 
 Int paru_panel_factorize(Int f, Int m, Int n, const Int panel_width,
-        Int panel_num, Int row_end, paru_matrix *paruMatInfo)
+                         Int panel_num, Int row_end, ParU_Numeric *Num)
 {
     // works like dgetf2f.f in netlib v3.0  here is a link:
     // https://github.com/xianyi/OpenBLAS/blob/develop/reference/dgetf2f.f
@@ -44,7 +44,7 @@ Int paru_panel_factorize(Int f, Int m, Int n, const Int panel_width,
     PARU_DEFINE_PRLEVEL;
     PRLEVEL(1, ("%% Inside panel factorization %ld \n", panel_num));
 
-    Int *row_degree_bound = paruMatInfo->row_degree_bound;
+    Int *row_degree_bound = Num->row_degree_bound;
     Int j1 = panel_num * panel_width;  // panel starting column
 
     //  j1 <= panel columns < j2
@@ -56,8 +56,8 @@ Int paru_panel_factorize(Int f, Int m, Int n, const Int panel_width,
 
     // ASSERT(row_end >= j2);
 
-    Int *frowList = paruMatInfo->frowList[f];
-    ParU_Factors *LUs = paruMatInfo->partial_LUs;
+    Int *frowList = Num->frowList[f];
+    ParU_Factors *LUs = Num->partial_LUs;
     double *F = LUs[f].p;
 
 #ifndef NDEBUG  // Printing the panel
@@ -71,10 +71,10 @@ Int paru_panel_factorize(Int f, Int m, Int n, const Int panel_width,
         PRLEVEL(PR, ("\n"));
     }
 #endif
-    Int *Super = paruMatInfo->Sym->Super;
+    Int *Super = Num->Sym->Super;
     Int col1 = Super[f]; /* fornt F has columns col1:col2-1 */
-    ParU_Symbolic *Sym = paruMatInfo->Sym;
-    Int *Diag_map = paruMatInfo->Diag_map;
+    ParU_Symbolic *Sym = Num->Sym;
+    Int *Diag_map = Num->Diag_map;
     Int n1 = Sym->n1;
 
     // column jth of the panel
@@ -120,10 +120,9 @@ Int paru_panel_factorize(Int f, Int m, Int n, const Int panel_width,
             }
         }
 
-
         /*** ATTENTION: IT FACES A NUMERICAL PROBLEM HOWEVER I USE REDUCTION**/
         /*  pragma omp declare reduction
-        //  (maxfabs : double: 
+        //  (maxfabs : double:
         //   omp_out = fabs(omp_in) > fabs(omp_out) ? omp_in : omp_out )
         */
 
@@ -162,7 +161,7 @@ Int paru_panel_factorize(Int f, Int m, Int n, const Int panel_width,
         {
             PRLEVEL(1, ("%% NO pivot found in %ld\n", n1 + col1 + j));
             #pragma omp atomic write
-            paruMatInfo->res = PARU_SINGULAR;
+            Num->res = PARU_SINGULAR;
             continue;
         }
 
@@ -207,17 +206,17 @@ Int paru_panel_factorize(Int f, Int m, Int n, const Int panel_width,
         if (chose_diag == 0)
         {
             Int row_sp = row_max;
-            //pragma omp taskloop  default(none) shared(maxval, F, row_sp, j,
-            //row_end, m, piv, frowList, row_degree_bound, row_deg_sp)
-            //grainsize(512)
-            
+            // pragma omp taskloop  default(none) shared(maxval, F, row_sp, j,
+            // row_end, m, piv, frowList, row_degree_bound, row_deg_sp)
+            // grainsize(512)
+
             for (Int i = j; i < row_end; i++)
             {
                 double value = F[j * m + i];
                 if (fabs(PIV_TOLER * maxval) < fabs(value) &&
-                        row_degree_bound[frowList[i]] < row_deg_sp)
+                    row_degree_bound[frowList[i]] < row_deg_sp)
                 {  // numerically acceptalbe and sparser
-                    //pragma omp critical
+                    // pragma omp critical
                     {
                         piv = value;
                         row_deg_sp = row_degree_bound[frowList[i]];
@@ -232,7 +231,7 @@ Int paru_panel_factorize(Int f, Int m, Int n, const Int panel_width,
         {
             Int pivcol = col1 + j + n1;      // S col index + n1
             Int pivrow = frowList[row_piv];  // S row index
-            paru_Diag_update(pivcol, pivrow, paruMatInfo);
+            paru_Diag_update(pivcol, pivrow, Num);
             PRLEVEL(1, ("%% symmetric matrix but the diag didn't picked for "
                         "row_piv=%ld\n",
                         row_piv));
@@ -241,7 +240,7 @@ Int paru_panel_factorize(Int f, Int m, Int n, const Int panel_width,
 
         // swap rows
         PRLEVEL(1, ("%% Swaping rows j=%ld, row_piv=%ld\n", j, row_piv));
-        swap_rows(F, frowList, m, n, j, row_piv, paruMatInfo);
+        swap_rows(F, frowList, m, n, j, row_piv, Num);
 
 #ifndef NDEBUG  // Printing the pivotal front
         PR = 1;
@@ -262,14 +261,14 @@ Int paru_panel_factorize(Int f, Int m, Int n, const Int panel_width,
         if (j < row_end - 1)
         {
             PRLEVEL(1, ("%% dscal\n"));
-            //pragma omp taskloop simd default(none)
-            //shared(j, row_end, F, m, piv) if(row_end-j > 1024)
-            #pragma omp simd 
+            // pragma omp taskloop simd default(none)
+            // shared(j, row_end, F, m, piv) if(row_end-j > 1024)
+            #pragma omp simd
             for (Int i = j + 1; i < row_end; i++)
             {
-                //printf("%%i=%ld value= %2.4lf", i, F[j * m + i]);
+                // printf("%%i=%ld value= %2.4lf", i, F[j * m + i]);
                 F[j * m + i] /= piv;
-                //printf(" -> %2.4lf\n", F[j * m + i]);
+                // printf(" -> %2.4lf\n", F[j * m + i]);
             }
         }
 
@@ -328,15 +327,15 @@ Int paru_panel_factorize(Int f, Int m, Int n, const Int panel_width,
             PRLEVEL(PR, ("\n"));
 
 #endif
-            //BLAS_DGER(&M, &N, &alpha, X, &Incx, Y, &Incy, A, &lda);
+            // BLAS_DGER(&M, &N, &alpha, X, &Incx, Y, &Incy, A, &lda);
             cblas_dger(CblasColMajor, M, N, alpha, X, Incx, Y, Incy, A, lda);
 #ifdef COUNT_FLOPS
-            //printf("dger adding to flop count %ld\n", M*N*2);
+// printf("dger adding to flop count %ld\n", M*N*2);
             #pragma omp atomic update
-            paruMatInfo->flp_cnt_dger += (double)2 * M * N;
+            Num->flp_cnt_dger += (double)2 * M * N;
 #ifndef NDEBUG
             PRLEVEL(PR, ("\n%% FlopCount Dger fac %d %d ", M, N));
-            PRLEVEL(PR, ("cnt = %lf\n ", paruMatInfo->flp_cnt_dger));
+            PRLEVEL(PR, ("cnt = %lf\n ", Num->flp_cnt_dger));
 #endif
 #endif
         }
@@ -357,30 +356,30 @@ Int paru_panel_factorize(Int f, Int m, Int n, const Int panel_width,
 }
 
 Int paru_factorize_full_summed(Int f, Int start_fac,
-        std::vector<Int> &panel_row,
-        std::set<Int> &stl_colSet,
-        std::vector<Int> &pivotal_elements,
-        paru_matrix *paruMatInfo)
+                               std::vector<Int> &panel_row,
+                               std::set<Int> &stl_colSet,
+                               std::vector<Int> &pivotal_elements,
+                               ParU_Numeric *Num)
 {
     DEBUGLEVEL(0);
     PARU_DEFINE_PRLEVEL;
 
-    Int *Super = paruMatInfo->Sym->Super;
+    Int *Super = Num->Sym->Super;
     Int col1 = Super[f]; /* fornt F has columns col1:col2-1 */
     Int col2 = Super[f + 1];
     Int fp = col2 - col1; /* first fp columns are pivotal */
 
-    ParU_Factors *LUs = paruMatInfo->partial_LUs;
-    Int rowCount = paruMatInfo->frowCount[f];
+    ParU_Factors *LUs = Num->partial_LUs;
+    Int rowCount = Num->frowCount[f];
     double *F = LUs[f].p;
 
-    Int panel_width = paruMatInfo->panel_width;
+    Int panel_width = Num->panel_width;
     Int num_panels =
         (fp % panel_width == 0) ? fp / panel_width : fp / panel_width + 1;
     for (Int panel_num = 0; panel_num < num_panels; panel_num++)
     {
 #ifndef NDEBUG  // Printing the pivotal front
-        Int *frowList = paruMatInfo->frowList[f];
+        Int *frowList = Num->frowList[f];
         PRLEVEL(PR, ("%%Pivotal Front Before %ld\n", panel_num));
 
         for (Int r = 0; r < rowCount; r++)
@@ -399,23 +398,22 @@ Int paru_factorize_full_summed(Int f, Int start_fac,
         Int j2 = (panel_num + 1) * panel_width;
         // factorize current panel
         paru_panel_factorize(f, rowCount, fp, panel_width, panel_num, row_end,
-                paruMatInfo);
-        //Int naft; //number of active frontal tasks
-        //pragma omp atomic read
-        //naft = paruMatInfo->naft;
-        //pragma omp parallel  proc_bind(close) if(naft == 1)
-        //pragma omp single
+                             Num);
+        // Int naft; //number of active frontal tasks
+        // pragma omp atomic read
+        // naft = Num->naft;
+        // pragma omp parallel  proc_bind(close) if(naft == 1)
+        // pragma omp single
         {
             // update row degree and dgeem can be done in parallel
-            //pragma omp task default(none) mergeable 
-            //shared(paruMatInfo, pivotal_elements, stl_colSet) 
-            //shared(panel_num, row_end, f, start_fac) 
+            // pragma omp task default(none) mergeable
+            // shared(Num, pivotal_elements, stl_colSet)
+            // shared(panel_num, row_end, f, start_fac)
 
-            if (paruMatInfo->Sym->Cm[f] !=0)  
+            if (Num->Sym->Cm[f] != 0)
             {  // if there is potential column left
-                paru_update_rowDeg(panel_num, row_end, f, start_fac,
-                        stl_colSet, pivotal_elements,
-                        paruMatInfo);
+                paru_update_rowDeg(panel_num, row_end, f, start_fac, stl_colSet,
+                                   pivotal_elements, Num);
             }
 
             /*               trsm
@@ -443,8 +441,8 @@ Int paru_factorize_full_summed(Int f, Int start_fac,
              * v              |___....____________________..._____|
              *
              */
-            //pragma omp task  shared(F) 
-            //shared(panel_width, j1, j2, fp, f, rowCount) 
+            // pragma omp task  shared(F)
+            // shared(panel_width, j1, j2, fp, f, rowCount)
             if (j2 < fp)  // if it is not the last
             {
                 BLAS_INT M = (BLAS_INT)panel_width;
@@ -455,35 +453,34 @@ Int paru_factorize_full_summed(Int f, Int start_fac,
                 double *B = F + j2 * rowCount + j1;
                 BLAS_INT ldb = (BLAS_INT)rowCount;
 #ifndef NDEBUG
-                    Int PR = 1;
-                    PRLEVEL(PR, ("%% M =%d N = %d alpha = %f \n", M, N, alpha));
-                    PRLEVEL(PR, ("%% lda =%d ldb =%d\n", lda, ldb));
-                    PRLEVEL(PR, ("%% Pivotal Front Before Trsm: %ld x %ld\n",
-                                fp, rowCount));
-                    for (Int r = 0; r < rowCount; r++)
-                    {
-                        PRLEVEL(PR, ("%% %ld\t", frowList[r]));
-                        for (Int c = 0; c < fp; c++)
-                            PRLEVEL(PR, (" %2.5lf\t", F[c * rowCount + r]));
-                        PRLEVEL(PR, ("\n"));
-                    }
+                Int PR = 1;
+                PRLEVEL(PR, ("%% M =%d N = %d alpha = %f \n", M, N, alpha));
+                PRLEVEL(PR, ("%% lda =%d ldb =%d\n", lda, ldb));
+                PRLEVEL(PR, ("%% Pivotal Front Before Trsm: %ld x %ld\n", fp,
+                             rowCount));
+                for (Int r = 0; r < rowCount; r++)
+                {
+                    PRLEVEL(PR, ("%% %ld\t", frowList[r]));
+                    for (Int c = 0; c < fp; c++)
+                        PRLEVEL(PR, (" %2.5lf\t", F[c * rowCount + r]));
+                    PRLEVEL(PR, ("\n"));
+                }
 
 #endif
-                    paru_tasked_trsm(f, M, N, alpha, 
-                            A, lda, B, ldb, paruMatInfo);
+                paru_tasked_trsm(f, M, N, alpha, A, lda, B, ldb, Num);
 #ifndef NDEBUG
-                    PRLEVEL(PR, ("%% Pivotal Front After Trsm: %ld x %ld\n %%",
-                                fp, rowCount));
-                    for (Int r = 0; r < rowCount; r++)
-                    {
-                        PRLEVEL(PR, ("%% %ld\t", frowList[r]));
-                        for (Int c = 0; c < fp; c++)
-                            PRLEVEL(PR, (" %2.5lf\t", F[c * rowCount + r]));
-                        PRLEVEL(PR, ("\n"));
-                    }
-#endif
+                PRLEVEL(PR, ("%% Pivotal Front After Trsm: %ld x %ld\n %%", fp,
+                             rowCount));
+                for (Int r = 0; r < rowCount; r++)
+                {
+                    PRLEVEL(PR, ("%% %ld\t", frowList[r]));
+                    for (Int c = 0; c < fp; c++)
+                        PRLEVEL(PR, (" %2.5lf\t", F[c * rowCount + r]));
+                    PRLEVEL(PR, ("\n"));
                 }
-        }      // end of parallel region; it doesn't show good performance
+#endif
+            }
+        }  // end of parallel region; it doesn't show good performance
 
         /*               dgemm   C := alpha*op(A)*op(B) + beta*C
          *
@@ -531,20 +528,18 @@ Int paru_factorize_full_summed(Int f, Int start_fac,
 #ifndef NDEBUG
             Int PR = 1;
             PRLEVEL(PR, ("%% DGEMM "));
-            PRLEVEL(PR,
-                    ("%% M =%d K = %d N = %d \n", M, K, N));
+            PRLEVEL(PR, ("%% M =%d K = %d N = %d \n", M, K, N));
             PRLEVEL(PR, ("%% lda =%d ldb =%d\n", lda, ldb));
             PRLEVEL(PR, ("%% j2 =%ld j1=%ld\n", j2, j1));
             PRLEVEL(PR, ("\n %%"));
 #endif
-            paru_tasked_dgemm(f, M, N, K, A, lda, B, ldb, 
-                    1, C, ldc, paruMatInfo);
+            paru_tasked_dgemm(f, M, N, K, A, lda, B, ldb, 1, C, ldc, Num);
             // printf ("%d %d %d ",M ,N, K);
             // printf ("%d %d %d\n ",lda ,ldb, ldc);
 #ifdef COUNT_FLOPS
-            //printf("dgemm adding to flop count %ld\n", M*N*2);
+            // printf("dgemm adding to flop count %ld\n", M*N*2);
             //#pragma omp atomic
-            //paruMatInfo->flp_cnt_real_dgemm += (double)2 * M * N * K;
+            // Num->flp_cnt_real_dgemm += (double)2 * M * N * K;
 #ifndef NDEBUG
             PRLEVEL(PR, ("\n%% FlopCount Dgemm factorize %d %d %d ", M, N, K));
             PRLEVEL(PR, ("%d %d %d \n", M, N, K));
@@ -556,7 +551,7 @@ Int paru_factorize_full_summed(Int f, Int start_fac,
         if (j2 < fp)
         {
             PRLEVEL(PR, ("%% Pivotal Front After Dgemm: %ld x %ld\n %%", fp,
-                        rowCount));
+                         rowCount));
             for (Int r = 0; r < rowCount; r++)
             {
                 PRLEVEL(PR, ("%% %ld\t", frowList[r]));

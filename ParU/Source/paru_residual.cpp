@@ -11,12 +11,12 @@
 
 #include "paru_internal.hpp"
 
-ParU_Ret paru_residual(double *b, double &resid, double &norm,        
-        cholmod_sparse *A, paru_matrix *paruMatInfo)
+ParU_Ret paru_residual(double *b, double &resid, double &norm,
+                       cholmod_sparse *A, ParU_Numeric *Num)
 {
     DEBUGLEVEL(0);
     PRLEVEL(1, ("%% inside residual\n"));
-    ParU_Symbolic *Sym = paruMatInfo->Sym;
+    ParU_Symbolic *Sym = Num->Sym;
     Int m = Sym->m;
 #ifndef NDEBUG
     Int PR = 1;
@@ -45,7 +45,7 @@ ParU_Ret paru_residual(double *b, double &resid, double &norm,
 #endif
 
     ParU_Ret info;
-    info = paru_solve(x, paruMatInfo);
+    info = paru_solve(x, Num);
     if (info != PARU_SUCCESS)
     {
         PRLEVEL(1, ("%% A problem happend during factorization\n"));
@@ -76,22 +76,21 @@ ParU_Ret paru_residual(double *b, double &resid, double &norm,
 }
 
 //////////////////////////  paru_residual //////////////mRHS////////////////////
-/*! @brief  get a factorized matrix A and a  multiple right hand side matrix B 
+/*! @brief  get a factorized matrix A and a  multiple right hand side matrix B
  *
  *          compute ||Ax -B||
  *
  * @author Aznaveh  for testing now
  * */
-ParU_Ret paru_residual(cholmod_sparse *A, paru_matrix *paruMatInfo,
-                              double *B,
-                              double *Results, Int n)  // output
+ParU_Ret paru_residual(cholmod_sparse *A, ParU_Numeric *Num, double *B,
+                       double *Results, Int n)  // output
                                                 //  0 residual
                                                 //  1 weighted residual
                                                 //  2 time
 {
     DEBUGLEVEL(0);
     PRLEVEL(1, ("%% mRHS inside residual\n"));
-    ParU_Symbolic *Sym = paruMatInfo->Sym;
+    ParU_Symbolic *Sym = Num->Sym;
     Int m = Sym->m;
 #ifndef NDEBUG
     Int PR = 1;
@@ -101,20 +100,20 @@ ParU_Ret paru_residual(cholmod_sparse *A, paru_matrix *paruMatInfo,
         PRLEVEL(1, ("%%"));
         for (Int l = 0; l < n; l++)
         {
-            PRLEVEL(1, (" %.2lf, ", B[l*m+k]));
+            PRLEVEL(1, (" %.2lf, ", B[l * m + k]));
             // PRLEVEL(1, (" %.2lf, ", B[k*n+l])); B row-major
         }
         PRLEVEL(1, (" \n"));
     }
 
 #endif
-    double *X = (double *)paru_alloc(m*n, sizeof(double));
+    double *X = (double *)paru_alloc(m * n, sizeof(double));
     if (X == NULL)
     {
         printf("Paru: memory problem inside residual\n");
         return PARU_OUT_OF_MEMORY;
     }
-    paru_memcpy(X, B, m*n * sizeof(double));
+    paru_memcpy(X, B, m * n * sizeof(double));
 
 #ifndef NDEBUG
     PRLEVEL(1, ("%% mRHS after copying X is:\n%%"));
@@ -123,7 +122,7 @@ ParU_Ret paru_residual(cholmod_sparse *A, paru_matrix *paruMatInfo,
         PRLEVEL(1, ("%%"));
         for (Int l = 0; l < n; l++)
         {
-            PRLEVEL(1, (" %.2lf, ", X[l*m+k]));
+            PRLEVEL(1, (" %.2lf, ", X[l * m + k]));
             // PRLEVEL(1, (" %.2lf, ", X[k*n+l])); X row major
         }
         PRLEVEL(1, (" \n"));
@@ -132,7 +131,7 @@ ParU_Ret paru_residual(cholmod_sparse *A, paru_matrix *paruMatInfo,
 #endif
 
     ParU_Ret info;
-    info = paru_solve(X, n, paruMatInfo);
+    info = paru_solve(X, n, Num);
     if (info != PARU_SUCCESS)
     {
         PRLEVEL(1, ("%% A problem happend during factorization\n"));
@@ -146,7 +145,7 @@ ParU_Ret paru_residual(cholmod_sparse *A, paru_matrix *paruMatInfo,
         PRLEVEL(1, ("%%"));
         for (Int l = 0; l < n; l++)
         {
-            PRLEVEL(1, (" %.2lf, ", X[l*m+k]));
+            PRLEVEL(1, (" %.2lf, ", X[l * m + k]));
             // PRLEVEL(1, (" %.2lf, ", X[k*n+l])); X row major
         }
         PRLEVEL(1, (" \n"));
@@ -155,22 +154,21 @@ ParU_Ret paru_residual(cholmod_sparse *A, paru_matrix *paruMatInfo,
 
 #endif
 
-    double res = 2000.0;  //They don't need to be initialized; just for some 
-    double weighted_res = 2000.0; //compiler warinings
+    double res = 2000.0;  // They don't need to be initialized; just for some
+    double weighted_res = 2000.0;  // compiler warinings
     for (Int l = 0; l < n; l++)
     {
         PRLEVEL(1, ("%% gaxpy\n"));
-        paru_gaxpy(A, X+m*l, B+m*l, -1);
-        res = paru_vec_1norm(B+m*l, m);
+        paru_gaxpy(A, X + m * l, B + m * l, -1);
+        res = paru_vec_1norm(B + m * l, m);
         PRLEVEL(1, ("%% res=%lf\n", res));
-        weighted_res = 
-            res / (paru_spm_1norm(A) * paru_vec_1norm(X+m*l, m));
-        printf("%ld |%.2lf| |%.2f|,", l,
-                res == 0 ? 0 : log10(res), res == 0 ? 0 : log10(weighted_res));
-        if ((l+1)%20 == 0) printf("\n");
+        weighted_res = res / (paru_spm_1norm(A) * paru_vec_1norm(X + m * l, m));
+        printf("%ld |%.2lf| |%.2f|,", l, res == 0 ? 0 : log10(res),
+               res == 0 ? 0 : log10(weighted_res));
+        if ((l + 1) % 20 == 0) printf("\n");
     }
     printf("\n");
-    paru_free(m*n, sizeof(Int), X);
+    paru_free(m * n, sizeof(Int), X);
     Results[0] = res;
     Results[1] = weighted_res;
     return PARU_SUCCESS;

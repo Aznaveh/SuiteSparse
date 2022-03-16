@@ -6,7 +6,7 @@
  *  in curent front. If the prior contribution block is empty free it here.
  *
  *
- ***************  assembling the pivotal part of the front 
+ ***************  assembling the pivotal part of the front
  *
  *      el           nEl
  *                  6, 7, 11, 12
@@ -30,12 +30,11 @@
  */
 #include "paru_internal.hpp"
 
-void paru_full_summed(Int e, Int f, paru_matrix *paruMatInfo)
-
+void paru_full_summed(Int e, Int f, ParU_Numeric *Num)
 {
     DEBUGLEVEL(0);
     PARU_DEFINE_PRLEVEL;
-    ParU_Symbolic *Sym = paruMatInfo->Sym;
+    ParU_Symbolic *Sym = Num->Sym;
 #ifndef NDEBUG
     Int *snM = Sym->super2atree;
     Int eli = snM[f];
@@ -47,7 +46,7 @@ void paru_full_summed(Int e, Int f, paru_matrix *paruMatInfo)
     Int col2 = Super[f + 1];
     PRLEVEL(PR, ("%% col1=%ld, col2=%ld\n", col1, col2));
 
-    ParU_Element **elementList = paruMatInfo->elementList;
+    ParU_Element **elementList = Num->elementList;
 
     ParU_Element *el = elementList[e];
 
@@ -63,7 +62,7 @@ void paru_full_summed(Int e, Int f, paru_matrix *paruMatInfo)
     // Int *el_rowIndex = rowIndex_pointer (el);
     Int *el_rowIndex = (Int *)(el + 1) + nEl;
 
-    ParU_Factors *LUs = paruMatInfo->partial_LUs;
+    ParU_Factors *LUs = Num->partial_LUs;
     Int rowCount = LUs[f].m;
     double *pivotalFront = LUs[f].p;
 
@@ -73,7 +72,7 @@ void paru_full_summed(Int e, Int f, paru_matrix *paruMatInfo)
 #ifndef NDEBUG  // print the element which is going to be assembled from
     PR = 2;
     PRLEVEL(PR, ("%% ASSEMBL element= %ld  mEl =%ld ", e, mEl));
-    if (PR <= 0) paru_print_element(paruMatInfo, e);
+    if (PR <= 0) paru_print_element(Num, e);
 #endif
 
     Int j = el->lac;  // keep record of latest lac
@@ -138,9 +137,9 @@ void paru_full_summed(Int e, Int f, paru_matrix *paruMatInfo)
             PRLEVEL(PR, ("%ld ", el_rowIndex[tempRow[i]]));
         PRLEVEL(PR, ("%% \n"));
 #endif
-        //FIXME SLOW DOWN
-        //Int *Depth = Sym->Depth;
-        //#pragma omp parallel 
+        // FIXME SLOW DOWN
+        // Int *Depth = Sym->Depth;
+        //#pragma omp parallel
         //#pragma omp single
         //#pragma omp taskgroup
         for (; j < nEl; j++)
@@ -188,7 +187,7 @@ void paru_full_summed(Int e, Int f, paru_matrix *paruMatInfo)
     if (elementList[e] != NULL)
     {
         el->lac = j;
-        Int *lacList = paruMatInfo->lacList;
+        Int *lacList = Num->lacList;
         lacList[e] = lac_el(elementList, e);
         PRLEVEL(1, ("%%e = %ld, el->lac= %ld ", e, el->lac));
         PRLEVEL(1, ("el_colIndex[%ld]=%ld :\n", el->lac, el_colIndex[el->lac]));
@@ -197,7 +196,7 @@ void paru_full_summed(Int e, Int f, paru_matrix *paruMatInfo)
 #ifndef NDEBUG  // print the element which has been assembled from
     PR = 1;
     PRLEVEL(PR, ("%% ASSEMBLED element= %ld  mEl =%ld ", e, mEl));
-    if (PR <= 0) paru_print_element(paruMatInfo, e);
+    if (PR <= 0) paru_print_element(Num, e);
 
     // Printing the pivotal front
     PR = 2;
@@ -206,7 +205,7 @@ void paru_full_summed(Int e, Int f, paru_matrix *paruMatInfo)
     for (Int c = col1; c < col2; c++) PRLEVEL(PR, ("%ld\t\t", c));
     PRLEVEL(PR, (" ;\n"));
 
-    Int *frowList = paruMatInfo->frowList[f];
+    Int *frowList = Num->frowList[f];
     for (Int r = 0; r < rowCount; r++)
     {
         PRLEVEL(PR, ("%% %ld\t", frowList[r]));

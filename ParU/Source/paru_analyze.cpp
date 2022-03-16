@@ -257,8 +257,8 @@ ParU_Ret paru_analyze(cholmod_sparse *A, ParU_Symbolic **S_handle)
     umfpack_dl_defaults(Control);
     Control[UMFPACK_ORDERING] = UMFPACK_ORDERING_METIS;
     Control[UMFPACK_FIXQ] = -1;
-    //Control[UMFPACK_STRATEGY] = UMFPACK_STRATEGY_UNSYMMETRIC;
-    //Control[UMFPACK_STRATEGY] = UMFPACK_STRATEGY_SYMMETRIC;
+    // Control[UMFPACK_STRATEGY] = UMFPACK_STRATEGY_UNSYMMETRIC;
+    // Control[UMFPACK_STRATEGY] = UMFPACK_STRATEGY_SYMMETRIC;
 
 #ifndef NDEBUG
     /* print the control parameters */
@@ -291,7 +291,7 @@ ParU_Ret paru_analyze(cholmod_sparse *A, ParU_Symbolic **S_handle)
 
     Int strategy = Info[UMFPACK_STRATEGY_USED];
     Sym->strategy = strategy;
-    //Sym->strategy = PARU_STRATEGY_SYMMETRIC;
+    // Sym->strategy = PARU_STRATEGY_SYMMETRIC;
 
 #ifndef NDEBUG
     PR = 0;
@@ -454,7 +454,7 @@ ParU_Ret paru_analyze(cholmod_sparse *A, ParU_Symbolic **S_handle)
                  "in frontal matrices: %ld\n",
                  k));
 
-    //PRLEVEL(PR, ("\nFrontal matrix chains:\n"));
+    // PRLEVEL(PR, ("\nFrontal matrix chains:\n"));
     //    for (Int j = 0; j < nchains; j++)
     //    {
     //        PRLEVEL(PR, ("Frontal matrices %ld to %ld in chain\n",
@@ -592,7 +592,7 @@ ParU_Ret paru_analyze(cholmod_sparse *A, ParU_Symbolic **S_handle)
     //
     Int threshold = 32;
     Int newF = 0;
-    //Int num_roots = 0;
+    // Int num_roots = 0;
 
     for (Int f = 0; f < nf; f++)
     {  // finding representative for each front
@@ -611,7 +611,7 @@ ParU_Ret paru_analyze(cholmod_sparse *A, ParU_Symbolic **S_handle)
             PRLEVEL(PR, ("%%number of pivot cols if Parent collapsed= %ld\n",
                          Super[Parent[repr] + 1] - Super[f]));
         }
-        //if (Parent[repr] == -1) num_roots++;
+        // if (Parent[repr] == -1) num_roots++;
 
         PRLEVEL(PR, ("%% newF = %ld for:\n", newF));
         for (Int k = f; k <= repr; k++)
@@ -623,7 +623,7 @@ ParU_Ret paru_analyze(cholmod_sparse *A, ParU_Symbolic **S_handle)
         newF++;
         f = repr;
     }
-    //Sym->num_roots = num_roots;
+    // Sym->num_roots = num_roots;
 
 #ifndef NDEBUG
     PR = 1;
@@ -656,13 +656,13 @@ ParU_Ret paru_analyze(cholmod_sparse *A, ParU_Symbolic **S_handle)
     Sym->Cm = NULL;  // Upper bound on number of columns excluding pivots
     Int *Fm = (Int *)paru_calloc((newNf + 1), sizeof(Int));
     Int *Cm = (Int *)paru_alloc((newNf + 1), sizeof(Int));
-    //Int *roots = (Int *)paru_alloc((num_roots), sizeof(Int));
+    // Int *roots = (Int *)paru_alloc((num_roots), sizeof(Int));
     Sym->Fm = Fm;
     Sym->Cm = Cm;
-    //Sym->roots = roots;
+    // Sym->roots = roots;
 
-    //if (Fm == NULL || Cm == NULL || roots == NULL)
-    if (Fm == NULL || Cm == NULL )
+    // if (Fm == NULL || Cm == NULL || roots == NULL)
+    if (Fm == NULL || Cm == NULL)
     {
         printf("Paru: memory problem\n");
         paru_free(n, sizeof(Int), inv_Diag_map);
@@ -738,11 +738,9 @@ ParU_Ret paru_analyze(cholmod_sparse *A, ParU_Symbolic **S_handle)
     PRLEVEL(PR, ("\n"));
 
 #endif
-    //printf("%%%% newParent:\n");
-    //for (Int k = 0; k < newNf; k++) printf("  %ld", newParent[k]);
-    //printf("\n");
-
-
+    // printf("%%%% newParent:\n");
+    // for (Int k = 0; k < newNf; k++) printf("  %ld", newParent[k]);
+    // printf("\n");
 
     paru_free(nf + 1, sizeof(Int), Sym->Parent);
     Sym->Parent = Parent = newParent;
@@ -918,8 +916,8 @@ ParU_Ret paru_analyze(cholmod_sparse *A, ParU_Symbolic **S_handle)
         return PARU_OUT_OF_MEMORY;
     }
 
-//-------- computing the inverse permutation for P and Diag_map
-    #pragma omp taskloop default(none) shared(m, Pinv, Pinit) grainsize(512)
+    //-------- computing the inverse permutation for P and Diag_map
+#pragma omp taskloop default(none) shared(m, Pinv, Pinit) grainsize(512)
     for (Int i = 0; i < m; i++)
     {
         Pinv[Pinit[i]] = i;
@@ -927,8 +925,8 @@ ParU_Ret paru_analyze(cholmod_sparse *A, ParU_Symbolic **S_handle)
 
     if (Diag_map)
     {
-        #pragma omp taskloop default(none) shared(m, Diag_map, inv_Diag_map) \
-        grainsize(512)
+#pragma omp taskloop default(none) shared(m, Diag_map, inv_Diag_map) \
+    grainsize(512)
         for (Int i = 0; i < m; i++)
         {
             Int newrow = Diag_map[i];  // Diag_map[newcol] = newrow
@@ -972,8 +970,8 @@ ParU_Ret paru_analyze(cholmod_sparse *A, ParU_Symbolic **S_handle)
     Int *cSlp = NULL;   // copy Singlton l p
     double *Rs = NULL;  // row scaling
     Ps = (Int *)paru_calloc(m - n1, sizeof(Int));
-    //XXX scale should come from the settings
-    //Int scale,  // if scale == 1 the S will be scaled by max_row
+    // XXX scale should come from the settings
+    // Int scale,  // if scale == 1 the S will be scaled by max_row
     Int scale = 1;
     if (scale == 1) Rs = (double *)paru_calloc(m, sizeof(double));
     if (cs1 > 0)
@@ -1212,8 +1210,8 @@ ParU_Ret paru_analyze(cholmod_sparse *A, ParU_Symbolic **S_handle)
     PRLEVEL(PR, ("\n"));
 #endif
 
-// update Pinv
-    #pragma omp taskloop default(none) shared(m, n1, Pinv, Pinit) grainsize(512)
+    // update Pinv
+#pragma omp taskloop default(none) shared(m, n1, Pinv, Pinit) grainsize(512)
     for (Int i = n1; i < m; i++)
     {
         Pinv[Pinit[i]] = i;
@@ -1221,7 +1219,7 @@ ParU_Ret paru_analyze(cholmod_sparse *A, ParU_Symbolic **S_handle)
 
     ///////////////////////////////////////////////////////////////
     Int *cSp = Work;
-    #pragma omp taskloop default(none) shared(m, n1, cSp, Sp, Ps) grainsize(512)
+#pragma omp taskloop default(none) shared(m, n1, cSp, Sp, Ps) grainsize(512)
     for (Int i = n1; i < m; i++)
     {
         Int row = i - n1;
@@ -1552,7 +1550,7 @@ ParU_Ret paru_analyze(cholmod_sparse *A, ParU_Symbolic **S_handle)
     // rows
     Int lastChildFlag = 0;
     Int childpointer = 0;
-    //Int root_count = 0;
+    // Int root_count = 0;
 
     for (Int f = 0; f < nf; f++)
     {
@@ -1564,9 +1562,9 @@ ParU_Ret paru_analyze(cholmod_sparse *A, ParU_Symbolic **S_handle)
 
         // computing works in each front
         Int fp = Super[f + 1] - Super[f];  // k
-        Int fm = Sym->Fm[f];             // m
-        Int fn = Sym->Cm[f];             // n Upper bound number of cols of f
-        //if (Parent[f] == -1) roots[root_count++] = f;
+        Int fm = Sym->Fm[f];               // m
+        Int fn = Sym->Cm[f];               // n Upper bound number of cols of f
+        // if (Parent[f] == -1) roots[root_count++] = f;
         front_flop_bound[f] = (double)(fp * fm * fn + fp * fm + fp * fn);
         stree_flop_bound[f] += front_flop_bound[f];
         for (Int i = Childp[f]; i <= Childp[f + 1] - 1; i++)
@@ -1638,8 +1636,8 @@ ParU_Ret paru_analyze(cholmod_sparse *A, ParU_Symbolic **S_handle)
         else
             lastChildFlag = 0;
     }
-//    PRLEVEL(1, ("%% root_count=%ld, num_roots=%ld\n ", root_count, num_roots));
-//    ASSERT(root_count == num_roots);
+    //    PRLEVEL(1, ("%% root_count=%ld, num_roots=%ld\n ", root_count,
+    //    num_roots)); ASSERT(root_count == num_roots);
 
     // Initialize first descendent of the etree
     PRLEVEL(PR, ("%% computing first of\n "));
@@ -1656,23 +1654,23 @@ ParU_Ret paru_analyze(cholmod_sparse *A, ParU_Symbolic **S_handle)
     std::vector<Int> task_helper(nf);
     const double flop_thresh = 1024;
     Int ntasks = 0;
- 
+
     for (Int f = 0; f < nf; f++)
     {
         Int par = Parent[f];
-        if (par == -1) 
+        if (par == -1)
         {
             task_helper[f] = ntasks++;
         }
         else
         {
-            Int num_sibl = Childp[par+1] - Childp[par] - 1;
-            if (num_sibl == 0 ) //getting rid of chains
+            Int num_sibl = Childp[par + 1] - Childp[par] - 1;
+            if (num_sibl == 0)  // getting rid of chains
             {
                 task_helper[f] = -1;
             }
             else if (stree_flop_bound[f] < flop_thresh)
-            {//getting rid of  small tasks
+            {  // getting rid of  small tasks
                 task_helper[f] = -1;
             }
             else
@@ -1682,21 +1680,20 @@ ParU_Ret paru_analyze(cholmod_sparse *A, ParU_Symbolic **S_handle)
         }
     }
 
-    PRLEVEL(1, ("%% ntasks = %ld\n",ntasks));
+    PRLEVEL(1, ("%% ntasks = %ld\n", ntasks));
     Sym->ntasks = ntasks;
     Int *task_map;
     Int *task_parent;
     Int *task_num_child;
     Int *task_depth;
-    Sym->task_map = task_map = (Int *)paru_alloc(ntasks+1, sizeof(Int));
+    Sym->task_map = task_map = (Int *)paru_alloc(ntasks + 1, sizeof(Int));
     Sym->task_parent = task_parent = (Int *)paru_alloc(ntasks, sizeof(Int));
     Sym->task_num_child = task_num_child =
         (Int *)paru_calloc(ntasks, sizeof(Int));
-    Sym->task_depth = task_depth =
-        (Int *)paru_calloc(ntasks, sizeof(Int));
+    Sym->task_depth = task_depth = (Int *)paru_calloc(ntasks, sizeof(Int));
 
-    if ( task_map == NULL || task_parent == NULL || task_num_child == NULL || 
-            task_depth == NULL)
+    if (task_map == NULL || task_parent == NULL || task_num_child == NULL ||
+        task_depth == NULL)
     {
         printf("Paru: Out of memory in symbolic phase");
         paru_free(m, sizeof(Int), Pinv);
@@ -1707,16 +1704,15 @@ ParU_Ret paru_analyze(cholmod_sparse *A, ParU_Symbolic **S_handle)
     Int i = 0;
     for (Int f = 0; f < nf; f++)
     {
-        if (task_helper[f] != -1)
-            task_map[++i] = f;
+        if (task_helper[f] != -1) task_map[++i] = f;
     }
 
-    for (Int t = 0; t < ntasks; t++) 
+    for (Int t = 0; t < ntasks; t++)
     {
-        Int node = task_map[t+1];
+        Int node = task_map[t + 1];
         Int rep = Parent[node];
-        PRLEVEL(1, ("t=%ld node=%ld rep =%ld\n",t,node,rep));
-        if (rep == -1)  
+        PRLEVEL(1, ("t=%ld node=%ld rep =%ld\n", t, node, rep));
+        if (rep == -1)
         {
             task_parent[t] = -1;
             if (t == 0 && nf > 1)
@@ -1727,64 +1723,59 @@ ParU_Ret paru_analyze(cholmod_sparse *A, ParU_Symbolic **S_handle)
         else
         {
             task_depth[t] = MAX(Depth[node], task_depth[t]);
-            while (task_helper[rep] < 0 )
-                rep = Parent[rep];
-            PRLEVEL(1, ("After a while t=%ld node=%ld rep =%ld\n",
-                        t,node,rep));
+            while (task_helper[rep] < 0) rep = Parent[rep];
+            PRLEVEL(1,
+                    ("After a while t=%ld node=%ld rep =%ld\n", t, node, rep));
             task_parent[t] = task_helper[rep];
         }
     }
 
-    for (Int t = 0; t < ntasks; t++) 
+    for (Int t = 0; t < ntasks; t++)
     {
         Int par = task_parent[t];
-        if (par != -1)
-            task_num_child[par]++;
+        if (par != -1) task_num_child[par]++;
     }
 
-    //finding max size of chain
+    // finding max size of chain
     Int max_chain = 0;
     Int ii = 0;
     while (ii < nf)
     {
         int chain_size = 0;
-        PRLEVEL(1,("ii = %ld\n",ii));
-        while (ii < nf && Childp[Parent[ii]+1]-Childp[Parent[ii]] == 1)
+        PRLEVEL(1, ("ii = %ld\n", ii));
+        while (ii < nf && Childp[Parent[ii] + 1] - Childp[Parent[ii]] == 1)
         {
             chain_size++;
             ii++;
         }
-        PRLEVEL(1,("after ii = %ld\n",ii));
-        max_chain = MAX( chain_size, max_chain);
-        PRLEVEL(1,("max_chain = %ld\n",max_chain));
+        PRLEVEL(1, ("after ii = %ld\n", ii));
+        max_chain = MAX(chain_size, max_chain);
+        PRLEVEL(1, ("max_chain = %ld\n", max_chain));
         ii++;
     }
     Sym->max_chain = max_chain;
-    PRLEVEL(1,("max_chain = %ld\n", max_chain));
+    PRLEVEL(1, ("max_chain = %ld\n", max_chain));
 
 #ifndef NDEBUG
 
     PR = 1;
     PRLEVEL(PR, ("%% Task tree helper:\n"));
-    for (Int i = 0; i < (Int)task_helper.size(); i++) 
+    for (Int i = 0; i < (Int)task_helper.size(); i++)
         PRLEVEL(PR, ("%ld)%ld ", i, task_helper[i]));
-    PRLEVEL(PR, ("\n%% tasknodes map (%ld):\n",ntasks));
-    for (Int i = 0; i <= ntasks ; i++) 
-        PRLEVEL(PR, ("%ld ", task_map[i]));
+    PRLEVEL(PR, ("\n%% tasknodes map (%ld):\n", ntasks));
+    for (Int i = 0; i <= ntasks; i++) PRLEVEL(PR, ("%ld ", task_map[i]));
     PR = -1;
     PRLEVEL(PR, ("\n%% tasktree :\n"));
-    for (Int i = 0; i < ntasks; i++) 
-        PRLEVEL(PR, ("%ld ", task_parent[i]));
+    for (Int i = 0; i < ntasks; i++) PRLEVEL(PR, ("%ld ", task_parent[i]));
     PRLEVEL(PR, ("\n"));
     PR = 1;
     PRLEVEL(PR, ("\n%% task_num_child:\n"));
-    for (Int i = 0; i < ntasks; i++) 
-        PRLEVEL(PR, ("%ld ", task_num_child[i]));
+    for (Int i = 0; i < ntasks; i++) PRLEVEL(PR, ("%ld ", task_num_child[i]));
     PRLEVEL(PR, ("\n"));
     PRLEVEL(PR, ("\n%% %ld tasks:\n", ntasks));
     for (Int t = 0; t < ntasks; t++)
     {
-        PRLEVEL(PR, ("%ld[%ld-%ld] ",t, task_map[t]+1, task_map[t+1]));
+        PRLEVEL(PR, ("%ld[%ld-%ld] ", t, task_map[t] + 1, task_map[t + 1]));
     }
     PRLEVEL(PR, ("\n%% task depth:\n"));
     for (Int t = 0; t < ntasks; t++)
@@ -1793,11 +1784,11 @@ ParU_Ret paru_analyze(cholmod_sparse *A, ParU_Symbolic **S_handle)
     }
     PRLEVEL(PR, ("\n"));
 #endif
-    //printf("%% tasktree :\n");
-    //for (Int i = 0; i < ntasks; i++) 
+    // printf("%% tasktree :\n");
+    // for (Int i = 0; i < ntasks; i++)
     //    printf("%ld ", task_parent[i]);
-    //printf("\n");
- 
+    // printf("\n");
+
     ///////////////////////////////////////////////////////////////////////////
 #ifndef NDEBUG
     PR = 1;
@@ -1849,9 +1840,9 @@ ParU_Ret paru_analyze(cholmod_sparse *A, ParU_Symbolic **S_handle)
     PRLEVEL(PR, ("\n"));
 
     PR = 1;
-//    PRLEVEL(PR, ("%%%% roots:\n"));
-//    for (Int k = 0; k < num_roots; k++) PRLEVEL(PR, ("  %ld", roots[k]));
-//    PRLEVEL(PR, ("\n"));
+    //    PRLEVEL(PR, ("%%%% roots:\n"));
+    //    for (Int k = 0; k < num_roots; k++) PRLEVEL(PR, ("  %ld", roots[k]));
+    //    PRLEVEL(PR, ("\n"));
 
     PRLEVEL(PR, ("%%%% Depth:\n"));
     for (Int k = 0; k < nf; k++) PRLEVEL(PR, ("  %ld", Depth[k]));
@@ -1860,7 +1851,7 @@ ParU_Ret paru_analyze(cholmod_sparse *A, ParU_Symbolic **S_handle)
 #endif
 #ifndef NTIME
     double time = PARU_OPENMP_GET_WTIME;
-    time -= start_time;  
+    time -= start_time;
     Sym->my_time = time;
     PRLEVEL(1, ("%% mRHS paru_apply_inv_perm %lf seconds\n", time));
 #endif

@@ -5,7 +5,7 @@
  *
  *
  *  doesn't need performance improvement mostly borrowed from CSparse
- *  
+ *
  *
  *  just is used for tests
  *

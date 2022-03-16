@@ -11,16 +11,16 @@
 ParU_Ret paru_prior_assemble(Int f, Int start_fac,
                                     std::vector<Int> &pivotal_elements,
                                     std::vector<Int> &colHash, heaps_info &hi,
-                                    paru_matrix *paruMatInfo)
+                                    ParU_Numeric *Num)
 {
     DEBUGLEVEL(0);
     PARU_DEFINE_PRLEVEL;
 
-    Paru_Work *Work = paruMatInfo->Work;
+    Paru_Work *Work = Num->Work;
     Int *elCol = Work->elCol;
 
-    ParU_Element **elementList = paruMatInfo->elementList;
-    ParU_Symbolic *Sym = paruMatInfo->Sym;
+    ParU_Element **elementList = Num->elementList;
+    ParU_Symbolic *Sym = Num->Sym;
     Int *snM = Sym->super2atree;
 
     Int pMark = start_fac;
@@ -60,7 +60,7 @@ ParU_Ret paru_prior_assemble(Int f, Int start_fac,
                 PRLEVEL(PR, ("%%assembling %ld in %ld\n", e, el_ind));
                 PRLEVEL(PR, ("%% size %ld x %ld\n", el->nrows, el->ncols));
                 #endif
-                paru_assemble_all(e, f, colHash, paruMatInfo);
+                paru_assemble_all(e, f, colHash, Num);
                 #ifndef NDEBUG
                 PRLEVEL(PR, ("%%assembling %ld in %ld done\n", e, el_ind));
                 #endif
@@ -70,7 +70,7 @@ ParU_Ret paru_prior_assemble(Int f, Int start_fac,
             #ifndef NDEBUG
             PRLEVEL(PR, ("%%assembling %ld in %ld\n", e, el_ind));
             #endif
-            paru_assemble_cols(e, f, colHash, paruMatInfo);
+            paru_assemble_cols(e, f, colHash, Num);
             #ifndef NDEBUG
             PRLEVEL(PR, ("%%partial col assembly%ld in %ld done\n", e, el_ind));
             #endif
@@ -96,7 +96,7 @@ ParU_Ret paru_prior_assemble(Int f, Int start_fac,
             //          ooooooxxxxx
             //
             {
-                paru_assemble_el_with0rows(e, f, colHash, paruMatInfo);
+                paru_assemble_el_with0rows(e, f, colHash, Num);
                 if (elementList[e] == NULL) continue;
                 #ifndef NDEBUG
                 PRLEVEL(PR, ("%%assembling %ld in %ld done\n", e, el_ind));
@@ -120,12 +120,12 @@ ParU_Ret paru_prior_assemble(Int f, Int start_fac,
     PRLEVEL(1, ("%% Next: work on the heap \n"));
     ParU_Ret res_make_heap;
     res_make_heap = paru_make_heap(f, start_fac, pivotal_elements, hi, colHash,
-                                   paruMatInfo);
+                                   Num);
     if (res_make_heap != PARU_SUCCESS) return res_make_heap;
     PRLEVEL(1, ("%% Done: work on the heap \n"));
 
     Int eli = snM[f];
-    std::vector<Int> **heapList = paruMatInfo->heapList;
+    std::vector<Int> **heapList = Num->heapList;
     std::vector<Int> *curHeap = heapList[eli];
 
     if (curHeap->empty()) return PARU_SUCCESS;
@@ -135,7 +135,7 @@ ParU_Ret paru_prior_assemble(Int f, Int start_fac,
 #endif
 
 #ifndef NDEBUG
-    Int *lacList = paruMatInfo->lacList;
+    Int *lacList = Num->lacList;
     PRLEVEL(PR, ("%% current heap:\n %%"));
     for (Int k = 0; k < (Int)curHeap->size(); k++)
     {

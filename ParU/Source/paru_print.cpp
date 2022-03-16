@@ -6,15 +6,15 @@
  * @author Aznaveh
  */
 #include "paru_internal.hpp"
-void paru_print_element(paru_matrix *paruMatInfo, Int e)
+void paru_print_element(ParU_Numeric *Num, Int e)
 {
     // print out contribution blocks
     ParU_Element **elementList;
-    elementList = paruMatInfo->elementList;
+    elementList = Num->elementList;
     ParU_Element *curEl = elementList[e];
 
-    Int morign = paruMatInfo->m;
-    Int nf = paruMatInfo->Sym->nf;
+    Int morign = Num->m;
+    Int nf = Num->Sym->nf;
 
     if (e > morign + nf + 1)
     {

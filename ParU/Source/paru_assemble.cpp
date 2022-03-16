@@ -9,18 +9,17 @@
 #include "paru_internal.hpp"
 
 void paru_assemble_all(Int e, Int f, std::vector<Int> &colHash,
-                       paru_matrix *paruMatInfo)
-
+                       ParU_Numeric *Num)
 {
     DEBUGLEVEL(0);
     PARU_DEFINE_PRLEVEL;
 
-    ParU_Symbolic *Sym = paruMatInfo->Sym;
+    ParU_Symbolic *Sym = Num->Sym;
     Int *snM = Sym->super2atree;
     Int eli = snM[f];
     PRLEVEL(PR, ("%% Eliminat all of %ld in %ld\n", e, eli));
 
-    ParU_Element **elementList = paruMatInfo->elementList;
+    ParU_Element **elementList = Num->elementList;
 
     ParU_Element *el = elementList[e];
     ParU_Element *curEl = elementList[eli];
@@ -34,8 +33,8 @@ void paru_assemble_all(Int e, Int f, std::vector<Int> &colHash,
     // Int *rowRelIndex = relRowInd (el);
     Int *rowRelIndex = (Int *)(el + 1) + 2 * nEl + mEl;
 
-    if (el->cValid != paruMatInfo->time_stamp[f])
-        paru_update_rel_ind_col(e, f, colHash, paruMatInfo);
+    if (el->cValid != Num->time_stamp[f])
+        paru_update_rel_ind_col(e, f, colHash, Num);
 
     // Int *colRelIndex = relColInd (ParU_Element *el);
     Int *colRelIndex = (Int *)(el + 1) + mEl + nEl;
@@ -50,12 +49,12 @@ void paru_assemble_all(Int e, Int f, std::vector<Int> &colHash,
     double *curEl_Num =
         (double *)((Int *)(curEl + 1) + 2 * curEl->nrows + 2 * curEl->ncols);
 
-    Paru_Work *Work = paruMatInfo->Work;
+    Paru_Work *Work = Num->Work;
     Int *isRowInFront = Work->rowSize;
 
 #ifndef NDEBUG
-    ParU_Factors *Us = paruMatInfo->partial_Us;
-    Int *fcolList = paruMatInfo->fcolList[f];
+    ParU_Factors *Us = Num->partial_Us;
+    Int *fcolList = Num->fcolList[f];
     Int colCount = Us[f].n;
     ASSERT(el_colIndex[el->lac] <= fcolList[colCount - 1]);
     ASSERT(el_colIndex[nEl - 1] <= 0 || fcolList[0] <= el_colIndex[nEl - 1]);
@@ -112,15 +111,15 @@ void paru_assemble_all(Int e, Int f, std::vector<Int> &colHash,
             }
         }
 
-        Int naft; //number of active frontal tasks
-        #pragma omp atomic read
-        naft = paruMatInfo->naft;
-        const Int max_threads = paruMatInfo->paru_max_threads;
+        Int naft;  // number of active frontal tasks
+#pragma omp atomic read
+        naft = Num->naft;
+        const Int max_threads = Num->paru_max_threads;
 
-        if (naft < max_threads/2  || el->nrowsleft*el->ncolsleft < 4096 || 
-                el->nrowsleft < 1024)
-        {   //not enoght threads or very small assembly
-            //sequential
+        if (naft < max_threads / 2 || el->nrowsleft * el->ncolsleft < 4096 ||
+            el->nrowsleft < 1024)
+        {  // not enoght threads or very small assembly
+            // sequential
             for (Int j = el->lac; j < nEl; j++)
             {
                 PRLEVEL(1, ("%% j =%ld \n", j));
@@ -148,15 +147,16 @@ void paru_assemble_all(Int e, Int f, std::vector<Int> &colHash,
             }
         }
         else
-        { 
-            //enoght threads and big assembly
+        {
+            // enoght threads and big assembly
             // parallel
-            PRLEVEL(1, ("Parallel Assembly naft=%ld colsleft=%ld rowsleft=%ld \n",
-                    naft, el->ncolsleft, el->nrowsleft));
-            
-            #pragma omp parallel proc_bind(close) num_threads(max_threads/naft)
-            #pragma omp single nowait
-            #pragma omp task untied
+            PRLEVEL(1,
+                    ("Parallel Assembly naft=%ld colsleft=%ld rowsleft=%ld \n",
+                     naft, el->ncolsleft, el->nrowsleft));
+
+#pragma omp parallel proc_bind(close) num_threads(max_threads / naft)
+#pragma omp single nowait
+#pragma omp task untied
             for (Int j = el->lac; j < nEl; j++)
             {
                 PRLEVEL(1, ("%% j =%ld \n", j));
@@ -164,14 +164,14 @@ void paru_assemble_all(Int e, Int f, std::vector<Int> &colHash,
                 Int colInd = el_colIndex[j];
                 PRLEVEL(1, ("%% colInd =%ld \n", colInd));
                 if (colInd < 0) continue;
-                //printf("inside paralle region %ld j=%ld (%d)\n", 
+                // printf("inside paralle region %ld j=%ld (%d)\n",
                 //        omp_get_active_level(), j,  omp_get_thread_num() );
 
                 Int fcolind = colRelIndex[j];
 
                 double *dC = curEl_Num + fcolind * curEl->nrows;
 
-                #pragma omp task 
+#pragma omp task
                 for (Int iii = 0; iii < el->nrowsleft; iii++)
                 {
                     Int i = tempRow[iii];
@@ -196,7 +196,7 @@ void paru_assemble_all(Int e, Int f, std::vector<Int> &colHash,
 // fit
 
 void paru_assemble_cols(Int e, Int f, std::vector<Int> &colHash,
-        paru_matrix *paruMatInfo)
+                        ParU_Numeric *Num)
 
 {
     DEBUGLEVEL(0);
@@ -204,7 +204,7 @@ void paru_assemble_cols(Int e, Int f, std::vector<Int> &colHash,
 #ifndef NDEBUG
     Int c = 0;  // number of columns assembled
 #endif
-    ParU_Symbolic *Sym = paruMatInfo->Sym;
+    ParU_Symbolic *Sym = Num->Sym;
     Int *snM = Sym->super2atree;
     Int eli = snM[f];
 
@@ -213,13 +213,13 @@ void paru_assemble_cols(Int e, Int f, std::vector<Int> &colHash,
     PR = 1;
 
     PRLEVEL(PR, ("%% %ld :\n", eli));
-    if (PR <= 0) paru_print_element(paruMatInfo, eli);
+    if (PR <= 0) paru_print_element(Num, eli);
 
     PRLEVEL(PR, ("%% %ld :\n", e));
-    if (PR <= 0) paru_print_element(paruMatInfo, e);
+    if (PR <= 0) paru_print_element(Num, e);
 #endif
 
-    ParU_Element **elementList = paruMatInfo->elementList;
+    ParU_Element **elementList = Num->elementList;
 
     ParU_Element *el = elementList[e];
     ParU_Element *curEl = elementList[eli];
@@ -243,27 +243,27 @@ void paru_assemble_cols(Int e, Int f, std::vector<Int> &colHash,
     double *curEl_Num =
         (double *)((Int *)(curEl + 1) + 2 * curEl->nrows + 2 * curEl->ncols);
 
-    Paru_Work *Work = paruMatInfo->Work;
+    Paru_Work *Work = Num->Work;
     Int *isRowInFront = Work->rowSize;
 
-    Int *fcolList = paruMatInfo->fcolList[f];
+    Int *fcolList = Num->fcolList[f];
 
     // Int tempRow[el->nrowsleft];  // C99
     std::vector<Int> tempRow(el->nrowsleft);
     Int tempRow_ready = 0;
     Int toll = 8;  // number of times it continue when do not find anything
 
-    //Int naft; //number of active frontal tasks
-    //pragma omp atomic read
-    //naft = paruMatInfo->naft;
-    //const Int max_threads = paruMatInfo->paru_max_threads;
+    // Int naft; //number of active frontal tasks
+    // pragma omp atomic read
+    // naft = Num->naft;
+    // const Int max_threads = Num->paru_max_threads;
     ////Int *Depth = Sym->Depth;
-    //pragma omp parallel proc_bind(close) num_threads(max_threads/naft) 
-    //if (naft < max_threads/2 && 
+    // pragma omp parallel proc_bind(close) num_threads(max_threads/naft)
+    // if (naft < max_threads/2 &&
     //        el->nrowsleft*el->ncolsleft < 4096 && el->nrowsleft < 1024 )
-    //pragma omp single nowait
-    //pragma omp task untied
-    
+    // pragma omp single nowait
+    // pragma omp task untied
+
     // TOLL FREE zone
     while (paru_find_hash(el_colIndex[el->lac], colHash, fcolList) != -1)
     {
@@ -296,8 +296,8 @@ void paru_assemble_cols(Int e, Int f, std::vector<Int> &colHash,
         ASSERT(colInd >= 0);
 
         double *dC = curEl_Num + fcolind * curEl->nrows;
-        
-        //pragma omp task 
+
+        // pragma omp task
         for (Int ii = 0; ii < el->nrowsleft; ii++)
         {
             Int i = tempRow[ii];
@@ -318,11 +318,11 @@ void paru_assemble_cols(Int e, Int f, std::vector<Int> &colHash,
             ;
     }
     // el->lac won't get updated after this
-    Int *lacList = paruMatInfo->lacList;
+    Int *lacList = Num->lacList;
     lacList[e] = el_colIndex[el->lac];
 
     // TOLL Zone
-    //**//pragma omp parallel 
+    //**//pragma omp parallel
     //**//pragma omp single nowait
     //**//pragma omp taskgroup
     for (Int j = el->lac + 1; j < nEl && el->ncolsleft > 0 && toll > 0; j++)
@@ -389,19 +389,19 @@ void paru_assemble_cols(Int e, Int f, std::vector<Int> &colHash,
 }
 
 void paru_assemble_rows(Int e, Int f, std::vector<Int> &colHash,
-        paru_matrix *paruMatInfo)
+                        ParU_Numeric *Num)
 
 {
     DEBUGLEVEL(0);
     PARU_DEFINE_PRLEVEL;
 
-    ParU_Symbolic *Sym = paruMatInfo->Sym;
+    ParU_Symbolic *Sym = Num->Sym;
     Int *snM = Sym->super2atree;
     Int eli = snM[f];
 
     PRLEVEL(PR, ("%% Eliminat some rows of %ld in %ld\n", e, eli));
 
-    ParU_Element **elementList = paruMatInfo->elementList;
+    ParU_Element **elementList = Num->elementList;
 
     ParU_Element *el = elementList[e];
     ParU_Element *curEl = elementList[eli];
@@ -431,7 +431,7 @@ void paru_assemble_rows(Int e, Int f, std::vector<Int> &colHash,
     double *curEl_Num =
         (double *)((Int *)(curEl + 1) + 2 * curEl->nrows + 2 * curEl->ncols);
 
-    Paru_Work *Work = paruMatInfo->Work;
+    Paru_Work *Work = Num->Work;
     Int *isRowInFront = Work->rowSize;
 
     std::vector<Int> tempRow;
@@ -469,14 +469,14 @@ void paru_assemble_rows(Int e, Int f, std::vector<Int> &colHash,
 #ifndef NDEBUG
     if (tempRow.size() > 0)
         PRLEVEL(PR, ("%% Toll free zone: %ld rows has been found: \n%%",
-                    tempRow.size()));
+                     tempRow.size()));
 #endif
 
     PRLEVEL(1, ("%% TollED \n"));
     Int toll = 8;  // number of times it continue when do not find anything
     // Toll zone
     while (i < mEl && nrowsSeen > 0 && toll > 0)
-        // while (i < mEl  && nrowsSeen >0 )
+    // while (i < mEl  && nrowsSeen >0 )
     {
         for (; el_rowIndex[i] < 0; i++)
             ;
@@ -515,14 +515,14 @@ void paru_assemble_rows(Int e, Int f, std::vector<Int> &colHash,
 #ifndef NDEBUG
     PR = 1;
     PRLEVEL(PR, ("%% Before eliminiatine some rows %ld :\n", eli));
-    if (PR <= 0) paru_print_element(paruMatInfo, eli);
+    if (PR <= 0) paru_print_element(Num, eli);
 
     PRLEVEL(PR, ("%% %ld :\n", e));
-    if (PR <= 0) paru_print_element(paruMatInfo, e);
+    if (PR <= 0) paru_print_element(Num, e);
 #endif
 
-    if (el->cValid != paruMatInfo->time_stamp[f])
-        paru_update_rel_ind_col(e, f, colHash, paruMatInfo);
+    if (el->cValid != Num->time_stamp[f])
+        paru_update_rel_ind_col(e, f, colHash, Num);
 
     Int ncolsSeen = nEl;
 
@@ -572,15 +572,15 @@ void paru_assemble_rows(Int e, Int f, std::vector<Int> &colHash,
 #ifndef NDEBUG
     PR = 1;
     PRLEVEL(PR, ("%% After Eliminate some rows %ld :\n", eli));
-    if (PR <= 0) paru_print_element(paruMatInfo, eli);
+    if (PR <= 0) paru_print_element(Num, eli);
 
     PRLEVEL(PR, ("%% %ld :\n", e));
-    if (PR <= 0) paru_print_element(paruMatInfo, e);
+    if (PR <= 0) paru_print_element(Num, e);
 #endif
 }
 
 void paru_assemble_el_with0rows(Int e, Int f, std::vector<Int> &colHash,
-        paru_matrix *paruMatInfo)
+                                ParU_Numeric *Num)
 
 {
     // This element contributes to both pivotal rows and pivotal columns
@@ -603,7 +603,7 @@ void paru_assemble_el_with0rows(Int e, Int f, std::vector<Int> &colHash,
     DEBUGLEVEL(0);
     PARU_DEFINE_PRLEVEL;
 
-    ParU_Symbolic *Sym = paruMatInfo->Sym;
+    ParU_Symbolic *Sym = Num->Sym;
     Int *snM = Sym->super2atree;
     Int eli = snM[f];
     PRLEVEL(PR, ("%% \n+++++++++++++++++++++++++++++++++++++++\n"));
@@ -612,14 +612,14 @@ void paru_assemble_el_with0rows(Int e, Int f, std::vector<Int> &colHash,
 #ifndef NDEBUG
     PR = 1;
     PRLEVEL(PR, ("%% %ld :\n", eli));
-    if (PR <= 0) paru_print_element(paruMatInfo, eli);
+    if (PR <= 0) paru_print_element(Num, eli);
 
     PRLEVEL(PR, ("%% %ld :\n", e));
-    if (PR <= 0) paru_print_element(paruMatInfo, e);
+    if (PR <= 0) paru_print_element(Num, e);
 
 #endif
 
-    ParU_Element **elementList = paruMatInfo->elementList;
+    ParU_Element **elementList = Num->elementList;
 
     ParU_Element *el = elementList[e];
     ParU_Element *curEl = elementList[eli];
@@ -635,8 +635,8 @@ void paru_assemble_el_with0rows(Int e, Int f, std::vector<Int> &colHash,
     // Int *rowRelIndex = relRowInd (el);
     Int *rowRelIndex = (Int *)(el + 1) + 2 * nEl + mEl;
 
-    if (el->cValid != paruMatInfo->time_stamp[f])
-        paru_update_rel_ind_col(e, f, colHash, paruMatInfo);
+    if (el->cValid != Num->time_stamp[f])
+        paru_update_rel_ind_col(e, f, colHash, Num);
 
     // Int *colRelIndex = relColInd (ParU_Element *el);
     Int *colRelIndex = (Int *)(el + 1) + mEl + nEl;
@@ -651,12 +651,12 @@ void paru_assemble_el_with0rows(Int e, Int f, std::vector<Int> &colHash,
     double *curEl_Num =
         (double *)((Int *)(curEl + 1) + 2 * curEl->nrows + 2 * curEl->ncols);
 
-    Paru_Work *Work = paruMatInfo->Work;
+    Paru_Work *Work = Num->Work;
     Int *isRowInFront = Work->rowSize;
 
 #ifndef NDEBUG
-    ParU_Factors *Us = paruMatInfo->partial_Us;
-    Int *fcolList = paruMatInfo->fcolList[f];
+    ParU_Factors *Us = Num->partial_Us;
+    Int *fcolList = Num->fcolList[f];
     Int colCount = Us[f].n;
     ASSERT(el_colIndex[el->lac] <= fcolList[colCount - 1]);
     ASSERT(el_colIndex[nEl - 1] <= 0 || fcolList[0] <= el_colIndex[nEl - 1]);
@@ -730,8 +730,8 @@ void paru_assemble_el_with0rows(Int e, Int f, std::vector<Int> &colHash,
         PRLEVEL(PR, ("%% \n"));
 #endif
         Int ncols2bSeen = el->ncolsleft;
-        //Int *Depth = Sym->Depth;
-        //**//pragma omp parallel 
+        // Int *Depth = Sym->Depth;
+        //**//pragma omp parallel
         //**//pragma omp single nowait
         //**//pragma omp taskgroup
         for (Int j = el->lac; j < nEl; j++)
@@ -745,7 +745,8 @@ void paru_assemble_el_with0rows(Int e, Int f, std::vector<Int> &colHash,
 
             double *dC = curEl_Num + fcolind * curEl->nrows;
 
-            //**//pragma omp task priority(Depth[f]) if(nrows2assembl > TASK_MIN)
+            //**//pragma omp task priority(Depth[f]) if(nrows2assembl >
+            // TASK_MIN)
             for (Int iii = 0; iii < nrows2assembl; iii++)
             {
                 Int i = tempRow[iii];
@@ -819,7 +820,7 @@ void paru_assemble_el_with0rows(Int e, Int f, std::vector<Int> &colHash,
 
     el->nrowsleft = el->nzr_pc;
     el->lac = new_lac;
-    Int *lacList = paruMatInfo->lacList;
+    Int *lacList = Num->lacList;
     lacList[e] = el_colIndex[el->lac];
 #ifndef NDEBUG
     Int *Super = Sym->Super;
@@ -829,16 +830,16 @@ void paru_assemble_el_with0rows(Int e, Int f, std::vector<Int> &colHash,
     PRLEVEL(PR, ("%% %ld(%ld) %ld-%ld :\n", f, eli, col1, col2));
     PRLEVEL(PR, ("%%Finally new-lac is %ld ", el->lac));
     PRLEVEL(PR, ("nEl=%ld\n lacList[%ld]=%ld nrowsleft=%ld\n", nEl, e,
-                lacList[e], el->nrowsleft));
+                 lacList[e], el->nrowsleft));
 
     PR = 1;
     if (nEl != new_lac && el_colIndex[new_lac] < col2) PR = -2;
 
     PRLEVEL(PR, ("%% %ld :\n", eli));
-    if (PR <= 0) paru_print_element(paruMatInfo, eli);
+    if (PR <= 0) paru_print_element(Num, eli);
 
     PRLEVEL(PR, ("%% %ld :\n", e));
-    if (PR <= 0) paru_print_element(paruMatInfo, e);
+    if (PR <= 0) paru_print_element(Num, e);
     PR = 1;
     ASSERT(nEl == new_lac || col2 <= el_colIndex[new_lac]);
 

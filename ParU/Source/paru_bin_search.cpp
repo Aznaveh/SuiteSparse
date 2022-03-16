@@ -7,7 +7,7 @@
  * @author Aznaveh
  *  */
 #include "paru_internal.hpp"
-#define LEN 8 //XXX
+#define LEN 8  // XXX
 
 Int bin_srch(Int *srt_lst, Int l, Int r, Int num)
 // a simple binary search for when we know all the indices are available

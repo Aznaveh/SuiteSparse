@@ -7,7 +7,7 @@
  *  @author Aznaveh
  */
 #include "paru_internal.hpp"
-#define C 4 //XXX
+#define C 4  // XXX
 
 int paru_intersection(Int e, ParU_Element **elementList,
                       std::set<Int> &stl_newColSet)

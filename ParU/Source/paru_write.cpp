@@ -6,11 +6,11 @@
  *  @author Aznaveh
  */
 #include "paru_internal.hpp"
-void paru_write(paru_matrix *paruMatInfo, int scale, char *id)
+void paru_write(ParU_Numeric *Num, int scale, char *id)
 {
     DEBUGLEVEL(0);
     PRLEVEL(1, ("%% Start Writing\n"));
-    ParU_Symbolic *Sym = paruMatInfo->Sym;
+    ParU_Symbolic *Sym = Num->Sym;
     Int nf = Sym->nf;
 
     Int m = Sym->m;
@@ -19,8 +19,8 @@ void paru_write(paru_matrix *paruMatInfo, int scale, char *id)
 
     Int *Qfill = Sym->Qfill;
 
-    ParU_Factors *LUs = paruMatInfo->partial_LUs;
-    ParU_Factors *Us = paruMatInfo->partial_Us;
+    ParU_Factors *LUs = Num->partial_LUs;
+    ParU_Factors *Us = Num->partial_Us;
     Int *Super = Sym->Super;
 
     char default_name[] = "0";
@@ -113,7 +113,7 @@ void paru_write(paru_matrix *paruMatInfo, int scale, char *id)
             Int col1 = Super[f];
             Int col2 = Super[f + 1];
             Int fp = col2 - col1;
-            Int *frowList = paruMatInfo->frowList[f];
+            Int *frowList = Num->frowList[f];
 
             for (Int k = 0; k < fp; k++)
             {
@@ -170,14 +170,14 @@ void paru_write(paru_matrix *paruMatInfo, int scale, char *id)
             printf("Error in opening a file");
             return;
         }
-        fprintf(infofptr, "%.17g\n", paruMatInfo->my_time + Sym->my_time);
-        fprintf(infofptr, "%.17g\n", paruMatInfo->umf_time);
+        fprintf(infofptr, "%.17g\n", Num->my_time + Sym->my_time);
+        fprintf(infofptr, "%.17g\n", Num->umf_time);
 
 #ifdef COUNT_FLOPS
-        fprintf(infofptr, "%.17g\n", paruMatInfo->flp_cnt_dgemm);
-        fprintf(infofptr, "%.17g\n", paruMatInfo->flp_cnt_trsm);
-        fprintf(infofptr, "%.17g\n", paruMatInfo->flp_cnt_dger);
-        fprintf(infofptr, "%.17g\n", paruMatInfo->flp_cnt_real_dgemm);
+        fprintf(infofptr, "%.17g\n", Num->flp_cnt_dgemm);
+        fprintf(infofptr, "%.17g\n", Num->flp_cnt_trsm);
+        fprintf(infofptr, "%.17g\n", Num->flp_cnt_dger);
+        fprintf(infofptr, "%.17g\n", Num->flp_cnt_real_dgemm);
 #endif
         fclose(infofptr);
     }
@@ -201,8 +201,8 @@ void paru_write(paru_matrix *paruMatInfo, int scale, char *id)
     Int nnz = 0;
     for (Int f = 0; f < nf; f++)
     {
-        Int colCount = paruMatInfo->fcolCount[f];
-        Int rowCount = paruMatInfo->frowCount[f];
+        Int colCount = Num->fcolCount[f];
+        Int rowCount = Num->frowCount[f];
         Int col1 = Super[f];
         Int col2 = Super[f + 1];
         Int fp = col2 - col1;
@@ -238,10 +238,10 @@ void paru_write(paru_matrix *paruMatInfo, int scale, char *id)
     // writing the L and U factors
     for (Int f = 0; f < nf; f++)
     {
-        Int colCount = paruMatInfo->fcolCount[f];
-        Int *fcolList = paruMatInfo->fcolList[f];
-        Int rowCount = paruMatInfo->frowCount[f];
-        Int *frowList = paruMatInfo->frowList[f];
+        Int colCount = Num->fcolCount[f];
+        Int *fcolList = Num->fcolList[f];
+        Int rowCount = Num->frowCount[f];
+        Int *frowList = Num->frowList[f];
         Int col1 = Super[f];
         Int col2 = Super[f + 1];
         Int fp = col2 - col1;

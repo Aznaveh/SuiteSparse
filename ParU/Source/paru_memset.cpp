@@ -8,14 +8,14 @@
 #include "paru_internal.hpp"
 #define MEM_CHUNK (1024 * 1024 * 128)  // hard coded chunk-size //XXX
 
-void paru_memset(void* ptr, Int value, size_t num)
+void paru_memset(void *ptr, Int value, size_t num)
 {
     if (num < MEM_CHUNK)
     {  // single task memse
         memset(ptr, value, num);
     }
     else
-    { // multiple task memset
+    {  // multiple task memset
         size_t nchunks = 1 + (num / MEM_CHUNK);
 
         int64_t k;

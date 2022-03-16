@@ -24,7 +24,7 @@
 #include "paru_internal.hpp"
 
 Int paru_trsm(Int f, double *pF, double *uPart, Int fp, Int rowCount,
-              Int colCount, paru_matrix *paruMatInfo)
+              Int colCount, ParU_Numeric *Num)
 {
     DEBUGLEVEL(0);
     BLAS_INT mB = (BLAS_INT)fp;
@@ -47,7 +47,7 @@ Int paru_trsm(Int f, double *pF, double *uPart, Int fp, Int rowCount,
     }
 #endif
 
-    paru_tasked_trsm(f, mB, nB, alpha, pF, lda, uPart, ldb, paruMatInfo);
+    paru_tasked_trsm(f, mB, nB, alpha, pF, lda, uPart, ldb, Num);
 
 #ifndef NDEBUG  // Printing the  U part
     PRLEVEL(p, ("(I)U After Trsm: %ld x %ld\n", fp, colCount));

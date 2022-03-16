@@ -3,18 +3,17 @@
 ////////////////////////////////////////////////////////////////////////////////
 /*! @brief    get a matrix and factorize it
  *      specify the order of eliminating fronts
- *      Allocate space for paruMatInfo
+ *      Allocate space for Num
  *      the user should free the space
  *
  * @author Aznaveh
  */
 #include "paru_internal.hpp"
 
-ParU_Ret paru_exec_tasks_seq(Int t, Int *task_num_child,
-                                paru_matrix *paruMatInfo)
+ParU_Ret paru_exec_tasks_seq(Int t, Int *task_num_child, ParU_Numeric *Num)
 {
     DEBUGLEVEL(0);
-    ParU_Symbolic *Sym = paruMatInfo->Sym;
+    ParU_Symbolic *Sym = Num->Sym;
     Int *task_parent = Sym->task_parent;
     Int daddy = task_parent[t];
     Int *task_map = Sym->task_map;
@@ -29,8 +28,8 @@ ParU_Ret paru_exec_tasks_seq(Int t, Int *task_num_child,
 #endif
     for (Int f = task_map[t] + 1; f <= task_map[t + 1]; f++)
     {
-        PRLEVEL(2, ("Seq: calling %ld\n",f));
-        myInfo = paru_front(f, paruMatInfo);
+        PRLEVEL(2, ("Seq: calling %ld\n", f));
+        myInfo = paru_front(f, Num);
         if (myInfo != PARU_SUCCESS)
         {
             return myInfo;
@@ -39,8 +38,8 @@ ParU_Ret paru_exec_tasks_seq(Int t, Int *task_num_child,
     Int num_rem_children;
 #ifndef NTIME
     double time = PARU_OPENMP_GET_WTIME;
-    time -= start_time;  
-    PRLEVEL(1, ("task time task %ld is %lf\n",t, time));
+    time -= start_time;
+    PRLEVEL(1, ("task time task %ld is %lf\n", t, time));
 #endif
 
 #ifndef NDEBUG
@@ -59,29 +58,26 @@ ParU_Ret paru_exec_tasks_seq(Int t, Int *task_num_child,
                      task_map[t] + 1, task_map[t + 1], task_num_child[daddy]));
             if (num_rem_children == 0)
             {
-                PRLEVEL(1,
-                        ("%%Seq task %ld executing its parent %ld\n", 
-                         t, daddy));
-                return myInfo =
-                    paru_exec_tasks_seq(daddy, task_num_child, paruMatInfo);
+                PRLEVEL(
+                    1, ("%%Seq task %ld executing its parent %ld\n", t, daddy));
+                return myInfo = paru_exec_tasks_seq(daddy, task_num_child, Num);
             }
         }
         else  // I was the only spoiled kid in the family;
         {
-            PRLEVEL(1, ("%% Seq task %ld only child executing its parent %ld\n", 
+            PRLEVEL(1, ("%% Seq task %ld only child executing its parent %ld\n",
                         t, daddy));
-            return myInfo = 
-                paru_exec_tasks_seq(daddy, task_num_child, paruMatInfo);
+            return myInfo = paru_exec_tasks_seq(daddy, task_num_child, Num);
         }
     }
     return myInfo;
 }
 
-ParU_Ret paru_exec_tasks (Int t, Int *task_num_child, Int &chain_task,
-                                paru_matrix *paruMatInfo)
+ParU_Ret paru_exec_tasks(Int t, Int *task_num_child, Int &chain_task,
+                         ParU_Numeric *Num)
 {
     DEBUGLEVEL(0);
-    ParU_Symbolic *Sym = paruMatInfo->Sym;
+    ParU_Symbolic *Sym = Num->Sym;
     Int *task_parent = Sym->task_parent;
     Int daddy = task_parent[t];
     Int *task_map = Sym->task_map;
@@ -96,7 +92,7 @@ ParU_Ret paru_exec_tasks (Int t, Int *task_num_child, Int &chain_task,
 #endif
     for (Int f = task_map[t] + 1; f <= task_map[t + 1]; f++)
     {
-        myInfo = paru_front(f, paruMatInfo);
+        myInfo = paru_front(f, Num);
         if (myInfo != PARU_SUCCESS)
         {
             return myInfo;
@@ -105,8 +101,8 @@ ParU_Ret paru_exec_tasks (Int t, Int *task_num_child, Int &chain_task,
     Int num_rem_children;
 #ifndef NTIME
     double time = PARU_OPENMP_GET_WTIME;
-    time -= start_time;  
-    PRLEVEL(1, ("task time task %ld is %lf\n",t, time));
+    time -= start_time;
+    PRLEVEL(1, ("task time task %ld is %lf\n", t, time));
 #endif
 
 #ifndef NDEBUG
@@ -117,7 +113,7 @@ ParU_Ret paru_exec_tasks (Int t, Int *task_num_child, Int &chain_task,
     {
         if (num_original_children != 1)
         {
-            #pragma omp atomic capture
+        #pragma omp atomic capture
             {
                 task_num_child[daddy]--;
                 num_rem_children = task_num_child[daddy];
@@ -132,18 +128,18 @@ ParU_Ret paru_exec_tasks (Int t, Int *task_num_child, Int &chain_task,
                         ("%% task %ld executing its parent %ld\n", t, daddy));
                 Int resq;
                 #pragma omp atomic read
-                resq = paruMatInfo->resq;
-                if (resq == 1) 
+                resq = Num->resq;
+                if (resq == 1)
                 {
                     chain_task = daddy;
                     PRLEVEL(2, ("%% CHAIN ALERT1: task %ld calling %ld"
-                                " resq = %ld\n", t, daddy, resq));
+                                " resq = %ld\n",
+                                t, daddy, resq));
                 }
                 else
                 {
-                    return myInfo =
-                        paru_exec_tasks(daddy, task_num_child, chain_task, 
-                                paruMatInfo);
+                    return myInfo = paru_exec_tasks(daddy, task_num_child,
+                                                    chain_task, Num);
                 }
             }
         }
@@ -153,25 +149,25 @@ ParU_Ret paru_exec_tasks (Int t, Int *task_num_child, Int &chain_task,
                         daddy));
             Int resq;
             #pragma omp atomic read
-            resq = paruMatInfo->resq;
-            if (resq == 1) 
+            resq = Num->resq;
+            if (resq == 1)
             {
                 chain_task = daddy;
-                    PRLEVEL(2, ("%% CHAIN ALERT1: task %ld calling %ld"
-                                " resq = %ld\n", t, daddy, resq));
+                PRLEVEL(2, ("%% CHAIN ALERT1: task %ld calling %ld"
+                            " resq = %ld\n",
+                            t, daddy, resq));
             }
             else
             {
-                return myInfo = 
-                    paru_exec_tasks(daddy, task_num_child, chain_task, 
-                            paruMatInfo);
+                return myInfo = paru_exec_tasks(daddy, task_num_child,
+                                                chain_task, Num);
             }
         }
     }
     return myInfo;
 }
 ParU_Ret paru_factorize(cholmod_sparse *A, ParU_Symbolic *Sym,
-        paru_matrix **paruMatInfo_handle)
+                        ParU_Numeric **Num_handle)
 {
     DEBUGLEVEL(0);
 #ifndef NTIME
@@ -194,12 +190,12 @@ ParU_Ret paru_factorize(cholmod_sparse *A, ParU_Symbolic *Sym,
         return PARU_INVALID;
     }
 
-    paru_matrix *paruMatInfo;
-    paruMatInfo = *paruMatInfo_handle;
+    ParU_Numeric *Num;
+    Num = *Num_handle;
 
     ParU_Ret info;
-    info = paru_init_rowFronts(&paruMatInfo, A, Sym);
-    *paruMatInfo_handle = paruMatInfo;
+    info = paru_init_rowFronts(&Num, A, Sym);
+    *Num_handle = Num;
 
     PRLEVEL(1, ("%% init_row is done\n"));
     if (info != PARU_SUCCESS)
@@ -207,7 +203,7 @@ ParU_Ret paru_factorize(cholmod_sparse *A, ParU_Symbolic *Sym,
         PRLEVEL(1, ("%% init_row has a problem\n"));
         return info;
     }
-    paruMatInfo->naft = 0;
+    Num->naft = 0;
     Int nf = Sym->nf;
     //////////////// Using task tree //////////////////////////////////////////
     Int ntasks = Sym->ntasks;
@@ -239,19 +235,17 @@ ParU_Ret paru_factorize(cholmod_sparse *A, ParU_Symbolic *Sym,
     Int max_chain = Sym->max_chain;
     double chainess = 2;
     double maxchain_ratio = 2;
-    paruMatInfo->resq = task_Q.size();
+    Num->resq = task_Q.size();
     printf("ntasks=%ld task_Q.size=%ld\n", ntasks, task_Q.size());
     if (ntasks > 0)
     {
         chainess = (task_depth[task_Q[0]] + 1) / (double)nf;
-        maxchain_ratio = (((double)max_chain+1)/nf);
-        printf("nf = %ld, deepest = %ld, chainess = %lf max_chain=%ld" 
-                " maxchain_ratio =%lf\n", 
-                nf,
-               task_depth[task_Q[0]],
-               chainess,
-               max_chain , maxchain_ratio);
-    } 
+        maxchain_ratio = (((double)max_chain + 1) / nf);
+        printf(
+            "nf = %ld, deepest = %ld, chainess = %lf max_chain=%ld"
+            " maxchain_ratio =%lf\n",
+            nf, task_depth[task_Q[0]], chainess, max_chain, maxchain_ratio);
+    }
 #ifndef NDEBUG
     Int PR = -1;
     Int *task_map = Sym->task_map;
@@ -265,18 +259,18 @@ ParU_Ret paru_factorize(cholmod_sparse *A, ParU_Symbolic *Sym,
     PRLEVEL(PR, ("\n"));
 #endif
 
-    //if (chainess < .6 && maxchain_ratio < .25)
+    // if (chainess < .6 && maxchain_ratio < .25)
 
-   paruMatInfo->paru_max_threads = PARU_OPENMP_MAX_THREADS;
-   if (ntasks > 1)
+    Num->paru_max_threads = PARU_OPENMP_MAX_THREADS;
+    if (ntasks > 1)
     {
         printf("Parallel\n");
-        #ifdef MKLROOT
+#ifdef MKLROOT
         PARU_OPENMP_SET_DYNAMIC(0);
         mkl_set_dynamic(0);
-        //mkl_set_threading_layer(MKL_THREADING_INTEL);
-        //mkl_set_interface_layer(MKL_INTERFACE_ILP64);
-        #endif
+// mkl_set_threading_layer(MKL_THREADING_INTEL);
+// mkl_set_interface_layer(MKL_INTERFACE_ILP64);
+#endif
         BLAS_set_num_threads(1);
         PARU_OPENMP_SET_MAX_ACTIVE_LEVELS(4);
         const Int size = (Int)task_Q.size();
@@ -294,7 +288,7 @@ ParU_Ret paru_factorize(cholmod_sparse *A, ParU_Symbolic *Sym,
             PRLEVEL(1, ("%% doing Queue tasks <%ld,%ld>\n", start, end));
             #pragma omp parallel proc_bind(spread)
             #pragma omp single nowait
-            #pragma omp task untied  //clang might seg fault on untied
+            #pragma omp task untied  // clang might seg fault on untied
             for (Int i = start; i < end; i++)
             // for (Int i = 0; i < (Int)task_Q.size(); i++)
             {
@@ -303,25 +297,22 @@ ParU_Ret paru_factorize(cholmod_sparse *A, ParU_Symbolic *Sym,
                 Int d = task_depth[t];
                 #pragma omp task mergeable priority(d)
                 {
-                    #pragma omp atomic update
-                    paruMatInfo->naft++;
+                #pragma omp atomic update
+                    Num->naft++;
 
                     ParU_Ret myInfo =
-                        // paru_exec_tasks(t, &task_num_child[0], paruMatInfo);
-                        paru_exec_tasks(t, task_num_child, chain_task, 
-                                paruMatInfo);
+                        // paru_exec_tasks(t, &task_num_child[0], Num);
+                        paru_exec_tasks(t, task_num_child, chain_task, Num);
                     if (myInfo != PARU_SUCCESS)
                     {
                         #pragma omp atomic write
                         info = myInfo;
                     }
                     #pragma omp atomic update
-                    paruMatInfo->naft--;
+                    Num->naft--;
 
                     #pragma omp atomic update
-                    paruMatInfo->resq--;
-
-
+                    Num->resq--;
                 }
             }
             start += steps;
@@ -329,10 +320,9 @@ ParU_Ret paru_factorize(cholmod_sparse *A, ParU_Symbolic *Sym,
         // chain break
         if (chain_task != -1 && info == PARU_SUCCESS)
         {
-            paruMatInfo->naft = 1; 
-            PRLEVEL(1, ("Chain_taskd %ld has remained\n",chain_task));
-            info  = 
-                paru_exec_tasks_seq(chain_task, task_num_child, paruMatInfo);
+            Num->naft = 1;
+            PRLEVEL(1, ("Chain_taskd %ld has remained\n", chain_task));
+            info = paru_exec_tasks_seq(chain_task, task_num_child, Num);
         }
         if (info != PARU_SUCCESS)
         {
@@ -343,8 +333,6 @@ ParU_Ret paru_factorize(cholmod_sparse *A, ParU_Symbolic *Sym,
                 printf("Paru: Input matrix is singular\n");
             return info;
         }
-        
-        
     }
 
     //////////////// Making task tree ///End////////////////////////////////////
@@ -352,12 +340,12 @@ ParU_Ret paru_factorize(cholmod_sparse *A, ParU_Symbolic *Sym,
     else
     {
         printf("Sequential\n");
-        paruMatInfo->naft = 1;
+        Num->naft = 1;
         for (Int i = 0; i < nf; i++)
         {
             // if (i %1000 == 0) PRLEVEL(1, ("%% Wroking on front %ld\n", i));
 
-            info = paru_front(i, paruMatInfo);
+            info = paru_front(i, Num);
             if (info != PARU_SUCCESS)
             {
                 PRLEVEL(1, ("%% A problem happend in %ld\n", i));
@@ -366,7 +354,7 @@ ParU_Ret paru_factorize(cholmod_sparse *A, ParU_Symbolic *Sym,
         }
     }
 
-    info = paru_perm(paruMatInfo);  // to form the final permutation
+    info = paru_perm(Num);  // to form the final permutation
 
     if (info == PARU_OUT_OF_MEMORY)
     {
@@ -374,29 +362,29 @@ ParU_Ret paru_factorize(cholmod_sparse *A, ParU_Symbolic *Sym,
         return info;
     }
 
-    #ifdef COUNT_FLOPS
-    double flop_count = paruMatInfo->flp_cnt_dgemm + paruMatInfo->flp_cnt_dger +
-        paruMatInfo->flp_cnt_trsm;
+#ifdef COUNT_FLOPS
+    double flop_count =
+        Num->flp_cnt_dgemm + Num->flp_cnt_dger + Num->flp_cnt_trsm;
     PRLEVEL(-1, ("Flop count = %.17g\n", flop_count));
-    #endif
-    Int max_rc = 0,  max_cc = 0;
+#endif
+    Int max_rc = 0, max_cc = 0;
     for (Int f = 0; f < nf; f++)
     {
-        Int rowCount = paruMatInfo->frowCount[f];
-        Int colCount = paruMatInfo->fcolCount[f];
+        Int rowCount = Num->frowCount[f];
+        Int colCount = Num->fcolCount[f];
         Int *Super = Sym->Super;
         Int col1 = Super[f];
         Int col2 = Super[f + 1];
         Int fp = col2 - col1;
-        max_rc = MAX(max_rc , rowCount);
-        max_cc = MAX(max_cc , colCount+fp);
+        max_rc = MAX(max_rc, rowCount);
+        max_cc = MAX(max_cc, colCount + fp);
     }
-    PRLEVEL(1, ("max_rc=%ld max_cc=%ld\n",max_rc, max_cc));
-    paruMatInfo->max_row_count = max_rc;
-    paruMatInfo->max_col_count = max_cc;
+    PRLEVEL(1, ("max_rc=%ld max_cc=%ld\n", max_rc, max_cc));
+    Num->max_row_count = max_rc;
+    Num->max_col_count = max_cc;
 #ifndef NTIME
     Int time = PARU_OPENMP_GET_WTIME;
-    paruMatInfo->my_time = time - my_start_time;
+    Num->my_time = time - my_start_time;
 #endif
     return PARU_SUCCESS;
 }

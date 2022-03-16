@@ -38,11 +38,11 @@
  * @author Aznaveh
  * */
 #include "paru_internal.hpp"
-ParU_Ret paru_perm(paru_matrix *paruMatInfo)
+ParU_Ret paru_perm(ParU_Numeric *Num)
 {
     DEBUGLEVEL(0);
     PARU_DEFINE_PRLEVEL;
-    ParU_Symbolic *Sym = paruMatInfo->Sym;
+    ParU_Symbolic *Sym = Num->Sym;
 
     if (Sym->Pfin != NULL)  // it must have been computed
         return PARU_SUCCESS;
@@ -77,7 +77,7 @@ ParU_Ret paru_perm(paru_matrix *paruMatInfo)
 #endif
 
     Int n1 = Sym->n1;  // row+col singletons
-    Int ip = 0;          // number of rows seen so far
+    Int ip = 0;        // number of rows seen so far
     PRLEVEL(PR, ("%% singlton part"));
     for (Int k = 0; k < n1; k++)
     {  // first singletons
@@ -92,7 +92,7 @@ ParU_Ret paru_perm(paru_matrix *paruMatInfo)
         Int col1 = Super[f];
         Int col2 = Super[f + 1];
         Int fp = col2 - col1;
-        Int *frowList = paruMatInfo->frowList[f];
+        Int *frowList = Num->frowList[f];
 
         for (Int k = 0; k < fp; k++)
         {
@@ -141,7 +141,7 @@ Int paru_apply_inv_perm(const Int *P, const double *b, double *x, Int m)
     PRLEVEL(1, (" \n"));
 #endif
 
-    //pragma omp parallel for
+    // pragma omp parallel for
     for (Int k = 0; k < m; k++)
     {
         Int j = P[k];  // k-new and j-old; P(new) = old
@@ -149,7 +149,7 @@ Int paru_apply_inv_perm(const Int *P, const double *b, double *x, Int m)
     }
 
 #ifndef NDEBUG
-   PRLEVEL(1, ("%% after applying inverse permutaion x is:\n"));
+    PRLEVEL(1, ("%% after applying inverse permutaion x is:\n"));
     for (Int k = 0; k < m; k++)
     {
         PRLEVEL(1, (" %.8lf, ", x[k]));
@@ -179,7 +179,7 @@ Int paru_apply_inv_perm(const Int *P, const double *B, double *X, Int m, Int n)
         PRLEVEL(PR, ("%%"));
         for (Int l = 0; l < n; l++)
         {
-            PRLEVEL(PR, (" %.2lf, ", B[l*m+k]));
+            PRLEVEL(PR, (" %.2lf, ", B[l * m + k]));
             // PRLEVEL(1, (" %.2lf, ", B[k*n+l])); B row-major
         }
         PRLEVEL(PR, (" \n"));
@@ -190,20 +190,20 @@ Int paru_apply_inv_perm(const Int *P, const double *B, double *X, Int m, Int n)
 #ifndef NTIME
     double start_time = PARU_OPENMP_GET_WTIME;
 #endif
-    //pragma omp parallel for
+    // pragma omp parallel for
     for (Int k = 0; k < m; k++)
     {
         Int j = P[k];  // k-new and j-old; P(new) = old
 
         for (Int l = 0; l < n; l++)
         {
-            X[l*m+j] = B[l*m+k]; // Pinv(old) = new
+            X[l * m + j] = B[l * m + k];  // Pinv(old) = new
         }
     }
 
 #ifndef NTIME
     double time = PARU_OPENMP_GET_WTIME;
-    time -= start_time;  
+    time -= start_time;
     PRLEVEL(1, ("%% mRHS paru_apply_inv_perm %lf seconds\n", time));
 #endif
 #ifndef NDEBUG
@@ -213,7 +213,7 @@ Int paru_apply_inv_perm(const Int *P, const double *B, double *X, Int m, Int n)
         PRLEVEL(1, ("%%"));
         for (Int l = 0; l < n; l++)
         {
-            PRLEVEL(1, (" %.2lf, ", X[l*m+k]));
+            PRLEVEL(1, (" %.2lf, ", X[l * m + k]));
             // PRLEVEL(1, (" %.2lf, ", X[k*n+l])); X row major
         }
         PRLEVEL(1, (" \n"));
@@ -289,13 +289,13 @@ Int paru_apply_perm_scale(const Int *P, const double *s, const double *B,
     }
     PRLEVEL(1, (" \n"));
 
-    PRLEVEL(1, ("%% and B is:\n")); //B is row major
+    PRLEVEL(1, ("%% and B is:\n"));  // B is row major
     for (Int k = 0; k < m; k++)
     {
         PRLEVEL(1, ("%%"));
         for (Int l = 0; l < n; l++)
         {
-            PRLEVEL(1, (" %.2lf, ", B[l*m+k]));
+            PRLEVEL(1, (" %.2lf, ", B[l * m + k]));
             // PRLEVEL(1, (" %.2lf, ", B[k*n+l])); B row-major
         }
         PRLEVEL(1, (" \n"));
@@ -320,14 +320,14 @@ Int paru_apply_perm_scale(const Int *P, const double *s, const double *B,
         Int j = P[k];  // k-new and j-old; P(new) = old
         for (Int l = 0; l < n; l++)
         {
-          // X[k*n+l] = (s == NULL) ? B[j*n+l] : B[j*n+l] / s[j];
-           X[l*m+k] = (s == NULL) ? B[l*m+j] : B[l*m+j] / s[j];
+            // X[k*n+l] = (s == NULL) ? B[j*n+l] : B[j*n+l] / s[j];
+            X[l * m + k] = (s == NULL) ? B[l * m + j] : B[l * m + j] / s[j];
         }
     }
 
 #ifndef NTIME
     double time = PARU_OPENMP_GET_WTIME;
-    time -= start_time;  
+    time -= start_time;
     PRLEVEL(1, ("%% mRHS paru_apply_perm_scale %lf seconds\n", time));
 #endif
 
@@ -338,7 +338,7 @@ Int paru_apply_perm_scale(const Int *P, const double *s, const double *B,
         PRLEVEL(1, ("%%"));
         for (Int l = 0; l < n; l++)
         {
-            PRLEVEL(1, (" %.2lf, ", X[l*m+k]));
+            PRLEVEL(1, (" %.2lf, ", X[l * m + k]));
             // PRLEVEL(1, (" %.2lf, ", X[k*n+l])); X row major
         }
         PRLEVEL(1, (" \n"));

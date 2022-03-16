@@ -56,12 +56,12 @@ int main(int argc, char **argv)
         return info;
     }
     printf ("Paru: Symbolic factorization is done!\n");
-    paru_matrix *paruMatInfo;
-    info = paru_factorize(A, Sym, &paruMatInfo);
+    ParU_Numeric *Num;
+    info = paru_factorize(A, Sym, &Num);
     double my_time = omp_get_wtime() - my_start_time;
     if (info != PARU_SUCCESS)
     {
-        paru_freemat(&paruMatInfo);
+        paru_freemat(&Num);
         paru_freesym(&Sym);
         cholmod_l_free_sparse(&A, cc);
         cholmod_l_finish(cc);
@@ -75,9 +75,9 @@ int main(int argc, char **argv)
     double *b = (double *)malloc(m * sizeof(double));
     for (Int i = 0; i < m; ++i) b[i] = i + 1;
     double resid, norm;
-    paru_residual(b, resid, norm, A, paruMatInfo);
+    paru_residual(b, resid, norm, A, Num);
     for (Int i = 0; i < m; ++i) b[i] = i + 1;
-    paru_backward(b, resid, norm, A, paruMatInfo);
+    paru_backward(b, resid, norm, A, Num);
     free(b);
 
     const Int nn = 16; //number of right handsides
@@ -85,12 +85,12 @@ int main(int argc, char **argv)
     double Res[4];
     for (Int i = 0; i < m; ++i) 
         for (Int j = 0; j < nn; ++j) B[j*m+i] = (double) (i+j + 1);
-    paru_residual(A, paruMatInfo, B, Res, nn);
+    paru_residual(A, Num, B, Res, nn);
     free(B);
 #endif
 
     //~~~~~~~~~~~~~~~~~~~End computation~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    Int max_threads = paruMatInfo->paru_max_threads;
+    Int max_threads = Num->paru_max_threads;
     BLAS_set_num_threads(max_threads);
 
     //~~~~~~~~~~~~~~~~~~~Calling umfpack~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -152,9 +152,9 @@ int main(int argc, char **argv)
     // Writing results to a file
     if (info == PARU_SUCCESS)
     {
-        // paruMatInfo->umf_time = umf_time;
+        // Num->umf_time = umf_time;
         // Writing LU factors into a file, can be time consuming
-        // paru_write(paruMatInfo, scale, argv[1]);
+        // paru_write(Num, scale, argv[1]);
         FILE *res_file;
         char res_name[] = "../Demo/Res/res.txt";
         res_file = fopen(res_name, "a");
@@ -172,7 +172,7 @@ int main(int argc, char **argv)
 
 #endif
     //~~~~~~~~~~~~~~~~~~~Free Everything~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    paru_freemat(&paruMatInfo);
+    paru_freemat(&Num);
     paru_freesym(&Sym);
 
     cholmod_l_free_sparse(&A, cc);

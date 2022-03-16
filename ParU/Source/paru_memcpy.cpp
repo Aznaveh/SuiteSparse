@@ -7,8 +7,9 @@
  * @author Aznaveh
  */
 #include "paru_internal.hpp"
-#define MEM_CHUNK (1024 * 1024 )  // hard coded chunk-size
-                                  // XXX
+#define MEM_CHUNK \
+    (1024 * 1024)  // hard coded chunk-size
+                   // XXX
 
 void paru_memcpy(void *destination, const void *source, size_t num)
 {
@@ -21,8 +22,8 @@ void paru_memcpy(void *destination, const void *source, size_t num)
         size_t nchunks = 1 + (num / MEM_CHUNK);
 
         int64_t k;
-       #pragma omp taskloop default(none)\
-       shared(nchunks, destination, source, num)
+        #pragma omp taskloop default(none) \
+        shared(nchunks, destination, source, num)
         for (k = 0; k < (int64_t)nchunks; k++)
         {
             size_t start = k * MEM_CHUNK;

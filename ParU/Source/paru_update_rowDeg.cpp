@@ -10,41 +10,39 @@
 
 void paru_update_rowDeg(Int panel_num, Int row_end, Int f, Int start_fac,
                         std::set<Int> &stl_colSet,
-                        std::vector<Int> &pivotal_elements,
-                        paru_matrix *paruMatInfo)
+                        std::vector<Int> &pivotal_elements, ParU_Numeric *Num)
 {
     DEBUGLEVEL(0);
     PARU_DEFINE_PRLEVEL;
 #ifndef NDEBUG
-    Int n = paruMatInfo->n;
+    Int n = Num->n;
     static Int r1 = 0, r2 = 0, r3 = 0;
 #endif
     PRLEVEL(1, ("%%-------ROW degree update of panel %ld of front %ld \n",
                 panel_num, f));
-    Int panel_width = paruMatInfo->panel_width;
-    ParU_Element **elementList = paruMatInfo->elementList;
-    Paru_Work *Work = paruMatInfo->Work;
+    Int panel_width = Num->panel_width;
+    ParU_Element **elementList = Num->elementList;
+    Paru_Work *Work = Num->Work;
 
     Int *elRow = Work->elRow;
     Int *elCol = Work->elCol;
 
-    ParU_Symbolic *Sym = paruMatInfo->Sym;
+    ParU_Symbolic *Sym = Num->Sym;
     Int *Super = Sym->Super;
     Int col1 = Super[f];  // fornt F has columns col1:col2-1
     Int col2 = Super[f + 1];
     Int fp = col2 - col1;  // first fp columns are pivotal
 
-    Int pMark = start_fac;  // Mark for pivotal rows
-    Int npMark =
-        ++paruMatInfo->time_stamp[f];  // making all the markings invalid
+    Int pMark = start_fac;              // Mark for pivotal rows
+    Int npMark = ++Num->time_stamp[f];  // making all the markings invalid
 
     Int colCount = stl_colSet.size();
 
     Int j1 = panel_num * panel_width;  // panel starting column
     Int j2 = (j1 + panel_width < fp) ? j1 + panel_width : fp;
 
-    Int rowCount = paruMatInfo->frowCount[f];
-    Int *row_degree_bound = paruMatInfo->row_degree_bound;
+    Int rowCount = Num->frowCount[f];
+    Int *row_degree_bound = Num->row_degree_bound;
 
     std::set<Int> stl_newColSet;  // the list of new columns
 
@@ -82,10 +80,10 @@ void paru_update_rowDeg(Int panel_num, Int row_end, Int f, Int start_fac,
      * v              |___....______________|
      *
      */
-    Int *frowList = paruMatInfo->frowList[f];
+    Int *frowList = Num->frowList[f];
     std::set<Int>::iterator it;
 
-    ParU_TupleList *RowList = paruMatInfo->RowList;
+    ParU_TupleList *RowList = Num->RowList;
     for (Int i = j1; i < j2; i++)
     {
         Int curFsRow = frowList[i];
@@ -134,7 +132,7 @@ void paru_update_rowDeg(Int panel_num, Int row_end, Int f, Int start_fac,
             {  // an element never seen before
 
                 PRLEVEL(
-                        1, ("%%P: first time seen elRow[%ld]=%ld \n", e, elRow[e]));
+                    1, ("%%P: first time seen elRow[%ld]=%ld \n", e, elRow[e]));
                 PRLEVEL(1, ("%%pMark=%ld  npMark= %ld\n", pMark, npMark));
 
                 // if (el->rValid < pMark)
@@ -203,7 +201,7 @@ void paru_update_rowDeg(Int panel_num, Int row_end, Int f, Int start_fac,
 #ifndef NDEBUG /* Checking if columns are correct */
     PR = 1;
     PRLEVEL(PR, ("%% There are %ld columns in this contribution block: \n",
-                colCount));
+                 colCount));
     PRLEVEL(PR, ("\n"));
     Int stl_colSize = stl_colSet.size();
 
@@ -221,7 +219,7 @@ void paru_update_rowDeg(Int panel_num, Int row_end, Int f, Int start_fac,
     // if the front did not grow, there is nothing else to do
     if (stl_newColSet.size() == 0) return;
 
-    paruMatInfo->fcolCount[f] = colCount;
+    Num->fcolCount[f] = colCount;
 
     /**** only travers over elements that contribute to pivotal columns *******/
     /*         to find their intersection
@@ -281,8 +279,8 @@ void paru_update_rowDeg(Int panel_num, Int row_end, Int f, Int start_fac,
 
 #ifndef NDEBUG
         PRLEVEL(PR, ("%% pivotal element= %ld lac=%ld colsleft=%ld \n", e,
-                    el->lac, el->ncolsleft));
-        if (PR <= 0) paru_print_element(paruMatInfo, e);
+                     el->lac, el->ncolsleft));
+        if (PR <= 0) paru_print_element(Num, e);
 #endif
         Int intsct = paru_intersection(e, elementList, stl_newColSet);
         if (el->cValid < pMark)
@@ -356,7 +354,7 @@ void paru_update_rowDeg(Int panel_num, Int row_end, Int f, Int start_fac,
                 Int e = curTpl.e;
 
 #ifndef NDEBUG
-                if (PR <= 0) paru_print_element(paruMatInfo, e);
+                if (PR <= 0) paru_print_element(Num, e);
 #endif
                 Int curRowIndex = curTpl.f;
 
@@ -458,7 +456,7 @@ void paru_update_rowDeg(Int panel_num, Int row_end, Int f, Int start_fac,
             Int e = curTpl.e;
 
 #ifndef NDEBUG
-            if (PR <= 0) paru_print_element(paruMatInfo, e);
+            if (PR <= 0) paru_print_element(Num, e);
 #endif
             Int curRowIndex = curTpl.f;
 
@@ -516,7 +514,7 @@ void paru_update_rowDeg(Int panel_num, Int row_end, Int f, Int start_fac,
         PR = 1;
         PRLEVEL(PR, ("%%old_bound_updated =%ld \n", old_bound_updated));
         PRLEVEL(PR, ("%%new_row_degree_bound_for_r=%ld \n",
-                    new_row_degree_bound_for_r));
+                     new_row_degree_bound_for_r));
         PRLEVEL(PR, ("%%row_degroo_bound[%ld]=%ld \n", r, row_degree_bound[r]));
 #endif
 
@@ -526,7 +524,7 @@ void paru_update_rowDeg(Int panel_num, Int row_end, Int f, Int start_fac,
                 : new_row_degree_bound_for_r;
     }
 
-    paruMatInfo->time_stamp[f] += 2;  // making all the markings invalid again
+    Num->time_stamp[f] += 2;  // making all the markings invalid again
 #ifndef NDEBUG
     PRLEVEL(1, ("%% Finalized counters r1=%ld r2=%ld r3=%ld sum=%ld\n", r1, r2,
                 r3, r1 + r2 + r3));

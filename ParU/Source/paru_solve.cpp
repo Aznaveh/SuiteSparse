@@ -10,13 +10,13 @@
 
 #include "paru_internal.hpp"
 
-ParU_Ret paru_solve(double *b, paru_matrix *paruMatInfo)
+ParU_Ret paru_solve(double *b, ParU_Numeric *Num)
 {
     DEBUGLEVEL(0);
     PRLEVEL(1, ("%% inside solve\n"));
-    ParU_Symbolic *Sym = paruMatInfo->Sym;
+    ParU_Symbolic *Sym = Num->Sym;
     Int m = Sym->m;
-    if (paruMatInfo->res == PARU_SINGULAR)
+    if (Num->res == PARU_SINGULAR)
     {
         printf("Paru: the matrix is singular; cannot be solved.\n");
         return PARU_SINGULAR;
@@ -40,15 +40,15 @@ ParU_Ret paru_solve(double *b, paru_matrix *paruMatInfo)
     paru_apply_perm_scale(Sym->Pfin, Sym->scale_row, b, x, m);
 
     PRLEVEL(1, ("%% lsolve\n"));
-    paru_lsolve(x, paruMatInfo);  // x = L\x
+    paru_lsolve(x, Num);  // x = L\x
     PRLEVEL(1, ("%% usolve\n"));
-    paru_usolve(x, paruMatInfo);                 // x = U\x
+    paru_usolve(x, Num);                       // x = U\x
     paru_apply_inv_perm(Sym->Qfill, x, b, m);  // b(q) = x
 
     paru_free(m, sizeof(Int), x);
 #ifndef NTIME
     double time = PARU_OPENMP_GET_WTIME;
-    time -= start_time;  
+    time -= start_time;
     PRLEVEL(-1, ("%%solve has been finished in %lf seconds\n", time));
 #endif
     return PARU_SUCCESS;
@@ -63,13 +63,13 @@ ParU_Ret paru_solve(double *b, paru_matrix *paruMatInfo)
 
 #include "paru_internal.hpp"
 
-ParU_Ret paru_solve(double *B, Int n, paru_matrix *paruMatInfo)
+ParU_Ret paru_solve(double *B, Int n, ParU_Numeric *Num)
 {
     DEBUGLEVEL(0);
     PRLEVEL(1, ("%% mRHS inside Solve\n"));
-    ParU_Symbolic *Sym = paruMatInfo->Sym;
+    ParU_Symbolic *Sym = Num->Sym;
     Int m = Sym->m;
-    if (paruMatInfo->res == PARU_SINGULAR)
+    if (Num->res == PARU_SINGULAR)
     {
         printf("Paru: the matrix is singular; cannot be solved.\n");
         return PARU_SINGULAR;
@@ -77,27 +77,27 @@ ParU_Ret paru_solve(double *B, Int n, paru_matrix *paruMatInfo)
 #ifndef NTIME
     double start_time = PARU_OPENMP_GET_WTIME;
 #endif
-    double *X = (double *)paru_alloc(m*n, sizeof(double));
+    double *X = (double *)paru_alloc(m * n, sizeof(double));
     if (X == NULL)
     {
         printf("Paru: memory problem inside Solve\n");
         return PARU_OUT_OF_MEMORY;
     }
-    paru_memcpy(X, B, m*n * sizeof(double));
+    paru_memcpy(X, B, m * n * sizeof(double));
 
     paru_apply_perm_scale(Sym->Pfin, Sym->scale_row, B, X, m, n);
 
     PRLEVEL(1, ("%%mRHS lsolve\n"));
-    paru_lsolve(X, n, paruMatInfo);  // X = L\X
+    paru_lsolve(X, n, Num);  // X = L\X
     PRLEVEL(1, ("%%mRHS usolve\n"));
-    paru_usolve(X, n, paruMatInfo);                 // X = U\X
-    paru_apply_inv_perm(Sym->Qfill, X, B, m, n);     // B(q) = X
+    paru_usolve(X, n, Num);                       // X = U\X
+    paru_apply_inv_perm(Sym->Qfill, X, B, m, n);  // B(q) = X
 
-    paru_free(m*n, sizeof(Int), X);
+    paru_free(m * n, sizeof(Int), X);
 
 #ifndef NTIME
     double time = PARU_OPENMP_GET_WTIME;
-    time -= start_time;  
+    time -= start_time;
     PRLEVEL(-1, ("%% mRHS solve has been finished in %lf seconds\n", time));
 #endif
     return PARU_SUCCESS;

@@ -14,12 +14,12 @@
  */
 #include "paru_internal.hpp"
 
-void paru_Diag_update(Int pivcol, Int pivrow, paru_matrix *paruMatInfo)
+void paru_Diag_update(Int pivcol, Int pivrow, ParU_Numeric *Num)
 
 {
     DEBUGLEVEL(0);
-    Int *Diag_map = paruMatInfo->Diag_map;
-    Int *inv_Diag_map = paruMatInfo->inv_Diag_map;
+    Int *Diag_map = Num->Diag_map;
+    Int *inv_Diag_map = Num->inv_Diag_map;
 
     ASSERT(Diag_map);
     ASSERT(inv_Diag_map);

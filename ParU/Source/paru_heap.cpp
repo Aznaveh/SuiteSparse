@@ -9,46 +9,44 @@
 #include "paru_internal.hpp"
 
 void paru_check_prior_element(Int e, Int f, Int start_fac,
-                              std::vector<Int> &colHash,
-                              paru_matrix *paruMatInfo)
+                              std::vector<Int> &colHash, ParU_Numeric *Num)
 // check if e can be assembeld into f
 {
-    Paru_Work *Work = paruMatInfo->Work;
+    Paru_Work *Work = Num->Work;
     Int *elRow = Work->elRow;
 
-    ParU_Element **elementList = paruMatInfo->elementList;
+    ParU_Element **elementList = Num->elementList;
 
     ParU_Element *el = elementList[e];
     if (elRow[e] == 0 && el->rValid > start_fac)
     {  // all the rows are inside he current front; maybe assemble some cols
-        paru_assemble_cols(e, f, colHash, paruMatInfo);
+        paru_assemble_cols(e, f, colHash, Num);
         return;
     }
 
     //    if ( (elCol [e] == 0 && el->cValid > start_fac) ||
-    //            el->cValid == paruMatInfo->time_stamp[f])
-    if (el->rValid == start_fac || el->cValid == paruMatInfo->time_stamp[f])
+    //            el->cValid == Num->time_stamp[f])
+    if (el->rValid == start_fac || el->cValid == Num->time_stamp[f])
     {  // all the cols are inside he current front; maybe assemble some rows
-        paru_assemble_rows(e, f, colHash, paruMatInfo);
+        paru_assemble_rows(e, f, colHash, Num);
     }
 }
 
 ParU_Ret paru_make_heap(Int f, Int start_fac,
-                               std::vector<Int> &pivotal_elements,
-                               heaps_info &hi, std::vector<Int> &colHash,
-                               paru_matrix *paruMatInfo)
+                        std::vector<Int> &pivotal_elements, heaps_info &hi,
+                        std::vector<Int> &colHash, ParU_Numeric *Num)
 {
     DEBUGLEVEL(0);
     PARU_DEFINE_PRLEVEL;
 
-    ParU_Symbolic *Sym = paruMatInfo->Sym;
+    ParU_Symbolic *Sym = Num->Sym;
     Int *aChild = Sym->aChild;
     Int *aChildp = Sym->aChildp;
     Int *snM = Sym->super2atree;
-    ParU_Element **elementList = paruMatInfo->elementList;
-    // Int m = paruMatInfo-> m;
+    ParU_Element **elementList = Num->elementList;
+    // Int m = Num-> m;
 
-    std::vector<Int> **heapList = paruMatInfo->heapList;
+    std::vector<Int> **heapList = Num->heapList;
 
     Int eli = snM[f];
 
@@ -61,7 +59,7 @@ ParU_Ret paru_make_heap(Int f, Int start_fac,
     biggest_Child_size = hi.biggest_Child_size;
     tot_size = hi.sum_size;
 
-    Int *lacList = paruMatInfo->lacList;
+    Int *lacList = Num->lacList;
     auto greater = [&lacList](Int a, Int b) { return lacList[a] > lacList[b]; };
 
     PRLEVEL(PR, ("%% tot_size =  %ld\n", tot_size));
@@ -93,8 +91,7 @@ ParU_Ret paru_make_heap(Int f, Int start_fac,
                     Int e = (*chHeap)[k];
                     if (elementList[e] != NULL)
                     {
-                        paru_check_prior_element(e, f, start_fac, colHash,
-                                                 paruMatInfo);
+                        paru_check_prior_element(e, f, start_fac, colHash, Num);
                         if (elementList[e] != NULL)
                         {
                             curHeap->push_back(e);
@@ -140,8 +137,7 @@ ParU_Ret paru_make_heap(Int f, Int start_fac,
                     Int e = (*chHeap)[k];
                     if (elementList[e] != NULL)
                     {
-                        paru_check_prior_element(e, f, start_fac, colHash,
-                                                 paruMatInfo);
+                        paru_check_prior_element(e, f, start_fac, colHash, Num);
                         if (elementList[e] != NULL) curHeap->push_back(e);
                     }
                 }
@@ -161,13 +157,13 @@ ParU_Ret paru_make_heap(Int f, Int start_fac,
     else
     {
         PRLEVEL(PR, ("Nothing in the heap. size of pivotal %ld \n",
-                    pivotal_elements.size()));
-        std::vector<Int> *curHeap; 
+                     pivotal_elements.size()));
+        std::vector<Int> *curHeap;
         try
         {
             curHeap = heapList[eli] = new std::vector<Int>;
         }
-        catch (std::bad_alloc const&)
+        catch (std::bad_alloc const &)
         {  // out of memory
             return PARU_OUT_OF_MEMORY;
         }
@@ -182,7 +178,7 @@ ParU_Ret paru_make_heap(Int f, Int start_fac,
 #ifndef NDEBUG
     std::vector<Int> *curHeap = heapList[eli];
     PRLEVEL(PR, ("After everything eli %ld has %ld elements\n", eli,
-                curHeap->size()));
+                 curHeap->size()));
     PRLEVEL(PR, ("%%Heap after making it(size = %ld) \n", curHeap->size()));
     for (Int i = 0; i < (Int)curHeap->size(); i++)
     {
@@ -202,22 +198,20 @@ ParU_Ret paru_make_heap(Int f, Int start_fac,
     return PARU_SUCCESS;
 }
 
-ParU_Ret paru_make_heap_empty_el(Int f,
-                                        std::vector<Int> &pivotal_elements,
-                                        heaps_info &hi,
-                                        paru_matrix *paruMatInfo)
+ParU_Ret paru_make_heap_empty_el(Int f, std::vector<Int> &pivotal_elements,
+                                 heaps_info &hi, ParU_Numeric *Num)
 {
     DEBUGLEVEL(0);
     PARU_DEFINE_PRLEVEL;
 
-    ParU_Symbolic *Sym = paruMatInfo->Sym;
+    ParU_Symbolic *Sym = Num->Sym;
     Int *aChild = Sym->aChild;
     Int *aChildp = Sym->aChildp;
     Int *snM = Sym->super2atree;
-    ParU_Element **elementList = paruMatInfo->elementList;
-    // Int m = paruMatInfo-> m;
+    ParU_Element **elementList = Num->elementList;
+    // Int m = Num-> m;
 
-    std::vector<Int> **heapList = paruMatInfo->heapList;
+    std::vector<Int> **heapList = Num->heapList;
 
     Int eli = snM[f];
 
@@ -230,7 +224,7 @@ ParU_Ret paru_make_heap_empty_el(Int f,
     biggest_Child_size = hi.biggest_Child_size;
     tot_size = hi.sum_size;
 
-    Int *lacList = paruMatInfo->lacList;
+    Int *lacList = Num->lacList;
     auto greater = [&lacList](Int a, Int b) { return lacList[a] > lacList[b]; };
 
     PRLEVEL(PR, ("%% tot_size =  %ld\n", tot_size));
@@ -263,7 +257,7 @@ ParU_Ret paru_make_heap_empty_el(Int f,
                     if (elementList[e] != NULL)
                     {
                         // paru_check_prior_element(e, f, start_fac, colHash,
-                        //                         paruMatInfo);
+                        //                         Num);
                         if (elementList[e] != NULL)
                         {
                             curHeap->push_back(e);
@@ -323,13 +317,13 @@ ParU_Ret paru_make_heap_empty_el(Int f,
     else
     {
         PRLEVEL(PR, ("Nothing in the heap. size of pivotal %ld \n",
-                    pivotal_elements.size()));
-        std::vector<Int> *curHeap; 
+                     pivotal_elements.size()));
+        std::vector<Int> *curHeap;
         try
         {
             curHeap = heapList[eli] = new std::vector<Int>;
         }
-        catch (std::bad_alloc const&)
+        catch (std::bad_alloc const &)
         {  // out of memory
             return PARU_OUT_OF_MEMORY;
         }
@@ -343,7 +337,7 @@ ParU_Ret paru_make_heap_empty_el(Int f,
 #ifndef NDEBUG
     std::vector<Int> *curHeap = heapList[eli];
     PRLEVEL(PR, ("After everything eli %ld has %ld elements\n", eli,
-                curHeap->size()));
+                 curHeap->size()));
     PRLEVEL(PR, ("%%Heap after making it(size = %ld) \n", curHeap->size()));
     for (Int i = 0; i < (Int)curHeap->size(); i++)
     {

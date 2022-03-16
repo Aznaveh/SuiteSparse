@@ -14,7 +14,7 @@
  */
 #include "paru_internal.hpp"
 ParU_Ret paru_front(Int f,  // front need to be assembled
-                           paru_matrix *paruMatInfo)
+                    ParU_Numeric *Num)
 {
     DEBUGLEVEL(-3);
     PARU_DEFINE_PRLEVEL;
@@ -24,21 +24,21 @@ ParU_Ret paru_front(Int f,  // front need to be assembled
      *  0 Detailed
      *  > 0 Everything
      */
-    ParU_Symbolic *Sym = paruMatInfo->Sym;
+    ParU_Symbolic *Sym = Num->Sym;
     Int *Super = Sym->Super;
     /* ---------------------------------------------------------------------- */
     /* get the front F  */
     /* ---------------------------------------------------------------------- */
 
-    PRLEVEL(-2, ("%%~~~~~~~  Assemble Front %ld start ~~%.0lf~~~~~~~(%d)\n", f, 
-               Sym->stree_flop_bound[f], omp_get_thread_num() ));
+    PRLEVEL(-2, ("%%~~~~~~~  Assemble Front %ld start ~~%.0lf~~~~~~~(%d)\n", f,
+                 Sym->stree_flop_bound[f], omp_get_thread_num()));
     /* pivotal columns Super [f] ... Super [f+1]-1 */
     Int col1 = Super[f]; /* fornt F has columns col1:col2-1 */
     Int col2 = Super[f + 1];
     Int fp = col2 - col1; /* first fp columns are pivotal */
 
-    ParU_Element **elementList = paruMatInfo->elementList;
-    Paru_Work *Work = paruMatInfo->Work;
+    ParU_Element **elementList = Num->elementList;
+    Paru_Work *Work = Num->Work;
 
     PRLEVEL(1, ("%% fp=%ld pivotal columns:clo1=%ld...col2=%ld\n", fp, col1,
                 col2 - 1));
@@ -46,7 +46,7 @@ ParU_Ret paru_front(Int f,  // front need to be assembled
 
     /* computing number of rows, set union */
 
-    Int panel_width = paruMatInfo->panel_width;
+    Int panel_width = Num->panel_width;
     Int num_panels = (Int)ceil((double)fp / panel_width);
 
     // panel_row shows number of rows in each panel.
@@ -67,7 +67,7 @@ ParU_Ret paru_front(Int f,  // front need to be assembled
                f);
         return PARU_OUT_OF_MEMORY;
     }
-    paruMatInfo->frowList[f] = frowList;
+    Num->frowList[f] = frowList;
 
     std::set<Int>::iterator it;
 #ifndef NDEBUG
@@ -75,15 +75,15 @@ ParU_Ret paru_front(Int f,  // front need to be assembled
 #endif
 
     // Initializing relative index validation flag of current front
-    paru_init_rel(f, paruMatInfo);
+    paru_init_rel(f, Num);
 
 #ifndef NDEBUG
-    Int time_f = paruMatInfo->time_stamp[f];
+    Int time_f = Num->time_stamp[f];
     PRLEVEL(0, ("%% Begin of Front %ld time_f = %ld\n", f, time_f));
 #endif
 
     // Int panel_num = 0;
-    paruMatInfo->frowCount[f] = 0;
+    Num->frowCount[f] = 0;
     // Int rowCount = 0;
 
     /************ Making the heap from list of the immediate children ******/
@@ -117,8 +117,8 @@ ParU_Ret paru_front(Int f,  // front need to be assembled
                             // importiant for Exit point
     PRLEVEL(1, ("%% Next: work on pivotal column assembly\n"));
     ParU_Ret res_pivotal;
-    res_pivotal = paru_pivotal(pivotal_elements, panel_row, zero_piv_rows, f,
-                               hi, paruMatInfo);
+    res_pivotal =
+        paru_pivotal(pivotal_elements, panel_row, zero_piv_rows, f, hi, Num);
     if (res_pivotal == PARU_OUT_OF_MEMORY)
     {
         printf("Paru: out of memory making pivotal of front %ld\n", f);
@@ -126,13 +126,13 @@ ParU_Ret paru_front(Int f,  // front need to be assembled
     }
     PRLEVEL(1, ("%% Done: work on pivotal column assembly\n"));
 
-    Int rowCount = paruMatInfo->frowCount[f];
-    frowList = paruMatInfo->frowList[f];
+    Int rowCount = Num->frowCount[f];
+    frowList = Num->frowList[f];
 
 #ifndef NDEBUG /* chekcing first part of Work to be zero */
     Int *rowMarkp = Work->rowMark;
     Int rowMark = rowMarkp[eli];
-    Int m = paruMatInfo->m;
+    Int m = Num->m;
 
     PRLEVEL(1, ("%% rowMark=%ld;\n", rowMark));
     for (Int i = 0; i < m; i++)
@@ -143,7 +143,7 @@ ParU_Ret paru_front(Int f,  // front need to be assembled
     }
 #endif
 
-    ParU_Factors *LUs = paruMatInfo->partial_LUs;
+    ParU_Factors *LUs = Num->partial_LUs;
     double *pivotalFront = LUs[f].p;
     LUs[f].m = rowCount;
     LUs[f].n = fp;
@@ -161,29 +161,29 @@ ParU_Ret paru_front(Int f,  // front need to be assembled
 #endif
 
     // provide paru_alloc as the allocator
-    Int fn = Sym->Cm[f];    /* Upper bound number of cols of F */
+    Int fn = Sym->Cm[f];      /* Upper bound number of cols of F */
     std::set<Int> stl_colSet; /* used in this scope */
 
     if (rowCount < fp)
     {
         // PRLEVEL(1, ("%% %ldx%ld \n", rowCount, fp));
         PRLEVEL(1, ("%% Structural Problem\n"));
-        printf("Paru: singular, structural problem on %ld: %ldx%ld\n", 
-                f, rowCount, fp);
+        printf("Paru: singular, structural problem on %ld: %ldx%ld\n", f,
+               rowCount, fp);
         #pragma omp atomic write
-        paruMatInfo->res = PARU_SINGULAR;
+        Num->res = PARU_SINGULAR;
         return PARU_SINGULAR;
     }
 
-    Int start_fac = paruMatInfo->time_stamp[f];
+    Int start_fac = Num->time_stamp[f];
     PRLEVEL(1, ("%% start_fac= %ld\n", start_fac));
 
     Int fac = paru_factorize_full_summed(f, start_fac, panel_row, stl_colSet,
-                                         pivotal_elements, paruMatInfo);
-    ++paruMatInfo->time_stamp[f];
+                                         pivotal_elements, Num);
+    ++Num->time_stamp[f];
 
 #ifndef NDEBUG
-    time_f = paruMatInfo->time_stamp[f];
+    time_f = Num->time_stamp[f];
     PRLEVEL(1, ("%%After factorization time_f = %ld\n", time_f));
 #endif
 
@@ -268,9 +268,9 @@ ParU_Ret paru_front(Int f,  // front need to be assembled
         }
     }
 
-    paruMatInfo->fcolList[f] = fcolList;
+    Num->fcolList[f] = fcolList;
 
-    std::vector<Int> **heapList = paruMatInfo->heapList;
+    std::vector<Int> **heapList = Num->heapList;
     std::vector<Int> *curHeap = heapList[eli];
 
     // EXIT point HERE
@@ -280,15 +280,14 @@ ParU_Ret paru_front(Int f,  // front need to be assembled
         {
             // make the heap and return
             PRLEVEL(-2, ("%%~~~~~~~Assemble Front %ld finished~~~1\n", f));
-            return paru_make_heap_empty_el(f, pivotal_elements, hi,
-                                           paruMatInfo);
+            return paru_make_heap_empty_el(f, pivotal_elements, hi, Num);
         }
         else
         {
-            paruMatInfo->fcolCount[f] = 0;
+            Num->fcolCount[f] = 0;
             PRLEVEL(1, ("%%Heap freed inside front %p id=%ld\n", curHeap, eli));
             delete curHeap;
-            paruMatInfo->heapList[eli] = nullptr;
+            Num->heapList[eli] = nullptr;
             PRLEVEL(1, ("%% pivotalFront =%p\n", pivotalFront));
             PRLEVEL(-2, ("%%~~~~~~~Assemble Front %ld finished~~~2\n", f));
             return PARU_SUCCESS;
@@ -355,17 +354,17 @@ ParU_Ret paru_front(Int f,  // front need to be assembled
     PRLEVEL(PR, ("%% uPart = %p size=%ld", uPart, colCount * fp));
 #endif
 
-    ParU_Factors *Us = paruMatInfo->partial_Us;
+    ParU_Factors *Us = Num->partial_Us;
     Us[f].m = fp;
     Us[f].n = colCount;
-    paruMatInfo->fcolCount[f] = colCount;
+    Num->fcolCount[f] = colCount;
     ASSERT(Us[f].p == NULL);
     Us[f].p = uPart;
 
-    ParU_TupleList *RowList = paruMatInfo->RowList;
+    ParU_TupleList *RowList = Num->RowList;
 
-    //Int *Depth = Sym->Depth;
-    //**//pragma omp parallel 
+    // Int *Depth = Sym->Depth;
+    //**//pragma omp parallel
     //**//pragma omp single nowait
     //**//pragma omp taskgroup
     for (Int i = 0; i < fp; i++)
@@ -406,7 +405,7 @@ ParU_Ret paru_front(Int f,  // front need to be assembled
 
             //**//pragma omp task priority(Depth[f]) if(mEl > 1024)
             paru_assemble_row_2U(e, f, curRowIndex, curFsRowIndex, colHash,
-                                 paruMatInfo);
+                                 Num);
             //**//pragma omp taskwait
 
             // FLIP(el_rowIndex[curRowIndex]); //marking row assembled
@@ -437,7 +436,7 @@ ParU_Ret paru_front(Int f,  // front need to be assembled
 
     /**** 6 ****                     TRSM and DGEMM                         ***/
 
-    paru_trsm(f, pivotalFront, uPart, fp, rowCount, colCount, paruMatInfo);
+    paru_trsm(f, pivotalFront, uPart, fp, rowCount, colCount, Num);
 
 #ifndef NDEBUG  // Printing the  U part
     PR = -1;
@@ -490,15 +489,14 @@ ParU_Ret paru_front(Int f,  // front need to be assembled
         {
             // keep the heap and do it for the parent.
             PRLEVEL(-2, ("%%~~~~~~~Assemble Front %ld finished~~~3\n", f));
-            return paru_make_heap_empty_el(f, pivotal_elements, hi,
-                                           paruMatInfo);
+            return paru_make_heap_empty_el(f, pivotal_elements, hi, Num);
             // There are stuff left from in zero
             // then return
         }
         else
         {
             delete curHeap;
-            paruMatInfo->heapList[eli] = nullptr;
+            Num->heapList[eli] = nullptr;
             PRLEVEL(1,
                     ("%%(2)Heap freed inside front %p id=%ld\n", curHeap, eli));
             PRLEVEL(1, ("%% pivotalFront =%p\n", pivotalFront));
@@ -511,7 +509,7 @@ ParU_Ret paru_front(Int f,  // front need to be assembled
     // Int *el_colIndex = colIndex_pointer (curEl);
     Int *el_colIndex = (Int *)(curEl + 1);
     curEl->lac = 0;
-    Int *lacList = paruMatInfo->lacList;
+    Int *lacList = Num->lacList;
     lacList[eli] = fcolList[0];
     for (Int i = 0; i < colCount; ++i) el_colIndex[i] = fcolList[i];
     Int *el_rowIndex = rowIndex_pointer(curEl);
@@ -532,8 +530,7 @@ ParU_Ret paru_front(Int f,  // front need to be assembled
     double *el_numbers =
         (double *)((Int *)(curEl + 1) + 2 * colCount + 2 * (rowCount - fp));
 
-    paru_dgemm(f, pivotalFront, uPart, el_numbers, 
-            fp, rowCount, colCount, paruMatInfo);
+    paru_dgemm(f, pivotalFront, uPart, el_numbers, fp, rowCount, colCount, Num);
     // printf ("%ld %ld %ld ",rowCount-fp, colCount, fp);
     // printf ("%ld %ld %ld \n",rowCount, fp, rowCount-fp);
 
@@ -545,12 +542,12 @@ ParU_Ret paru_front(Int f,  // front need to be assembled
             {
                 if (uPart[fp * jj + ii] != 0 &&
                         pivotalFront[rowCount * ii + kk] != 0)
-                    paruMatInfo->flp_cnt_real_dgemm += 2.0;
+                    Num->flp_cnt_real_dgemm += 2.0;
             }
 #endif
 
     PRLEVEL(PR, ("\n%% FlopCount Dgemm front %ld %ld %ld \n", rowCount - fp, fp,
-                colCount));
+                 colCount));
     PRLEVEL(PR, ("%ld %ld %ld \n", rowCount - fp, fp, colCount));
 #endif
 
@@ -558,16 +555,16 @@ ParU_Ret paru_front(Int f,  // front need to be assembled
     // Printing the contribution block after dgemm
     PR = 1;
     PRLEVEL(PR, ("\n%%After DGEMM:"));
-    if (PR <= 0) paru_print_element(paruMatInfo, eli);
+    if (PR <= 0) paru_print_element(Num, eli);
 #endif
 
     /**** 7 **** Count number of rows and columsn of prior CBs to asslemble ***/
 
-    // paruMatInfo->time_stamp[f]++; //invalidating all the marks
+    // Num->time_stamp[f]++; //invalidating all the marks
     PRLEVEL(-1, ("\n%%||||  Start Finalize %ld ||||\n", f));
     ParU_Ret res_prior;
-    res_prior = paru_prior_assemble(f, start_fac, pivotal_elements, colHash, hi,
-                        paruMatInfo);
+    res_prior =
+        paru_prior_assemble(f, start_fac, pivotal_elements, colHash, hi, Num);
     if (res_prior != PARU_SUCCESS) return res_prior;
     PRLEVEL(-1, ("\n%%||||  Finish Finalize %ld ||||\n", f));
 

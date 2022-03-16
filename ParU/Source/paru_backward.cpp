@@ -13,12 +13,12 @@
 
 #include "paru_internal.hpp"
 
-ParU_Ret paru_backward (double *x1, double &resid, double &norm,
-        cholmod_sparse *A, paru_matrix *paruMatInfo)
+ParU_Ret paru_backward(double *x1, double &resid, double &norm,
+                       cholmod_sparse *A, ParU_Numeric *Num)
 {
     DEBUGLEVEL(0);
     PRLEVEL(1, ("%% inside backward\n"));
-    ParU_Symbolic *Sym = paruMatInfo->Sym;
+    ParU_Symbolic *Sym = Num->Sym;
     Int m = Sym->m;
 #ifndef NDEBUG
     Int PR = 1;
@@ -46,7 +46,7 @@ ParU_Ret paru_backward (double *x1, double &resid, double &norm,
 #endif
 
     ParU_Ret info;
-    info = paru_solve(b, paruMatInfo);
+    info = paru_solve(b, Num);
     if (info != PARU_SUCCESS)
     {
         PRLEVEL(1, ("%% A problem happend during factorization\n"));
@@ -70,8 +70,9 @@ ParU_Ret paru_backward (double *x1, double &resid, double &norm,
     //                resid == 0 ? 0 : log10(resid),
     //                resid == 0 ? 0 :log10(norm)));
     //
-    printf("backward error is |%.2lf| and weigheted backward error is |%.2f|.\n"
-            , resid == 0 ? 0 : log10(resid), resid == 0 ? 0 : log10(norm));
+    printf(
+        "backward error is |%.2lf| and weigheted backward error is |%.2f|.\n",
+        resid == 0 ? 0 : log10(resid), resid == 0 ? 0 : log10(norm));
 
     paru_free(m, sizeof(Int), b);
     return PARU_SUCCESS;

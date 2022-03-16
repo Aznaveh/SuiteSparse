@@ -12,24 +12,24 @@
 #include "paru_internal.hpp"
 
 void paru_assemble_row_2U(Int e, Int f, Int sR, Int dR,
-                          std::vector<Int> &colHash, paru_matrix *paruMatInfo)
+                          std::vector<Int> &colHash, ParU_Numeric *Num)
 {
     DEBUGLEVEL(0);
 
-    ParU_Element **elementList = paruMatInfo->elementList;
+    ParU_Element **elementList = Num->elementList;
     ParU_Element *el = elementList[e];
 
-    if (el->cValid != paruMatInfo->time_stamp[f])
+    if (el->cValid != Num->time_stamp[f])
         // if not updatated
-        paru_update_rel_ind_col(e, f, colHash, paruMatInfo);
+        paru_update_rel_ind_col(e, f, colHash, Num);
 
-    ParU_Factors *Us = paruMatInfo->partial_Us;
+    ParU_Factors *Us = Num->partial_Us;
     double *uPart = Us[f].p;  // uPart
 
     Int nEl = el->ncols;
     Int mEl = el->nrows;
 
-    ParU_Factors *LUs = paruMatInfo->partial_LUs;
+    ParU_Factors *LUs = Num->partial_LUs;
     Int fp = LUs[f].n;
 
     // Int *el_colIndex = colIndex_pointer (curEl);

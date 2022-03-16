@@ -6,17 +6,17 @@
  *          this time is checking for validation or invalidation of elements
  *
  *
- * @param paruMatInfo: pointer to matrix info
+ * @param Num: pointer to matrix info
  *        f: front that is going to be initialized;
  *
  * @author Aznaveh
  */
 #include "paru_internal.hpp"
-void paru_init_rel(Int f, paru_matrix *paruMatInfo)
+void paru_init_rel(Int f, ParU_Numeric *Num)
 {
     DEBUGLEVEL(0);
-    ParU_Symbolic *Sym = paruMatInfo->Sym;
-    Int *time_stamp = paruMatInfo->time_stamp;
+    ParU_Symbolic *Sym = Num->Sym;
+    Int *time_stamp = Num->time_stamp;
 
     Int *Child = Sym->Child;
     Int *Childp = Sym->Childp;
