@@ -10,7 +10,7 @@ void paru_write(paru_matrix *paruMatInfo, int scale, char *id)
 {
     DEBUGLEVEL(0);
     PRLEVEL(1, ("%% Start Writing\n"));
-    ParU_symbolic *Sym = paruMatInfo->Sym;
+    ParU_Symbolic *Sym = paruMatInfo->Sym;
     Int nf = Sym->nf;
 
     Int m = Sym->m;

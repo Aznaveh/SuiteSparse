@@ -204,18 +204,18 @@ Int paru_cumsum(Int n, Int *X);
 Int bin_srch_col(Int *srt_lst, Int l, Int r, Int num);
 Int bin_srch(Int *srt_lst, Int l, Int r, Int num);
 
-ParU_Res paru_init_rowFronts(paru_matrix **paruMatInfo_handle,
-                                    cholmod_sparse *A, ParU_symbolic *Sym);
-ParU_Res paru_front(Int f, paru_matrix *paruMatInfo);
+ParU_Ret paru_init_rowFronts(paru_matrix **paruMatInfo_handle,
+                                    cholmod_sparse *A, ParU_Symbolic *Sym);
+ParU_Ret paru_front(Int f, paru_matrix *paruMatInfo);
 
-ParU_Res paru_pivotal(std::vector<Int> &pivotal_elements,
+ParU_Ret paru_pivotal(std::vector<Int> &pivotal_elements,
                              std::vector<Int> &panel_row, Int &zero_piv_rows,
                              Int f, heaps_info &hi, paru_matrix *paruMatInfo);
 
 int paru_intersection(Int e, ParU_Element **elementList,
                       std::set<Int> &stl_colSet);
 
-ParU_Res paru_prior_assemble(Int f, Int start_fac,
+ParU_Ret paru_prior_assemble(Int f, Int start_fac,
                                     std::vector<Int> &pivotal_elements,
                                     std::vector<Int> &colHash, heaps_info &hi,
                                     paru_matrix *paruMatInfo);
@@ -235,12 +235,12 @@ void paru_assemble_el_with0rows(Int e, Int f, std::vector<Int> &colHash,
 void paru_full_summed(Int e, Int f, paru_matrix *paruMatInfo);
 
 // heap related
-ParU_Res paru_make_heap(Int f, Int start_fac,
+ParU_Ret paru_make_heap(Int f, Int start_fac,
                                std::vector<Int> &pivotal_elements,
                                heaps_info &hi, std::vector<Int> &colHash,
                                paru_matrix *paruMatInfo);
 
-ParU_Res paru_make_heap_empty_el(Int f,
+ParU_Ret paru_make_heap_empty_el(Int f,
                                         std::vector<Int> &pivotal_elements,
                                         heaps_info &hi,
                                         paru_matrix *paruMatInfo);
@@ -250,7 +250,7 @@ void paru_insert_hash(Int key, Int value, std::vector<Int> &colHash);
 Int paru_find_hash(Int key, std::vector<Int> &colHash, Int *fcolList);
 
 // permutation stuff for the solver
-ParU_Res paru_perm(paru_matrix *paruMatInfo);
+ParU_Ret paru_perm(paru_matrix *paruMatInfo);
 Int paru_apply_inv_perm(const Int *P, const double *b, double *x, Int m);
 Int paru_apply_inv_perm(const Int *P, const double *b, double *x, Int m, Int n);
 Int paru_apply_perm_scale(const Int *P, const double *s, const double *b,

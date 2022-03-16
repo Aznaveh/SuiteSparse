@@ -35,7 +35,7 @@ void paru_full_summed(Int e, Int f, paru_matrix *paruMatInfo)
 {
     DEBUGLEVEL(0);
     PARU_DEFINE_PRLEVEL;
-    ParU_symbolic *Sym = paruMatInfo->Sym;
+    ParU_Symbolic *Sym = paruMatInfo->Sym;
 #ifndef NDEBUG
     Int *snM = Sym->super2atree;
     Int eli = snM[f];

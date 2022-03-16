@@ -13,12 +13,12 @@
  */
 #include "paru_internal.hpp"
 
-ParU_Res paru_init_rowFronts(
+ParU_Ret paru_init_rowFronts(
     paru_matrix **paruMatInfo_handle,  // in/out
                                        // inputs, not modified
     cholmod_sparse *A,
     // symbolic analysis
-    ParU_symbolic *Sym)
+    ParU_Symbolic *Sym)
 {
     //mallopt(M_TRIM_THRESHOLD, -1);         // disable sbrk trimming
     //mallopt(M_TOP_PAD, 16 * 1024 * 1024);  // increase padding to speedup malloc
@@ -238,7 +238,7 @@ ParU_Res paru_init_rowFronts(
     // Activating comments after this parts will break the matlab input matrix
     // allocating row tuples, elements and updating column tuples
 
-    ParU_Res info;
+    ParU_Ret info;
     Int out_of_memory = 0;
     #pragma omp taskloop default(none) \
     shared(out_of_memory, Sym, Sp, row_degree_bound, elementList, m, \

@@ -10,11 +10,11 @@
  */
 #include "paru_internal.hpp"
 
-ParU_Res paru_exec_tasks_seq(Int t, Int *task_num_child,
+ParU_Ret paru_exec_tasks_seq(Int t, Int *task_num_child,
                                 paru_matrix *paruMatInfo)
 {
     DEBUGLEVEL(0);
-    ParU_symbolic *Sym = paruMatInfo->Sym;
+    ParU_Symbolic *Sym = paruMatInfo->Sym;
     Int *task_parent = Sym->task_parent;
     Int daddy = task_parent[t];
     Int *task_map = Sym->task_map;
@@ -23,7 +23,7 @@ ParU_Res paru_exec_tasks_seq(Int t, Int *task_num_child,
     if (daddy != -1) num_original_children = Sym->task_num_child[daddy];
     PRLEVEL(1, ("Seq: executing task %ld fronts %ld-%ld (%ld children)\n", t,
                 task_map[t] + 1, task_map[t + 1], num_original_children));
-    ParU_Res myInfo;
+    ParU_Ret myInfo;
 #ifndef NTIME
     double start_time = PARU_OPENMP_GET_WTIME;
 #endif
@@ -77,11 +77,11 @@ ParU_Res paru_exec_tasks_seq(Int t, Int *task_num_child,
     return myInfo;
 }
 
-ParU_Res paru_exec_tasks (Int t, Int *task_num_child, Int &chain_task,
+ParU_Ret paru_exec_tasks (Int t, Int *task_num_child, Int &chain_task,
                                 paru_matrix *paruMatInfo)
 {
     DEBUGLEVEL(0);
-    ParU_symbolic *Sym = paruMatInfo->Sym;
+    ParU_Symbolic *Sym = paruMatInfo->Sym;
     Int *task_parent = Sym->task_parent;
     Int daddy = task_parent[t];
     Int *task_map = Sym->task_map;
@@ -90,7 +90,7 @@ ParU_Res paru_exec_tasks (Int t, Int *task_num_child, Int &chain_task,
     if (daddy != -1) num_original_children = Sym->task_num_child[daddy];
     PRLEVEL(1, ("executing task %ld fronts %ld-%ld (%ld children)\n", t,
                 task_map[t] + 1, task_map[t + 1], num_original_children));
-    ParU_Res myInfo;
+    ParU_Ret myInfo;
 #ifndef NTIME
     double start_time = PARU_OPENMP_GET_WTIME;
 #endif
@@ -170,7 +170,7 @@ ParU_Res paru_exec_tasks (Int t, Int *task_num_child, Int &chain_task,
     }
     return myInfo;
 }
-ParU_Res paru_factorize(cholmod_sparse *A, ParU_symbolic *Sym,
+ParU_Ret paru_factorize(cholmod_sparse *A, ParU_Symbolic *Sym,
         paru_matrix **paruMatInfo_handle)
 {
     DEBUGLEVEL(0);
@@ -197,7 +197,7 @@ ParU_Res paru_factorize(cholmod_sparse *A, ParU_symbolic *Sym,
     paru_matrix *paruMatInfo;
     paruMatInfo = *paruMatInfo_handle;
 
-    ParU_Res info;
+    ParU_Ret info;
     info = paru_init_rowFronts(&paruMatInfo, A, Sym);
     *paruMatInfo_handle = paruMatInfo;
 
@@ -306,7 +306,7 @@ ParU_Res paru_factorize(cholmod_sparse *A, ParU_symbolic *Sym,
                     #pragma omp atomic update
                     paruMatInfo->naft++;
 
-                    ParU_Res myInfo =
+                    ParU_Ret myInfo =
                         // paru_exec_tasks(t, &task_num_child[0], paruMatInfo);
                         paru_exec_tasks(t, task_num_child, chain_task, 
                                 paruMatInfo);

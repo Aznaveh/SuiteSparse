@@ -12,7 +12,7 @@ int main(int argc, char **argv)
 {
     cholmod_common Common, *cc;
     cholmod_sparse *A;
-    ParU_symbolic *Sym = NULL;
+    ParU_Symbolic *Sym = NULL;
 
     //~~~~~~~~~Reading the input matrix and test if the format is OK~~~~~~~~~~~~
     // start CHOLMOD
@@ -46,7 +46,7 @@ int main(int argc, char **argv)
 
     double my_start_time = omp_get_wtime();
 
-    ParU_Res info;
+    ParU_Ret info;
 
     info = paru_analyze(A, &Sym);
     if (info != PARU_SUCCESS)

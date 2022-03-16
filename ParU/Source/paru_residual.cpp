@@ -11,12 +11,12 @@
 
 #include "paru_internal.hpp"
 
-ParU_Res paru_residual(double *b, double &resid, double &norm,        
+ParU_Ret paru_residual(double *b, double &resid, double &norm,        
         cholmod_sparse *A, paru_matrix *paruMatInfo)
 {
     DEBUGLEVEL(0);
     PRLEVEL(1, ("%% inside residual\n"));
-    ParU_symbolic *Sym = paruMatInfo->Sym;
+    ParU_Symbolic *Sym = paruMatInfo->Sym;
     Int m = Sym->m;
 #ifndef NDEBUG
     Int PR = 1;
@@ -44,7 +44,7 @@ ParU_Res paru_residual(double *b, double &resid, double &norm,
     PRLEVEL(1, (" \n"));
 #endif
 
-    ParU_Res info;
+    ParU_Ret info;
     info = paru_solve(x, paruMatInfo);
     if (info != PARU_SUCCESS)
     {
@@ -82,7 +82,7 @@ ParU_Res paru_residual(double *b, double &resid, double &norm,
  *
  * @author Aznaveh  for testing now
  * */
-ParU_Res paru_residual(cholmod_sparse *A, paru_matrix *paruMatInfo,
+ParU_Ret paru_residual(cholmod_sparse *A, paru_matrix *paruMatInfo,
                               double *B,
                               double *Results, Int n)  // output
                                                 //  0 residual
@@ -91,7 +91,7 @@ ParU_Res paru_residual(cholmod_sparse *A, paru_matrix *paruMatInfo,
 {
     DEBUGLEVEL(0);
     PRLEVEL(1, ("%% mRHS inside residual\n"));
-    ParU_symbolic *Sym = paruMatInfo->Sym;
+    ParU_Symbolic *Sym = paruMatInfo->Sym;
     Int m = Sym->m;
 #ifndef NDEBUG
     Int PR = 1;
@@ -131,7 +131,7 @@ ParU_Res paru_residual(cholmod_sparse *A, paru_matrix *paruMatInfo,
     PRLEVEL(1, (" \n"));
 #endif
 
-    ParU_Res info;
+    ParU_Ret info;
     info = paru_solve(X, n, paruMatInfo);
     if (info != PARU_SUCCESS)
     {

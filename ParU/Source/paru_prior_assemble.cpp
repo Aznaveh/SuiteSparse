@@ -8,7 +8,7 @@
 
 #include "paru_internal.hpp"
 
-ParU_Res paru_prior_assemble(Int f, Int start_fac,
+ParU_Ret paru_prior_assemble(Int f, Int start_fac,
                                     std::vector<Int> &pivotal_elements,
                                     std::vector<Int> &colHash, heaps_info &hi,
                                     paru_matrix *paruMatInfo)
@@ -20,7 +20,7 @@ ParU_Res paru_prior_assemble(Int f, Int start_fac,
     Int *elCol = Work->elCol;
 
     ParU_Element **elementList = paruMatInfo->elementList;
-    ParU_symbolic *Sym = paruMatInfo->Sym;
+    ParU_Symbolic *Sym = paruMatInfo->Sym;
     Int *snM = Sym->super2atree;
 
     Int pMark = start_fac;
@@ -118,7 +118,7 @@ ParU_Res paru_prior_assemble(Int f, Int start_fac,
     /************ Making the heap from list of the immediate children
      * ******/
     PRLEVEL(1, ("%% Next: work on the heap \n"));
-    ParU_Res res_make_heap;
+    ParU_Ret res_make_heap;
     res_make_heap = paru_make_heap(f, start_fac, pivotal_elements, hi, colHash,
                                    paruMatInfo);
     if (res_make_heap != PARU_SUCCESS) return res_make_heap;

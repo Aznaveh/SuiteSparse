@@ -13,12 +13,12 @@
 
 #include "paru_internal.hpp"
 
-ParU_Res paru_backward (double *x1, double &resid, double &norm,
+ParU_Ret paru_backward (double *x1, double &resid, double &norm,
         cholmod_sparse *A, paru_matrix *paruMatInfo)
 {
     DEBUGLEVEL(0);
     PRLEVEL(1, ("%% inside backward\n"));
-    ParU_symbolic *Sym = paruMatInfo->Sym;
+    ParU_Symbolic *Sym = paruMatInfo->Sym;
     Int m = Sym->m;
 #ifndef NDEBUG
     Int PR = 1;
@@ -45,7 +45,7 @@ ParU_Res paru_backward (double *x1, double &resid, double &norm,
     PRLEVEL(1, (" \n"));
 #endif
 
-    ParU_Res info;
+    ParU_Ret info;
     info = paru_solve(b, paruMatInfo);
     if (info != PARU_SUCCESS)
     {

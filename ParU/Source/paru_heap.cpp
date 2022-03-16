@@ -33,7 +33,7 @@ void paru_check_prior_element(Int e, Int f, Int start_fac,
     }
 }
 
-ParU_Res paru_make_heap(Int f, Int start_fac,
+ParU_Ret paru_make_heap(Int f, Int start_fac,
                                std::vector<Int> &pivotal_elements,
                                heaps_info &hi, std::vector<Int> &colHash,
                                paru_matrix *paruMatInfo)
@@ -41,7 +41,7 @@ ParU_Res paru_make_heap(Int f, Int start_fac,
     DEBUGLEVEL(0);
     PARU_DEFINE_PRLEVEL;
 
-    ParU_symbolic *Sym = paruMatInfo->Sym;
+    ParU_Symbolic *Sym = paruMatInfo->Sym;
     Int *aChild = Sym->aChild;
     Int *aChildp = Sym->aChildp;
     Int *snM = Sym->super2atree;
@@ -202,7 +202,7 @@ ParU_Res paru_make_heap(Int f, Int start_fac,
     return PARU_SUCCESS;
 }
 
-ParU_Res paru_make_heap_empty_el(Int f,
+ParU_Ret paru_make_heap_empty_el(Int f,
                                         std::vector<Int> &pivotal_elements,
                                         heaps_info &hi,
                                         paru_matrix *paruMatInfo)
@@ -210,7 +210,7 @@ ParU_Res paru_make_heap_empty_el(Int f,
     DEBUGLEVEL(0);
     PARU_DEFINE_PRLEVEL;
 
-    ParU_symbolic *Sym = paruMatInfo->Sym;
+    ParU_Symbolic *Sym = paruMatInfo->Sym;
     Int *aChild = Sym->aChild;
     Int *aChildp = Sym->aChildp;
     Int *snM = Sym->super2atree;

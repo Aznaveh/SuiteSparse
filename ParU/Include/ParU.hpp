@@ -54,7 +54,7 @@ extern "C"
 #define PARU_STRATEGY_SYMMETRIC 3    // prefer diagonal
 
 // =============================================================================
-// === ParU_symbolic ===========================================================
+// === ParU_Symbolic ===========================================================
 // =============================================================================
 //
 // The contents of this object do not change during numeric factorization.  The
@@ -92,7 +92,7 @@ struct ParU_L_singleton
     double *Slx; 
 };
 
-struct ParU_symbolic
+struct ParU_Symbolic
 { 
     // -------------------------------------------------------------------------
     // row-form of the input matrix and its permutations
@@ -315,7 +315,7 @@ struct ParU_Factors
     double *p; //  point to factorized parts
 };
 
-enum ParU_Res
+enum ParU_Ret
 {
     PARU_SUCCESS,
     PARU_OUT_OF_MEMORY,
@@ -326,7 +326,7 @@ enum ParU_Res
 typedef struct
 {             /*Matrix */
     Int m, n; /* size of the sumbatrix that is factorized */
-    ParU_symbolic *Sym;
+    ParU_Symbolic *Sym;
     ParU_TupleList *RowList; /* size n of dynamic list */
 
     ParU_Element **elementList; /* pointers to all elements, size = m+nf+1 */
@@ -390,7 +390,7 @@ typedef struct
     Int paru_max_threads; //I want to call omp_get_max_threads just once
                          // or user can give me a value less than that
 
-    ParU_Res res;
+    ParU_Ret res;
 
 } paru_matrix;
 
@@ -406,21 +406,21 @@ info: an enum: PARU_SUCCESS, PARU_OUT_OF_MEMORY, PARU_INVALID, PARU_SINGULAR,
 */
 
 // a routine that does init_row and also factorization
-ParU_Res paru_analyze(cholmod_sparse *A, ParU_symbolic **Sym_handle);
-ParU_Res paru_factorize(cholmod_sparse *A, ParU_symbolic *Sym,
+ParU_Ret paru_analyze(cholmod_sparse *A, ParU_Symbolic **Sym_handle);
+ParU_Ret paru_factorize(cholmod_sparse *A, ParU_Symbolic *Sym,
                                paru_matrix **paruMatInfo_handle);
-ParU_Res paru_solve(double *b, paru_matrix *paruMatInfo);
-ParU_Res paru_solve(double *B, Int n, paru_matrix *paruMatInfo);
+ParU_Ret paru_solve(double *b, paru_matrix *paruMatInfo);
+ParU_Ret paru_solve(double *B, Int n, paru_matrix *paruMatInfo);
 
-ParU_Res paru_freesym(ParU_symbolic **Sym_handle);
-ParU_Res paru_freemat(paru_matrix **paruMatInfo_handle);
+ParU_Ret paru_freesym(ParU_Symbolic **Sym_handle);
+ParU_Ret paru_freemat(paru_matrix **paruMatInfo_handle);
 
-ParU_Res paru_residual(double *b, double &resid, double &norm,
+ParU_Ret paru_residual(double *b, double &resid, double &norm,
         cholmod_sparse *A, paru_matrix *paruMatInfo);
                               
-ParU_Res paru_residual(cholmod_sparse *A, paru_matrix *paruMatInfo,
+ParU_Ret paru_residual(cholmod_sparse *A, paru_matrix *paruMatInfo,
                               double *b, double *Results, Int n);
 
-ParU_Res paru_backward (double *x1, double &resid, double &norm,
+ParU_Ret paru_backward (double *x1, double &resid, double &norm,
         cholmod_sparse *A, paru_matrix *paruMatInfo);
 #endif

@@ -10,11 +10,11 @@
 
 #include "paru_internal.hpp"
 
-ParU_Res paru_solve(double *b, paru_matrix *paruMatInfo)
+ParU_Ret paru_solve(double *b, paru_matrix *paruMatInfo)
 {
     DEBUGLEVEL(0);
     PRLEVEL(1, ("%% inside solve\n"));
-    ParU_symbolic *Sym = paruMatInfo->Sym;
+    ParU_Symbolic *Sym = paruMatInfo->Sym;
     Int m = Sym->m;
     if (paruMatInfo->res == PARU_SINGULAR)
     {
@@ -63,11 +63,11 @@ ParU_Res paru_solve(double *b, paru_matrix *paruMatInfo)
 
 #include "paru_internal.hpp"
 
-ParU_Res paru_solve(double *B, Int n, paru_matrix *paruMatInfo)
+ParU_Ret paru_solve(double *B, Int n, paru_matrix *paruMatInfo)
 {
     DEBUGLEVEL(0);
     PRLEVEL(1, ("%% mRHS inside Solve\n"));
-    ParU_symbolic *Sym = paruMatInfo->Sym;
+    ParU_Symbolic *Sym = paruMatInfo->Sym;
     Int m = Sym->m;
     if (paruMatInfo->res == PARU_SINGULAR)
     {

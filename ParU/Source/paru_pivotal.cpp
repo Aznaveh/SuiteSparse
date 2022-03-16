@@ -12,13 +12,13 @@
  */
 #include "paru_internal.hpp"
 
-ParU_Res paru_pivotal(std::vector<Int> &pivotal_elements,
+ParU_Ret paru_pivotal(std::vector<Int> &pivotal_elements,
                              std::vector<Int> &panel_row, Int &zero_piv_rows,
                              Int f, heaps_info &hi, paru_matrix *paruMatInfo)
 {
     DEBUGLEVEL(0);
     PARU_DEFINE_PRLEVEL;
-    ParU_symbolic *Sym = paruMatInfo->Sym;
+    ParU_Symbolic *Sym = paruMatInfo->Sym;
     Int *snM = Sym->super2atree;
     std::vector<Int> **heapList = paruMatInfo->heapList;
     Int eli = snM[f];
