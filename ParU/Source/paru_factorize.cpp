@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////////////////////
-//////////////////////////  paru_factorize /////////////////////////////////////
+//////////////////////////  ParU_Factorize /////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 /*! @brief    get a matrix and factorize it
  *      specify the order of eliminating fronts
@@ -166,7 +166,7 @@ ParU_Ret paru_exec_tasks(Int t, Int *task_num_child, Int &chain_task,
     }
     return myInfo;
 }
-ParU_Ret paru_factorize(cholmod_sparse *A, ParU_Symbolic *Sym,
+ParU_Ret ParU_Factorize(cholmod_sparse *A, ParU_Symbolic *Sym,
                         ParU_Numeric **Num_handle, ParU_Control Control)
 {
     DEBUGLEVEL(0);
@@ -194,7 +194,9 @@ ParU_Ret paru_factorize(cholmod_sparse *A, ParU_Symbolic *Sym,
     Num = *Num_handle;
 
     ParU_Ret info;
-    info = paru_init_rowFronts(&Num, A, Sym, Control);
+    // XXX populate my_Control with tested values of Control
+    ParU_Control my_Control = Control;
+    info = paru_init_rowFronts(&Num, A, Sym, my_Control);
     *Num_handle = Num;
 
     PRLEVEL(1, ("%% init_row is done\n"));

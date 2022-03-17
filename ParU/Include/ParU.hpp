@@ -406,24 +406,24 @@ info: an enum: PARU_SUCCESS, PARU_OUT_OF_MEMORY, PARU_INVALID, PARU_SINGULAR,
 */
 
 // a routine that does init_row and also factorization
-ParU_Ret paru_analyze(cholmod_sparse *A, ParU_Symbolic **Sym_handle,
+ParU_Ret ParU_Analyze(cholmod_sparse *A, ParU_Symbolic **Sym_handle,
                       ParU_Control Control);
-ParU_Ret paru_factorize(cholmod_sparse *A, ParU_Symbolic *Sym,
+ParU_Ret ParU_Factorize(cholmod_sparse *A, ParU_Symbolic *Sym,
                         ParU_Numeric **Num_handle, ParU_Control Control);
-ParU_Ret paru_solve(double *b, ParU_Numeric *Num, ParU_Control Control);
-ParU_Ret paru_solve(double *B, Int n, ParU_Numeric *Num, ParU_Control Control);
+ParU_Ret ParU_Solve(double *b, ParU_Numeric *Num, ParU_Control Control);
+ParU_Ret ParU_Solve(double *B, Int n, ParU_Numeric *Num, ParU_Control Control);
 
-ParU_Ret paru_freesym(ParU_Symbolic **Sym_handle, ParU_Control Control);
-ParU_Ret paru_freemat(ParU_Numeric **Num_handle, ParU_Control Control);
+ParU_Ret ParU_Freesym(ParU_Symbolic **Sym_handle, ParU_Control Control);
+ParU_Ret ParU_Freenum(ParU_Numeric **Num_handle, ParU_Control Control);
 
-ParU_Ret paru_residual(double *b, double &resid, double &norm,
+ParU_Ret ParU_Residual(double *b, double &resid, double &norm,
                        cholmod_sparse *A, ParU_Numeric *Num,
                        ParU_Control Control);
 
-ParU_Ret paru_residual(cholmod_sparse *A, ParU_Numeric *Num, double *b,
+ParU_Ret ParU_Residual(cholmod_sparse *A, ParU_Numeric *Num, double *b,
                        double *Results, Int n, ParU_Control Control);
 
-ParU_Ret paru_backward(double *x1, double &resid, double &norm,
+ParU_Ret ParU_Backward(double *x1, double &resid, double &norm,
                        cholmod_sparse *A, ParU_Numeric *Num,
                        ParU_Control Control);
 #endif

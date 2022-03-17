@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////////////////////
-//////////////////////////  paru_residual //////////////////////////////////////
+//////////////////////////  ParU_Residual //////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 /*! @brief    get a factorized matrix A and a vector b
  *
@@ -11,7 +11,7 @@
 
 #include "paru_internal.hpp"
 
-ParU_Ret paru_residual(double *b, double &resid, double &norm,
+ParU_Ret ParU_Residual(double *b, double &resid, double &norm,
                        cholmod_sparse *A, ParU_Numeric *Num,
                        ParU_Control Control)
 {
@@ -46,7 +46,7 @@ ParU_Ret paru_residual(double *b, double &resid, double &norm,
 #endif
 
     ParU_Ret info;
-    info = paru_solve(x, Num, Control);
+    info = ParU_Solve(x, Num, Control);
     if (info != PARU_SUCCESS)
     {
         PRLEVEL(1, ("%% A problem happend during factorization\n"));
@@ -76,14 +76,14 @@ ParU_Ret paru_residual(double *b, double &resid, double &norm,
     return PARU_SUCCESS;
 }
 
-//////////////////////////  paru_residual //////////////mRHS////////////////////
+//////////////////////////  ParU_Residual //////////////mRHS////////////////////
 /*! @brief  get a factorized matrix A and a  multiple right hand side matrix B
  *
  *          compute ||Ax -B||
  *
  * @author Aznaveh  for testing now
  * */
-ParU_Ret paru_residual(cholmod_sparse *A, ParU_Numeric *Num, double *B,
+ParU_Ret ParU_Residual(cholmod_sparse *A, ParU_Numeric *Num, double *B,
                        double *Results, Int n, ParU_Control Control)  // output
                                                 //  0 residual
                                                 //  1 weighted residual
@@ -132,7 +132,7 @@ ParU_Ret paru_residual(cholmod_sparse *A, ParU_Numeric *Num, double *B,
 #endif
 
     ParU_Ret info;
-    info = paru_solve(X, n, Num, Control);
+    info = ParU_Solve(X, n, Num, Control);
     if (info != PARU_SUCCESS)
     {
         PRLEVEL(1, ("%% A problem happend during factorization\n"));

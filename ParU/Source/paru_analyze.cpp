@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////// paru_analyze /////////////////////////////////
+///////////////////////////////// ParU_Analyze /////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 /*! @brief Computing etree and do the symbolic analysis. In this file I am going
  * to use umfpack symbolic analysis instaed of spqrsym. However, I will keep the
@@ -49,7 +49,7 @@
  * @author Aznaveh
  * */
 #include "paru_internal.hpp"
-ParU_Ret paru_analyze(cholmod_sparse *A, ParU_Symbolic **S_handle,
+ParU_Ret ParU_Analyze(cholmod_sparse *A, ParU_Symbolic **S_handle,
                       ParU_Control Control)
 {
     DEBUGLEVEL(0);
@@ -384,7 +384,7 @@ ParU_Ret paru_analyze(cholmod_sparse *A, ParU_Symbolic **S_handle,
         paru_free((n + 1), sizeof(Int), newParent);
         paru_free(n, sizeof(Int), inv_Diag_map);
         printf("Paru: out of memory\n");
-        paru_freesym(&Sym, Control);
+        ParU_Freesym(&Sym, Control);
         umfpack_dl_free_symbolic(&Symbolic);
         umfpack_dl_azn_free_sw(&SW);
         return PARU_OUT_OF_MEMORY;
@@ -526,7 +526,7 @@ ParU_Ret paru_analyze(cholmod_sparse *A, ParU_Symbolic **S_handle,
         paru_free((n + 1), sizeof(Int), Front_parent);
         paru_free((m + 1), sizeof(Int), Pinit);
         paru_free(n, sizeof(Int), inv_Diag_map);
-        paru_freesym(&Sym, Control);
+        ParU_Freesym(&Sym, Control);
         umfpack_dl_azn_free_sw(&SW);
         return PARU_OUT_OF_MEMORY;
     }
@@ -545,7 +545,7 @@ ParU_Ret paru_analyze(cholmod_sparse *A, ParU_Symbolic **S_handle,
             printf("Paru: memory problem\n");
             paru_free((m + 1), sizeof(Int), Pinit);
             paru_free(n, sizeof(Int), inv_Diag_map);
-            paru_freesym(&Sym, Control);
+            ParU_Freesym(&Sym, Control);
             umfpack_dl_azn_free_sw(&SW);
             return PARU_OUT_OF_MEMORY;
         }
@@ -667,7 +667,7 @@ ParU_Ret paru_analyze(cholmod_sparse *A, ParU_Symbolic **S_handle,
     {
         printf("Paru: memory problem\n");
         paru_free(n, sizeof(Int), inv_Diag_map);
-        paru_freesym(&Sym, Control);
+        ParU_Freesym(&Sym, Control);
         umfpack_dl_azn_free_sw(&SW);
         return PARU_OUT_OF_MEMORY;
     }
@@ -811,7 +811,7 @@ ParU_Ret paru_analyze(cholmod_sparse *A, ParU_Symbolic **S_handle,
     {
         printf("Paru: memory problem\n");
         paru_free((m + 1), sizeof(Int), Pinit);
-        paru_freesym(&Sym, Control);
+        ParU_Freesym(&Sym, Control);
         paru_free(n, sizeof(Int), inv_Diag_map);
         // umfpack_dl_azn_free_sw (&SW);
         return PARU_OUT_OF_MEMORY;
@@ -861,7 +861,7 @@ ParU_Ret paru_analyze(cholmod_sparse *A, ParU_Symbolic **S_handle,
     {
         printf("Paru: memory problem\n");
         paru_free((m + 1), sizeof(Int), Pinit);
-        paru_freesym(&Sym, Control);
+        ParU_Freesym(&Sym, Control);
         paru_free(n, sizeof(Int), inv_Diag_map);
         // umfpack_dl_azn_free_sw (&SW);
         return PARU_OUT_OF_MEMORY;
@@ -875,7 +875,7 @@ ParU_Ret paru_analyze(cholmod_sparse *A, ParU_Symbolic **S_handle,
         printf("Paru: memory problem\n");
         paru_free((m + 1), sizeof(Int), Pinit);
         paru_free((MAX(m, n) + 2), sizeof(Int), Work);
-        paru_freesym(&Sym, Control);
+        ParU_Freesym(&Sym, Control);
         paru_free(n, sizeof(Int), inv_Diag_map);
         // umfpack_dl_azn_free_sw (&SW);
         return PARU_OUT_OF_MEMORY;
@@ -909,7 +909,7 @@ ParU_Ret paru_analyze(cholmod_sparse *A, ParU_Symbolic **S_handle,
         paru_free((m + 1), sizeof(Int), Pinit);
         paru_free((MAX(m, n) + 2), sizeof(Int), Work);
 
-        paru_freesym(&Sym, Control);
+        ParU_Freesym(&Sym, Control);
         // umfpack_dl_azn_free_sw (&SW);
 
         paru_free(n, sizeof(Int), inv_Diag_map);
@@ -1003,7 +1003,7 @@ ParU_Ret paru_analyze(cholmod_sparse *A, ParU_Symbolic **S_handle,
         paru_free(m, sizeof(Int), Pinv);
         paru_free(n, sizeof(Int), inv_Diag_map);
         // umfpack_dl_azn_free_sw (&SW);
-        paru_freesym(&Sym, Control);
+        ParU_Freesym(&Sym, Control);
         return PARU_OUT_OF_MEMORY;
     }
     Int sunz = 0;  // U nnz: singlteton nnzero of s
@@ -1140,7 +1140,7 @@ ParU_Ret paru_analyze(cholmod_sparse *A, ParU_Symbolic **S_handle,
                 paru_free(m, sizeof(Int), Pinv);
                 if (cs1 > 0) paru_free((cs1 + 1), sizeof(Int), cSup);
                 if (rs1 > 0) paru_free((rs1 + 1), sizeof(Int), cSlp);
-                paru_freesym(&Sym, Control);
+                ParU_Freesym(&Sym, Control);
                 return PARU_OUT_OF_MEMORY;
             }
         }
@@ -1197,7 +1197,7 @@ ParU_Ret paru_analyze(cholmod_sparse *A, ParU_Symbolic **S_handle,
         paru_free((MAX(m, n) + 2), sizeof(Int), Work);
 
         paru_free(m, sizeof(Int), Pinv);
-        paru_freesym(&Sym, Control);
+        ParU_Freesym(&Sym, Control);
         // umfpack_dl_azn_free_sw (&SW);
         return PARU_OUT_OF_MEMORY;
     }
@@ -1341,7 +1341,7 @@ ParU_Ret paru_analyze(cholmod_sparse *A, ParU_Symbolic **S_handle,
     {
         printf("Paru: memory problem\n");
         paru_free(m, sizeof(Int), Pinv);
-        paru_freesym(&Sym, Control);
+        ParU_Freesym(&Sym, Control);
         // umfpack_dl_azn_free_sw (&SW);
         return PARU_OUT_OF_MEMORY;
     }
@@ -1534,7 +1534,7 @@ ParU_Ret paru_analyze(cholmod_sparse *A, ParU_Symbolic **S_handle,
     {
         printf("Paru: Out of memory in symbolic phase");
         paru_free(m, sizeof(Int), Pinv);
-        paru_freesym(&Sym, Control);
+        ParU_Freesym(&Sym, Control);
         return PARU_OUT_OF_MEMORY;
     }
     // initialization
@@ -1698,7 +1698,7 @@ ParU_Ret paru_analyze(cholmod_sparse *A, ParU_Symbolic **S_handle,
     {
         printf("Paru: Out of memory in symbolic phase");
         paru_free(m, sizeof(Int), Pinv);
-        paru_freesym(&Sym, Control);
+        ParU_Freesym(&Sym, Control);
         return PARU_OUT_OF_MEMORY;
     }
     task_map[0] = -1;

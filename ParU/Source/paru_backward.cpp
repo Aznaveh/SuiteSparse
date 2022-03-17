@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////////////////////
-//////////////////////////  paru_backward //////////////////////////////////////
+//////////////////////////  ParU_Backward //////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 /*! @brief     compute the backward error
  *
@@ -13,7 +13,7 @@
 
 #include "paru_internal.hpp"
 
-ParU_Ret paru_backward(double *x1, double &resid, double &norm,
+ParU_Ret ParU_Backward(double *x1, double &resid, double &norm,
                        cholmod_sparse *A, ParU_Numeric *Num,
                        ParU_Control Control)
 {
@@ -47,7 +47,7 @@ ParU_Ret paru_backward(double *x1, double &resid, double &norm,
 #endif
 
     ParU_Ret info;
-    info = paru_solve(b, Num, Control);
+    info = ParU_Solve(b, Num, Control);
     if (info != PARU_SUCCESS)
     {
         PRLEVEL(1, ("%% A problem happend during factorization\n"));

@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////////////////////
-//////////////////////////  paru_solve /////////////////////////////////////////
+//////////////////////////  ParU_Solve /////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 /*!  @brief  sovle Ax = b
  *      get a factorized matrix and a right hand side
@@ -10,7 +10,7 @@
 
 #include "paru_internal.hpp"
 
-ParU_Ret paru_solve(double *b, ParU_Numeric *Num, ParU_Control Control)
+ParU_Ret ParU_Solve(double *b, ParU_Numeric *Num, ParU_Control Control)
 {
     DEBUGLEVEL(0);
     PRLEVEL(1, ("%% inside solve\n"));
@@ -53,7 +53,7 @@ ParU_Ret paru_solve(double *b, ParU_Numeric *Num, ParU_Control Control)
 #endif
     return PARU_SUCCESS;
 }
-//////////////////////////  paru_solve ////////////// mRHS /////////////////////
+//////////////////////////  ParU_Solve ////////////// mRHS /////////////////////
 /*!  @brief  sovle AX = B
  *      get a factorized matrix and several right hand sides
  *      returns X; overwrites it on B
@@ -63,7 +63,7 @@ ParU_Ret paru_solve(double *b, ParU_Numeric *Num, ParU_Control Control)
 
 #include "paru_internal.hpp"
 
-ParU_Ret paru_solve(double *B, Int n, ParU_Numeric *Num, ParU_Control Control)
+ParU_Ret ParU_Solve(double *B, Int n, ParU_Numeric *Num, ParU_Control Control)
 {
     DEBUGLEVEL(0);
     PRLEVEL(1, ("%% mRHS inside Solve\n"));
