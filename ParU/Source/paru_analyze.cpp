@@ -844,7 +844,7 @@ ParU_Ret ParU_Analyze(cholmod_sparse *A, ParU_Symbolic **S_handle,
         if (Parent[f] > 0) Childp[Parent[f] + 1]++;
     }
     // see GraphBLAS/Source/GB_cumsum.c
-    paru_cumsum(nf + 2, Childp);
+    paru_cumsum(nf + 2, Childp, Control);
 #ifndef NDEBUG
     Sym->Us_bound_size = Us_bound_size;
     Sym->LUs_bound_size = LUs_bound_size;
@@ -1247,17 +1247,17 @@ ParU_Ret ParU_Analyze(cholmod_sparse *A, ParU_Symbolic **S_handle,
     PRLEVEL(PR, ("\n"));
 #endif
 
-    paru_cumsum(m + 1 - n1, cSp);
+    paru_cumsum(m + 1 - n1, cSp, Control);
     paru_memcpy(Sp, cSp, (m + 1 - n1) * sizeof(Int), Control);
 
     if (cs1 > 0)
     {
-        paru_cumsum(cs1 + 1, Sup);
+        paru_cumsum(cs1 + 1, Sup, Control);
         paru_memcpy(cSup, Sup, (cs1 + 1) * sizeof(Int), Control);
     }
     if (rs1 > 0)
     {
-        paru_cumsum(rs1 + 1, Slp);
+        paru_cumsum(rs1 + 1, Slp, Control);
         paru_memcpy(cSlp, Slp, (rs1 + 1) * sizeof(Int), Control);
     }
 

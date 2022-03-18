@@ -8,13 +8,14 @@
  * @author Aznaveh
  */
 #include "paru_internal.hpp"
-#define base (1024 * 1024 * 256)
-//XXX
-Int paru_cumsum(Int n, Int *X)
+
+Int paru_cumsum(Int n, Int *X, ParU_Control *Control)
 {  // n is size, X is size n and in/out
     Int tot = 0;
     if (X == NULL) return tot;
-    if (n < base)
+    
+    Int mem_chunk = Control->mem_chunk;
+    if (n < mem_chunk)
     {
         for (Int k = 0; k < n; k++)
         {
@@ -25,14 +26,14 @@ Int paru_cumsum(Int n, Int *X)
     }
     Int mid = n/2;
     Int sum = 0;
-    #pragma omp parallel default(none) shared(sum, n, X) firstprivate(mid)
+    #pragma omp parallel shared(sum, n, X, Control) firstprivate(mid)
     {
         #pragma omp single
         {
             #pragma omp task 
-            sum = paru_cumsum(mid, X);
+            sum = paru_cumsum(mid, X, Control);
             #pragma omp task 
-            paru_cumsum(n - mid, X+mid);
+            paru_cumsum(n - mid, X+mid, Control);
             #pragma omp taskwait 
             #pragma omp taskloop 
             for (int i = mid; i < n; i ++)

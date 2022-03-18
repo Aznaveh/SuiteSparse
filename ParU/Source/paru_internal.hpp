@@ -197,7 +197,7 @@ void paru_update_rowDeg(Int panel_num, Int row_end, Int f, Int start_fac,
                         std::set<Int> &stl_colSet,
                         std::vector<Int> &pivotal_elements, ParU_Numeric *Num);
 
-Int paru_cumsum(Int n, Int *X);
+Int paru_cumsum(Int n, Int *X, ParU_Control *Control);
 
 Int bin_srch_col(Int *srt_lst, Int l, Int r, Int num);
 Int bin_srch(Int *srt_lst, Int l, Int r, Int num);
