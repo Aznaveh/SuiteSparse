@@ -8,8 +8,6 @@
  */
 
 #include "paru_internal.hpp"
-#define PIV_TOLER 0.1     // pivot tolerance  //XXX
-#define DIAG_TOLER 0.001  // pivot tolerance
 
 void swap_rows(double *F, Int *frowList, Int m, Int n, Int r1, Int r2,
                ParU_Numeric *Num)
@@ -45,6 +43,7 @@ Int paru_panel_factorize(Int f, Int m, Int n, const Int panel_width,
     PRLEVEL(1, ("%% Inside panel factorization %ld \n", panel_num));
 
     Int *row_degree_bound = Num->row_degree_bound;
+    ParU_Control *Control = Num->Control;
     Int j1 = panel_num * panel_width;  // panel starting column
 
     //  j1 <= panel columns < j2
@@ -174,7 +173,7 @@ Int paru_panel_factorize(Int f, Int m, Int n, const Int panel_width,
         {
             if (diag_found != -1)
             {
-                if (fabs(DIAG_TOLER * maxval) < fabs(diag_val))
+                if (fabs(Control->diag_toler * maxval) < fabs(diag_val))
                 {
                     piv = diag_val;
                     row_piv = diag_found;
@@ -213,7 +212,7 @@ Int paru_panel_factorize(Int f, Int m, Int n, const Int panel_width,
             for (Int i = j; i < row_end; i++)
             {
                 double value = F[j * m + i];
-                if (fabs(PIV_TOLER * maxval) < fabs(value) &&
+                if (fabs(Control->piv_toler * maxval) < fabs(value) &&
                     row_degree_bound[frowList[i]] < row_deg_sp)
                 {  // numerically acceptalbe and sparser
                     // pragma omp critical
