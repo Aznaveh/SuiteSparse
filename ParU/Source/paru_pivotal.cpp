@@ -134,7 +134,8 @@ ParU_Ret paru_pivotal(std::vector<Int> &pivotal_elements,
     std::set<Int> stl_rowSet;
     std::set<Int>::iterator it;
 #endif
-    Int panel_width = Num->panel_width;
+    ParU_Control *Control = Num->Control;
+    Int panel_width = Control->panel_width;
     Int fp = col2 - col1; /* first fp columns are pivotal */
     Int num_panels = (Int)ceil((double)fp / panel_width);
 

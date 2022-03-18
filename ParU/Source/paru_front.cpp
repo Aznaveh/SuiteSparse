@@ -45,8 +45,10 @@ ParU_Ret paru_front(Int f,  // front need to be assembled
     ASSERT(fp > 0);
 
     /* computing number of rows, set union */
-
-    Int panel_width = Num->panel_width;
+    
+    ParU_Control *Control = Num->Control;
+    Int panel_width = Control->panel_width;
+ 
     Int num_panels = (Int)ceil((double)fp / panel_width);
 
     // panel_row shows number of rows in each panel.
@@ -166,10 +168,8 @@ ParU_Ret paru_front(Int f,  // front need to be assembled
 
     if (rowCount < fp)
     {
-        // PRLEVEL(1, ("%% %ldx%ld \n", rowCount, fp));
-        PRLEVEL(1, ("%% Structural Problem\n"));
-        printf("Paru: singular, structural problem on %ld: %ldx%ld\n", f,
-               rowCount, fp);
+        PRLEVEL(1, ("Paru: singular, structural problem on %ld: %ldx%ld\n", f,
+               rowCount, fp) );
         #pragma omp atomic write
         Num->res = PARU_SINGULAR;
         return PARU_SINGULAR;

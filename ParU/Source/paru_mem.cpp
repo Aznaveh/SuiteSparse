@@ -191,7 +191,7 @@ void operator delete(void *ptr) noexcept
 }
 
 //  freeing symbolic analysis data structure
-ParU_Ret ParU_Freesym(ParU_Symbolic **Sym_handle, ParU_Control Control)
+ParU_Ret ParU_Freesym(ParU_Symbolic **Sym_handle, ParU_Control *Control)
 {
     DEBUGLEVEL(0);
     if (Sym_handle == NULL || *Sym_handle == NULL)
@@ -298,7 +298,7 @@ void paru_free_el(Int e, ParU_Element **elementList)
 }
 
 // It uses Sym, Do not free Sym before
-ParU_Ret ParU_Freenum (ParU_Numeric **Num_handle, ParU_Control Control)
+ParU_Ret ParU_Freenum (ParU_Numeric **Num_handle, ParU_Control *Control)
 {
     DEBUGLEVEL(0);
     if (Num_handle == NULL || *Num_handle == NULL) return PARU_INVALID;

@@ -120,7 +120,7 @@ Int paru_panel_factorize(Int f, Int m, Int n, const Int panel_width,
             }
         }
 
-        /*** ATTENTION: IT FACES A NUMERICAL PROBLEM HOWEVER I USE REDUCTION**/
+        /*** ATTENTION: IT FACES A NUMERICAL PROBLEM EVEN IF I USE REDUCTION**/
         /*  pragma omp declare reduction
         //  (maxfabs : double:
         //   omp_out = fabs(omp_in) > fabs(omp_out) ? omp_in : omp_out )
@@ -373,7 +373,9 @@ Int paru_factorize_full_summed(Int f, Int start_fac,
     Int rowCount = Num->frowCount[f];
     double *F = LUs[f].p;
 
-    Int panel_width = Num->panel_width;
+    ParU_Control *Control = Num->Control;
+    Int panel_width = Control->panel_width;
+ 
     Int num_panels =
         (fp % panel_width == 0) ? fp / panel_width : fp / panel_width + 1;
     for (Int panel_num = 0; panel_num < num_panels; panel_num++)

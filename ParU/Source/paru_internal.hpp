@@ -161,8 +161,9 @@ void paru_free_el(Int e, ParU_Element **elementList);
 void *operator new(std::size_t sz);
 void operator delete(void *ptr) noexcept;
 
-void paru_memset(void *ptr, Int value, size_t num);
-void paru_memcpy(void *destination, const void *source, size_t num);
+void paru_memset(void *ptr, Int value, size_t num, ParU_Control *Control);
+void paru_memcpy(void *destination, const void *source, size_t num, 
+        ParU_Control *Control);
 
 /* add tuple functions defintions */
 Int paru_add_rowTuple(ParU_TupleList *RowList, Int row, ParU_Tuple T);
@@ -202,7 +203,7 @@ Int bin_srch_col(Int *srt_lst, Int l, Int r, Int num);
 Int bin_srch(Int *srt_lst, Int l, Int r, Int num);
 
 ParU_Ret paru_init_rowFronts(ParU_Numeric **Num_handle, cholmod_sparse *A,
-                             ParU_Symbolic *Sym, ParU_Control Control);
+                             ParU_Symbolic *Sym, ParU_Control *Control);
 ParU_Ret paru_front(Int f, ParU_Numeric *Num);
 
 ParU_Ret paru_pivotal(std::vector<Int> &pivotal_elements,

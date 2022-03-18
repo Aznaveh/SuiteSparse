@@ -177,7 +177,7 @@ Int paru_lsolve(double *x, ParU_Numeric *Num)
     PRLEVEL(-1, ("%% lsolve took %1.1lf\n", time));
 #endif
 #ifndef NDEBUG
-    PRLEVEL(1, ("%%after lsolve x is:\n%%", time));
+    PRLEVEL(1, ("%%after lsolve x is:\n%%"));
     for (Int k = 0; k < m; k++)
     {
         PRLEVEL(1, (" %.2lf, ", x[k]));

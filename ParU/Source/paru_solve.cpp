@@ -10,7 +10,7 @@
 
 #include "paru_internal.hpp"
 
-ParU_Ret ParU_Solve(double *b, ParU_Numeric *Num, ParU_Control Control)
+ParU_Ret ParU_Solve(double *b, ParU_Numeric *Num, ParU_Control *Control)
 {
     DEBUGLEVEL(0);
     PRLEVEL(1, ("%% inside solve\n"));
@@ -31,12 +31,8 @@ ParU_Ret ParU_Solve(double *b, ParU_Numeric *Num, ParU_Control Control)
         printf("Paru: memory problem inside solve\n");
         return PARU_OUT_OF_MEMORY;
     }
-    paru_memcpy(x, b, m * sizeof(double));
+    paru_memcpy(x, b, m * sizeof(double), Control);
 
-    // if (Sym->scale_row)             // x = s.x
-    //    paru_apply_scale(Sym->scale_row, x, m);
-    // paru_memcpy(b, x, m * sizeof(double));
-    // paru_apply_perm(Sym->Pfin, b, x, m);  // x = b (p)
     paru_apply_perm_scale(Sym->Pfin, Sym->scale_row, b, x, m);
 
     PRLEVEL(1, ("%% lsolve\n"));
@@ -63,7 +59,7 @@ ParU_Ret ParU_Solve(double *b, ParU_Numeric *Num, ParU_Control Control)
 
 #include "paru_internal.hpp"
 
-ParU_Ret ParU_Solve(double *B, Int n, ParU_Numeric *Num, ParU_Control Control)
+ParU_Ret ParU_Solve(double *B, Int n, ParU_Numeric *Num, ParU_Control *Control)
 {
     DEBUGLEVEL(0);
     PRLEVEL(1, ("%% mRHS inside Solve\n"));
@@ -83,7 +79,7 @@ ParU_Ret ParU_Solve(double *B, Int n, ParU_Numeric *Num, ParU_Control Control)
         printf("Paru: memory problem inside Solve\n");
         return PARU_OUT_OF_MEMORY;
     }
-    paru_memcpy(X, B, m * n * sizeof(double));
+    paru_memcpy(X, B, m * n * sizeof(double), Control);
 
     paru_apply_perm_scale(Sym->Pfin, Sym->scale_row, B, X, m, n);
 

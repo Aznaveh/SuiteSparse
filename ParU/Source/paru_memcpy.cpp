@@ -7,29 +7,27 @@
  * @author Aznaveh
  */
 #include "paru_internal.hpp"
-#define MEM_CHUNK \
-    (1024 * 1024)  // hard coded chunk-size
-                   // XXX
 
-void paru_memcpy(void *destination, const void *source, size_t num)
+void paru_memcpy(void *destination, const void *source, 
+        size_t num, ParU_Control *Control)
 {
-    if (num < MEM_CHUNK)
+    size_t mem_chunk = Control->mem_chunk;
+    if (num < mem_chunk)
     {  // single task memcpy
         memcpy(destination, source, num);
     }
     else
     {  // multiple task memcpy
-        size_t nchunks = 1 + (num / MEM_CHUNK);
+        size_t nchunks = 1 + (num / mem_chunk);
 
         int64_t k;
-        #pragma omp taskloop default(none) \
-        shared(nchunks, destination, source, num)
+        #pragma omp taskloop 
         for (k = 0; k < (int64_t)nchunks; k++)
         {
-            size_t start = k * MEM_CHUNK;
+            size_t start = k * mem_chunk;
             if (start < num)
             {
-                size_t chunk = MIN(num - start, MEM_CHUNK);
+                size_t chunk = MIN(num - start, mem_chunk);
                 // void* arithmetic is illegal it is why I am using this
                 unsigned char *pdest = (unsigned char *)destination + start;
                 const unsigned char *psrc = (unsigned char *)source + start;

@@ -50,7 +50,7 @@
  * */
 #include "paru_internal.hpp"
 ParU_Ret ParU_Analyze(cholmod_sparse *A, ParU_Symbolic **S_handle,
-                      ParU_Control Control)
+                      ParU_Control *Control)
 {
     DEBUGLEVEL(0);
     PARU_DEFINE_PRLEVEL;
@@ -256,8 +256,11 @@ ParU_Ret ParU_Analyze(cholmod_sparse *A, ParU_Symbolic **S_handle,
     //      However I am using the default for now; Page 40 UMFPACK_UserGuide
     //      Page 22 UserGuide
     umfpack_dl_defaults(umf_Control);
-    umf_Control[UMFPACK_ORDERING] = UMFPACK_ORDERING_METIS;
+    umf_Control[UMFPACK_ORDERING] = Control->umfpack_ordering;
+    //umf_Control[UMFPACK_ORDERING] = UMFPACK_ORDERING_METIS;
     umf_Control[UMFPACK_FIXQ] = -1;
+    umf_Control[UMFPACK_STRATEGY] = Control->umfpack_strategy;
+    //umf_Control[UMFPACK_STRATEGY] = UMFPACK_STRATEGY_AUTO;
     // umf_Control[UMFPACK_STRATEGY] = UMFPACK_STRATEGY_UNSYMMETRIC;
     // umf_Control[UMFPACK_STRATEGY] = UMFPACK_STRATEGY_SYMMETRIC;
 
@@ -290,8 +293,13 @@ ParU_Ret ParU_Analyze(cholmod_sparse *A, ParU_Symbolic **S_handle,
     /* startegy UMFPACK used*/
     /* ---------------------------------------------------------------------- */
 
+    //I am sticking used strategy in Sym; maybe I should change both here and
+    //paru_fs_factorize FIXME
     Int strategy = Info[UMFPACK_STRATEGY_USED];
-    Sym->strategy = strategy;
+    if (Control->paru_strategy == PARU_STRATEGY_AUTO)
+        Sym->strategy = strategy;
+    else
+        Sym->strategy = Control->paru_strategy;
     // Sym->strategy = PARU_STRATEGY_SYMMETRIC;
 
 #ifndef NDEBUG
@@ -368,7 +376,6 @@ ParU_Ret ParU_Analyze(cholmod_sparse *A, ParU_Symbolic **S_handle,
     // temp amalgamation data structure
     Int *fmap = (Int *)paru_alloc((n + 1), sizeof(Int));
     Int *newParent = (Int *)paru_alloc((n + 1), sizeof(Int));
-    // TODO: unsymmetric strategy and Diag_map is not working good together
     if (Sym->strategy == PARU_STRATEGY_SYMMETRIC)
         Diag_map = Sym_umf->Diagonal_map;
     else
@@ -881,7 +888,7 @@ ParU_Ret ParU_Analyze(cholmod_sparse *A, ParU_Symbolic **S_handle,
         return PARU_OUT_OF_MEMORY;
     }
 
-    paru_memcpy(cChildp, Childp, (nf + 2) * sizeof(Int));
+    paru_memcpy(cChildp, Childp, (nf + 2) * sizeof(Int), Control);
 
     for (Int f = 0; f < nf; f++)
     {
@@ -971,9 +978,7 @@ ParU_Ret ParU_Analyze(cholmod_sparse *A, ParU_Symbolic **S_handle,
     Int *cSlp = NULL;   // copy Singlton l p
     double *Rs = NULL;  // row scaling
     Ps = (Int *)paru_calloc(m - n1, sizeof(Int));
-    // XXX scale should come from the settings
-    // Int scale,  // if scale == 1 the S will be scaled by max_row
-    Int scale = 1;
+    Int scale = Control->scale; // if 1 the S will be scaled by max_row
     if (scale == 1) Rs = (double *)paru_calloc(m, sizeof(double));
     if (cs1 > 0)
     {
@@ -1243,17 +1248,17 @@ ParU_Ret ParU_Analyze(cholmod_sparse *A, ParU_Symbolic **S_handle,
 #endif
 
     paru_cumsum(m + 1 - n1, cSp);
-    paru_memcpy(Sp, cSp, (m + 1 - n1) * sizeof(Int));
+    paru_memcpy(Sp, cSp, (m + 1 - n1) * sizeof(Int), Control);
 
     if (cs1 > 0)
     {
         paru_cumsum(cs1 + 1, Sup);
-        paru_memcpy(cSup, Sup, (cs1 + 1) * sizeof(Int));
+        paru_memcpy(cSup, Sup, (cs1 + 1) * sizeof(Int), Control);
     }
     if (rs1 > 0)
     {
         paru_cumsum(rs1 + 1, Slp);
-        paru_memcpy(cSlp, Slp, (rs1 + 1) * sizeof(Int));
+        paru_memcpy(cSlp, Slp, (rs1 + 1) * sizeof(Int), Control);
     }
 
 #ifndef NDEBUG
@@ -1538,13 +1543,13 @@ ParU_Ret ParU_Analyze(cholmod_sparse *A, ParU_Symbolic **S_handle,
         return PARU_OUT_OF_MEMORY;
     }
     // initialization
-    paru_memset(aParent, -1, (ms + nf) * sizeof(Int));
+    paru_memset(aParent, -1, (ms + nf) * sizeof(Int), Control);
 #ifndef NDEBUG
-    paru_memset(aChild, -1, (ms + nf + 1) * sizeof(Int));
+    paru_memset(aChild, -1, (ms + nf + 1) * sizeof(Int), Control);
     PR = 1;
 #endif
-    paru_memset(aChildp, -1, (ms + nf + 2) * sizeof(Int));
-    paru_memset(first, -1, (nf + 1) * sizeof(Int));
+    paru_memset(aChildp, -1, (ms + nf + 2) * sizeof(Int), Control);
+    paru_memset(first, -1, (nf + 1) * sizeof(Int), Control);
 
     aChildp[0] = 0;
     Int offset = 0;  // number of rows visited in each iteration orig front+

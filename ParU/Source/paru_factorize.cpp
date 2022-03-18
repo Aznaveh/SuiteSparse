@@ -167,7 +167,7 @@ ParU_Ret paru_exec_tasks(Int t, Int *task_num_child, Int &chain_task,
     return myInfo;
 }
 ParU_Ret ParU_Factorize(cholmod_sparse *A, ParU_Symbolic *Sym,
-                        ParU_Numeric **Num_handle, ParU_Control Control)
+                        ParU_Numeric **Num_handle, ParU_Control *Control)
 {
     DEBUGLEVEL(0);
 #ifndef NTIME
@@ -195,8 +195,8 @@ ParU_Ret ParU_Factorize(cholmod_sparse *A, ParU_Symbolic *Sym,
 
     ParU_Ret info;
     // XXX populate my_Control with tested values of Control
-    ParU_Control my_Control = Control;
-    info = paru_init_rowFronts(&Num, A, Sym, my_Control);
+    ParU_Control my_Control = *Control;
+    info = paru_init_rowFronts(&Num, A, Sym, &my_Control);
     *Num_handle = Num;
 
     PRLEVEL(1, ("%% init_row is done\n"));
@@ -213,11 +213,12 @@ ParU_Ret ParU_Factorize(cholmod_sparse *A, ParU_Symbolic *Sym,
     std::vector<Int> task_Q;
     // This vector changes during factorization
     // std::vector<Int> task_num_child(ntasks);
-    // paru_memcpy ( &task_num_child[0] , Sym->task_num_child,
+    // paru_emcpy ( &task_num_child[0] , Sym->task_num_child,
     //        ntasks * sizeof(Int));
 
     Int task_num_child[ntasks];
-    paru_memcpy(task_num_child, Sym->task_num_child, ntasks * sizeof(Int));
+    paru_memcpy(task_num_child, Sym->task_num_child, 
+            ntasks * sizeof(Int), Control);
 
     for (Int t = 0; t < ntasks; t++)
     {

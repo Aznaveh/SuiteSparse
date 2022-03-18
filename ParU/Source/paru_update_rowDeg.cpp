@@ -20,7 +20,8 @@ void paru_update_rowDeg(Int panel_num, Int row_end, Int f, Int start_fac,
 #endif
     PRLEVEL(1, ("%%-------ROW degree update of panel %ld of front %ld \n",
                 panel_num, f));
-    Int panel_width = Num->panel_width;
+    ParU_Control *Control = Num->Control;
+    Int panel_width = Control->panel_width;
     ParU_Element **elementList = Num->elementList;
     Paru_Work *Work = Num->Work;
 

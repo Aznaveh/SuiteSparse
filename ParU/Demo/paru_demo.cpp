@@ -47,7 +47,7 @@ int main(int argc, char **argv)
     ParU_Control Control;
     ParU_Ret info;
 
-    info = ParU_Analyze(A, &Sym, Control);
+    info = ParU_Analyze(A, &Sym, &Control);
     if (info != PARU_SUCCESS)
     {
         cholmod_l_free_sparse(&A, cc);
@@ -56,12 +56,12 @@ int main(int argc, char **argv)
     }
     printf("Paru: Symbolic factorization is done!\n");
     ParU_Numeric *Num;
-    info = ParU_Factorize(A, Sym, &Num, Control);
+    info = ParU_Factorize(A, Sym, &Num, &Control);
     double my_time = omp_get_wtime() - my_start_time;
     if (info != PARU_SUCCESS)
     {
-        ParU_Freenum(&Num, Control);
-        ParU_Freesym(&Sym, Control);
+        ParU_Freenum(&Num, &Control);
+        ParU_Freesym(&Sym, &Control);
         cholmod_l_free_sparse(&A, cc);
         cholmod_l_finish(cc);
         return info;
@@ -74,9 +74,9 @@ int main(int argc, char **argv)
     double *b = (double *)malloc(m * sizeof(double));
     for (Int i = 0; i < m; ++i) b[i] = i + 1;
     double resid, norm;
-    ParU_Residual(b, resid, norm, A, Num, Control);
+    ParU_Residual(b, resid, norm, A, Num, &Control);
     for (Int i = 0; i < m; ++i) b[i] = i + 1;
-    ParU_Backward(b, resid, norm, A, Num, Control);
+    ParU_Backward(b, resid, norm, A, Num, &Control);
     free(b);
 
     const Int nn = 16;  // number of right handsides
@@ -84,7 +84,7 @@ int main(int argc, char **argv)
     double Res[4];
     for (Int i = 0; i < m; ++i)
         for (Int j = 0; j < nn; ++j) B[j * m + i] = (double)(i + j + 1);
-    ParU_Residual(A, Num, B, Res, nn, Control);
+    ParU_Residual(A, Num, B, Res, nn, &Control);
     free(B);
 #endif
 
@@ -170,8 +170,8 @@ int main(int argc, char **argv)
 
 #endif
     //~~~~~~~~~~~~~~~~~~~Free Everything~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    ParU_Freenum(&Num, Control);
-    ParU_Freesym(&Sym, Control);
+    ParU_Freenum(&Num, &Control);
+    ParU_Freesym(&Sym, &Control);
 
     cholmod_l_free_sparse(&A, cc);
     cholmod_l_finish(cc);

@@ -13,7 +13,7 @@
 
 ParU_Ret ParU_Residual(double *b, double &resid, double &norm,
                        cholmod_sparse *A, ParU_Numeric *Num,
-                       ParU_Control Control)
+                       ParU_Control *Control)
 {
     DEBUGLEVEL(0);
     PRLEVEL(1, ("%% inside residual\n"));
@@ -34,7 +34,7 @@ ParU_Ret ParU_Residual(double *b, double &resid, double &norm,
         printf("Paru: memory problem inside residual\n");
         return PARU_OUT_OF_MEMORY;
     }
-    paru_memcpy(x, b, m * sizeof(double));
+    paru_memcpy(x, b, m * sizeof(double), Control);
 
 #ifndef NDEBUG
     PRLEVEL(1, ("%% after copying x is:\n%%"));
@@ -84,7 +84,7 @@ ParU_Ret ParU_Residual(double *b, double &resid, double &norm,
  * @author Aznaveh  for testing now
  * */
 ParU_Ret ParU_Residual(cholmod_sparse *A, ParU_Numeric *Num, double *B,
-                       double *Results, Int n, ParU_Control Control)  // output
+                       double *Results, Int n, ParU_Control *Control)  // output
                                                 //  0 residual
                                                 //  1 weighted residual
                                                 //  2 time
@@ -114,7 +114,7 @@ ParU_Ret ParU_Residual(cholmod_sparse *A, ParU_Numeric *Num, double *B,
         printf("Paru: memory problem inside residual\n");
         return PARU_OUT_OF_MEMORY;
     }
-    paru_memcpy(X, B, m * n * sizeof(double));
+    paru_memcpy(X, B, m * n * sizeof(double), Control);
 
 #ifndef NDEBUG
     PRLEVEL(1, ("%% mRHS after copying X is:\n%%"));

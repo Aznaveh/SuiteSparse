@@ -144,7 +144,7 @@ struct ParU_Symbolic
     // non-empty rows of S, and Sleft [n+1] == m.  That is, Sleft [n]
     // ... Sleft [n+1]-1 gives the empty rows of S, if any.
 
-    Int strategy;  // for this package it is important if the strategy is
+    Int strategy;  // the strategy USED by umfpack
     // symmetric or if it is unsymmetric
 
     // -------------------------------------------------------------------------
@@ -324,7 +324,16 @@ enum ParU_Ret
 
 struct ParU_Control
 {
+    Int mem_chunk = 1024*1024; //chunk size for memset and memcpy
+    //Sybmolic controls
+    Int scale = 1; // if 1 matrix will be scaled using max_row
+    Int umfpack_ordering = UMFPACK_ORDERING_METIS;
+    Int umfpack_strategy = UMFPACK_STRATEGY_AUTO; //symmetric or unsymmetric
+
+
+    //Numeric controls
     Int panel_width = 32;  // width of panel for dense factorizaiton
+    Int paru_strategy = PARU_STRATEGY_AUTO; //the same stratey umfpack used
 };
 
 struct ParU_Numeric
@@ -332,6 +341,7 @@ struct ParU_Numeric
     Int m, n;  // size of the sumbatrix that is factorized
     ParU_Symbolic *Sym;
     ParU_TupleList *RowList;  // size n of dynamic list
+    ParU_Control *Control;   // a copy of controls for internal use
 
     ParU_Element **elementList;  // pointers to all elements, size = m+nf+1
     Paru_Work *Work;
@@ -356,7 +366,6 @@ struct ParU_Numeric
     Int max_row_count;      // maximum number of rows/cols for all the fronts
     Int max_col_count;      // it is initalized after factorization
     Int *row_degree_bound;  // row degree size number of rows
-    Int panel_width;        // XXX  // width of panel for dense factorizaiton
 
     Int *lacList;  // sieze m+nf least active column of each element
                    //    el_colIndex[el->lac]  == lacList [e]
@@ -396,34 +405,24 @@ struct ParU_Numeric
 };
 
 //------------------------------------------------------------------------------
-// user:
-
-/* usage:
-   S = paru_analyse (A) ;
-   LU = paru_factoriz (A,S) ;
-info: an enum: PARU_SUCCESS, PARU_OUT_OF_MEMORY, PARU_INVALID, PARU_SINGULAR,
-... info = paru_analyse (&S, A) ; info = paru_factoriz (&LU, A,S) ;
-*/
-
-// a routine that does init_row and also factorization
 ParU_Ret ParU_Analyze(cholmod_sparse *A, ParU_Symbolic **Sym_handle,
-                      ParU_Control Control);
+                      ParU_Control *Control);
 ParU_Ret ParU_Factorize(cholmod_sparse *A, ParU_Symbolic *Sym,
-                        ParU_Numeric **Num_handle, ParU_Control Control);
-ParU_Ret ParU_Solve(double *b, ParU_Numeric *Num, ParU_Control Control);
-ParU_Ret ParU_Solve(double *B, Int n, ParU_Numeric *Num, ParU_Control Control);
+                        ParU_Numeric **Num_handle, ParU_Control *Control);
+ParU_Ret ParU_Solve(double *b, ParU_Numeric *Num, ParU_Control *Control);
+ParU_Ret ParU_Solve(double *B, Int n, ParU_Numeric *Num, ParU_Control *Control);
 
-ParU_Ret ParU_Freesym(ParU_Symbolic **Sym_handle, ParU_Control Control);
-ParU_Ret ParU_Freenum(ParU_Numeric **Num_handle, ParU_Control Control);
+ParU_Ret ParU_Freesym(ParU_Symbolic **Sym_handle, ParU_Control *Control);
+ParU_Ret ParU_Freenum(ParU_Numeric **Num_handle, ParU_Control *Control);
 
 ParU_Ret ParU_Residual(double *b, double &resid, double &norm,
                        cholmod_sparse *A, ParU_Numeric *Num,
-                       ParU_Control Control);
+                       ParU_Control *Control);
 
 ParU_Ret ParU_Residual(cholmod_sparse *A, ParU_Numeric *Num, double *b,
-                       double *Results, Int n, ParU_Control Control);
+                       double *Results, Int n, ParU_Control *Control);
 
 ParU_Ret ParU_Backward(double *x1, double &resid, double &norm,
                        cholmod_sparse *A, ParU_Numeric *Num,
-                       ParU_Control Control);
+                       ParU_Control *Control);
 #endif

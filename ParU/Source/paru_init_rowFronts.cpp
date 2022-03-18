@@ -18,7 +18,7 @@ ParU_Ret paru_init_rowFronts(ParU_Numeric **Num_handle,  // in/out
                              cholmod_sparse *A,
                              // symbolic analysis
                              ParU_Symbolic *Sym,
-                             ParU_Control Control)
+                             ParU_Control *Control)
 {
     // mallopt(M_TRIM_THRESHOLD, -1);         // disable sbrk trimming
     // mallopt(M_TOP_PAD, 16 * 1024 * 1024);  // increase padding to speedup
@@ -53,8 +53,8 @@ ParU_Ret paru_init_rowFronts(ParU_Numeric **Num_handle,  // in/out
     m = Num->m = Sym->m - Sym->n1;
     n = Num->n = Sym->n - Sym->n1;
     nf = Sym->nf;
-    Num->panel_width = 32;
     Num->res = PARU_SUCCESS;
+    Num->Control = Control;
 
     Paru_Work *Work = Num->Work = (Paru_Work *)paru_alloc(1, sizeof(Paru_Work));
 
@@ -120,8 +120,8 @@ ParU_Ret paru_init_rowFronts(ParU_Numeric **Num_handle,  // in/out
         inv_Diag_map = Num->inv_Diag_map =
             (Int *)paru_alloc(Sym->n, sizeof(Int));
 #ifndef NDEBUG
-        paru_memset(Diag_map, 0, Sym->n * sizeof(Int));
-        paru_memset(inv_Diag_map, 0, Sym->n * sizeof(Int));
+        paru_memset(Diag_map, 0, Sym->n * sizeof(Int), Control);
+        paru_memset(inv_Diag_map, 0, Sym->n * sizeof(Int), Control);
 #endif
     }
 
@@ -141,16 +141,16 @@ ParU_Ret paru_init_rowFronts(ParU_Numeric **Num_handle,  // in/out
 
     // Initializations
     PRLEVEL(1, ("%% $RowList =%p\n", RowList));
-    paru_memset(rowSize, -1, m * sizeof(Int));
+    paru_memset(rowSize, -1, m * sizeof(Int), Control);
     PRLEVEL(1, ("%% rowSize pointer=%p size=%ld \n", rowSize, m * sizeof(Int)));
 
     PRLEVEL(1, ("%% rowMark pointer=%p size=%ld \n", rowMark,
                 (m + nf) * sizeof(Int)));
 
-    paru_memset(elRow, -1, (m + nf) * sizeof(Int));
+    paru_memset(elRow, -1, (m + nf) * sizeof(Int), Control);
     PRLEVEL(1, ("%% elRow=%p\n", elRow));
 
-    paru_memset(elCol, -1, (m + nf) * sizeof(Int));
+    paru_memset(elCol, -1, (m + nf) * sizeof(Int), Control);
     PRLEVEL(1, ("%% elCol=%p\n", elCol));
 
     PRLEVEL(1, ("%% Work =%p\n ", Work));
