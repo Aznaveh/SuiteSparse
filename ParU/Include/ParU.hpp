@@ -338,7 +338,8 @@ struct ParU_Control
     double piv_toler = 0.1;    //tolerance for accepting sparse pivots
     double diag_toler = 0.001; //tolerance for accepting symmetric pivots
     Int trivial = 4; // dgemms with sizes less than trivial doesn't call BLAS
-    Int worthwhile = 512; // dgemms bigger than worthwhile 
+    Int worthwhile_dgemm = 512; // dgemms bigger than worthwhile are tasked
+    Int worthwhile_trsm = 4096; // trsm bigger than worthwhile are tasked
     Int paru_max_threads;  
     
 };

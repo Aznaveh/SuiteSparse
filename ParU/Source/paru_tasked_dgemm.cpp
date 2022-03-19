@@ -17,7 +17,7 @@ void paru_tasked_dgemm(Int f, BLAS_INT M, BLAS_INT N, BLAS_INT K, double *A,
     Int naft;
     ParU_Control *Control = Num->Control;
     Int trivial = Control->trivial;
-    Int L = Control->worthwhile;
+    Int L = Control->worthwhile_dgemm;
     #pragma omp atomic read
     naft = Num->naft;
     const Int max_threads = Control->paru_max_threads;
