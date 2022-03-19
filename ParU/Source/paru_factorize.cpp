@@ -242,7 +242,8 @@ ParU_Ret ParU_Factorize(cholmod_sparse *A, ParU_Symbolic *Sym,
     printf("ntasks=%ld task_Q.size=%ld\n", ntasks, task_Q.size());
     if (ntasks > 0)
     {
-        chainess = (task_depth[task_Q[0]] + 1) / (double)nf;
+        //chainess = (task_depth[task_Q[0]] + 1) / (double)nf;
+        chainess = 1 - (task_Q.size()  / (double)ntasks);
         maxchain_ratio = (((double)max_chain + 1) / nf);
         printf(
             "nf = %ld, deepest = %ld, chainess = %lf max_chain=%ld"
@@ -272,7 +273,7 @@ ParU_Ret ParU_Factorize(cholmod_sparse *A, ParU_Symbolic *Sym,
     else 
         Control->paru_max_threads = paru_max_threads;
 
-    if (ntasks > 1)
+    if (task_Q.size() > 1)
     {
         printf("Parallel\n");
 #ifdef MKLROOT
