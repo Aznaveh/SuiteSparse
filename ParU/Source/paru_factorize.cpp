@@ -274,7 +274,7 @@ ParU_Ret ParU_Factorize(cholmod_sparse *A, ParU_Symbolic *Sym,
         Control->paru_max_threads = paru_max_threads;
 
     //if (task_Q.size() > 1 && ntasks*2 > Control->paru_max_threads )
-    if (task_Q.size()*2 >  Control->paru_max_threads )
+    if ( (Int) task_Q.size()*2 >  Control->paru_max_threads )
     {
         printf("Parallel\n");
 #ifdef MKLROOT
