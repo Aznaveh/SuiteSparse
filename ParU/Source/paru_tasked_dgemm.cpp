@@ -7,8 +7,6 @@
  * @author Aznaveh
  */
 #include "paru_internal.hpp"
-#define L 512    // XXX
-#define SMALL 4  // XXX
 
 void paru_tasked_dgemm(Int f, BLAS_INT M, BLAS_INT N, BLAS_INT K, double *A,
                        BLAS_INT lda, double *B, BLAS_INT ldb, double beta,
@@ -17,13 +15,12 @@ void paru_tasked_dgemm(Int f, BLAS_INT M, BLAS_INT N, BLAS_INT K, double *A,
     DEBUGLEVEL(0);
     // alpha is always -1  in my DGEMMs
     Int naft;
+    ParU_Control *Control = Num->Control;
+    Int trivial = Control->trivial;
+    Int L = Control->worthwhile;
     #pragma omp atomic read
     naft = Num->naft;
     const Int max_threads = Num->paru_max_threads;
-    //#ifdef MKLROOT
-    // omp_set_dynamic(0);
-    // mkl_set_dynamic(0);
-    //#endif
     if (naft == 1)
         BLAS_set_num_threads(max_threads);
     else
@@ -31,7 +28,7 @@ void paru_tasked_dgemm(Int f, BLAS_INT M, BLAS_INT N, BLAS_INT K, double *A,
 #ifndef NTIME
     double start_time = PARU_OPENMP_GET_WTIME;
 #endif
-    if (M < SMALL && N < SMALL && K < SMALL)
+    if (M < trivial && N < trivial && K <trivial)
     // if(0)
     {
         PRLEVEL(1, ("%% SMALL DGEMM (%d,%d,%d) in %ld\n", M, N, K, f));
