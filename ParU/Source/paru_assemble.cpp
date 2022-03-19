@@ -112,9 +112,10 @@ void paru_assemble_all(Int e, Int f, std::vector<Int> &colHash,
         }
 
         Int naft;  // number of active frontal tasks
-#pragma omp atomic read
+        #pragma omp atomic read
         naft = Num->naft;
-        const Int max_threads = Num->paru_max_threads;
+        ParU_Control *Control = Num->Control;
+        const Int max_threads = Control->paru_max_threads;
 
         if (naft < max_threads / 2 || el->nrowsleft * el->ncolsleft < 4096 ||
             el->nrowsleft < 1024)
@@ -358,7 +359,7 @@ void paru_assemble_cols(Int e, Int f, std::vector<Int> &colHash,
         toll++;  // if found
         double *dC = curEl_Num + fcolind * curEl->nrows;
 
-        //**//pragma omp task priority(Depth[f]) if(el->nrowsleft > TASK_MIN)
+        //**//pragma omp task priority(Depth[f]) if(el->nrowsleft > 1024)
         for (Int ii = 0; ii < el->nrowsleft; ii++)
         {
             Int i = tempRow[ii];
@@ -745,8 +746,7 @@ void paru_assemble_el_with0rows(Int e, Int f, std::vector<Int> &colHash,
 
             double *dC = curEl_Num + fcolind * curEl->nrows;
 
-            //**//pragma omp task priority(Depth[f]) if(nrows2assembl >
-            // TASK_MIN)
+            //**//pragma omp task priority(Depth[f]) if(nrows2assembl > 1024)
             for (Int iii = 0; iii < nrows2assembl; iii++)
             {
                 Int i = tempRow[iii];

@@ -264,7 +264,14 @@ ParU_Ret ParU_Factorize(cholmod_sparse *A, ParU_Symbolic *Sym,
 
     // if (chainess < .6 && maxchain_ratio < .25)
 
-    Num->paru_max_threads = PARU_OPENMP_MAX_THREADS;
+    Int paru_max_threads = PARU_OPENMP_MAX_THREADS;
+    // chekcing user input 
+    if (Control->paru_max_threads > 0)
+        Control->paru_max_threads = 
+            MIN (paru_max_threads, Control->paru_max_threads);
+    else 
+        Control->paru_max_threads = paru_max_threads;
+
     if (ntasks > 1)
     {
         printf("Parallel\n");

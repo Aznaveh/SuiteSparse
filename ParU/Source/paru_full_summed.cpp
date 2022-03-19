@@ -137,7 +137,7 @@ void paru_full_summed(Int e, Int f, ParU_Numeric *Num)
             PRLEVEL(PR, ("%ld ", el_rowIndex[tempRow[i]]));
         PRLEVEL(PR, ("%% \n"));
 #endif
-        // FIXME SLOW DOWN
+        // SLOW DOWN!
         // Int *Depth = Sym->Depth;
         //#pragma omp parallel
         //#pragma omp single
@@ -155,7 +155,7 @@ void paru_full_summed(Int e, Int f, ParU_Numeric *Num)
 
             double *dC = pivotalFront + fcolInd * rowCount;
 
-            //#pragma omp task priority(Depth[f]) if(nrows2assembl > TASK_MIN)
+            //#pragma omp task priority(Depth[f]) if(nrows2assembl > 1024)
             for (Int iii = 0; iii < nrows2assembl; iii++)
             {
                 Int i = tempRow[iii];

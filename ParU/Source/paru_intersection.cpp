@@ -7,7 +7,7 @@
  *  @author Aznaveh
  */
 #include "paru_internal.hpp"
-#define C 4  // XXX
+#define Const 4
 
 int paru_intersection(Int e, ParU_Element **elementList,
                       std::set<Int> &stl_newColSet)
@@ -41,7 +41,7 @@ int paru_intersection(Int e, ParU_Element **elementList,
     PRLEVEL(PR, ("%% newColSet.size = %ld\n", stl_newColSet.size()));
     PRLEVEL(PR, ("%% nEl = %ld\n", nEl));
     std::set<Int>::iterator it;
-    if ((Int)(C * stl_newColSet.size()) < nEl - el->lac)
+    if ((Int)(Const * stl_newColSet.size()) < nEl - el->lac)
     // if size el >> stl_newColSet
     //   binary search each of elements in stl_newColSet in el
     //   log(nEl)*stl_newColSet.size()
@@ -61,7 +61,7 @@ int paru_intersection(Int e, ParU_Element **elementList,
             };
         }
     }
-    else if ((Int)stl_newColSet.size() > C * (nEl - el->lac))
+    else if ((Int)stl_newColSet.size() > Const * (nEl - el->lac))
     {  //  else if stl_newColSet >> el
         PRLEVEL(PR, ("%%el << stl_newColSet\n"));
         //      binary search each of elements in el in stl_newColSet

@@ -20,7 +20,7 @@ void paru_tasked_dgemm(Int f, BLAS_INT M, BLAS_INT N, BLAS_INT K, double *A,
     Int L = Control->worthwhile;
     #pragma omp atomic read
     naft = Num->naft;
-    const Int max_threads = Num->paru_max_threads;
+    const Int max_threads = Control->paru_max_threads;
     if (naft == 1)
         BLAS_set_num_threads(max_threads);
     else

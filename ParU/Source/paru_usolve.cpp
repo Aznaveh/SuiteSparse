@@ -42,6 +42,7 @@ Int paru_usolve(double *x, ParU_Numeric *Num)
     double start_time = PARU_OPENMP_GET_WTIME;
 #endif
     ParU_Symbolic *Sym = Num->Sym;
+    ParU_Control *Control = Num->Control;
     Int nf = Sym->nf;
 
     Int n1 = Sym->n1;   // row+col singletons
@@ -51,7 +52,7 @@ Int paru_usolve(double *x, ParU_Numeric *Num)
     ParU_Factors *Us = Num->partial_Us;
     Int *Super = Sym->Super;
 
-    const Int max_threads = Num->paru_max_threads;
+    const Int max_threads = Control->paru_max_threads;
     BLAS_set_num_threads(max_threads);
     std::vector<double> work(Num->max_col_count);
 
@@ -180,6 +181,7 @@ Int paru_usolve(double *X, Int n, ParU_Numeric *Num)
     if (!X) return (0);
     PARU_DEFINE_PRLEVEL;
     ParU_Symbolic *Sym = Num->Sym;
+    ParU_Control *Control = Num->Control;
     Int m = Sym->m;
     Int nf = Sym->nf;
 #ifndef NDEBUG
@@ -206,7 +208,7 @@ Int paru_usolve(double *X, Int n, ParU_Numeric *Num)
     ParU_Factors *Us = Num->partial_Us;
     Int *Super = Sym->Super;
 
-    const Int max_threads = Num->paru_max_threads;
+    const Int max_threads = Control->paru_max_threads;
     BLAS_set_num_threads(max_threads);
     std::vector<double> work(Num->max_col_count * n);
 

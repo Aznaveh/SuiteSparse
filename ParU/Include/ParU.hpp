@@ -339,6 +339,7 @@ struct ParU_Control
     double diag_toler = 0.001; //tolerance for accepting symmetric pivots
     Int trivial = 4; // dgemms with sizes less than trivial doesn't call BLAS
     Int worthwhile = 512; // dgemms bigger than worthwhile 
+    Int paru_max_threads;  
     
 };
 
@@ -405,8 +406,6 @@ struct ParU_Numeric
 
     Int naft;              // number of actvie frontal tasks
     Int resq;              // number of remainig ready tasks in the queue
-    Int paru_max_threads;  // I want to call omp_get_max_threads just once
-                           // or user can give me a value less than that
     ParU_Ret res;          // returning value of numeric phase
 };
 
