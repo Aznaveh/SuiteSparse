@@ -191,7 +191,7 @@ Int paru_lsolve(double *x, ParU_Numeric *Num)
 ///mRHS///////////////////
 Int paru_lsolve(double *X, Int n, ParU_Numeric *Num)
 {
-    DEBUGLEVEL(0);
+    DEBUGLEVEL(1);
     PARU_DEFINE_PRLEVEL;
     if (!X) return (0);
     ParU_Symbolic *Sym = Num->Sym;
@@ -200,18 +200,19 @@ Int paru_lsolve(double *X, Int n, ParU_Numeric *Num)
     Int nf = Sym->nf;
 
 #ifndef NDEBUG
+    PR = 2;
     PRLEVEL(1, ("%% mRHS inside LSolve X is:\n"));
     for (Int k = 0; k < m; k++)
     {
-        PRLEVEL(1, ("%%"));
+        PRLEVEL(PR, ("%%"));
         for (Int l = 0; l < n; l++)
         {
-            PRLEVEL(1, (" %.2lf, ", X[l * m + k]));
+            PRLEVEL(PR, (" %.2lf, ", X[l * m + k]));
             // PRLEVEL(1, (" %.2lf, ", X[k*n+l])); X row major
         }
-        PRLEVEL(1, (" \n"));
+        PRLEVEL(PR, (" \n"));
     }
-    PRLEVEL(1, (" \n"));
+    PRLEVEL(PR, (" \n"));
 #endif
 #ifndef NTIME
     double start_time = PARU_OPENMP_GET_WTIME;
@@ -262,15 +263,15 @@ Int paru_lsolve(double *X, Int n, ParU_Numeric *Num)
     PRLEVEL(1, ("%% mRHS lsovle singletons finished and X is:\n"));
     for (Int k = 0; k < m; k++)
     {
-        PRLEVEL(1, ("%%"));
+        PRLEVEL(PR, ("%%"));
         for (Int l = 0; l < n; l++)
         {
-            PRLEVEL(1, (" %.2lf, ", X[l * m + k]));
+            PRLEVEL(PR, (" %.2lf, ", X[l * m + k]));
             // PRLEVEL(1, (" %.2lf, ", X[k*n+l])); X row major
         }
-        PRLEVEL(1, (" \n"));
+        PRLEVEL(PR, (" \n"));
     }
-    PRLEVEL(1, (" \n"));
+    PRLEVEL(PR, (" \n"));
 #endif
     const Int max_threads = Control->paru_max_threads;
     BLAS_set_num_threads(max_threads);

@@ -298,13 +298,13 @@ ParU_Ret ParU_Factorize(cholmod_sparse *A, ParU_Symbolic *Sym,
     if ( (Int) task_Q.size()*2 >  Control->paru_max_threads )
     {
         printf("Parallel\n");
-        Int paru_max_threads = PARU_OPENMP_MAX_THREADS;
+        Int max_threads = PARU_OPENMP_MAX_THREADS;
         // chekcing user input 
         if (Control->paru_max_threads > 0)
             Control->paru_max_threads = 
-                MIN (paru_max_threads, Control->paru_max_threads);
+                MIN (max_threads, Control->paru_max_threads);
         else 
-            Control->paru_max_threads = paru_max_threads;
+            Control->paru_max_threads = max_threads;
 
         PRLEVEL (PR, ("Control: max_th=%ld scale=%ld piv_toler=%lf " 
                  "diag_toler=%lf trivial =%ld worthwhile_dgemm=%ld "
