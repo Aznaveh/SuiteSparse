@@ -249,10 +249,10 @@ Int paru_apply_perm_scale(const Int *P, const double *s, const double *b,
 Int paru_apply_perm_scale(const Int *P, const double *s, const double *b,
                           double *x, Int m, Int n);
 // lsolve and usolve
-Int paru_lsolve(double *x, ParU_Numeric *Num);
-Int paru_lsolve(double *X, Int n, ParU_Numeric *Num);
-Int paru_usolve(double *x, ParU_Numeric *Num);
-Int paru_usolve(double *X, Int n, ParU_Numeric *Num);
+Int paru_lsolve(double *x, ParU_Numeric *Num, ParU_Control *Control);
+Int paru_lsolve(double *X, Int n, ParU_Numeric *Num, ParU_Control *Control);
+Int paru_usolve(double *x, ParU_Numeric *Num, ParU_Control *Control);
+Int paru_usolve(double *X, Int n, ParU_Numeric *Num, ParU_Control *Control);
 
 Int paru_gaxpy(cholmod_sparse *A, const double *x, double *y, double alpha);
 double paru_spm_1norm(cholmod_sparse *A);

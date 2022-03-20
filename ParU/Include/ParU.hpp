@@ -350,6 +350,7 @@ struct ParU_Numeric
     ParU_Symbolic *Sym;
     ParU_TupleList *RowList;  // size n of dynamic list
     ParU_Control *Control;   // a copy of controls for internal use
+                            // it is freed after factorize
 
     ParU_Element **elementList;  // pointers to all elements, size = m+nf+1
     Paru_Work *Work;
