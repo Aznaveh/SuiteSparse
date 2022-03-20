@@ -50,7 +50,7 @@
  * */
 #include "paru_internal.hpp"
 ParU_Ret ParU_Analyze(cholmod_sparse *A, ParU_Symbolic **S_handle,
-                      ParU_Control *Control)
+                      ParU_Control *user_Control)
 {
     DEBUGLEVEL(0);
     PARU_DEFINE_PRLEVEL;
@@ -256,6 +256,33 @@ ParU_Ret ParU_Analyze(cholmod_sparse *A, ParU_Symbolic **S_handle,
     //      However I am using the default for now; Page 40 UMFPACK_UserGuide
     //      Page 22 UserGuide
     umfpack_dl_defaults(umf_Control);
+
+    //before using the Control checking user input
+    ParU_Control my_Control = *user_Control;
+    {
+        Int mem_chunk = my_Control.mem_chunk;
+        if (mem_chunk < 1024 )
+            my_Control.mem_chunk = 1024*1024;
+        Int umfpack_ordering = my_Control.umfpack_ordering;
+        // I dont support UMFPACK_ORDERING_GIVEN or UMFPACK_ORDERING_USER now
+        if (umfpack_ordering != UMFPACK_ORDERING_METIS &&
+                umfpack_ordering != UMFPACK_ORDERING_AMD &&
+                umfpack_ordering != UMFPACK_ORDERING_CHOLMOD &&
+                umfpack_ordering != UMFPACK_ORDERING_BEST &&
+                umfpack_ordering != UMFPACK_ORDERING_NONE )
+            my_Control.umfpack_ordering = UMFPACK_ORDERING_METIS;
+        Int umfpack_strategy = my_Control.umfpack_strategy;
+        // I dont support UMFPACK_ORDERING_GIVEN or UMFPACK_ORDERING_USER now
+        if (umfpack_strategy != UMFPACK_STRATEGY_AUTO &&
+                umfpack_strategy != UMFPACK_STRATEGY_SYMMETRIC &&
+                umfpack_strategy != UMFPACK_STRATEGY_UNSYMMETRIC)
+            my_Control.umfpack_strategy = UMFPACK_STRATEGY_AUTO;
+        Int scale = my_Control.scale;
+        if ( scale != 0 || scale != 1)
+            my_Control.scale = 1;
+    }
+    ParU_Control *Control= &my_Control;
+    
     umf_Control[UMFPACK_ORDERING] = Control->umfpack_ordering;
     //umf_Control[UMFPACK_ORDERING] = UMFPACK_ORDERING_METIS;
     umf_Control[UMFPACK_FIXQ] = -1;

@@ -167,9 +167,9 @@ ParU_Ret paru_exec_tasks(Int t, Int *task_num_child, Int &chain_task,
     return myInfo;
 }
 ParU_Ret ParU_Factorize(cholmod_sparse *A, ParU_Symbolic *Sym,
-                        ParU_Numeric **Num_handle, ParU_Control *Control)
+                        ParU_Numeric **Num_handle, ParU_Control *user_Control)
 {
-    DEBUGLEVEL(0);
+    DEBUGLEVEL(1);
 #ifndef NTIME
     double my_start_time = PARU_OPENMP_GET_WTIME;
 #endif
@@ -194,9 +194,39 @@ ParU_Ret ParU_Factorize(cholmod_sparse *A, ParU_Symbolic *Sym,
     Num = *Num_handle;
 
     ParU_Ret info;
-    // XXX populate my_Control with tested values of Control
-    ParU_Control my_Control = *Control;
-    info = paru_init_rowFronts(&Num, A, Sym, &my_Control);
+    // populate my_Control with tested values of Control
+    ParU_Control my_Control = *user_Control;
+    {
+        Int mem_chunk = my_Control.mem_chunk;
+        if (mem_chunk < 1024 )
+            my_Control.mem_chunk = 1024*1024;
+        Int panel_width = my_Control.panel_width;
+        if (panel_width < 0 || panel_width > Sym->m )
+            my_Control.panel_width = 32;
+        Int paru_strategy = my_Control.paru_strategy;
+        if (paru_strategy != PARU_STRATEGY_AUTO &&
+                paru_strategy != PARU_STRATEGY_SYMMETRIC &&
+                paru_strategy != PARU_STRATEGY_UNSYMMETRIC)
+            my_Control.paru_strategy = PARU_STRATEGY_AUTO; 
+        double piv_toler = my_Control.piv_toler;
+        if (piv_toler > 1 || piv_toler < 0)
+            my_Control.piv_toler = .1;
+        double diag_toler = my_Control.diag_toler;
+        if ( diag_toler > 1 || diag_toler < 0)
+            my_Control.diag_toler = .001;
+        Int trivial = my_Control.trivial;
+        if ( trivial < 0)
+            my_Control.trivial = 4;
+        Int worthwhile_dgemm = my_Control.worthwhile_dgemm;
+        if ( worthwhile_dgemm < 0)
+            my_Control.worthwhile_dgemm = 512;
+        Int worthwhile_trsm = my_Control.worthwhile_trsm;
+        if ( worthwhile_trsm < 0)
+            my_Control.worthwhile_trsm = 4096;
+    }
+    ParU_Control *Control= &my_Control;
+
+    info = paru_init_rowFronts(&Num, A, Sym, Control);
     *Num_handle = Num;
 
     PRLEVEL(1, ("%% init_row is done\n"));
@@ -226,9 +256,9 @@ ParU_Ret ParU_Factorize(cholmod_sparse *A, ParU_Symbolic *Sym,
     }
 
     std::sort(task_Q.begin(), task_Q.end(),
-              [&task_depth](const Int &t1, const Int &t2) -> bool {
-                  return task_depth[t1] > task_depth[t2];
-              });
+            [&task_depth](const Int &t1, const Int &t2) -> bool {
+            return task_depth[t1] > task_depth[t2];
+            });
 
     // Int *Depth = Sym->Depth;
     //    std::sort(task_Q.begin(), task_Q.end(),
@@ -246,7 +276,7 @@ ParU_Ret ParU_Factorize(cholmod_sparse *A, ParU_Symbolic *Sym,
         chainess = 1 - (task_Q.size()  / (double)ntasks);
         maxchain_ratio = (((double)max_chain + 1) / nf);
         printf(
-            "nf = %ld, deepest = %ld, chainess = %lf max_chain=%ld"
+                "nf = %ld, deepest = %ld, chainess = %lf max_chain=%ld"
             " maxchain_ratio =%lf\n",
             nf, task_depth[task_Q[0]], chainess, max_chain, maxchain_ratio);
     }
@@ -263,25 +293,32 @@ ParU_Ret ParU_Factorize(cholmod_sparse *A, ParU_Symbolic *Sym,
     PRLEVEL(PR, ("\n"));
 #endif
 
-    // if (chainess < .6 && maxchain_ratio < .25)
-
-    Int paru_max_threads = PARU_OPENMP_MAX_THREADS;
-    // chekcing user input 
-    if (Control->paru_max_threads > 0)
-        Control->paru_max_threads = 
-            MIN (paru_max_threads, Control->paru_max_threads);
-    else 
-        Control->paru_max_threads = paru_max_threads;
 
     //if (task_Q.size() > 1 && ntasks*2 > Control->paru_max_threads )
     if ( (Int) task_Q.size()*2 >  Control->paru_max_threads )
     {
         printf("Parallel\n");
+        Int paru_max_threads = PARU_OPENMP_MAX_THREADS;
+        // chekcing user input 
+        if (Control->paru_max_threads > 0)
+            Control->paru_max_threads = 
+                MIN (paru_max_threads, Control->paru_max_threads);
+        else 
+            Control->paru_max_threads = paru_max_threads;
+
+        PRLEVEL (PR, ("Control: max_th=%ld scale=%ld piv_toler=%lf " 
+                 "diag_toler=%lf trivial =%ld worthwhile_dgemm=%ld "
+                 "worthwhile_trsm=%ld\n",
+                    Control->paru_max_threads, Control->scale, 
+                    Control->piv_toler, Control->diag_toler, Control->trivial, 
+                    Control->worthwhile_dgemm,
+                    Control->worthwhile_trsm));
+
 #ifdef MKLROOT
         PARU_OPENMP_SET_DYNAMIC(0);
         mkl_set_dynamic(0);
-// mkl_set_threading_layer(MKL_THREADING_INTEL);
-// mkl_set_interface_layer(MKL_INTERFACE_ILP64);
+        // mkl_set_threading_layer(MKL_THREADING_INTEL);
+        // mkl_set_interface_layer(MKL_INTERFACE_ILP64);
 #endif
         BLAS_set_num_threads(1);
         PARU_OPENMP_SET_MAX_ACTIVE_LEVELS(4);
@@ -291,7 +328,7 @@ ParU_Ret ParU_Factorize(cholmod_sparse *A, ParU_Symbolic *Sym,
         Int chain_task = -1;
         Int start = 0;
         PRLEVEL(
-            1, ("%% size=%ld, steps =%ld, stages =%ld\n", size, steps, stages));
+                1, ("%% size=%ld, steps =%ld, stages =%ld\n", size, steps, stages));
 
         for (Int ii = 0; ii < stages; ii++)
         {
@@ -302,14 +339,14 @@ ParU_Ret ParU_Factorize(cholmod_sparse *A, ParU_Symbolic *Sym,
             #pragma omp single nowait
             #pragma omp task untied  // clang might seg fault on untied
             for (Int i = start; i < end; i++)
-            // for (Int i = 0; i < (Int)task_Q.size(); i++)
+                // for (Int i = 0; i < (Int)task_Q.size(); i++)
             {
                 Int t = task_Q[i];
                 // printf("poping %ld \n", f);
                 Int d = task_depth[t];
                 #pragma omp task mergeable priority(d)
                 {
-                #pragma omp atomic update
+                    #pragma omp atomic update
                     Num->naft++;
 
                     ParU_Ret myInfo =
