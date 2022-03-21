@@ -240,11 +240,7 @@ struct ParU_Symbolic
     Int *task_parent;  // tree data structure for tasks
     Int *task_num_child;  // number of children of each task
     Int *task_depth;      // max depth of each task
-
-    // symbolic analysis time
-    double my_time;
-
-    Int max_chain;  // maximum size of the chains in final tree
+    Int max_chain;        // maximum size of the chains in final tree
 };
 
 // =============================================================================
@@ -324,24 +320,23 @@ enum ParU_Ret
 
 struct ParU_Control
 {
-    Int mem_chunk = 1024*1024; //chunk size for memset and memcpy
-    //Sybmolic controls
-    Int scale = 1; // if 1 matrix will be scaled using max_row
+    Int mem_chunk = 1024 * 1024;  // chunk size for memset and memcpy
+    // Sybmolic controls
+    Int scale = 1;  // if 1 matrix will be scaled using max_row
     Int umfpack_ordering = UMFPACK_ORDERING_METIS;
-    Int umfpack_strategy = UMFPACK_STRATEGY_AUTO; //symmetric or unsymmetric
+    Int umfpack_strategy = UMFPACK_STRATEGY_AUTO;  // symmetric or unsymmetric
 
-
-    //Numeric controls
+    // Numeric controls
     Int panel_width = 32;  // width of panel for dense factorizaiton
-    Int paru_strategy = PARU_STRATEGY_AUTO; //the same stratey umfpack used
+    Int paru_strategy = PARU_STRATEGY_AUTO;  // the same stratey umfpack used
 
-    double piv_toler = 0.1;    //tolerance for accepting sparse pivots
-    double diag_toler = 0.001; //tolerance for accepting symmetric pivots
-    Int trivial = 4; // dgemms with sizes less than trivial doesn't call BLAS
-    Int worthwhile_dgemm = 512; // dgemms bigger than worthwhile are tasked
-    Int worthwhile_trsm = 4096; // trsm bigger than worthwhile are tasked
-    Int paru_max_threads = 0;  //It will be initialized with omp_max_threads
-                               // if the user did not provide
+    double piv_toler = 0.1;     // tolerance for accepting sparse pivots
+    double diag_toler = 0.001;  // tolerance for accepting symmetric pivots
+    Int trivial = 4;  // dgemms with sizes less than trivial doesn't call BLAS
+    Int worthwhile_dgemm = 512;  // dgemms bigger than worthwhile are tasked
+    Int worthwhile_trsm = 4096;  // trsm bigger than worthwhile are tasked
+    Int paru_max_threads = 0;    // It will be initialized with omp_max_threads
+                                 // if the user did not provide
 };
 
 struct ParU_Numeric
@@ -349,8 +344,8 @@ struct ParU_Numeric
     Int m, n;  // size of the sumbatrix that is factorized
     ParU_Symbolic *Sym;
     ParU_TupleList *RowList;  // size n of dynamic list
-    ParU_Control *Control;   // a copy of controls for internal use
-                            // it is freed after factorize
+    ParU_Control *Control;    // a copy of controls for internal use
+                              // it is freed after factorize
 
     ParU_Element **elementList;  // pointers to all elements, size = m+nf+1
     Paru_Work *Work;
@@ -394,10 +389,6 @@ struct ParU_Numeric
     // its own. The list of heaps are initialized by nullptr
     std::vector<Int> **heapList;  // size m+nf+1, initialized with nullptr
 
-    // analysis information
-    double my_time;  // factorization time
-    double umf_time;
-
     // #ifdef COUNT_FLOPS
     // flop count info
     double flp_cnt_dgemm;
@@ -406,9 +397,9 @@ struct ParU_Numeric
     double flp_cnt_real_dgemm;
     // #endif
 
-    Int naft;              // number of actvie frontal tasks
-    Int resq;              // number of remainig ready tasks in the queue
-    ParU_Ret res;          // returning value of numeric phase
+    Int naft;      // number of actvie frontal tasks
+    Int resq;      // number of remainig ready tasks in the queue
+    ParU_Ret res;  // returning value of numeric phase
 };
 
 //------------------------------------------------------------------------------

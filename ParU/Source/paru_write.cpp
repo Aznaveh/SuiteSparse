@@ -170,8 +170,10 @@ void paru_write(ParU_Numeric *Num, int scale, char *id)
             printf("Error in opening a file");
             return;
         }
-        fprintf(infofptr, "%.17g\n", Num->my_time + Sym->my_time);
-        fprintf(infofptr, "%.17g\n", Num->umf_time);
+        // I don't use umf_time inside a user visible DS anymore
+        // maybe I can use another DS for internal use if I need it in future
+        //fprintf(infofptr, "%.17g\n", Num->my_time + Sym->my_time);
+        // fprintf(infofptr, "%.17g\n", Num->umf_time);
 
 #ifdef COUNT_FLOPS
         fprintf(infofptr, "%.17g\n", Num->flp_cnt_dgemm);

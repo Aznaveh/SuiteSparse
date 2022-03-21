@@ -151,9 +151,6 @@ int main(int argc, char **argv)
     // Writing results to a file
     if (info == PARU_SUCCESS)
     {
-        // Num->umf_time = umf_time;
-        // Writing LU factors into a file, can be time consuming
-        // paru_write(Num, scale, argv[1]);
         FILE *res_file;
         char res_name[] = "../Demo/Res/res.txt";
         res_file = fopen(res_name, "a");
