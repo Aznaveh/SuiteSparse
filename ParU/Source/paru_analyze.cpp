@@ -319,15 +319,14 @@ ParU_Ret ParU_Analyze(cholmod_sparse *A, ParU_Symbolic **S_handle,
     /* ---------------------------------------------------------------------- */
     /* startegy UMFPACK used*/
     /* ---------------------------------------------------------------------- */
-
-    //I am sticking used strategy in Sym; maybe I should change both here and
-    //paru_fs_factorize FIXME
     Int strategy = Info[UMFPACK_STRATEGY_USED];
     if (Control->paru_strategy == PARU_STRATEGY_AUTO)
+    { // if user didn't choose the strategy I will pick the same strategy
+        // as umfpack.        However I cannot save it in current control
         Sym->strategy = strategy;
+    }
     else
         Sym->strategy = Control->paru_strategy;
-    // Sym->strategy = PARU_STRATEGY_SYMMETRIC;
 
 #ifndef NDEBUG
     PR = 0;

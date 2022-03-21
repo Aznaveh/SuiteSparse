@@ -204,10 +204,18 @@ ParU_Ret ParU_Factorize(cholmod_sparse *A, ParU_Symbolic *Sym,
         if (panel_width < 0 || panel_width > Sym->m )
             my_Control.panel_width = 32;
         Int paru_strategy = my_Control.paru_strategy;
-        if (paru_strategy != PARU_STRATEGY_AUTO &&
-                paru_strategy != PARU_STRATEGY_SYMMETRIC &&
+        //at this point the strategy should be known 
+        //if the user didnot decide I 
+        if (paru_strategy == PARU_STRATEGY_AUTO) //user didn't specify
+            //so I use the same strategy as umfpack 
+            my_Control.paru_strategy = Sym->strategy;
+        else if (paru_strategy != PARU_STRATEGY_SYMMETRIC &&
                 paru_strategy != PARU_STRATEGY_UNSYMMETRIC)
-            my_Control.paru_strategy = PARU_STRATEGY_AUTO; 
+            //user input is not correct so I go to default
+            my_Control.paru_strategy = Sym->strategy; 
+        //else user already picked symmetric or unsymmetric 
+        // and it has been copied over
+        
         double piv_toler = my_Control.piv_toler;
         if (piv_toler > 1 || piv_toler < 0)
             my_Control.piv_toler = .1;

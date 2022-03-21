@@ -169,7 +169,7 @@ Int paru_panel_factorize(Int f, Int m, Int n, const Int panel_width,
         Int row_piv = row_max;
         Int chose_diag = 0;
 
-        if (Sym->strategy == PARU_STRATEGY_SYMMETRIC)
+        if (Control->paru_strategy == PARU_STRATEGY_SYMMETRIC)
         {
             if (diag_found != -1)
             {
@@ -226,7 +226,8 @@ Int paru_panel_factorize(Int f, Int m, Int n, const Int panel_width,
             row_piv = row_sp;
         }
 
-        if (Sym->strategy == PARU_STRATEGY_SYMMETRIC && chose_diag == 0)
+        if (Control->paru_strategy == PARU_STRATEGY_SYMMETRIC 
+                && chose_diag == 0)
         {
             Int pivcol = col1 + j + n1;      // S col index + n1
             Int pivrow = frowList[row_piv];  // S row index
