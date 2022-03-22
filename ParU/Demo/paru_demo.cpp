@@ -73,19 +73,25 @@ int main(int argc, char **argv)
     Int m = Sym->m;
     double *b = (double *)malloc(m * sizeof(double));
     for (Int i = 0; i < m; ++i) b[i] = i + 1;
+    my_start_time = omp_get_wtime();
+    info = ParU_Solve(b, Num, &Control);
+    my_time = omp_get_wtime() - my_start_time;
+    printf ("Solve time is %lf seconds.\n", my_time);
+    for (Int i = 0; i < m; ++i) b[i] = i + 1;
+    my_start_time = omp_get_wtime();
     double resid, norm;
     ParU_Residual(b, resid, norm, A, Num, &Control);
-    for (Int i = 0; i < m; ++i) b[i] = i + 1;
-    ParU_Backward(b, resid, norm, A, Num, &Control);
+    //for (Int i = 0; i < m; ++i) b[i] = i + 1;
+    //ParU_Backward(b, resid, norm, A, Num, &Control);
     free(b);
 
-    const Int nn = 16;  // number of right handsides
-    double *B = (double *)malloc(m * nn * sizeof(double));
-    double Res[4];
-    for (Int i = 0; i < m; ++i)
-        for (Int j = 0; j < nn; ++j) B[j * m + i] = (double)(i + j + 1);
-    ParU_Residual(A, Num, B, Res, nn, &Control);
-    free(B);
+    //const Int nn = 16;  // number of right handsides
+    //double *B = (double *)malloc(m * nn * sizeof(double));
+    //double Res[4];
+    //for (Int i = 0; i < m; ++i)
+    //    for (Int j = 0; j < nn; ++j) B[j * m + i] = (double)(i + j + 1);
+    //ParU_Residual(A, Num, B, Res, nn, &Control);
+    //free(B);
 #endif
 
     //~~~~~~~~~~~~~~~~~~~End computation~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
