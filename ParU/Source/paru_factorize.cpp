@@ -170,6 +170,7 @@ ParU_Ret ParU_Factorize(cholmod_sparse *A, ParU_Symbolic *Sym,
                         ParU_Numeric **Num_handle, ParU_Control *user_Control)
 {
     DEBUGLEVEL(1);
+    PARU_DEFINE_PRLEVEL;
 #ifndef NTIME
     double my_start_time = PARU_OPENMP_GET_WTIME;
 #endif
@@ -289,7 +290,7 @@ ParU_Ret ParU_Factorize(cholmod_sparse *A, ParU_Symbolic *Sym,
             nf, task_depth[task_Q[0]], chainess, max_chain, maxchain_ratio);
     }
 #ifndef NDEBUG
-    Int PR = -1;
+    PR = -1;
     Int *task_map = Sym->task_map;
     PRLEVEL(PR, ("\n%% task_Q:\n"));
     for (Int i = 0; i < (Int)task_Q.size(); i++)
@@ -442,7 +443,7 @@ ParU_Ret ParU_Factorize(cholmod_sparse *A, ParU_Symbolic *Sym,
 #ifndef NTIME
     Int time = PARU_OPENMP_GET_WTIME;
     time -= my_start_time;
-    PRLEVEL(1, ("factorization time took %ld is %lf\n", t, time));
+    PRLEVEL(1, ("factorization time took is %lf\n", time));
 #endif
     return PARU_SUCCESS;
 }

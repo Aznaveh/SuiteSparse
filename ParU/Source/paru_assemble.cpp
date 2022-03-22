@@ -13,6 +13,10 @@ void paru_assemble_all(Int e, Int f, std::vector<Int> &colHash,
 {
     DEBUGLEVEL(0);
     PARU_DEFINE_PRLEVEL;
+#ifndef NTIME
+    static double tot_assem_time = 0;
+    double start_time = PARU_OPENMP_GET_WTIME;
+#endif
 
     ParU_Symbolic *Sym = Num->Sym;
     Int *snM = Sym->super2atree;
@@ -117,8 +121,9 @@ void paru_assemble_all(Int e, Int f, std::vector<Int> &colHash,
         ParU_Control *Control = Num->Control;
         const Int max_threads = Control->paru_max_threads;
 
-        if (naft < max_threads / 2 || el->nrowsleft * el->ncolsleft < 4096 ||
-            el->nrowsleft < 1024)
+        //if (naft < max_threads / 2 || el->nrowsleft * el->ncolsleft < 4096 ||
+        //    el->nrowsleft < 1024)
+        if(1)
         {  // not enoght threads or very small assembly
             // sequential
             for (Int j = el->lac; j < nEl; j++)
@@ -155,9 +160,10 @@ void paru_assemble_all(Int e, Int f, std::vector<Int> &colHash,
                     ("Parallel Assembly naft=%ld colsleft=%ld rowsleft=%ld \n",
                      naft, el->ncolsleft, el->nrowsleft));
 
-#pragma omp parallel proc_bind(close) num_threads(max_threads / naft)
-#pragma omp single nowait
-#pragma omp task untied
+            #pragma omp parallel proc_bind(close) \
+                num_threads(max_threads / naft)
+            #pragma omp single nowait
+            #pragma omp task untied
             for (Int j = el->lac; j < nEl; j++)
             {
                 PRLEVEL(1, ("%% j =%ld \n", j));
@@ -172,7 +178,7 @@ void paru_assemble_all(Int e, Int f, std::vector<Int> &colHash,
 
                 double *dC = curEl_Num + fcolind * curEl->nrows;
 
-#pragma omp task
+                #pragma omp task
                 for (Int iii = 0; iii < el->nrowsleft; iii++)
                 {
                     Int i = tempRow[iii];
@@ -190,6 +196,14 @@ void paru_assemble_all(Int e, Int f, std::vector<Int> &colHash,
         }
     }
     paru_free_el(e, elementList);
+#ifndef NTIME
+    double time = PARU_OPENMP_GET_WTIME;
+    time -= start_time;
+    tot_assem_time += time;
+    if (f > Sym->nf - 5)
+        PRLEVEL(-1, ("%% assemble all %ld\t->%ld\t took %lf seconds tot=%lf\n",
+                e, f, time, tot_assem_time));
+#endif
 }
 
 // try to find columns and assemble them to current front. After the first
