@@ -441,7 +441,7 @@ ParU_Ret ParU_Factorize(cholmod_sparse *A, ParU_Symbolic *Sym,
     Num->max_row_count = max_rc;
     Num->max_col_count = max_cc;
 #ifndef NTIME
-    Int time = PARU_OPENMP_GET_WTIME;
+    double time = PARU_OPENMP_GET_WTIME;
     time -= my_start_time;
     PRLEVEL(1, ("factorization time took is %lf\n", time));
 #endif
