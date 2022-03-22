@@ -73,10 +73,10 @@ int main(int argc, char **argv)
     Int m = Sym->m;
     double *b = (double *)malloc(m * sizeof(double));
     for (Int i = 0; i < m; ++i) b[i] = i + 1;
-    my_start_time = omp_get_wtime();
+    double my_solve_time_start = omp_get_wtime();
     info = ParU_Solve(b, Num, &Control);
-    my_time = omp_get_wtime() - my_start_time;
-    printf ("Solve time is %lf seconds.\n", my_time);
+    double my_solve_time = omp_get_wtime() - my_solve_time_start;
+    printf ("Solve time is %lf seconds.\n", my_solve_time);
     for (Int i = 0; i < m; ++i) b[i] = i + 1;
     my_start_time = omp_get_wtime();
     Control.umfpack_ordering = UMFPACK_ORDERING_BEST;
