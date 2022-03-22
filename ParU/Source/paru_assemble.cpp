@@ -121,9 +121,8 @@ void paru_assemble_all(Int e, Int f, std::vector<Int> &colHash,
         ParU_Control *Control = Num->Control;
         const Int max_threads = Control->paru_max_threads;
 
-        //if (naft < max_threads / 2 || el->nrowsleft * el->ncolsleft < 4096 ||
-        //    el->nrowsleft < 1024)
-        if(1)
+        if (naft < max_threads / 2 || el->nrowsleft * el->ncolsleft < 4096 ||
+            el->nrowsleft < 1024)
         {  // not enoght threads or very small assembly
             // sequential
             for (Int j = el->lac; j < nEl; j++)
@@ -159,6 +158,10 @@ void paru_assemble_all(Int e, Int f, std::vector<Int> &colHash,
             PRLEVEL(1,
                     ("Parallel Assembly naft=%ld colsleft=%ld rowsleft=%ld \n",
                      naft, el->ncolsleft, el->nrowsleft));
+            
+             printf ("Parallel Assembly naft=%ld colsleft=%ld rowsleft=%ld \n",
+                     naft, el->ncolsleft, el->nrowsleft);
+
 
             #pragma omp parallel proc_bind(close) \
                 num_threads(max_threads / naft)
@@ -171,8 +174,8 @@ void paru_assemble_all(Int e, Int f, std::vector<Int> &colHash,
                 Int colInd = el_colIndex[j];
                 PRLEVEL(1, ("%% colInd =%ld \n", colInd));
                 if (colInd < 0) continue;
-                // printf("inside paralle region %ld j=%ld (%d)\n",
-                //        omp_get_active_level(), j,  omp_get_thread_num() );
+                 PRLEVEL(1, ("inside paralle region %d j=%ld (%d)\n",
+                        omp_get_active_level(), j,  omp_get_thread_num() ));
 
                 Int fcolind = colRelIndex[j];
 
@@ -189,6 +192,10 @@ void paru_assemble_all(Int e, Int f, std::vector<Int> &colHash,
                     PRLEVEL(1, ("%% dC [%ld] =%2.5lf \n", ri, dC[ri]));
                     dC[ri] += sC[i];
                     PRLEVEL(1, ("%% dC [%ld] =%2.5lf \n", i, dC[ri]));
+                   // #ifndef NTIME
+                   // //if (f > Sym->nf - 5)
+                   //     PRLEVEL(-1, ("p "));
+                   // #endif
                 }
                 if (--el->ncolsleft == 0) break;
                 PRLEVEL(1, ("\n"));
