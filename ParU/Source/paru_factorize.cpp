@@ -290,7 +290,7 @@ ParU_Ret ParU_Factorize(cholmod_sparse *A, ParU_Symbolic *Sym,
             nf, task_depth[task_Q[0]], chainess, max_chain, maxchain_ratio);
     }
 #ifndef NDEBUG
-    PR = -1;
+    PR = 1;
     Int *task_map = Sym->task_map;
     PRLEVEL(PR, ("\n%% task_Q:\n"));
     for (Int i = 0; i < (Int)task_Q.size(); i++)

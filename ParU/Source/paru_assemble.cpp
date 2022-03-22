@@ -199,6 +199,7 @@ void paru_assemble_all(Int e, Int f, std::vector<Int> &colHash,
 #ifndef NTIME
     double time = PARU_OPENMP_GET_WTIME;
     time -= start_time;
+    #pragma omp atomic update
     tot_assem_time += time;
     if (f > Sym->nf - 5)
         PRLEVEL(-1, ("%% assemble all %ld\t->%ld\t took %lf seconds tot=%lf\n",
