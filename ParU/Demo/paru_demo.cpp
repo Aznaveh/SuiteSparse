@@ -79,6 +79,8 @@ int main(int argc, char **argv)
     printf ("Solve time is %lf seconds.\n", my_time);
     for (Int i = 0; i < m; ++i) b[i] = i + 1;
     my_start_time = omp_get_wtime();
+    Control.umfpack_ordering = UMFPACK_ORDERING_BEST;
+    Control.paru_strategy = PARU_STRATEGY_SYMMETRIC;
     double resid, norm;
     ParU_Residual(b, resid, norm, A, Num, &Control);
     //for (Int i = 0; i < m; ++i) b[i] = i + 1;
