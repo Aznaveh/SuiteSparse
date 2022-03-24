@@ -12,7 +12,7 @@
 
 ParU_Ret paru_exec_tasks_seq(Int t, Int *task_num_child, ParU_Numeric *Num)
 {
-    DEBUGLEVEL(0);
+    DEBUGLEVEL(1);
     ParU_Symbolic *Sym = Num->Sym;
     Int *task_parent = Sym->task_parent;
     Int daddy = task_parent[t];
@@ -76,7 +76,7 @@ ParU_Ret paru_exec_tasks_seq(Int t, Int *task_num_child, ParU_Numeric *Num)
 ParU_Ret paru_exec_tasks(Int t, Int *task_num_child, Int &chain_task,
                          ParU_Numeric *Num)
 {
-    DEBUGLEVEL(0);
+    DEBUGLEVEL(1);
     ParU_Symbolic *Sym = Num->Sym;
     Int *task_parent = Sym->task_parent;
     Int daddy = task_parent[t];
@@ -232,6 +232,12 @@ ParU_Ret ParU_Factorize(cholmod_sparse *A, ParU_Symbolic *Sym,
         Int worthwhile_trsm = my_Control.worthwhile_trsm;
         if ( worthwhile_trsm < 0)
             my_Control.worthwhile_trsm = 4096;
+        Int max_threads = PARU_OPENMP_MAX_THREADS;
+        if (my_Control.paru_max_threads > 0)
+            my_Control.paru_max_threads  =
+                MIN (max_threads, my_Control.paru_max_threads);
+        else            
+            my_Control.paru_max_threads  = max_threads;
     }
     ParU_Control *Control= &my_Control;
 
@@ -304,18 +310,12 @@ ParU_Ret ParU_Factorize(cholmod_sparse *A, ParU_Symbolic *Sym,
 
 
     //if (task_Q.size() > 1 && ntasks*2 > Control->paru_max_threads )
-    if ( (Int) task_Q.size()*2 >  Control->paru_max_threads )
+   if ( (Int) task_Q.size()*2 >  Control->paru_max_threads )
+   //if (1)
     {
         printf("Parallel\n");
-        Int max_threads = PARU_OPENMP_MAX_THREADS;
         // chekcing user input 
-        if (Control->paru_max_threads > 0)
-            Control->paru_max_threads = 
-                MIN (max_threads, Control->paru_max_threads);
-        else 
-            Control->paru_max_threads = max_threads;
-
-        PRLEVEL (PR, ("Control: max_th=%ld scale=%ld piv_toler=%lf " 
+        PRLEVEL (2, ("Control: max_th=%ld scale=%ld piv_toler=%lf " 
                  "diag_toler=%lf trivial =%ld worthwhile_dgemm=%ld "
                  "worthwhile_trsm=%ld\n",
                     Control->paru_max_threads, Control->scale, 
