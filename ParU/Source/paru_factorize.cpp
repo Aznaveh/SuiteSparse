@@ -12,7 +12,7 @@
 
 ParU_Ret paru_exec_tasks_seq(Int t, Int *task_num_child, ParU_Numeric *Num)
 {
-    DEBUGLEVEL(1);
+    DEBUGLEVEL(0);
     ParU_Symbolic *Sym = Num->Sym;
     Int *task_parent = Sym->task_parent;
     Int daddy = task_parent[t];
@@ -76,7 +76,7 @@ ParU_Ret paru_exec_tasks_seq(Int t, Int *task_num_child, ParU_Numeric *Num)
 ParU_Ret paru_exec_tasks(Int t, Int *task_num_child, Int &chain_task,
                          ParU_Numeric *Num)
 {
-    DEBUGLEVEL(1);
+    DEBUGLEVEL(0);
     ParU_Symbolic *Sym = Num->Sym;
     Int *task_parent = Sym->task_parent;
     Int daddy = task_parent[t];
@@ -169,7 +169,7 @@ ParU_Ret paru_exec_tasks(Int t, Int *task_num_child, Int &chain_task,
 ParU_Ret ParU_Factorize(cholmod_sparse *A, ParU_Symbolic *Sym,
                         ParU_Numeric **Num_handle, ParU_Control *user_Control)
 {
-    DEBUGLEVEL(1);
+    DEBUGLEVEL(0);
     PARU_DEFINE_PRLEVEL;
 #ifndef NTIME
     double my_start_time = PARU_OPENMP_GET_WTIME;

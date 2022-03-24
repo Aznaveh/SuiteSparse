@@ -13,7 +13,7 @@ ParU_Ret paru_prior_assemble(Int f, Int start_fac,
                                     std::vector<Int> &colHash, heaps_info &hi,
                                     ParU_Numeric *Num)
 {
-    DEBUGLEVEL(1);
+    DEBUGLEVEL(0);
     PARU_DEFINE_PRLEVEL;
 
     Paru_Work *Work = Num->Work;
