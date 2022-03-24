@@ -11,22 +11,36 @@
 void paru_assemble_all(Int e, Int f, std::vector<Int> &colHash,
                        ParU_Numeric *Num)
 {
-    DEBUGLEVEL(0);
+    DEBUGLEVEL(1);
     PARU_DEFINE_PRLEVEL;
 #ifndef NTIME
     static double tot_assem_time = 0;
     double start_time = PARU_OPENMP_GET_WTIME;
 #endif
 
+
     ParU_Symbolic *Sym = Num->Sym;
     Int *snM = Sym->super2atree;
     Int eli = snM[f];
-    PRLEVEL(PR, ("%% Eliminat all of %ld in %ld\n", e, eli));
+    PRLEVEL(PR, ("%% Eliminate all of %ld in %ld(f=%ld) (tid=%d)\n", e, eli, f,
+                PARU_OPENMP_GET_THREAD_ID));
+
+#ifndef NDEBUG
+    PR = 0;
+    PRLEVEL(PR, ("%% %ld :\n", e));
+    if (PR <= 0) paru_print_element(Num, e);
+
+    PRLEVEL(PR, ("%% %ld :\n", eli));
+    if (PR <= 0) paru_print_element(Num, eli);
+    PR = 1;
+#endif
+
 
     ParU_Element **elementList = Num->elementList;
 
     ParU_Element *el = elementList[e];
     ParU_Element *curEl = elementList[eli];
+
 
     Int nEl = el->ncols;
     Int mEl = el->nrows;
@@ -96,7 +110,7 @@ void paru_assemble_all(Int e, Int f, std::vector<Int> &colHash,
     }
     else
     {
-        PRLEVEL(PR, ("%% more than 1 col left\n %%"));
+        PRLEVEL(PR, ("%% more than 1 col left (%ld->%ld)\n %%", e, eli));
 
         // save the structure of the rows once at first
         // Int tempRow[el->nrowsleft];  // C99
@@ -121,10 +135,19 @@ void paru_assemble_all(Int e, Int f, std::vector<Int> &colHash,
         ParU_Control *Control = Num->Control;
         const Int max_threads = Control->paru_max_threads;
 
-        if (naft < max_threads / 2 || el->nrowsleft * el->ncolsleft < 4096 ||
-            el->nrowsleft < 1024)
+        //if (naft > max_threads / 2 || el->nrowsleft * el->ncolsleft < 4096 ||
+        //    el->nrowsleft < 1024)
+        if(0)
         {  // not enoght threads or very small assembly
             // sequential
+            PRLEVEL(1,
+                    ("Seqntial Assembly naft=%ld colsleft=%ld rowsleft=%ld \n",
+                     naft, el->ncolsleft, el->nrowsleft));
+ 
+            
+            //printf("Seqntial Assembly naft=%ld colsleft=%ld rowsleft=%ld \n",
+            //         naft, el->ncolsleft, el->nrowsleft);
+ 
             for (Int j = el->lac; j < nEl; j++)
             {
                 PRLEVEL(1, ("%% j =%ld \n", j));
@@ -156,61 +179,125 @@ void paru_assemble_all(Int e, Int f, std::vector<Int> &colHash,
             // enoght threads and big assembly
             // parallel
             PRLEVEL(1,
-                    ("Parallel Assembly naft=%ld colsleft=%ld rowsleft=%ld \n",
-                     naft, el->ncolsleft, el->nrowsleft));
+                    ("Parallel Assembly naft=%ld colsleft=%ld rowsleft=%ld "
+                     "el->lac = %ld nEl=%ld rem =%ld (%ld->%ld)\n",
+                     naft, el->ncolsleft, el->nrowsleft, 
+                     el->lac, nEl, nEl-el->lac, e, eli));
+
+
+            //printf("Parallel Assembly naft=%ld colsleft=%ld rowsleft=%ld "
+            //        "el->lac = %ld nEl=%ld rem =%ld\n",
+            //        naft, el->ncolsleft, el->nrowsleft, 
+            //        el->lac, nEl, nEl-el->lac);
+
+
+            //#..pragma omp parallel proc_bind(close) 
+            //num_threads(max_threads / naft)
+            //#..pragma omp single nowait
+            //#..pragma omp task untied
+            //for (Int j = el->lac; j < nEl; j++)
+            //{
+            //    PRLEVEL(1, ("%% j =%ld \n", j));
+            //    double *sC = el_Num + mEl * j;  // source column pointer
+            //    Int colInd = el_colIndex[j];
+            //    PRLEVEL(1, ("%% colInd =%ld \n", colInd));
+            //    if (colInd < 0) continue;
+            //    PRLEVEL(1, ("inside paralle region %d j=%ld (%d)\n",
+            //                omp_get_active_level(), j,  omp_get_thread_num() ));
+
+            //    Int fcolind = colRelIndex[j];
+
+            //    double *dC = curEl_Num + fcolind * curEl->nrows;
+
+            //    #pragma omp task
+            //    for (Int iii = 0; iii < el->nrowsleft; iii++)
+            //    {
+            //        Int i = tempRow[iii];
+            //        Int ri = rowRelIndex[i];
+
+            //        PRLEVEL(1, ("%% ri = %ld \n", ri));
+            //        PRLEVEL(1, ("%% sC [%ld] =%2.5lf \n", i, sC[i]));
+            //        PRLEVEL(1, ("%% dC [%ld] =%2.5lf \n", ri, dC[ri]));
+            //        dC[ri] += sC[i];
+            //        PRLEVEL(1, ("%% dC [%ld] =%2.5lf \n", i, dC[ri]));
+            //    }
+            //    if (--el->ncolsleft == 0) break;
+            //    PRLEVEL(1, ("\n"));
+            //}
             
-             printf ("Parallel Assembly naft=%ld colsleft=%ld rowsleft=%ld \n",
-                     naft, el->ncolsleft, el->nrowsleft);
-
-
-            #pragma omp parallel proc_bind(close) \
-                num_threads(max_threads / naft)
-            #pragma omp single nowait
-            #pragma omp task untied
-            for (Int j = el->lac; j < nEl; j++)
+            /////////////////////////////////////////////////////////////////////
+            /////////////////////////////////////////////////////////////////////
+            /////////////////////////////////////////////////////////////////////
+            
+            Int ntasks = (max_threads - naft + 1);
+            ntasks = ntasks == 0 ? 1 : ntasks;
+            Int task_size = (nEl - el->lac)/ntasks;
+            PRLEVEL(1, ("BBB el->lac=%ld nEl=%ld ntasks=%ld task_size=%ld\n", 
+                        el->lac, nEl, ntasks, task_size));
+            if (task_size == 0 || task_size == 1)
             {
-                PRLEVEL(1, ("%% j =%ld \n", j));
-                double *sC = el_Num + mEl * j;  // source column pointer
-                Int colInd = el_colIndex[j];
-                PRLEVEL(1, ("%% colInd =%ld \n", colInd));
-                if (colInd < 0) continue;
-                 PRLEVEL(1, ("inside paralle region %d j=%ld (%d)\n",
-                        omp_get_active_level(), j,  omp_get_thread_num() ));
-
-                Int fcolind = colRelIndex[j];
-
-                double *dC = curEl_Num + fcolind * curEl->nrows;
-
-                #pragma omp task
-                for (Int iii = 0; iii < el->nrowsleft; iii++)
+                task_size = 1;
+                ntasks = nEl - el->lac;
+            }
+            PRLEVEL(1, ("el->lac=%ld nEl=%ld ntasks=%ld task_size=%ld\n", 
+                        el->lac, nEl, ntasks, task_size));
+            #pragma omp parallel proc_bind(close) 
+            #pragma omp single 
+            #pragma omp task 
+            for (Int t = 0; t < ntasks; t++)
+            {
+                Int c1 = el->lac + t*task_size; 
+                Int c2 = el->lac + (t+1)*task_size; 
+                c2 = c2 > nEl ? nEl : c2;
+                PRLEVEL(1, ("t=%ld c1=%ld c2=%ld\n", t, c1, c2));
+                #pragma omp task mergeable
+                for (Int j = c1; j < c2; j++)
                 {
-                    Int i = tempRow[iii];
-                    Int ri = rowRelIndex[i];
+                    PRLEVEL(1, ("%% j =%ld t=%ld\n", j,t));
+                    double *sC = el_Num + mEl * j;  // source column pointer
+                    Int colInd = el_colIndex[j];
+                    PRLEVEL(1, ("%% colInd =%ld \n", colInd));
+                    if (colInd < 0) continue;
+                    PRLEVEL(1, ("inside paralle region %d j=%ld (tid=%d)\n",
+                                PARU_OPENMP_GET_ACTIVE_LEVEL, j,  
+                                PARU_OPENMP_GET_THREAD_NUM));
+                    Int fcolind = colRelIndex[j];
 
-                    PRLEVEL(1, ("%% ri = %ld \n", ri));
-                    PRLEVEL(1, ("%% sC [%ld] =%2.5lf \n", i, sC[i]));
-                    PRLEVEL(1, ("%% dC [%ld] =%2.5lf \n", ri, dC[ri]));
-                    dC[ri] += sC[i];
-                    PRLEVEL(1, ("%% dC [%ld] =%2.5lf \n", i, dC[ri]));
-                   // #ifndef NTIME
-                   // //if (f > Sym->nf - 5)
-                   //     PRLEVEL(-1, ("p "));
-                   // #endif
+                    double *dC = curEl_Num + fcolind * curEl->nrows;
+
+                    for (Int iii = 0; iii < el->nrowsleft; iii++)
+                    {
+                        Int i = tempRow[iii];
+                        Int ri = rowRelIndex[i];
+
+                        PRLEVEL(1, ("%% ri = %ld \n", ri));
+                        PRLEVEL(1, ("%% sC [%ld] =%2.5lf \n", i, sC[i]));
+                        PRLEVEL(1, ("%% dC [%ld] =%2.5lf \n", ri, dC[ri]));
+                        dC[ri] += sC[i];
+                        PRLEVEL(1, ("%% dC [%ld] =%2.5lf \n", i, dC[ri]));
+                    }
+                    PRLEVEL(1, ("\n"));
                 }
-                if (--el->ncolsleft == 0) break;
-                PRLEVEL(1, ("\n"));
             }
         }
     }
-    paru_free_el(e, elementList);
+   paru_free_el(e, elementList);
+#ifndef NDEBUG
+    PR = 0;
+    PRLEVEL(PR, ("%% after assembly %ld :\n", eli));
+    if (PR <= 0) paru_print_element(Num, eli);
+    PR = 1;
+#endif
+
+
 #ifndef NTIME
     double time = PARU_OPENMP_GET_WTIME;
     time -= start_time;
     #pragma omp atomic update
     tot_assem_time += time;
     if (f > Sym->nf - 5)
-        PRLEVEL(-1, ("%% assemble all %ld\t->%ld\t took %lf seconds tot=%lf\n",
-                e, f, time, tot_assem_time));
+        PRLEVEL(1, ("%% assemble all %ld\t->%ld\t took %lf seconds tot=%lf\n",
+                    e, eli, time, tot_assem_time));
 #endif
 }
 
@@ -219,7 +306,7 @@ void paru_assemble_all(Int e, Int f, std::vector<Int> &colHash,
 // fit
 
 void paru_assemble_cols(Int e, Int f, std::vector<Int> &colHash,
-                        ParU_Numeric *Num)
+        ParU_Numeric *Num)
 
 {
     DEBUGLEVEL(0);
@@ -350,7 +437,7 @@ void paru_assemble_cols(Int e, Int f, std::vector<Int> &colHash,
     //**//pragma omp taskgroup
     for (Int j = el->lac + 1; j < nEl && el->ncolsleft > 0 && toll > 0; j++)
     {
-        PRLEVEL(PR, ("%% Toll zone\n"));
+        PRLEVEL(1, ("%% Toll zone\n"));
         toll--;
         if (tempRow_ready == 0)
         {

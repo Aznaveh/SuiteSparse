@@ -287,13 +287,17 @@ void paru_free_el(Int e, ParU_Element **elementList)
     DEBUGLEVEL(0);
     ParU_Element *el = elementList[e];
     if (el == NULL) return;
+#ifndef NDEBUG
     Int nrows = el->nrows, ncols = el->ncols;
     PRLEVEL(1, ("%%Free the element e =%ld\t", e));
     PRLEVEL(1, ("%% nrows =%ld ", nrows));
     PRLEVEL(1, ("%% ncols =%ld\n", ncols));
     Int tot_size = sizeof(ParU_Element) + sizeof(Int) * (2 * (nrows + ncols)) +
-                   sizeof(double) * nrows * ncols;
+    sizeof(double) * nrows * ncols;
     paru_free(1, tot_size, el);
+#else
+    paru_free(1, 0, el);
+#endif
     elementList[e] = NULL;
 }
 

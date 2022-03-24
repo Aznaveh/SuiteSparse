@@ -13,7 +13,7 @@ ParU_Ret paru_prior_assemble(Int f, Int start_fac,
                                     std::vector<Int> &colHash, heaps_info &hi,
                                     ParU_Numeric *Num)
 {
-    DEBUGLEVEL(0);
+    DEBUGLEVEL(1);
     PARU_DEFINE_PRLEVEL;
 
     Paru_Work *Work = Num->Work;
@@ -28,7 +28,7 @@ ParU_Ret paru_prior_assemble(Int f, Int start_fac,
 #ifndef NDEBUG
     Int *elRow = Work->elRow;
     Int el_ind = snM[f];
-    PRLEVEL(PR, ("%%Inside prior\n"));
+    PRLEVEL(PR, ("%%Inside prior eli=%ld f=%ld\n", el_ind, f));
     PRLEVEL(PR, ("%% pivotal size is %ld ", pivotal_elements.size()));
 
 #endif
