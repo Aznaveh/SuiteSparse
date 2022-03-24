@@ -248,7 +248,7 @@ void paru_assemble_all(Int e, Int f, std::vector<Int> &colHash,
             {
                 Int c1 = el->lac + t*task_size; 
                 Int c2 = el->lac + (t+1)*task_size; 
-                c2 = c2 > nEl ? nEl : c2;
+                c2 = t == ntasks-1 ? nEl : c2;
                 PRLEVEL(1, ("t=%ld c1=%ld c2=%ld\n", t, c1, c2));
                 #pragma omp task mergeable
                 for (Int j = c1; j < c2; j++)
