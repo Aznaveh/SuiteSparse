@@ -280,9 +280,15 @@ ParU_Ret ParU_Analyze(cholmod_sparse *A, ParU_Symbolic **S_handle,
         Int scale = my_Control.scale;
         if ( scale != 0 || scale != 1)
             my_Control.scale = 1;
+        Int max_threads = PARU_OPENMP_MAX_THREADS;
+        if (my_Control.paru_max_threads > 0)
+            my_Control.paru_max_threads  =
+                MIN (max_threads, my_Control.paru_max_threads);
+        else            
+            my_Control.paru_max_threads  = max_threads;
     }
     ParU_Control *Control= &my_Control;
-    
+
     umf_Control[UMFPACK_ORDERING] = Control->umfpack_ordering;
     //umf_Control[UMFPACK_ORDERING] = UMFPACK_ORDERING_METIS;
     umf_Control[UMFPACK_FIXQ] = -1;
@@ -300,12 +306,12 @@ ParU_Ret ParU_Analyze(cholmod_sparse *A, ParU_Symbolic **S_handle,
 
     void *SW;
     status = umfpack_dl_azn_symbolic(m, n, Ap, Ai, Ax,
-                                     NULL,   // user provided ordering
-                                     FALSE,  // No user ordering
-                                     NULL,   // user params
-                                     &Symbolic,
-                                     &SW,  // new in/out
-                                     umf_Control, Info);
+            NULL,   // user provided ordering
+            FALSE,  // No user ordering
+            NULL,   // user params
+            &Symbolic,
+            &SW,  // new in/out
+            umf_Control, Info);
 
     if (status < 0)
     {
@@ -624,7 +630,8 @@ ParU_Ret ParU_Analyze(cholmod_sparse *A, ParU_Symbolic **S_handle,
     // Upperbound how to do: maximum of pervious upperbounds
     // Number of the columns of the root of each subtree
     //
-    Int threshold = 32;
+    Int threshold = Control->relaxed_amalgamation_threshold;
+    PRLEVEL (1, ("Relaxed amalgamation threshold = %ld\n",threshold));
     Int newF = 0;
     // Int num_roots = 0;
 

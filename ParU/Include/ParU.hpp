@@ -326,6 +326,10 @@ struct ParU_Control
     Int umfpack_ordering = UMFPACK_ORDERING_METIS;
     Int umfpack_strategy = UMFPACK_STRATEGY_AUTO;  // symmetric or unsymmetric
 
+    Int relaxed_amalgamation_threshold =
+        32;  // symbolic analysis tries that each front have more pivot columns
+             // than this threshold
+
     // Numeric controls
     Int panel_width = 32;  // width of panel for dense factorizaiton
     Int paru_strategy = PARU_STRATEGY_AUTO;  // the same stratey umfpack used
