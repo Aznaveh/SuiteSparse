@@ -2,6 +2,11 @@
 // ======================= ParU.hpp ===========================================/
 // ============================================================================/
 
+// ParU, Mohsen Aznaveh and Timothy A. Davis, (c) 2022, All Rights Reserved.
+// SPDX-License-Identifier: GNU GPL 3.0
+
+// TODO: add intro
+
 #ifndef PARU_H
 #define PARU_H
 
@@ -62,8 +67,8 @@ extern "C"
 // has been borrowed from UMFPACK
 //
 //              ParU_L_singleton is CSC
-//                                    l
-//                                    v
+//                                   |
+//                                   v
 // 	  ParU_U_singleton is CSR -> L U U U U U U U U
 // 	                             . L U U U U U U U
 // 	                             . . L U U U U U U
@@ -85,7 +90,7 @@ struct ParU_U_singleton
 
 struct ParU_L_singleton
 {
-    // CSC format for U singletons
+    // CSC format for L singletons
     Int nnz;   // nnz in submatrix
     Int *Slp;  // size rs1
     Int *Sli;  // size is computed
@@ -244,8 +249,9 @@ struct ParU_Symbolic
 };
 
 // =============================================================================
-//      ParU_Tuple, Row and Column data structure
+//      ParU_Tuple, Row data structure
 // =============================================================================
+// move to paru_internal.h
 struct ParU_Tuple
 {
     // The (e,f) tuples for element lists
@@ -256,6 +262,8 @@ struct ParU_Tuple
 // =============================================================================
 // An element, contribution block
 // =============================================================================
+
+// move to paru_internal.h
 struct ParU_Element
 {
     Int
@@ -285,6 +293,7 @@ struct ParU_Element
     //   double ncols*nrows; numeric values
 };
 
+// move to paru_internal.h
 struct ParU_TupleList
 {                      // List of tuples
     Int numTuple,      //  number of Tuples in this element
@@ -292,6 +301,7 @@ struct ParU_TupleList
     ParU_Tuple *list;  // list of tuples regarding to this element
 };
 
+// move to paru_internal.h
 struct Paru_Work
 {
     // gather scatter space for rows
@@ -321,7 +331,7 @@ enum ParU_Ret
 struct ParU_Control
 {
     Int mem_chunk = 1024 * 1024;  // chunk size for memset and memcpy
-    // Sybmolic controls
+    // Symbolic controls
     Int scale = 1;  // if 1 matrix will be scaled using max_row
     Int umfpack_ordering = UMFPACK_ORDERING_METIS;
     Int umfpack_strategy = UMFPACK_STRATEGY_AUTO;  // symmetric or unsymmetric
@@ -346,13 +356,16 @@ struct ParU_Control
 struct ParU_Numeric
 {
     Int m, n;  // size of the sumbatrix that is factorized
+
+    // TODO: remove this:
     ParU_Symbolic *Sym;
+
     ParU_TupleList *RowList;  // size n of dynamic list
     ParU_Control *Control;    // a copy of controls for internal use
                               // it is freed after factorize
 
     ParU_Element **elementList;  // pointers to all elements, size = m+nf+1
-    Paru_Work *Work;
+    Paru_Work *Work; // workspace used during factorization only
 
     Int *time_stamp;  // for relative index update; not initialized
 
@@ -366,6 +379,7 @@ struct ParU_Numeric
     ParU_Factors *partial_LUs;  // size nf   size(LUs)= rowCount[f]*fp
 
     // only used for statistics when debugging is enabled:
+    // TODO: make sure these are zero when the object is allocated
     Int actual_alloc_LUs;      // actual memory allocated for LUs
     Int actual_alloc_Us;       // actual memory allocated for Us
     Int actual_alloc_row_int;  // actual memory allocated for rows
@@ -375,7 +389,7 @@ struct ParU_Numeric
     Int max_col_count;      // it is initalized after factorization
     Int *row_degree_bound;  // row degree size number of rows
 
-    Int *lacList;  // sieze m+nf least active column of each element
+    Int *lacList;  // size m+nf least active column of each element
                    //    el_colIndex[el->lac]  == lacList [e]
                    //    number of element
 
@@ -395,6 +409,7 @@ struct ParU_Numeric
 
     // #ifdef COUNT_FLOPS
     // flop count info
+    // TODO: make sure these are zero when the object is allocated
     double flp_cnt_dgemm;
     double flp_cnt_trsm;
     double flp_cnt_dger;
@@ -407,24 +422,97 @@ struct ParU_Numeric
 };
 
 //------------------------------------------------------------------------------
-ParU_Ret ParU_Analyze(cholmod_sparse *A, ParU_Symbolic **Sym_handle,
-                      ParU_Control *Control);
-ParU_Ret ParU_Factorize(cholmod_sparse *A, ParU_Symbolic *Sym,
-                        ParU_Numeric **Num_handle, ParU_Control *Control);
-ParU_Ret ParU_Solve(double *b, ParU_Numeric *Num, ParU_Control *Control);
+// TODO: describe each function, like a short user guide
+
+// ParU_Analyze: discuss here..
+
+    // (1) input
+    // (2) input/output
+    // (3) output
+    // (4) control
+
+ParU_Ret ParU_Analyze
+(
+    // input:
+    cholmod_sparse *A,          // input matrix to analyze ...
+    // output:
+    ParU_Symbolic **Sym_handle, // output, symbolic analysis
+    // control:
+    ParU_Control *Control
+);
+
+ParU_Ret ParU_Factorize
+(
+    // input:
+    cholmod_sparse *A,
+    ParU_Symbolic *Sym,
+    // output:
+    ParU_Numeric **Num_handle,
+    // control:
+    ParU_Control *Control);
+
+// FIXME:
+ParU_Ret ParU_Solve
+(
+    // input/output:
+    double *b,
+    // input:
+    ParU_Numeric *Num,
+    // control:
+    ParU_Control *Control
+);
+
+ParU_Ret ParU_Solve(double *b, double *x, ParU_Numeric *Num, ParU_Control *Control)
+{
+    x = b // memcpy
+    return (ParU_Solve(x, Num, Control)) ;
+}
+
 ParU_Ret ParU_Solve(double *B, Int n, ParU_Numeric *Num, ParU_Control *Control);
 
 ParU_Ret ParU_Freesym(ParU_Symbolic **Sym_handle, ParU_Control *Control);
+
 ParU_Ret ParU_Freenum(ParU_Numeric **Num_handle, ParU_Control *Control);
 
-ParU_Ret ParU_Residual(double *b, double &resid, double &norm,
+// resid = norm1(b-A*x) / norm1(A)
+ParU_Ret ParU_Residual(double *b, double &resid,    // delete
                        cholmod_sparse *A, ParU_Numeric *Num,
                        ParU_Control *Control);
 
+// resid = norm1(b-A*x) / norm1(A)
+ParU_Ret ParU_Residual
+(
+    // inputs:
+    cholmod_sparse *A,
+    double *x,
+    double *b,
+    // output:
+    double &resid, double &anorm,
+    // control:
+    ParU_Control *Control
+);
+
+// resid = norm1(b-A*x) / norm1(A)
+ParU_Ret ParU_Residual
+(
+    // inputs:
+    cholmod_sparse *A,
+    double *X,
+    double *B,
+    Int n,          // # of columns of X and B
+    // output:
+    double &resid, double &anorm,
+    // control:
+    ParU_Control *Control
+);
+
+// delete this:
 ParU_Ret ParU_Residual(cholmod_sparse *A, ParU_Numeric *Num, double *b,
                        double *Results, Int n, ParU_Control *Control);
 
+// not user-callable: for testing only
 ParU_Ret ParU_Backward(double *x1, double &resid, double &norm,
                        cholmod_sparse *A, ParU_Numeric *Num,
                        ParU_Control *Control);
+
 #endif

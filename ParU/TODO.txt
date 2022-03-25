@@ -1,0 +1,21 @@
+
+documentation
+ACM TOMS paper
+HPEC'22 paper
+SIAM CSE conf paper?
+thesis
+
+MATLAB interface?
+    paru factorization -> plain L,U sparse matrices (CSC)
+
+Makefile: as-is (future cmake)
+
+test coverage
+
+Demo: cleanup
+
+source: take out tabs
+
+decide about: (*resid) = 4 or resid = ...
+
+C wrapper
