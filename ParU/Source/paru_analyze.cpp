@@ -104,15 +104,15 @@ ParU_Ret ParU_Analyze(cholmod_sparse *A, ParU_Symbolic **S_handle,
         //
         //
         //  --- Copied from UMFPACK
-        // 	---   x x x x x x x x x
-        // 	---   . x x x x x x x x
-        // 	---   . . x x x x x x x
-        // 	---   . . . x . . . . .
-        // 	---   . . . x x . . . .
-        // 	---   . . . x x s s s s
-        // 	---   . . . x x s s s s
-        // 	---   . . . x x s s s s
-        // 	---   . . . x x s s s s
+        //  ---   x x x x x x x x x
+        //  ---   . x x x x x x x x
+        //  ---   . . x x x x x x x
+        //  ---   . . . x . . . . .
+        //  ---   . . . x x . . . .
+        //  ---   . . . x x s s s s
+        //  ---   . . . x x s s s s
+        //  ---   . . . x x s s s s
+        //  ---   . . . x x s s s s
         //
         //  ---   The above example has 3 column singletons (the first three
         //  ---   columns and their corresponding pivot rows) and 2 row

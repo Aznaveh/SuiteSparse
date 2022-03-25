@@ -47,7 +47,7 @@ ParU_Ret ParU_Backward(double *x1, double &resid, double &norm,
 #endif
 
     ParU_Ret info;
-    info = ParU_Solve(b, Num, Control);
+    info = ParU_Solve(Num, b, Control);
     if (info != PARU_SUCCESS)
     {
         PRLEVEL(1, ("%% A problem happend during factorization\n"));

@@ -74,7 +74,7 @@ int main(int argc, char **argv)
     double *b = (double *)malloc(m * sizeof(double));
     for (Int i = 0; i < m; ++i) b[i] = i + 1;
     double my_solve_time_start = omp_get_wtime();
-    info = ParU_Solve(b, Num, &Control);
+    info = ParU_Solve(Num, b, &Control);
     double my_solve_time = omp_get_wtime() - my_solve_time_start;
     printf ("Solve time is %lf seconds.\n", my_solve_time);
     for (Int i = 0; i < m; ++i) b[i] = i + 1;

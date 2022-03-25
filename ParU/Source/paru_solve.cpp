@@ -10,7 +10,7 @@
 
 #include "paru_internal.hpp"
 
-ParU_Ret ParU_Solve(double *b, ParU_Numeric *Num, ParU_Control *user_Control)
+ParU_Ret ParU_Solve(ParU_Numeric *Num, double *b, ParU_Control *user_Control)
 {
     DEBUGLEVEL(0);
     PRLEVEL(1, ("%% inside solve\n"));
@@ -74,7 +74,7 @@ ParU_Ret ParU_Solve(double *b, ParU_Numeric *Num, ParU_Control *user_Control)
 
 #include "paru_internal.hpp"
 
-ParU_Ret ParU_Solve(double *B, Int n, ParU_Numeric *Num, 
+ParU_Ret ParU_Solve(ParU_Numeric *Num, Int nrhs, double *B,   
         ParU_Control *user_Control)
 {
     DEBUGLEVEL(0);
@@ -89,7 +89,7 @@ ParU_Ret ParU_Solve(double *B, Int n, ParU_Numeric *Num,
 #ifndef NTIME
     double start_time = PARU_OPENMP_GET_WTIME;
 #endif
-    double *X = (double *)paru_alloc(m * n, sizeof(double));
+    double *X = (double *)paru_alloc(m * nrhs, sizeof(double));
     if (X == NULL)
     {
         printf("Paru: memory problem inside Solve\n");
@@ -111,16 +111,16 @@ ParU_Ret ParU_Solve(double *B, Int n, ParU_Numeric *Num,
     }
     ParU_Control *Control= &my_Control;
 
-    paru_memcpy(X, B, m * n * sizeof(double), Control);
-    paru_apply_perm_scale(Sym->Pfin, Sym->scale_row, B, X, m, n);
+    paru_memcpy(X, B, m * nrhs * sizeof(double), Control);
+    paru_apply_perm_scale(Sym->Pfin, Sym->scale_row, B, X, m, nrhs);
 
     PRLEVEL(1, ("%%mRHS lsolve\n"));
-    paru_lsolve(X, n, Num, Control);  // X = L\X
+    paru_lsolve(X, nrhs, Num, Control);  // X = L\X
     PRLEVEL(1, ("%%mRHS usolve\n"));
-    paru_usolve(X, n, Num, Control);                       // X = U\X
-    paru_apply_inv_perm(Sym->Qfill, X, B, m, n);  // B(q) = X
+    paru_usolve(X, nrhs, Num, Control);                       // X = U\X
+    paru_apply_inv_perm(Sym->Qfill, X, B, m, nrhs);  // B(q) = X
 
-    paru_free(m * n, sizeof(Int), X);
+    paru_free(m * nrhs, sizeof(Int), X);
 
 #ifndef NTIME
     double time = PARU_OPENMP_GET_WTIME;

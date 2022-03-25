@@ -67,17 +67,17 @@ extern "C"
 // has been borrowed from UMFPACK
 //
 //              ParU_L_singleton is CSC
-//                                   |
-//                                   v
-// 	  ParU_U_singleton is CSR -> L U U U U U U U U
-// 	                             . L U U U U U U U
-// 	                             . . L U U U U U U
-// 	                             . . . L . . . . .
-// 	                             . . . L L . . . .
-// 	                             . . . L L x x x x
-// 	                             . . . L L x x x x
-// 	                             . . . L L x x x x
-// 	                             . . . L L x x x x
+//                               |
+//                               v
+//    ParU_U_singleton is CSR -> L U U U U U U U U
+//                               . L U U U U U U U
+//                               . . L U U U U U U
+//                               . . . L . . . . .
+//                               . . . L L . . . .
+//                               . . . L L x x x x
+//                               . . . L L x x x x
+//                               . . . L L x x x x
+//                               . . . L L x x x x
 
 struct ParU_U_singleton
 {
@@ -283,12 +283,12 @@ struct ParU_Element
     size_t size_allocated;
     // followed in memory by:
     //   Int
-    //   col [0..ncols-1],	column indices of this element
-    //   row [0..nrows-1] ;	row indices of this element
+    //   col [0..ncols-1],  column indices of this element
+    //   row [0..nrows-1] ; row indices of this element
     //
-    //   relColInd [0..ncols-1];	relative indices of this element for
+    //   relColInd [0..ncols-1];    relative indices of this element for
     //   current front
-    //   relRowInd [0..nrows-1],	relative indices of this element for
+    //   relRowInd [0..nrows-1],    relative indices of this element for
     //   current front
     //   double ncols*nrows; numeric values
 };
@@ -365,7 +365,7 @@ struct ParU_Numeric
                               // it is freed after factorize
 
     ParU_Element **elementList;  // pointers to all elements, size = m+nf+1
-    Paru_Work *Work; // workspace used during factorization only
+    Paru_Work *Work;             // workspace used during factorization only
 
     Int *time_stamp;  // for relative index update; not initialized
 
@@ -426,85 +426,82 @@ struct ParU_Numeric
 
 // ParU_Analyze: discuss here..
 
-    // (1) input
-    // (2) input/output
-    // (3) output
-    // (4) control
+// (1) input
+// (2) input/output
+// (3) output
+// (4) control
 
-ParU_Ret ParU_Analyze
-(
+ParU_Ret ParU_Analyze(
     // input:
-    cholmod_sparse *A,          // input matrix to analyze ...
+    cholmod_sparse *A,  // input matrix to analyze ...
     // output:
-    ParU_Symbolic **Sym_handle, // output, symbolic analysis
+    ParU_Symbolic **Sym_handle,  // output, symbolic analysis
     // control:
-    ParU_Control *Control
-);
+    ParU_Control *Control);
 
-ParU_Ret ParU_Factorize
-(
+ParU_Ret ParU_Factorize(
     // input:
-    cholmod_sparse *A,
-    ParU_Symbolic *Sym,
+    cholmod_sparse *A, ParU_Symbolic *Sym,
     // output:
     ParU_Numeric **Num_handle,
     // control:
     ParU_Control *Control);
 
 // FIXME:
-ParU_Ret ParU_Solve
-(
-    // input/output:
-    double *b,
+ParU_Ret ParU_Solve(
     // input:
     ParU_Numeric *Num,
+    // input/output:
+    double *b,
     // control:
-    ParU_Control *Control
-);
+    ParU_Control *Control);
 
-ParU_Ret ParU_Solve(double *b, double *x, ParU_Numeric *Num, ParU_Control *Control)
-{
-    x = b // memcpy
-    return (ParU_Solve(x, Num, Control)) ;
-}
+// TODO: write this
+// ParU_Ret ParU_Solve(double *b, double *x, ParU_Numeric *Num, ParU_Control
+// *Control)
+//{
+//    x = b // memcpy
+//    return (ParU_Solve(x, Num, Control)) ;
+//}
 
-ParU_Ret ParU_Solve(double *B, Int n, ParU_Numeric *Num, ParU_Control *Control);
+ParU_Ret ParU_Solve(
+    // input
+    ParU_Numeric *Num, 
+    Int nrhs,
+    // input/output:
+    double *B,  // m(num_rows of A) x nrhs
+    // control:
+    ParU_Control *Control);
 
 ParU_Ret ParU_Freesym(ParU_Symbolic **Sym_handle, ParU_Control *Control);
 
 ParU_Ret ParU_Freenum(ParU_Numeric **Num_handle, ParU_Control *Control);
 
 // resid = norm1(b-A*x) / norm1(A)
-ParU_Ret ParU_Residual(double *b, double &resid,    // delete
+// FIXME: to be like the comment
+ParU_Ret ParU_Residual(double *b, double &resid,  double &norm, // delete
                        cholmod_sparse *A, ParU_Numeric *Num,
                        ParU_Control *Control);
 
 // resid = norm1(b-A*x) / norm1(A)
-ParU_Ret ParU_Residual
-(
-    // inputs:
-    cholmod_sparse *A,
-    double *x,
-    double *b,
-    // output:
-    double &resid, double &anorm,
-    // control:
-    ParU_Control *Control
-);
+//ParU_Ret ParU_Residual(
+//    // inputs:
+//    cholmod_sparse *A, double *x, double *b,
+//    // output:
+//    double &resid, double &anorm,
+//    // control:
+//    ParU_Control *Control);
+
 
 // resid = norm1(b-A*x) / norm1(A)
-ParU_Ret ParU_Residual
-(
-    // inputs:
-    cholmod_sparse *A,
-    double *X,
-    double *B,
-    Int n,          // # of columns of X and B
-    // output:
-    double &resid, double &anorm,
-    // control:
-    ParU_Control *Control
-);
+//ParU_Ret ParU_Residual(
+//    // inputs:
+//    cholmod_sparse *A, double *X, double *B,
+//    Int n,  // # of columns of X and B
+//    // output:
+//    double &resid, double &anorm,
+//    // control:
+//    ParU_Control *Control);
 
 // delete this:
 ParU_Ret ParU_Residual(cholmod_sparse *A, ParU_Numeric *Num, double *b,
