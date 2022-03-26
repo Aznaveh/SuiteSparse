@@ -287,7 +287,7 @@ ParU_Ret ParU_Factorize(cholmod_sparse *A, ParU_Symbolic *Sym,
     {
         //chainess = (task_depth[task_Q[0]] + 1) / (double)nf;
         chainess = 1 - (task_Q.size()  / (double)ntasks);
-        printf("nf = %ld, deepest = %ld, chainess = %lf n",
+        printf("nf = %ld, deepest = %ld, chainess = %lf \n", 
                 nf, task_depth[task_Q[0]], chainess);
     }
 #ifndef NDEBUG
