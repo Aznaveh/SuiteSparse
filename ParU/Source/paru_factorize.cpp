@@ -280,20 +280,15 @@ ParU_Ret ParU_Factorize(cholmod_sparse *A, ParU_Symbolic *Sym,
     //            [&Depth, &task_map](const Int &t1, const Int &t2)-> bool
     //            {return Depth[task_map[t1]+1] > Depth[task_map[t2]+1];});
 
-    Int max_chain = Sym->max_chain;
     double chainess = 2;
-    double maxchain_ratio = 2;
     Num->resq = task_Q.size();
     printf("ntasks=%ld task_Q.size=%ld\n", ntasks, task_Q.size());
     if (ntasks > 0)
     {
         //chainess = (task_depth[task_Q[0]] + 1) / (double)nf;
         chainess = 1 - (task_Q.size()  / (double)ntasks);
-        maxchain_ratio = (((double)max_chain + 1) / nf);
-        printf(
-                "nf = %ld, deepest = %ld, chainess = %lf max_chain=%ld"
-            " maxchain_ratio =%lf\n",
-            nf, task_depth[task_Q[0]], chainess, max_chain, maxchain_ratio);
+        printf("nf = %ld, deepest = %ld, chainess = %lf n",
+                nf, task_depth[task_Q[0]], chainess);
     }
 #ifndef NDEBUG
     PR = 1;
@@ -303,21 +298,21 @@ ParU_Ret ParU_Factorize(cholmod_sparse *A, ParU_Symbolic *Sym,
     {
         Int t = task_Q[i];
         PRLEVEL(PR, ("%ld[%ld-%ld](%ld) ", t, task_map[t] + 1, task_map[t + 1],
-                     task_depth[t]));
+                    task_depth[t]));
     }
     PRLEVEL(PR, ("\n"));
 #endif
 
 
     //if (task_Q.size() > 1 && ntasks*2 > Control->paru_max_threads )
-   if ( (Int) task_Q.size()*2 >  Control->paru_max_threads )
-   //if (1)
+    if ( (Int) task_Q.size()*2 >  Control->paru_max_threads )
+        //if (1)
     {
         printf("Parallel\n");
         // chekcing user input 
         PRLEVEL (2, ("Control: max_th=%ld scale=%ld piv_toler=%lf " 
-                 "diag_toler=%lf trivial =%ld worthwhile_dgemm=%ld "
-                 "worthwhile_trsm=%ld\n",
+                    "diag_toler=%lf trivial =%ld worthwhile_dgemm=%ld "
+                    "worthwhile_trsm=%ld\n",
                     Control->paru_max_threads, Control->scale, 
                     Control->piv_toler, Control->diag_toler, Control->trivial, 
                     Control->worthwhile_dgemm,

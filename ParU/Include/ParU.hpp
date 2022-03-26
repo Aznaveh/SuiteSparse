@@ -245,7 +245,7 @@ struct ParU_Symbolic
     Int *task_parent;  // tree data structure for tasks
     Int *task_num_child;  // number of children of each task
     Int *task_depth;      // max depth of each task
-    Int max_chain;        // maximum size of the chains in final tree
+    //Int max_chain;        // maximum size of the chains in final tree
 };
 
 // =============================================================================

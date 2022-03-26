@@ -173,7 +173,6 @@ ParU_Ret paru_init_rowFronts(ParU_Numeric **Num_handle,  // in/out
         return PARU_INVALID;
     }
 
-    Int snz = Sym->snz;
     double *Sx = Sym->Sx;
     Int *Sp = Sym->Sp;
     Int *Sj = Sym->Sj;
@@ -183,6 +182,7 @@ ParU_Ret paru_init_rowFronts(ParU_Numeric **Num_handle,  // in/out
     // -------------------------------------------------------------------------
 #ifndef NDEBUG
     Int PR = 1;
+    Int snz = Sym->snz;
     PRLEVEL(PR, ("\n%% Insid init row fronts\n"));
     PRLEVEL(PR, ("%% Sp =\n%%"));
     for (Int i = 0; i <= m; i++) PRLEVEL(PR, ("%ld ", Sp[i]));
@@ -343,10 +343,5 @@ ParU_Ret paru_init_rowFronts(ParU_Numeric **Num_handle,  // in/out
     PRLEVEL(0, ("X = InMatrix(:,3);\n"));
     PRLEVEL(0, ("S = sparse(I,J,X);\n"));
 
-    // Free here or if not wil be freed in paru_mem anyway
-    paru_free(snz, sizeof(double), Sx);
-    paru_free(snz, sizeof(Int), Sj);
-    Sym->Sx = NULL;
-    Sym->Sj = NULL;
     return info;
 }
