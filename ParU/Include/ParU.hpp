@@ -116,6 +116,7 @@ struct ParU_Symbolic
     Int snz;     // nnz in submatrix
     Int *Sp;     // size m+1-n1, row pointers of S
     Int *Sj;     // size snz = Sp [n], column indices of S
+    //FIXME: remove Sx and scale_row
     double *Sx;  // size snz = Sp [n], numeric values of S
 
     double *scale_row;  // the array for row scaling based on original matrix
@@ -356,6 +357,16 @@ struct ParU_Control
 struct ParU_Numeric
 {
     Int m, n;  // size of the sumbatrix that is factorized
+
+    double *Sx;  // size snz = Sp [n], numeric values of S; 
+                 // Sp and Sj must be initialized in Symbolic phase
+    //Numeric values of singletons
+    double *Sux;   //u singletons, Sup Suj are in symbolic
+    double *Slx;   //l singletons, Slp Sli are in symbolic
+    double *Rs;  // the array for row scaling based on original matrix
+                        // size = m
+
+
 
     // TODO: remove this:
     ParU_Symbolic *Sym;

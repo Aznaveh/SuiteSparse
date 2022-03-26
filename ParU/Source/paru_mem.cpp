@@ -313,12 +313,20 @@ ParU_Ret ParU_Freenum (ParU_Numeric **Num_handle, ParU_Control *Control)
     Int m = Num->m;  // m and n is different than Sym
     Int n = Num->n;  // Here there are submatrix size
 
+    
     ParU_TupleList *RowList = Num->RowList;
     PRLEVEL(1, ("%% RowList =%p\n", RowList));
 
     ParU_Symbolic *Sym = Num->Sym;
     Int nf = Sym->nf;
 
+    //freeing the numerical input
+    paru_free(Sym->snz, sizeof(double), Num->Sx);
+    if (Sym->cs1 > 0)
+        paru_free(Sym->snz, sizeof(double), Num->Sux);
+    if (Sym->rs1 > 0)
+        paru_free(Sym->snz, sizeof(double), Num->Slx);
+    paru_free(Sym->m, sizeof(Int), Num->Rs);
     for (Int row = 0; row < m; row++)
     {
         Int len = RowList[row].len;

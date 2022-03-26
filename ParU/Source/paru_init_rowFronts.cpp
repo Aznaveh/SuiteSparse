@@ -81,6 +81,10 @@ ParU_Ret paru_init_rowFronts(ParU_Numeric **Num_handle,  // in/out
     Num->time_stamp = NULL;
     Num->Diag_map = NULL;
     Num->inv_Diag_map = NULL;
+    Num->Sx = NULL;
+    Num->Sux = NULL;
+    Num->Slx = NULL;
+    Num->Rs= NULL;
 
     if (nf == 0)
     {  // nothing to be done
@@ -125,13 +129,34 @@ ParU_Ret paru_init_rowFronts(ParU_Numeric **Num_handle,  // in/out
 #endif
     }
 
+    Int snz = Sym->snz;
+    double *SSx = Num->Sx = (double *)paru_alloc(snz, sizeof(double));
+    double *Sux = NULL;
+    if (Sym->cs1 > 0)
+    {
+        Int  sunz = Sym->ustons.nnz;
+        Sux = (double *)paru_alloc(sunz, sizeof(double));
+    }
+    Num->Sux = Sux;
+    double *Slx = NULL;
+    if (Sym->rs1 > 0)
+    {
+        Int  slnz = Sym->lstons.nnz;
+        Slx = (double *)paru_alloc(slnz, sizeof(double));
+    }
+    Num->Slx = Slx;
+    Int scale = Control->scale; // if 1 the S will be scaled by max_row
+    double *Rs = NULL;
+    if (scale == 1) Rs = (double *)paru_calloc(Sym->m, sizeof(double));
+
     if (rowMark == NULL || elRow == NULL || elCol == NULL || rowSize == NULL ||
         Num->lacList == NULL || RowList == NULL || row_degree_bound == NULL ||
         elementList == NULL || Num->frowCount == NULL ||
         Num->fcolCount == NULL || Num->frowList == NULL ||
         Num->fcolList == NULL || Num->partial_Us == NULL ||
         Num->partial_LUs == NULL || Num->time_stamp == NULL ||
-        heapList == NULL ||
+        heapList == NULL || SSx == NULL || (scale == 1 && Rs == NULL) || 
+        (Sym->cs1 > 0 && Sux == NULL) || (Sym->rs1 > 0 && Slx == NULL) ||
         (Sym->strategy == PARU_STRATEGY_SYMMETRIC &&
          (Diag_map == NULL || inv_Diag_map == NULL)))
     {
@@ -182,7 +207,6 @@ ParU_Ret paru_init_rowFronts(ParU_Numeric **Num_handle,  // in/out
     // -------------------------------------------------------------------------
 #ifndef NDEBUG
     Int PR = 1;
-    Int snz = Sym->snz;
     PRLEVEL(PR, ("\n%% Insid init row fronts\n"));
     PRLEVEL(PR, ("%% Sp =\n%%"));
     for (Int i = 0; i <= m; i++) PRLEVEL(PR, ("%ld ", Sp[i]));
