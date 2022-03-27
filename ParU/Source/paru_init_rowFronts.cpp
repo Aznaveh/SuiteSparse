@@ -17,14 +17,15 @@ ParU_Ret paru_init_rowFronts(ParU_Numeric **Num_handle,  // in/out
                                                          // inputs, not modified
                              cholmod_sparse *A,
                              // symbolic analysis
-                             ParU_Symbolic *Sym,
-                             ParU_Control *Control)
+                             ParU_Symbolic *Sym, ParU_Control *Control)
 {
     // mallopt(M_TRIM_THRESHOLD, -1);         // disable sbrk trimming
     // mallopt(M_TOP_PAD, 16 * 1024 * 1024);  // increase padding to speedup
     // malloc
 
-    DEBUGLEVEL(-1);
+    DEBUGLEVEL(1);
+    PARU_DEFINE_PRLEVEL;
+
     if (!A->packed)
     {
         printf("Paru: A is not packed; Wrong format \n");
@@ -84,7 +85,7 @@ ParU_Ret paru_init_rowFronts(ParU_Numeric **Num_handle,  // in/out
     Num->Sx = NULL;
     Num->Sux = NULL;
     Num->Slx = NULL;
-    Num->Rs= NULL;
+    Num->Rs = NULL;
 
     if (nf == 0)
     {  // nothing to be done
@@ -126,52 +127,55 @@ ParU_Ret paru_init_rowFronts(ParU_Numeric **Num_handle,  // in/out
 #ifndef NDEBUG
         paru_memset(Diag_map, 0, Sym->n * sizeof(Int), Control);
         paru_memset(inv_Diag_map, 0, Sym->n * sizeof(Int), Control);
+        PR= -1;
 #endif
     }
 
     Int snz = Sym->snz;
-    double *SSx = Num->Sx = (double *)paru_alloc(snz, sizeof(double));
-    Int *cSp = NULL; //copy of Sp, temporary for making Sx
+    double *SSx = NULL;
+    SSx = Num->Sx = (double *)paru_alloc(snz, sizeof(double));
+    Int *cSp = NULL;  // copy of Sp, temporary for making Sx
     cSp = (Int *)paru_alloc(m + 1, sizeof(Int));
-    double *Sux = NULL; 
-    Int *cSup = NULL;  //copy of Sup temporary for making Sux
-    Int cs1 = Sym->cs1; Int rs1 = Sym->rs1;
+    double *Sux = NULL;
+    Int *cSup = NULL;  // copy of Sup temporary for making Sux
+    Int cs1 = Sym->cs1;
+    Int rs1 = Sym->rs1;
     if (cs1 > 0)
     {
-        Int  sunz = Sym->ustons.nnz;
+        Int sunz = Sym->ustons.nnz;
         Sux = (double *)paru_alloc(sunz, sizeof(double));
         cSup = (Int *)paru_alloc(cs1 + 1, sizeof(Int));
     }
     Num->Sux = Sux;
-    double *Slx = NULL; 
-    Int *cSlp = NULL; //copyf of Slp temporary, for making Slx
+    double *Slx = NULL;
+    Int *cSlp = NULL;  // copyf of Slp temporary, for making Slx
     if (rs1 > 0)
     {
-        Int  slnz = Sym->lstons.nnz;
+        Int slnz = Sym->lstons.nnz;
         Slx = (double *)paru_alloc(slnz, sizeof(double));
         cSlp = (Int *)paru_alloc(rs1 + 1, sizeof(Int));
     }
     Num->Slx = Slx;
-    Int scale = Control->scale; // if 1 the S will be scaled by max_row
+    Int scale = Control->scale;  // if 1 the S will be scaled by max_row
     double *Rs = NULL;
     if (scale == 1) Rs = (double *)paru_calloc(Sym->m, sizeof(double));
 
     if (rowMark == NULL || elRow == NULL || elCol == NULL || rowSize == NULL ||
-            Num->lacList == NULL || RowList == NULL || row_degree_bound == NULL ||
-            elementList == NULL || Num->frowCount == NULL ||
-            Num->fcolCount == NULL || Num->frowList == NULL ||
-            Num->fcolList == NULL || Num->partial_Us == NULL ||
-            Num->partial_LUs == NULL || Num->time_stamp == NULL ||
-            heapList == NULL || SSx == NULL || (scale == 1 && Rs == NULL) || 
-            (cs1 > 0 && (Sux == NULL || cSup == NULL)) || 
-            (rs1 > 0 && (Slx == NULL|| cSlp == NULL)) || cSup == NULL ||
-            (Sym->strategy == PARU_STRATEGY_SYMMETRIC &&
-             (Diag_map == NULL || inv_Diag_map == NULL)))
+        Num->lacList == NULL || RowList == NULL || row_degree_bound == NULL ||
+        elementList == NULL || Num->frowCount == NULL ||
+        Num->fcolCount == NULL || Num->frowList == NULL ||
+        Num->fcolList == NULL || Num->partial_Us == NULL ||
+        Num->partial_LUs == NULL || Num->time_stamp == NULL ||
+        heapList == NULL || SSx == NULL || (scale == 1 && Rs == NULL) ||
+        (cs1 > 0 && (Sux == NULL || cSup == NULL)) ||
+        (rs1 > 0 && (Slx == NULL || cSlp == NULL)) || cSp == NULL ||
+        (Sym->strategy == PARU_STRATEGY_SYMMETRIC &&
+         (Diag_map == NULL || inv_Diag_map == NULL)))
     {
-        ParU_Freenum(&Num, Control);
-        paru_free(m+1, sizeof(Int), cSp);
+        paru_free(m + 1, sizeof(Int), cSp);
         if (cs1 > 0) paru_free((cs1 + 1), sizeof(Int), cSup);
         if (rs1 > 0) paru_free((rs1 + 1), sizeof(Int), cSlp);
+        ParU_Freenum(&Num, Control);
         return PARU_OUT_OF_MEMORY;
     }
 
@@ -197,6 +201,9 @@ ParU_Ret paru_init_rowFronts(ParU_Numeric **Num_handle,  // in/out
         Int *Ap = (Int *)A->p;
         Int *Ai = (Int *)A->i;
         double *Ax = (double *)A->x;
+        Int *Sp = Sym->Sp;
+        Int *Slp = Sym->lstons.Slp;
+        Int *Sup = Sym->ustons.Sup;
 
         paru_memcpy(cSp, Sp, (m + 1) * sizeof(Int), Control);
         if (cs1 > 0)
@@ -207,35 +214,77 @@ ParU_Ret paru_init_rowFronts(ParU_Numeric **Num_handle,  // in/out
         {
             paru_memcpy(cSlp, Slp, (rs1 + 1) * sizeof(Int), Control);
         }
+        Int n1 = Sym->n1;
 
+        Int *Qinit = Sym->Qfill;
+        Int *Pinv = Sym->Pinv;
+        for (Int newcol = 0; newcol < Sym->n; newcol++)
+        {
+            Int oldcol = Qinit[newcol];
+            for (Int p = Ap[oldcol]; p < Ap[oldcol + 1]; p++)
+            {
+                Int oldrow = Ai[p];
+                Int newrow = Pinv[oldrow];
+                Int srow = newrow - n1;
+                Int scol = newcol - n1;
+                if (Control->scale == 1) 
+                    Rs[oldrow] = MAX(Rs[oldrow], fabs(Ax[p]));
+            //    if (srow >= 0 && scol >= 0)
+            //    {  // it is insdie S otherwise it is part of singleton
+            //        SSx[cSp[srow]++] = Ax[p] ; //FIXME to Sx
+            //    }
+            //    else if (srow < 0 && scol >= 0)
+            //    {  // inside the U singletons
+            //        PRLEVEL(PR, ("Usingleton newcol = %ld newrow=%ld\n",
+            //                    newcol, newrow));
+            //        Sux[++cSup[newrow]] = Ax[p]; //let the diagonal entries
+            //                                     // be first
+            //    }
+            //    else
+            //    {
+/////////////////////////////////////////////////////////////////////////////////
+            //        if (newrow < cs1)
+            //        {  // inside U singletons CSR
+            //            PRLEVEL(PR, ("Inside U singletons\n"));
+            //            if (newcol == newrow)
+            //            {  // diagonal entry
+            //                Sux[Sup[newrow]] = Ax[p];
+            //                    
+            //            }
+            //            else
+            //            {
+            //                Sux[++cSup[newrow]] = Ax[p];
+            //            }
+            //        }
+            //        else
+            //        {  // inside L singletons CSC
+            //            PRLEVEL(PR, ("Inside L singletons\n"));
+            //            if (newcol == newrow)
+            //            {  // diagonal entry
+            //                Slx[Slp[newcol - cs1]] = Ax[p];
+            //            }
+            //            else
+            //            {
+            //                Slx[++cSlp[newcol - cs1]] = Ax[p];
+            //            }
+            //        }
+            //        /////////////////////////////////////////////////////////
+            //    }
+            }
+        }
 
-
-        //for (Int newcol = n1; newcol < n; newcol++)
-        //{
-        //    Int oldcol = Qinit[newcol];
-        //    for (Int p = Ap[oldcol]; p < Ap[oldcol + 1]; p++)
-        //    {
-        //        Int oldrow = Ai[p];
-        //        Int newrow = Pinv[oldrow];
-        //        Int srow = newrow - n1;
-        //        Int scol = newcol - n1;
-        //        if (srow >= 0)
-        //        {  // it is insdie S otherwise it is part of singleton
-        //            Sj[cSp[srow]] = scol;
-        //            Sx[cSp[srow]++] = (Rs == NULL) ? Ax[p] : Ax[p] / Rs[oldrow];
-        //        }
-        //        else
-        //        {  // inside the U singletons
-        //            PRLEVEL(PR, ("Usingleton rest newcol = %ld newrow=%ld\n",
-        //                        newcol, newrow));
-        //            ASSERT(newrow != newcol);  // not a diagonal entry
-        //            Suj[++cSup[newrow]] = newcol;
-        //            Sux[cSup[newrow]] = (Rs == NULL) ? Ax[p] : Ax[p] / Rs[oldrow];
-        //        }
-        //    }
-        //}
-
-        paru_free(m+1, sizeof(Int), cSp);
+////////////////////////////////////#ifndef NDEBUG
+        printf ("HERE\n");
+        double *SymRs = Sym->scale_row;
+        if (Control->scale == 1)
+            for (Int i = 0; i < m; i++)
+            {
+                if (SymRs[i] != Rs[i])
+                    printf ("XXXX i=%ld sym_rs=%lf num_rs=%lf\n", 
+                           i, SymRs[i], Rs[i]);
+            }
+////////////////////////////////////#endif
+        paru_free(m + 1, sizeof(Int), cSp);
         if (Sym->cs1 > 0) paru_free((cs1 + 1), sizeof(Int), cSup);
         if (Sym->rs1 > 0) paru_free((rs1 + 1), sizeof(Int), cSlp);
     }
@@ -265,7 +314,7 @@ ParU_Ret paru_init_rowFronts(ParU_Numeric **Num_handle,  // in/out
     // create S = A (p,q)', or S=A(p,q), S is considered to be in row-form
     // -------------------------------------------------------------------------
 #ifndef NDEBUG
-    Int PR = 1;
+    PR = 1;
     PRLEVEL(PR, ("\n%% Insid init row fronts\n"));
     PRLEVEL(PR, ("%% Sp =\n%%"));
     for (Int i = 0; i <= m; i++) PRLEVEL(PR, ("%ld ", Sp[i]));
@@ -283,7 +332,7 @@ ParU_Ret paru_init_rowFronts(ParU_Numeric **Num_handle,  // in/out
     if (Diag_map)
     {
         #pragma omp taskloop default(none) shared(Sym, Diag_map, inv_Diag_map) \
-         grainsize(512)
+        grainsize(512)
         for (Int i = 0; i < Sym->n; i++)
         {
             // paru_memcpy(Diag_map, Sym->Diag_map, (Sym->n) * sizeof(Int));
@@ -339,7 +388,7 @@ ParU_Ret paru_init_rowFronts(ParU_Numeric **Num_handle,  // in/out
         {  // out of memory
             ParU_Freenum(&Num, Control);
             printf("Paru: Out of memory: curEl\n");
-            #pragma omp atomic update
+        #pragma omp atomic update
             out_of_memory += 1;
         }
 

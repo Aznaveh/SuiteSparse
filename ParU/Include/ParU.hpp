@@ -143,6 +143,7 @@ struct ParU_Symbolic
     Int *Pfin;  // size m, row permutation.
     // ParU final permutation. Look paru_perm for more details
 
+    Int *Pinv;  //TODO
     Int *Sleft;  // size n-n1+2.  The list of rows of S whose
     // leftmost column index is j is given by
     // Sleft [j] ... Sleft [j+1]-1.  This can be empty (that is, Sleft
