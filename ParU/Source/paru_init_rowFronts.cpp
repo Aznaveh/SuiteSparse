@@ -218,6 +218,20 @@ ParU_Ret paru_init_rowFronts(ParU_Numeric **Num_handle,  // in/out
 
         Int *Qinit = Sym->Qfill;
         Int *Pinv = Sym->Pinv;
+        
+        if (Control->scale == 1) 
+        {
+            for (Int newcol = 0; newcol < Sym->n; newcol++)
+            {
+                Int oldcol = Qinit[newcol];
+                for (Int p = Ap[oldcol]; p < Ap[oldcol + 1]; p++)
+                {
+                    Int oldrow = Ai[p];
+                    Rs[oldrow] = MAX(Rs[oldrow], fabs(Ax[p]));
+                }
+            }
+        }
+
         for (Int newcol = 0; newcol < Sym->n; newcol++)
         {
             Int oldcol = Qinit[newcol];
@@ -227,40 +241,42 @@ ParU_Ret paru_init_rowFronts(ParU_Numeric **Num_handle,  // in/out
                 Int newrow = Pinv[oldrow];
                 Int srow = newrow - n1;
                 Int scol = newcol - n1;
-                if (Control->scale == 1) 
-                    Rs[oldrow] = MAX(Rs[oldrow], fabs(Ax[p]));
-            //    if (srow >= 0 && scol >= 0)
-            //    {  // it is insdie S otherwise it is part of singleton
-            //        SSx[cSp[srow]++] = Ax[p] ; //FIXME to Sx
-            //    }
-            //    else if (srow < 0 && scol >= 0)
-            //    {  // inside the U singletons
-            //        PRLEVEL(PR, ("Usingleton newcol = %ld newrow=%ld\n",
-            //                    newcol, newrow));
-            //        Sux[++cSup[newrow]] = Ax[p]; //let the diagonal entries
-            //                                     // be first
-            //    }
-            //    else
-            //    {
-/////////////////////////////////////////////////////////////////////////////////
-            //        if (newrow < cs1)
-            //        {  // inside U singletons CSR
-            //            PRLEVEL(PR, ("Inside U singletons\n"));
-            //            if (newcol == newrow)
-            //            {  // diagonal entry
-            //                Sux[Sup[newrow]] = Ax[p];
-            //                    
-            //            }
-            //            else
-            //            {
-            //                Sux[++cSup[newrow]] = Ax[p];
-            //            }
-            //        }
-            //        else
-            //        {  // inside L singletons CSC
-            //            PRLEVEL(PR, ("Inside L singletons\n"));
-            //            if (newcol == newrow)
-            //            {  // diagonal entry
+                // //if (Control->scale == 1) 
+                // //    Rs[oldrow] = MAX(Rs[oldrow], fabs(Ax[p]));
+                    if (srow >= 0 && scol >= 0)
+                    {  // it is insdie S otherwise it is part of singleton
+                        SSx[cSp[srow]++] = (Rs == NULL) ? 
+                            Ax[p] : Ax[p] / Rs[oldrow];
+                    }
+                    else if (srow < 0 && scol >= 0)
+                    {  // inside the U singletons
+                        PRLEVEL(PR, ("Usingleton newcol = %ld newrow=%ld\n",
+                                    newcol, newrow));
+                        //let the diagonal entries be first
+                        Sux[++cSup[newrow]] = (Rs == NULL) ? 
+                            Ax[p] : Ax[p] / Rs[oldrow];
+                    }
+                //    else
+                //    {
+                /////////////////////////////////////////////////////////////////////////////////
+                //        if (newrow < cs1)
+                //        {  // inside U singletons CSR
+                //            PRLEVEL(PR, ("Inside U singletons\n"));
+                //            if (newcol == newrow)
+                //            {  // diagonal entry
+                //                Sux[Sup[newrow]] = Ax[p];
+                //                    
+                //            }
+                //            else
+                //            {
+                //                Sux[++cSup[newrow]] = Ax[p];
+                //            }
+                //        }
+                //        else
+                //        {  // inside L singletons CSC
+                //            PRLEVEL(PR, ("Inside L singletons\n"));
+                //            if (newcol == newrow)
+                //            {  // diagonal entry
             //                Slx[Slp[newcol - cs1]] = Ax[p];
             //            }
             //            else
@@ -276,6 +292,7 @@ ParU_Ret paru_init_rowFronts(ParU_Numeric **Num_handle,  // in/out
 ////////////////////////////////////#ifndef NDEBUG
         printf ("HERE\n");
         double *SymRs = Sym->scale_row;
+        double *Sx = Sym->Sx;
         if (Control->scale == 1)
             for (Int i = 0; i < m; i++)
             {
@@ -283,7 +300,15 @@ ParU_Ret paru_init_rowFronts(ParU_Numeric **Num_handle,  // in/out
                     printf ("XXXX i=%ld sym_rs=%lf num_rs=%lf\n", 
                            i, SymRs[i], Rs[i]);
             }
-////////////////////////////////////#endif
+        for (Int row = 0; row < m; row++)
+        {
+            for (Int p = Sp[row]; p < Sp[row + 1]; p++)
+                if (Sx[p] != SSx[p])
+                    printf ("YYYY row=%ld p=%ld Sx=%lf SSx=%lf\n", 
+                           row, p, Sx[p], SSx[p]);
+ 
+        }
+        ////////////////////////////////////#endif
         paru_free(m + 1, sizeof(Int), cSp);
         if (Sym->cs1 > 0) paru_free((cs1 + 1), sizeof(Int), cSup);
         if (Sym->rs1 > 0) paru_free((rs1 + 1), sizeof(Int), cSlp);

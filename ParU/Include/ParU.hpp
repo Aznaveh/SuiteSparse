@@ -67,11 +67,11 @@ extern "C"
 // has been borrowed from UMFPACK
 //
 //              ParU_L_singleton is CSC
-//                               |
-//                               v
-//    ParU_U_singleton is CSR -> L U U U U U U U U
-//                               . L U U U U U U U
-//                               . . L U U U U U U
+//                                     |
+//                                     v
+//    ParU_U_singleton is CSR -> U U U U U U U U U
+//                               . U U U U U U U U
+//                               . . U U U U U U U
 //                               . . . L . . . . .
 //                               . . . L L . . . .
 //                               . . . L L x x x x
