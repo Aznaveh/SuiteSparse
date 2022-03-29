@@ -23,7 +23,7 @@ ParU_Ret paru_init_rowFronts(ParU_Numeric **Num_handle,  // in/out
     // mallopt(M_TOP_PAD, 16 * 1024 * 1024);  // increase padding to speedup
     // malloc
 
-    DEBUGLEVEL(1);
+    DEBUGLEVEL(0);
     PARU_DEFINE_PRLEVEL;
 
     if (!A->packed)
@@ -127,7 +127,7 @@ ParU_Ret paru_init_rowFronts(ParU_Numeric **Num_handle,  // in/out
 #ifndef NDEBUG
         paru_memset(Diag_map, 0, Sym->n * sizeof(Int), Control);
         paru_memset(inv_Diag_map, 0, Sym->n * sizeof(Int), Control);
-        PR= -1;
+        PR= 2;
 #endif
     }
 
@@ -140,18 +140,20 @@ ParU_Ret paru_init_rowFronts(ParU_Numeric **Num_handle,  // in/out
     Int *cSup = NULL;  // copy of Sup temporary for making Sux
     Int cs1 = Sym->cs1;
     Int rs1 = Sym->rs1;
+    Int sunz = 0;
     if (cs1 > 0)
     {
-        Int sunz = Sym->ustons.nnz;
+        sunz = Sym->ustons.nnz;
         Sux = (double *)paru_alloc(sunz, sizeof(double));
         cSup = (Int *)paru_alloc(cs1 + 1, sizeof(Int));
     }
     Num->Sux = Sux;
     double *Slx = NULL;
     Int *cSlp = NULL;  // copyf of Slp temporary, for making Slx
+    Int slnz = 0;
     if (rs1 > 0)
     {
-        Int slnz = Sym->lstons.nnz;
+        slnz = Sym->lstons.nnz;
         Slx = (double *)paru_alloc(slnz, sizeof(double));
         cSlp = (Int *)paru_alloc(rs1 + 1, sizeof(Int));
     }
@@ -180,20 +182,20 @@ ParU_Ret paru_init_rowFronts(ParU_Numeric **Num_handle,  // in/out
     }
 
     // Initializations
-    PRLEVEL(1, ("%% $RowList =%p\n", RowList));
+    PRLEVEL(PR, ("%% $RowList =%p\n", RowList));
     paru_memset(rowSize, -1, m * sizeof(Int), Control);
-    PRLEVEL(1, ("%% rowSize pointer=%p size=%ld \n", rowSize, m * sizeof(Int)));
+    PRLEVEL(PR, ("%% rowSize pointer=%p size=%ld \n", rowSize, m * sizeof(Int)));
 
-    PRLEVEL(1, ("%% rowMark pointer=%p size=%ld \n", rowMark,
+    PRLEVEL(PR, ("%% rowMark pointer=%p size=%ld \n", rowMark,
                 (m + nf) * sizeof(Int)));
 
     paru_memset(elRow, -1, (m + nf) * sizeof(Int), Control);
-    PRLEVEL(1, ("%% elRow=%p\n", elRow));
+    PRLEVEL(PR, ("%% elRow=%p\n", elRow));
 
     paru_memset(elCol, -1, (m + nf) * sizeof(Int), Control);
-    PRLEVEL(1, ("%% elCol=%p\n", elCol));
+    PRLEVEL(PR, ("%% elCol=%p\n", elCol));
 
-    PRLEVEL(1, ("%% Work =%p\n ", Work));
+    PRLEVEL(PR, ("%% Work =%p\n ", Work));
 
     //////////////////Initializing numerics Sx, Sux and Slx //////////////////{
     Int *Sp = Sym->Sp;
@@ -202,23 +204,63 @@ ParU_Ret paru_init_rowFronts(ParU_Numeric **Num_handle,  // in/out
         Int *Ai = (Int *)A->i;
         double *Ax = (double *)A->x;
         Int *Sp = Sym->Sp;
-        Int *Slp = Sym->lstons.Slp;
-        Int *Sup = Sym->ustons.Sup;
-
+        Int *Slp = NULL;
+        Int *Sup = NULL;
         paru_memcpy(cSp, Sp, (m + 1) * sizeof(Int), Control);
         if (cs1 > 0)
         {
+            Sup = Sym->ustons.Sup;
             paru_memcpy(cSup, Sup, (cs1 + 1) * sizeof(Int), Control);
         }
         if (rs1 > 0)
         {
+            Slp = Sym->lstons.Slp;
             paru_memcpy(cSlp, Slp, (rs1 + 1) * sizeof(Int), Control);
         }
+#ifndef NDEBUG
+    PR = -3;
+    PRLEVEL(PR, ("Init Sup and Slp in the middle\n"));
+    if (cs1 > 0)
+    {
+        PRLEVEL(PR, ("(%ld) Sup =", sunz));
+        for (Int k = 0; k <= cs1; k++)
+        {
+            PRLEVEL(PR, ("%ld ", Sup[k]));
+            PRLEVEL(PR + 2, ("c%ld ", cSup[k]));
+            if (Sup[k] != cSup[k])
+                PRLEVEL(PR, ("Sup[%ld] =%ld, cSup=%ld", k, Sup[k], cSup[k]));
+            ASSERT(Sup[k] == cSup[k]);
+        }
+        PRLEVEL(PR, ("\n"));
+    }
+    if (rs1 > 0)
+    {
+        PRLEVEL(PR, ("(%ld) Slp =", slnz));
+        for (Int k = 0; k <= rs1; k++)
+        {
+            PRLEVEL(PR, ("%ld ", Slp[k]));
+            PRLEVEL(PR + 2, ("o%ld ", cSlp[k]));
+            if (Slp[k] != cSlp[k])
+                PRLEVEL(PR,
+                        ("\nSup[%ld] =%ld, cSup=%ld\n", k, Slp[k], cSlp[k]));
+            ASSERT(Slp[k] == cSlp[k]);
+        }
+        PRLEVEL(PR, ("\n"));
+    }
+#endif
+
         Int n1 = Sym->n1;
 
         Int *Qinit = Sym->Qfill;
         Int *Pinv = Sym->Pinv;
-        
+#ifndef NDEBUG
+    PR = -1;
+    PRLEVEL(PR, ("Iniit Pinv =\n"));
+    for (Int i = 0; i < m; i++) PRLEVEL(PR, ("%ld ", Pinv[i]));
+    PRLEVEL(PR, ("\n"));
+#endif
+
+
         if (Control->scale == 1) 
         {
             for (Int newcol = 0; newcol < Sym->n; newcol++)
@@ -232,6 +274,68 @@ ParU_Ret paru_init_rowFronts(ParU_Numeric **Num_handle,  // in/out
             }
         }
 
+        //for (Int newcol = 0; newcol < n1; newcol++)
+        //{  // The columns that are just in singleton
+        //    Int oldcol = Qinit[newcol];
+        //    PRLEVEL(PR, ("newcol = %ld oldcol=%ld\n", newcol, oldcol));
+        //    for (Int p = Ap[oldcol]; p < Ap[oldcol + 1]; p++)
+        //    {
+        //        Int oldrow = Ai[p];
+        //        Int newrow = Pinv[oldrow];
+        //        PRLEVEL(PR, ("newrow=%ld oldrow=%ld\n", newrow, oldrow));
+        //        if (newrow < cs1)
+        //        {  // inside U singletons CSR
+        //            PRLEVEL(PR, ("Inside U singletons\n"));
+        //            if (newcol == newrow)
+        //            {  // diagonal entry
+        //                Sux[Sup[newrow]] =
+        //                    (Rs == NULL) ? Ax[p] : Ax[p] / Rs[oldrow];
+        //            }
+        //            else
+        //            {
+        //                Sux[++cSup[newrow]] =
+        //                    (Rs == NULL) ? Ax[p] : Ax[p] / Rs[oldrow];
+        //            }
+        //        }
+        //        else
+        //        {  // inside L singletons CSC
+        //            PRLEVEL(PR, ("Inside L singletons\n"));
+        //            if (newcol == newrow)
+        //            {  // diagonal entry
+        //                Slx[Slp[newcol - cs1]] =
+        //                    (Rs == NULL) ? Ax[p] : Ax[p] / Rs[oldrow];
+        //            }
+        //            else
+        //            {
+        //                Slx[++cSlp[newcol - cs1]] =
+        //                    (Rs == NULL) ? Ax[p] : Ax[p] / Rs[oldrow];
+        //            }
+        //        }
+        //    }
+        //}
+        //for (Int newcol = n1; newcol < Sym->n; newcol++)
+        //{
+        //    Int oldcol = Qinit[newcol];
+        //    for (Int p = Ap[oldcol]; p < Ap[oldcol + 1]; p++)
+        //    {
+        //        Int oldrow = Ai[p];
+        //        Int newrow = Pinv[oldrow];
+        //        Int srow = newrow - n1;
+        //        Int scol = newcol - n1;
+        //        if (srow >= 0)
+        //        {  // it is insdie S otherwise it is part of singleton
+        //            SSx[cSp[srow]++] = (Rs == NULL) ? Ax[p] : Ax[p] / Rs[oldrow];
+        //        }
+        //        else
+        //        {  // inside the U singletons
+        //            PRLEVEL(PR, ("Usingleton rest newcol = %ld newrow=%ld\n",
+        //                        newcol, newrow));
+        //            Sux[++cSup[newrow]] = (Rs == NULL) ? Ax[p] : Ax[p] / Rs[oldrow];
+        //        }
+        //    }
+        //}
+
+
         for (Int newcol = 0; newcol < Sym->n; newcol++)
         {
             Int oldcol = Qinit[newcol];
@@ -241,74 +345,73 @@ ParU_Ret paru_init_rowFronts(ParU_Numeric **Num_handle,  // in/out
                 Int newrow = Pinv[oldrow];
                 Int srow = newrow - n1;
                 Int scol = newcol - n1;
-                // //if (Control->scale == 1) 
-                // //    Rs[oldrow] = MAX(Rs[oldrow], fabs(Ax[p]));
-                    if (srow >= 0 && scol >= 0)
-                    {  // it is insdie S otherwise it is part of singleton
-                        SSx[cSp[srow]++] = (Rs == NULL) ? 
-                            Ax[p] : Ax[p] / Rs[oldrow];
+                if (srow >= 0 && scol >= 0)
+                {  // it is insdie S otherwise it is part of singleton
+                    SSx[cSp[srow]++] = (Rs == NULL) ? 
+                        Ax[p] : Ax[p] / Rs[oldrow];
+                }
+                else if (srow < 0 && scol >= 0)
+                {  // inside the U singletons
+                    PRLEVEL(PR, ("Usingleton newcol = %ld newrow=%ld\n",
+                                newcol, newrow));
+                    //let the diagonal entries be first
+                    Sux[++cSup[newrow]] = (Rs == NULL) ? 
+                        Ax[p] : Ax[p] / Rs[oldrow];
+                }
+                else
+                {
+                    if (newrow < cs1)
+                    {  // inside U singletons CSR
+                        //PRLEVEL(PR, ("Inside U singletons\n"));
+                        if (newcol == newrow)
+                        {  // diagonal entry
+                            Sux[Sup[newrow]] =
+                                (Rs == NULL) ? Ax[p] : Ax[p] / Rs[oldrow];
+
+                        }
+                        else
+                        {
+                            Sux[++cSup[newrow]] =
+                                (Rs == NULL) ? Ax[p] : Ax[p] / Rs[oldrow];
+                        }
                     }
-                    else if (srow < 0 && scol >= 0)
-                    {  // inside the U singletons
-                        PRLEVEL(PR, ("Usingleton newcol = %ld newrow=%ld\n",
-                                    newcol, newrow));
-                        //let the diagonal entries be first
-                        Sux[++cSup[newrow]] = (Rs == NULL) ? 
-                            Ax[p] : Ax[p] / Rs[oldrow];
+                    else
+                    {  // inside L singletons CSC
+                        //PRLEVEL(PR, ("Inside L singletons\n"));
+                        if (newcol == newrow)
+                        {  // diagonal entry
+                            Slx[Slp[newcol - cs1]] = 
+                                (Rs == NULL) ? Ax[p] : Ax[p] / Rs[oldrow];
+                        }
+                        else
+                        {
+                            Slx[++cSlp[newcol - cs1]] = 
+                                (Rs == NULL) ? Ax[p] : Ax[p] / Rs[oldrow];
+                        }
                     }
-                //    else
-                //    {
-                /////////////////////////////////////////////////////////////////////////////////
-                //        if (newrow < cs1)
-                //        {  // inside U singletons CSR
-                //            PRLEVEL(PR, ("Inside U singletons\n"));
-                //            if (newcol == newrow)
-                //            {  // diagonal entry
-                //                Sux[Sup[newrow]] = Ax[p];
-                //                    
-                //            }
-                //            else
-                //            {
-                //                Sux[++cSup[newrow]] = Ax[p];
-                //            }
-                //        }
-                //        else
-                //        {  // inside L singletons CSC
-                //            PRLEVEL(PR, ("Inside L singletons\n"));
-                //            if (newcol == newrow)
-                //            {  // diagonal entry
-            //                Slx[Slp[newcol - cs1]] = Ax[p];
-            //            }
-            //            else
-            //            {
-            //                Slx[++cSlp[newcol - cs1]] = Ax[p];
-            //            }
-            //        }
-            //        /////////////////////////////////////////////////////////
-            //    }
+                }
             }
         }
 
-////////////////////////////////////#ifndef NDEBUG
-        printf ("HERE\n");
+        #ifndef NDEBUG
         double *SymRs = Sym->scale_row;
         double *Sx = Sym->Sx;
         if (Control->scale == 1)
             for (Int i = 0; i < m; i++)
             {
                 if (SymRs[i] != Rs[i])
-                    printf ("XXXX i=%ld sym_rs=%lf num_rs=%lf\n", 
-                           i, SymRs[i], Rs[i]);
+                    PRLEVEL (1, ("XXXX i=%ld sym_rs=%lf num_rs=%lf\n", 
+                            i, SymRs[i], Rs[i]));
             }
         for (Int row = 0; row < m; row++)
         {
             for (Int p = Sp[row]; p < Sp[row + 1]; p++)
                 if (Sx[p] != SSx[p])
-                    printf ("YYYY row=%ld p=%ld Sx=%lf SSx=%lf\n", 
-                           row, p, Sx[p], SSx[p]);
- 
+                    PRLEVEL (1, ("YYYY row=%ld p=%ld Sx=%lf SSx=%lf\n", 
+                            row, p, Sx[p], SSx[p]));
+
         }
-        ////////////////////////////////////#endif
+        #endif
         paru_free(m + 1, sizeof(Int), cSp);
         if (Sym->cs1 > 0) paru_free((cs1 + 1), sizeof(Int), cSup);
         if (Sym->rs1 > 0) paru_free((rs1 + 1), sizeof(Int), cSlp);
@@ -351,7 +454,7 @@ ParU_Ret paru_init_rowFronts(ParU_Numeric **Num_handle,  // in/out
 
 #endif
 
-    PRLEVEL(0, ("InMatrix=[\n"));  // MATLAB matrix,
+    PRLEVEL(1, ("InMatrix=[\n"));  // MATLAB matrix,
 
     // copying Diag_map
     if (Diag_map)
@@ -365,7 +468,7 @@ ParU_Ret paru_init_rowFronts(ParU_Numeric **Num_handle,  // in/out
             inv_Diag_map[Diag_map[i]] = i;
         }
 #ifndef NDEBUG
-        PR = -1;
+        PR = 1;
         PRLEVEL(PR, ("init_row Diag_map (%ld) =\n", Sym->n));
         for (Int i = 0; i < MIN(64, Sym->n); i++)
             PRLEVEL(PR, ("%ld ", Diag_map[i]));
@@ -494,11 +597,11 @@ ParU_Ret paru_init_rowFronts(ParU_Numeric **Num_handle,  // in/out
     else
         info = PARU_SUCCESS;
 
-    PRLEVEL(0, ("];\n"));
-    PRLEVEL(0, ("I = InMatrix(:,1);\n"));
-    PRLEVEL(0, ("J = InMatrix(:,2);\n"));
-    PRLEVEL(0, ("X = InMatrix(:,3);\n"));
-    PRLEVEL(0, ("S = sparse(I,J,X);\n"));
+    PRLEVEL(1, ("];\n"));
+    PRLEVEL(1, ("I = InMatrix(:,1);\n"));
+    PRLEVEL(1, ("J = InMatrix(:,2);\n"));
+    PRLEVEL(1, ("X = InMatrix(:,3);\n"));
+    PRLEVEL(1, ("S = sparse(I,J,X);\n"));
 
     return info;
 }

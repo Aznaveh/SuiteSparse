@@ -1094,11 +1094,10 @@ ParU_Ret ParU_Analyze(cholmod_sparse *A, ParU_Symbolic **S_handle,
             }
         }
     }
-    Sym->ustons.nnz = sunz;
-    Sym->lstons.nnz = slnz;
+
 #ifndef NDEBUG
     PR = 1;
-    PRLEVEL(PR, ("Sup and Slp in the middle\n"));
+    PRLEVEL(PR, ("Analyze: Sup and Slp in the middle\n"));
     if (cs1 > 0)
     {
         PRLEVEL(PR, ("(%ld) Sup =", sunz));
@@ -1186,6 +1185,7 @@ ParU_Ret ParU_Analyze(cholmod_sparse *A, ParU_Symbolic **S_handle,
     PRLEVEL(PR, ("]\n"));
 
 #ifndef NDEBUG
+    PR = 1;
     PRLEVEL(PR, ("Sup and Slp finished (before cumsum)U-sing =%ld L-sing=%ld\n",
                  sunz, slnz));
     if (cs1 > 0)
@@ -1200,10 +1200,10 @@ ParU_Ret ParU_Analyze(cholmod_sparse *A, ParU_Symbolic **S_handle,
         for (Int k = cs1; k <= n1; k++) PRLEVEL(PR, ("%ld ", Slp[k - cs1]));
         PRLEVEL(PR, ("\n"));
     }
+    PR = 1;
     PRLEVEL(PR, ("Ps =\n"));
     for (Int k = 0; k < rowcount; k++) PRLEVEL(PR, ("%ld ", Ps[k]));
     PRLEVEL(PR, ("\n"));
-    PR = -1;
     if (Diag_map)
     {
         PRLEVEL(PR, ("Symbolic Diag_map (%ld) =\n", n));
@@ -1295,8 +1295,8 @@ ParU_Ret ParU_Analyze(cholmod_sparse *A, ParU_Symbolic **S_handle,
     }
 
 #ifndef NDEBUG
-    PR = 1;
-    PRLEVEL(PR, ("Sup and Slp in the middle\n"));
+    PR = -1;
+    PRLEVEL(PR, ("Analyze: Sup and Slp in the after cumsum\n"));
     if (cs1 > 0)
     {
         PRLEVEL(PR, ("(%ld) Sup =", sunz));
@@ -1331,7 +1331,7 @@ ParU_Ret ParU_Analyze(cholmod_sparse *A, ParU_Symbolic **S_handle,
 #endif
 
 #ifndef NDEBUG
-    PR = 1;
+    PR = -1;
     PRLEVEL(PR, ("After Stair case Pinv =\n"));
     for (Int i = 0; i < m; i++) PRLEVEL(PR, ("%ld ", Pinv[i]));
     PRLEVEL(PR, ("\n"));
@@ -1349,6 +1349,8 @@ ParU_Ret ParU_Analyze(cholmod_sparse *A, ParU_Symbolic **S_handle,
 
     Int *Suj = NULL;
     double *Sux = NULL;
+    Sym->ustons.nnz = sunz;
+    Sym->lstons.nnz = slnz;
     if (cs1 > 0)
     {
         Suj = (Int *)paru_alloc(sunz, sizeof(Int));
