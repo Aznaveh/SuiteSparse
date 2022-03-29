@@ -132,8 +132,8 @@ ParU_Ret paru_init_rowFronts(ParU_Numeric **Num_handle,  // in/out
     }
 
     Int snz = Sym->snz;
-    double *SSx = NULL;
-    SSx = Num->Sx = (double *)paru_alloc(snz, sizeof(double));
+    double *Sx = NULL;
+    Sx = Num->Sx = (double *)paru_alloc(snz, sizeof(double));
     Int *cSp = NULL;  // copy of Sp, temporary for making Sx
     cSp = (Int *)paru_alloc(m + 1, sizeof(Int));
     double *Sux = NULL;
@@ -168,7 +168,7 @@ ParU_Ret paru_init_rowFronts(ParU_Numeric **Num_handle,  // in/out
         Num->fcolCount == NULL || Num->frowList == NULL ||
         Num->fcolList == NULL || Num->partial_Us == NULL ||
         Num->partial_LUs == NULL || Num->time_stamp == NULL ||
-        heapList == NULL || SSx == NULL || (scale == 1 && Rs == NULL) ||
+        heapList == NULL || Sx == NULL || (scale == 1 && Rs == NULL) ||
         (cs1 > 0 && (Sux == NULL || cSup == NULL)) ||
         (rs1 > 0 && (Slx == NULL || cSlp == NULL)) || cSp == NULL ||
         (Sym->strategy == PARU_STRATEGY_SYMMETRIC &&
@@ -286,7 +286,7 @@ ParU_Ret paru_init_rowFronts(ParU_Numeric **Num_handle,  // in/out
                 Int scol = newcol - n1;
                 if (srow >= 0 && scol >= 0)
                 {  // it is insdie S otherwise it is part of singleton
-                    SSx[cSp[srow]++] = (Rs == NULL) ? 
+                    Sx[cSp[srow]++] = (Rs == NULL) ? 
                         Ax[p] : Ax[p] / Rs[oldrow];
                 }
                 else if (srow < 0 && scol >= 0)
@@ -333,7 +333,6 @@ ParU_Ret paru_init_rowFronts(ParU_Numeric **Num_handle,  // in/out
         }
 
         double *SymRs = Sym->scale_row;
-        double *Sx = Sym->Sx;
         if (Rs)
             for (Int i = 0; i < m; i++)
             {
@@ -341,14 +340,6 @@ ParU_Ret paru_init_rowFronts(ParU_Numeric **Num_handle,  // in/out
                     printf ("XXXX i=%ld sym_rs=%lf num_rs=%lf\n", 
                             i, SymRs[i], Rs[i]);
             }
-        for (Int row = 0; row < m; row++)
-        {
-            for (Int p = Sp[row]; p < Sp[row + 1]; p++)
-                if (Sx[p] != SSx[p])
-                    printf ("YYYY row=%ld p=%ld Sx=%lf SSx=%lf\n", 
-                            row, p, Sx[p], SSx[p]);
-
-        }
         double *symSux = Sym->ustons.Sux; 
         for (Int i = 0; i < sunz; i++)
             if (Sux[i] != symSux[i]) 
@@ -383,7 +374,6 @@ ParU_Ret paru_init_rowFronts(ParU_Numeric **Num_handle,  // in/out
         return PARU_INVALID;
     }
 
-    double *Sx = Sym->Sx;
     Int *Sj = Sym->Sj;
 
     /// ------------------------------------------------------------------------

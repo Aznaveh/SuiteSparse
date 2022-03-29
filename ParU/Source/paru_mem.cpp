@@ -227,7 +227,6 @@ ParU_Ret ParU_Freesym(ParU_Symbolic **Sym_handle, ParU_Control *Control)
 
     paru_free(m + 1 - n1, sizeof(Int), Sym->Sp);
     paru_free(snz, sizeof(Int), Sym->Sj);
-    paru_free(snz, sizeof(double), Sym->Sx);
     paru_free(n + 2 - n1, sizeof(Int), Sym->Sleft);
 
     // paru_free((n + 1), sizeof(Int), Sym->Chain_start);

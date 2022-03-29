@@ -80,7 +80,6 @@ ParU_Ret ParU_Analyze(cholmod_sparse *A, ParU_Symbolic **S_handle,
     Sym->Parent = Sym->Super = Sym->Child = Sym->Childp = NULL;
     Sym->Qfill = Sym->Pfin = Sym->Pinit = Sym->Diag_map = NULL;
     Sym->Sp = Sym->Sj = Sym->Sleft = Sym->Ps = NULL;
-    Sym->Sx = NULL;
     Sym->Fm = Sym->Cm = NULL;
     Sym->aParent = Sym->aChildp = Sym->aChild = Sym->row2atree = NULL;
     Sym->super2atree = Sym->first = NULL;
@@ -1369,14 +1368,12 @@ ParU_Ret ParU_Analyze(cholmod_sparse *A, ParU_Symbolic **S_handle,
     Sym->lstons.Slx = Slx;
     Sym->lstons.Sli = Sli;
 
-    // Updating Sj and Sx using copy of Sp
+    // Updating Sj using copy of Sp
     Int *Sj = (Int *)paru_alloc(snz, sizeof(Int));
-    double *Sx = (double *)paru_alloc(snz, sizeof(double));
 
     Sym->Sj = Sj;
-    Sym->Sx = Sx;
 
-    if (Sj == NULL || Sx == NULL || (cs1 > 0 && (Suj == NULL || Sux == NULL)) ||
+    if (Sj == NULL || (cs1 > 0 && (Suj == NULL || Sux == NULL)) ||
         (rs1 > 0 && (Sli == NULL || Slx == NULL)))
     {
         printf("Paru: memory problem\n");
@@ -1386,7 +1383,7 @@ ParU_Ret ParU_Analyze(cholmod_sparse *A, ParU_Symbolic **S_handle,
         return PARU_OUT_OF_MEMORY;
     }
 
-    // construct Sj, Sx and singltons
+    // construct Sj and singltons
 #ifndef NDEBUG
     PR = 1;
     PRLEVEL(PR, ("Constructing Sj and singletons\n"));
@@ -1447,8 +1444,7 @@ ParU_Ret ParU_Analyze(cholmod_sparse *A, ParU_Symbolic **S_handle,
             Int scol = newcol - n1;
             if (srow >= 0)
             {  // it is insdie S otherwise it is part of singleton
-                Sj[cSp[srow]] = scol;
-                Sx[cSp[srow]++] = (Rs == NULL) ? Ax[p] : Ax[p] / Rs[oldrow];
+                Sj[cSp[srow]++] = scol;
             }
             else
             {  // inside the U singletons
