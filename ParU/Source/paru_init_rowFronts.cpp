@@ -261,7 +261,7 @@ ParU_Ret paru_init_rowFronts(ParU_Numeric **Num_handle,  // in/out
 #endif
 
 
-        if (Control->scale == 1) 
+        if (Rs) 
         {
             for (Int newcol = 0; newcol < Sym->n; newcol++)
             {
@@ -273,67 +273,6 @@ ParU_Ret paru_init_rowFronts(ParU_Numeric **Num_handle,  // in/out
                 }
             }
         }
-
-        //for (Int newcol = 0; newcol < n1; newcol++)
-        //{  // The columns that are just in singleton
-        //    Int oldcol = Qinit[newcol];
-        //    PRLEVEL(PR, ("newcol = %ld oldcol=%ld\n", newcol, oldcol));
-        //    for (Int p = Ap[oldcol]; p < Ap[oldcol + 1]; p++)
-        //    {
-        //        Int oldrow = Ai[p];
-        //        Int newrow = Pinv[oldrow];
-        //        PRLEVEL(PR, ("newrow=%ld oldrow=%ld\n", newrow, oldrow));
-        //        if (newrow < cs1)
-        //        {  // inside U singletons CSR
-        //            PRLEVEL(PR, ("Inside U singletons\n"));
-        //            if (newcol == newrow)
-        //            {  // diagonal entry
-        //                Sux[Sup[newrow]] =
-        //                    (Rs == NULL) ? Ax[p] : Ax[p] / Rs[oldrow];
-        //            }
-        //            else
-        //            {
-        //                Sux[++cSup[newrow]] =
-        //                    (Rs == NULL) ? Ax[p] : Ax[p] / Rs[oldrow];
-        //            }
-        //        }
-        //        else
-        //        {  // inside L singletons CSC
-        //            PRLEVEL(PR, ("Inside L singletons\n"));
-        //            if (newcol == newrow)
-        //            {  // diagonal entry
-        //                Slx[Slp[newcol - cs1]] =
-        //                    (Rs == NULL) ? Ax[p] : Ax[p] / Rs[oldrow];
-        //            }
-        //            else
-        //            {
-        //                Slx[++cSlp[newcol - cs1]] =
-        //                    (Rs == NULL) ? Ax[p] : Ax[p] / Rs[oldrow];
-        //            }
-        //        }
-        //    }
-        //}
-        //for (Int newcol = n1; newcol < Sym->n; newcol++)
-        //{
-        //    Int oldcol = Qinit[newcol];
-        //    for (Int p = Ap[oldcol]; p < Ap[oldcol + 1]; p++)
-        //    {
-        //        Int oldrow = Ai[p];
-        //        Int newrow = Pinv[oldrow];
-        //        Int srow = newrow - n1;
-        //        Int scol = newcol - n1;
-        //        if (srow >= 0)
-        //        {  // it is insdie S otherwise it is part of singleton
-        //            SSx[cSp[srow]++] = (Rs == NULL) ? Ax[p] : Ax[p] / Rs[oldrow];
-        //        }
-        //        else
-        //        {  // inside the U singletons
-        //            PRLEVEL(PR, ("Usingleton rest newcol = %ld newrow=%ld\n",
-        //                        newcol, newrow));
-        //            Sux[++cSup[newrow]] = (Rs == NULL) ? Ax[p] : Ax[p] / Rs[oldrow];
-        //        }
-        //    }
-        //}
 
 
         for (Int newcol = 0; newcol < Sym->n; newcol++)
@@ -585,9 +524,6 @@ ParU_Ret paru_init_rowFronts(ParU_Numeric **Num_handle,  // in/out
         {
             el_colrowIndex[j] = Sj[p];
             el_colrowNum[j++] = Sx[p];
-            // printf("Sj[%ld] =%ld Sx[%ld]=%lf \n", p, Sj[p], p, Sx[p]);
-            // for Matlab
-            // printf("%ld,%ld, %.16lf;\n", row + 1, Sj[p] + 1, Sx[p]);
         }
         el_colrowIndex[j++] = row;  // initializing element row index
         Num->lacList[e] = lac_el(elementList, e);
