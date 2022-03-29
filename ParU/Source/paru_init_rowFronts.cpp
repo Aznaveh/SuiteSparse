@@ -332,25 +332,34 @@ ParU_Ret paru_init_rowFronts(ParU_Numeric **Num_handle,  // in/out
             }
         }
 
-        #ifndef NDEBUG
         double *SymRs = Sym->scale_row;
         double *Sx = Sym->Sx;
-        if (Control->scale == 1)
+        if (Rs)
             for (Int i = 0; i < m; i++)
             {
                 if (SymRs[i] != Rs[i])
-                    PRLEVEL (1, ("XXXX i=%ld sym_rs=%lf num_rs=%lf\n", 
-                            i, SymRs[i], Rs[i]));
+                    printf ("XXXX i=%ld sym_rs=%lf num_rs=%lf\n", 
+                            i, SymRs[i], Rs[i]);
             }
         for (Int row = 0; row < m; row++)
         {
             for (Int p = Sp[row]; p < Sp[row + 1]; p++)
                 if (Sx[p] != SSx[p])
-                    PRLEVEL (1, ("YYYY row=%ld p=%ld Sx=%lf SSx=%lf\n", 
-                            row, p, Sx[p], SSx[p]));
+                    printf ("YYYY row=%ld p=%ld Sx=%lf SSx=%lf\n", 
+                            row, p, Sx[p], SSx[p]);
 
         }
-        #endif
+        double *symSux = Sym->ustons.Sux; 
+        for (Int i = 0; i < sunz; i++)
+            if (Sux[i] != symSux[i]) 
+                    printf ("SUXY i=%ld Sux=%lf SymSux=%lf\n", 
+                            i, Sux[i], symSux[i]);
+        double *symSlx = Sym->lstons.Slx; 
+        for (Int i = 0; i < slnz; i++)
+            if (Slx[i] != symSlx[i]) 
+                    printf ("SLXY i=%ld Slx=%lf SymSlx=%lf\n", 
+                            i, Slx[i], symSlx[i]);
+
         paru_free(m + 1, sizeof(Int), cSp);
         if (Sym->cs1 > 0) paru_free((cs1 + 1), sizeof(Int), cSup);
         if (Sym->rs1 > 0) paru_free((rs1 + 1), sizeof(Int), cSlp);
