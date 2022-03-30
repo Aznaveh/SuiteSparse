@@ -85,7 +85,6 @@ struct ParU_U_singleton
     Int nnz;   // nnz in submatrix
     Int *Sup;  // size cs1
     Int *Suj;  // size is computed
-    double *Sux;
 };
 
 struct ParU_L_singleton
@@ -94,7 +93,6 @@ struct ParU_L_singleton
     Int nnz;   // nnz in submatrix
     Int *Slp;  // size rs1
     Int *Sli;  // size is computed
-    double *Slx;
 };
 
 struct ParU_Symbolic

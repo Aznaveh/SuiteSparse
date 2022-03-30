@@ -86,7 +86,6 @@ ParU_Ret ParU_Analyze(cholmod_sparse *A, ParU_Symbolic **S_handle,
     Sym->stree_flop_bound = Sym->front_flop_bound = NULL;
     Sym->ustons.Sup = Sym->lstons.Slp = NULL;
     Sym->ustons.Suj = Sym->lstons.Sli = NULL;
-    Sym->ustons.Sux = Sym->lstons.Slx = NULL;
     Sym->task_map = Sym->task_parent = Sym->task_num_child = NULL;
 
     //############  Calling UMFPACK and retrieving data structure ##############
@@ -1324,25 +1323,19 @@ ParU_Ret ParU_Analyze(cholmod_sparse *A, ParU_Symbolic **S_handle,
 #endif
 
     Int *Suj = NULL;
-    double *Sux = NULL;
     Sym->ustons.nnz = sunz;
     Sym->lstons.nnz = slnz;
     if (cs1 > 0)
     {
         Suj = (Int *)paru_alloc(sunz, sizeof(Int));
-        Sux = (double *)paru_alloc(sunz, sizeof(double));
     }
-    Sym->ustons.Sux = Sux;
     Sym->ustons.Suj = Suj;
 
     Int *Sli = NULL;
-    double *Slx = NULL;
     if (rs1 > 0)
     {
         Sli = (Int *)paru_alloc(slnz, sizeof(Int));
-        Slx = (double *)paru_alloc(slnz, sizeof(double));
     }
-    Sym->lstons.Slx = Slx;
     Sym->lstons.Sli = Sli;
 
     // Updating Sj using copy of Sp
@@ -1350,10 +1343,10 @@ ParU_Ret ParU_Analyze(cholmod_sparse *A, ParU_Symbolic **S_handle,
 
     Sym->Sj = Sj;
 
-    if (Sj == NULL || (cs1 > 0 && (Suj == NULL || Sux == NULL)) ||
-        (rs1 > 0 && (Sli == NULL || Slx == NULL)))
+    if (Sj == NULL || (cs1 > 0 && Suj == NULL ) ||  (rs1 > 0 && Sli == NULL ))
     {
         printf("Paru: memory problem\n");
+        //FIXME PINv is saved and will be freed
         paru_free(m, sizeof(Int), Pinv);
         ParU_Freesym(&Sym, Control);
         // umfpack_dl_azn_free_sw (&SW);
@@ -1380,14 +1373,10 @@ ParU_Ret ParU_Analyze(cholmod_sparse *A, ParU_Symbolic **S_handle,
                 if (newcol == newrow)
                 {  // diagonal entry
                     Suj[Sup[newrow]] = newcol;
-                    Sux[Sup[newrow]] =
-                        (Rs == NULL) ? Ax[p] : Ax[p] / Rs[oldrow];
                 }
                 else
                 {
                     Suj[++cSup[newrow]] = newcol;
-                    Sux[cSup[newrow]] =
-                        (Rs == NULL) ? Ax[p] : Ax[p] / Rs[oldrow];
                 }
             }
             else
@@ -1396,14 +1385,10 @@ ParU_Ret ParU_Analyze(cholmod_sparse *A, ParU_Symbolic **S_handle,
                 if (newcol == newrow)
                 {  // diagonal entry
                     Sli[Slp[newcol - cs1]] = newrow;
-                    Slx[Slp[newcol - cs1]] =
-                        (Rs == NULL) ? Ax[p] : Ax[p] / Rs[oldrow];
                 }
                 else
                 {
                     Sli[++cSlp[newcol - cs1]] = newrow;
-                    Slx[cSlp[newcol - cs1]] =
-                        (Rs == NULL) ? Ax[p] : Ax[p] / Rs[oldrow];
                 }
             }
         }
@@ -1429,7 +1414,6 @@ ParU_Ret ParU_Analyze(cholmod_sparse *A, ParU_Symbolic **S_handle,
                              newcol, newrow));
                 ASSERT(newrow != newcol);  // not a diagonal entry
                 Suj[++cSup[newrow]] = newcol;
-                Sux[cSup[newrow]] = (Rs == NULL) ? Ax[p] : Ax[p] / Rs[oldrow];
             }
         }
     }
@@ -1440,7 +1424,7 @@ ParU_Ret ParU_Analyze(cholmod_sparse *A, ParU_Symbolic **S_handle,
     PRLEVEL(PR, ("Constructing Sj and singletons finished here\n"));
 #ifndef NDEBUG
     PR = 1;
-    PRLEVEL(PR, ("Sup and Slp after mading Sux Slx\n"));
+    PRLEVEL(PR, ("Sup and Slp after mading \n"));
     if (cs1 > 0)
     {
         PRLEVEL(PR, ("U singltons(CSR) (nnz=%ld) Sup =", sunz));
@@ -1452,7 +1436,7 @@ ParU_Ret ParU_Analyze(cholmod_sparse *A, ParU_Symbolic **S_handle,
             PRLEVEL(PR, ("row = %ld\n", newrow));
             for (Int p = Sup[newrow]; p < Sup[newrow + 1]; p++)
             {
-                PRLEVEL(PR, (" (%ld)%.2lf", Suj[p], Sux[p]));
+                PRLEVEL(PR, (" (%ld)", Suj[p]));
             }
             PRLEVEL(PR, ("\n"));
         }
@@ -1468,7 +1452,7 @@ ParU_Ret ParU_Analyze(cholmod_sparse *A, ParU_Symbolic **S_handle,
             PRLEVEL(PR, ("col = %ld\n", newcol));
             for (Int p = Slp[newcol - cs1]; p < Slp[newcol - cs1 + 1]; p++)
             {
-                PRLEVEL(PR, (" (%ld)%.2lf", Sli[p], Slx[p]));
+                PRLEVEL(PR, (" (%ld)", Sli[p]));
             }
             PRLEVEL(PR, ("\n"));
         }

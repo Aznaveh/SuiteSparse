@@ -255,7 +255,6 @@ ParU_Ret ParU_Freesym(ParU_Symbolic **Sym_handle, ParU_Control *Control)
             paru_free(cs1 + 1, sizeof(Int), ustons.Sup);
             Int nnz = ustons.nnz;
             paru_free(nnz, sizeof(Int), ustons.Suj);
-            paru_free(nnz, sizeof(Int), ustons.Sux);
         }
 
         Int rs1 = Sym->rs1;
@@ -265,7 +264,6 @@ ParU_Ret ParU_Freesym(ParU_Symbolic **Sym_handle, ParU_Control *Control)
             paru_free(rs1 + 1, sizeof(Int), lstons.Slp);
             Int nnz = lstons.nnz;
             paru_free(nnz, sizeof(Int), lstons.Sli);
-            paru_free(nnz, sizeof(double), lstons.Slx);
         }
     }
     Int ntasks = Sym->ntasks;
@@ -322,9 +320,17 @@ ParU_Ret ParU_Freenum (ParU_Numeric **Num_handle, ParU_Control *Control)
     //freeing the numerical input
     paru_free(Sym->snz, sizeof(double), Num->Sx);
     if (Sym->cs1 > 0)
-        paru_free(Sym->snz, sizeof(double), Num->Sux);
+    {
+        ParU_U_singleton ustons = Sym->ustons;
+        Int nnz = ustons.nnz;
+        paru_free(nnz, sizeof(double), Num->Sux);
+    }
     if (Sym->rs1 > 0)
-        paru_free(Sym->snz, sizeof(double), Num->Slx);
+    {
+        ParU_L_singleton lstons = Sym->lstons;
+        Int nnz = lstons.nnz;
+        paru_free(nnz, sizeof(double), Num->Slx);
+    }
     paru_free(Sym->m, sizeof(Int), Num->Rs);
     for (Int row = 0; row < m; row++)
     {
