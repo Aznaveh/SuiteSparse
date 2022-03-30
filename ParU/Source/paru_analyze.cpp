@@ -275,10 +275,7 @@ ParU_Ret ParU_Analyze(cholmod_sparse *A, ParU_Symbolic **S_handle,
                 umfpack_strategy != UMFPACK_STRATEGY_SYMMETRIC &&
                 umfpack_strategy != UMFPACK_STRATEGY_UNSYMMETRIC)
             my_Control.umfpack_strategy = UMFPACK_STRATEGY_AUTO;
-        Int scale = my_Control.scale;
-        if ( scale != 0 || scale != 1)
-            my_Control.scale = 1;
-        Int max_threads = PARU_OPENMP_MAX_THREADS;
+       Int max_threads = PARU_OPENMP_MAX_THREADS;
         if (my_Control.paru_max_threads > 0)
             my_Control.paru_max_threads  =
                 MIN (max_threads, my_Control.paru_max_threads);
@@ -951,7 +948,6 @@ ParU_Ret ParU_Analyze(cholmod_sparse *A, ParU_Symbolic **S_handle,
         // umfpack_dl_azn_free_sw (&SW);
 
         paru_free(n, sizeof(Int), inv_Diag_map);
-        paru_free(m, sizeof(Int), Pinv);
         return PARU_OUT_OF_MEMORY;
     }
 
@@ -1007,10 +1003,7 @@ ParU_Ret ParU_Analyze(cholmod_sparse *A, ParU_Symbolic **S_handle,
     Int *cSup = NULL;   // copy of Singlton u p
     Int *Slp = NULL;    // Singlton l p
     Int *cSlp = NULL;   // copy Singlton l p
-    double *Rs = NULL;  // row scaling
     Ps = (Int *)paru_calloc(m - n1, sizeof(Int));
-    Int scale = Control->scale; // if 1 the S will be scaled by max_row
-    if (scale == 1) Rs = (double *)paru_calloc(m, sizeof(double));
     if (cs1 > 0)
     {
         Sup = Sym->ustons.Sup = (Int *)paru_calloc(cs1 + 1, sizeof(Int));
@@ -1023,7 +1016,6 @@ ParU_Ret ParU_Analyze(cholmod_sparse *A, ParU_Symbolic **S_handle,
     }
 
     if (((Slp == NULL || cSlp == NULL) && rs1 != 0) ||
-        (Rs == NULL && scale == 1) ||
         ((Sup == NULL || cSup == NULL) && cs1 != 0) || Ps == NULL)
     {
         printf("Paru: rs1=%ld cs1=%ld memory problem\n", rs1, cs1);
@@ -1034,9 +1026,7 @@ ParU_Ret ParU_Analyze(cholmod_sparse *A, ParU_Symbolic **S_handle,
         paru_free((rs1 + 1), sizeof(Int), cSlp);
 
         paru_free((m + 1), sizeof(Int), Pinit);
-        paru_free(m, sizeof(Int), Rs);
         paru_free((MAX(m, n) + 2), sizeof(Int), Work);
-        paru_free(m, sizeof(Int), Pinv);
         paru_free(n, sizeof(Int), inv_Diag_map);
         // umfpack_dl_azn_free_sw (&SW);
         ParU_Freesym(&Sym, Control);
@@ -1063,7 +1053,6 @@ ParU_Ret ParU_Analyze(cholmod_sparse *A, ParU_Symbolic **S_handle,
         {
             Int oldrow = Ai[p];
             Int newrow = Pinv[oldrow];
-            if (Rs) Rs[oldrow] = MAX(Rs[oldrow], fabs(Ax[p]));
             PRLEVEL(PR, ("newrow=%ld oldrow=%ld\n", newrow, oldrow));
             if (newrow < cs1)
             {  // inside U singletons
@@ -1118,7 +1107,6 @@ ParU_Ret ParU_Analyze(cholmod_sparse *A, ParU_Symbolic **S_handle,
             Int oldrow = Ai[p];
             Int newrow = Pinv[oldrow];
             Int srow = newrow - n1;
-            if (Rs) Rs[oldrow] = MAX(Rs[oldrow], fabs(Ax[p]));
             PRLEVEL(1, ("\tnewrow=%ld oldrow=%ld srow=%ld\n", newrow, oldrow,
                         srow));
             if (srow >= 0)
@@ -1209,7 +1197,6 @@ ParU_Ret ParU_Analyze(cholmod_sparse *A, ParU_Symbolic **S_handle,
         paru_free((m + 1), sizeof(Int), Pinit);
         paru_free((MAX(m, n) + 2), sizeof(Int), Work);
 
-        paru_free(m, sizeof(Int), Pinv);
         ParU_Freesym(&Sym, Control);
         // umfpack_dl_azn_free_sw (&SW);
         return PARU_OUT_OF_MEMORY;
@@ -1346,8 +1333,6 @@ ParU_Ret ParU_Analyze(cholmod_sparse *A, ParU_Symbolic **S_handle,
     if (Sj == NULL || (cs1 > 0 && Suj == NULL ) ||  (rs1 > 0 && Sli == NULL ))
     {
         printf("Paru: memory problem\n");
-        //FIXME PINv is saved and will be freed
-        paru_free(m, sizeof(Int), Pinv);
         ParU_Freesym(&Sym, Control);
         // umfpack_dl_azn_free_sw (&SW);
         return PARU_OUT_OF_MEMORY;
@@ -1530,7 +1515,6 @@ ParU_Ret ParU_Analyze(cholmod_sparse *A, ParU_Symbolic **S_handle,
         stree_flop_bound == NULL)
     {
         printf("Paru: Out of memory in symbolic phase");
-        paru_free(m, sizeof(Int), Pinv);
         ParU_Freesym(&Sym, Control);
         return PARU_OUT_OF_MEMORY;
     }
@@ -1694,7 +1678,6 @@ ParU_Ret ParU_Analyze(cholmod_sparse *A, ParU_Symbolic **S_handle,
         task_depth == NULL)
     {
         printf("Paru: Out of memory in symbolic phase");
-        paru_free(m, sizeof(Int), Pinv);
         ParU_Freesym(&Sym, Control);
         return PARU_OUT_OF_MEMORY;
     }
