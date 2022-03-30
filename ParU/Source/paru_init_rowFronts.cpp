@@ -49,10 +49,9 @@ ParU_Ret paru_init_rowFronts(ParU_Numeric **Num_handle,  // in/out
     }
     *Num_handle = Num;
 
-    Int m, n, nf;
+    Int m, nf;
     Num->Sym = Sym;
     m = Num->m = Sym->m - Sym->n1;
-    n = Num->n = Sym->n - Sym->n1;
     nf = Sym->nf;
     Num->res = PARU_SUCCESS;
     Num->Control = Control;
@@ -378,7 +377,6 @@ ParU_Ret paru_init_rowFronts(ParU_Numeric **Num_handle,  // in/out
     Num->flp_cnt_real_dgemm = 0.0;
 #endif
 
-    PRLEVEL(1, ("%% m=%ld, n=%ld\n", m, n));
     // RowList, ColList and elementList are place holders
     // pointers to pointers that are allocated
 
@@ -388,6 +386,8 @@ ParU_Ret paru_init_rowFronts(ParU_Numeric **Num_handle,  // in/out
     // create S = A (p,q)', or S=A(p,q), S is considered to be in row-form
     // -------------------------------------------------------------------------
 #ifndef NDEBUG
+    Int n = Num->n = Sym->n - Sym->n1;
+    PRLEVEL(1, ("%% m=%ld, n=%ld\n", m, n));
     PR = 1;
     PRLEVEL(PR, ("\n%% Inside init row fronts\n"));
     PRLEVEL(PR, ("%% Sp =\n%%"));
@@ -397,7 +397,6 @@ ParU_Ret paru_init_rowFronts(ParU_Numeric **Num_handle,  // in/out
     PRLEVEL(PR, ("Sj =\n"));
     for (Int k = 0; k < snz; k++) PRLEVEL(PR, ("%ld ", Sj[k]));
     PRLEVEL(PR, ("\n"));
-
 #endif
 
     PRLEVEL(1, ("InMatrix=[\n"));  // MATLAB matrix,
