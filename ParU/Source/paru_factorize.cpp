@@ -238,6 +238,11 @@ ParU_Ret ParU_Factorize(cholmod_sparse *A, ParU_Symbolic *Sym,
                 MIN (max_threads, my_Control.paru_max_threads);
         else            
             my_Control.paru_max_threads  = max_threads;
+
+        Int scale = my_Control.scale;
+        if ( scale != 0 || scale != 1)
+            my_Control.scale = 1;
+
     }
     ParU_Control *Control= &my_Control;
 

@@ -48,7 +48,16 @@ ParU_Ret ParU_Solve(ParU_Numeric *Num, double *b, ParU_Control *user_Control)
 
 
     paru_memcpy(x, b, m * sizeof(double), Control);
-    paru_apply_perm_scale(Sym->Pfin, Sym->scale_row, b, x, m);
+    //paru_apply_perm_scale(Sym->Pfin, Sym->scale_row, b, x, m);
+    paru_apply_perm_scale(Sym->Pfin, Num->Rs, b, x, m);
+
+    double *Syms = Sym->scale_row;
+    double *Nums = Num->Rs;
+
+    printf ("Nums = %p Syms=%p\n",Nums, Syms);
+    for (Int i = 0; i< m; i++)
+        if(Nums[i] != Syms[i])
+                printf ("i=%ld Nums=%lf Syms=%lf\n",i, Nums[i], Syms[i]);
 
     PRLEVEL(1, ("%% lsolve\n"));
     paru_lsolve(x, Num, Control);  // x = L\x
@@ -112,7 +121,8 @@ ParU_Ret ParU_Solve(ParU_Numeric *Num, Int nrhs, double *B,
     ParU_Control *Control= &my_Control;
 
     paru_memcpy(X, B, m * nrhs * sizeof(double), Control);
-    paru_apply_perm_scale(Sym->Pfin, Sym->scale_row, B, X, m, nrhs);
+    //paru_apply_perm_scale(Sym->Pfin, Sym->scale_row, B, X, m, nrhs);
+    paru_apply_perm_scale(Sym->Pfin, Num->Rs, B, X, m, nrhs);
 
     PRLEVEL(1, ("%%mRHS lsolve\n"));
     paru_lsolve(X, nrhs, Num, Control);  // X = L\X

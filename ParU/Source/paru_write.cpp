@@ -137,7 +137,7 @@ void paru_write(ParU_Numeric *Num, int scale, char *id)
     //-------------------- writing row scales to a file
     if (scale)
     {
-        double *scale_row = Sym->scale_row;
+        double *Rs = Num->Rs;
         FILE *scalefptr;
         char fname[100] = "";
         strcat(fname, dpath);
@@ -151,7 +151,7 @@ void paru_write(ParU_Numeric *Num, int scale, char *id)
             return;
         }
         for (Int row = 0; row < m; row++)
-            fprintf(scalefptr, "%.17g\n", scale_row[row]);
+            fprintf(scalefptr, "%.17g\n", Rs[row]);
         fclose(scalefptr);
     }
     //--------------------

@@ -158,10 +158,11 @@ ParU_Ret paru_init_rowFronts(ParU_Numeric **Num_handle,  // in/out
         cSlp = (Int *)paru_alloc(rs1 + 1, sizeof(Int));
     }
     Num->Slx = Slx;
-    Int scale = Control->scale;  // if 1 the S will be scaled by max_row
     double *Rs = NULL;
-    if (scale == 1) Rs = (double *)paru_calloc(Sym->m, sizeof(double));
-
+    Int scale = Control->scale;  // if 1 the S will be scaled by max_row
+    if (scale == 1) 
+        Rs = (double *)paru_calloc(Sym->m, sizeof(double));
+    Num->Rs = Rs;
     if (rowMark == NULL || elRow == NULL || elCol == NULL || rowSize == NULL ||
         Num->lacList == NULL || RowList == NULL || row_degree_bound == NULL ||
         elementList == NULL || Num->frowCount == NULL ||
@@ -273,6 +274,20 @@ ParU_Ret paru_init_rowFronts(ParU_Numeric **Num_handle,  // in/out
                 }
             }
         }
+#ifndef NDEBUG
+        PR = 2;
+        PRLEVEL(PR, ("%% Rs=%p:\n[",Rs));
+        if (Rs != NULL)
+        {  // making sure that every row has at most one element more than zero
+            for (Int k = 0; k < Sym->m; k++)
+            {
+                PRLEVEL(PR, ("%lf ", Rs[k]));
+                printf("%lf ", Rs[k]);
+                ASSERT (Rs[k] > 0);
+            }
+        }
+        PRLEVEL(PR, ("]\n"));
+#endif
 
 
         for (Int newcol = 0; newcol < Sym->n; newcol++)
@@ -332,26 +347,18 @@ ParU_Ret paru_init_rowFronts(ParU_Numeric **Num_handle,  // in/out
             }
         }
 
-        double *SymRs = Sym->scale_row;
-        if (Rs)
-            for (Int i = 0; i < m; i++)
-            {
-                if (SymRs[i] != Rs[i])
-                    printf ("XXXX i=%ld sym_rs=%lf num_rs=%lf\n", 
-                            i, SymRs[i], Rs[i]);
-            }
-        double *symSux = Sym->ustons.Sux; 
-        for (Int i = 0; i < sunz; i++)
-            if (Sux[i] != symSux[i]) 
-                    printf ("SUXY i=%ld Sux=%lf SymSux=%lf\n", 
-                            i, Sux[i], symSux[i]);
-        double *symSlx = Sym->lstons.Slx; 
-        for (Int i = 0; i < slnz; i++)
-            if (Slx[i] != symSlx[i]) 
-                    printf ("SLXY i=%ld Slx=%lf SymSlx=%lf\n", 
-                            i, Slx[i], symSlx[i]);
+        //double *symSux = Sym->ustons.Sux; 
+        //for (Int i = 0; i < sunz; i++)
+        //    if (Sux[i] != symSux[i]) 
+        //            printf ("SUXY i=%ld Sux=%lf SymSux=%lf\n", 
+        //                    i, Sux[i], symSux[i]);
+        //double *symSlx = Sym->lstons.Slx; 
+        //for (Int i = 0; i < slnz; i++)
+        //    if (Slx[i] != symSlx[i]) 
+        //            printf ("SLXY i=%ld Slx=%lf SymSlx=%lf\n", 
+        //                    i, Slx[i], symSlx[i]);
 
-        paru_free(m + 1, sizeof(Int), cSp);
+        //paru_free(m + 1, sizeof(Int), cSp);
         if (Sym->cs1 > 0) paru_free((cs1 + 1), sizeof(Int), cSup);
         if (Sym->rs1 > 0) paru_free((rs1 + 1), sizeof(Int), cSlp);
     }

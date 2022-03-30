@@ -1294,7 +1294,7 @@ ParU_Ret ParU_Analyze(cholmod_sparse *A, ParU_Symbolic **S_handle,
     }
 
 #ifndef NDEBUG
-    PR = -1;
+    PR = 1;
     PRLEVEL(PR, ("Analyze: Sup and Slp in the after cumsum\n"));
     if (cs1 > 0)
     {
@@ -1330,7 +1330,7 @@ ParU_Ret ParU_Analyze(cholmod_sparse *A, ParU_Symbolic **S_handle,
 #endif
 
 #ifndef NDEBUG
-    PR = -1;
+    PR = 1;
     PRLEVEL(PR, ("After Stair case Pinv =\n"));
     for (Int i = 0; i < m; i++) PRLEVEL(PR, ("%ld ", Pinv[i]));
     PRLEVEL(PR, ("\n"));
