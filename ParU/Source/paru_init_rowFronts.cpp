@@ -66,10 +66,12 @@ ParU_Ret paru_init_rowFronts(ParU_Numeric **Num_handle,  // in/out
         return PARU_OUT_OF_MEMORY;
     }
 
-    Work->rowMark = Work->elRow = NULL;
-    Work->elCol = Work->rowSize = NULL;
-    Num->row_degree_bound = NULL;
-    Num->RowList = NULL;
+    Int *rowMark = Work->rowMark = NULL;
+    Int *elRow = Work->elRow = NULL;
+    Int *elCol = Work->elCol =  NULL;
+    Int *rowSize = Work->rowSize = NULL;
+    Int *row_degree_bound = Num->row_degree_bound = NULL;
+    ParU_TupleList *RowList = Num->RowList = NULL;
     Num->lacList = NULL;
     Num->frowCount = NULL;
     Num->fcolCount = NULL;
@@ -77,58 +79,59 @@ ParU_Ret paru_init_rowFronts(ParU_Numeric **Num_handle,  // in/out
     Num->fcolList = NULL;
     Num->partial_Us = NULL;
     Num->partial_LUs = NULL;
-    Num->heapList = NULL;
+    std::vector<Int> **heapList = Num->heapList = NULL;
+    ParU_Element **elementList = NULL;
     Num->elementList = NULL;
     Num->time_stamp = NULL;
-    Num->Diag_map = NULL;
-    Num->inv_Diag_map = NULL;
+    Int *Diag_map =  Num->Diag_map = NULL;
+    Int *inv_Diag_map = Num->inv_Diag_map = NULL;
     Num->Sx = NULL;
     Num->Sux = NULL;
     Num->Slx = NULL;
     Num->Rs = NULL;
 
-    if (nf == 0)
-    {  // nothing to be done
-        return PARU_SUCCESS;
-    }
-    // Memory allocations for Num
-    Int *rowMark = Work->rowMark = (Int *)paru_alloc(m + nf + 1, sizeof(Int));
-    Int *elRow = Work->elRow = (Int *)paru_alloc(m + nf, sizeof(Int));
-    Int *elCol = Work->elCol = (Int *)paru_alloc(m + nf, sizeof(Int));
-    Int *rowSize = Work->rowSize = (Int *)paru_alloc(m, sizeof(Int));
-    Int *row_degree_bound = Num->row_degree_bound =
-        (Int *)paru_alloc(m, sizeof(Int));
-    ParU_TupleList *RowList = Num->RowList =
-        (ParU_TupleList *)paru_alloc(1, m * sizeof(ParU_TupleList));
-    Num->lacList = (Int *)paru_alloc(m + nf, sizeof(Int));
-    Num->frowCount = (Int *)paru_alloc(1, nf * sizeof(Int));
-    Num->fcolCount = (Int *)paru_alloc(1, nf * sizeof(Int));
-    Num->frowList = (Int **)paru_calloc(1, nf * sizeof(Int *));
-    Num->fcolList = (Int **)paru_calloc(1, nf * sizeof(Int *));
-    Num->partial_Us =  // Initialize with NULL
-        (ParU_Factors *)paru_calloc(1, nf * sizeof(ParU_Factors));
-    Num->partial_LUs =  // Initialize with NULL
-        (ParU_Factors *)paru_calloc(1, nf * sizeof(ParU_Factors));
-    Num->time_stamp = (Int *)paru_alloc(1, nf * sizeof(Int));
-
-    std::vector<Int> **heapList = Num->heapList =
-        (std::vector<Int> **)paru_calloc(
-            1, (m + nf + 1) * sizeof(std::vector<Int> *));
-    ParU_Element **elementList;
-    elementList = Num->elementList =  // Initialize with NULL
-        (ParU_Element **)paru_calloc(1, (m + nf + 1) * sizeof(ParU_Element));
-    Int *Diag_map = Num->Diag_map = NULL;
-    Int *inv_Diag_map = Num->inv_Diag_map = NULL;
-    if (Sym->strategy == PARU_STRATEGY_SYMMETRIC)
+    if (nf != 0)
     {
-        Diag_map = Num->Diag_map = (Int *)paru_alloc(Sym->n, sizeof(Int));
-        inv_Diag_map = Num->inv_Diag_map =
-            (Int *)paru_alloc(Sym->n, sizeof(Int));
+        // Memory allocations for Num
+        rowMark = Work->rowMark =
+            (Int *)paru_alloc(m + nf + 1, sizeof(Int));
+        elRow = Work->elRow = (Int *)paru_alloc(m + nf, sizeof(Int));
+        elCol = Work->elCol = (Int *)paru_alloc(m + nf, sizeof(Int));
+        rowSize = Work->rowSize = (Int *)paru_alloc(m, sizeof(Int));
+        row_degree_bound = Num->row_degree_bound =
+            (Int *)paru_alloc(m, sizeof(Int));
+        RowList = Num->RowList =
+            (ParU_TupleList *)paru_alloc(1, m * sizeof(ParU_TupleList));
+        Num->lacList = (Int *)paru_alloc(m + nf, sizeof(Int));
+        Num->frowCount = (Int *)paru_alloc(1, nf * sizeof(Int));
+        Num->fcolCount = (Int *)paru_alloc(1, nf * sizeof(Int));
+        Num->frowList = (Int **)paru_calloc(1, nf * sizeof(Int *));
+        Num->fcolList = (Int **)paru_calloc(1, nf * sizeof(Int *));
+        Num->partial_Us =  // Initialize with NULL
+            (ParU_Factors *)paru_calloc(1, nf * sizeof(ParU_Factors));
+        Num->partial_LUs =  // Initialize with NULL
+            (ParU_Factors *)paru_calloc(1, nf * sizeof(ParU_Factors));
+        Num->time_stamp = (Int *)paru_alloc(1, nf * sizeof(Int));
+
+        heapList = Num->heapList =
+            (std::vector<Int> **)paru_calloc(
+                1, (m + nf + 1) * sizeof(std::vector<Int> *));
+        elementList = Num->elementList =  // Initialize with NULL
+            (ParU_Element **)paru_calloc(1,
+                                         (m + nf + 1) * sizeof(ParU_Element));
+        Diag_map = Num->Diag_map = NULL;
+        Num->inv_Diag_map = NULL;
+        if (Sym->strategy == PARU_STRATEGY_SYMMETRIC)
+        {
+            Diag_map = Num->Diag_map = (Int *)paru_alloc(Sym->n, sizeof(Int));
+            inv_Diag_map = Num->inv_Diag_map =
+                (Int *)paru_alloc(Sym->n, sizeof(Int));
 #ifndef NDEBUG
-        paru_memset(Diag_map, 0, Sym->n * sizeof(Int), Control);
-        paru_memset(inv_Diag_map, 0, Sym->n * sizeof(Int), Control);
-        PR= 2;
+            paru_memset(Diag_map, 0, Sym->n * sizeof(Int), Control);
+            paru_memset(inv_Diag_map, 0, Sym->n * sizeof(Int), Control);
+            PR = 2;
 #endif
+        }
     }
 
     Int snz = Sym->snz;
@@ -160,20 +163,23 @@ ParU_Ret paru_init_rowFronts(ParU_Numeric **Num_handle,  // in/out
     Num->Slx = Slx;
     double *Rs = NULL;
     Int scale = Control->scale;  // if 1 the S will be scaled by max_row
-    if (scale == 1) 
-        Rs = (double *)paru_calloc(Sym->m, sizeof(double));
+    if (scale == 1) Rs = (double *)paru_calloc(Sym->m, sizeof(double));
     Num->Rs = Rs;
-    if (rowMark == NULL || elRow == NULL || elCol == NULL || rowSize == NULL ||
-        Num->lacList == NULL || RowList == NULL || row_degree_bound == NULL ||
-        elementList == NULL || Num->frowCount == NULL ||
-        Num->fcolCount == NULL || Num->frowList == NULL ||
-        Num->fcolList == NULL || Num->partial_Us == NULL ||
-        Num->partial_LUs == NULL || Num->time_stamp == NULL ||
-        heapList == NULL || Sx == NULL || (scale == 1 && Rs == NULL) ||
+    if ((nf != 0 &&
+         (rowMark == NULL || elRow == NULL || elCol == NULL ||
+          rowSize == NULL || Num->lacList == NULL || RowList == NULL ||
+          row_degree_bound == NULL || elementList == NULL ||
+          Num->frowCount == NULL || Num->fcolCount == NULL ||
+          Num->frowList == NULL || Num->fcolList == NULL ||
+          Num->partial_Us == NULL || Num->partial_LUs == NULL ||
+          Num->time_stamp == NULL || heapList == NULL ||
+          (Sym->strategy == PARU_STRATEGY_SYMMETRIC &&
+           (Diag_map == NULL || inv_Diag_map == NULL)))) ||
+
+        // stuff that can be allocated even when nf==0
+        Sx == NULL || (scale == 1 && Rs == NULL) ||
         (cs1 > 0 && (Sux == NULL || cSup == NULL)) ||
-        (rs1 > 0 && (Slx == NULL || cSlp == NULL)) || cSp == NULL ||
-        (Sym->strategy == PARU_STRATEGY_SYMMETRIC &&
-         (Diag_map == NULL || inv_Diag_map == NULL)))
+        (rs1 > 0 && (Slx == NULL || cSlp == NULL)) || cSp == NULL)
     {
         paru_free(m + 1, sizeof(Int), cSp);
         if (cs1 > 0) paru_free((cs1 + 1), sizeof(Int), cSup);
@@ -183,20 +189,24 @@ ParU_Ret paru_init_rowFronts(ParU_Numeric **Num_handle,  // in/out
     }
 
     // Initializations
-    PRLEVEL(PR, ("%% $RowList =%p\n", RowList));
-    paru_memset(rowSize, -1, m * sizeof(Int), Control);
-    PRLEVEL(PR, ("%% rowSize pointer=%p size=%ld \n", rowSize, m * sizeof(Int)));
+    if (nf != 0)
+    {
+        PRLEVEL(PR, ("%% $RowList =%p\n", RowList));
+        paru_memset(rowSize, -1, m * sizeof(Int), Control);
+        PRLEVEL(PR, ("%% rowSize pointer=%p size=%ld \n", rowSize,
+                     m * sizeof(Int)));
 
-    PRLEVEL(PR, ("%% rowMark pointer=%p size=%ld \n", rowMark,
-                (m + nf) * sizeof(Int)));
+        PRLEVEL(PR, ("%% rowMark pointer=%p size=%ld \n", rowMark,
+                     (m + nf) * sizeof(Int)));
 
-    paru_memset(elRow, -1, (m + nf) * sizeof(Int), Control);
-    PRLEVEL(PR, ("%% elRow=%p\n", elRow));
+        paru_memset(elRow, -1, (m + nf) * sizeof(Int), Control);
+        PRLEVEL(PR, ("%% elRow=%p\n", elRow));
 
-    paru_memset(elCol, -1, (m + nf) * sizeof(Int), Control);
-    PRLEVEL(PR, ("%% elCol=%p\n", elCol));
+        paru_memset(elCol, -1, (m + nf) * sizeof(Int), Control);
+        PRLEVEL(PR, ("%% elCol=%p\n", elCol));
 
-    PRLEVEL(PR, ("%% Work =%p\n ", Work));
+        PRLEVEL(PR, ("%% Work =%p\n ", Work));
+    }
 
     //////////////////Initializing numerics Sx, Sux and Slx //////////////////{
     Int *Sp = Sym->Sp;
@@ -219,35 +229,36 @@ ParU_Ret paru_init_rowFronts(ParU_Numeric **Num_handle,  // in/out
             paru_memcpy(cSlp, Slp, (rs1 + 1) * sizeof(Int), Control);
         }
 #ifndef NDEBUG
-    PR = -3;
-    PRLEVEL(PR, ("Init Sup and Slp in the middle\n"));
-    if (cs1 > 0)
-    {
-        PRLEVEL(PR, ("(%ld) Sup =", sunz));
-        for (Int k = 0; k <= cs1; k++)
+        PR = -3;
+        PRLEVEL(PR, ("Init Sup and Slp in the middle\n"));
+        if (cs1 > 0)
         {
-            PRLEVEL(PR, ("%ld ", Sup[k]));
-            PRLEVEL(PR + 2, ("c%ld ", cSup[k]));
-            if (Sup[k] != cSup[k])
-                PRLEVEL(PR, ("Sup[%ld] =%ld, cSup=%ld", k, Sup[k], cSup[k]));
-            ASSERT(Sup[k] == cSup[k]);
+            PRLEVEL(PR, ("(%ld) Sup =", sunz));
+            for (Int k = 0; k <= cs1; k++)
+            {
+                PRLEVEL(PR, ("%ld ", Sup[k]));
+                PRLEVEL(PR + 2, ("c%ld ", cSup[k]));
+                if (Sup[k] != cSup[k])
+                    PRLEVEL(PR,
+                            ("Sup[%ld] =%ld, cSup=%ld", k, Sup[k], cSup[k]));
+                ASSERT(Sup[k] == cSup[k]);
+            }
+            PRLEVEL(PR, ("\n"));
         }
-        PRLEVEL(PR, ("\n"));
-    }
-    if (rs1 > 0)
-    {
-        PRLEVEL(PR, ("(%ld) Slp =", slnz));
-        for (Int k = 0; k <= rs1; k++)
+        if (rs1 > 0)
         {
-            PRLEVEL(PR, ("%ld ", Slp[k]));
-            PRLEVEL(PR + 2, ("o%ld ", cSlp[k]));
-            if (Slp[k] != cSlp[k])
-                PRLEVEL(PR,
-                        ("\nSup[%ld] =%ld, cSup=%ld\n", k, Slp[k], cSlp[k]));
-            ASSERT(Slp[k] == cSlp[k]);
+            PRLEVEL(PR, ("(%ld) Slp =", slnz));
+            for (Int k = 0; k <= rs1; k++)
+            {
+                PRLEVEL(PR, ("%ld ", Slp[k]));
+                PRLEVEL(PR + 2, ("o%ld ", cSlp[k]));
+                if (Slp[k] != cSlp[k])
+                    PRLEVEL(PR, ("\nSup[%ld] =%ld, cSup=%ld\n", k, Slp[k],
+                                 cSlp[k]));
+                ASSERT(Slp[k] == cSlp[k]);
+            }
+            PRLEVEL(PR, ("\n"));
         }
-        PRLEVEL(PR, ("\n"));
-    }
 #endif
 
         Int n1 = Sym->n1;
@@ -255,14 +266,13 @@ ParU_Ret paru_init_rowFronts(ParU_Numeric **Num_handle,  // in/out
         Int *Qinit = Sym->Qfill;
         Int *Pinv = Sym->Pinv;
 #ifndef NDEBUG
-    PR = -1;
-    PRLEVEL(PR, ("Iniit Pinv =\n"));
-    for (Int i = 0; i < m; i++) PRLEVEL(PR, ("%ld ", Pinv[i]));
-    PRLEVEL(PR, ("\n"));
+        PR = -1;
+        PRLEVEL(PR, ("Iniit Pinv =\n"));
+        for (Int i = 0; i < m; i++) PRLEVEL(PR, ("%ld ", Pinv[i]));
+        PRLEVEL(PR, ("\n"));
 #endif
 
-
-        if (Rs) 
+        if (Rs)
         {
             for (Int newcol = 0; newcol < Sym->n; newcol++)
             {
@@ -276,19 +286,18 @@ ParU_Ret paru_init_rowFronts(ParU_Numeric **Num_handle,  // in/out
         }
 #ifndef NDEBUG
         PR = 2;
-        PRLEVEL(PR, ("%% Rs=%p:\n[",Rs));
+        PRLEVEL(PR, ("%% Rs=%p:\n[", Rs));
         if (Rs != NULL)
         {  // making sure that every row has at most one element more than zero
             for (Int k = 0; k < Sym->m; k++)
             {
                 PRLEVEL(PR, ("%lf ", Rs[k]));
                 printf("%lf ", Rs[k]);
-                ASSERT (Rs[k] > 0);
+                ASSERT(Rs[k] > 0);
             }
         }
         PRLEVEL(PR, ("]\n"));
 #endif
-
 
         for (Int newcol = 0; newcol < Sym->n; newcol++)
         {
@@ -301,27 +310,25 @@ ParU_Ret paru_init_rowFronts(ParU_Numeric **Num_handle,  // in/out
                 Int scol = newcol - n1;
                 if (srow >= 0 && scol >= 0)
                 {  // it is insdie S otherwise it is part of singleton
-                    Sx[cSp[srow]++] = (Rs == NULL) ? 
-                        Ax[p] : Ax[p] / Rs[oldrow];
+                    Sx[cSp[srow]++] = (Rs == NULL) ? Ax[p] : Ax[p] / Rs[oldrow];
                 }
                 else if (srow < 0 && scol >= 0)
                 {  // inside the U singletons
-                    PRLEVEL(PR, ("Usingleton newcol = %ld newrow=%ld\n",
-                                newcol, newrow));
-                    //let the diagonal entries be first
-                    Sux[++cSup[newrow]] = (Rs == NULL) ? 
-                        Ax[p] : Ax[p] / Rs[oldrow];
+                    PRLEVEL(PR, ("Usingleton newcol = %ld newrow=%ld\n", newcol,
+                                 newrow));
+                    // let the diagonal entries be first
+                    Sux[++cSup[newrow]] =
+                        (Rs == NULL) ? Ax[p] : Ax[p] / Rs[oldrow];
                 }
                 else
                 {
                     if (newrow < cs1)
                     {  // inside U singletons CSR
-                        //PRLEVEL(PR, ("Inside U singletons\n"));
+                        // PRLEVEL(PR, ("Inside U singletons\n"));
                         if (newcol == newrow)
                         {  // diagonal entry
                             Sux[Sup[newrow]] =
                                 (Rs == NULL) ? Ax[p] : Ax[p] / Rs[oldrow];
-
                         }
                         else
                         {
@@ -331,15 +338,15 @@ ParU_Ret paru_init_rowFronts(ParU_Numeric **Num_handle,  // in/out
                     }
                     else
                     {  // inside L singletons CSC
-                        //PRLEVEL(PR, ("Inside L singletons\n"));
+                        // PRLEVEL(PR, ("Inside L singletons\n"));
                         if (newcol == newrow)
                         {  // diagonal entry
-                            Slx[Slp[newcol - cs1]] = 
+                            Slx[Slp[newcol - cs1]] =
                                 (Rs == NULL) ? Ax[p] : Ax[p] / Rs[oldrow];
                         }
                         else
                         {
-                            Slx[++cSlp[newcol - cs1]] = 
+                            Slx[++cSlp[newcol - cs1]] =
                                 (Rs == NULL) ? Ax[p] : Ax[p] / Rs[oldrow];
                         }
                     }
@@ -347,18 +354,18 @@ ParU_Ret paru_init_rowFronts(ParU_Numeric **Num_handle,  // in/out
             }
         }
 
-        //double *symSux = Sym->ustons.Sux; 
-        //for (Int i = 0; i < sunz; i++)
-        //    if (Sux[i] != symSux[i]) 
-        //            printf ("SUXY i=%ld Sux=%lf SymSux=%lf\n", 
+        // double *symSux = Sym->ustons.Sux;
+        // for (Int i = 0; i < sunz; i++)
+        //    if (Sux[i] != symSux[i])
+        //            printf ("SUXY i=%ld Sux=%lf SymSux=%lf\n",
         //                    i, Sux[i], symSux[i]);
-        //double *symSlx = Sym->lstons.Slx; 
-        //for (Int i = 0; i < slnz; i++)
-        //    if (Slx[i] != symSlx[i]) 
-        //            printf ("SLXY i=%ld Slx=%lf SymSlx=%lf\n", 
+        // double *symSlx = Sym->lstons.Slx;
+        // for (Int i = 0; i < slnz; i++)
+        //    if (Slx[i] != symSlx[i])
+        //            printf ("SLXY i=%ld Slx=%lf SymSlx=%lf\n",
         //                    i, Slx[i], symSlx[i]);
 
-        //paru_free(m + 1, sizeof(Int), cSp);
+        // paru_free(m + 1, sizeof(Int), cSp);
         if (Sym->cs1 > 0) paru_free((cs1 + 1), sizeof(Int), cSup);
         if (Sym->rs1 > 0) paru_free((rs1 + 1), sizeof(Int), cSlp);
     }
@@ -374,12 +381,6 @@ ParU_Ret paru_init_rowFronts(ParU_Numeric **Num_handle,  // in/out
     PRLEVEL(1, ("%% m=%ld, n=%ld\n", m, n));
     // RowList, ColList and elementList are place holders
     // pointers to pointers that are allocated
-    if (m == 0 || n == 0)
-    {
-        printf("Paru: the dimension of matrix is zero: %ld x %ld \n", m, n);
-        paru_free(1, sizeof(ParU_Numeric), Num);
-        return PARU_INVALID;
-    }
 
     Int *Sj = Sym->Sj;
 
@@ -388,7 +389,7 @@ ParU_Ret paru_init_rowFronts(ParU_Numeric **Num_handle,  // in/out
     // -------------------------------------------------------------------------
 #ifndef NDEBUG
     PR = 1;
-    PRLEVEL(PR, ("\n%% Insid init row fronts\n"));
+    PRLEVEL(PR, ("\n%% Inside init row fronts\n"));
     PRLEVEL(PR, ("%% Sp =\n%%"));
     for (Int i = 0; i <= m; i++) PRLEVEL(PR, ("%ld ", Sp[i]));
     PRLEVEL(PR, ("\n"));
@@ -404,8 +405,8 @@ ParU_Ret paru_init_rowFronts(ParU_Numeric **Num_handle,  // in/out
     // copying Diag_map
     if (Diag_map)
     {
-        #pragma omp taskloop default(none) shared(Sym, Diag_map, inv_Diag_map) \
-        grainsize(512)
+#pragma omp taskloop default(none) shared(Sym, Diag_map, inv_Diag_map) \
+    grainsize(512)
         for (Int i = 0; i < Sym->n; i++)
         {
             // paru_memcpy(Diag_map, Sym->Diag_map, (Sym->n) * sizeof(Int));
@@ -444,7 +445,7 @@ ParU_Ret paru_init_rowFronts(ParU_Numeric **Num_handle,  // in/out
 
     ParU_Ret info;
     Int out_of_memory = 0;
-    #pragma omp taskloop grainsize(512)
+#pragma omp taskloop grainsize(512)
     for (Int row = 0; row < m; row++)
     {
         Int e = Sym->row2atree[row];
@@ -461,7 +462,7 @@ ParU_Ret paru_init_rowFronts(ParU_Numeric **Num_handle,  // in/out
         {  // out of memory
             ParU_Freenum(&Num, Control);
             printf("Paru: Out of memory: curEl\n");
-        #pragma omp atomic update
+#pragma omp atomic update
             out_of_memory += 1;
         }
 
@@ -477,7 +478,7 @@ ParU_Ret paru_init_rowFronts(ParU_Numeric **Num_handle,  // in/out
         {  // out of memory
             ParU_Freenum(&Num, Control);
             printf("Paru: Out of memory: curHeap\n");
-            #pragma omp atomic update
+#pragma omp atomic update
             out_of_memory += 1;
         }
         // printf("%%Heap allocated %p id=%ld \n", curHeap, e);
@@ -501,7 +502,7 @@ ParU_Ret paru_init_rowFronts(ParU_Numeric **Num_handle,  // in/out
         {  // out of memory
             ParU_Freenum(&Num, Control);
             printf("Paru: out of memory, RowList[row].list \n");
-            #pragma omp atomic update
+#pragma omp atomic update
             out_of_memory += 1;
         }
         RowList[row].numTuple = 0;
@@ -514,7 +515,7 @@ ParU_Ret paru_init_rowFronts(ParU_Numeric **Num_handle,  // in/out
         {
             ParU_Freenum(&Num, Control);
             printf("Paru: out of memory, add_rowTuple \n");
-            #pragma omp atomic update
+#pragma omp atomic update
             out_of_memory += 1;
         }
 
