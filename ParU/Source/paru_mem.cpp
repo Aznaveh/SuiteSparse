@@ -244,7 +244,6 @@ ParU_Ret ParU_Freesym(ParU_Symbolic **Sym_handle, ParU_Control *Control)
     paru_free(ms, sizeof(Int), Sym->row2atree);
     paru_free(nf, sizeof(Int), Sym->super2atree);
     paru_free(nf + 1, sizeof(Int), Sym->first);
-    paru_free(m, sizeof(Int), Sym->scale_row);
     paru_free(m, sizeof(Int), Sym->Pinv);
 
     if (n1 > 0)

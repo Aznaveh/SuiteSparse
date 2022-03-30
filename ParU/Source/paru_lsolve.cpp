@@ -68,7 +68,7 @@ Int paru_lsolve(double *x, ParU_Numeric *Num, ParU_Control *Control)
             PRLEVEL(PR, ("j = %ld\n", j));
             Int *Slp = Sym->lstons.Slp;
             Int *Sli = Sym->lstons.Sli;
-            double *Slx = Sym->lstons.Slx;
+            double *Slx = Num->Slx;
             ASSERT(Sli != NULL && Slx != NULL && Slp != NULL);
             Int diag = Slp[j - cs1];
             PRLEVEL(PR, (" x[%ld]=%.2lf Slx[%ld]=%.2lf\n", j, x[j], diag,
@@ -230,7 +230,7 @@ Int paru_lsolve(double *X, Int n, ParU_Numeric *Num,  ParU_Control *Control)
             PRLEVEL(PR, ("j = %ld\n", j));
             Int *Slp = Sym->lstons.Slp;
             Int *Sli = Sym->lstons.Sli;
-            double *Slx = Sym->lstons.Slx;
+            double *Slx = Num->Slx;
             ASSERT(Sli != NULL && Slx != NULL && Slp != NULL);
             Int diag = Slp[j - cs1];
             PRLEVEL(PR, (" X[%ld]=%.2lf Slx[%ld]=%.2lf\n", j, X[j * n], diag,

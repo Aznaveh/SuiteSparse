@@ -283,20 +283,22 @@ ParU_Ret paru_init_rowFronts(ParU_Numeric **Num_handle,  // in/out
                 }
             }
         }
-#ifndef NDEBUG
-        PR = 2;
-        PRLEVEL(PR, ("%% Rs=%p:\n[", Rs));
-        if (Rs != NULL)
+
+        PRLEVEL(PR, ("%% Rs:\n["));
+        if (Rs)
         {  // making sure that every row has at most one element more than zero
-            for (Int k = 0; k < Sym->m; k++)
+            for (Int k = 0; k < m; k++)
             {
                 PRLEVEL(PR, ("%lf ", Rs[k]));
-                printf("%lf ", Rs[k]);
-                ASSERT(Rs[k] > 0);
+                if (Rs[k] <= 0)
+                {
+                    printf("Paru: Matrix is singular, row %ld is zero\n", k);
+                    ParU_Freenum(&Num, Control);
+                    return PARU_SINGULAR;
+                }
             }
         }
         PRLEVEL(PR, ("]\n"));
-#endif
 
         for (Int newcol = 0; newcol < Sym->n; newcol++)
         {
@@ -314,7 +316,7 @@ ParU_Ret paru_init_rowFronts(ParU_Numeric **Num_handle,  // in/out
                 else if (srow < 0 && scol >= 0)
                 {  // inside the U singletons
                     PRLEVEL(PR, ("Usingleton newcol = %ld newrow=%ld\n", newcol,
-                                 newrow));
+                                newrow));
                     // let the diagonal entries be first
                     Sux[++cSup[newrow]] =
                         (Rs == NULL) ? Ax[p] : Ax[p] / Rs[oldrow];

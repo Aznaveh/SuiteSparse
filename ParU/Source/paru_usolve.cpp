@@ -138,7 +138,7 @@ Int paru_usolve(double *x, ParU_Numeric *Num, ParU_Control *Control)
             PRLEVEL(PR, ("i = %ld\n", i));
             Int *Sup = Sym->ustons.Sup;
             Int *Suj = Sym->ustons.Suj;
-            double *Sux = Sym->ustons.Sux;
+            double *Sux = Num->Sux;
             ASSERT(Suj != NULL && Sux != NULL && Sup != NULL);
             PRLEVEL(PR, (" Before computation x[%ld]=%.2lf \n", i, x[i]))
             for (Int p = Sup[i] + 1; p < Sup[i + 1]; p++)
@@ -296,7 +296,7 @@ Int paru_usolve(double *X, Int n, ParU_Numeric *Num, ParU_Control *Control)
             PRLEVEL(PR, ("i = %ld\n", i));
             Int *Sup = Sym->ustons.Sup;
             Int *Suj = Sym->ustons.Suj;
-            double *Sux = Sym->ustons.Sux;
+            double *Sux = Num->Sux;
             ASSERT(Suj != NULL && Sux != NULL && Sup != NULL);
             for (Int p = Sup[i] + 1; p < Sup[i + 1]; p++)
             {

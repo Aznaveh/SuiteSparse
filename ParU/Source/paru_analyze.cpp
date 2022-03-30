@@ -1158,30 +1158,7 @@ ParU_Ret ParU_Analyze(cholmod_sparse *A, ParU_Symbolic **S_handle,
     }
     Sleft[n - n1 + 1] = m - n1 - rowcount;  // empty rows of S if any
     Sym->snz = snz;
-    Sym->scale_row = Rs;
     paru_free(n, sizeof(Int), inv_Diag_map);
-
-    PRLEVEL(PR, ("%% scale_row:\n["));
-    if (Rs != NULL)
-    {  // making sure that every row has at most one element more than zero
-        for (Int k = 0; k < m; k++)
-        {
-            PRLEVEL(PR, ("%lf ", Rs[k]));
-            if (Rs[k] <= 0)
-            {
-                printf("Paru: Matrix is singular, row %ld is zero\n", k);
-                paru_free((m - n1), sizeof(Int), Ps);
-                paru_free((m + 1), sizeof(Int), Pinit);
-                paru_free((MAX(m, n) + 2), sizeof(Int), Work);
-                paru_free(m, sizeof(Int), Pinv);
-                if (cs1 > 0) paru_free((cs1 + 1), sizeof(Int), cSup);
-                if (rs1 > 0) paru_free((rs1 + 1), sizeof(Int), cSlp);
-                ParU_Freesym(&Sym, Control);
-                return PARU_OUT_OF_MEMORY;
-            }
-        }
-    }
-    PRLEVEL(PR, ("]\n"));
 
 #ifndef NDEBUG
     PR = 1;

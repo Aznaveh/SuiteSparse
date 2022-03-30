@@ -116,10 +116,7 @@ struct ParU_Symbolic
     Int snz;     // nnz in submatrix
     Int *Sp;     // size m+1-n1, row pointers of S
     Int *Sj;     // size snz = Sp [n], column indices of S
-    //FIXME: remove scale_row
 
-    double *scale_row;  // the array for row scaling based on original matrix
-                        // size = m
 
     // Usingletons and Lsingltons
     ParU_U_singleton ustons;
