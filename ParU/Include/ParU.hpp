@@ -111,10 +111,9 @@ struct ParU_Symbolic
 
     Int m, n, anz;  // S is m-by-n with anz entries; S is scaled
 
-    Int snz;     // nnz in submatrix
-    Int *Sp;     // size m+1-n1, row pointers of S
-    Int *Sj;     // size snz = Sp [n], column indices of S
-
+    Int snz;  // nnz in submatrix
+    Int *Sp;  // size m+1-n1, row pointers of S
+    Int *Sj;  // size snz = Sp [n], column indices of S
 
     // Usingletons and Lsingltons
     ParU_U_singleton ustons;
@@ -124,20 +123,19 @@ struct ParU_Symbolic
     // Qfill [k] = j if column k of A is column j of S.
 
     Int *Pinit;  // size m, row permutation.
-    // UMFPACK computes it and I compute Pinv out of it.
-    // I need it in several places so I decided to keep it
+    // UMFPACK computes it and Pinv  is its inverse
+    Int *Pinv;  // Inverse of Pinit; it is used to make S
 
     Int *Diag_map;  // size n,
     // UMFPACK computes it and I use it to find original diags out of it
 
     Int *Ps;  // size m, row permutation.
     // Permutation from S to LU. needed for lsolve and usolve
-    // Look paru_perm for more details
+    // Look at paru_perm for more details
 
     Int *Pfin;  // size m, row permutation.
     // ParU final permutation. Look paru_perm for more details
 
-    Int *Pinv;  //TODO
     Int *Sleft;  // size n-n1+2.  The list of rows of S whose
     // leftmost column index is j is given by
     // Sleft [j] ... Sleft [j+1]-1.  This can be empty (that is, Sleft
@@ -241,7 +239,7 @@ struct ParU_Symbolic
     Int *task_parent;  // tree data structure for tasks
     Int *task_num_child;  // number of children of each task
     Int *task_depth;      // max depth of each task
-    //Int max_chain;        // maximum size of the chains in final tree
+    // Int max_chain;        // maximum size of the chains in final tree
 };
 
 // =============================================================================
@@ -352,17 +350,15 @@ struct ParU_Control
 struct ParU_Numeric
 {
     Int m, n;  // size of the sumbatrix that is factorized
+    
+    double *Rs;   // the array for row scaling based on original matrix
+                  // size = m
 
-    double *Sx;  // size snz = Sp [n], numeric values of S; 
+    double *Sx;  // size snz = Sp [n], numeric values of (scaled) S;
                  // Sp and Sj must be initialized in Symbolic phase
-    //Numeric values of singletons
-    double *Sux;   //u singletons, Sup Suj are in symbolic
-    double *Slx;   //l singletons, Slp Sli are in symbolic
-    double *Rs;  // the array for row scaling based on original matrix
-                        // size = m
-
-
-
+    // Numeric values of singletons
+    double *Sux;  // u singletons, Sup Suj are in symbolic
+    double *Slx;  // l singletons, Slp Sli are in symbolic
     // TODO: remove this:
     ParU_Symbolic *Sym;
 
@@ -472,8 +468,7 @@ ParU_Ret ParU_Solve(
 
 ParU_Ret ParU_Solve(
     // input
-    ParU_Numeric *Num, 
-    Int nrhs,
+    ParU_Numeric *Num, Int nrhs,
     // input/output:
     double *B,  // m(num_rows of A) x nrhs
     // control:
@@ -485,12 +480,12 @@ ParU_Ret ParU_Freenum(ParU_Numeric **Num_handle, ParU_Control *Control);
 
 // resid = norm1(b-A*x) / norm1(A)
 // FIXME: to be like the comment
-ParU_Ret ParU_Residual(double *b, double &resid,  double &norm, // delete
+ParU_Ret ParU_Residual(double *b, double &resid, double &norm,  // delete
                        cholmod_sparse *A, ParU_Numeric *Num,
                        ParU_Control *Control);
 
 // resid = norm1(b-A*x) / norm1(A)
-//ParU_Ret ParU_Residual(
+// ParU_Ret ParU_Residual(
 //    // inputs:
 //    cholmod_sparse *A, double *x, double *b,
 //    // output:
@@ -498,9 +493,8 @@ ParU_Ret ParU_Residual(double *b, double &resid,  double &norm, // delete
 //    // control:
 //    ParU_Control *Control);
 
-
 // resid = norm1(b-A*x) / norm1(A)
-//ParU_Ret ParU_Residual(
+// ParU_Ret ParU_Residual(
 //    // inputs:
 //    cholmod_sparse *A, double *X, double *B,
 //    Int n,  // # of columns of X and B

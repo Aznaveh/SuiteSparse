@@ -255,40 +255,39 @@ ParU_Ret ParU_Analyze(cholmod_sparse *A, ParU_Symbolic **S_handle,
     //      Page 22 UserGuide
     umfpack_dl_defaults(umf_Control);
 
-    //before using the Control checking user input
+    // before using the Control checking user input
     ParU_Control my_Control = *user_Control;
     {
         Int mem_chunk = my_Control.mem_chunk;
-        if (mem_chunk < 1024 )
-            my_Control.mem_chunk = 1024*1024;
+        if (mem_chunk < 1024) my_Control.mem_chunk = 1024 * 1024;
         Int umfpack_ordering = my_Control.umfpack_ordering;
         // I dont support UMFPACK_ORDERING_GIVEN or UMFPACK_ORDERING_USER now
         if (umfpack_ordering != UMFPACK_ORDERING_METIS &&
-                umfpack_ordering != UMFPACK_ORDERING_AMD &&
-                umfpack_ordering != UMFPACK_ORDERING_CHOLMOD &&
-                umfpack_ordering != UMFPACK_ORDERING_BEST &&
-                umfpack_ordering != UMFPACK_ORDERING_NONE )
+            umfpack_ordering != UMFPACK_ORDERING_AMD &&
+            umfpack_ordering != UMFPACK_ORDERING_CHOLMOD &&
+            umfpack_ordering != UMFPACK_ORDERING_BEST &&
+            umfpack_ordering != UMFPACK_ORDERING_NONE)
             my_Control.umfpack_ordering = UMFPACK_ORDERING_METIS;
         Int umfpack_strategy = my_Control.umfpack_strategy;
         // I dont support UMFPACK_ORDERING_GIVEN or UMFPACK_ORDERING_USER now
         if (umfpack_strategy != UMFPACK_STRATEGY_AUTO &&
-                umfpack_strategy != UMFPACK_STRATEGY_SYMMETRIC &&
-                umfpack_strategy != UMFPACK_STRATEGY_UNSYMMETRIC)
+            umfpack_strategy != UMFPACK_STRATEGY_SYMMETRIC &&
+            umfpack_strategy != UMFPACK_STRATEGY_UNSYMMETRIC)
             my_Control.umfpack_strategy = UMFPACK_STRATEGY_AUTO;
-       Int max_threads = PARU_OPENMP_MAX_THREADS;
+        Int max_threads = PARU_OPENMP_MAX_THREADS;
         if (my_Control.paru_max_threads > 0)
-            my_Control.paru_max_threads  =
-                MIN (max_threads, my_Control.paru_max_threads);
-        else            
-            my_Control.paru_max_threads  = max_threads;
+            my_Control.paru_max_threads =
+                MIN(max_threads, my_Control.paru_max_threads);
+        else
+            my_Control.paru_max_threads = max_threads;
     }
-    ParU_Control *Control= &my_Control;
+    ParU_Control *Control = &my_Control;
 
     umf_Control[UMFPACK_ORDERING] = Control->umfpack_ordering;
-    //umf_Control[UMFPACK_ORDERING] = UMFPACK_ORDERING_METIS;
+    // umf_Control[UMFPACK_ORDERING] = UMFPACK_ORDERING_METIS;
     umf_Control[UMFPACK_FIXQ] = -1;
     umf_Control[UMFPACK_STRATEGY] = Control->umfpack_strategy;
-    //umf_Control[UMFPACK_STRATEGY] = UMFPACK_STRATEGY_AUTO;
+    // umf_Control[UMFPACK_STRATEGY] = UMFPACK_STRATEGY_AUTO;
     // umf_Control[UMFPACK_STRATEGY] = UMFPACK_STRATEGY_UNSYMMETRIC;
     // umf_Control[UMFPACK_STRATEGY] = UMFPACK_STRATEGY_SYMMETRIC;
 
@@ -301,12 +300,12 @@ ParU_Ret ParU_Analyze(cholmod_sparse *A, ParU_Symbolic **S_handle,
 
     void *SW;
     status = umfpack_dl_azn_symbolic(m, n, Ap, Ai, Ax,
-            NULL,   // user provided ordering
-            FALSE,  // No user ordering
-            NULL,   // user params
-            &Symbolic,
-            &SW,  // new in/out
-            umf_Control, Info);
+                                     NULL,   // user provided ordering
+                                     FALSE,  // No user ordering
+                                     NULL,   // user params
+                                     &Symbolic,
+                                     &SW,  // new in/out
+                                     umf_Control, Info);
 
     if (status < 0)
     {
@@ -322,7 +321,7 @@ ParU_Ret ParU_Analyze(cholmod_sparse *A, ParU_Symbolic **S_handle,
     /* ---------------------------------------------------------------------- */
     Int strategy = Info[UMFPACK_STRATEGY_USED];
     if (Control->paru_strategy == PARU_STRATEGY_AUTO)
-    { // if user didn't choose the strategy I will pick the same strategy
+    {  // if user didn't choose the strategy I will pick the same strategy
         // as umfpack.        However I cannot save it in current control
         Sym->strategy = strategy;
     }
@@ -626,7 +625,7 @@ ParU_Ret ParU_Analyze(cholmod_sparse *A, ParU_Symbolic **S_handle,
     // Number of the columns of the root of each subtree
     //
     Int threshold = Control->relaxed_amalgamation_threshold;
-    PRLEVEL (1, ("Relaxed amalgamation threshold = %ld\n",threshold));
+    PRLEVEL(1, ("Relaxed amalgamation threshold = %ld\n", threshold));
     Int newF = 0;
     // Int num_roots = 0;
 
@@ -999,10 +998,10 @@ ParU_Ret ParU_Analyze(cholmod_sparse *A, ParU_Symbolic **S_handle,
 
     Int *Ps;  // new row permutation for just the Submatrix part
 
-    Int *Sup = NULL;    // Singlton u p
-    Int *cSup = NULL;   // copy of Singlton u p
-    Int *Slp = NULL;    // Singlton l p
-    Int *cSlp = NULL;   // copy Singlton l p
+    Int *Sup = NULL;   // Singlton u p
+    Int *cSup = NULL;  // copy of Singlton u p
+    Int *Slp = NULL;   // Singlton l p
+    Int *cSlp = NULL;  // copy Singlton l p
     Ps = (Int *)paru_calloc(m - n1, sizeof(Int));
     if (cs1 > 0)
     {
@@ -1298,9 +1297,9 @@ ParU_Ret ParU_Analyze(cholmod_sparse *A, ParU_Symbolic **S_handle,
     for (Int i = 0; i < m; i++) PRLEVEL(PR, ("%ld ", Pinv[i]));
     PRLEVEL(PR, ("\n"));
 #endif
-
     // PofA
     Sym->Pinit = Pinit;
+    Sym->Pinv = Pinv;
     ///////////////////////////////////////////////////////////////
 #ifndef NDEBUG
     PR = 1;
@@ -1330,7 +1329,7 @@ ParU_Ret ParU_Analyze(cholmod_sparse *A, ParU_Symbolic **S_handle,
 
     Sym->Sj = Sj;
 
-    if (Sj == NULL || (cs1 > 0 && Suj == NULL ) ||  (rs1 > 0 && Sli == NULL ))
+    if (Sj == NULL || (cs1 > 0 && Suj == NULL) || (rs1 > 0 && Sli == NULL))
     {
         printf("Paru: memory problem\n");
         ParU_Freesym(&Sym, Control);
@@ -1409,7 +1408,7 @@ ParU_Ret ParU_Analyze(cholmod_sparse *A, ParU_Symbolic **S_handle,
     PRLEVEL(PR, ("Constructing Sj and singletons finished here\n"));
 #ifndef NDEBUG
     PR = 1;
-    PRLEVEL(PR, ("Sup and Slp after mading \n"));
+    PRLEVEL(PR, ("Sup and Slp after making \n"));
     if (cs1 > 0)
     {
         PRLEVEL(PR, ("U singltons(CSR) (nnz=%ld) Sup =", sunz));
@@ -1474,8 +1473,7 @@ ParU_Ret ParU_Analyze(cholmod_sparse *A, ParU_Symbolic **S_handle,
 
 #ifndef NDEBUG
     PR = 1;
-    // HERE
-    /* print fronts*/
+    // print fronts
     for (Int f = 0; f < nf; f++)
     {
         Int col1 = Super[f];
@@ -1718,13 +1716,13 @@ ParU_Ret ParU_Analyze(cholmod_sparse *A, ParU_Symbolic **S_handle,
     }
 
     // finding max size of chains
-    //Int max_chain = 0;
-    //Int ii = 0;
-    //while (ii < nf)
+    // Int max_chain = 0;
+    // Int ii = 0;
+    // while (ii < nf)
     //{
     //    Int chain_size = 0;
     //    PRLEVEL(1, ("ii = %ld\n", ii));
-    //    while (Parent[ii] != -1 && ii < nf && 
+    //    while (Parent[ii] != -1 && ii < nf &&
     //      Childp[Parent[ii] + 1] - Childp[Parent[ii]] == 1)
     //    {
     //        chain_size++;
@@ -1735,8 +1733,8 @@ ParU_Ret ParU_Analyze(cholmod_sparse *A, ParU_Symbolic **S_handle,
     //    PRLEVEL(1, ("max_chain = %ld\n", max_chain));
     //    ii++;
     //}
-    //Sym->max_chain = max_chain;
-    //PRLEVEL(1, ("max_chain = %ld\n", max_chain));
+    // Sym->max_chain = max_chain;
+    // PRLEVEL(1, ("max_chain = %ld\n", max_chain));
 
 #ifndef NDEBUG
 
@@ -1765,14 +1763,7 @@ ParU_Ret ParU_Analyze(cholmod_sparse *A, ParU_Symbolic **S_handle,
         PRLEVEL(PR, ("%ld ", task_depth[t]));
     }
     PRLEVEL(PR, ("\n"));
-#endif
-    // printf("%% tasktree :\n");
-    // for (Int i = 0; i < ntasks; i++)
-    //    printf("%ld ", task_parent[i]);
-    // printf("\n");
 
-    ///////////////////////////////////////////////////////////////////////////
-#ifndef NDEBUG
     PR = 1;
     PRLEVEL(PR, ("%% super node mapping ,snM (and rows): "));
     for (Int f = 0; f < nf; f++)
@@ -1804,7 +1795,6 @@ ParU_Ret ParU_Analyze(cholmod_sparse *A, ParU_Symbolic **S_handle,
     for (Int i = 0; i < ms + nf + 1; i++) PRLEVEL(PR, ("%ld ", aChild[i]));
     PRLEVEL(PR, ("\n"));
 
-    // HERE
     PR = 1;
     for (Int i = 0; i < ms + nf; i++)
     {
@@ -1836,7 +1826,5 @@ ParU_Ret ParU_Analyze(cholmod_sparse *A, ParU_Symbolic **S_handle,
     time -= start_time;
     PRLEVEL(1, ("%% mRHS paru_apply_inv_perm %lf seconds\n", time));
 #endif
-    //paru_free(m, sizeof(Int), Pinv);
-    Sym->Pinv = Pinv;
     return PARU_SUCCESS;
 }
