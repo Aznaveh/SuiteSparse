@@ -10,11 +10,11 @@
 
 #include "paru_internal.hpp"
 
-ParU_Ret ParU_Solve(ParU_Numeric *Num, double *b, ParU_Control *user_Control)
+ParU_Ret ParU_Solve(ParU_Symbolic *Sym, ParU_Numeric *Num, double *b,
+                    ParU_Control *user_Control)
 {
     DEBUGLEVEL(0);
     PRLEVEL(1, ("%% inside solve\n"));
-    ParU_Symbolic *Sym = Num->Sym;
     Int m = Sym->m;
     if (Num->res == PARU_SINGULAR)
     {
@@ -31,29 +31,27 @@ ParU_Ret ParU_Solve(ParU_Numeric *Num, double *b, ParU_Control *user_Control)
         printf("Paru: memory problem inside solve\n");
         return PARU_OUT_OF_MEMORY;
     }
-    //making copy of user input and check it
+    // making copy of user input and check it
     ParU_Control my_Control = *user_Control;
     {
         Int mem_chunk = my_Control.mem_chunk;
-        if (mem_chunk < 1024 )
-            my_Control.mem_chunk = 1024*1024;
+        if (mem_chunk < 1024) my_Control.mem_chunk = 1024 * 1024;
         Int max_threads = PARU_OPENMP_MAX_THREADS;
         if (my_Control.paru_max_threads > 0)
-            my_Control.paru_max_threads = 
-                MIN (max_threads, my_Control.paru_max_threads);
+            my_Control.paru_max_threads =
+                MIN(max_threads, my_Control.paru_max_threads);
         else
             my_Control.paru_max_threads = max_threads;
     }
-    ParU_Control *Control= &my_Control;
-
+    ParU_Control *Control = &my_Control;
 
     paru_memcpy(x, b, m * sizeof(double), Control);
     paru_apply_perm_scale(Sym->Pfin, Num->Rs, b, x, m);
 
     PRLEVEL(1, ("%% lsolve\n"));
-    paru_lsolve(x, Num, Control);  // x = L\x
+    paru_lsolve(x, Sym, Num, Control);  // x = L\x
     PRLEVEL(1, ("%% usolve\n"));
-    paru_usolve(x, Num, Control);                       // x = U\x
+    paru_usolve(x, Sym, Num, Control);              // x = U\x
     paru_apply_inv_perm(Sym->Qfill, x, b, m);  // b(q) = x
 
     paru_free(m, sizeof(Int), x);
@@ -65,11 +63,9 @@ ParU_Ret ParU_Solve(ParU_Numeric *Num, double *b, ParU_Control *user_Control)
     return PARU_SUCCESS;
 }
 ////////////////////////Keeps a copy of b //////////////////////////////////////
-ParU_Ret ParU_Solve(ParU_Numeric *Num, double *b, double *x, 
-        ParU_Control *user_Control)
+ParU_Ret ParU_Solve(ParU_Symbolic *Sym, ParU_Numeric *Num, double *b, double *x,
+                    ParU_Control *user_Control)
 {
-
-    ParU_Symbolic *Sym = Num->Sym;
     if (Num->res == PARU_SINGULAR)
     {
         printf("Paru: the matrix is singular; cannot be solved.\n");
@@ -78,21 +74,19 @@ ParU_Ret ParU_Solve(ParU_Numeric *Num, double *b, double *x,
     ParU_Control my_Control = *user_Control;
     {
         Int mem_chunk = my_Control.mem_chunk;
-        if (mem_chunk < 1024 )
-            my_Control.mem_chunk = 1024*1024;
+        if (mem_chunk < 1024) my_Control.mem_chunk = 1024 * 1024;
         Int max_threads = PARU_OPENMP_MAX_THREADS;
         if (my_Control.paru_max_threads > 0)
-            my_Control.paru_max_threads = 
-                MIN (max_threads, my_Control.paru_max_threads);
+            my_Control.paru_max_threads =
+                MIN(max_threads, my_Control.paru_max_threads);
         else
             my_Control.paru_max_threads = max_threads;
     }
-    ParU_Control *Control= &my_Control;
+    ParU_Control *Control = &my_Control;
 
     Int m = Sym->m;
     paru_memcpy(x, b, m * sizeof(double), Control);
-    return ParU_Solve (Num, x, user_Control);
-
+    return ParU_Solve(Sym, Num, x, user_Control);
 }
 //////////////////////////  ParU_Solve ////////////// mRHS /////////////////////
 /*!  @brief  sovle AX = B
@@ -104,12 +98,11 @@ ParU_Ret ParU_Solve(ParU_Numeric *Num, double *b, double *x,
 
 #include "paru_internal.hpp"
 
-ParU_Ret ParU_Solve(ParU_Numeric *Num, Int nrhs, double *B,   
-        ParU_Control *user_Control)
+ParU_Ret ParU_Solve(ParU_Symbolic *Sym, ParU_Numeric *Num, Int nrhs, double *B,
+                    ParU_Control *user_Control)
 {
     DEBUGLEVEL(0);
     PRLEVEL(1, ("%% mRHS inside Solve\n"));
-    ParU_Symbolic *Sym = Num->Sym;
     Int m = Sym->m;
     if (Num->res == PARU_SINGULAR)
     {
@@ -126,28 +119,27 @@ ParU_Ret ParU_Solve(ParU_Numeric *Num, Int nrhs, double *B,
         return PARU_OUT_OF_MEMORY;
     }
 
-    //making copy of user input and check it
+    // making copy of user input and check it
     ParU_Control my_Control = *user_Control;
     {
         Int mem_chunk = my_Control.mem_chunk;
-        if (mem_chunk < 1024 )
-            my_Control.mem_chunk = 1024*1024;
+        if (mem_chunk < 1024) my_Control.mem_chunk = 1024 * 1024;
         Int max_threads = PARU_OPENMP_MAX_THREADS;
         if (my_Control.paru_max_threads > 0)
-            my_Control.paru_max_threads = 
-                MIN (max_threads, my_Control.paru_max_threads);
+            my_Control.paru_max_threads =
+                MIN(max_threads, my_Control.paru_max_threads);
         else
             my_Control.paru_max_threads = max_threads;
     }
-    ParU_Control *Control= &my_Control;
+    ParU_Control *Control = &my_Control;
 
     paru_memcpy(X, B, m * nrhs * sizeof(double), Control);
     paru_apply_perm_scale(Sym->Pfin, Num->Rs, B, X, m, nrhs);
 
     PRLEVEL(1, ("%%mRHS lsolve\n"));
-    paru_lsolve(X, nrhs, Num, Control);  // X = L\X
+    paru_lsolve(X, nrhs, Sym, Num, Control);  // X = L\X
     PRLEVEL(1, ("%%mRHS usolve\n"));
-    paru_usolve(X, nrhs, Num, Control);                       // X = U\X
+    paru_usolve(X, nrhs, Sym, Num, Control);              // X = U\X
     paru_apply_inv_perm(Sym->Qfill, X, B, m, nrhs);  // B(q) = X
 
     paru_free(m * nrhs, sizeof(Int), X);

@@ -451,7 +451,7 @@ ParU_Ret ParU_Factorize(
 
 ParU_Ret ParU_Solve(
     // input:
-    ParU_Numeric *Num,
+        ParU_Symbolic *Sym, ParU_Numeric *Num,
     // input/output:
     double *b,
     // control:
@@ -459,7 +459,7 @@ ParU_Ret ParU_Solve(
 
 ParU_Ret ParU_Solve(
     // input:
-    ParU_Numeric *Num, double *b,
+    ParU_Symbolic *Sym, ParU_Numeric *Num, double *b,
     // output
     double *x,
     // control:
@@ -467,7 +467,7 @@ ParU_Ret ParU_Solve(
 
 ParU_Ret ParU_Solve(
     // input
-    ParU_Numeric *Num, Int nrhs,
+    ParU_Symbolic *Sym, ParU_Numeric *Num, Int nrhs,
     // input/output:
     double *B,  // m(num_rows of A) x nrhs
     // control:

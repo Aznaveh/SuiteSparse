@@ -158,8 +158,8 @@ void *operator new(std::size_t sz);
 void operator delete(void *ptr) noexcept;
 
 void paru_memset(void *ptr, Int value, size_t num, ParU_Control *Control);
-void paru_memcpy(void *destination, const void *source, size_t num, 
-        ParU_Control *Control);
+void paru_memcpy(void *destination, const void *source, size_t num,
+                 ParU_Control *Control);
 
 /* add tuple functions defintions */
 Int paru_add_rowTuple(ParU_TupleList *RowList, Int row, ParU_Tuple T);
@@ -249,10 +249,14 @@ Int paru_apply_perm_scale(const Int *P, const double *s, const double *b,
 Int paru_apply_perm_scale(const Int *P, const double *s, const double *b,
                           double *x, Int m, Int n);
 // lsolve and usolve
-Int paru_lsolve(double *x, ParU_Numeric *Num, ParU_Control *Control);
-Int paru_lsolve(double *X, Int n, ParU_Numeric *Num, ParU_Control *Control);
-Int paru_usolve(double *x, ParU_Numeric *Num, ParU_Control *Control);
-Int paru_usolve(double *X, Int n, ParU_Numeric *Num, ParU_Control *Control);
+Int paru_lsolve(double *x, ParU_Symbolic *Sym, ParU_Numeric *Num,
+                ParU_Control *Control);
+Int paru_lsolve(double *X, Int n, ParU_Symbolic *Sym, ParU_Numeric *Num,
+                ParU_Control *Control);
+Int paru_usolve(double *x, ParU_Symbolic *Sym, ParU_Numeric *Num,
+                ParU_Control *Control);
+Int paru_usolve(double *X, Int n, ParU_Symbolic *Sym, ParU_Numeric *Num,
+                ParU_Control *Control);
 
 Int paru_gaxpy(cholmod_sparse *A, const double *x, double *y, double alpha);
 double paru_spm_1norm(cholmod_sparse *A);

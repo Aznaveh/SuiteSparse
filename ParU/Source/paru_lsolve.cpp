@@ -33,12 +33,12 @@
  * @author Aznaveh
  * */
 #include "paru_internal.hpp"
-Int paru_lsolve(double *x, ParU_Numeric *Num, ParU_Control *Control)
+Int paru_lsolve(double *x, ParU_Symbolic *Sym, ParU_Numeric *Num,
+                ParU_Control *Control)
 {
     DEBUGLEVEL(0);
     if (!x) return (0);
     PARU_DEFINE_PRLEVEL;
-    ParU_Symbolic *Sym = Num->Sym;
     Int nf = Sym->nf;
 
 #ifndef NDEBUG
@@ -187,13 +187,13 @@ Int paru_lsolve(double *x, ParU_Numeric *Num, ParU_Control *Control)
     return (1);
 }
 ///////////////////////////////// paru_lsolve ///multiple
-///mRHS///////////////////
-Int paru_lsolve(double *X, Int n, ParU_Numeric *Num,  ParU_Control *Control)
+/// mRHS///////////////////
+Int paru_lsolve(double *X, Int n, ParU_Symbolic *Sym, ParU_Numeric *Num,
+                ParU_Control *Control)
 {
     DEBUGLEVEL(1);
     PARU_DEFINE_PRLEVEL;
     if (!X) return (0);
-    ParU_Symbolic *Sym = Num->Sym;
     Int m = Sym->m;
     Int nf = Sym->nf;
 

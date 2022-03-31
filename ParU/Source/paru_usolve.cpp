@@ -31,8 +31,10 @@
  *
  * @author Aznaveh
  * */
+
 #include "paru_internal.hpp"
-Int paru_usolve(double *x, ParU_Numeric *Num, ParU_Control *Control)
+Int paru_usolve(double *x, ParU_Symbolic *Sym, ParU_Numeric *Num,
+                ParU_Control *Control)
 {
     DEBUGLEVEL(0);
     // check if input is read
@@ -41,7 +43,6 @@ Int paru_usolve(double *x, ParU_Numeric *Num, ParU_Control *Control)
 #ifndef NTIME
     double start_time = PARU_OPENMP_GET_WTIME;
 #endif
-    ParU_Symbolic *Sym = Num->Sym;
     Int nf = Sym->nf;
 
     Int n1 = Sym->n1;   // row+col singletons
@@ -172,14 +173,14 @@ Int paru_usolve(double *x, ParU_Numeric *Num, ParU_Control *Control)
     return (1);
 }
 ///////////////////////////////// paru_usolve ///multiple
-///mRHS///////////////////
-Int paru_usolve(double *X, Int n, ParU_Numeric *Num, ParU_Control *Control)
+/// mRHS///////////////////
+Int paru_usolve(double *X, Int n, ParU_Symbolic *Sym, ParU_Numeric *Num,
+                ParU_Control *Control)
 {
     DEBUGLEVEL(0);
     // check if input is read
     if (!X) return (0);
     PARU_DEFINE_PRLEVEL;
-    ParU_Symbolic *Sym = Num->Sym;
     Int m = Sym->m;
     Int nf = Sym->nf;
 #ifndef NDEBUG

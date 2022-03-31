@@ -45,7 +45,7 @@ ParU_Ret ParU_Residual(double *b, double &resid, double &norm,
 #endif
 
     ParU_Ret info;
-    info = ParU_Solve(Num, x, Control);
+    info = ParU_Solve(Sym, Num, x, Control);
     if (info != PARU_SUCCESS)
     {
         PRLEVEL(1, ("%% A problem happend during factorization\n"));
@@ -174,7 +174,7 @@ ParU_Ret ParU_Residual(cholmod_sparse *A, ParU_Numeric *Num, double *B,
 #endif
 
     ParU_Ret info;
-    info = ParU_Solve(Num, n, X, Control);
+    info = ParU_Solve(Sym, Num, n, X, Control);
     if (info != PARU_SUCCESS)
     {
         PRLEVEL(1, ("%% A problem happend during factorization\n"));
