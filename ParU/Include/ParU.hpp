@@ -350,9 +350,9 @@ struct ParU_Control
 struct ParU_Numeric
 {
     Int m, n;  // size of the sumbatrix that is factorized
-    
-    double *Rs;   // the array for row scaling based on original matrix
-                  // size = m
+
+    double *Rs;  // the array for row scaling based on original matrix
+                 // size = m
 
     double *Sx;  // size snz = Sp [n], numeric values of (scaled) S;
                  // Sp and Sj must be initialized in Symbolic phase
@@ -449,7 +449,6 @@ ParU_Ret ParU_Factorize(
     // control:
     ParU_Control *Control);
 
-// FIXME:
 ParU_Ret ParU_Solve(
     // input:
     ParU_Numeric *Num,
@@ -458,13 +457,13 @@ ParU_Ret ParU_Solve(
     // control:
     ParU_Control *Control);
 
-// TODO: write this
-// ParU_Ret ParU_Solve(double *b, double *x, ParU_Numeric *Num, ParU_Control
-// *Control)
-//{
-//    x = b // memcpy
-//    return (ParU_Solve(x, Num, Control)) ;
-//}
+ParU_Ret ParU_Solve(
+    // input:
+    ParU_Numeric *Num, double *b,
+    // output
+    double *x,
+    // control:
+    ParU_Control *user_Control);
 
 ParU_Ret ParU_Solve(
     // input
@@ -485,13 +484,13 @@ ParU_Ret ParU_Residual(double *b, double &resid, double &norm,  // delete
                        ParU_Control *Control);
 
 // resid = norm1(b-A*x) / norm1(A)
-// ParU_Ret ParU_Residual(
-//    // inputs:
-//    cholmod_sparse *A, double *x, double *b,
-//    // output:
-//    double &resid, double &anorm,
-//    // control:
-//    ParU_Control *Control);
+ParU_Ret ParU_Residual(
+    // inputs:
+    cholmod_sparse *A, double *x, double *b, Int m,
+    // output:
+    double &resid, double &anorm,
+    // control:
+    ParU_Control *Control);
 
 // resid = norm1(b-A*x) / norm1(A)
 // ParU_Ret ParU_Residual(

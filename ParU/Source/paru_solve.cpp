@@ -64,6 +64,36 @@ ParU_Ret ParU_Solve(ParU_Numeric *Num, double *b, ParU_Control *user_Control)
 #endif
     return PARU_SUCCESS;
 }
+////////////////////////Keeps a copy of b //////////////////////////////////////
+ParU_Ret ParU_Solve(ParU_Numeric *Num, double *b, double *x, 
+        ParU_Control *user_Control)
+{
+
+    ParU_Symbolic *Sym = Num->Sym;
+    if (Num->res == PARU_SINGULAR)
+    {
+        printf("Paru: the matrix is singular; cannot be solved.\n");
+        return PARU_SINGULAR;
+    }
+    ParU_Control my_Control = *user_Control;
+    {
+        Int mem_chunk = my_Control.mem_chunk;
+        if (mem_chunk < 1024 )
+            my_Control.mem_chunk = 1024*1024;
+        Int max_threads = PARU_OPENMP_MAX_THREADS;
+        if (my_Control.paru_max_threads > 0)
+            my_Control.paru_max_threads = 
+                MIN (max_threads, my_Control.paru_max_threads);
+        else
+            my_Control.paru_max_threads = max_threads;
+    }
+    ParU_Control *Control= &my_Control;
+
+    Int m = Sym->m;
+    paru_memcpy(x, b, m * sizeof(double), Control);
+    return ParU_Solve (Num, x, user_Control);
+
+}
 //////////////////////////  ParU_Solve ////////////// mRHS /////////////////////
 /*!  @brief  sovle AX = B
  *      get a factorized matrix and several right hand sides

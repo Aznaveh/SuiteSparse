@@ -6,6 +6,7 @@
  * @author Aznaveh
  * */
 #include <omp.h>
+#include <math.h>
 
 #include "ParU.hpp"
 
@@ -72,20 +73,28 @@ int main(int argc, char **argv)
 #if 1
     Int m = Sym->m;
     double *b = (double *)malloc(m * sizeof(double));
+    double *xx = (double *)malloc(m * sizeof(double));
     for (Int i = 0; i < m; ++i) b[i] = i + 1;
     double my_solve_time_start = omp_get_wtime();
-    info = ParU_Solve(Num, b, &Control);
+    info = ParU_Solve(Num, b, xx, &Control);
     double my_solve_time = omp_get_wtime() - my_solve_time_start;
     printf ("Solve time is %lf seconds.\n", my_solve_time);
-    for (Int i = 0; i < m; ++i) b[i] = i + 1;
     my_start_time = omp_get_wtime();
-    Control.umfpack_ordering = UMFPACK_ORDERING_BEST;
-    Control.paru_strategy = PARU_STRATEGY_SYMMETRIC;
-    double resid, norm;
+    double resid, norm, anorm;
     ParU_Residual(b, resid, norm, A, Num, &Control);
+
+    for (Int i = 0; i < m; ++i) b[i] = i + 1;
+    printf("NEW\n");
+    ParU_Residual(A, xx, b, m, resid, anorm, &Control);
+    
+    printf("Residual is |%.2lf| and anorm is |%.2f|.\n",
+           resid == 0 ? 0 : log10(resid), anorm);
+
+
     //for (Int i = 0; i < m; ++i) b[i] = i + 1;
     //ParU_Backward(b, resid, norm, A, Num, &Control);
     free(b);
+    free(xx);
 
     //const Int nn = 16;  // number of right handsides
     //double *B = (double *)malloc(m * nn * sizeof(double));
