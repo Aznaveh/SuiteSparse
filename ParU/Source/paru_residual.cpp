@@ -267,15 +267,18 @@ ParU_Ret ParU_Residual(
     }
     PRLEVEL(1, (" \n"));
 #endif
-    ///TODO I need to use spmv instead of gaxpy here?
-/////
-//    PRLEVEL(1, ("%% gaxpy\n"));
-//    paru_gaxpy(A, x, ax_b, -1);
     anorm = paru_spm_1norm(A) ;
-//    PRLEVEL(1, ("%% resid=%lf\n", resid));
-//    TODO: I also need to compute 1norm of a dense matrix
-//    resid =  paru_vec_1norm(ax_b, m)/ anorm;
+    resid = 0;
+    for (Int l = 0; l < nrhs; l++)
+    {
+        ///TODO I need to use spmv instead of gaxpy here?
+        PRLEVEL(1, ("%% gaxpy\n"));
+        paru_gaxpy(A, X + m * l, AX_B + m * l, -1);
+        //    TODO: I also need to compute 1norm of a dense matrix?
+        double res = paru_vec_1norm(AX_B + m * l, m);
+        PRLEVEL(1, ("%% res=%lf\n", res));
+        resid = MAX(resid, res / anorm);
+    }
     paru_free(m*nrhs, sizeof(double), AX_B);
     return PARU_SUCCESS;
-
 }
