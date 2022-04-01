@@ -451,7 +451,7 @@ ParU_Ret ParU_Factorize(
 
 ParU_Ret ParU_Solve(
     // input:
-        ParU_Symbolic *Sym, ParU_Numeric *Num,
+    ParU_Symbolic *Sym, ParU_Numeric *Num,
     // input/output:
     double *b,
     // control:
@@ -470,6 +470,14 @@ ParU_Ret ParU_Solve(
     ParU_Symbolic *Sym, ParU_Numeric *Num, Int nrhs,
     // input/output:
     double *B,  // m(num_rows of A) x nrhs
+    // control:
+    ParU_Control *Control);
+
+ParU_Ret ParU_Solve(
+    // input
+    ParU_Symbolic *Sym, ParU_Numeric *Num, Int nrhs, double *B,
+    // output:
+    double *X,
     // control:
     ParU_Control *Control);
 
@@ -493,14 +501,13 @@ ParU_Ret ParU_Residual(
     ParU_Control *Control);
 
 // resid = norm1(b-A*x) / norm1(A)
-// ParU_Ret ParU_Residual(
-//    // inputs:
-//    cholmod_sparse *A, double *X, double *B,
-//    Int n,  // # of columns of X and B
-//    // output:
-//    double &resid, double &anorm,
-//    // control:
-//    ParU_Control *Control);
+ParU_Ret ParU_Residual(
+    // inputs:
+    cholmod_sparse *A, double *X, double *B, Int m, Int nrhs,
+    // output:
+    double &resid, double &anorm,
+    // control:
+    ParU_Control *Control);
 
 // delete this:
 ParU_Ret ParU_Residual(cholmod_sparse *A, ParU_Numeric *Num, double *b,
