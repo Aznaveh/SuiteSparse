@@ -10,7 +10,8 @@
  */
 #include "paru_internal.hpp"
 
-ParU_Ret paru_exec_tasks_seq(Int t, Int *task_num_child, ParU_Numeric *Num)
+ParU_Ret paru_exec_tasks_seq(Int t, Int *task_num_child, 
+        paru_work *Work, ParU_Numeric *Num)
 {
     DEBUGLEVEL(0);
     ParU_Symbolic *Sym = Num->Sym;
@@ -29,7 +30,7 @@ ParU_Ret paru_exec_tasks_seq(Int t, Int *task_num_child, ParU_Numeric *Num)
     for (Int f = task_map[t] + 1; f <= task_map[t + 1]; f++)
     {
         PRLEVEL(2, ("Seq: calling %ld\n", f));
-        myInfo = paru_front(f, Num);
+        myInfo = paru_front(f, Work, Num);
         if (myInfo != PARU_SUCCESS)
         {
             return myInfo;
@@ -60,21 +61,23 @@ ParU_Ret paru_exec_tasks_seq(Int t, Int *task_num_child, ParU_Numeric *Num)
             {
                 PRLEVEL(
                     1, ("%%Seq task %ld executing its parent %ld\n", t, daddy));
-                return myInfo = paru_exec_tasks_seq(daddy, task_num_child, Num);
+                return myInfo = paru_exec_tasks_seq(daddy, task_num_child, 
+                        Work, Num);
             }
         }
         else  // I was the only spoiled kid in the family;
         {
             PRLEVEL(1, ("%% Seq task %ld only child executing its parent %ld\n",
                         t, daddy));
-            return myInfo = paru_exec_tasks_seq(daddy, task_num_child, Num);
+            return myInfo = paru_exec_tasks_seq(daddy, task_num_child, 
+                    Work, Num);
         }
     }
     return myInfo;
 }
 
 ParU_Ret paru_exec_tasks(Int t, Int *task_num_child, Int &chain_task,
-                         ParU_Numeric *Num)
+        paru_work *Work, ParU_Numeric *Num)
 {
     DEBUGLEVEL(0);
     ParU_Symbolic *Sym = Num->Sym;
@@ -92,7 +95,7 @@ ParU_Ret paru_exec_tasks(Int t, Int *task_num_child, Int &chain_task,
 #endif
     for (Int f = task_map[t] + 1; f <= task_map[t + 1]; f++)
     {
-        myInfo = paru_front(f, Num);
+        myInfo = paru_front(f, Work, Num);
         if (myInfo != PARU_SUCCESS)
         {
             return myInfo;
@@ -139,7 +142,7 @@ ParU_Ret paru_exec_tasks(Int t, Int *task_num_child, Int &chain_task,
                 else
                 {
                     return myInfo = paru_exec_tasks(daddy, task_num_child,
-                                                    chain_task, Num);
+                                                    chain_task, Work, Num);
                 }
             }
         }
@@ -160,7 +163,7 @@ ParU_Ret paru_exec_tasks(Int t, Int *task_num_child, Int &chain_task,
             else
             {
                 return myInfo = paru_exec_tasks(daddy, task_num_child,
-                                                chain_task, Num);
+                                                chain_task, Work, Num);
             }
         }
     }
@@ -190,9 +193,6 @@ ParU_Ret ParU_Factorize(cholmod_sparse *A, ParU_Symbolic *Sym,
     {
         return PARU_INVALID;
     }
-
-    ParU_Numeric *Num;
-    Num = *Num_handle;
 
     ParU_Ret info;
     // populate my_Control with tested values of Control
@@ -246,7 +246,11 @@ ParU_Ret ParU_Factorize(cholmod_sparse *A, ParU_Symbolic *Sym,
     }
     ParU_Control *Control= &my_Control;
 
-    info = paru_init_rowFronts(&Num, A, Sym, Control);
+    paru_work Work;
+    ParU_Numeric *Num;
+    Num = *Num_handle;
+    
+    info = paru_init_rowFronts(&Work, &Num, A, Sym, Control);
     *Num_handle = Num;
 
     PRLEVEL(1, ("%% init_row is done\n"));
@@ -337,7 +341,8 @@ ParU_Ret ParU_Factorize(cholmod_sparse *A, ParU_Symbolic *Sym,
         Int chain_task = -1;
         Int start = 0;
         PRLEVEL(
-                1, ("%% size=%ld, steps =%ld, stages =%ld\n", size, steps, stages));
+                1, ("%% size=%ld, steps =%ld, stages =%ld\n", 
+                    size, steps, stages));
 
         for (Int ii = 0; ii < stages; ii++)
         {
@@ -360,7 +365,8 @@ ParU_Ret ParU_Factorize(cholmod_sparse *A, ParU_Symbolic *Sym,
 
                     ParU_Ret myInfo =
                         // paru_exec_tasks(t, &task_num_child[0], Num);
-                        paru_exec_tasks(t, task_num_child, chain_task, Num);
+                        paru_exec_tasks(t, task_num_child, chain_task, 
+                                &Work, Num);
                     if (myInfo != PARU_SUCCESS)
                     {
                         #pragma omp atomic write
@@ -380,7 +386,7 @@ ParU_Ret ParU_Factorize(cholmod_sparse *A, ParU_Symbolic *Sym,
         {
             Num->naft = 1;
             PRLEVEL(1, ("Chain_taskd %ld has remained\n", chain_task));
-            info = paru_exec_tasks_seq(chain_task, task_num_child, Num);
+            info = paru_exec_tasks_seq(chain_task, task_num_child, &Work, Num);
         }
         if (info != PARU_SUCCESS)
         {
@@ -403,7 +409,7 @@ ParU_Ret ParU_Factorize(cholmod_sparse *A, ParU_Symbolic *Sym,
         {
             // if (i %1000 == 0) PRLEVEL(1, ("%% Wroking on front %ld\n", i));
 
-            info = paru_front(i, Num);
+            info = paru_front(i, &Work, Num);
             if (info != PARU_SUCCESS)
             {
                 PRLEVEL(1, ("%% A problem happend in %ld\n", i));
@@ -413,6 +419,7 @@ ParU_Ret ParU_Factorize(cholmod_sparse *A, ParU_Symbolic *Sym,
     }
 
     info = paru_perm(Num);  // to form the final permutation
+    paru_free_work(Sym, &Work);   // free the work DS 
 
     if (info == PARU_OUT_OF_MEMORY)
     {

@@ -61,7 +61,7 @@ int main(int argc, char **argv)
     double my_time = omp_get_wtime() - my_start_time;
     if (info != PARU_SUCCESS)
     {
-        ParU_Freenum(&Num, &Control);
+        ParU_Freenum(Sym, &Num, &Control);
         ParU_Freesym(&Sym, &Control);
         cholmod_l_free_sparse(&A, cc);
         cholmod_l_finish(cc);
@@ -182,7 +182,7 @@ int main(int argc, char **argv)
 
 #endif
     //~~~~~~~~~~~~~~~~~~~Free Everything~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    ParU_Freenum(&Num, &Control);
+    ParU_Freenum(Sym, &Num, &Control);
     ParU_Freesym(&Sym, &Control);
 
     cholmod_l_free_sparse(&A, cc);

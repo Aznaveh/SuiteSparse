@@ -64,7 +64,7 @@ void paru_assemble_all(Int e, Int f, std::vector<Int> &colHash,
     double *curEl_Num =
         (double *)((Int *)(curEl + 1) + 2 * curEl->nrows + 2 * curEl->ncols);
 
-    Paru_Work *Work = Num->Work;
+    paru_work *Work = Num->Work;
     Int *isRowInFront = Work->rowSize;
 
 #ifndef NDEBUG
@@ -335,7 +335,7 @@ void paru_assemble_cols(Int e, Int f, std::vector<Int> &colHash,
     double *curEl_Num =
         (double *)((Int *)(curEl + 1) + 2 * curEl->nrows + 2 * curEl->ncols);
 
-    Paru_Work *Work = Num->Work;
+    paru_work *Work = Num->Work;
     Int *isRowInFront = Work->rowSize;
 
     Int *fcolList = Num->fcolList[f];
@@ -523,7 +523,7 @@ void paru_assemble_rows(Int e, Int f, std::vector<Int> &colHash,
     double *curEl_Num =
         (double *)((Int *)(curEl + 1) + 2 * curEl->nrows + 2 * curEl->ncols);
 
-    Paru_Work *Work = Num->Work;
+    paru_work *Work = Num->Work;
     Int *isRowInFront = Work->rowSize;
 
     std::vector<Int> tempRow;
@@ -743,7 +743,7 @@ void paru_assemble_el_with0rows(Int e, Int f, std::vector<Int> &colHash,
     double *curEl_Num =
         (double *)((Int *)(curEl + 1) + 2 * curEl->nrows + 2 * curEl->ncols);
 
-    Paru_Work *Work = Num->Work;
+    paru_work *Work = Num->Work;
     Int *isRowInFront = Work->rowSize;
 
 #ifndef NDEBUG

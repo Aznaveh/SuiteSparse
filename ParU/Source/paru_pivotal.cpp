@@ -40,7 +40,7 @@ ParU_Ret paru_pivotal(std::vector<Int> &pivotal_elements,
 
     Int *lacList = Num->lacList;
 
-    Paru_Work *Work = Num->Work;
+    paru_work *Work = Num->Work;
     Int *rowMarkp = Work->rowMark;
     Int rowMark = 0;
 

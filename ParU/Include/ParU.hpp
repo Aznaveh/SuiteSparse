@@ -296,7 +296,7 @@ struct ParU_TupleList
 };
 
 // move to paru_internal.h
-struct Paru_Work
+struct paru_work
 {
     // gather scatter space for rows
     Int *rowSize;  // Initalized data structure, size of rows
@@ -367,7 +367,7 @@ struct ParU_Numeric
                               // it is freed after factorize
 
     ParU_Element **elementList;  // pointers to all elements, size = m+nf+1
-    Paru_Work *Work;             // workspace used during factorization only
+    paru_work *Work;             // workspace used during factorization only
 
     Int *time_stamp;  // for relative index update; not initialized
 
@@ -483,7 +483,12 @@ ParU_Ret ParU_Solve(
 
 ParU_Ret ParU_Freesym(ParU_Symbolic **Sym_handle, ParU_Control *Control);
 
-ParU_Ret ParU_Freenum(ParU_Numeric **Num_handle, ParU_Control *Control);
+ParU_Ret ParU_Freenum(
+    // input
+        ParU_Symbolic *Sym,
+    // output
+        ParU_Numeric **Num_handle, 
+        ParU_Control *Control);
 
 // resid = norm1(b-A*x) / norm1(A)
 ParU_Ret ParU_Residual(

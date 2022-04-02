@@ -14,7 +14,7 @@
  */
 #include "paru_internal.hpp"
 ParU_Ret paru_front(Int f,  // front need to be assembled
-                    ParU_Numeric *Num)
+              paru_work *Work, ParU_Numeric *Num)
 {
     DEBUGLEVEL(-3);
     PARU_DEFINE_PRLEVEL;
@@ -38,7 +38,6 @@ ParU_Ret paru_front(Int f,  // front need to be assembled
     Int fp = col2 - col1; /* first fp columns are pivotal */
 
     ParU_Element **elementList = Num->elementList;
-    Paru_Work *Work = Num->Work;
 
     PRLEVEL(1, ("%% fp=%ld pivotal columns:clo1=%ld...col2=%ld\n", fp, col1,
                 col2 - 1));

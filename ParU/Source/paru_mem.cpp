@@ -290,7 +290,7 @@ void paru_free_el(Int e, ParU_Element **elementList)
     PRLEVEL(1, ("%% nrows =%ld ", nrows));
     PRLEVEL(1, ("%% ncols =%ld\n", ncols));
     Int tot_size = sizeof(ParU_Element) + sizeof(Int) * (2 * (nrows + ncols)) +
-    sizeof(double) * nrows * ncols;
+                   sizeof(double) * nrows * ncols;
     paru_free(1, tot_size, el);
 #else
     paru_free(1, 0, el);
@@ -298,11 +298,33 @@ void paru_free_el(Int e, ParU_Element **elementList)
     elementList[e] = NULL;
 }
 
+ParU_Ret paru_free_work(ParU_Symbolic *Sym, paru_work *Work)
+{
+    Int m = Sym->m - Sym->n1;
+    Int nf = Sym->nf;
+    paru_free(m, sizeof(Int), Work->rowSize);
+    paru_free(m + nf + 1, sizeof(Int), Work->rowMark);
+    paru_free(m + nf, sizeof(Int), Work->elRow);
+    paru_free(m + nf, sizeof(Int), Work->elCol);
+    return PARU_SUCCESS;
+}
 // It uses Sym, Do not free Sym before
-ParU_Ret ParU_Freenum (ParU_Numeric **Num_handle, ParU_Control *Control)
+ParU_Ret ParU_Freenum(ParU_Symbolic *Sym, ParU_Numeric **Num_handle,
+                      ParU_Control *Control)
 {
     DEBUGLEVEL(0);
-    if (Num_handle == NULL || *Num_handle == NULL) return PARU_INVALID;
+    if (Num_handle == NULL || *Num_handle == NULL || Sym == NULL)
+    {
+        if (Sym == NULL)
+            printf(
+                "Paru: Symbolic data structure has been freed before! Wrong "
+                "usage\n");
+        else
+            printf(
+                "Paru: Numeric data structure been freed before! Wrong "
+                "usage\n");
+        return PARU_INVALID;
+    }
 
     ParU_Numeric *Num;
     Num = *Num_handle;
@@ -310,14 +332,11 @@ ParU_Ret ParU_Freenum (ParU_Numeric **Num_handle, ParU_Control *Control)
     Int m = Num->m;  // m and n is different than Sym
     Int n = Num->n;  // Here there are submatrix size
 
-    
     ParU_TupleList *RowList = Num->RowList;
     PRLEVEL(1, ("%% RowList =%p\n", RowList));
-
-    ParU_Symbolic *Sym = Num->Sym;
     Int nf = Sym->nf;
 
-    //freeing the numerical input
+    // freeing the numerical input
     paru_free(Sym->snz, sizeof(double), Num->Sx);
     if (Sym->cs1 > 0)
     {
@@ -345,12 +364,7 @@ ParU_Ret ParU_Freenum (ParU_Numeric **Num_handle, ParU_Control *Control)
     PRLEVEL(1, ("%% Sym = %p\n", Sym));
     PRLEVEL(1, ("%% freeing initialized elements:\n"));
     for (Int i = 0; i < m; i++)
-    {  // freeing all row elements
-        if (Sym == NULL)
-        {
-            printf("Paru: probably Sym has been freed before! Wrong usage\n");
-            return PARU_INVALID;
-        }
+    {                               // freeing all row elements
         Int e = Sym->row2atree[i];  // element number in augmented tree
         PRLEVEL(1, ("%% e =%ld\t", e));
         paru_free_el(e, elementList);
@@ -438,16 +452,6 @@ ParU_Ret ParU_Freenum (ParU_Numeric **Num_handle, ParU_Control *Control)
     paru_free(1, (m + nf + 1) * sizeof(std::vector<Int> **), Num->heapList);
 
     paru_free(1, (m + nf + 1) * sizeof(ParU_Element), elementList);
-
-    Paru_Work *Work = Num->Work;
-    if (Work != NULL)
-    {
-        paru_free(m, sizeof(Int), Work->rowSize);
-        paru_free(m + nf + 1, sizeof(Int), Work->rowMark);
-        paru_free(m + nf, sizeof(Int), Work->elRow);
-        paru_free(m + nf, sizeof(Int), Work->elCol);
-        paru_free(1, sizeof(Paru_Work), Num->Work);
-    }
 
     paru_free(m + nf, sizeof(Int), Num->lacList);
 

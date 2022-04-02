@@ -16,7 +16,7 @@ ParU_Ret paru_prior_assemble(Int f, Int start_fac,
     DEBUGLEVEL(0);
     PARU_DEFINE_PRLEVEL;
 
-    Paru_Work *Work = Num->Work;
+    paru_work *Work = Num->Work;
     Int *elCol = Work->elCol;
 
     ParU_Element **elementList = Num->elementList;

@@ -12,7 +12,7 @@ void paru_check_prior_element(Int e, Int f, Int start_fac,
                               std::vector<Int> &colHash, ParU_Numeric *Num)
 // check if e can be assembeld into f
 {
-    Paru_Work *Work = Num->Work;
+    paru_work *Work = Num->Work;
     Int *elRow = Work->elRow;
 
     ParU_Element **elementList = Num->elementList;

@@ -13,8 +13,10 @@
  */
 #include "paru_internal.hpp"
 
-ParU_Ret paru_init_rowFronts(ParU_Numeric **Num_handle,  // in/out
-                                                         // inputs, not modified
+ParU_Ret paru_init_rowFronts(
+        paru_work *Work,
+        ParU_Numeric **Num_handle,  // in/out
+                                   // inputs, not modified
                              cholmod_sparse *A,
                              // symbolic analysis
                              ParU_Symbolic *Sym, ParU_Control *Control)
@@ -56,14 +58,7 @@ ParU_Ret paru_init_rowFronts(ParU_Numeric **Num_handle,  // in/out
     Num->res = PARU_SUCCESS;
     Num->Control = Control;
 
-    Paru_Work *Work = Num->Work = (Paru_Work *)paru_alloc(1, sizeof(Paru_Work));
-
-    if (Work == NULL)
-    {  // out of memory
-        printf("Paru: out of memory: Work\n");
-        ParU_Freenum(&Num, Control); //XXX
-        return PARU_OUT_OF_MEMORY;
-    }
+    Num->Work = Work; //XXX
 
     Int *rowMark = Work->rowMark = NULL;
     Int *elRow = Work->elRow = NULL;
@@ -181,7 +176,6 @@ ParU_Ret paru_init_rowFronts(ParU_Numeric **Num_handle,  // in/out
         paru_free(m + 1, sizeof(Int), cSp);
         if (cs1 > 0) paru_free((cs1 + 1), sizeof(Int), cSup);
         if (rs1 > 0) paru_free((rs1 + 1), sizeof(Int), cSlp);
-        ParU_Freenum(&Num, Control); //XXX
         return PARU_OUT_OF_MEMORY;
     }
 
@@ -443,7 +437,6 @@ ParU_Ret paru_init_rowFronts(ParU_Numeric **Num_handle,  // in/out
             paru_create_element(nrows, ncols, 0);
         if (curEl == NULL)
         {  // out of memory
-            ParU_Freenum(&Num, Control);
             printf("Paru: Out of memory: curEl\n");
 #pragma omp atomic update
             out_of_memory += 1;
@@ -459,7 +452,6 @@ ParU_Ret paru_init_rowFronts(ParU_Numeric **Num_handle,  // in/out
         }
         catch (std::bad_alloc const &)
         {  // out of memory
-            ParU_Freenum(&Num, Control);
             printf("Paru: Out of memory: curHeap\n");
 #pragma omp atomic update
             out_of_memory += 1;
@@ -483,7 +475,6 @@ ParU_Ret paru_init_rowFronts(ParU_Numeric **Num_handle,  // in/out
             (ParU_Tuple *)paru_alloc(slackRow * nrows, sizeof(ParU_Tuple));
         if (RowList[row].list == NULL)
         {  // out of memory
-            ParU_Freenum(&Num, Control);
             printf("Paru: out of memory, RowList[row].list \n");
 #pragma omp atomic update
             out_of_memory += 1;
@@ -496,7 +487,6 @@ ParU_Ret paru_init_rowFronts(ParU_Numeric **Num_handle,  // in/out
         rowTuple.f = 0;
         if (paru_add_rowTuple(RowList, row, rowTuple))
         {
-            ParU_Freenum(&Num, Control);
             printf("Paru: out of memory, add_rowTuple \n");
 #pragma omp atomic update
             out_of_memory += 1;

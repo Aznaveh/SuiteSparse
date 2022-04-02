@@ -37,9 +37,9 @@ VGFLAGS = --leak-check=yes  --log-file="valgrindlogfile.log"\
 
 val:
 
-	valgrind	$(VGFLAGS)	./x_paru_demo < ../Matrix/ParUTst/tmp.mtx
+#	valgrind	$(VGFLAGS)	./x_paru_demo < ../Matrix/ParUTst/tmp.mtx
 #	valgrind	$(VGFLAGS)	./x_paru_demo < ../Matrix/west0067.mtx 
-#	valgrind	$(VGFLAGS)	./x_paru_demo < ../Matrix/b1_ss.mtx
+	valgrind	$(VGFLAGS)	./x_paru_demo < ../Matrix/b1_ss.mtx
 
 	
 	#compling everything with -g

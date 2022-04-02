@@ -198,9 +198,9 @@ Int paru_cumsum(Int n, Int *X, ParU_Control *Control);
 Int bin_srch_col(Int *srt_lst, Int l, Int r, Int num);
 Int bin_srch(Int *srt_lst, Int l, Int r, Int num);
 
-ParU_Ret paru_init_rowFronts(ParU_Numeric **Num_handle, cholmod_sparse *A,
-                             ParU_Symbolic *Sym, ParU_Control *Control);
-ParU_Ret paru_front(Int f, ParU_Numeric *Num);
+ParU_Ret paru_init_rowFronts(paru_work *Work, ParU_Numeric **Num_handle, 
+        cholmod_sparse *A, ParU_Symbolic *Sym, ParU_Control *Control);
+ParU_Ret paru_front(Int f, paru_work *Work, ParU_Numeric *Num);
 
 ParU_Ret paru_pivotal(std::vector<Int> &pivotal_elements,
                       std::vector<Int> &panel_row, Int &zero_piv_rows, Int f,
@@ -258,6 +258,7 @@ void paru_tasked_dgemm(Int f, BLAS_INT m, BLAS_INT n, BLAS_INT k, double *A,
 void paru_tasked_trsm(Int f, int m, int n, double alpha, double *a, int lda,
                       double *b, int ldb, ParU_Numeric *Num);
 
+ParU_Ret paru_free_work(ParU_Symbolic *Sym, paru_work *Work);
 // lsolve and usolve
 Int paru_lsolve(double *x, ParU_Symbolic *Sym, ParU_Numeric *Num,
                 ParU_Control *Control);
@@ -267,10 +268,6 @@ Int paru_usolve(double *x, ParU_Symbolic *Sym, ParU_Numeric *Num,
                 ParU_Control *Control);
 Int paru_usolve(double *X, Int n, ParU_Symbolic *Sym, ParU_Numeric *Num,
                 ParU_Control *Control);
-
-
-
-
 
 // not user-callable: for testing only
 ParU_Ret paru_backward(double *x1, double &resid, double &norm,
