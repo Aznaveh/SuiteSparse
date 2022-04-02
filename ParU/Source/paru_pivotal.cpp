@@ -14,7 +14,7 @@
 
 ParU_Ret paru_pivotal(std::vector<Int> &pivotal_elements,
                       std::vector<Int> &panel_row, Int &zero_piv_rows, Int f,
-                      heaps_info &hi, ParU_Numeric *Num)
+                      heaps_info &hi, paru_work *Work, ParU_Numeric *Num)
 {
     DEBUGLEVEL(0);
     PARU_DEFINE_PRLEVEL;
@@ -40,7 +40,6 @@ ParU_Ret paru_pivotal(std::vector<Int> &pivotal_elements,
 
     Int *lacList = Num->lacList;
 
-    paru_work *Work = Num->Work;
     Int *rowMarkp = Work->rowMark;
     Int rowMark = 0;
 

@@ -199,7 +199,8 @@ ParU_Ret paru_make_heap(Int f, Int start_fac,
 }
 
 ParU_Ret paru_make_heap_empty_el(Int f, std::vector<Int> &pivotal_elements,
-                                 heaps_info &hi, ParU_Numeric *Num)
+                                 heaps_info &hi, paru_work *Work, 
+                                 ParU_Numeric *Num)
 {
     DEBUGLEVEL(0);
     PARU_DEFINE_PRLEVEL;

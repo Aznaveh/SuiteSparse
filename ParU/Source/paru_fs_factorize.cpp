@@ -359,7 +359,7 @@ Int paru_factorize_full_summed(Int f, Int start_fac,
                                std::vector<Int> &panel_row,
                                std::set<Int> &stl_colSet,
                                std::vector<Int> &pivotal_elements,
-                               ParU_Numeric *Num)
+                               paru_work *Work, ParU_Numeric *Num)
 {
     DEBUGLEVEL(0);
     PARU_DEFINE_PRLEVEL;

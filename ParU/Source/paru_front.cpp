@@ -76,7 +76,7 @@ ParU_Ret paru_front(Int f,  // front need to be assembled
 #endif
 
     // Initializing relative index validation flag of current front
-    paru_init_rel(f, Num);
+    paru_init_rel(f, Work, Num);
 
 #ifndef NDEBUG
     Int time_f = Num->time_stamp[f];
@@ -118,8 +118,8 @@ ParU_Ret paru_front(Int f,  // front need to be assembled
                             // importiant for Exit point
     PRLEVEL(1, ("%% Next: work on pivotal column assembly\n"));
     ParU_Ret res_pivotal;
-    res_pivotal =
-        paru_pivotal(pivotal_elements, panel_row, zero_piv_rows, f, hi, Num);
+    res_pivotal = paru_pivotal(pivotal_elements, panel_row, 
+            zero_piv_rows, f, hi, Work, Num);
     if (res_pivotal == PARU_OUT_OF_MEMORY)
     {
         printf("Paru: out of memory making pivotal of front %ld\n", f);
@@ -178,7 +178,7 @@ ParU_Ret paru_front(Int f,  // front need to be assembled
     PRLEVEL(1, ("%% start_fac= %ld\n", start_fac));
 
     Int fac = paru_factorize_full_summed(f, start_fac, panel_row, stl_colSet,
-                                         pivotal_elements, Num);
+                                         pivotal_elements, Work, Num);
     ++Num->time_stamp[f];
 
 #ifndef NDEBUG
@@ -279,7 +279,7 @@ ParU_Ret paru_front(Int f,  // front need to be assembled
         {
             // make the heap and return
             PRLEVEL(-2, ("%%~~~~~~~Assemble Front %ld finished~~~1\n", f));
-            return paru_make_heap_empty_el(f, pivotal_elements, hi, Num);
+            return paru_make_heap_empty_el(f, pivotal_elements, hi, Work, Num);
         }
         else
         {
@@ -404,7 +404,7 @@ ParU_Ret paru_front(Int f,  // front need to be assembled
 
             //**//pragma omp task priority(Depth[f]) if(mEl > 1024)
             paru_assemble_row_2U(e, f, curRowIndex, curFsRowIndex, colHash,
-                                 Num);
+                                 Work, Num);
             //**//pragma omp taskwait
 
             // FLIP(el_rowIndex[curRowIndex]); //marking row assembled
@@ -488,7 +488,7 @@ ParU_Ret paru_front(Int f,  // front need to be assembled
         {
             // keep the heap and do it for the parent.
             PRLEVEL(-2, ("%%~~~~~~~Assemble Front %ld finished~~~3\n", f));
-            return paru_make_heap_empty_el(f, pivotal_elements, hi, Num);
+            return paru_make_heap_empty_el(f, pivotal_elements, hi, Work, Num);
             // There are stuff left from in zero
             // then return
         }

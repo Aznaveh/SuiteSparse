@@ -170,12 +170,13 @@ Int paru_factorize_full_summed(Int f, Int start_fac,
                                std::vector<Int> &panel_row,
                                std::set<Int> &stl_colSet,
                                std::vector<Int> &pivotal_elements,
-                               ParU_Numeric *Num);
+                               paru_work *Work, ParU_Numeric *Num);
 
 ParU_Element *paru_create_element(Int nrows, Int ncols, Int init);
 
 void paru_assemble_row_2U(Int e, Int f, Int sR, Int dR,
-                          std::vector<Int> &colHash, ParU_Numeric *Num);
+                          std::vector<Int> &colHash, 
+                          paru_work *Work, ParU_Numeric *Num);
 
 Int paru_trsm(Int f, double *pF, double *uPart, Int fp, Int rowCount,
               Int colCount, ParU_Numeric *Num);
@@ -184,7 +185,7 @@ Int paru_dgemm(Int f, double *pF, double *uPart, double *el, Int fp,
 
 void paru_print_element(ParU_Numeric *Num, Int e);
 void paru_print_ParU_TupleList(ParU_TupleList *listSet, Int index);
-void paru_init_rel(Int f, ParU_Numeric *Num);
+void paru_init_rel(Int f, paru_work *Work, ParU_Numeric *Num);
 
 void paru_update_rel_ind_col(Int e, Int f, std::vector<Int> &colHash,
                              ParU_Numeric *Num);
@@ -204,7 +205,7 @@ ParU_Ret paru_front(Int f, paru_work *Work, ParU_Numeric *Num);
 
 ParU_Ret paru_pivotal(std::vector<Int> &pivotal_elements,
                       std::vector<Int> &panel_row, Int &zero_piv_rows, Int f,
-                      heaps_info &hi, ParU_Numeric *Num);
+                      heaps_info &hi, paru_work *Work, ParU_Numeric *Num);
 
 int paru_intersection(Int e, ParU_Element **elementList,
                       std::set<Int> &stl_colSet);
@@ -234,7 +235,8 @@ ParU_Ret paru_make_heap(Int f, Int start_fac,
                         std::vector<Int> &colHash, ParU_Numeric *Num);
 
 ParU_Ret paru_make_heap_empty_el(Int f, std::vector<Int> &pivotal_elements,
-                                 heaps_info &hi, ParU_Numeric *Num);
+                                 heaps_info &hi, paru_work *Work, 
+                                 ParU_Numeric *Num);
 
 // hash related
 void paru_insert_hash(Int key, Int value, std::vector<Int> &colHash);

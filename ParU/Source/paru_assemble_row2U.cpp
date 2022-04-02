@@ -12,7 +12,8 @@
 #include "paru_internal.hpp"
 
 void paru_assemble_row_2U(Int e, Int f, Int sR, Int dR,
-                          std::vector<Int> &colHash, ParU_Numeric *Num)
+                          std::vector<Int> &colHash, 
+                          paru_work *Work, ParU_Numeric *Num)
 {
     DEBUGLEVEL(0);
 
