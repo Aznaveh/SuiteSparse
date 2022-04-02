@@ -81,21 +81,13 @@ int main(int argc, char **argv)
     printf ("Solve time is %lf seconds.\n", my_solve_time);
     my_start_time = omp_get_wtime();
     double resid, norm, anorm;
-    ParU_Residual(b, resid, norm, A, Num, &Control);
-
-    for (Int i = 0; i < m; ++i) b[i] = i + 1;
-    printf("NEW\n");
     ParU_Residual(A, xx, b, m, resid, anorm, &Control);
     
     printf("Residual is |%.2lf| and anorm is |%.2f|.\n",
            resid == 0 ? 0 : log10(resid), anorm);
 
-
-    //for (Int i = 0; i < m; ++i) b[i] = i + 1;
-    //ParU_Backward(b, resid, norm, A, Num, &Control);
     free(b);
     free(xx);
-
     const Int nrhs = 16;  // number of right handsides
     double *B = (double *)malloc(m * nrhs * sizeof(double));
     double *X = (double *)malloc(m * nrhs * sizeof(double));
@@ -106,7 +98,6 @@ int main(int argc, char **argv)
     ParU_Residual(A, X, B, m, nrhs, resid, anorm, &Control);
     printf("mRhs Residual is |%.2lf| and anorm is |%.2f|.\n",
            resid == 0 ? 0 : log10(resid), anorm);
-
 
     free(B);
     free(X);

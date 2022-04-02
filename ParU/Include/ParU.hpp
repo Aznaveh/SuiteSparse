@@ -486,12 +486,6 @@ ParU_Ret ParU_Freesym(ParU_Symbolic **Sym_handle, ParU_Control *Control);
 ParU_Ret ParU_Freenum(ParU_Numeric **Num_handle, ParU_Control *Control);
 
 // resid = norm1(b-A*x) / norm1(A)
-// FIXME: to be like the comment
-ParU_Ret ParU_Residual(double *b, double &resid, double &norm,  // delete
-                       cholmod_sparse *A, ParU_Numeric *Num,
-                       ParU_Control *Control);
-
-// resid = norm1(b-A*x) / norm1(A)
 ParU_Ret ParU_Residual(
     // inputs:
     cholmod_sparse *A, double *x, double *b, Int m,
@@ -508,14 +502,4 @@ ParU_Ret ParU_Residual(
     double &resid, double &anorm,
     // control:
     ParU_Control *Control);
-
-// delete this:
-ParU_Ret ParU_Residual(cholmod_sparse *A, ParU_Numeric *Num, double *b,
-                       double *Results, Int n, ParU_Control *Control);
-
-// not user-callable: for testing only
-ParU_Ret ParU_Backward(double *x1, double &resid, double &norm,
-                       cholmod_sparse *A, ParU_Numeric *Num,
-                       ParU_Control *Control);
-
 #endif

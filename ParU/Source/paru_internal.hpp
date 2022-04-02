@@ -248,6 +248,16 @@ Int paru_apply_perm_scale(const Int *P, const double *s, const double *b,
                           double *x, Int m);
 Int paru_apply_perm_scale(const Int *P, const double *s, const double *b,
                           double *x, Int m, Int n);
+Int paru_gaxpy(cholmod_sparse *A, const double *x, double *y, double alpha);
+double paru_spm_1norm(cholmod_sparse *A);
+double paru_vec_1norm(const double *x, Int n);
+void paru_Diag_update(Int pivcol, Int pivrow, ParU_Numeric *Num);
+void paru_tasked_dgemm(Int f, BLAS_INT m, BLAS_INT n, BLAS_INT k, double *A,
+                       BLAS_INT lda, double *B, BLAS_INT ldb, double beta,
+                       double *C, BLAS_INT ldc, ParU_Numeric *Num);
+void paru_tasked_trsm(Int f, int m, int n, double alpha, double *a, int lda,
+                      double *b, int ldb, ParU_Numeric *Num);
+
 // lsolve and usolve
 Int paru_lsolve(double *x, ParU_Symbolic *Sym, ParU_Numeric *Num,
                 ParU_Control *Control);
@@ -258,15 +268,14 @@ Int paru_usolve(double *x, ParU_Symbolic *Sym, ParU_Numeric *Num,
 Int paru_usolve(double *X, Int n, ParU_Symbolic *Sym, ParU_Numeric *Num,
                 ParU_Control *Control);
 
-Int paru_gaxpy(cholmod_sparse *A, const double *x, double *y, double alpha);
-double paru_spm_1norm(cholmod_sparse *A);
-double paru_vec_1norm(const double *x, Int n);
-void paru_Diag_update(Int pivcol, Int pivrow, ParU_Numeric *Num);
-void paru_tasked_dgemm(Int f, BLAS_INT m, BLAS_INT n, BLAS_INT k, double *A,
-                       BLAS_INT lda, double *B, BLAS_INT ldb, double beta,
-                       double *C, BLAS_INT ldc, ParU_Numeric *Num);
-void paru_tasked_trsm(Int f, int m, int n, double alpha, double *a, int lda,
-                      double *b, int ldb, ParU_Numeric *Num);
+
+
+
+
+// not user-callable: for testing only
+ParU_Ret paru_backward(double *x1, double &resid, double &norm,
+                       cholmod_sparse *A, ParU_Numeric *Num,
+                       ParU_Control *Control);
 
 void paru_write(ParU_Numeric *Num, int scale, char *id);
 #endif
