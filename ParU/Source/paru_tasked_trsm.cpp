@@ -15,7 +15,7 @@ void paru_tasked_trsm(Int f, int m, int n, double alpha, double *a, int lda,
     ParU_Control *Control = Num->Control;
     Int L = Control->worthwhile_trsm;
     #pragma omp atomic read
-    naft = Num->naft;
+    naft = Work->naft;
     const Int max_threads = Control->paru_max_threads;
     if (naft == 1)
         BLAS_set_num_threads(max_threads);
@@ -67,6 +67,6 @@ void paru_tasked_trsm(Int f, int m, int n, double alpha, double *a, int lda,
 
 #ifdef COUNT_FLOPS
     #pragma omp atomic update
-    Num->flp_cnt_trsm += (double)(m + 1) * m * n;
+    Work->flp_cnt_trsm += (double)(m + 1) * m * n;
 #endif
 }

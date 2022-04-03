@@ -58,8 +58,6 @@ ParU_Ret paru_init_rowFronts(
     Num->res = PARU_SUCCESS;
     Num->Control = Control;
 
-    Num->Work = Work; //XXX
-
     Int *rowMark = Work->rowMark = NULL;
     Int *elRow = Work->elRow = NULL;
     Int *elCol = Work->elCol = NULL;
@@ -76,7 +74,6 @@ ParU_Ret paru_init_rowFronts(
     std::vector<Int> **heapList = Num->heapList = NULL;
     ParU_Element **elementList = NULL;
     Num->elementList = NULL;
-    Num->time_stamp = NULL;
     Int *Diag_map = Num->Diag_map = NULL;
     Int *inv_Diag_map = Num->inv_Diag_map = NULL;
     Num->Sx = NULL;
@@ -84,6 +81,7 @@ ParU_Ret paru_init_rowFronts(
     Num->Slx = NULL;
     Num->Rs = NULL;
 
+    Work->time_stamp = NULL;
     if (nf != 0)
     {
         // Memory allocations for Num
@@ -104,7 +102,8 @@ ParU_Ret paru_init_rowFronts(
             (ParU_Factors *)paru_calloc(1, nf * sizeof(ParU_Factors));
         Num->partial_LUs =  // Initialize with NULL
             (ParU_Factors *)paru_calloc(1, nf * sizeof(ParU_Factors));
-        Num->time_stamp = (Int *)paru_alloc(1, nf * sizeof(Int));
+
+        Work->time_stamp = (Int *)paru_alloc(1, nf * sizeof(Int));
 
         heapList = Num->heapList = (std::vector<Int> **)paru_calloc(
             1, (m + nf + 1) * sizeof(std::vector<Int> *));
@@ -164,7 +163,7 @@ ParU_Ret paru_init_rowFronts(
           Num->frowCount == NULL || Num->fcolCount == NULL ||
           Num->frowList == NULL || Num->fcolList == NULL ||
           Num->partial_Us == NULL || Num->partial_LUs == NULL ||
-          Num->time_stamp == NULL || heapList == NULL ||
+          Work->time_stamp == NULL || heapList == NULL ||
           (Sym->strategy == PARU_STRATEGY_SYMMETRIC &&
            (Diag_map == NULL || inv_Diag_map == NULL)))) ||
 
@@ -349,10 +348,10 @@ ParU_Ret paru_init_rowFronts(
         /////////////////////}
 #ifdef COUNT_FLOPS
     // flop count info init
-    Num->flp_cnt_dgemm = 0.0;
-    Num->flp_cnt_trsm = 0.0;
-    Num->flp_cnt_dger = 0.0;
-    Num->flp_cnt_real_dgemm = 0.0;
+    Work->flp_cnt_dgemm = 0.0;
+    Work->flp_cnt_trsm = 0.0;
+    Work->flp_cnt_dger = 0.0;
+    Work->flp_cnt_real_dgemm = 0.0;
 #endif
 
     // RowList, ColList and elementList are place holders

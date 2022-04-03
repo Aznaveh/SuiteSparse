@@ -356,13 +356,13 @@ ParU_Ret paru_pivotal(std::vector<Int> &pivotal_elements,
     }
 
 #ifndef NDEBUG
-    Num->actual_alloc_LUs += rowCount * fp;
-    Num->actual_alloc_row_int += rowCount;
+    Work->actual_alloc_LUs += rowCount * fp;
+    Work->actual_alloc_row_int += rowCount;
     if (fm != rowCount) PRLEVEL(PR, ("%% fm=%ld rowCount=%ld ", fm, rowCount));
-    PRLEVEL(PR, ("%% LUs=%ld ", Num->actual_alloc_LUs));
+    PRLEVEL(PR, ("%% LUs=%ld ", Work->actual_alloc_LUs));
     PRLEVEL(PR, ("%% pivotalFront = %p size=%ld", pivotalFront, rowCount * fp));
-    Int act = Num->actual_alloc_LUs + Num->actual_alloc_Us +
-              Num->actual_alloc_row_int;
+    Int act = Work->actual_alloc_LUs + Work->actual_alloc_Us +
+              Work->actual_alloc_row_int;
     Int upp = Sym->Us_bound_size + Sym->LUs_bound_size + Sym->row_Int_bound +
               Sym->col_Int_bound;
     PRLEVEL(PR, ("%% MEM=%ld percent=%lf%%", act, 100.0 * act / upp));

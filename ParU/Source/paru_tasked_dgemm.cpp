@@ -20,7 +20,7 @@ void paru_tasked_dgemm(Int f, BLAS_INT M, BLAS_INT N, BLAS_INT K, double *A,
     Int trivial = Control->trivial;
     Int L = Control->worthwhile_dgemm;
 #pragma omp atomic read
-    naft = Num->naft;
+    naft = Work->naft;
     const Int max_threads = Control->paru_max_threads;
     if (naft == 1)
         BLAS_set_num_threads(max_threads);
@@ -116,6 +116,6 @@ void paru_tasked_dgemm(Int f, BLAS_INT M, BLAS_INT N, BLAS_INT K, double *A,
 
 #ifdef COUNT_FLOPS
 #pragma omp atomic update
-    Num->flp_cnt_dgemm += (double)2 * M * N * K;
+    Work->flp_cnt_dgemm += (double)2 * M * N * K;
 #endif
 }

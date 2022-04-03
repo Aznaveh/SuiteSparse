@@ -35,7 +35,7 @@ void paru_update_rowDeg(Int panel_num, Int row_end, Int f, Int start_fac,
     Int fp = col2 - col1;  // first fp columns are pivotal
 
     Int pMark = start_fac;              // Mark for pivotal rows
-    Int npMark = ++Num->time_stamp[f];  // making all the markings invalid
+    Int npMark = ++Work->time_stamp[f];  // making all the markings invalid
 
     Int colCount = stl_colSet.size();
 
@@ -525,7 +525,7 @@ void paru_update_rowDeg(Int panel_num, Int row_end, Int f, Int start_fac,
                 : new_row_degree_bound_for_r;
     }
 
-    Num->time_stamp[f] += 2;  // making all the markings invalid again
+    Work->time_stamp[f] += 2;  // making all the markings invalid again
 #ifndef NDEBUG
     PRLEVEL(1, ("%% Finalized counters r1=%ld r2=%ld r3=%ld sum=%ld\n", r1, r2,
                 r3, r1 + r2 + r3));

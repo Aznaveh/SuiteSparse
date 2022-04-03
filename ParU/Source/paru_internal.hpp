@@ -100,6 +100,37 @@ struct heaps_info
     Int sum_size, biggest_Child_size, biggest_Child_id;
 };
 
+struct paru_work
+{
+    // gather scatter space for rows
+    Int *rowSize;  // Initalized data structure, size of rows
+    // Int rowMark;      // Work->rowSize[x] < rowMark[eli] for each front
+    Int *rowMark;  // size = m+nf
+
+    // gather scatter space for elements
+    Int *elRow;  // Initalized data structure, size m+nf
+    Int *elCol;  // Initalized data structure, size m+nf
+
+    // only used for statistics when debugging is enabled:
+    Int actual_alloc_LUs;      // actual memory allocated for LUs
+    Int actual_alloc_Us;       // actual memory allocated for Us
+    Int actual_alloc_row_int;  // actual memory allocated for rows
+    Int actual_alloc_col_int;  // actual memory allocated for cols
+    
+    #ifdef COUNT_FLOPS
+    double flp_cnt_dgemm;
+    double flp_cnt_trsm;
+    double flp_cnt_dger;
+    double flp_cnt_real_dgemm;
+    #endif
+
+    Int *time_stamp;  // for relative index update; not initialized
+
+
+    Int naft;      // number of actvie frontal tasks
+    Int resq;      // number of remainig ready tasks in the queue
+};
+
 //------------------------------------------------------------------------------
 // inline internal functions
 
@@ -282,5 +313,5 @@ ParU_Ret paru_backward(double *x1, double &resid, double &norm,
                        cholmod_sparse *A, ParU_Symbolic *Sym, ParU_Numeric *Num,
                        ParU_Control *Control);
 
-void paru_write(ParU_Numeric *Num, int scale, char *id);
+void paru_write(int scale, char *id, paru_work *Work, ParU_Numeric *Num);
 #endif

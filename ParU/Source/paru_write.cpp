@@ -6,7 +6,7 @@
  *  @author Aznaveh
  */
 #include "paru_internal.hpp"
-void paru_write(ParU_Numeric *Num, int scale, char *id)
+void paru_write(int scale, char *id, paru_work *Work, ParU_Numeric *Num)
 {
     DEBUGLEVEL(0);
     PRLEVEL(1, ("%% Start Writing\n"));
@@ -176,10 +176,10 @@ void paru_write(ParU_Numeric *Num, int scale, char *id)
         // fprintf(infofptr, "%.17g\n", Num->umf_time);
 
 #ifdef COUNT_FLOPS
-        fprintf(infofptr, "%.17g\n", Num->flp_cnt_dgemm);
-        fprintf(infofptr, "%.17g\n", Num->flp_cnt_trsm);
-        fprintf(infofptr, "%.17g\n", Num->flp_cnt_dger);
-        fprintf(infofptr, "%.17g\n", Num->flp_cnt_real_dgemm);
+        fprintf(infofptr, "%.17g\n", Work->flp_cnt_dgemm);
+        fprintf(infofptr, "%.17g\n", Work->flp_cnt_trsm);
+        fprintf(infofptr, "%.17g\n", Work->flp_cnt_dger);
+        fprintf(infofptr, "%.17g\n", Work->flp_cnt_real_dgemm);
 #endif
         fclose(infofptr);
     }

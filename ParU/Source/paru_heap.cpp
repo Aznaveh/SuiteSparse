@@ -24,9 +24,7 @@ void paru_check_prior_element(Int e, Int f, Int start_fac,
         return;
     }
 
-    //    if ( (elCol [e] == 0 && el->cValid > start_fac) ||
-    //            el->cValid == Num->time_stamp[f])
-    if (el->rValid == start_fac || el->cValid == Num->time_stamp[f])
+    if (el->rValid == start_fac || el->cValid == Work->time_stamp[f])
     {  // all the cols are inside he current front; maybe assemble some rows
         paru_assemble_rows(e, f, colHash, Work, Num);
     }

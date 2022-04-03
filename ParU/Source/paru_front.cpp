@@ -79,7 +79,7 @@ ParU_Ret paru_front(Int f,  // front need to be assembled
     paru_init_rel(f, Work, Num);
 
 #ifndef NDEBUG
-    Int time_f = Num->time_stamp[f];
+    Int time_f = Work->time_stamp[f];
     PRLEVEL(0, ("%% Begin of Front %ld time_f = %ld\n", f, time_f));
 #endif
 
@@ -174,15 +174,15 @@ ParU_Ret paru_front(Int f,  // front need to be assembled
         return PARU_SINGULAR;
     }
 
-    Int start_fac = Num->time_stamp[f];
+    Int start_fac = Work->time_stamp[f];
     PRLEVEL(1, ("%% start_fac= %ld\n", start_fac));
 
     Int fac = paru_factorize_full_summed(f, start_fac, panel_row, stl_colSet,
                                          pivotal_elements, Work, Num);
-    ++Num->time_stamp[f];
+    ++Work->time_stamp[f];
 
 #ifndef NDEBUG
-    time_f = Num->time_stamp[f];
+    time_f = Work->time_stamp[f];
     PRLEVEL(1, ("%%After factorization time_f = %ld\n", time_f));
 #endif
 
@@ -540,7 +540,7 @@ ParU_Ret paru_front(Int f,  // front need to be assembled
             {
                 if (uPart[fp * jj + ii] != 0 &&
                         pivotalFront[rowCount * ii + kk] != 0)
-                    Num->flp_cnt_real_dgemm += 2.0;
+                    Work->flp_cnt_real_dgemm += 2.0;
             }
 #endif
 
@@ -558,7 +558,6 @@ ParU_Ret paru_front(Int f,  // front need to be assembled
 
     /**** 7 **** Count number of rows and columsn of prior CBs to asslemble ***/
 
-    // Num->time_stamp[f]++; //invalidating all the marks
     PRLEVEL(-1, ("\n%%||||  Start Finalize %ld ||||\n", f));
     ParU_Ret res_prior;
     res_prior =

@@ -306,6 +306,8 @@ ParU_Ret paru_free_work(ParU_Symbolic *Sym, paru_work *Work)
     paru_free(m + nf + 1, sizeof(Int), Work->rowMark);
     paru_free(m + nf, sizeof(Int), Work->elRow);
     paru_free(m + nf, sizeof(Int), Work->elCol);
+
+    paru_free(1, nf * sizeof(Int), Work->time_stamp);
     return PARU_SUCCESS;
 }
 // It uses Sym, Do not free Sym before
@@ -429,7 +431,6 @@ ParU_Ret ParU_Freenum(ParU_Symbolic *Sym, ParU_Numeric **Num_handle,
     PRLEVEL(1, ("%% FREE upperBoundSize =%ld \n", upperBoundSize));
 #endif
 
-    paru_free(1, nf * sizeof(Int), Num->time_stamp);
     // in practice each parent should deal with the memory for the children
 #ifndef NDEBUG
     std::vector<Int> **heapList = Num->heapList;

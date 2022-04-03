@@ -295,18 +295,6 @@ struct ParU_TupleList
     ParU_Tuple *list;  // list of tuples regarding to this element
 };
 
-// move to paru_internal.h
-struct paru_work
-{
-    // gather scatter space for rows
-    Int *rowSize;  // Initalized data structure, size of rows
-    // Int rowMark;      // Work->rowSize[x] < rowMark[eli] for each front
-    Int *rowMark;  // size = m+nf
-
-    // gather scatter space for elements
-    Int *elRow;  // Initalized data structure, size m+nf
-    Int *elCol;  // Initalized data structure, size m+nf
-};
 
 struct ParU_Factors
 {               // dense factorized part pointer
@@ -326,7 +314,6 @@ struct ParU_Control
 {
     Int mem_chunk = 1024 * 1024;  // chunk size for memset and memcpy
     // Symbolic controls
-    Int scale = 1;  // if 1 matrix will be scaled using max_row
     Int umfpack_ordering = UMFPACK_ORDERING_METIS;
     Int umfpack_strategy = UMFPACK_STRATEGY_AUTO;  // symmetric or unsymmetric
 
@@ -335,6 +322,7 @@ struct ParU_Control
              // than this threshold
 
     // Numeric controls
+    Int scale = 1;  // if 1 matrix will be scaled using max_row
     Int panel_width = 32;  // width of panel for dense factorizaiton
     Int paru_strategy = PARU_STRATEGY_AUTO;  // the same stratey umfpack used
 
@@ -367,9 +355,7 @@ struct ParU_Numeric
                               // it is freed after factorize
 
     ParU_Element **elementList;  // pointers to all elements, size = m+nf+1
-    paru_work *Work;             // workspace used during factorization only
 
-    Int *time_stamp;  // for relative index update; not initialized
 
     // Computed parts of each front
     Int *frowCount;  // size nf   size(CB) = rowCount[f]x
@@ -379,13 +365,6 @@ struct ParU_Numeric
                      //   matrix S
     ParU_Factors *partial_Us;   // size nf   size(Us)= fp*colCount[f]
     ParU_Factors *partial_LUs;  // size nf   size(LUs)= rowCount[f]*fp
-
-    // only used for statistics when debugging is enabled:
-    // TODO: make sure these are zero when the object is allocated
-    Int actual_alloc_LUs;      // actual memory allocated for LUs
-    Int actual_alloc_Us;       // actual memory allocated for Us
-    Int actual_alloc_row_int;  // actual memory allocated for rows
-    Int actual_alloc_col_int;  // actual memory allocated for cols
 
     Int max_row_count;      // maximum number of rows/cols for all the fronts
     Int max_col_count;      // it is initalized after factorization
@@ -409,17 +388,6 @@ struct ParU_Numeric
     // its own. The list of heaps are initialized by nullptr
     std::vector<Int> **heapList;  // size m+nf+1, initialized with nullptr
 
-    // #ifdef COUNT_FLOPS
-    // flop count info
-    // TODO: make sure these are zero when the object is allocated
-    double flp_cnt_dgemm;
-    double flp_cnt_trsm;
-    double flp_cnt_dger;
-    double flp_cnt_real_dgemm;
-    // #endif
-
-    Int naft;      // number of actvie frontal tasks
-    Int resq;      // number of remainig ready tasks in the queue
     ParU_Ret res;  // returning value of numeric phase
 };
 

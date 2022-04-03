@@ -10,8 +10,8 @@
  */
 #include "paru_internal.hpp"
 
-ParU_Ret paru_exec_tasks_seq(Int t, Int *task_num_child, 
-        paru_work *Work, ParU_Numeric *Num)
+ParU_Ret paru_exec_tasks_seq(Int t, Int *task_num_child, paru_work *Work,
+                             ParU_Numeric *Num)
 {
     DEBUGLEVEL(0);
     ParU_Symbolic *Sym = Num->Sym;
@@ -61,23 +61,23 @@ ParU_Ret paru_exec_tasks_seq(Int t, Int *task_num_child,
             {
                 PRLEVEL(
                     1, ("%%Seq task %ld executing its parent %ld\n", t, daddy));
-                return myInfo = paru_exec_tasks_seq(daddy, task_num_child, 
-                        Work, Num);
+                return myInfo = paru_exec_tasks_seq(daddy, task_num_child, Work,
+                                                    Num);
             }
         }
         else  // I was the only spoiled kid in the family;
         {
             PRLEVEL(1, ("%% Seq task %ld only child executing its parent %ld\n",
                         t, daddy));
-            return myInfo = paru_exec_tasks_seq(daddy, task_num_child, 
-                    Work, Num);
+            return myInfo =
+                       paru_exec_tasks_seq(daddy, task_num_child, Work, Num);
         }
     }
     return myInfo;
 }
 
 ParU_Ret paru_exec_tasks(Int t, Int *task_num_child, Int &chain_task,
-        paru_work *Work, ParU_Numeric *Num)
+                         paru_work *Work, ParU_Numeric *Num)
 {
     DEBUGLEVEL(0);
     ParU_Symbolic *Sym = Num->Sym;
@@ -116,7 +116,7 @@ ParU_Ret paru_exec_tasks(Int t, Int *task_num_child, Int &chain_task,
     {
         if (num_original_children != 1)
         {
-        #pragma omp atomic capture
+#pragma omp atomic capture
             {
                 task_num_child[daddy]--;
                 num_rem_children = task_num_child[daddy];
@@ -130,8 +130,8 @@ ParU_Ret paru_exec_tasks(Int t, Int *task_num_child, Int &chain_task,
                 PRLEVEL(1,
                         ("%% task %ld executing its parent %ld\n", t, daddy));
                 Int resq;
-                #pragma omp atomic read
-                resq = Num->resq;
+#pragma omp atomic read
+                resq = Work->resq;
                 if (resq == 1)
                 {
                     chain_task = daddy;
@@ -151,8 +151,8 @@ ParU_Ret paru_exec_tasks(Int t, Int *task_num_child, Int &chain_task,
             PRLEVEL(1, ("%% task %ld only child executing its parent %ld\n", t,
                         daddy));
             Int resq;
-            #pragma omp atomic read
-            resq = Num->resq;
+#pragma omp atomic read
+            resq = Work->resq;
             if (resq == 1)
             {
                 chain_task = daddy;
@@ -199,58 +199,54 @@ ParU_Ret ParU_Factorize(cholmod_sparse *A, ParU_Symbolic *Sym,
     ParU_Control my_Control = *user_Control;
     {
         Int mem_chunk = my_Control.mem_chunk;
-        if (mem_chunk < 1024 )
-            my_Control.mem_chunk = 1024*1024;
+        if (mem_chunk < 1024) my_Control.mem_chunk = 1024 * 1024;
         Int panel_width = my_Control.panel_width;
-        if (panel_width < 0 || panel_width > Sym->m )
+        if (panel_width < 0 || panel_width > Sym->m)
             my_Control.panel_width = 32;
         Int paru_strategy = my_Control.paru_strategy;
-        //at this point the strategy should be known 
-        //if the user didnot decide I 
-        if (paru_strategy == PARU_STRATEGY_AUTO) //user didn't specify
-            //so I use the same strategy as umfpack 
+        // at this point the strategy should be known
+        // if the user didnot decide I
+        if (paru_strategy == PARU_STRATEGY_AUTO)  // user didn't specify
+            // so I use the same strategy as umfpack
             my_Control.paru_strategy = Sym->strategy;
         else if (paru_strategy != PARU_STRATEGY_SYMMETRIC &&
-                paru_strategy != PARU_STRATEGY_UNSYMMETRIC)
-            //user input is not correct so I go to default
-            my_Control.paru_strategy = Sym->strategy; 
-        //else user already picked symmetric or unsymmetric 
+                 paru_strategy != PARU_STRATEGY_UNSYMMETRIC)
+            // user input is not correct so I go to default
+            my_Control.paru_strategy = Sym->strategy;
+        // else user already picked symmetric or unsymmetric
         // and it has been copied over
-        
+
         double piv_toler = my_Control.piv_toler;
-        if (piv_toler > 1 || piv_toler < 0)
-            my_Control.piv_toler = .1;
+        if (piv_toler > 1 || piv_toler < 0) my_Control.piv_toler = .1;
         double diag_toler = my_Control.diag_toler;
-        if ( diag_toler > 1 || diag_toler < 0)
-            my_Control.diag_toler = .001;
+        if (diag_toler > 1 || diag_toler < 0) my_Control.diag_toler = .001;
         Int trivial = my_Control.trivial;
-        if ( trivial < 0)
-            my_Control.trivial = 4;
+        if (trivial < 0) my_Control.trivial = 4;
         Int worthwhile_dgemm = my_Control.worthwhile_dgemm;
-        if ( worthwhile_dgemm < 0)
-            my_Control.worthwhile_dgemm = 512;
+        if (worthwhile_dgemm < 0) my_Control.worthwhile_dgemm = 512;
         Int worthwhile_trsm = my_Control.worthwhile_trsm;
-        if ( worthwhile_trsm < 0)
-            my_Control.worthwhile_trsm = 4096;
+        if (worthwhile_trsm < 0) my_Control.worthwhile_trsm = 4096;
         Int max_threads = PARU_OPENMP_MAX_THREADS;
         if (my_Control.paru_max_threads > 0)
-            my_Control.paru_max_threads  =
-                MIN (max_threads, my_Control.paru_max_threads);
-        else            
-            my_Control.paru_max_threads  = max_threads;
+            my_Control.paru_max_threads =
+                MIN(max_threads, my_Control.paru_max_threads);
+        else
+            my_Control.paru_max_threads = max_threads;
 
         Int scale = my_Control.scale;
-        if ( scale != 0 || scale != 1)
-            my_Control.scale = 1;
-
+        if (scale != 0 || scale != 1) my_Control.scale = 1;
     }
-    ParU_Control *Control= &my_Control;
+    ParU_Control *Control = &my_Control;
 
-    paru_work Work;
+    paru_work myWork;
+    paru_work *Work;
+    Work = &myWork;
+
+    Work->naft = 0;
     ParU_Numeric *Num;
     Num = *Num_handle;
-    
-    info = paru_init_rowFronts(&Work, &Num, A, Sym, Control);
+
+    info = paru_init_rowFronts(Work, &Num, A, Sym, Control);
     *Num_handle = Num;
 
     PRLEVEL(1, ("%% init_row is done\n"));
@@ -259,7 +255,6 @@ ParU_Ret ParU_Factorize(cholmod_sparse *A, ParU_Symbolic *Sym,
         PRLEVEL(1, ("%% init_row has a problem\n"));
         return info;
     }
-    Num->naft = 0;
     Int nf = Sym->nf;
     //////////////// Using task tree //////////////////////////////////////////
     Int ntasks = Sym->ntasks;
@@ -271,8 +266,8 @@ ParU_Ret ParU_Factorize(cholmod_sparse *A, ParU_Symbolic *Sym,
     //        ntasks * sizeof(Int));
 
     Int task_num_child[ntasks];
-    paru_memcpy(task_num_child, Sym->task_num_child, 
-            ntasks * sizeof(Int), Control);
+    paru_memcpy(task_num_child, Sym->task_num_child, ntasks * sizeof(Int),
+                Control);
 
     for (Int t = 0; t < ntasks; t++)
     {
@@ -280,9 +275,9 @@ ParU_Ret ParU_Factorize(cholmod_sparse *A, ParU_Symbolic *Sym,
     }
 
     std::sort(task_Q.begin(), task_Q.end(),
-            [&task_depth](const Int &t1, const Int &t2) -> bool {
-            return task_depth[t1] > task_depth[t2];
-            });
+              [&task_depth](const Int &t1, const Int &t2) -> bool {
+                  return task_depth[t1] > task_depth[t2];
+              });
 
     // Int *Depth = Sym->Depth;
     //    std::sort(task_Q.begin(), task_Q.end(),
@@ -290,16 +285,18 @@ ParU_Ret ParU_Factorize(cholmod_sparse *A, ParU_Symbolic *Sym,
     //            {return Depth[task_map[t1]+1] > Depth[task_map[t2]+1];});
 
     double chainess = 2;
-    Num->resq = task_Q.size();
+    Work->resq = task_Q.size();
     printf("ntasks=%ld task_Q.size=%ld\n", ntasks, task_Q.size());
     if (ntasks > 0)
     {
-        //chainess = (task_depth[task_Q[0]] + 1) / (double)nf;
-        chainess = 1 - (task_Q.size()  / (double)ntasks);
-        printf("nf = %ld, deepest = %ld, chainess = %lf \n", 
-                nf, task_depth[task_Q[0]], chainess);
+        // chainess = (task_depth[task_Q[0]] + 1) / (double)nf;
+        chainess = 1 - (task_Q.size() / (double)ntasks);
+        printf("nf = %ld, deepest = %ld, chainess = %lf \n", nf,
+               task_depth[task_Q[0]], chainess);
     }
 #ifndef NDEBUG
+    Work->actual_alloc_LUs = Work->actual_alloc_Us = 0;
+    Work->actual_alloc_row_int = Work->actual_alloc_col_int = 0;
     PR = 1;
     Int *task_map = Sym->task_map;
     PRLEVEL(PR, ("\n%% task_Q:\n"));
@@ -307,25 +304,23 @@ ParU_Ret ParU_Factorize(cholmod_sparse *A, ParU_Symbolic *Sym,
     {
         Int t = task_Q[i];
         PRLEVEL(PR, ("%ld[%ld-%ld](%ld) ", t, task_map[t] + 1, task_map[t + 1],
-                    task_depth[t]));
+                     task_depth[t]));
     }
     PRLEVEL(PR, ("\n"));
 #endif
 
-
-    //if (task_Q.size() > 1 && ntasks*2 > Control->paru_max_threads )
-    if ( (Int) task_Q.size()*2 >  Control->paru_max_threads )
-        //if (1)
+    // if (task_Q.size() > 1 && ntasks*2 > Control->paru_max_threads )
+    if ((Int)task_Q.size() * 2 > Control->paru_max_threads)
+    // if (1)
     {
         printf("Parallel\n");
-        // chekcing user input 
-        PRLEVEL (2, ("Control: max_th=%ld scale=%ld piv_toler=%lf " 
+        // chekcing user input
+        PRLEVEL(2, ("Control: max_th=%ld scale=%ld piv_toler=%lf "
                     "diag_toler=%lf trivial =%ld worthwhile_dgemm=%ld "
                     "worthwhile_trsm=%ld\n",
-                    Control->paru_max_threads, Control->scale, 
-                    Control->piv_toler, Control->diag_toler, Control->trivial, 
-                    Control->worthwhile_dgemm,
-                    Control->worthwhile_trsm));
+                    Control->paru_max_threads, Control->scale,
+                    Control->piv_toler, Control->diag_toler, Control->trivial,
+                    Control->worthwhile_dgemm, Control->worthwhile_trsm));
 
 #ifdef MKLROOT
         PARU_OPENMP_SET_DYNAMIC(0);
@@ -341,42 +336,41 @@ ParU_Ret ParU_Factorize(cholmod_sparse *A, ParU_Symbolic *Sym,
         Int chain_task = -1;
         Int start = 0;
         PRLEVEL(
-                1, ("%% size=%ld, steps =%ld, stages =%ld\n", 
-                    size, steps, stages));
+            1, ("%% size=%ld, steps =%ld, stages =%ld\n", size, steps, stages));
 
         for (Int ii = 0; ii < stages; ii++)
         {
             if (start >= size) break;
             Int end = start + steps > size ? size : start + steps;
             PRLEVEL(1, ("%% doing Queue tasks <%ld,%ld>\n", start, end));
-            #pragma omp parallel proc_bind(spread)
-            #pragma omp single nowait
-            #pragma omp task untied  // clang might seg fault on untied
+#pragma omp parallel proc_bind(spread)
+#pragma omp single nowait
+#pragma omp task untied  // clang might seg fault on untied
             for (Int i = start; i < end; i++)
-                // for (Int i = 0; i < (Int)task_Q.size(); i++)
+            // for (Int i = 0; i < (Int)task_Q.size(); i++)
             {
                 Int t = task_Q[i];
                 // printf("poping %ld \n", f);
                 Int d = task_depth[t];
-                #pragma omp task mergeable priority(d)
+#pragma omp task mergeable priority(d)
                 {
-                    #pragma omp atomic update
-                    Num->naft++;
+#pragma omp atomic update
+                    Work->naft++;
 
                     ParU_Ret myInfo =
                         // paru_exec_tasks(t, &task_num_child[0], Num);
-                        paru_exec_tasks(t, task_num_child, chain_task, 
-                                &Work, Num);
+                        paru_exec_tasks(t, task_num_child, chain_task, Work,
+                                        Num);
                     if (myInfo != PARU_SUCCESS)
                     {
-                        #pragma omp atomic write
+#pragma omp atomic write
                         info = myInfo;
                     }
-                    #pragma omp atomic update
-                    Num->naft--;
+#pragma omp atomic update
+                    Work->naft--;
 
-                    #pragma omp atomic update
-                    Num->resq--;
+#pragma omp atomic update
+                    Work->resq--;
                 }
             }
             start += steps;
@@ -384,9 +378,9 @@ ParU_Ret ParU_Factorize(cholmod_sparse *A, ParU_Symbolic *Sym,
         // chain break
         if (chain_task != -1 && info == PARU_SUCCESS)
         {
-            Num->naft = 1;
+            Work->naft = 1;
             PRLEVEL(1, ("Chain_taskd %ld has remained\n", chain_task));
-            info = paru_exec_tasks_seq(chain_task, task_num_child, &Work, Num);
+            info = paru_exec_tasks_seq(chain_task, task_num_child, Work, Num);
         }
         if (info != PARU_SUCCESS)
         {
@@ -404,12 +398,12 @@ ParU_Ret ParU_Factorize(cholmod_sparse *A, ParU_Symbolic *Sym,
     else
     {
         printf("Sequential\n");
-        Num->naft = 1;
+        Work->naft = 1;
         for (Int i = 0; i < nf; i++)
         {
             // if (i %1000 == 0) PRLEVEL(1, ("%% Wroking on front %ld\n", i));
 
-            info = paru_front(i, &Work, Num);
+            info = paru_front(i, Work, Num);
             if (info != PARU_SUCCESS)
             {
                 PRLEVEL(1, ("%% A problem happend in %ld\n", i));
@@ -419,7 +413,7 @@ ParU_Ret ParU_Factorize(cholmod_sparse *A, ParU_Symbolic *Sym,
     }
 
     info = paru_perm(Sym, Num);  // to form the final permutation
-    paru_free_work(Sym, &Work);   // free the work DS 
+    paru_free_work(Sym, Work);  // free the work DS
 
     if (info == PARU_OUT_OF_MEMORY)
     {

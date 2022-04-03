@@ -403,7 +403,7 @@ Int paru_factorize_full_summed(Int f, Int start_fac,
                              Work, Num);
         // Int naft; //number of active frontal tasks
         // pragma omp atomic read
-        // naft = Num->naft;
+        // naft = Work->naft;
         // pragma omp parallel  proc_bind(close) if(naft == 1)
         // pragma omp single
         {

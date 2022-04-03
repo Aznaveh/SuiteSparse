@@ -48,7 +48,7 @@ void paru_assemble_all(Int e, Int f, std::vector<Int> &colHash,
     // Int *rowRelIndex = relRowInd (el);
     Int *rowRelIndex = (Int *)(el + 1) + 2 * nEl + mEl;
 
-    if (el->cValid != Num->time_stamp[f])
+    if (el->cValid != Work->time_stamp[f])
         paru_update_rel_ind_col(e, f, colHash, Work, Num);
 
     // Int *colRelIndex = relColInd (ParU_Element *el);
@@ -127,7 +127,7 @@ void paru_assemble_all(Int e, Int f, std::vector<Int> &colHash,
 
         Int naft;  // number of active frontal tasks
         #pragma omp atomic read
-        naft = Num->naft;
+        naft = Work->naft;
         ParU_Control *Control = Num->Control;
         const Int max_threads = Control->paru_max_threads;
 
@@ -610,7 +610,7 @@ void paru_assemble_rows(Int e, Int f, std::vector<Int> &colHash,
     if (PR <= 0) paru_print_element(e, Work, Num);
 #endif
 
-    if (el->cValid != Num->time_stamp[f])
+    if (el->cValid != Work->time_stamp[f])
         paru_update_rel_ind_col(e, f, colHash, Work, Num);
 
     Int ncolsSeen = nEl;
@@ -724,7 +724,7 @@ void paru_assemble_el_with0rows(Int e, Int f, std::vector<Int> &colHash,
     // Int *rowRelIndex = relRowInd (el);
     Int *rowRelIndex = (Int *)(el + 1) + 2 * nEl + mEl;
 
-    if (el->cValid != Num->time_stamp[f])
+    if (el->cValid != Work->time_stamp[f])
         paru_update_rel_ind_col(e, f, colHash, Work, Num);
 
     // Int *colRelIndex = relColInd (ParU_Element *el);

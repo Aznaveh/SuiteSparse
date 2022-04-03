@@ -48,5 +48,5 @@ void paru_update_rel_ind_col(Int e, Int f, std::vector<Int> &colHash,
     PRLEVEL(1, ("%%update relative in %ld finished\n", f));
 
     // update the cVal of el
-    el->cValid = Num->time_stamp[f];
+    el->cValid = Work->time_stamp[f];
 }
