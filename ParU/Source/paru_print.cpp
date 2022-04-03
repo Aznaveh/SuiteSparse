@@ -6,7 +6,7 @@
  * @author Aznaveh
  */
 #include "paru_internal.hpp"
-void paru_print_element(ParU_Numeric *Num, Int e)
+void paru_print_element(Int e, paru_work *Work, ParU_Numeric *Num)
 {
     // print out contribution blocks
     ParU_Element **elementList;

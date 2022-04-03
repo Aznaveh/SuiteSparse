@@ -30,7 +30,7 @@
  */
 #include "paru_internal.hpp"
 
-void paru_full_summed(Int e, Int f, ParU_Numeric *Num)
+void paru_full_summed(Int e, Int f, paru_work *Work, ParU_Numeric *Num)
 {
     DEBUGLEVEL(0);
     PARU_DEFINE_PRLEVEL;
@@ -72,7 +72,7 @@ void paru_full_summed(Int e, Int f, ParU_Numeric *Num)
 #ifndef NDEBUG  // print the element which is going to be assembled from
     PR = 2;
     PRLEVEL(PR, ("%% ASSEMBL element= %ld  mEl =%ld ", e, mEl));
-    if (PR <= 0) paru_print_element(Num, e);
+    if (PR <= 0) paru_print_element(e, Work, Num);
 #endif
 
     Int j = el->lac;  // keep record of latest lac
@@ -196,7 +196,7 @@ void paru_full_summed(Int e, Int f, ParU_Numeric *Num)
 #ifndef NDEBUG  // print the element which has been assembled from
     PR = 1;
     PRLEVEL(PR, ("%% ASSEMBLED element= %ld  mEl =%ld ", e, mEl));
-    if (PR <= 0) paru_print_element(Num, e);
+    if (PR <= 0) paru_print_element(e, Work, Num);
 
     // Printing the pivotal front
     PR = 2;

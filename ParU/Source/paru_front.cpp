@@ -435,7 +435,7 @@ ParU_Ret paru_front(Int f,  // front need to be assembled
 
     /**** 6 ****                     TRSM and DGEMM                         ***/
 
-    paru_trsm(f, pivotalFront, uPart, fp, rowCount, colCount, Num);
+    paru_trsm(f, pivotalFront, uPart, fp, rowCount, colCount, Work, Num);
 
 #ifndef NDEBUG  // Printing the  U part
     PR = -1;
@@ -529,9 +529,8 @@ ParU_Ret paru_front(Int f,  // front need to be assembled
     double *el_numbers =
         (double *)((Int *)(curEl + 1) + 2 * colCount + 2 * (rowCount - fp));
 
-    paru_dgemm(f, pivotalFront, uPart, el_numbers, fp, rowCount, colCount, Num);
-    // printf ("%ld %ld %ld ",rowCount-fp, colCount, fp);
-    // printf ("%ld %ld %ld \n",rowCount, fp, rowCount-fp);
+    paru_dgemm(f, pivotalFront, uPart, el_numbers, fp, rowCount, 
+            colCount, Work, Num);
 
 #ifdef COUNT_FLOPS
 #if 0
@@ -554,7 +553,7 @@ ParU_Ret paru_front(Int f,  // front need to be assembled
     // Printing the contribution block after dgemm
     PR = 1;
     PRLEVEL(PR, ("\n%%After DGEMM:"));
-    if (PR <= 0) paru_print_element(Num, eli);
+    if (PR <= 0) paru_print_element(eli, Work, Num);
 #endif
 
     /**** 7 **** Count number of rows and columsn of prior CBs to asslemble ***/
@@ -563,7 +562,8 @@ ParU_Ret paru_front(Int f,  // front need to be assembled
     PRLEVEL(-1, ("\n%%||||  Start Finalize %ld ||||\n", f));
     ParU_Ret res_prior;
     res_prior =
-        paru_prior_assemble(f, start_fac, pivotal_elements, colHash, hi, Num);
+        paru_prior_assemble(f, start_fac, pivotal_elements, 
+                colHash, hi, Work, Num);
     if (res_prior != PARU_SUCCESS) return res_prior;
     PRLEVEL(-1, ("\n%%||||  Finish Finalize %ld ||||\n", f));
 

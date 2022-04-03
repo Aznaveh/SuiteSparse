@@ -33,8 +33,8 @@ void swap_rows(double *F, Int *frowList, Int m, Int n, Int r1, Int r2,
         std::swap(F[j * m + r1], F[j * m + r2]);
 }
 
-Int paru_panel_factorize(Int f, Int m, Int n, const Int panel_width,
-                         Int panel_num, Int row_end, ParU_Numeric *Num)
+Int paru_panel_factorize(Int f, Int m, Int n, const Int panel_width, 
+        Int panel_num, Int row_end, paru_work *Work, ParU_Numeric *Num)
 {
     // works like dgetf2f.f in netlib v3.0  here is a link:
     // https://github.com/xianyi/OpenBLAS/blob/develop/reference/dgetf2f.f
@@ -400,7 +400,7 @@ Int paru_factorize_full_summed(Int f, Int start_fac,
         Int j2 = (panel_num + 1) * panel_width;
         // factorize current panel
         paru_panel_factorize(f, rowCount, fp, panel_width, panel_num, row_end,
-                             Num);
+                             Work, Num);
         // Int naft; //number of active frontal tasks
         // pragma omp atomic read
         // naft = Num->naft;
@@ -415,7 +415,7 @@ Int paru_factorize_full_summed(Int f, Int start_fac,
             if (Num->Sym->Cm[f] != 0)
             {  // if there is potential column left
                 paru_update_rowDeg(panel_num, row_end, f, start_fac, stl_colSet,
-                                   pivotal_elements, Num);
+                                   pivotal_elements, Work, Num);
             }
 
             /*               trsm
@@ -469,7 +469,7 @@ Int paru_factorize_full_summed(Int f, Int start_fac,
                 }
 
 #endif
-                paru_tasked_trsm(f, M, N, alpha, A, lda, B, ldb, Num);
+                paru_tasked_trsm(f, M, N, alpha, A, lda, B, ldb, Work, Num);
 #ifndef NDEBUG
                 PRLEVEL(PR, ("%% Pivotal Front After Trsm: %ld x %ld\n %%", fp,
                              rowCount));
@@ -535,7 +535,7 @@ Int paru_factorize_full_summed(Int f, Int start_fac,
             PRLEVEL(PR, ("%% j2 =%ld j1=%ld\n", j2, j1));
             PRLEVEL(PR, ("\n %%"));
 #endif
-            paru_tasked_dgemm(f, M, N, K, A, lda, B, ldb, 1, C, ldc, Num);
+            paru_tasked_dgemm(f, M, N, K, A, lda, B, ldb, 1, C, ldc, Work, Num);
             // printf ("%d %d %d ",M ,N, K);
             // printf ("%d %d %d\n ",lda ,ldb, ldc);
 #ifdef COUNT_FLOPS

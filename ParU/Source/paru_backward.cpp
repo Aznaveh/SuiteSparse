@@ -14,12 +14,11 @@
 #include "paru_internal.hpp"
 
 ParU_Ret paru_backward(double *x1, double &resid, double &norm,
-                       cholmod_sparse *A, ParU_Numeric *Num,
+                       cholmod_sparse *A, ParU_Symbolic *Sym, ParU_Numeric *Num,
                        ParU_Control *Control)
 {
     DEBUGLEVEL(0);
     PRLEVEL(1, ("%% inside backward\n"));
-    ParU_Symbolic *Sym = Num->Sym;
     Int m = Sym->m;
 #ifndef NDEBUG
     Int PR = 1;

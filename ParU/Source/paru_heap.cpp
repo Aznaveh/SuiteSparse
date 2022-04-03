@@ -9,10 +9,10 @@
 #include "paru_internal.hpp"
 
 void paru_check_prior_element(Int e, Int f, Int start_fac,
-                              std::vector<Int> &colHash, ParU_Numeric *Num)
+                              std::vector<Int> &colHash, paru_work *Work,
+                              ParU_Numeric *Num)
 // check if e can be assembeld into f
 {
-    paru_work *Work = Num->Work;
     Int *elRow = Work->elRow;
 
     ParU_Element **elementList = Num->elementList;
@@ -20,7 +20,7 @@ void paru_check_prior_element(Int e, Int f, Int start_fac,
     ParU_Element *el = elementList[e];
     if (elRow[e] == 0 && el->rValid > start_fac)
     {  // all the rows are inside he current front; maybe assemble some cols
-        paru_assemble_cols(e, f, colHash, Num);
+        paru_assemble_cols(e, f, colHash, Work, Num);
         return;
     }
 
@@ -28,13 +28,14 @@ void paru_check_prior_element(Int e, Int f, Int start_fac,
     //            el->cValid == Num->time_stamp[f])
     if (el->rValid == start_fac || el->cValid == Num->time_stamp[f])
     {  // all the cols are inside he current front; maybe assemble some rows
-        paru_assemble_rows(e, f, colHash, Num);
+        paru_assemble_rows(e, f, colHash, Work, Num);
     }
 }
 
 ParU_Ret paru_make_heap(Int f, Int start_fac,
                         std::vector<Int> &pivotal_elements, heaps_info &hi,
-                        std::vector<Int> &colHash, ParU_Numeric *Num)
+                        std::vector<Int> &colHash, paru_work *Work,
+                        ParU_Numeric *Num)
 {
     DEBUGLEVEL(0);
     PARU_DEFINE_PRLEVEL;
@@ -91,7 +92,8 @@ ParU_Ret paru_make_heap(Int f, Int start_fac,
                     Int e = (*chHeap)[k];
                     if (elementList[e] != NULL)
                     {
-                        paru_check_prior_element(e, f, start_fac, colHash, Num);
+                        paru_check_prior_element(e, f, start_fac, colHash, Work,
+                                                 Num);
                         if (elementList[e] != NULL)
                         {
                             curHeap->push_back(e);
@@ -137,7 +139,8 @@ ParU_Ret paru_make_heap(Int f, Int start_fac,
                     Int e = (*chHeap)[k];
                     if (elementList[e] != NULL)
                     {
-                        paru_check_prior_element(e, f, start_fac, colHash, Num);
+                        paru_check_prior_element(e, f, start_fac, colHash, Work,
+                                                 Num);
                         if (elementList[e] != NULL) curHeap->push_back(e);
                     }
                 }
@@ -199,7 +202,7 @@ ParU_Ret paru_make_heap(Int f, Int start_fac,
 }
 
 ParU_Ret paru_make_heap_empty_el(Int f, std::vector<Int> &pivotal_elements,
-                                 heaps_info &hi, paru_work *Work, 
+                                 heaps_info &hi, paru_work *Work,
                                  ParU_Numeric *Num)
 {
     DEBUGLEVEL(0);
@@ -257,14 +260,9 @@ ParU_Ret paru_make_heap_empty_el(Int f, std::vector<Int> &pivotal_elements,
                     Int e = (*chHeap)[k];
                     if (elementList[e] != NULL)
                     {
-                        // paru_check_prior_element(e, f, start_fac, colHash,
-                        //                         Num);
-                        if (elementList[e] != NULL)
-                        {
-                            curHeap->push_back(e);
-                            std::push_heap(curHeap->begin(), curHeap->end(),
-                                           greater);
-                        }
+                        curHeap->push_back(e);
+                        std::push_heap(curHeap->begin(), curHeap->end(),
+                                       greater);
                     }
                 }
                 delete heapList[chelid];

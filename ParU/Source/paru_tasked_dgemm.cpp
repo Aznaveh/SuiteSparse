@@ -10,7 +10,8 @@
 
 void paru_tasked_dgemm(Int f, BLAS_INT M, BLAS_INT N, BLAS_INT K, double *A,
                        BLAS_INT lda, double *B, BLAS_INT ldb, double beta,
-                       double *C, BLAS_INT ldc, ParU_Numeric *Num)
+                       double *C, BLAS_INT ldc, paru_work *Work,
+                       ParU_Numeric *Num)
 {
     DEBUGLEVEL(0);
     // alpha is always -1  in my DGEMMs
@@ -18,7 +19,7 @@ void paru_tasked_dgemm(Int f, BLAS_INT M, BLAS_INT N, BLAS_INT K, double *A,
     ParU_Control *Control = Num->Control;
     Int trivial = Control->trivial;
     Int L = Control->worthwhile_dgemm;
-    #pragma omp atomic read
+#pragma omp atomic read
     naft = Num->naft;
     const Int max_threads = Control->paru_max_threads;
     if (naft == 1)
@@ -28,7 +29,7 @@ void paru_tasked_dgemm(Int f, BLAS_INT M, BLAS_INT N, BLAS_INT K, double *A,
 #ifndef NTIME
     double start_time = PARU_OPENMP_GET_WTIME;
 #endif
-    if (M < trivial && N < trivial && K <trivial)
+    if (M < trivial && N < trivial && K < trivial)
     // if(0)
     {
         PRLEVEL(1, ("%% SMALL DGEMM (%d,%d,%d) in %ld\n", M, N, K, f));
@@ -81,8 +82,8 @@ void paru_tasked_dgemm(Int f, BLAS_INT M, BLAS_INT N, BLAS_INT K, double *A,
 
         PRLEVEL(1, ("%% col-blocks=%ld,row-blocks=%ld [%ld]\n", num_col_blocks,
                     num_row_blocks, num_col_blocks * num_row_blocks));
-        #pragma omp parallel proc_bind(close)
-        #pragma omp single nowait
+#pragma omp parallel proc_bind(close)
+#pragma omp single nowait
         {
             for (Int I = 0; I < num_row_blocks; I++)
             {
@@ -95,7 +96,7 @@ void paru_tasked_dgemm(Int f, BLAS_INT M, BLAS_INT N, BLAS_INT K, double *A,
                         (J + 1) == num_col_blocks ? (N - J * len_col) : len_col;
                     PRLEVEL(1, ("%% I=%ld J=%ld m=%d n=%d in %ld\n", I, J, m, n,
                                 f));
-                    #pragma omp task
+#pragma omp task
                     cblas_dgemm(CblasColMajor, CblasNoTrans, CblasNoTrans, m, n,
                                 K, -1, A + (I * len_row), lda,
                                 B + (J * len_col * ldb), ldb, beta,
@@ -114,7 +115,7 @@ void paru_tasked_dgemm(Int f, BLAS_INT M, BLAS_INT N, BLAS_INT K, double *A,
 #endif
 
 #ifdef COUNT_FLOPS
-    #pragma omp atomic update
+#pragma omp atomic update
     Num->flp_cnt_dgemm += (double)2 * M * N * K;
 #endif
 }

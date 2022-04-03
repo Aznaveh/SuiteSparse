@@ -8,7 +8,7 @@
  */
 #include "paru_internal.hpp"
 void paru_tasked_trsm(Int f, int m, int n, double alpha, double *a, int lda,
-                      double *b, int ldb, ParU_Numeric *Num)
+                      double *b, int ldb, paru_work *Work, ParU_Numeric *Num)
 {
     DEBUGLEVEL(0);
     Int naft;

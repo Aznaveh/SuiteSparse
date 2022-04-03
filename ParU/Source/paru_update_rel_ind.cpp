@@ -9,7 +9,7 @@
 
 #include "paru_internal.hpp"
 void paru_update_rel_ind_col(Int e, Int f, std::vector<Int> &colHash,
-                             ParU_Numeric *Num)
+                               paru_work *Work, ParU_Numeric *Num)
 {
     // updating relative column index
     // it might be for curent element or for the Upart therefore we might even

@@ -14,7 +14,7 @@
 #include "paru_internal.hpp"
 
 Int paru_dgemm(Int f, double *pF, double *uPart, double *el, Int fp,
-               Int rowCount, Int colCount, ParU_Numeric *Num)
+               Int rowCount, Int colCount, paru_work *Work, ParU_Numeric *Num)
 {
     DEBUGLEVEL(0);
     PRLEVEL(1, ("%% rowCount =%ld  ", rowCount));
@@ -74,7 +74,8 @@ Int paru_dgemm(Int f, double *pF, double *uPart, double *el, Int fp,
 
     // double beta = 0;  // U part is not initialized
 
-    paru_tasked_dgemm(f, mA, nB, nA, pF + fp, lda, uPart, ldb, 0, el, ldc, Num);
+    paru_tasked_dgemm(f, mA, nB, nA, pF + fp, lda, uPart, ldb, 0, el, ldc, Work,
+                      Num);
 
 #ifndef NDEBUG
     Int PR = 1;

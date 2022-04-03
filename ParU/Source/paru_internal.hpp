@@ -175,32 +175,34 @@ Int paru_factorize_full_summed(Int f, Int start_fac,
 ParU_Element *paru_create_element(Int nrows, Int ncols, Int init);
 
 void paru_assemble_row_2U(Int e, Int f, Int sR, Int dR,
-                          std::vector<Int> &colHash, 
-                          paru_work *Work, ParU_Numeric *Num);
+                          std::vector<Int> &colHash, paru_work *Work,
+                          ParU_Numeric *Num);
 
 Int paru_trsm(Int f, double *pF, double *uPart, Int fp, Int rowCount,
-              Int colCount, ParU_Numeric *Num);
+              Int colCount, paru_work *Work, ParU_Numeric *Num);
 Int paru_dgemm(Int f, double *pF, double *uPart, double *el, Int fp,
-               Int rowCount, Int colCount, ParU_Numeric *Num);
+               Int rowCount, Int colCount, paru_work *Work, ParU_Numeric *Num);
 
-void paru_print_element(ParU_Numeric *Num, Int e);
+void paru_print_element(Int e, paru_work *Work, ParU_Numeric *Num);
 void paru_print_ParU_TupleList(ParU_TupleList *listSet, Int index);
 void paru_init_rel(Int f, paru_work *Work, ParU_Numeric *Num);
 
 void paru_update_rel_ind_col(Int e, Int f, std::vector<Int> &colHash,
-                             ParU_Numeric *Num);
+                             paru_work *Work, ParU_Numeric *Num);
 
 void paru_update_rowDeg(Int panel_num, Int row_end, Int f, Int start_fac,
                         std::set<Int> &stl_colSet,
-                        std::vector<Int> &pivotal_elements, ParU_Numeric *Num);
+                        std::vector<Int> &pivotal_elements, paru_work *Work,
+                        ParU_Numeric *Num);
 
 Int paru_cumsum(Int n, Int *X, ParU_Control *Control);
 
 Int bin_srch_col(Int *srt_lst, Int l, Int r, Int num);
 Int bin_srch(Int *srt_lst, Int l, Int r, Int num);
 
-ParU_Ret paru_init_rowFronts(paru_work *Work, ParU_Numeric **Num_handle, 
-        cholmod_sparse *A, ParU_Symbolic *Sym, ParU_Control *Control);
+ParU_Ret paru_init_rowFronts(paru_work *Work, ParU_Numeric **Num_handle,
+                             cholmod_sparse *A, ParU_Symbolic *Sym,
+                             ParU_Control *Control);
 ParU_Ret paru_front(Int f, paru_work *Work, ParU_Numeric *Num);
 
 ParU_Ret paru_pivotal(std::vector<Int> &pivotal_elements,
@@ -213,29 +215,30 @@ int paru_intersection(Int e, ParU_Element **elementList,
 ParU_Ret paru_prior_assemble(Int f, Int start_fac,
                              std::vector<Int> &pivotal_elements,
                              std::vector<Int> &colHash, heaps_info &hi,
-                             ParU_Numeric *Num);
+                             paru_work *Work, ParU_Numeric *Num);
 
-void paru_assemble_all(Int e, Int f, std::vector<Int> &colHash,
+void paru_assemble_all(Int e, Int f, std::vector<Int> &colHash, paru_work *Work,
                        ParU_Numeric *Num);
 
 void paru_assemble_cols(Int e, Int f, std::vector<Int> &colHash,
-                        ParU_Numeric *Num);
+                        paru_work *Work, ParU_Numeric *Num);
 
 void paru_assemble_rows(Int e, Int f, std::vector<Int> &colHash,
-                        ParU_Numeric *Num);
+                        paru_work *Work, ParU_Numeric *Num);
 
 void paru_assemble_el_with0rows(Int e, Int f, std::vector<Int> &colHash,
-                                ParU_Numeric *Num);
+                                paru_work *Work, ParU_Numeric *Num);
 
-void paru_full_summed(Int e, Int f, ParU_Numeric *Num);
+void paru_full_summed(Int e, Int f, paru_work *Work, ParU_Numeric *Num);
 
 // heap related
 ParU_Ret paru_make_heap(Int f, Int start_fac,
                         std::vector<Int> &pivotal_elements, heaps_info &hi,
-                        std::vector<Int> &colHash, ParU_Numeric *Num);
+                        std::vector<Int> &colHash, paru_work *Work,
+                        ParU_Numeric *Num);
 
 ParU_Ret paru_make_heap_empty_el(Int f, std::vector<Int> &pivotal_elements,
-                                 heaps_info &hi, paru_work *Work, 
+                                 heaps_info &hi, paru_work *Work,
                                  ParU_Numeric *Num);
 
 // hash related
@@ -243,7 +246,7 @@ void paru_insert_hash(Int key, Int value, std::vector<Int> &colHash);
 Int paru_find_hash(Int key, std::vector<Int> &colHash, Int *fcolList);
 
 // permutation stuff for the solver
-ParU_Ret paru_perm(ParU_Numeric *Num);
+ParU_Ret paru_perm(ParU_Symbolic *Sym, ParU_Numeric *Num);
 Int paru_apply_inv_perm(const Int *P, const double *b, double *x, Int m);
 Int paru_apply_inv_perm(const Int *P, const double *b, double *x, Int m, Int n);
 Int paru_apply_perm_scale(const Int *P, const double *s, const double *b,
@@ -253,12 +256,15 @@ Int paru_apply_perm_scale(const Int *P, const double *s, const double *b,
 Int paru_gaxpy(cholmod_sparse *A, const double *x, double *y, double alpha);
 double paru_spm_1norm(cholmod_sparse *A);
 double paru_vec_1norm(const double *x, Int n);
+
 void paru_Diag_update(Int pivcol, Int pivrow, ParU_Numeric *Num);
 void paru_tasked_dgemm(Int f, BLAS_INT m, BLAS_INT n, BLAS_INT k, double *A,
                        BLAS_INT lda, double *B, BLAS_INT ldb, double beta,
-                       double *C, BLAS_INT ldc, ParU_Numeric *Num);
+                       double *C, BLAS_INT ldc, paru_work *Work,
+                       ParU_Numeric *Num);
+
 void paru_tasked_trsm(Int f, int m, int n, double alpha, double *a, int lda,
-                      double *b, int ldb, ParU_Numeric *Num);
+                      double *b, int ldb, paru_work *Work, ParU_Numeric *Num);
 
 ParU_Ret paru_free_work(ParU_Symbolic *Sym, paru_work *Work);
 // lsolve and usolve
@@ -273,7 +279,7 @@ Int paru_usolve(double *X, Int n, ParU_Symbolic *Sym, ParU_Numeric *Num,
 
 // not user-callable: for testing only
 ParU_Ret paru_backward(double *x1, double &resid, double &norm,
-                       cholmod_sparse *A, ParU_Numeric *Num,
+                       cholmod_sparse *A, ParU_Symbolic *Sym, ParU_Numeric *Num,
                        ParU_Control *Control);
 
 void paru_write(ParU_Numeric *Num, int scale, char *id);

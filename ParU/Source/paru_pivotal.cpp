@@ -156,7 +156,7 @@ ParU_Ret paru_pivotal(std::vector<Int> &pivotal_elements,
         PRLEVEL(PR, ("lac = %ld ", el->lac));
         PRLEVEL(PR, ("lac_col = %ld\n ", lacList[e]));
         ASSERT(el_colIndex[el->lac] >= col1);
-        if (PR <= 0) paru_print_element(Num, e);
+        if (PR <= 0) paru_print_element(e, Work, Num);
 #endif
 
         Int mEl = el->nrows;
@@ -402,7 +402,7 @@ ParU_Ret paru_pivotal(std::vector<Int> &pivotal_elements,
     for (Int i = 0; i < (Int)pivotal_elements.size(); i++)
     {
         Int e = pivotal_elements[i];
-        paru_full_summed(e, f, Num);
+        paru_full_summed(e, f, Work, Num);
         if (elementList[e] != NULL)
         {  // keeping the element
             pivotal_elements[ii++] = pivotal_elements[i];

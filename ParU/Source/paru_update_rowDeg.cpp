@@ -10,7 +10,8 @@
 
 void paru_update_rowDeg(Int panel_num, Int row_end, Int f, Int start_fac,
                         std::set<Int> &stl_colSet,
-                        std::vector<Int> &pivotal_elements, ParU_Numeric *Num)
+                        std::vector<Int> &pivotal_elements, paru_work *Work,
+                        ParU_Numeric *Num)
 {
     DEBUGLEVEL(0);
     PARU_DEFINE_PRLEVEL;
@@ -23,7 +24,6 @@ void paru_update_rowDeg(Int panel_num, Int row_end, Int f, Int start_fac,
     ParU_Control *Control = Num->Control;
     Int panel_width = Control->panel_width;
     ParU_Element **elementList = Num->elementList;
-    paru_work *Work = Num->Work;
 
     Int *elRow = Work->elRow;
     Int *elCol = Work->elCol;
@@ -281,7 +281,7 @@ void paru_update_rowDeg(Int panel_num, Int row_end, Int f, Int start_fac,
 #ifndef NDEBUG
         PRLEVEL(PR, ("%% pivotal element= %ld lac=%ld colsleft=%ld \n", e,
                      el->lac, el->ncolsleft));
-        if (PR <= 0) paru_print_element(Num, e);
+        if (PR <= 0) paru_print_element(e, Work, Num);
 #endif
         Int intsct = paru_intersection(e, elementList, stl_newColSet);
         if (el->cValid < pMark)
@@ -355,7 +355,7 @@ void paru_update_rowDeg(Int panel_num, Int row_end, Int f, Int start_fac,
                 Int e = curTpl.e;
 
 #ifndef NDEBUG
-                if (PR <= 0) paru_print_element(Num, e);
+                if (PR <= 0) paru_print_element(e, Work, Num);
 #endif
                 Int curRowIndex = curTpl.f;
 
@@ -457,7 +457,7 @@ void paru_update_rowDeg(Int panel_num, Int row_end, Int f, Int start_fac,
             Int e = curTpl.e;
 
 #ifndef NDEBUG
-            if (PR <= 0) paru_print_element(Num, e);
+            if (PR <= 0) paru_print_element(e, Work, Num);
 #endif
             Int curRowIndex = curTpl.f;
 

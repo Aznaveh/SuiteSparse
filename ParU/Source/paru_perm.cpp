@@ -38,11 +38,10 @@
  * @author Aznaveh
  * */
 #include "paru_internal.hpp"
-ParU_Ret paru_perm(ParU_Numeric *Num)
+ParU_Ret paru_perm(ParU_Symbolic *Sym, ParU_Numeric *Num)
 {
     DEBUGLEVEL(0);
     PARU_DEFINE_PRLEVEL;
-    ParU_Symbolic *Sym = Num->Sym;
 
     if (Sym->Pfin != NULL)  // it must have been computed
         return PARU_SUCCESS;

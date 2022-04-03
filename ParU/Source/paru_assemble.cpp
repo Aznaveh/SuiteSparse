@@ -9,7 +9,7 @@
 #include "paru_internal.hpp"
 
 void paru_assemble_all(Int e, Int f, std::vector<Int> &colHash,
-                       ParU_Numeric *Num)
+        paru_work *Work, ParU_Numeric *Num)
 {
     DEBUGLEVEL(0);
     PARU_DEFINE_PRLEVEL;
@@ -27,10 +27,10 @@ void paru_assemble_all(Int e, Int f, std::vector<Int> &colHash,
 #ifndef NDEBUG
     PR = 0;
     PRLEVEL(PR, ("%% %ld :\n", e));
-    if (PR <= 0) paru_print_element(Num, e);
+    if (PR <= 0) paru_print_element(e, Work, Num);
 
     PRLEVEL(PR, ("%% %ld :\n", eli));
-    if (PR <= 0) paru_print_element(Num, eli);
+    if (PR <= 0) paru_print_element(eli Work, Num);
     PR = 1;
 #endif
 
@@ -49,7 +49,7 @@ void paru_assemble_all(Int e, Int f, std::vector<Int> &colHash,
     Int *rowRelIndex = (Int *)(el + 1) + 2 * nEl + mEl;
 
     if (el->cValid != Num->time_stamp[f])
-        paru_update_rel_ind_col(e, f, colHash, Num);
+        paru_update_rel_ind_col(e, f, colHash, Work, Num);
 
     // Int *colRelIndex = relColInd (ParU_Element *el);
     Int *colRelIndex = (Int *)(el + 1) + mEl + nEl;
@@ -64,7 +64,6 @@ void paru_assemble_all(Int e, Int f, std::vector<Int> &colHash,
     double *curEl_Num =
         (double *)((Int *)(curEl + 1) + 2 * curEl->nrows + 2 * curEl->ncols);
 
-    paru_work *Work = Num->Work;
     Int *isRowInFront = Work->rowSize;
 
 #ifndef NDEBUG
@@ -268,7 +267,7 @@ void paru_assemble_all(Int e, Int f, std::vector<Int> &colHash,
 #ifndef NDEBUG
     PR = 0;
     PRLEVEL(PR, ("%% after assembly %ld :\n", eli));
-    if (PR <= 0) paru_print_element(Num, eli);
+    if (PR <= 0) paru_print_element(eli, Work, Num);
     PR = 1;
 #endif
 
@@ -288,7 +287,7 @@ void paru_assemble_all(Int e, Int f, std::vector<Int> &colHash,
 // fit
 
 void paru_assemble_cols(Int e, Int f, std::vector<Int> &colHash,
-                        ParU_Numeric *Num)
+        paru_work *Work, ParU_Numeric *Num)
 
 {
     DEBUGLEVEL(0);
@@ -305,10 +304,10 @@ void paru_assemble_cols(Int e, Int f, std::vector<Int> &colHash,
     PR = 1;
 
     PRLEVEL(PR, ("%% %ld :\n", eli));
-    if (PR <= 0) paru_print_element(Num, eli);
+    if (PR <= 0) paru_print_element(eli, Work, Num);
 
     PRLEVEL(PR, ("%% %ld :\n", e));
-    if (PR <= 0) paru_print_element(Num, e);
+    if (PR <= 0) paru_print_element(e, Work, Num);
 #endif
 
     ParU_Element **elementList = Num->elementList;
@@ -335,7 +334,6 @@ void paru_assemble_cols(Int e, Int f, std::vector<Int> &colHash,
     double *curEl_Num =
         (double *)((Int *)(curEl + 1) + 2 * curEl->nrows + 2 * curEl->ncols);
 
-    paru_work *Work = Num->Work;
     Int *isRowInFront = Work->rowSize;
 
     Int *fcolList = Num->fcolList[f];
@@ -481,7 +479,7 @@ void paru_assemble_cols(Int e, Int f, std::vector<Int> &colHash,
 }
 
 void paru_assemble_rows(Int e, Int f, std::vector<Int> &colHash,
-                        ParU_Numeric *Num)
+        paru_work *Work, ParU_Numeric *Num)
 
 {
     DEBUGLEVEL(0);
@@ -523,7 +521,6 @@ void paru_assemble_rows(Int e, Int f, std::vector<Int> &colHash,
     double *curEl_Num =
         (double *)((Int *)(curEl + 1) + 2 * curEl->nrows + 2 * curEl->ncols);
 
-    paru_work *Work = Num->Work;
     Int *isRowInFront = Work->rowSize;
 
     std::vector<Int> tempRow;
@@ -607,14 +604,14 @@ void paru_assemble_rows(Int e, Int f, std::vector<Int> &colHash,
 #ifndef NDEBUG
     PR = 1;
     PRLEVEL(PR, ("%% Before eliminiatine some rows %ld :\n", eli));
-    if (PR <= 0) paru_print_element(Num, eli);
+    if (PR <= 0) paru_print_element(eli, Work, Num);
 
     PRLEVEL(PR, ("%% %ld :\n", e));
-    if (PR <= 0) paru_print_element(Num, e);
+    if (PR <= 0) paru_print_element(e, Work, Num);
 #endif
 
     if (el->cValid != Num->time_stamp[f])
-        paru_update_rel_ind_col(e, f, colHash, Num);
+        paru_update_rel_ind_col(e, f, colHash, Work, Num);
 
     Int ncolsSeen = nEl;
 
@@ -664,15 +661,15 @@ void paru_assemble_rows(Int e, Int f, std::vector<Int> &colHash,
 #ifndef NDEBUG
     PR = 1;
     PRLEVEL(PR, ("%% After Eliminate some rows %ld :\n", eli));
-    if (PR <= 0) paru_print_element(Num, eli);
+    if (PR <= 0) paru_print_element(eli, Work, Num);
 
     PRLEVEL(PR, ("%% %ld :\n", e));
-    if (PR <= 0) paru_print_element(Num, e);
+    if (PR <= 0) paru_print_element(e, Work, Num);
 #endif
 }
 
 void paru_assemble_el_with0rows(Int e, Int f, std::vector<Int> &colHash,
-                                ParU_Numeric *Num)
+        paru_work *Work, ParU_Numeric *Num)
 
 {
     // This element contributes to both pivotal rows and pivotal columns
@@ -704,10 +701,10 @@ void paru_assemble_el_with0rows(Int e, Int f, std::vector<Int> &colHash,
 #ifndef NDEBUG
     PR = 1;
     PRLEVEL(PR, ("%% %ld :\n", eli));
-    if (PR <= 0) paru_print_element(Num, eli);
+    if (PR <= 0) paru_print_element(eli, Work, Num);
 
     PRLEVEL(PR, ("%% %ld :\n", e));
-    if (PR <= 0) paru_print_element(Num, e);
+    if (PR <= 0) paru_print_element(e, Work, Num);
 
 #endif
 
@@ -728,7 +725,7 @@ void paru_assemble_el_with0rows(Int e, Int f, std::vector<Int> &colHash,
     Int *rowRelIndex = (Int *)(el + 1) + 2 * nEl + mEl;
 
     if (el->cValid != Num->time_stamp[f])
-        paru_update_rel_ind_col(e, f, colHash, Num);
+        paru_update_rel_ind_col(e, f, colHash, Work, Num);
 
     // Int *colRelIndex = relColInd (ParU_Element *el);
     Int *colRelIndex = (Int *)(el + 1) + mEl + nEl;
@@ -743,7 +740,6 @@ void paru_assemble_el_with0rows(Int e, Int f, std::vector<Int> &colHash,
     double *curEl_Num =
         (double *)((Int *)(curEl + 1) + 2 * curEl->nrows + 2 * curEl->ncols);
 
-    paru_work *Work = Num->Work;
     Int *isRowInFront = Work->rowSize;
 
 #ifndef NDEBUG
@@ -927,10 +923,10 @@ void paru_assemble_el_with0rows(Int e, Int f, std::vector<Int> &colHash,
     if (nEl != new_lac && el_colIndex[new_lac] < col2) PR = -2;
 
     PRLEVEL(PR, ("%% %ld :\n", eli));
-    if (PR <= 0) paru_print_element(Num, eli);
+    if (PR <= 0) paru_print_element(eli, Work, Num);
 
     PRLEVEL(PR, ("%% %ld :\n", e));
-    if (PR <= 0) paru_print_element(Num, e);
+    if (PR <= 0) paru_print_element(e, Work, Num);
     PR = 1;
     ASSERT(nEl == new_lac || col2 <= el_colIndex[new_lac]);
 

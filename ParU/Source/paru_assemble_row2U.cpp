@@ -22,7 +22,7 @@ void paru_assemble_row_2U(Int e, Int f, Int sR, Int dR,
 
     if (el->cValid != Num->time_stamp[f])
         // if not updatated
-        paru_update_rel_ind_col(e, f, colHash, Num);
+        paru_update_rel_ind_col(e, f, colHash, Work, Num);
 
     ParU_Factors *Us = Num->partial_Us;
     double *uPart = Us[f].p;  // uPart
