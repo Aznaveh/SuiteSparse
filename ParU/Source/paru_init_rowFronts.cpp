@@ -63,7 +63,6 @@ ParU_Ret paru_init_rowFronts(
     Int *elCol = Work->elCol = NULL;
     Int *rowSize = Work->rowSize = NULL;
     Int *row_degree_bound = Num->row_degree_bound = NULL;
-    ParU_TupleList *RowList = Num->RowList = NULL;
     Num->lacList = NULL;
     Num->frowCount = NULL;
     Num->fcolCount = NULL;
@@ -82,6 +81,7 @@ ParU_Ret paru_init_rowFronts(
     Num->Rs = NULL;
 
     Work->time_stamp = NULL;
+    paru_tupleList *RowList = Work->RowList = NULL;
     if (nf != 0)
     {
         // Memory allocations for Num
@@ -91,8 +91,8 @@ ParU_Ret paru_init_rowFronts(
         rowSize = Work->rowSize = (Int *)paru_alloc(m, sizeof(Int));
         row_degree_bound = Num->row_degree_bound =
             (Int *)paru_alloc(m, sizeof(Int));
-        RowList = Num->RowList =
-            (ParU_TupleList *)paru_alloc(1, m * sizeof(ParU_TupleList));
+        RowList = Work->RowList =
+            (paru_tupleList *)paru_alloc(1, m * sizeof(paru_tupleList));
         Num->lacList = (Int *)paru_alloc(m + nf, sizeof(Int));
         Num->frowCount = (Int *)paru_alloc(1, nf * sizeof(Int));
         Num->fcolCount = (Int *)paru_alloc(1, nf * sizeof(Int));
@@ -471,7 +471,7 @@ ParU_Ret paru_init_rowFronts(
 
         // Allocating Rowlist and updating its tuples
         RowList[row].list =
-            (ParU_Tuple *)paru_alloc(slackRow * nrows, sizeof(ParU_Tuple));
+            (paru_tuple *)paru_alloc(slackRow * nrows, sizeof(paru_tuple));
         if (RowList[row].list == NULL)
         {  // out of memory
             printf("Paru: out of memory, RowList[row].list \n");
@@ -481,7 +481,7 @@ ParU_Ret paru_init_rowFronts(
         RowList[row].numTuple = 0;
         RowList[row].len = slackRow;
 
-        ParU_Tuple rowTuple;
+        paru_tuple rowTuple;
         rowTuple.e = e;
         rowTuple.f = 0;
         if (paru_add_rowTuple(RowList, row, rowTuple))

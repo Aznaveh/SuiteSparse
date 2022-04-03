@@ -360,7 +360,7 @@ ParU_Ret paru_front(Int f,  // front need to be assembled
     ASSERT(Us[f].p == NULL);
     Us[f].p = uPart;
 
-    ParU_TupleList *RowList = Num->RowList;
+    paru_tupleList *RowList = Work->RowList;
 
     // Int *Depth = Sym->Depth;
     //**//pragma omp parallel
@@ -371,15 +371,15 @@ ParU_Ret paru_front(Int f,  // front need to be assembled
         Int curFsRowIndex = i;  // current fully summed row index
         Int curFsRow = frowList[curFsRowIndex];
         PRLEVEL(1, ("%% curFsRow =%ld\n", curFsRow));
-        ParU_TupleList *curRowTupleList = &RowList[curFsRow];
+        paru_tupleList *curRowTupleList = &RowList[curFsRow];
         Int numTuple = curRowTupleList->numTuple;
         ASSERT(numTuple >= 0);
         ASSERT(numTuple <= m);
-        ParU_Tuple *listRowTuples = curRowTupleList->list;
+        paru_tuple *listRowTuples = curRowTupleList->list;
         PRLEVEL(1, ("%% numTuple = %ld\n", numTuple));
         for (Int k = 0; k < numTuple; k++)
         {
-            ParU_Tuple curTpl = listRowTuples[k];
+            paru_tuple curTpl = listRowTuples[k];
             Int e = curTpl.e;
             ParU_Element *el = elementList[e];
             if (el == NULL) continue;
@@ -571,7 +571,7 @@ ParU_Ret paru_front(Int f,  // front need to be assembled
     for (Int i = fp; i < rowCount; ++i)
     {
         Int locIndx = i - fp;
-        ParU_Tuple rowTuple;
+        paru_tuple rowTuple;
         rowTuple.e = eli;
         rowTuple.f = locIndx;
         if (paru_add_rowTuple(RowList, frowList[i], rowTuple))

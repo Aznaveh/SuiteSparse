@@ -64,7 +64,7 @@ void paru_print_element(Int e, paru_work *Work, ParU_Numeric *Num)
     }
 }
 
-void paru_print_ParU_TupleList(ParU_TupleList *listSet, Int index)
+void paru_print_paru_tupleList(paru_tupleList *listSet, Int index)
 {
     DEBUGLEVEL(0);
     PRLEVEL(1, ("%% listSet =%p\n", listSet));
@@ -75,14 +75,14 @@ void paru_print_ParU_TupleList(ParU_TupleList *listSet, Int index)
         return;
     }
 
-    ParU_TupleList cur = listSet[index];
+    paru_tupleList cur = listSet[index];
     Int numTuple = cur.numTuple;
-    ParU_Tuple *l = cur.list;
+    paru_tuple *l = cur.list;
 
     printf("%% There are %ld tuples in this list:\n %%", numTuple);
     for (Int i = 0; i < numTuple; i++)
     {
-        ParU_Tuple curTpl = l[i];
+        paru_tuple curTpl = l[i];
         printf(" (%ld,%ld)", curTpl.e, curTpl.f);
     }
     printf("\n");

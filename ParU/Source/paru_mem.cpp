@@ -308,23 +308,35 @@ ParU_Ret paru_free_work(ParU_Symbolic *Sym, paru_work *Work)
     paru_free(m + nf, sizeof(Int), Work->elCol);
 
     paru_free(1, nf * sizeof(Int), Work->time_stamp);
+
+    paru_tupleList *RowList = Work->RowList;
+    PRLEVEL(1, ("%% RowList =%p\n", RowList));
+
+    for (Int row = 0; row < m; row++)
+    {
+        Int len = RowList[row].len;
+        paru_free(len, sizeof(paru_tuple), RowList[row].list);
+    }
+    paru_free(1, m * sizeof(paru_tupleList), RowList);
+
+
     return PARU_SUCCESS;
 }
 // It uses Sym, Do not free Sym before
 ParU_Ret ParU_Freenum(ParU_Symbolic *Sym, ParU_Numeric **Num_handle,
-                      ParU_Control *Control)
+        ParU_Control *Control)
 {
     DEBUGLEVEL(0);
     if (Num_handle == NULL || *Num_handle == NULL || Sym == NULL)
     {
         if (Sym == NULL)
             printf(
-                "Paru: Symbolic data structure has been freed before! Wrong "
-                "usage\n");
+                    "Paru: Symbolic data structure has been freed before! Wrong "
+                    "usage\n");
         else
             printf(
-                "Paru: Numeric data structure been freed before! Wrong "
-                "usage\n");
+                    "Paru: Numeric data structure been freed before! Wrong "
+                    "usage\n");
         return PARU_INVALID;
     }
 
@@ -334,8 +346,6 @@ ParU_Ret ParU_Freenum(ParU_Symbolic *Sym, ParU_Numeric **Num_handle,
     Int m = Num->m;  // m and n is different than Sym
     Int n = Num->n;  // Here there are submatrix size
 
-    ParU_TupleList *RowList = Num->RowList;
-    PRLEVEL(1, ("%% RowList =%p\n", RowList));
     Int nf = Sym->nf;
 
     // freeing the numerical input
@@ -353,13 +363,6 @@ ParU_Ret ParU_Freenum(ParU_Symbolic *Sym, ParU_Numeric **Num_handle,
         paru_free(nnz, sizeof(double), Num->Slx);
     }
     paru_free(Sym->m, sizeof(Int), Num->Rs);
-    for (Int row = 0; row < m; row++)
-    {
-        Int len = RowList[row].len;
-        paru_free(len, sizeof(ParU_Tuple), RowList[row].list);
-    }
-    paru_free(1, m * sizeof(ParU_TupleList), RowList);
-
     ParU_Element **elementList;
     elementList = Num->elementList;
 

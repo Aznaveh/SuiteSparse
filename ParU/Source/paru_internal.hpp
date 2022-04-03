@@ -100,6 +100,26 @@ struct heaps_info
     Int sum_size, biggest_Child_size, biggest_Child_id;
 };
 
+// =============================================================================
+//      ParU_Tuple, Row data structure
+// =============================================================================
+// move to paru_internal.h
+struct paru_tuple
+{
+    // The (e,f) tuples for element lists
+    Int e,  //  element number
+        f;  //   offest
+};
+
+
+struct paru_tupleList
+{                      // List of tuples
+    Int numTuple,      //  number of Tuples in this element
+        len;           //  length of allocated space for current list
+    paru_tuple *list;  // list of tuples regarding to this element
+};
+
+
 struct paru_work
 {
     // gather scatter space for rows
@@ -124,6 +144,7 @@ struct paru_work
     double flp_cnt_real_dgemm;
     #endif
 
+    paru_tupleList *RowList;  // size n of dynamic list
     Int *time_stamp;  // for relative index update; not initialized
 
 
@@ -193,7 +214,7 @@ void paru_memcpy(void *destination, const void *source, size_t num,
                  ParU_Control *Control);
 
 /* add tuple functions defintions */
-Int paru_add_rowTuple(ParU_TupleList *RowList, Int row, ParU_Tuple T);
+Int paru_add_rowTuple(paru_tupleList *RowList, Int row, paru_tuple T);
 
 Int paru_dgetrf(double *F, Int *frowList, Int m, Int n, BLAS_INT *ipiv);
 
@@ -215,7 +236,7 @@ Int paru_dgemm(Int f, double *pF, double *uPart, double *el, Int fp,
                Int rowCount, Int colCount, paru_work *Work, ParU_Numeric *Num);
 
 void paru_print_element(Int e, paru_work *Work, ParU_Numeric *Num);
-void paru_print_ParU_TupleList(ParU_TupleList *listSet, Int index);
+void paru_print_paru_tupleList(paru_tupleList *listSet, Int index);
 void paru_init_rel(Int f, paru_work *Work, ParU_Numeric *Num);
 
 void paru_update_rel_ind_col(Int e, Int f, std::vector<Int> &colHash,

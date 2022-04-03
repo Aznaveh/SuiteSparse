@@ -414,6 +414,7 @@ ParU_Ret ParU_Factorize(cholmod_sparse *A, ParU_Symbolic *Sym,
 
     info = paru_perm(Sym, Num);  // to form the final permutation
     paru_free_work(Sym, Work);  // free the work DS
+    Num->Control = NULL;
 
     if (info == PARU_OUT_OF_MEMORY)
     {

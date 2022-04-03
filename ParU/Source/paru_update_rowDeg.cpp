@@ -84,7 +84,7 @@ void paru_update_rowDeg(Int panel_num, Int row_end, Int f, Int start_fac,
     Int *frowList = Num->frowList[f];
     std::set<Int>::iterator it;
 
-    ParU_TupleList *RowList = Num->RowList;
+    paru_tupleList *RowList = Work->RowList;
     for (Int i = j1; i < j2; i++)
     {
         Int curFsRow = frowList[i];
@@ -93,16 +93,16 @@ void paru_update_rowDeg(Int panel_num, Int row_end, Int f, Int start_fac,
         PRLEVEL(1, ("%% 4: curFsRowIndex = %ld\n", curFsRowIndex));
         PRLEVEL(1, ("%% curFsRow =%ld\n", curFsRow));
 #endif
-        ParU_TupleList *curRowTupleList = &RowList[curFsRow];
+        paru_tupleList *curRowTupleList = &RowList[curFsRow];
         Int numTuple = curRowTupleList->numTuple;
         ASSERT(numTuple >= 0);
-        ParU_Tuple *listRowTuples = curRowTupleList->list;
+        paru_tuple *listRowTuples = curRowTupleList->list;
         PRLEVEL(1, ("%% 4: numTuple = %ld\n", numTuple));
 
         Int pdst = 0, psrc;
         for (psrc = 0; psrc < numTuple; psrc++)
         {
-            ParU_Tuple curTpl = listRowTuples[psrc];
+            paru_tuple curTpl = listRowTuples[psrc];
 
             Int e = curTpl.e;
             Int curRowIndex = curTpl.f;
@@ -339,19 +339,19 @@ void paru_update_rowDeg(Int panel_num, Int row_end, Int f, Int start_fac,
         for (Int k = j2; k < rowCount; k++)
         {
             Int r = frowList[k];
-            ParU_TupleList *curRowTupleList = &RowList[r];
+            paru_tupleList *curRowTupleList = &RowList[r];
             Int numTuple = curRowTupleList->numTuple;
             ASSERT(numTuple >= 0);
-            ParU_Tuple *listRowTuples = curRowTupleList->list;
+            paru_tuple *listRowTuples = curRowTupleList->list;
 #ifndef NDEBUG
             Int PR = 1;
             PRLEVEL(PR, ("\n %%----r =%ld  numTuple = %ld\n", r, numTuple));
-            if (PR <= 0) paru_print_ParU_TupleList(RowList, r);
+            if (PR <= 0) paru_print_paru_tupleList(RowList, r);
 #endif
             Int pdst = 0, psrc;
             for (psrc = 0; psrc < numTuple; psrc++)
             {
-                ParU_Tuple curTpl = listRowTuples[psrc];
+                paru_tuple curTpl = listRowTuples[psrc];
                 Int e = curTpl.e;
 
 #ifndef NDEBUG
@@ -439,21 +439,21 @@ void paru_update_rowDeg(Int panel_num, Int row_end, Int f, Int start_fac,
 
         new_row_degree_bound_for_r = colCount;
 
-        ParU_TupleList *curRowTupleList = &RowList[r];
+        paru_tupleList *curRowTupleList = &RowList[r];
         Int numTuple = curRowTupleList->numTuple;
         ASSERT(numTuple >= 0);
-        ParU_Tuple *listRowTuples = curRowTupleList->list;
+        paru_tuple *listRowTuples = curRowTupleList->list;
 #ifndef NDEBUG
         Int PR = 1;
         PRLEVEL(PR,
                 ("\n %%--------> 2nd r =%ld  numTuple = %ld\n", r, numTuple));
-        if (PR <= 0) paru_print_ParU_TupleList(RowList, r);
+        if (PR <= 0) paru_print_paru_tupleList(RowList, r);
 #endif
 
         Int pdst = 0, psrc;
         for (psrc = 0; psrc < numTuple; psrc++)
         {
-            ParU_Tuple curTpl = listRowTuples[psrc];
+            paru_tuple curTpl = listRowTuples[psrc];
             Int e = curTpl.e;
 
 #ifndef NDEBUG

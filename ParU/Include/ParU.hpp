@@ -243,17 +243,6 @@ struct ParU_Symbolic
 };
 
 // =============================================================================
-//      ParU_Tuple, Row data structure
-// =============================================================================
-// move to paru_internal.h
-struct ParU_Tuple
-{
-    // The (e,f) tuples for element lists
-    Int e,  //  element number
-        f;  //   offest
-};
-
-// =============================================================================
 // An element, contribution block
 // =============================================================================
 
@@ -285,14 +274,6 @@ struct ParU_Element
     //   relRowInd [0..nrows-1],    relative indices of this element for
     //   current front
     //   double ncols*nrows; numeric values
-};
-
-// move to paru_internal.h
-struct ParU_TupleList
-{                      // List of tuples
-    Int numTuple,      //  number of Tuples in this element
-        len;           //  length of allocated space for current list
-    ParU_Tuple *list;  // list of tuples regarding to this element
 };
 
 
@@ -350,7 +331,6 @@ struct ParU_Numeric
     // TODO: remove this:
     ParU_Symbolic *Sym;
 
-    ParU_TupleList *RowList;  // size n of dynamic list
     ParU_Control *Control;    // a copy of controls for internal use
                               // it is freed after factorize
 
