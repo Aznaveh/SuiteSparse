@@ -45,7 +45,7 @@ ParU_Ret paru_make_heap(Int f, Int start_fac,
     paru_element **elementList = Work->elementList;
     // Int m = Num-> m;
 
-    std::vector<Int> **heapList = Num->heapList;
+    std::vector<Int> **heapList = Work->heapList;
 
     Int eli = snM[f];
 
@@ -213,7 +213,7 @@ ParU_Ret paru_make_heap_empty_el(Int f, std::vector<Int> &pivotal_elements,
     paru_element **elementList = Work->elementList;
     // Int m = Num-> m;
 
-    std::vector<Int> **heapList = Num->heapList;
+    std::vector<Int> **heapList = Work->heapList;
 
     Int eli = snM[f];
 

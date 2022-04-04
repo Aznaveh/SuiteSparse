@@ -20,7 +20,7 @@ ParU_Ret paru_pivotal(std::vector<Int> &pivotal_elements,
     PARU_DEFINE_PRLEVEL;
     ParU_Symbolic *Sym =  Work->Sym;
     Int *snM = Sym->super2atree;
-    std::vector<Int> **heapList = Num->heapList;
+    std::vector<Int> **heapList = Work->heapList;
     Int eli = snM[f];
 
     Int *Super = Sym->Super;

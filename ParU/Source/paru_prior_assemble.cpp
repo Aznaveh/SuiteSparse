@@ -124,7 +124,7 @@ ParU_Ret paru_prior_assemble(Int f, Int start_fac,
     PRLEVEL(1, ("%% Done: work on the heap \n"));
 
     Int eli = snM[f];
-    std::vector<Int> **heapList = Num->heapList;
+    std::vector<Int> **heapList = Work->heapList;
     std::vector<Int> *curHeap = heapList[eli];
 
     if (curHeap->empty()) return PARU_SUCCESS;

@@ -348,23 +348,45 @@ ParU_Ret paru_free_work(ParU_Symbolic *Sym, paru_work *Work)
     paru_free(1, (m + nf + 1) * sizeof(paru_element), elementList);
 
     paru_free(m + nf, sizeof(Int), Work->lacList);
+
+    // in practice each parent should deal with the memory for the children
+#ifndef NDEBUG
+    std::vector<Int> **heapList = Work->heapList;
+    // freeing memory of heaps.
+    if (heapList != NULL)
+    {
+        for (Int eli = 0; eli < m + nf + 1; eli++)
+        {
+            if (heapList[eli] != nullptr)
+            {
+                PRLEVEL(1,
+                        ("%% %ld has not been freed %p\n", eli, heapList[eli]));
+                delete heapList[eli];
+                heapList[eli] = nullptr;
+            }
+            ASSERT(heapList[eli] == nullptr);
+        }
+    }
+#endif
+    paru_free(1, (m + nf + 1) * sizeof(std::vector<Int> **), Work->heapList);
+
     return PARU_SUCCESS;
 }
 // It uses Sym, Do not free Sym before
 ParU_Ret ParU_Freenum(ParU_Symbolic *Sym, ParU_Numeric **Num_handle,
-        ParU_Control *Control)
+                      ParU_Control *Control)
 {
     DEBUGLEVEL(0);
     if (Num_handle == NULL || *Num_handle == NULL || Sym == NULL)
     {
         if (Sym == NULL)
             printf(
-                    "Paru: Symbolic data structure has been freed before! Wrong "
-                    "usage\n");
+                "Paru: Symbolic data structure has been freed before! Wrong "
+                "usage\n");
         else
             printf(
-                    "Paru: Numeric data structure been freed before! Wrong "
-                    "usage\n");
+                "Paru: Numeric data structure been freed before! Wrong "
+                "usage\n");
         return PARU_INVALID;
     }
 
@@ -438,26 +460,6 @@ ParU_Ret ParU_Freenum(ParU_Symbolic *Sym, ParU_Numeric **Num_handle,
     PRLEVEL(1, ("%% FREE upperBoundSize =%ld \n", upperBoundSize));
 #endif
 
-    // in practice each parent should deal with the memory for the children
-#ifndef NDEBUG
-    std::vector<Int> **heapList = Num->heapList;
-    // freeing memory of heaps.
-    if (heapList != NULL)
-    {
-        for (Int eli = 0; eli < m + nf + 1; eli++)
-        {
-            if (heapList[eli] != nullptr)
-            {
-                PRLEVEL(1,
-                        ("%% %ld has not been freed %p\n", eli, heapList[eli]));
-                delete heapList[eli];
-                heapList[eli] = nullptr;
-            }
-            ASSERT(heapList[eli] == nullptr);
-        }
-    }
-#endif
-    paru_free(1, (m + nf + 1) * sizeof(std::vector<Int> **), Num->heapList);
     paru_free(m, sizeof(Int), Num->row_degree_bound);
     paru_free(1, sizeof(ParU_Numeric), Num);
     *Num_handle = NULL;

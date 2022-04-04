@@ -65,7 +65,6 @@ ParU_Ret paru_init_rowFronts(
     Num->fcolList = NULL;
     Num->partial_Us = NULL;
     Num->partial_LUs = NULL;
-    std::vector<Int> **heapList = Num->heapList = NULL;
     Num->Sx = NULL;
     Num->Sux = NULL;
     Num->Slx = NULL;
@@ -82,6 +81,7 @@ ParU_Ret paru_init_rowFronts(
     Int *inv_Diag_map = Work->inv_Diag_map = NULL;
     paru_element **elementList = Work->elementList = NULL;
     Work->lacList = NULL;
+    std::vector<Int> **heapList = Work->heapList = NULL;
 
     if (nf != 0)
     {
@@ -106,7 +106,7 @@ ParU_Ret paru_init_rowFronts(
 
         Work->time_stamp = (Int *)paru_alloc(1, nf * sizeof(Int));
 
-        heapList = Num->heapList = (std::vector<Int> **)paru_calloc(
+        heapList = Work->heapList = (std::vector<Int> **)paru_calloc(
             1, (m + nf + 1) * sizeof(std::vector<Int> *));
         elementList = Work->elementList =  // Initialize with NULL
             (paru_element **)paru_calloc(1,
@@ -446,7 +446,7 @@ ParU_Ret paru_init_rowFronts(
         std::vector<Int> *curHeap;
         try
         {
-            curHeap = Num->heapList[e] = new std::vector<Int>;
+            curHeap = Work->heapList[e] = new std::vector<Int>;
         }
         catch (std::bad_alloc const &)
         {  // out of memory

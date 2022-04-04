@@ -186,14 +186,19 @@ struct paru_work
     // inverse of Diag_map from Sym;
     // It helps editing the Diag_map
 
-    ParU_Symbolic *Sym; //point to the symbolic that user sends
+    ParU_Symbolic *Sym;  // point to the symbolic that user sends
 
     paru_element **elementList;  // pointers to all elements, size = m+nf+1
 
     Int *lacList;  // size m+nf least active column of each element
                    //    el_colIndex[el->lac]  == lacList [e]
                    //    number of element
-
+                   //
+    // each active front owns and manage a heap list. The heap is based on the
+    // least numbered column. The active front Takes the pointer of the biggest
+    // child and release its other children after concatenating their list to
+    // its own. The list of heaps are initialized by nullptr
+    std::vector<Int> **heapList;  // size m+nf+1, initialized with nullptr
 
     Int naft;  // number of actvie frontal tasks
     Int resq;  // number of remainig ready tasks in the queue

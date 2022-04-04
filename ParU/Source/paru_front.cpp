@@ -269,7 +269,7 @@ ParU_Ret paru_front(Int f,  // front need to be assembled
 
     Num->fcolList[f] = fcolList;
 
-    std::vector<Int> **heapList = Num->heapList;
+    std::vector<Int> **heapList = Work->heapList;
     std::vector<Int> *curHeap = heapList[eli];
 
     // EXIT point HERE
@@ -286,7 +286,7 @@ ParU_Ret paru_front(Int f,  // front need to be assembled
             Num->fcolCount[f] = 0;
             PRLEVEL(1, ("%%Heap freed inside front %p id=%ld\n", curHeap, eli));
             delete curHeap;
-            Num->heapList[eli] = nullptr;
+            Work->heapList[eli] = nullptr;
             PRLEVEL(1, ("%% pivotalFront =%p\n", pivotalFront));
             PRLEVEL(-2, ("%%~~~~~~~Assemble Front %ld finished~~~2\n", f));
             return PARU_SUCCESS;
@@ -495,7 +495,7 @@ ParU_Ret paru_front(Int f,  // front need to be assembled
         else
         {
             delete curHeap;
-            Num->heapList[eli] = nullptr;
+            Work->heapList[eli] = nullptr;
             PRLEVEL(1,
                     ("%%(2)Heap freed inside front %p id=%ld\n", curHeap, eli));
             PRLEVEL(1, ("%% pivotalFront =%p\n", pivotalFront));
