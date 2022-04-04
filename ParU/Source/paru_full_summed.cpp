@@ -187,7 +187,7 @@ void paru_full_summed(Int e, Int f, paru_work *Work, ParU_Numeric *Num)
     if (elementList[e] != NULL)
     {
         el->lac = j;
-        Int *lacList = Num->lacList;
+        Int *lacList = Work->lacList;
         lacList[e] = lac_el(elementList, e);
         PRLEVEL(1, ("%%e = %ld, el->lac= %ld ", e, el->lac));
         PRLEVEL(1, ("el_colIndex[%ld]=%ld :\n", el->lac, el_colIndex[el->lac]));

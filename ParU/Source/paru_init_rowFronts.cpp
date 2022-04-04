@@ -59,7 +59,6 @@ ParU_Ret paru_init_rowFronts(
     Num->Control = Control;
 
     Int *row_degree_bound = Num->row_degree_bound = NULL;
-    Num->lacList = NULL;
     Num->frowCount = NULL;
     Num->fcolCount = NULL;
     Num->frowList = NULL;
@@ -82,6 +81,7 @@ ParU_Ret paru_init_rowFronts(
     Int *Diag_map = Work->Diag_map = NULL;
     Int *inv_Diag_map = Work->inv_Diag_map = NULL;
     paru_element **elementList = Work->elementList = NULL;
+    Work->lacList = NULL;
 
     if (nf != 0)
     {
@@ -94,7 +94,7 @@ ParU_Ret paru_init_rowFronts(
             (Int *)paru_alloc(m, sizeof(Int));
         RowList = Work->RowList =
             (paru_tupleList *)paru_alloc(1, m * sizeof(paru_tupleList));
-        Num->lacList = (Int *)paru_alloc(m + nf, sizeof(Int));
+        Work->lacList = (Int *)paru_alloc(m + nf, sizeof(Int));
         Num->frowCount = (Int *)paru_alloc(1, nf * sizeof(Int));
         Num->fcolCount = (Int *)paru_alloc(1, nf * sizeof(Int));
         Num->frowList = (Int **)paru_calloc(1, nf * sizeof(Int *));
@@ -157,7 +157,7 @@ ParU_Ret paru_init_rowFronts(
     Num->Rs = Rs;
     if ((nf != 0 &&
          (rowMark == NULL || elRow == NULL || elCol == NULL ||
-          rowSize == NULL || Num->lacList == NULL || RowList == NULL ||
+          rowSize == NULL || Work->lacList == NULL || RowList == NULL ||
           row_degree_bound == NULL || elementList == NULL ||
           Num->frowCount == NULL || Num->fcolCount == NULL ||
           Num->frowList == NULL || Num->fcolList == NULL ||
@@ -504,7 +504,7 @@ ParU_Ret paru_init_rowFronts(
             el_colrowNum[j++] = Sx[p];
         }
         el_colrowIndex[j++] = row;  // initializing element row index
-        Num->lacList[e] = lac_el(elementList, e);
+        Work->lacList[e] = lac_el(elementList, e);
     }
     if (out_of_memory)
         info = PARU_OUT_OF_MEMORY;

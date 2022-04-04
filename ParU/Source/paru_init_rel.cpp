@@ -12,7 +12,7 @@
  * @author Aznaveh
  */
 #include "paru_internal.hpp"
-void paru_init_rel(Int f, paru_work *Work, ParU_Numeric *Num)
+void paru_init_rel(Int f, paru_work *Work)
 {
     DEBUGLEVEL(0);
     ParU_Symbolic *Sym = Work->Sym;

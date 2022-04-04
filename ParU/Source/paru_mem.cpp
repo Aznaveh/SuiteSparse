@@ -347,6 +347,7 @@ ParU_Ret paru_free_work(ParU_Symbolic *Sym, paru_work *Work)
 
     paru_free(1, (m + nf + 1) * sizeof(paru_element), elementList);
 
+    paru_free(m + nf, sizeof(Int), Work->lacList);
     return PARU_SUCCESS;
 }
 // It uses Sym, Do not free Sym before
@@ -457,10 +458,6 @@ ParU_Ret ParU_Freenum(ParU_Symbolic *Sym, ParU_Numeric **Num_handle,
     }
 #endif
     paru_free(1, (m + nf + 1) * sizeof(std::vector<Int> **), Num->heapList);
-
-
-    paru_free(m + nf, sizeof(Int), Num->lacList);
-
     paru_free(m, sizeof(Int), Num->row_degree_bound);
     paru_free(1, sizeof(ParU_Numeric), Num);
     *Num_handle = NULL;

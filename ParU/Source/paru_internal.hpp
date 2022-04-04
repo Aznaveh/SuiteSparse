@@ -190,6 +190,11 @@ struct paru_work
 
     paru_element **elementList;  // pointers to all elements, size = m+nf+1
 
+    Int *lacList;  // size m+nf least active column of each element
+                   //    el_colIndex[el->lac]  == lacList [e]
+                   //    number of element
+
+
     Int naft;  // number of actvie frontal tasks
     Int resq;  // number of remainig ready tasks in the queue
 };
@@ -279,7 +284,7 @@ Int paru_dgemm(Int f, double *pF, double *uPart, double *el, Int fp,
 
 void paru_print_element(Int e, paru_work *Work, ParU_Numeric *Num);
 void paru_print_paru_tupleList(paru_tupleList *listSet, Int index);
-void paru_init_rel(Int f, paru_work *Work, ParU_Numeric *Num);
+void paru_init_rel(Int f, paru_work *Work);
 
 void paru_update_rel_ind_col(Int e, Int f, std::vector<Int> &colHash,
                              paru_work *Work, ParU_Numeric *Num);

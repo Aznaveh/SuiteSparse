@@ -408,7 +408,7 @@ void paru_assemble_cols(Int e, Int f, std::vector<Int> &colHash,
             ;
     }
     // el->lac won't get updated after this
-    Int *lacList = Num->lacList;
+    Int *lacList = Work->lacList;
     lacList[e] = el_colIndex[el->lac];
 
     // TOLL Zone
@@ -907,7 +907,7 @@ void paru_assemble_el_with0rows(Int e, Int f, std::vector<Int> &colHash,
 
     el->nrowsleft = el->nzr_pc;
     el->lac = new_lac;
-    Int *lacList = Num->lacList;
+    Int *lacList = Work->lacList;
     lacList[e] = el_colIndex[el->lac];
 #ifndef NDEBUG
     Int *Super = Sym->Super;

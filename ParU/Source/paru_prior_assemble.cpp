@@ -134,7 +134,7 @@ ParU_Ret paru_prior_assemble(Int f, Int start_fac,
 #endif
 
 #ifndef NDEBUG
-    Int *lacList = Num->lacList;
+    Int *lacList = Work->lacList;
     PRLEVEL(PR, ("%% current heap:\n %%"));
     for (Int k = 0; k < (Int)curHeap->size(); k++)
     {

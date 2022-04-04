@@ -76,7 +76,7 @@ ParU_Ret paru_front(Int f,  // front need to be assembled
 #endif
 
     // Initializing relative index validation flag of current front
-    paru_init_rel(f, Work, Num);
+    paru_init_rel(f, Work);
 
 #ifndef NDEBUG
     Int time_f = Work->time_stamp[f];
@@ -508,7 +508,7 @@ ParU_Ret paru_front(Int f,  // front need to be assembled
     // Int *el_colIndex = colIndex_pointer (curEl);
     Int *el_colIndex = (Int *)(curEl + 1);
     curEl->lac = 0;
-    Int *lacList = Num->lacList;
+    Int *lacList = Work->lacList;
     lacList[eli] = fcolList[0];
     for (Int i = 0; i < colCount; ++i) el_colIndex[i] = fcolList[i];
     Int *el_rowIndex = rowIndex_pointer(curEl);

@@ -310,10 +310,6 @@ struct ParU_Numeric
     Int max_col_count;      // it is initalized after factorization
     Int *row_degree_bound;  // row degree size number of rows
 
-    Int *lacList;  // size m+nf least active column of each element
-                   //    el_colIndex[el->lac]  == lacList [e]
-                   //    number of element
-
     // each active front owns and manage a heap list. The heap is based on the
     // least numbered column. The active front Takes the pointer of the biggest
     // child and release its other children after concatenating their list to

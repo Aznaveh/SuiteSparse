@@ -58,7 +58,7 @@ ParU_Ret paru_make_heap(Int f, Int start_fac,
     biggest_Child_size = hi.biggest_Child_size;
     tot_size = hi.sum_size;
 
-    Int *lacList = Num->lacList;
+    Int *lacList = Work->lacList;
     auto greater = [&lacList](Int a, Int b) { return lacList[a] > lacList[b]; };
 
     PRLEVEL(PR, ("%% tot_size =  %ld\n", tot_size));
@@ -226,7 +226,7 @@ ParU_Ret paru_make_heap_empty_el(Int f, std::vector<Int> &pivotal_elements,
     biggest_Child_size = hi.biggest_Child_size;
     tot_size = hi.sum_size;
 
-    Int *lacList = Num->lacList;
+    Int *lacList = Work->lacList;
     auto greater = [&lacList](Int a, Int b) { return lacList[a] > lacList[b]; };
 
     PRLEVEL(PR, ("%% tot_size =  %ld\n", tot_size));
