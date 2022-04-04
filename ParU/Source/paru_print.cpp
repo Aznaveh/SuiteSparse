@@ -14,7 +14,7 @@ void paru_print_element(Int e, paru_work *Work, ParU_Numeric *Num)
     paru_element *curEl = elementList[e];
 
     Int morign = Num->m;
-    Int nf = Num->Sym->nf;
+    Int nf = Work->Sym->nf;
 
     if (e > morign + nf + 1)
     {

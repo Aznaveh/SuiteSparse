@@ -70,9 +70,9 @@ Int paru_panel_factorize(Int f, Int m, Int n, const Int panel_width,
         PRLEVEL(PR, ("\n"));
     }
 #endif
-    Int *Super = Num->Sym->Super;
+    ParU_Symbolic *Sym = Work->Sym;
+    Int *Super = Sym->Super;
     Int col1 = Super[f]; /* fornt F has columns col1:col2-1 */
-    ParU_Symbolic *Sym = Num->Sym;
     Int *Diag_map = Work->Diag_map;
     Int n1 = Sym->n1;
 
@@ -364,7 +364,7 @@ Int paru_factorize_full_summed(Int f, Int start_fac,
     DEBUGLEVEL(0);
     PARU_DEFINE_PRLEVEL;
 
-    Int *Super = Num->Sym->Super;
+    Int *Super = Work->Sym->Super;
     Int col1 = Super[f]; /* fornt F has columns col1:col2-1 */
     Int col2 = Super[f + 1];
     Int fp = col2 - col1; /* first fp columns are pivotal */
@@ -412,7 +412,7 @@ Int paru_factorize_full_summed(Int f, Int start_fac,
             // shared(Num, pivotal_elements, stl_colSet)
             // shared(panel_num, row_end, f, start_fac)
 
-            if (Num->Sym->Cm[f] != 0)
+            if (Work->Sym->Cm[f] != 0)
             {  // if there is potential column left
                 paru_update_rowDeg(panel_num, row_end, f, start_fac, stl_colSet,
                                    pivotal_elements, Work, Num);

@@ -14,7 +14,7 @@ ParU_Ret paru_exec_tasks_seq(Int t, Int *task_num_child, paru_work *Work,
                              ParU_Numeric *Num)
 {
     DEBUGLEVEL(0);
-    ParU_Symbolic *Sym = Num->Sym;
+    ParU_Symbolic *Sym = Work->Sym;
     Int *task_parent = Sym->task_parent;
     Int daddy = task_parent[t];
     Int *task_map = Sym->task_map;
@@ -80,7 +80,7 @@ ParU_Ret paru_exec_tasks(Int t, Int *task_num_child, Int &chain_task,
                          paru_work *Work, ParU_Numeric *Num)
 {
     DEBUGLEVEL(0);
-    ParU_Symbolic *Sym = Num->Sym;
+    ParU_Symbolic *Sym = Work->Sym;
     Int *task_parent = Sym->task_parent;
     Int daddy = task_parent[t];
     Int *task_map = Sym->task_map;

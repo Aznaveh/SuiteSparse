@@ -293,8 +293,6 @@ struct ParU_Numeric
     // Numeric values of singletons
     double *Sux;  // u singletons, Sup Suj are in symbolic
     double *Slx;  // l singletons, Slp Sli are in symbolic
-    // TODO: remove this:
-    ParU_Symbolic *Sym;
 
     ParU_Control *Control;  // a copy of controls for internal use
                             // it is freed after factorize

@@ -24,7 +24,7 @@ ParU_Ret paru_front(Int f,  // front need to be assembled
      *  0 Detailed
      *  > 0 Everything
      */
-    ParU_Symbolic *Sym = Num->Sym;
+    ParU_Symbolic *Sym = Work->Sym;
     Int *Super = Sym->Super;
     /* ---------------------------------------------------------------------- */
     /* get the front F  */

@@ -186,6 +186,8 @@ struct paru_work
     // inverse of Diag_map from Sym;
     // It helps editing the Diag_map
 
+    ParU_Symbolic *Sym; //point to the symbolic that user sends
+
     paru_element **elementList;  // pointers to all elements, size = m+nf+1
 
     Int naft;  // number of actvie frontal tasks

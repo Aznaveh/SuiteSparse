@@ -52,7 +52,7 @@ ParU_Ret paru_init_rowFronts(
     *Num_handle = Num;
 
     Int m, nf;
-    Num->Sym = Sym;
+    Work->Sym = Sym;
     m = Num->m = Sym->m - Sym->n1;
     nf = Sym->nf;
     Num->res = PARU_SUCCESS;

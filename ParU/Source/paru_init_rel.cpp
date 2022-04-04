@@ -15,7 +15,7 @@
 void paru_init_rel(Int f, paru_work *Work, ParU_Numeric *Num)
 {
     DEBUGLEVEL(0);
-    ParU_Symbolic *Sym = Num->Sym;
+    ParU_Symbolic *Sym = Work->Sym;
     Int *time_stamp = Work->time_stamp;
 
     Int *Child = Sym->Child;

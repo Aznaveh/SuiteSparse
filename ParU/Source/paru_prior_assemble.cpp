@@ -19,7 +19,7 @@ ParU_Ret paru_prior_assemble(Int f, Int start_fac,
     Int *elCol = Work->elCol;
 
     paru_element **elementList = Work->elementList;
-    ParU_Symbolic *Sym = Num->Sym;
+    ParU_Symbolic *Sym = Work->Sym;
     Int *snM = Sym->super2atree;
 
     Int pMark = start_fac;

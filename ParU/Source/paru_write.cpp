@@ -10,7 +10,7 @@ void paru_write(int scale, char *id, paru_work *Work, ParU_Numeric *Num)
 {
     DEBUGLEVEL(0);
     PRLEVEL(1, ("%% Start Writing\n"));
-    ParU_Symbolic *Sym = Num->Sym;
+    ParU_Symbolic *Sym = Work->Sym;
     Int nf = Sym->nf;
 
     Int m = Sym->m;

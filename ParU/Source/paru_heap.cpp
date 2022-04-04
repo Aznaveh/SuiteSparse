@@ -38,7 +38,7 @@ ParU_Ret paru_make_heap(Int f, Int start_fac,
     DEBUGLEVEL(0);
     PARU_DEFINE_PRLEVEL;
 
-    ParU_Symbolic *Sym = Num->Sym;
+    ParU_Symbolic *Sym = Work->Sym;
     Int *aChild = Sym->aChild;
     Int *aChildp = Sym->aChildp;
     Int *snM = Sym->super2atree;
@@ -206,7 +206,7 @@ ParU_Ret paru_make_heap_empty_el(Int f, std::vector<Int> &pivotal_elements,
     DEBUGLEVEL(0);
     PARU_DEFINE_PRLEVEL;
 
-    ParU_Symbolic *Sym = Num->Sym;
+    ParU_Symbolic *Sym = Work->Sym;
     Int *aChild = Sym->aChild;
     Int *aChildp = Sym->aChildp;
     Int *snM = Sym->super2atree;

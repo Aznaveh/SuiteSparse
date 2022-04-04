@@ -34,7 +34,7 @@ void paru_full_summed(Int e, Int f, paru_work *Work, ParU_Numeric *Num)
 {
     DEBUGLEVEL(0);
     PARU_DEFINE_PRLEVEL;
-    ParU_Symbolic *Sym = Num->Sym;
+    ParU_Symbolic *Sym = Work->Sym;
 #ifndef NDEBUG
     Int *snM = Sym->super2atree;
     Int eli = snM[f];
