@@ -46,9 +46,9 @@ void paru_full_summed(Int e, Int f, paru_work *Work, ParU_Numeric *Num)
     Int col2 = Super[f + 1];
     PRLEVEL(PR, ("%% col1=%ld, col2=%ld\n", col1, col2));
 
-    ParU_Element **elementList = Num->elementList;
+    paru_element **elementList = Work->elementList;
 
-    ParU_Element *el = elementList[e];
+    paru_element *el = elementList[e];
 
     Int nEl = el->ncols;
     Int mEl = el->nrows;

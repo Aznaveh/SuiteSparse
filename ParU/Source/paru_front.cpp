@@ -37,7 +37,7 @@ ParU_Ret paru_front(Int f,  // front need to be assembled
     Int col2 = Super[f + 1];
     Int fp = col2 - col1; /* first fp columns are pivotal */
 
-    ParU_Element **elementList = Num->elementList;
+    paru_element **elementList = Work->elementList;
 
     PRLEVEL(1, ("%% fp=%ld pivotal columns:clo1=%ld...col2=%ld\n", fp, col1,
                 col2 - 1));
@@ -381,7 +381,7 @@ ParU_Ret paru_front(Int f,  // front need to be assembled
         {
             paru_tuple curTpl = listRowTuples[k];
             Int e = curTpl.e;
-            ParU_Element *el = elementList[e];
+            paru_element *el = elementList[e];
             if (el == NULL) continue;
 
             Int curRowIndex = curTpl.f;
@@ -462,7 +462,7 @@ ParU_Ret paru_front(Int f,  // front need to be assembled
     PR = 1;
 #endif
 
-    ParU_Element *curEl;
+    paru_element *curEl;
     PRLEVEL(
         1, ("%% rowCount=%ld, colCount=%ld, fp=%ld\n", rowCount, colCount, fp));
     PRLEVEL(1, ("%% curEl is %ld by %ld\n", rowCount - fp, colCount));

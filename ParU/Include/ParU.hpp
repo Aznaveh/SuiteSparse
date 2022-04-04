@@ -242,41 +242,6 @@ struct ParU_Symbolic
     // Int max_chain;        // maximum size of the chains in final tree
 };
 
-// =============================================================================
-// An element, contribution block
-// =============================================================================
-
-// move to paru_internal.h
-struct ParU_Element
-{
-    Int
-
-        nrowsleft,  // number of rows remaining
-        ncolsleft,  // number of columns remaining
-        nrows,      // number of rows
-        ncols,      // number of columns
-        rValid,     // validity of relative row index
-        cValid;     // validity of relative column index
-
-    Int lac;  // least active column which is active
-    // 0 <= lac <= ncols
-
-    Int nzr_pc;  // number of zero rows in pivotal column of current front
-
-    size_t size_allocated;
-    // followed in memory by:
-    //   Int
-    //   col [0..ncols-1],  column indices of this element
-    //   row [0..nrows-1] ; row indices of this element
-    //
-    //   relColInd [0..ncols-1];    relative indices of this element for
-    //   current front
-    //   relRowInd [0..nrows-1],    relative indices of this element for
-    //   current front
-    //   double ncols*nrows; numeric values
-};
-
-
 struct ParU_Factors
 {               // dense factorized part pointer
     Int m, n;   //  mxn dense matrix
@@ -303,7 +268,7 @@ struct ParU_Control
              // than this threshold
 
     // Numeric controls
-    Int scale = 1;  // if 1 matrix will be scaled using max_row
+    Int scale = 1;         // if 1 matrix will be scaled using max_row
     Int panel_width = 32;  // width of panel for dense factorizaiton
     Int paru_strategy = PARU_STRATEGY_AUTO;  // the same stratey umfpack used
 
@@ -331,11 +296,8 @@ struct ParU_Numeric
     // TODO: remove this:
     ParU_Symbolic *Sym;
 
-    ParU_Control *Control;    // a copy of controls for internal use
-                              // it is freed after factorize
-
-    ParU_Element **elementList;  // pointers to all elements, size = m+nf+1
-
+    ParU_Control *Control;  // a copy of controls for internal use
+                            // it is freed after factorize
 
     // Computed parts of each front
     Int *frowCount;  // size nf   size(CB) = rowCount[f]x
@@ -353,14 +315,6 @@ struct ParU_Numeric
     Int *lacList;  // size m+nf least active column of each element
                    //    el_colIndex[el->lac]  == lacList [e]
                    //    number of element
-
-    Int *Diag_map;  // size n,
-    // Both of these are NULL if the stratey is not symmetric
-    // copy of Diag_map from Sym;
-    // this copy can be updated during the factorization
-    Int *inv_Diag_map;  // size n,
-    // inverse of Diag_map from Sym;
-    // It helps editing the Diag_map
 
     // each active front owns and manage a heap list. The heap is based on the
     // least numbered column. The active front Takes the pointer of the biggest
@@ -433,10 +387,9 @@ ParU_Ret ParU_Freesym(ParU_Symbolic **Sym_handle, ParU_Control *Control);
 
 ParU_Ret ParU_Freenum(
     // input
-        ParU_Symbolic *Sym,
+    ParU_Symbolic *Sym,
     // output
-        ParU_Numeric **Num_handle, 
-        ParU_Control *Control);
+    ParU_Numeric **Num_handle, ParU_Control *Control);
 
 // resid = norm1(b-A*x) / norm1(A)
 ParU_Ret ParU_Residual(

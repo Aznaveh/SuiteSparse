@@ -23,7 +23,7 @@ void paru_update_rowDeg(Int panel_num, Int row_end, Int f, Int start_fac,
                 panel_num, f));
     ParU_Control *Control = Num->Control;
     Int panel_width = Control->panel_width;
-    ParU_Element **elementList = Num->elementList;
+    paru_element **elementList = Work->elementList;
 
     Int *elRow = Work->elRow;
     Int *elCol = Work->elCol;
@@ -111,7 +111,7 @@ void paru_update_rowDeg(Int panel_num, Int row_end, Int f, Int start_fac,
 #endif
             if (e < 0 || curRowIndex < 0) continue;
 
-            ParU_Element *el = elementList[e];
+            paru_element *el = elementList[e];
 
             if (el == NULL) continue;
 
@@ -269,7 +269,7 @@ void paru_update_rowDeg(Int panel_num, Int row_end, Int f, Int start_fac,
     for (Int i = 0; i < (Int)pivotal_elements.size(); i++)
     {
         Int e = pivotal_elements[i];
-        ParU_Element *el = elementList[e];
+        paru_element *el = elementList[e];
         if (el == NULL)
         {  // removing the  element from the list
             PRLEVEL(1, ("%% eli = %ld, element= %ld  \n", eli, e));
@@ -361,7 +361,7 @@ void paru_update_rowDeg(Int panel_num, Int row_end, Int f, Int start_fac,
 
                 if (e < 0 || curRowIndex < 0) continue;
 
-                ParU_Element *el = elementList[e];
+                paru_element *el = elementList[e];
                 if (el == NULL) continue;
 
                 // Int *el_rowIndex = rowIndex_pointer (el);
@@ -461,7 +461,7 @@ void paru_update_rowDeg(Int panel_num, Int row_end, Int f, Int start_fac,
 #endif
             Int curRowIndex = curTpl.f;
 
-            ParU_Element *el = elementList[e];
+            paru_element *el = elementList[e];
             // ASSERT (el != NULL);
             if (el == NULL) continue;
 

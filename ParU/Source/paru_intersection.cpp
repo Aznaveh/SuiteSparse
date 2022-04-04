@@ -9,7 +9,7 @@
 #include "paru_internal.hpp"
 #define Const 4
 
-int paru_intersection(Int e, ParU_Element **elementList,
+int paru_intersection(Int e, paru_element **elementList,
                       std::set<Int> &stl_newColSet)
 {
     DEBUGLEVEL(0);
@@ -25,7 +25,7 @@ int paru_intersection(Int e, ParU_Element **elementList,
 
 #endif
 
-    ParU_Element *el = elementList[e];
+    paru_element *el = elementList[e];
 
     Int nEl = el->ncols;
     Int *el_colIndex = (Int *)(el + 1);

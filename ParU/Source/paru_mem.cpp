@@ -279,17 +279,17 @@ ParU_Ret ParU_Freesym(ParU_Symbolic **Sym_handle, ParU_Control *Control)
 }
 
 // free element e from elementList
-void paru_free_el(Int e, ParU_Element **elementList)
+void paru_free_el(Int e, paru_element **elementList)
 {
     DEBUGLEVEL(0);
-    ParU_Element *el = elementList[e];
+    paru_element *el = elementList[e];
     if (el == NULL) return;
 #ifndef NDEBUG
     Int nrows = el->nrows, ncols = el->ncols;
     PRLEVEL(1, ("%%Free the element e =%ld\t", e));
     PRLEVEL(1, ("%% nrows =%ld ", nrows));
     PRLEVEL(1, ("%% ncols =%ld\n", ncols));
-    Int tot_size = sizeof(ParU_Element) + sizeof(Int) * (2 * (nrows + ncols)) +
+    Int tot_size = sizeof(paru_element) + sizeof(Int) * (2 * (nrows + ncols)) +
                    sizeof(double) * nrows * ncols;
     paru_free(1, tot_size, el);
 #else
@@ -302,6 +302,7 @@ ParU_Ret paru_free_work(ParU_Symbolic *Sym, paru_work *Work)
 {
     Int m = Sym->m - Sym->n1;
     Int nf = Sym->nf;
+    Int n = Sym->n - Sym->n1;
     paru_free(m, sizeof(Int), Work->rowSize);
     paru_free(m + nf + 1, sizeof(Int), Work->rowMark);
     paru_free(m + nf, sizeof(Int), Work->elRow);
@@ -319,6 +320,32 @@ ParU_Ret paru_free_work(ParU_Symbolic *Sym, paru_work *Work)
     }
     paru_free(1, m * sizeof(paru_tupleList), RowList);
 
+    if (Work->Diag_map)
+    {
+        paru_free(n, sizeof(Int), Work->Diag_map);
+        paru_free(n, sizeof(Int), Work->inv_Diag_map);
+    }
+
+    paru_element **elementList;
+    elementList = Work->elementList;
+
+    PRLEVEL(1, ("%% Sym = %p\n", Sym));
+    PRLEVEL(1, ("%% freeing initialized elements:\n"));
+    for (Int i = 0; i < m; i++)
+    {                               // freeing all row elements
+        Int e = Sym->row2atree[i];  // element number in augmented tree
+        PRLEVEL(1, ("%% e =%ld\t", e));
+        paru_free_el(e, elementList);
+    }
+
+    PRLEVEL(1, ("\n%% freeing CB elements:\n"));
+    for (Int i = 0; i < nf; i++)
+    {                                 // freeing all other elements
+        Int e = Sym->super2atree[i];  // element number in augmented tree
+        paru_free_el(e, elementList);
+    }
+
+    paru_free(1, (m + nf + 1) * sizeof(paru_element), elementList);
 
     return PARU_SUCCESS;
 }
@@ -344,7 +371,6 @@ ParU_Ret ParU_Freenum(ParU_Symbolic *Sym, ParU_Numeric **Num_handle,
     Num = *Num_handle;
 
     Int m = Num->m;  // m and n is different than Sym
-    Int n = Num->n;  // Here there are submatrix size
 
     Int nf = Sym->nf;
 
@@ -363,26 +389,8 @@ ParU_Ret ParU_Freenum(ParU_Symbolic *Sym, ParU_Numeric **Num_handle,
         paru_free(nnz, sizeof(double), Num->Slx);
     }
     paru_free(Sym->m, sizeof(Int), Num->Rs);
-    ParU_Element **elementList;
-    elementList = Num->elementList;
 
-    PRLEVEL(1, ("%% Sym = %p\n", Sym));
-    PRLEVEL(1, ("%% freeing initialized elements:\n"));
-    for (Int i = 0; i < m; i++)
-    {                               // freeing all row elements
-        Int e = Sym->row2atree[i];  // element number in augmented tree
-        PRLEVEL(1, ("%% e =%ld\t", e));
-        paru_free_el(e, elementList);
-    }
-
-    PRLEVEL(1, ("\n%% freeing CB elements:\n"));
-    for (Int i = 0; i < nf; i++)
-    {                                 // freeing all other elements
-        Int e = Sym->super2atree[i];  // element number in augmented tree
-        paru_free_el(e, elementList);
-    }
-
-    // free the answer
+    // free the factors
     ParU_Factors *LUs = Num->partial_LUs;
     ParU_Factors *Us = Num->partial_Us;
 
@@ -418,11 +426,6 @@ ParU_Ret ParU_Freenum(ParU_Symbolic *Sym, ParU_Numeric **Num_handle,
     paru_free(1, nf * sizeof(ParU_Factors), LUs);
     paru_free(1, nf * sizeof(ParU_Factors), Us);
 
-    if (Num->Diag_map)
-    {
-        paru_free(n, sizeof(Int), Num->Diag_map);
-        paru_free(n, sizeof(Int), Num->inv_Diag_map);
-    }
 #ifndef NDEBUG
     Int Us_bound_size = Sym->Us_bound_size;
     Int LUs_bound_size = Sym->LUs_bound_size;
@@ -455,7 +458,6 @@ ParU_Ret ParU_Freenum(ParU_Symbolic *Sym, ParU_Numeric **Num_handle,
 #endif
     paru_free(1, (m + nf + 1) * sizeof(std::vector<Int> **), Num->heapList);
 
-    paru_free(1, (m + nf + 1) * sizeof(ParU_Element), elementList);
 
     paru_free(m + nf, sizeof(Int), Num->lacList);
 

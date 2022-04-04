@@ -34,10 +34,10 @@ void paru_assemble_all(Int e, Int f, std::vector<Int> &colHash,
     PR = 1;
 #endif
 
-    ParU_Element **elementList = Num->elementList;
+    paru_element **elementList = Work->elementList;
 
-    ParU_Element *el = elementList[e];
-    ParU_Element *curEl = elementList[eli];
+    paru_element *el = elementList[e];
+    paru_element *curEl = elementList[eli];
 
     Int nEl = el->ncols;
     Int mEl = el->nrows;
@@ -51,7 +51,7 @@ void paru_assemble_all(Int e, Int f, std::vector<Int> &colHash,
     if (el->cValid != Work->time_stamp[f])
         paru_update_rel_ind_col(e, f, colHash, Work, Num);
 
-    // Int *colRelIndex = relColInd (ParU_Element *el);
+    // Int *colRelIndex = relColInd (paru_element *el);
     Int *colRelIndex = (Int *)(el + 1) + mEl + nEl;
 
     // Int *el_rowIndex = rowIndex_pointer (el);
@@ -310,10 +310,10 @@ void paru_assemble_cols(Int e, Int f, std::vector<Int> &colHash,
     if (PR <= 0) paru_print_element(e, Work, Num);
 #endif
 
-    ParU_Element **elementList = Num->elementList;
+    paru_element **elementList = Work->elementList;
 
-    ParU_Element *el = elementList[e];
-    ParU_Element *curEl = elementList[eli];
+    paru_element *el = elementList[e];
+    paru_element *curEl = elementList[eli];
 
     Int nEl = el->ncols;
     Int mEl = el->nrows;
@@ -491,10 +491,10 @@ void paru_assemble_rows(Int e, Int f, std::vector<Int> &colHash,
 
     PRLEVEL(PR, ("%% Eliminat some rows of %ld in %ld\n", e, eli));
 
-    ParU_Element **elementList = Num->elementList;
+    paru_element **elementList = Work->elementList;
 
-    ParU_Element *el = elementList[e];
-    ParU_Element *curEl = elementList[eli];
+    paru_element *el = elementList[e];
+    paru_element *curEl = elementList[eli];
 
     Int nEl = el->ncols;
     Int mEl = el->nrows;
@@ -505,7 +505,7 @@ void paru_assemble_rows(Int e, Int f, std::vector<Int> &colHash,
     // Int *rowRelIndex = relRowInd (el);
     Int *rowRelIndex = (Int *)(el + 1) + 2 * nEl + mEl;
 
-    // Int *colRelIndex = relColInd (ParU_Element *el);
+    // Int *colRelIndex = relColInd (paru_element *el);
     Int *colRelIndex = (Int *)(el + 1) + mEl + nEl;
 
     // Int *el_rowIndex = rowIndex_pointer (el);
@@ -708,10 +708,10 @@ void paru_assemble_el_with0rows(Int e, Int f, std::vector<Int> &colHash,
 
 #endif
 
-    ParU_Element **elementList = Num->elementList;
+    paru_element **elementList = Work->elementList;
 
-    ParU_Element *el = elementList[e];
-    ParU_Element *curEl = elementList[eli];
+    paru_element *el = elementList[e];
+    paru_element *curEl = elementList[eli];
 
     Int nEl = el->ncols;
     Int mEl = el->nrows;
@@ -727,7 +727,7 @@ void paru_assemble_el_with0rows(Int e, Int f, std::vector<Int> &colHash,
     if (el->cValid != Work->time_stamp[f])
         paru_update_rel_ind_col(e, f, colHash, Work, Num);
 
-    // Int *colRelIndex = relColInd (ParU_Element *el);
+    // Int *colRelIndex = relColInd (paru_element *el);
     Int *colRelIndex = (Int *)(el + 1) + mEl + nEl;
 
     // Int *el_rowIndex = rowIndex_pointer (el);

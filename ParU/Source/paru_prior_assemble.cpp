@@ -18,7 +18,7 @@ ParU_Ret paru_prior_assemble(Int f, Int start_fac,
 
     Int *elCol = Work->elCol;
 
-    ParU_Element **elementList = Num->elementList;
+    paru_element **elementList = Work->elementList;
     ParU_Symbolic *Sym = Num->Sym;
     Int *snM = Sym->super2atree;
 
@@ -36,7 +36,7 @@ ParU_Ret paru_prior_assemble(Int f, Int start_fac,
     for (Int i = 0; i < (Int)pivotal_elements.size(); i++)
     {
         Int e = pivotal_elements[i];
-        ParU_Element *el = elementList[e];
+        paru_element *el = elementList[e];
         PRLEVEL(PR, ("%% element= %ld  \n", e));
         if (el == NULL)
         {
@@ -139,7 +139,7 @@ ParU_Ret paru_prior_assemble(Int f, Int start_fac,
     for (Int k = 0; k < (Int)curHeap->size(); k++)
     {
         Int ee = (*curHeap)[k];
-        ParU_Element *ell = elementList[ee];
+        paru_element *ell = elementList[ee];
         PRLEVEL(PR, ("%ld-%ld", k, ee));
         if (ell != NULL)
         {

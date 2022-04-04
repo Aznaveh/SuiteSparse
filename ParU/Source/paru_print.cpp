@@ -9,23 +9,23 @@
 void paru_print_element(Int e, paru_work *Work, ParU_Numeric *Num)
 {
     // print out contribution blocks
-    ParU_Element **elementList;
-    elementList = Num->elementList;
-    ParU_Element *curEl = elementList[e];
+    paru_element **elementList;
+    elementList = Work->elementList;
+    paru_element *curEl = elementList[e];
 
     Int morign = Num->m;
     Int nf = Num->Sym->nf;
 
     if (e > morign + nf + 1)
     {
-        printf("%% ParU_Element %ld is out of range; just %ld elements \n", e,
+        printf("%% paru_element %ld is out of range; just %ld elements \n", e,
                morign + nf + 1);
         return;
     }
 
     if (curEl == NULL)
     {
-        printf("%% ParU_Element %ld is empty\n", e);
+        printf("%% paru_element %ld is empty\n", e);
         return;
     }
 
@@ -42,7 +42,7 @@ void paru_print_element(Int e, paru_work *Work, ParU_Numeric *Num)
     double *el_colrowNum = numeric_pointer(curEl);
 
     printf("\n");
-    printf("%% ParU_Element %ld is %ld x %ld:\n", e, m, n);
+    printf("%% paru_element %ld is %ld x %ld:\n", e, m, n);
 
     printf("\t");
     //    for (int j = 0; j < n; j++)

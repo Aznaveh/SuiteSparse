@@ -58,10 +58,6 @@ ParU_Ret paru_init_rowFronts(
     Num->res = PARU_SUCCESS;
     Num->Control = Control;
 
-    Int *rowMark = Work->rowMark = NULL;
-    Int *elRow = Work->elRow = NULL;
-    Int *elCol = Work->elCol = NULL;
-    Int *rowSize = Work->rowSize = NULL;
     Int *row_degree_bound = Num->row_degree_bound = NULL;
     Num->lacList = NULL;
     Num->frowCount = NULL;
@@ -71,17 +67,22 @@ ParU_Ret paru_init_rowFronts(
     Num->partial_Us = NULL;
     Num->partial_LUs = NULL;
     std::vector<Int> **heapList = Num->heapList = NULL;
-    ParU_Element **elementList = NULL;
-    Num->elementList = NULL;
-    Int *Diag_map = Num->Diag_map = NULL;
-    Int *inv_Diag_map = Num->inv_Diag_map = NULL;
     Num->Sx = NULL;
     Num->Sux = NULL;
     Num->Slx = NULL;
     Num->Rs = NULL;
 
+    //Workd DS
+    Int *rowMark = Work->rowMark = NULL;
+    Int *elRow = Work->elRow = NULL;
+    Int *elCol = Work->elCol = NULL;
+    Int *rowSize = Work->rowSize = NULL;
     Work->time_stamp = NULL;
     paru_tupleList *RowList = Work->RowList = NULL;
+    Int *Diag_map = Work->Diag_map = NULL;
+    Int *inv_Diag_map = Work->inv_Diag_map = NULL;
+    paru_element **elementList = Work->elementList = NULL;
+
     if (nf != 0)
     {
         // Memory allocations for Num
@@ -107,15 +108,13 @@ ParU_Ret paru_init_rowFronts(
 
         heapList = Num->heapList = (std::vector<Int> **)paru_calloc(
             1, (m + nf + 1) * sizeof(std::vector<Int> *));
-        elementList = Num->elementList =  // Initialize with NULL
-            (ParU_Element **)paru_calloc(1,
-                                         (m + nf + 1) * sizeof(ParU_Element));
-        Diag_map = Num->Diag_map = NULL;
-        Num->inv_Diag_map = NULL;
+        elementList = Work->elementList =  // Initialize with NULL
+            (paru_element **)paru_calloc(1,
+                                         (m + nf + 1) * sizeof(paru_element));
         if (Sym->strategy == PARU_STRATEGY_SYMMETRIC)
         {
-            Diag_map = Num->Diag_map = (Int *)paru_alloc(Sym->n, sizeof(Int));
-            inv_Diag_map = Num->inv_Diag_map =
+            Diag_map = Work->Diag_map = (Int *)paru_alloc(Sym->n, sizeof(Int));
+            inv_Diag_map = Work->inv_Diag_map =
                 (Int *)paru_alloc(Sym->n, sizeof(Int));
 #ifndef NDEBUG
             paru_memset(Diag_map, 0, Sym->n * sizeof(Int), Control);
@@ -432,7 +431,7 @@ ParU_Ret paru_init_rowFronts(
 
         row_degree_bound[row] = ncols;  // Initialzing row degree
 
-        ParU_Element *curEl = elementList[e] =
+        paru_element *curEl = elementList[e] =
             paru_create_element(nrows, ncols, 0);
         if (curEl == NULL)
         {  // out of memory
@@ -461,7 +460,7 @@ ParU_Ret paru_init_rowFronts(
 
 #ifndef NDEBUG  // Printing the pointers info
                 // printf ("%% curEl = %p ", curEl);
-        // Int size = sizeof(ParU_Element) + sizeof(Int) * (2 * (nrows + ncols))
+        // Int size = sizeof(paru_element) + sizeof(Int) * (2 * (nrows + ncols))
         //           + sizeof(double) * nrows * ncols;
         // printf("size= %ld\n", size);
 #endif

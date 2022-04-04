@@ -15,9 +15,9 @@ void paru_check_prior_element(Int e, Int f, Int start_fac,
 {
     Int *elRow = Work->elRow;
 
-    ParU_Element **elementList = Num->elementList;
+    paru_element **elementList = Work->elementList;
 
-    ParU_Element *el = elementList[e];
+    paru_element *el = elementList[e];
     if (elRow[e] == 0 && el->rValid > start_fac)
     {  // all the rows are inside he current front; maybe assemble some cols
         paru_assemble_cols(e, f, colHash, Work, Num);
@@ -42,7 +42,7 @@ ParU_Ret paru_make_heap(Int f, Int start_fac,
     Int *aChild = Sym->aChild;
     Int *aChildp = Sym->aChildp;
     Int *snM = Sym->super2atree;
-    ParU_Element **elementList = Num->elementList;
+    paru_element **elementList = Work->elementList;
     // Int m = Num-> m;
 
     std::vector<Int> **heapList = Num->heapList;
@@ -107,7 +107,7 @@ ParU_Ret paru_make_heap(Int f, Int start_fac,
             for (Int i = 0; i < (Int)pivotal_elements.size(); i++)
             {
                 Int e = pivotal_elements[i];
-                ParU_Element *el = elementList[e];
+                paru_element *el = elementList[e];
 #ifndef NDEBUG
                 ASSERT(el != NULL);
 #endif
@@ -210,7 +210,7 @@ ParU_Ret paru_make_heap_empty_el(Int f, std::vector<Int> &pivotal_elements,
     Int *aChild = Sym->aChild;
     Int *aChildp = Sym->aChildp;
     Int *snM = Sym->super2atree;
-    ParU_Element **elementList = Num->elementList;
+    paru_element **elementList = Work->elementList;
     // Int m = Num-> m;
 
     std::vector<Int> **heapList = Num->heapList;
@@ -270,7 +270,7 @@ ParU_Ret paru_make_heap_empty_el(Int f, std::vector<Int> &pivotal_elements,
             for (Int i = 0; i < (Int)pivotal_elements.size(); i++)
             {
                 Int e = pivotal_elements[i];
-                ParU_Element *el = elementList[e];
+                paru_element *el = elementList[e];
                 if (el == NULL) continue;
                 PRLEVEL(PR, ("%ld  ", e));
                 curHeap->push_back(e);

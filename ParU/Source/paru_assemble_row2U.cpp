@@ -17,8 +17,8 @@ void paru_assemble_row_2U(Int e, Int f, Int sR, Int dR,
 {
     DEBUGLEVEL(0);
 
-    ParU_Element **elementList = Num->elementList;
-    ParU_Element *el = elementList[e];
+    paru_element **elementList = Work->elementList;
+    paru_element *el = elementList[e];
 
     if (el->cValid != Work->time_stamp[f])
         // if not updatated
@@ -36,7 +36,7 @@ void paru_assemble_row_2U(Int e, Int f, Int sR, Int dR,
     // Int *el_colIndex = colIndex_pointer (curEl);
     Int *el_colIndex = (Int *)(el + 1);
 
-    // Int *colRelIndex = relColInd (ParU_Element *el);
+    // Int *colRelIndex = relColInd (paru_element *el);
     Int *colRelIndex = (Int *)(el + 1) + mEl + nEl;
 
     // double *el_Num = numeric_pointer (el);
