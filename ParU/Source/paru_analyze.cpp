@@ -627,7 +627,8 @@ ParU_Ret ParU_Analyze(cholmod_sparse *A, ParU_Symbolic **S_handle,
     Int threshold = Control->relaxed_amalgamation_threshold;
     PRLEVEL(1, ("Relaxed amalgamation threshold = %ld\n", threshold));
     Int newF = 0;
-    // Int num_roots = 0;
+
+    // Int num_roots = 0; //deprecated I dont use it anymore
 
     for (Int f = 0; f < nf; f++)
     {  // finding representative for each front

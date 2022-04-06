@@ -5,24 +5,27 @@
 // ParU, Mohsen Aznaveh and Timothy A. Davis, (c) 2022, All Rights Reserved.
 // SPDX-License-Identifier: GNU GPL 3.0
 
-// TODO: add intro
+// This is ParU.hpp file. All user callable routines are here and they start
+// with ParU_*. This file must be included in all user code that use Paru.
+// Paru is a parallel sparse direct solver. This package uses OpenMP tasking for
+// parallelism. Paru calls UMFPACK for symbolic analysis phase, after that some
+// symbolic analysis is done by Paru itself and  then numeric phase starts. The
+// numeric computation is a task parallel phase using OpenMP.  Each task may
+// call parallel BLAS, therefore we have a nested parallism. The performance of
+// BLAS has a heavy impact on the performance of Paru.
+//
+//                  General Usage for solving Ax = b
+//          A is a sparse matrix in matrix market format with double entries
+//          and b is a dense vector of double 
+//          (or a dense matrix B for multiple rhs)
+//
+//               info = ParU_Analyze(A, &Sym, &Control);
+//               info = ParU_Factorize(A, Sym, &Num, &Control);
+//               info = ParU_Solve(Sym, Num, b, x, &Control);
+//               See paru_demo for mor examples
 
 #ifndef PARU_H
 #define PARU_H
-
-// These libraries are included probably in Suitesparse_config
-//#include <stdlib.h>
-//#include <math.h>
-//#include <float.h>
-//#include <stdio.h>
-//#include <cstring>
-
-// To be able to use set
-#include <algorithm>
-#include <set>
-#include <vector>
-
-//#include <malloc.h> // mallopt used in paru_init_rowFronts.cpp
 
 #define CHOLMOD_BLAS_H
 #ifdef BLAS_INT
@@ -53,18 +56,18 @@ extern "C"
 #endif
 #define Int int64_t
 
-//  Just like UMFPACK_STRATEGY defined in UMFPACK/Include/umfpack.h
+//  the same values as UMFPACK_STRATEGY defined in UMFPACK/Include/umfpack.h
 #define PARU_STRATEGY_AUTO 0         // decided to use sym. or unsym. strategy
 #define PARU_STRATEGY_UNSYMMETRIC 1  // COLAMD(A), metis, ...
 #define PARU_STRATEGY_SYMMETRIC 3    // prefer diagonal
 
 // =============================================================================
-// === ParU_Symbolic ===========================================================
+// =========================== ParU_Symbolic ===================================
 // =============================================================================
 //
 // The contents of this object do not change during numeric factorization.  The
 // ParU_U_singleton and ParU_L_singleton are datastructures for singletons that
-// has been borrowed from UMFPACK
+// has been borrowed from UMFPACK, but it is saved differently
 //
 //              ParU_L_singleton is CSC
 //                                     |
@@ -74,10 +77,10 @@ extern "C"
 //                               . . U U U U U U U
 //                               . . . L . . . . .
 //                               . . . L L . . . .
-//                               . . . L L x x x x
-//                               . . . L L x x x x
-//                               . . . L L x x x x
-//                               . . . L L x x x x
+//                               . . . L L S S S S
+//                               . . . L L S S S S
+//                               . . . L L S S S S
+//                               . . . L L S S S S
 
 struct ParU_U_singleton
 {
@@ -103,13 +106,13 @@ struct ParU_Symbolic
 
     // During symbolic analysis, the nonzero pattern of S = A(P,Q) is
     // constructed, where A is the user's input matrix.  Its numerical values
-    // are also constructed, but they do not become part of the Symbolic
-    // object.  The matrix S is stored in row-oriented form.  The rows of S are
+    // are not constructed.
+    // The matrix S is stored in row-oriented form.  The rows of S are
     // sorted according to their leftmost column index (via Pinv).  Column
     // indices in each row of S are in strictly ascending order, even though
-    // the input matrix A need not be sorted.
+    // the input matrix A need not be sorted. User can look inside S matrix.
 
-    Int m, n, anz;  // S is m-by-n with anz entries; S is scaled
+    Int m, n, anz;  // S is m-by-n with anz entries
 
     Int snz;  // nnz in submatrix
     Int *Sp;  // size m+1-n1, row pointers of S
@@ -131,10 +134,9 @@ struct ParU_Symbolic
 
     Int *Ps;  // size m, row permutation.
     // Permutation from S to LU. needed for lsolve and usolve
-    // Look at paru_perm for more details
 
     Int *Pfin;  // size m, row permutation.
-    // ParU final permutation. Look paru_perm for more details
+    // ParU final permutation.
 
     Int *Sleft;  // size n-n1+2.  The list of rows of S whose
     // leftmost column index is j is given by
@@ -143,8 +145,8 @@ struct ParU_Symbolic
     // non-empty rows of S, and Sleft [n+1] == m.  That is, Sleft [n]
     // ... Sleft [n+1]-1 gives the empty rows of S, if any.
 
-    Int strategy;  // the strategy USED by umfpack
-    // symmetric or if it is unsymmetric
+    Int strategy;  // the strategy that is actually used by umfpack
+    // symmetric or unsymmetric
 
     // -------------------------------------------------------------------------
     // frontal matrices: pattern and tree
@@ -152,11 +154,6 @@ struct ParU_Symbolic
 
     // Each frontal matrix is fm-by-fn, with fnpiv pivot columns.  The fn
     // column indices are given by a set of size fnpiv pivot columns
-
-    // The row indices of the front are not kept.  If the Householder vectors
-    // are not kept, the row indices are not needed.  If the Householder
-    // vectors are kept, the row indices are computed dynamically during
-    // numerical factorization.
 
     Int nf;  // number of frontal matrices; nf <= MIN (m,n)
     Int n1;  // number of singletons in the matrix
@@ -188,10 +185,6 @@ struct ParU_Symbolic
     // pivot column in the front F.  This refers to a column of S.  The
     // number of expected pivot columns in F is thus
     // Super [f+1] - Super [f].
-
-    // Int num_roots;  // number of roots
-    // it is at least one and can be more in case of forest
-    Int *roots;
 
     // Upper bound number of rows for each front
     Int *Fm;  // size nf+1
@@ -232,33 +225,25 @@ struct ParU_Symbolic
     double *front_flop_bound;  // bound on m*n*k for each front size nf+1
     double *stree_flop_bound;  // flop bound for front and descendents size nf+1
 
-    // data structure related to tasks
+    // data structure related to Paru tasks
     Int ntasks;        // number of tasks; at most nf
     Int *task_map;     // each task does the fronts
                        // from task_map[i]+1 to task_map[i+1]; task_map[0] is -1
     Int *task_parent;  // tree data structure for tasks
     Int *task_num_child;  // number of children of each task
     Int *task_depth;      // max depth of each task
-    // Int max_chain;        // maximum size of the chains in final tree
 };
 
-struct ParU_Factors
-{               // dense factorized part pointer
-    Int m, n;   //  mxn dense matrix
-    double *p;  //  point to factorized parts
-};
-
-enum ParU_Ret
-{
-    PARU_SUCCESS,
-    PARU_OUT_OF_MEMORY,
-    PARU_INVALID,
-    PARU_SINGULAR
-};
-
+// =============================================================================
+// =========================== ParU_Control ====================================
+// =============================================================================
+// The defualt value of some control options can be found here. All user
+// callable functions use ParU_Control; some controls are used only in symbolic
+// phase and some controls are only used in numeric phase.
 struct ParU_Control
 {
     Int mem_chunk = 1024 * 1024;  // chunk size for memset and memcpy
+
     // Symbolic controls
     Int umfpack_ordering = UMFPACK_ORDERING_METIS;
     Int umfpack_strategy = UMFPACK_STRATEGY_AUTO;  // symmetric or unsymmetric
@@ -280,10 +265,30 @@ struct ParU_Control
     Int paru_max_threads = 0;    // It will be initialized with omp_max_threads
                                  // if the user did not provide
 };
+// =============================================================================
+// =========================== ParU_Numeric ====================================
+// =============================================================================
+// ParU_Numeric contains all the numeric information that user needs for solving
+// a system. The factors are saved as a seried of dense matrices. User can check
+// the ParU_Ret to see if the factorization is successfull. sizes of
+// ParU_Numeric is size of S matrix in Symbolic analysis.
+struct ParU_Factors
+{               // dense factorized part pointer
+    Int m, n;   //  mxn dense matrix
+    double *p;  //  point to factorized parts
+};
+
+enum ParU_Ret
+{
+    PARU_SUCCESS,
+    PARU_OUT_OF_MEMORY,
+    PARU_INVALID,
+    PARU_SINGULAR
+};
 
 struct ParU_Numeric
 {
-    Int m, n;  // size of the sumbatrix that is factorized
+    Int m, n;  // size of the sumbatrix(S) that is factorized
 
     double *Rs;  // the array for row scaling based on original matrix
                  // size = m
@@ -314,15 +319,11 @@ struct ParU_Numeric
 };
 
 //------------------------------------------------------------------------------
-// TODO: describe each function, like a short user guide
-
-// ParU_Analyze: discuss here..
-
-// (1) input
-// (2) input/output
-// (3) output
-// (4) control
-
+// ParU_Analyze: Symbolic analysis is done in this routine. UMFPACK is called
+// here and after that some more speciallized symbolic computation is done for
+// Paru. ParU_Analyze can be called once and used for differen ParU_Factorize
+// calls. You cannot free Symbolic before Numeric.
+//------------------------------------------------------------------------------
 ParU_Ret ParU_Analyze(
     // input:
     cholmod_sparse *A,  // input matrix to analyze ...
@@ -331,6 +332,11 @@ ParU_Ret ParU_Analyze(
     // control:
     ParU_Control *Control);
 
+//------------------------------------------------------------------------------
+// ParU_Factorize: Numeric factorization is done in this routine. Scaling and
+// making Sx matrix, computing factors and permutations is here. ParU_Symbolic
+// structure is computed ParU_Analyze and is an input in this routine.
+//------------------------------------------------------------------------------
 ParU_Ret ParU_Factorize(
     // input:
     cholmod_sparse *A, ParU_Symbolic *Sym,
@@ -339,6 +345,12 @@ ParU_Ret ParU_Factorize(
     // control:
     ParU_Control *Control);
 
+//------------------------------------------------------------------------------
+//--------------------- Solve routines -----------------------------------------
+//------------------------------------------------------------------------------
+// In all the solve routines Num structure must come with the same Sym struct
+// that comes from ParU_Factorize
+//-------- Ax = b (x is overwritten on b)---------------------------------------
 ParU_Ret ParU_Solve(
     // input:
     ParU_Symbolic *Sym, ParU_Numeric *Num,
@@ -346,7 +358,7 @@ ParU_Ret ParU_Solve(
     double *b,
     // control:
     ParU_Control *Control);
-
+//-------- Ax = b --------------------------------------------------------------
 ParU_Ret ParU_Solve(
     // input:
     ParU_Symbolic *Sym, ParU_Numeric *Num, double *b,
@@ -354,7 +366,7 @@ ParU_Ret ParU_Solve(
     double *x,
     // control:
     ParU_Control *user_Control);
-
+//-------- AX = B  (X is overwritten on B, multiple rhs)------------------------
 ParU_Ret ParU_Solve(
     // input
     ParU_Symbolic *Sym, ParU_Numeric *Num, Int nrhs,
@@ -362,7 +374,7 @@ ParU_Ret ParU_Solve(
     double *B,  // m(num_rows of A) x nrhs
     // control:
     ParU_Control *Control);
-
+//-------- AX = B  (multiple rhs)-----------------------------------------------
 ParU_Ret ParU_Solve(
     // input
     ParU_Symbolic *Sym, ParU_Numeric *Num, Int nrhs, double *B,
@@ -371,14 +383,10 @@ ParU_Ret ParU_Solve(
     // control:
     ParU_Control *Control);
 
-ParU_Ret ParU_Freesym(ParU_Symbolic **Sym_handle, ParU_Control *Control);
-
-ParU_Ret ParU_Freenum(
-    // input
-    ParU_Symbolic *Sym,
-    // output
-    ParU_Numeric **Num_handle, ParU_Control *Control);
-
+//------------------------------------------------------------------------------
+//-------------- computing residual --------------------------------------------
+//------------------------------------------------------------------------------
+// The user provide both x and b
 // resid = norm1(b-A*x) / norm1(A)
 ParU_Ret ParU_Residual(
     // inputs:
@@ -388,7 +396,7 @@ ParU_Ret ParU_Residual(
     // control:
     ParU_Control *Control);
 
-// resid = norm1(b-A*x) / norm1(A)
+// resid = norm1(B-A*X) / norm1(A) (multiple rhs)
 ParU_Ret ParU_Residual(
     // inputs:
     cholmod_sparse *A, double *X, double *B, Int m, Int nrhs,
@@ -396,4 +404,17 @@ ParU_Ret ParU_Residual(
     double &resid, double &anorm,
     // control:
     ParU_Control *Control);
+
+//------------------------------------------------------------------------------
+//------------ Free routines----------------------------------------------------
+//------------------------------------------------------------------------------
+// Num must be freed with corresponding Sym and Sym cannot be freed befor
+// corresponding Num
+ParU_Ret ParU_Freenum(
+    // input
+    ParU_Symbolic *Sym,
+    // output
+    ParU_Numeric **Num_handle, ParU_Control *Control);
+
+ParU_Ret ParU_Freesym(ParU_Symbolic **Sym_handle, ParU_Control *Control);
 #endif

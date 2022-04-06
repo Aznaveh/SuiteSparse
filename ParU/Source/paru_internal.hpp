@@ -75,6 +75,20 @@ static int print_level = 0;
 #define PARU_DEFINE_PRLEVEL
 #endif
 
+// These libraries are included in Suitesparse_config
+//#include <stdlib.h>
+//#include <math.h>
+//#include <float.h>
+//#include <stdio.h>
+//#include <cstring>
+//#include <malloc.h> // mallopt used in paru_init_rowFronts.cpp
+
+// To be able to use set
+#include <algorithm>
+#include <set>
+#include <vector>
+
+
 // -----------------------------------------------------------------------------
 // basic macros
 // -----------------------------------------------------------------------------
@@ -101,9 +115,8 @@ struct heaps_info
 };
 
 // =============================================================================
-//      ParU_Tuple, Row data structure
+//                   ParU_Tuple, Row data structure
 // =============================================================================
-// move to paru_internal.h
 struct paru_tuple
 {
     // The (e,f) tuples for element lists
@@ -119,9 +132,8 @@ struct paru_tupleList
 };
 
 // =============================================================================
-// An element, contribution block
+//                  An element, contribution block
 // =============================================================================
-
 struct paru_element
 {
     Int
