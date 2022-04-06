@@ -1,5 +1,5 @@
 /* ========================================================================== */
-/* === umfpack_azn ========================================================== */
+/* === umfpack_paru ========================================================== */
 /* ========================================================================== */
 
 /* -------------------------------------------------------------------------- */
@@ -7,7 +7,7 @@
 /* All Rights Reserved.  See ../Doc/License.txt for License.                  */
 /* -------------------------------------------------------------------------- */
 
-int umfpack_di_azn_symbolic
+int umfpack_di_paru_symbolic
 (
     int n_row,
     int n_col,
@@ -24,7 +24,7 @@ int umfpack_di_azn_symbolic
     double Info [UMFPACK_INFO]
 ) ;
 
-SuiteSparse_long umfpack_dl_azn_symbolic
+SuiteSparse_long umfpack_dl_paru_symbolic
 (
     SuiteSparse_long n_row,
     SuiteSparse_long n_col,
@@ -42,7 +42,7 @@ SuiteSparse_long umfpack_dl_azn_symbolic
     double Info [UMFPACK_INFO]
 ) ;
 
-int umfpack_zi_azn_symbolic
+int umfpack_zi_paru_symbolic
 (
     int n_row,
     int n_col,
@@ -58,7 +58,7 @@ int umfpack_zi_azn_symbolic
     double Info [UMFPACK_INFO]
 ) ;
 
-SuiteSparse_long umfpack_zl_azn_symbolic
+SuiteSparse_long umfpack_zl_paru_symbolic
 (
     SuiteSparse_long n_row,
     SuiteSparse_long n_col,
@@ -76,22 +76,22 @@ SuiteSparse_long umfpack_zl_azn_symbolic
     double Info [UMFPACK_INFO]
 ) ;
 
-void umfpack_di_azn_free_sw
+void umfpack_di_paru_free_sw
 (
     void **SW
 ) ;
 
-void umfpack_dl_azn_free_sw
+void umfpack_dl_paru_free_sw
 (
     void **SW
 ) ;
 
-void umfpack_zi_azn_free_sw
+void umfpack_zi_paru_free_sw
 (
     void **SW
 ) ;
 
-void umfpack_zl_azn_free_sw
+void umfpack_zl_paru_free_sw
 (
     void **SW
 ) ;

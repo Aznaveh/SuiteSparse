@@ -2588,14 +2588,14 @@ PRIVATE Int symbolic_analysis
 
     if (SW_Handle != NULL)
     {
-        /* do not free the workspace; return it to umfpack_*_azn_symbolic */
+        /* do not free the workspace; return it to umfpack_*_paru_symbolic */
         (*SW_Handle) = (void *) SW ;
         SW = NULL ;
     }
     else
     {
         /* free the workspace; this is the normal case for UMFPACK */
-        UMFPACK_azn_free_sw ((void **) (&SW)) ;
+        UMFPACK_paru_free_sw ((void **) (&SW)) ;
 
         DEBUG0 (("(3)Symbolic UMF_malloc_count - init_count = "ID"\n",
             UMF_malloc_count - init_count)) ;
@@ -2617,10 +2617,10 @@ PRIVATE Int symbolic_analysis
 
 
 /* ========================================================================== */
-/* === UMFPACK_azn_free_sw ================================================== */
+/* === UMFPACK_paru_free_sw ================================================= */
 /* ========================================================================== */
 
-GLOBAL void UMFPACK_azn_free_sw
+GLOBAL void UMFPACK_paru_free_sw
 (
     void **SW_Handle
 )
@@ -2668,7 +2668,7 @@ PRIVATE void error
 )
 {
 
-    UMFPACK_azn_free_sw ((void **) SW_Handle) ;
+    UMFPACK_paru_free_sw ((void **) SW_Handle) ;
     UMFPACK_free_symbolic ((void **) Symbolic) ;
     ASSERT (UMF_malloc_count == init_count) ;
 }
@@ -2777,10 +2777,10 @@ GLOBAL Int UMFPACK_fsymbolic
 
 
 /* ========================================================================== */
-/* === UMFPACK_azn_symbolic ================================================= */
+/* === UMFPACK_paru_symbolic ================================================ */
 /* ========================================================================== */
 
-GLOBAL Int UMFPACK_azn_symbolic
+GLOBAL Int UMFPACK_paru_symbolic
 (
     Int n_row,
     Int n_col,

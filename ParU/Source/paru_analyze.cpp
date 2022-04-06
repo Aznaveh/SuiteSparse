@@ -299,7 +299,7 @@ ParU_Ret ParU_Analyze(cholmod_sparse *A, ParU_Symbolic **S_handle,
     /* performing the symbolic analysis */
 
     void *SW;
-    status = umfpack_dl_azn_symbolic(m, n, Ap, Ai, Ax,
+    status = umfpack_dl_paru_symbolic(m, n, Ap, Ai, Ax,
                                      NULL,   // user provided ordering
                                      FALSE,  // No user ordering
                                      NULL,   // user params
@@ -419,7 +419,7 @@ ParU_Ret ParU_Analyze(cholmod_sparse *A, ParU_Symbolic **S_handle,
         printf("Paru: out of memory\n");
         ParU_Freesym(&Sym, Control);
         umfpack_dl_free_symbolic(&Symbolic);
-        umfpack_dl_azn_free_sw(&SW);
+        umfpack_dl_paru_free_sw(&SW);
         return PARU_OUT_OF_MEMORY;
     }
 
@@ -560,7 +560,7 @@ ParU_Ret ParU_Analyze(cholmod_sparse *A, ParU_Symbolic **S_handle,
         paru_free((m + 1), sizeof(Int), Pinit);
         paru_free(n, sizeof(Int), inv_Diag_map);
         ParU_Freesym(&Sym, Control);
-        umfpack_dl_azn_free_sw(&SW);
+        umfpack_dl_paru_free_sw(&SW);
         return PARU_OUT_OF_MEMORY;
     }
     Sym->Parent = Parent;
@@ -579,7 +579,7 @@ ParU_Ret ParU_Analyze(cholmod_sparse *A, ParU_Symbolic **S_handle,
             paru_free((m + 1), sizeof(Int), Pinit);
             paru_free(n, sizeof(Int), inv_Diag_map);
             ParU_Freesym(&Sym, Control);
-            umfpack_dl_azn_free_sw(&SW);
+            umfpack_dl_paru_free_sw(&SW);
             return PARU_OUT_OF_MEMORY;
         }
 
@@ -702,7 +702,7 @@ ParU_Ret ParU_Analyze(cholmod_sparse *A, ParU_Symbolic **S_handle,
         printf("Paru: memory problem\n");
         paru_free(n, sizeof(Int), inv_Diag_map);
         ParU_Freesym(&Sym, Control);
-        umfpack_dl_azn_free_sw(&SW);
+        umfpack_dl_paru_free_sw(&SW);
         return PARU_OUT_OF_MEMORY;
     }
 
@@ -781,7 +781,7 @@ ParU_Ret ParU_Analyze(cholmod_sparse *A, ParU_Symbolic **S_handle,
     Sym->Parent = Parent = newParent;
     nf = Sym->nf = newNf;
 
-    umfpack_dl_azn_free_sw(&SW);
+    umfpack_dl_paru_free_sw(&SW);
     paru_free((n + 1), sizeof(Int), Front_npivcol);
     paru_free((n + 1), sizeof(Int), fmap);
 
@@ -847,7 +847,7 @@ ParU_Ret ParU_Analyze(cholmod_sparse *A, ParU_Symbolic **S_handle,
         paru_free((m + 1), sizeof(Int), Pinit);
         ParU_Freesym(&Sym, Control);
         paru_free(n, sizeof(Int), inv_Diag_map);
-        // umfpack_dl_azn_free_sw (&SW);
+        // umfpack_dl_paru_free_sw (&SW);
         return PARU_OUT_OF_MEMORY;
     }
 
@@ -897,7 +897,7 @@ ParU_Ret ParU_Analyze(cholmod_sparse *A, ParU_Symbolic **S_handle,
         paru_free((m + 1), sizeof(Int), Pinit);
         ParU_Freesym(&Sym, Control);
         paru_free(n, sizeof(Int), inv_Diag_map);
-        // umfpack_dl_azn_free_sw (&SW);
+        // umfpack_dl_paru_free_sw (&SW);
         return PARU_OUT_OF_MEMORY;
     }
 
@@ -911,7 +911,7 @@ ParU_Ret ParU_Analyze(cholmod_sparse *A, ParU_Symbolic **S_handle,
         paru_free((MAX(m, n) + 2), sizeof(Int), Work);
         ParU_Freesym(&Sym, Control);
         paru_free(n, sizeof(Int), inv_Diag_map);
-        // umfpack_dl_azn_free_sw (&SW);
+        // umfpack_dl_paru_free_sw (&SW);
         return PARU_OUT_OF_MEMORY;
     }
 
@@ -944,7 +944,7 @@ ParU_Ret ParU_Analyze(cholmod_sparse *A, ParU_Symbolic **S_handle,
         paru_free((MAX(m, n) + 2), sizeof(Int), Work);
 
         ParU_Freesym(&Sym, Control);
-        // umfpack_dl_azn_free_sw (&SW);
+        // umfpack_dl_paru_free_sw (&SW);
 
         paru_free(n, sizeof(Int), inv_Diag_map);
         return PARU_OUT_OF_MEMORY;
@@ -1027,7 +1027,7 @@ ParU_Ret ParU_Analyze(cholmod_sparse *A, ParU_Symbolic **S_handle,
         paru_free((m + 1), sizeof(Int), Pinit);
         paru_free((MAX(m, n) + 2), sizeof(Int), Work);
         paru_free(n, sizeof(Int), inv_Diag_map);
-        // umfpack_dl_azn_free_sw (&SW);
+        // umfpack_dl_paru_free_sw (&SW);
         ParU_Freesym(&Sym, Control);
         return PARU_OUT_OF_MEMORY;
     }
@@ -1197,7 +1197,7 @@ ParU_Ret ParU_Analyze(cholmod_sparse *A, ParU_Symbolic **S_handle,
         paru_free((MAX(m, n) + 2), sizeof(Int), Work);
 
         ParU_Freesym(&Sym, Control);
-        // umfpack_dl_azn_free_sw (&SW);
+        // umfpack_dl_paru_free_sw (&SW);
         return PARU_OUT_OF_MEMORY;
     }
     ASSERT(rowcount == m - n1);
@@ -1333,7 +1333,7 @@ ParU_Ret ParU_Analyze(cholmod_sparse *A, ParU_Symbolic **S_handle,
     {
         printf("Paru: memory problem\n");
         ParU_Freesym(&Sym, Control);
-        // umfpack_dl_azn_free_sw (&SW);
+        // umfpack_dl_paru_free_sw (&SW);
         return PARU_OUT_OF_MEMORY;
     }
 
