@@ -25,7 +25,7 @@ double paru_spm_1norm(cholmod_sparse *A)
             PRLEVEL(3, ("Ax[%ld] = %.2lf\n", p, Ax[p]));
             s += fabs(Ax[p]);
         }
-        PRLEVEL(2, ("s = %.2lf\n", s));
+        PRLEVEL(2, ("s = %le\n", s));
         norm = MAX(norm, s);
     }
     PRLEVEL(1, ("norm = %.8lf\n", norm));
