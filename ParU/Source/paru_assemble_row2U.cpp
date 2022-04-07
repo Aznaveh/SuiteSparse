@@ -1,6 +1,9 @@
 ////////////////////////////////////////////////////////////////////////////////
 //////////////////////////  paru_assemble_row2U.cpp ////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
+// ParU, Mohsen Aznaveh and Timothy A. Davis, (c) 2022, All Rights Reserved.
+// SPDX-License-Identifier: GNU GPL 3.0
+
 /*! @brief  assemble numbers in U part of the matrix.
  *          It is per row, and the matrices are stored in column,
  *          therefore it can reduce the performance in some cases.

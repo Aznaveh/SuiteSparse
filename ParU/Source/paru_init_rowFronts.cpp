@@ -1,6 +1,9 @@
 ////////////////////////////////////////////////////////////////////////////////
 //////////////////////////  paru_init_rowFronts  ///////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
+// ParU, Mohsen Aznaveh and Timothy A. Davis, (c) 2022, All Rights Reserved.
+// SPDX-License-Identifier: GNU GPL 3.0
+
 /*!  @brief  Initializing row fronts; fronts will be assembled later.
  *         Initializing Row and column tuple lists:
  *            allocating memory and updating lists and initializing matrix

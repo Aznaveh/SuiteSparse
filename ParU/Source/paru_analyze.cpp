@@ -1,6 +1,9 @@
 ////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////// ParU_Analyze /////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
+// ParU, Mohsen Aznaveh and Timothy A. Davis, (c) 2022, All Rights Reserved.
+// SPDX-License-Identifier: GNU GPL 3.0
+
 /*! @brief Computing etree and do the symbolic analysis. In this file I am going
  * to use umfpack symbolic analysis instaed of spqrsym. However, I will keep the
  * style of spqr mostly.

@@ -1,6 +1,9 @@
 ////////////////////////////////////////////////////////////////////////////////
 //////////////////////////  paru_full_summed ///////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
+/// ParU, Mohsen Aznaveh and Timothy A. Davis, (c) 2022, All Rights Reserved.
+// SPDX-License-Identifier: GNU GPL 3.0
+
 /*! @brief  fully sum the pivotal column from a prior contribution block e
  *  assembling starts with el->lac and continues until no assembly is possible
  *  in curent front. If the prior contribution block is empty free it here.
