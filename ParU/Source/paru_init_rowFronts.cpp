@@ -458,13 +458,6 @@ ParU_Ret paru_init_rowFronts(
 
         curHeap->push_back(e);
 
-#ifndef NDEBUG  // Printing the pointers info
-                // printf ("%% curEl = %p ", curEl);
-        // Int size = sizeof(paru_element) + sizeof(Int) * (2 * (nrows + ncols))
-        //           + sizeof(double) * nrows * ncols;
-        // printf("size= %ld\n", size);
-#endif
-
         // constants for initialzing lists
         Int slackRow = 2;
 
