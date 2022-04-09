@@ -5,12 +5,32 @@ SPDX-License-Identifier: GNU GPL 3.0
 
 --------------------------------------------------------------------------------
 
-## License
+## Introduction
 
 Paru: is a set of routings for solving sparse linear system via parallel
 multifrontal LU factorization algorithms.  Requires OpenMP 4.0+, BLAS, CHOLMOD,
 UMFPACK, AMD, COLAMD and METIS.
 
+##  How to use
+
+You should include ParU.hpp in your C++ project. Then for solving Ax=b
+In which A is a sparse matrix in matrix market format with double entries
+and b is a dense vector of double 
+(or a dense matrix B for multiple rhs)
+
+     // you can have different Controls for each
+     info = ParU_Analyze(A, &Sym, &Control);
+     // you can have multiple different factorization with a single ParU_Analyze
+     info = ParU_Factorize(A, Sym, &Num, &Control);
+     info = ParU_Solve(Sym, Num, b, x, &Control);
+     ParU_Freenum(Sym, &Num, &Control);
+     ParU_Freesym(&Sym, &Control);
+
+See Demo fore more examples
+
+
+--------------------------------------------------------------------------------
+## License
 Copyright (C) 2022 Mohsen Aznaveh and Timothy A. Davis
 
 This program is free software: you can redistribute it and/or modify it under

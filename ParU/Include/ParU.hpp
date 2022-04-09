@@ -22,7 +22,7 @@
 //               info = ParU_Analyze(A, &Sym, &Control);
 //               info = ParU_Factorize(A, Sym, &Num, &Control);
 //               info = ParU_Solve(Sym, Num, b, x, &Control);
-//               See paru_demo for mor examples
+//               See paru_demo for more examples
 
 #ifndef PARU_H
 #define PARU_H
