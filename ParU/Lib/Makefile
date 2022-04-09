@@ -250,12 +250,12 @@ $(INSTALL_LIB)/$(SO_TARGET): $(OBJ)
 	( cd $(INSTALL_LIB) ; ln -sf $(SO_TARGET) $(SO_MAIN) )
 	$(CP) ../Include/ParU.hpp $(INSTALL_INCLUDE)
 	$(CP) ../Doc/paru_user_guide.pdf $(INSTALL_DOC)
-	$(CP) ../README.txt $(INSTALL_DOC)/PARU_README.txt
+	$(CP) ../README.md $(INSTALL_DOC)/PARU_README.md
 	chmod 755 $(INSTALL_LIB)/$(SO_TARGET)
 	chmod 644 $(INSTALL_INCLUDE)/ParU.hpp
 #	chmod 644 $(INSTALL_DOC)/paru_user_guide.pdf
 	chmod 744 $(INSTALL_DOC)/paru_user_guide.pdf
-	chmod 644 $(INSTALL_DOC)/PARU_README.txt
+	chmod 644 $(INSTALL_DOC)/PARU_README.md
 
 # uninstall PARU
 uninstall:
@@ -264,4 +264,4 @@ uninstall:
 	$(RM) $(INSTALL_LIB)/$(SO_MAIN)
 	$(RM) $(INSTALL_INCLUDE)/ParU.hpp
 	$(RM) $(INSTALL_DOC)/paru_user_guide.pdf
-	$(RM) $(INSTALL_DOC)/PARU_README.txt
+	$(RM) $(INSTALL_DOC)/PARU_README.md
