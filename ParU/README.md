@@ -1,6 +1,7 @@
 # SuiteSparse:ParU
 
 ParU, Mohsen Aznaveh and Timothy A. Davis, (c) 2022, All Rights Reserved.
+
 SPDX-License-Identifier: GNU GPL 3.0
 
 --------------------------------------------------------------------------------
