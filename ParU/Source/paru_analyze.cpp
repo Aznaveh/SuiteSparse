@@ -1184,7 +1184,7 @@ ParU_Ret ParU_Analyze(cholmod_sparse *A, ParU_Symbolic **S_handle,
     {
         // That must not happen anyway if umfpack finds it
         printf("Paru: Empty rows in submatrix\n");
-
+        return PARU_SINGULAR;
 #ifndef NDEBUG
         PRLEVEL(1, ("m = %ld, n1 = %ld, rowcount = %ld, snz = %ld\n", m, n1,
                     rowcount, snz));

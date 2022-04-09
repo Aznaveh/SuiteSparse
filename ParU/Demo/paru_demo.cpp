@@ -88,7 +88,7 @@ int main(int argc, char **argv)
     double resid, norm, anorm;
     ParU_Residual(A, xx, b, m, resid, anorm, &Control);
     
-    printf("Residual is |%.2lf| and anorm is |%.2e|.\n",
+    printf("Residual is |%.2lf| and anorm is %.2e.\n",
            resid == 0 ? 0 : log10(resid), anorm);
 
     free(b);
@@ -101,8 +101,7 @@ int main(int argc, char **argv)
 
     info = ParU_Solve(Sym, Num, nrhs, B, X, &Control);
     ParU_Residual(A, X, B, m, nrhs, resid, anorm, &Control);
-    printf("mRhs Residual is |%.2lf| and anorm is |%.2e|.\n",
-           resid == 0 ? 0 : log10(resid), anorm);
+    printf("mRhs Residual is |%.2lf|\n", resid == 0 ? 0 : log10(resid));
 
     free(B);
     free(X);
