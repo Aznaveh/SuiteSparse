@@ -166,6 +166,13 @@ Int paru_panel_factorize(Int f, Int m, Int n, const Int panel_width,
             Num->res = PARU_SINGULAR;
             continue;
         }
+        //XXX if piv valuse is less than epsilon the matrix might be singular
+        double eps = 1e-15;
+        if (maxval < eps)
+        {
+            #pragma omp atomic write
+            Num->res = PARU_SINGULAR;
+        }
 
         // initialzing pivot as max numeric value
         double piv = maxval;
@@ -242,12 +249,12 @@ Int paru_panel_factorize(Int f, Int m, Int n, const Int panel_width,
         PRLEVEL(1, ("%% piv value= %2.4lf row_deg=%ld\n", piv, row_deg_sp));
         PRLEVEL(-1, ("%% piv value= %e \n", piv));
         //XXX if piv valuse is less than epsilon the matrix might be singular
-        double eps = 1e-15;
-        if (piv < eps)
-        {
-            #pragma omp atomic write
-            Num->res = PARU_SINGULAR;
-        }
+        //double eps = 1e-15;
+        //if (piv < eps)
+        //{
+        //    #pragma omp atomic write
+        //    Num->res = PARU_SINGULAR;
+        //}
 
         // swap rows
         PRLEVEL(1, ("%% Swaping rows j=%ld, row_piv=%ld\n", j, row_piv));
