@@ -450,5 +450,5 @@ ParU_Ret ParU_Factorize(cholmod_sparse *A, ParU_Symbolic *Sym,
     time -= my_start_time;
     PRLEVEL(1, ("factorization time took is %lf\n", time));
 #endif
-    return PARU_SUCCESS;
+    return Num->res;
 }

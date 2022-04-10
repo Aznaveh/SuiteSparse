@@ -4,14 +4,13 @@
 // ParU, Mohsen Aznaveh and Timothy A. Davis, (c) 2022, All Rights Reserved.
 // SPDX-License-Identifier: GNU GPL 3.0
 
-
 /*
  * @brief    test to see how to call umfpack symbolic analysis
  *
  * @author Aznaveh
  * */
-#include <omp.h>
 #include <math.h>
+#include <omp.h>
 
 #include "ParU.hpp"
 
@@ -66,6 +65,8 @@ int main(int argc, char **argv)
     double my_time = omp_get_wtime() - my_start_time;
     if (info != PARU_SUCCESS)
     {
+        printf("Paru: factorization was not successfull in %lf seconds.\n",
+               my_time);
         ParU_Freenum(Sym, &Num, &Control);
         ParU_Freesym(&Sym, &Control);
         cholmod_l_free_sparse(&A, cc);
@@ -75,36 +76,39 @@ int main(int argc, char **argv)
     printf("Paru: factorization was successfull in %lf seconds.\n", my_time);
 
     //~~~~~~~~~~~~~~~~~~~Test the results ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-#if 1
     Int m = Sym->m;
-    double *b = (double *)malloc(m * sizeof(double));
-    double *xx = (double *)malloc(m * sizeof(double));
-    for (Int i = 0; i < m; ++i) b[i] = i + 1;
-    double my_solve_time_start = omp_get_wtime();
-    info = ParU_Solve(Sym, Num, b, xx, &Control);
-    double my_solve_time = omp_get_wtime() - my_solve_time_start;
-    printf ("Solve time is %lf seconds.\n", my_solve_time);
-    my_start_time = omp_get_wtime();
-    double resid, norm, anorm;
-    ParU_Residual(A, xx, b, m, resid, anorm, &Control);
-    
-    printf("Residual is |%.2lf| and anorm is %.2e.\n",
-           resid == 0 ? 0 : log10(resid), anorm);
+#if 1
+    if (info == PARU_SUCCESS)
+    {
+        double *b = (double *)malloc(m * sizeof(double));
+        double *xx = (double *)malloc(m * sizeof(double));
+        for (Int i = 0; i < m; ++i) b[i] = i + 1;
+        double my_solve_time_start = omp_get_wtime();
+        info = ParU_Solve(Sym, Num, b, xx, &Control);
+        double my_solve_time = omp_get_wtime() - my_solve_time_start;
+        printf("Solve time is %lf seconds.\n", my_solve_time);
+        my_start_time = omp_get_wtime();
+        double resid, norm, anorm;
+        ParU_Residual(A, xx, b, m, resid, anorm, &Control);
 
-    free(b);
-    free(xx);
-    const Int nrhs = 16;  // number of right handsides
-    double *B = (double *)malloc(m * nrhs * sizeof(double));
-    double *X = (double *)malloc(m * nrhs * sizeof(double));
-    for (Int i = 0; i < m; ++i)
-        for (Int j = 0; j < nrhs; ++j) B[j * m + i] = (double)(i + j + 1);
+        printf("Residual is |%.2lf| and anorm is %.2e.\n",
+               resid == 0 ? 0 : log10(resid), anorm);
 
-    info = ParU_Solve(Sym, Num, nrhs, B, X, &Control);
-    ParU_Residual(A, X, B, m, nrhs, resid, anorm, &Control);
-    printf("mRhs Residual is |%.2lf|\n", resid == 0 ? 0 : log10(resid));
+        free(b);
+        free(xx);
+        const Int nrhs = 16;  // number of right handsides
+        double *B = (double *)malloc(m * nrhs * sizeof(double));
+        double *X = (double *)malloc(m * nrhs * sizeof(double));
+        for (Int i = 0; i < m; ++i)
+            for (Int j = 0; j < nrhs; ++j) B[j * m + i] = (double)(i + j + 1);
 
-    free(B);
-    free(X);
+        info = ParU_Solve(Sym, Num, nrhs, B, X, &Control);
+        ParU_Residual(A, X, B, m, nrhs, resid, anorm, &Control);
+        printf("mRhs Residual is |%.2lf|\n", resid == 0 ? 0 : log10(resid));
+
+        free(B);
+        free(X);
+    }
 #endif
 
     //~~~~~~~~~~~~~~~~~~~End computation~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -153,7 +157,7 @@ int main(int argc, char **argv)
 
     umf_time = omp_get_wtime() - umf_start_time;
 
-    b = (double *)malloc(m * sizeof(double));
+    double *b = (double *)malloc(m * sizeof(double));
     double *x = (double *)malloc(m * sizeof(double));
     for (Int i = 0; i < m; ++i) b[i] = i + 1;
 
