@@ -167,12 +167,12 @@ Int paru_panel_factorize(Int f, Int m, Int n, const Int panel_width,
             continue;
         }
         //XXX if piv valuse is less than epsilon the matrix might be singular
-        double eps = 1e-15;
-        if (maxval < eps)
-        {
-            #pragma omp atomic write
-            Num->res = PARU_SINGULAR;
-        }
+        //double eps = 1e-15;
+        //if (maxval < eps)
+        //{
+        //    #pragma omp atomic write
+        //    Num->res = PARU_SINGULAR;
+        //}
 
         // initialzing pivot as max numeric value
         double piv = maxval;
