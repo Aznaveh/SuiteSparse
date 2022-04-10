@@ -65,15 +65,12 @@ int main(int argc, char **argv)
     double my_time = omp_get_wtime() - my_start_time;
     if (info != PARU_SUCCESS)
     {
-        printf("Paru: factorization was not successfull in %lf seconds.\n",
+        printf("Paru: factorization was NOT successfull in %lf seconds.\n",
                my_time);
-        ParU_Freenum(Sym, &Num, &Control);
-        ParU_Freesym(&Sym, &Control);
-        cholmod_l_free_sparse(&A, cc);
-        cholmod_l_finish(cc);
-        return info;
     }
-    printf("Paru: factorization was successfull in %lf seconds.\n", my_time);
+    else
+        printf("Paru: factorization was successfull in %lf seconds.\n",
+               my_time);
 
     //~~~~~~~~~~~~~~~~~~~Test the results ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     Int m = Sym->m;
