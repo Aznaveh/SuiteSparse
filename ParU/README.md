@@ -12,6 +12,15 @@ Paru: is a set of routings for solving sparse linear system via parallel
 multifrontal LU factorization algorithms.  Requires OpenMP 4.0+, BLAS, CHOLMOD,
 UMFPACK, AMD, COLAMD and METIS.
 
+##  How to install
+
+You should first install all dependencies for Paru which is UMFPACK and all its 
+dependencies (AMD, CHOLMOD, ...). By default Paru also needs metis. The 
+configuration of Paru is mostly done via SuiteSparse config file (BLAS library,
+OpenMP settings and ...) which is in SuiteSparse/SuiteSparse_config.
+All SuiteSparse dependencies should be in the same directory as in Paru.
+After that simply call make.
+
 ##  How to use
 
 You should include ParU.hpp in your C++ project. Then for solving Ax=b
