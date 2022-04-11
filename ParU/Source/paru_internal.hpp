@@ -280,6 +280,14 @@ void paru_memset(void *ptr, Int value, size_t num, ParU_Control *Control);
 void paru_memcpy(void *destination, const void *source, size_t num,
                  ParU_Control *Control);
 
+#ifdef PARU_ALLOC_TESTING
+bool paru_get_malloc_tracking (void) ;
+void paru_set_malloc_tracking (bool track) ;
+void paru_set_nmalloc (bool nmalloc) ;
+Int paru_decr_nmalloc (void) ;
+Int paru_get_nmalloc (void) ;
+#endif
+
 /* add tuple functions defintions */
 Int paru_add_rowTuple(paru_tupleList *RowList, Int row, paru_tuple T);
 

@@ -10,6 +10,119 @@
  * @author Aznaveh
  *
  */
+
+#ifdef PARU_ALLOC_TESTING
+// global variables
+bool paru_malloc_tracking = false ;
+Int paru_nmalloc = 0 ;
+
+/* sample usage:
+
+    To test:
+
+        int info = paru_stuff ( ...) ;
+
+    do this instead:
+
+        paru_set_malloc_tracking (true) ;
+        for (nmalloc = 0 ; ; nmalloc++)
+        {
+            paru_set_nmalloc (nmalloc) ;
+            // do stuff
+            int info = paru_stuff (...) ;
+            if (info != PARU_OUT_OF_MEMORY) break ;
+        }
+        paru_set_malloc_tracking (false) ;
+
+    or:
+
+        int info ;
+        BRUTAL_ALLOC_TEST (info, paru_sym (...)) ;
+        if (info == PARU_SUCCESS)
+        {
+            BRUTAL_ALLOC_TEST (info, paru_num (...)) ;
+        }
+        if (info == PARU_SUCCESS)
+        {
+            BRUTAL_ALLOC_TEST (info, paru_solve (...)) ;
+        }
+        TEST_ASSERT (info == PARU_SUCCESS)
+        free sym, num, soln
+
+    // put in test coverage *.h file:
+    #ifdef PARU_ALLOC_TESTING
+    #define BRUTAL_ALLOC_TEST(info,method)              \
+    {                                                   \
+        paru_set_malloc_tracking (true) ;               \
+        for (Int nmalloc = 0 ; ; Int nmalloc++)         \
+        {                                               \
+            paru_set_nmalloc (nmalloc)                  \
+            // do stuff                                 \
+            info = method ;                             \
+            if (info != PARU_OUT_OF_MEMORY) break ;     \
+            if (nmalloc > 1000000) { test failure }
+        }                                               \
+        paru_set_malloc_tracking (false) ;              \
+    }
+    #else
+    #define BRUTAL_ALLOC_TEST(info,method)              \
+    {                                                   \
+        info = method ;                                 \
+    }
+    #endif
+*/
+
+bool paru_get_malloc_tracking (void)
+{
+    bool track ;
+    #pragma omp critical paru_malloc_testing
+    {
+        track = paru_malloc_tracking ;
+    }
+    return (track) ;
+}
+
+void paru_set_malloc_tracking (bool track)
+{
+    #pragma omp critical paru_malloc_testing
+    {
+        paru_malloc_tracking = track ;
+    }
+}
+
+void paru_set_nmalloc (bool nmalloc)
+{
+    #pragma omp critical paru_malloc_testing
+    {
+        paru_nmalloc = nmalloc ;
+    }
+}
+
+Int paru_decr_nmalloc (void)
+{
+    Int nmalloc = 0 ;
+    #pragma omp critical paru_malloc_testing
+    {
+        if (paru_nmalloc > 0)
+        {
+            nmalloc = paru_nmalloc-- ;
+        }
+    }
+    return (nmalloc) ;
+}
+
+Int paru_get_nmalloc (void)
+{
+    Int nmalloc = 0 ;
+    #pragma omp critical paru_malloc_testing
+    {
+        nmalloc = paru_nmalloc ;
+    }
+    return (nmalloc) ;
+}
+
+#endif
+
 #include "paru_internal.hpp"
 //  Wrapper around malloc routine
 //
@@ -20,7 +133,7 @@ void *paru_alloc(size_t n, size_t size)
 #ifndef NDEBUG
     static Int alloc_count = 0;
 #endif
-    void *p;
+    void *p = NULL ;
     if (size == 0)
     {
         printf("Paru: size must be > 0\n");
@@ -34,7 +147,26 @@ void *paru_alloc(size_t n, size_t size)
     }
     else
     {
+
+        #ifdef PARU_ALLOC_TESTING
+        // brutal memory testing only
+        if (paru_get_malloc_tracking ())
+        {
+            Int nmalloc = paru_decr_nmalloc ( ) ;
+            if (nmalloc > 0)
+            {
+                p = SuiteSparse_malloc(n, size);
+            }
+        }
+        else
+        {
+            p = SuiteSparse_malloc(n, size);
+        }
+        #else
+        // in production
         p = SuiteSparse_malloc(n, size);
+        #endif
+
         if (p == NULL)
         {
             // out of memory
@@ -76,7 +208,26 @@ void *paru_calloc(size_t n, size_t size)
     }
     else
     {
+
+        #ifdef PARU_ALLOC_TESTING
+        // brutal memory testing only
+        if (paru_get_malloc_tracking ())
+        {
+            Int nmalloc = paru_decr_nmalloc ( ) ;
+            if (nmalloc > 0)
+            {
+                p = SuiteSparse_calloc(n, size);
+            }
+        }
+        else
+        {
+            p = SuiteSparse_calloc(n, size);
+        }
+        #else
+        // in production
         p = SuiteSparse_calloc(n, size);
+        #endif
+
         if (p == NULL)
         {
             // out of memory
@@ -115,7 +266,7 @@ void *paru_realloc(
     }
     else if (oldP == NULL)
     {  // A new alloc
-        p = SuiteSparse_malloc(newsize, size_Entry);
+        p = paru_alloc (newsize, size_Entry);
         *size = (p == NULL) ? 0 : newsize * size_Entry;
     }
     else if (newsize == *size)
@@ -134,7 +285,31 @@ void *paru_realloc(
     {  // The object exists, and is changing to some other nonzero size.
         PRLEVEL(1, ("realloc : %ld to %ld, %ld\n", *size, newsize, size_Entry));
         int ok = TRUE;
+
+        #ifdef PARU_ALLOC_TESTING
+        // brutal memory testing only
+        if (paru_get_malloc_tracking ())
+        {
+            Int nmalloc = paru_decr_nmalloc ( ) ;
+            if (nmalloc > 0)
+            {
+                p = SuiteSparse_realloc(newsize, *size, size_Entry, oldP, &ok);
+            }
+            else
+            {
+                // pretend to fail
+                ok = FALSE ;
+            }
+        }
+        else
+        {
+            p = SuiteSparse_realloc(newsize, *size, size_Entry, oldP, &ok);
+        }
+        #else
+        // in production
         p = SuiteSparse_realloc(newsize, *size, size_Entry, oldP, &ok);
+        #endif
+
         if (ok)
         {
 #ifndef NDEBUG
@@ -199,7 +374,7 @@ ParU_Ret ParU_Freesym(ParU_Symbolic **Sym_handle, ParU_Control *Control)
     DEBUGLEVEL(0);
     if (Sym_handle == NULL || *Sym_handle == NULL)
         // nothing to do; caller probably ran out of memory
-        return PARU_OUT_OF_MEMORY;
+        return PARU_SUCCESS;
 
     ParU_Symbolic *Sym;
     Sym = *Sym_handle;
@@ -375,22 +550,15 @@ ParU_Ret paru_free_work(ParU_Symbolic *Sym, paru_work *Work)
 
     return PARU_SUCCESS;
 }
-// It uses Sym, Do not free Sym before
-ParU_Ret ParU_Freenum(ParU_Symbolic *Sym, ParU_Numeric **Num_handle,
+
+ParU_Ret ParU_Freenum(ParU_Numeric **Num_handle,
                       ParU_Control *Control)
 {
     DEBUGLEVEL(0);
-    if (Num_handle == NULL || *Num_handle == NULL || Sym == NULL)
+    if (Num_handle == NULL || *Num_handle == NULL)
     {
-        if (Sym == NULL)
-            printf(
-                "Paru: Symbolic data structure has been freed before! Wrong "
-                "usage\n");
-        else
-            printf(
-                "Paru: Numeric data structure been freed before! Wrong "
-                "usage\n");
-        return PARU_INVALID;
+        // nothing to do
+        return PARU_SUCCESS;
     }
 
     ParU_Numeric *Num;
@@ -398,23 +566,23 @@ ParU_Ret ParU_Freenum(ParU_Symbolic *Sym, ParU_Numeric **Num_handle,
 
     Int m = Num->m;  // m and n is different than Sym
 
-    Int nf = Sym->nf;
+    Int nf = Sym->nf;   // HERE: nf
 
     // freeing the numerical input
-    paru_free(Sym->snz, sizeof(double), Num->Sx);
-    if (Sym->cs1 > 0)
+    paru_free(Sym->snz, sizeof(double), Num->Sx);   // HERE: snz
+    if (Sym->cs1 > 0)   // HERE: cs1
     {
         ParU_U_singleton ustons = Sym->ustons;
         Int nnz = ustons.nnz;
-        paru_free(nnz, sizeof(double), Num->Sux);
+        paru_free(nnz, sizeof(double), Num->Sux);   // HERE: nnz of ustons
     }
-    if (Sym->rs1 > 0)
+    if (Sym->rs1 > 0)   // HERE: rs1
     {
         ParU_L_singleton lstons = Sym->lstons;
         Int nnz = lstons.nnz;
-        paru_free(nnz, sizeof(double), Num->Slx);
+        paru_free(nnz, sizeof(double), Num->Slx);   // HERE: nnz of lstons
     }
-    paru_free(Sym->m, sizeof(Int), Num->Rs);
+    paru_free(Sym->m, sizeof(Int), Num->Rs);        // HERE: sym_m
 
     // free the factors
     ParU_Factors *LUs = Num->partial_LUs;
@@ -453,6 +621,7 @@ ParU_Ret ParU_Freenum(ParU_Symbolic *Sym, ParU_Numeric **Num_handle,
     paru_free(1, nf * sizeof(ParU_Factors), Us);
 
 #ifndef NDEBUG
+    // HERE: delete this
     Int Us_bound_size = Sym->Us_bound_size;
     Int LUs_bound_size = Sym->LUs_bound_size;
     Int double_size = LUs_bound_size + Us_bound_size;
