@@ -431,26 +431,29 @@ ParU_Ret ParU_Factorize(cholmod_sparse *A, ParU_Symbolic *Sym,
     PRLEVEL(-1, ("Flop count = %.17g\n", flop_count));
 #endif
     Int max_rc = 0, max_cc = 0;
-    double min_udiag, max_udiag;
+    double min_udiag = -1, max_udiag = 1; // not to fail for nf ==0
     // using the first value of the first front just to initialize
-    ParU_Factors *LUs = Num->partial_LUs;
-    max_udiag = min_udiag = *(LUs[0].p);
-    for (Int f = 0; f < nf; f++)
+    if (nf > 0)
     {
-        Int rowCount = Num->frowCount[f];
-        Int colCount = Num->fcolCount[f];
-        Int *Super = Sym->Super;
-        Int col1 = Super[f];
-        Int col2 = Super[f + 1];
-        Int fp = col2 - col1;
-        max_rc = MAX(max_rc, rowCount);
-        max_cc = MAX(max_cc, colCount + fp);
-        double *A = LUs[f].p;
-        for (Int i = 0; i < fp; i++)
+        ParU_Factors *LUs = Num->partial_LUs;
+        max_udiag = min_udiag = *(LUs[0].p);
+        for (Int f = 0; f < nf; f++)
         {
-            double udiag = fabs(A[rowCount * i + i]);
-            min_udiag = MIN(min_udiag, udiag);
-            max_udiag = MAX(max_udiag, udiag);
+            Int rowCount = Num->frowCount[f];
+            Int colCount = Num->fcolCount[f];
+            Int *Super = Sym->Super;
+            Int col1 = Super[f];
+            Int col2 = Super[f + 1];
+            Int fp = col2 - col1;
+            max_rc = MAX(max_rc, rowCount);
+            max_cc = MAX(max_cc, colCount + fp);
+            double *A = LUs[f].p;
+            for (Int i = 0; i < fp; i++)
+            {
+                double udiag = fabs(A[rowCount * i + i]);
+                min_udiag = MIN(min_udiag, udiag);
+                max_udiag = MAX(max_udiag, udiag);
+            }
         }
     }
     PRLEVEL(1, ("max_rc=%ld max_cc=%ld\n", max_rc, max_cc));
