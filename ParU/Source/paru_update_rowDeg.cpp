@@ -46,7 +46,7 @@ void paru_update_rowDeg(Int panel_num, Int row_end, Int f, Int start_fac,
     Int j2 = (j1 + panel_width < fp) ? j1 + panel_width : fp;
 
     Int rowCount = Num->frowCount[f];
-    Int *row_degree_bound = Num->row_degree_bound;
+    Int *row_degree_bound = Work->row_degree_bound;
 
     std::set<Int> stl_newColSet;  // the list of new columns
 

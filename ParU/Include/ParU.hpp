@@ -289,15 +289,19 @@ enum ParU_Ret
 struct ParU_Numeric
 {
     Int m, n;  // size of the sumbatrix(S) that is factorized
+    Int sym_m; // number of rows of original matrix; a copy of Sym->m
 
+    Int nf;  // number of fronts copy of Sym->nf
     double *Rs;  // the array for row scaling based on original matrix
                  // size = m
 
+    Int snz; //nnz in S; copy of Sym->snz
     double *Sx;  // size snz = Sp [n], numeric values of (scaled) S;
                  // Sp and Sj must be initialized in Symbolic phase
-    // Numeric values of singletons
-    double *Sux;  // u singletons, Sup Suj are in symbolic
-    double *Slx;  // l singletons, Slp Sli are in symbolic
+    Int sunz;
+    double *Sux;  // Numeric values u singletons, Sup Suj are in symbolic
+    Int slnz;
+    double *Slx;  // Numeric values l singletons, Slp Sli are in symbolic
 
     ParU_Control *Control;  // a copy of controls for internal use
                             // it is freed after factorize
@@ -313,8 +317,10 @@ struct ParU_Numeric
 
     Int max_row_count;      // maximum number of rows/cols for all the fronts
     Int max_col_count;      // it is initalized after factorization
-    Int *row_degree_bound;  // row degree size number of rows
 
+    double rcond;
+    double min_udiag;
+    double max_udiag;
     ParU_Ret res;  // returning value of numeric phase
 };
 
@@ -410,11 +416,7 @@ ParU_Ret ParU_Residual(
 //------------------------------------------------------------------------------
 // Num must be freed with corresponding Sym and Sym cannot be freed befor
 // corresponding Num
-ParU_Ret ParU_Freenum(
-    // input
-    ParU_Symbolic *Sym,
-    // output
-    ParU_Numeric **Num_handle, ParU_Control *Control);
+ParU_Ret ParU_Freenum(ParU_Numeric **Num_handle, ParU_Control *Control);
 
 ParU_Ret ParU_Freesym(ParU_Symbolic **Sym_handle, ParU_Control *Control);
 #endif

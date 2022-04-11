@@ -56,12 +56,12 @@ ParU_Ret paru_init_rowFronts(
 
     Int m, nf;
     Work->Sym = Sym;
+    Num->sym_m = Sym->m;
     m = Num->m = Sym->m - Sym->n1;
-    nf = Sym->nf;
+    nf = Num->nf = Sym->nf;
     Num->res = PARU_SUCCESS;
     Num->Control = Control;
 
-    Int *row_degree_bound = Num->row_degree_bound = NULL;
     Num->frowCount = NULL;
     Num->fcolCount = NULL;
     Num->frowList = NULL;
@@ -85,6 +85,7 @@ ParU_Ret paru_init_rowFronts(
     paru_element **elementList = Work->elementList = NULL;
     Work->lacList = NULL;
     std::vector<Int> **heapList = Work->heapList = NULL;
+    Int *row_degree_bound = Work->row_degree_bound = NULL;
 
     if (nf != 0)
     {
@@ -93,7 +94,7 @@ ParU_Ret paru_init_rowFronts(
         elRow = Work->elRow = (Int *)paru_alloc(m + nf, sizeof(Int));
         elCol = Work->elCol = (Int *)paru_alloc(m + nf, sizeof(Int));
         rowSize = Work->rowSize = (Int *)paru_alloc(m, sizeof(Int));
-        row_degree_bound = Num->row_degree_bound =
+        row_degree_bound = Work->row_degree_bound =
             (Int *)paru_alloc(m, sizeof(Int));
         RowList = Work->RowList =
             (paru_tupleList *)paru_alloc(1, m * sizeof(paru_tupleList));
@@ -127,7 +128,7 @@ ParU_Ret paru_init_rowFronts(
         }
     }
 
-    Int snz = Sym->snz;
+    Int snz = Num->snz = Sym->snz;
     double *Sx = NULL;
     Sx = Num->Sx = (double *)paru_alloc(snz, sizeof(double));
     Int *cSp = NULL;  // copy of Sp, temporary for making Sx
@@ -153,6 +154,8 @@ ParU_Ret paru_init_rowFronts(
         Slx = (double *)paru_alloc(slnz, sizeof(double));
         cSlp = (Int *)paru_alloc(rs1 + 1, sizeof(Int));
     }
+    Num->sunz = sunz;
+    Num->slnz = slnz;
     Num->Slx = Slx;
     double *Rs = NULL;
     Int scale = Control->scale;  // if 1 the S will be scaled by max_row
@@ -343,7 +346,7 @@ ParU_Ret paru_init_rowFronts(
             }
         }
     }
-
+    paru_free(m + 1, sizeof(Int), cSp);
     if (Sym->cs1 > 0) paru_free((cs1 + 1), sizeof(Int), cSup);
     if (Sym->rs1 > 0) paru_free((rs1 + 1), sizeof(Int), cSlp);
         //////////////////Initializing numerics Sx, Sux and Slx

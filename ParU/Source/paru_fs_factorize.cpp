@@ -45,7 +45,7 @@ Int paru_panel_factorize(Int f, Int m, Int n, const Int panel_width,
     PARU_DEFINE_PRLEVEL;
     PRLEVEL(1, ("%% Inside panel factorization %ld \n", panel_num));
 
-    Int *row_degree_bound = Num->row_degree_bound;
+    Int *row_degree_bound = Work->row_degree_bound;
     ParU_Control *Control = Num->Control;
     Int j1 = panel_num * panel_width;  // panel starting column
 

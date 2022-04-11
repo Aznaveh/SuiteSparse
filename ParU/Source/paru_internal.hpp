@@ -201,6 +201,8 @@ struct paru_work
     // inverse of Diag_map from Sym;
     // It helps editing the Diag_map
 
+    Int *row_degree_bound;  // row degree size number of rows
+
     ParU_Symbolic *Sym;  // point to the symbolic that user sends
 
     paru_element **elementList;  // pointers to all elements, size = m+nf+1

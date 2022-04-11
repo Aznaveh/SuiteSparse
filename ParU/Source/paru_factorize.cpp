@@ -416,7 +416,7 @@ ParU_Ret ParU_Factorize(cholmod_sparse *A, ParU_Symbolic *Sym,
     }
 
     info = paru_perm(Sym, Num);  // to form the final permutation
-    paru_free_work(Sym, Work);  // free the work DS
+    paru_free_work(Sym, Work);   // free the work DS
     Num->Control = NULL;
 
     if (info == PARU_OUT_OF_MEMORY)
@@ -431,6 +431,10 @@ ParU_Ret ParU_Factorize(cholmod_sparse *A, ParU_Symbolic *Sym,
     PRLEVEL(-1, ("Flop count = %.17g\n", flop_count));
 #endif
     Int max_rc = 0, max_cc = 0;
+    double min_udiag, max_udiag;
+    // using the first value of the first front just to initialize
+    ParU_Factors *LUs = Num->partial_LUs;
+    max_udiag = min_udiag = *(LUs[0].p);
     for (Int f = 0; f < nf; f++)
     {
         Int rowCount = Num->frowCount[f];
@@ -441,10 +445,22 @@ ParU_Ret ParU_Factorize(cholmod_sparse *A, ParU_Symbolic *Sym,
         Int fp = col2 - col1;
         max_rc = MAX(max_rc, rowCount);
         max_cc = MAX(max_cc, colCount + fp);
+        double *A = LUs[f].p;
+        for (Int i = 0; i < fp; i++)
+        {
+            double udiag = fabs(A[rowCount * i + i]);
+            min_udiag = MIN(min_udiag, udiag);
+            max_udiag = MAX(max_udiag, udiag);
+        }
     }
     PRLEVEL(1, ("max_rc=%ld max_cc=%ld\n", max_rc, max_cc));
+    PRLEVEL(1, ("max_udiag=%e min_udiag=%e rcond=%e\n", max_udiag, min_udiag,
+                min_udiag / max_udiag));
     Num->max_row_count = max_rc;
     Num->max_col_count = max_cc;
+    Num->min_udiag = min_udiag;
+    Num->max_udiag = max_udiag;
+    Num->rcond = min_udiag / max_udiag;
 #ifndef NTIME
     double time = PARU_OPENMP_GET_WTIME;
     time -= my_start_time;

@@ -88,8 +88,8 @@ int main(int argc, char **argv)
         double resid, norm, anorm;
         ParU_Residual(A, xx, b, m, resid, anorm, &Control);
 
-        printf("Residual is |%.2lf| and anorm is %.2e.\n",
-               resid == 0 ? 0 : log10(resid), anorm);
+        printf("Residual is |%.2lf| and anorm is %.2e and rocnd is %.2e.\n",
+               resid == 0 ? 0 : log10(resid), anorm, Num->rcond);
 
         free(b);
         free(xx);
@@ -187,7 +187,7 @@ int main(int argc, char **argv)
 
 #endif
     //~~~~~~~~~~~~~~~~~~~Free Everything~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    ParU_Freenum(Sym, &Num, &Control);
+    ParU_Freenum(&Num, &Control);
     ParU_Freesym(&Sym, &Control);
 
     cholmod_l_free_sparse(&A, cc);
