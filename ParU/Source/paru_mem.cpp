@@ -550,8 +550,7 @@ ParU_Ret paru_free_work(ParU_Symbolic *Sym, paru_work *Work)
     return PARU_SUCCESS;
 }
 
-ParU_Ret ParU_Freenum(ParU_Numeric **Num_handle,
-                     ParU_Control *Control)
+ParU_Ret ParU_Freenum(ParU_Numeric **Num_handle, ParU_Control *Control)
 {
     DEBUGLEVEL(0);
     if (Num_handle == NULL || *Num_handle == NULL)
@@ -563,20 +562,19 @@ ParU_Ret ParU_Freenum(ParU_Numeric **Num_handle,
     ParU_Numeric *Num;
     Num = *Num_handle;
 
-    Int m = Num->m;  
     Int nf = Num->nf;
 
     // freeing the numerical input
-    paru_free(Num->snz, sizeof(double), Num->Sx);  
-    if (Num->sunz > 0)                            
+    paru_free(Num->snz, sizeof(double), Num->Sx);
+    if (Num->sunz > 0)
     {
         paru_free(Num->sunz, sizeof(double), Num->Sux);
     }
-    if (Num->slnz > 0)                              
+    if (Num->slnz > 0)
     {
-        paru_free(Num->slnz, sizeof(double), Num->Slx); 
+        paru_free(Num->slnz, sizeof(double), Num->Slx);
     }
- 
+
     paru_free(Num->sym_m, sizeof(Int), Num->Rs);  // HERE: sym_m
 
     // free the factors
