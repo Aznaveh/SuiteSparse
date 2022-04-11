@@ -431,12 +431,12 @@ ParU_Ret ParU_Factorize(cholmod_sparse *A, ParU_Symbolic *Sym,
     PRLEVEL(-1, ("Flop count = %.17g\n", flop_count));
 #endif
     Int max_rc = 0, max_cc = 0;
-    double min_udiag = -1, max_udiag = 1; // not to fail for nf ==0
+    double min_udiag = 1, max_udiag = 1; // not to fail for nf ==0
     // using the first value of the first front just to initialize
     if (nf > 0)
     {
         ParU_Factors *LUs = Num->partial_LUs;
-        max_udiag = min_udiag = *(LUs[0].p);
+        max_udiag = min_udiag = fabs(*(LUs[0].p));
         for (Int f = 0; f < nf; f++)
         {
             Int rowCount = Num->frowCount[f];
