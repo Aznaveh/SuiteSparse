@@ -430,8 +430,8 @@ ParU_Ret ParU_Factorize(cholmod_sparse *A, ParU_Symbolic *Sym,
         Num->flp_cnt_dgemm + Num->flp_cnt_dger + Num->flp_cnt_trsm;
     PRLEVEL(-1, ("Flop count = %.17g\n", flop_count));
 #endif
-    Int max_rc = 0, max_cc = 0;
-    double min_udiag = 1, max_udiag = 1; // not to fail for nf ==0
+    Int max_rc = 1, max_cc = -1;
+    double min_udiag = 0, max_udiag = 0; // not to fail for nf ==0
     // using the first value of the first front just to initialize
     if (nf > 0)
     {
