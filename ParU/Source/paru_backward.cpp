@@ -35,7 +35,7 @@ ParU_Ret paru_backward(double *x1, double &resid, double &norm,
     double *b = (double *)paru_calloc(m, sizeof(double));
     if (b == NULL)
     {
-        printf("Paru: memory problem inside backward\n");
+        PRLEVEL(1, ("Paru: memory problem inside backward\n"));
         return PARU_OUT_OF_MEMORY;
     }
     paru_gaxpy(A, x1, b, 1);
@@ -68,15 +68,8 @@ ParU_Ret paru_backward(double *x1, double &resid, double &norm,
     resid = paru_vec_1norm(b, m);
     PRLEVEL(1, ("%% resid =%lf\n", resid));
     norm = resid / (paru_spm_1norm(A) * paru_vec_1norm(x1, m));
-    //    PRLEVEL(1, ("backward error is |%.2lf| and weigheted backward error is
-    //    |%.2f|.\n",
-    //                resid == 0 ? 0 : log10(resid),
-    //                resid == 0 ? 0 :log10(norm)));
-    //
-    printf(
-        "backward error is |%.2lf| and weigheted backward error is |%.2f|.\n",
-        resid == 0 ? 0 : log10(resid), resid == 0 ? 0 : log10(norm));
-
+    PRLEVEL(1, ("backward error is |%.2lf| and weigheted backward error is"
+       "|%.2f|.\n",resid == 0 ? 0 : log10(resid), resid == 0 ? 0 :log10(norm)));
     paru_free(m, sizeof(Int), b);
     return PARU_SUCCESS;
 }

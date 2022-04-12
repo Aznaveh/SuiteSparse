@@ -16,10 +16,9 @@
  */
 #include "paru_internal.hpp"
 
-ParU_Ret paru_init_rowFronts(
-        paru_work *Work,
-        ParU_Numeric **Num_handle,  // in/out
-                                   // inputs, not modified
+ParU_Ret paru_init_rowFronts(paru_work *Work,
+                             ParU_Numeric **Num_handle,  // in/out
+                                                         // inputs, not modified
                              cholmod_sparse *A,
                              // symbolic analysis
                              ParU_Symbolic *Sym, ParU_Control *Control)
@@ -33,13 +32,13 @@ ParU_Ret paru_init_rowFronts(
 
     if (!A->packed)
     {
-        printf("Paru: A is not packed; Wrong format \n");
+        PRLEVEL(1, ("Paru: A is not packed; Wrong format \n"));
         return PARU_INVALID;
     }
 
     if (Sym == NULL)
     {
-        printf("Paru: Sym is NULL\n");
+        PRLEVEL(1, ("Paru: Sym is NULL\n"));
         return PARU_INVALID;
     }
 
@@ -48,7 +47,7 @@ ParU_Ret paru_init_rowFronts(
     Num = (ParU_Numeric *)paru_alloc(1, sizeof(ParU_Numeric));
     if (Num == NULL)
     {  // out of memory
-        printf("Paru: out of memory, Num\n");
+        PRLEVEL(1, ("Paru: out of memory, Num\n"));
         // Nothing to be freed
         return PARU_OUT_OF_MEMORY;
     }
@@ -73,7 +72,7 @@ ParU_Ret paru_init_rowFronts(
     Num->Slx = NULL;
     Num->Rs = NULL;
 
-    //Workd DS
+    // Workd DS
     Int *rowMark = Work->rowMark = NULL;
     Int *elRow = Work->elRow = NULL;
     Int *elCol = Work->elCol = NULL;
@@ -285,8 +284,8 @@ ParU_Ret paru_init_rowFronts(
             PRLEVEL(PR, ("%lf ", Rs[k]));
             if (Rs[k] <= 0)
             {
-                printf("Paru: Matrix is singular, row %ld is zero\n", k);
-                Num->res = PARU_SINGULAR; 
+                PRLEVEL(1, ("Paru: Matrix is singular, row %ld is zero\n", k));
+                Num->res = PARU_SINGULAR;
                 return PARU_SINGULAR;
             }
         }
@@ -386,8 +385,8 @@ ParU_Ret paru_init_rowFronts(
     // copying Diag_map
     if (Diag_map)
     {
-#pragma omp taskloop default(none) shared(Sym, Diag_map, inv_Diag_map) \
-    grainsize(512)
+        #pragma omp taskloop default(none) shared(Sym, Diag_map, inv_Diag_map) \
+        grainsize(512)
         for (Int i = 0; i < Sym->n; i++)
         {
             // paru_memcpy(Diag_map, Sym->Diag_map, (Sym->n) * sizeof(Int));
@@ -426,23 +425,21 @@ ParU_Ret paru_init_rowFronts(
 
     ParU_Ret info;
     Int out_of_memory = 0;
-#pragma omp taskloop grainsize(512)
+    #pragma omp taskloop grainsize(512)
     for (Int row = 0; row < m; row++)
     {
         Int e = Sym->row2atree[row];
         Int nrows = 1,
             ncols =
                 Sp[row + 1] - Sp[row];  // nrows and ncols of current front/row
-        // printf("%% element %ld = %ld x %ld\n", e, nrows, ncols);
-
         row_degree_bound[row] = ncols;  // Initialzing row degree
 
         paru_element *curEl = elementList[e] =
             paru_create_element(nrows, ncols, 0);
         if (curEl == NULL)
         {  // out of memory
-            printf("Paru: Out of memory: curEl\n");
-#pragma omp atomic update
+            PRLEVEL(1, ("Paru: Out of memory: curEl\n"));
+            #pragma omp atomic update
             out_of_memory += 1;
         }
 
@@ -456,11 +453,10 @@ ParU_Ret paru_init_rowFronts(
         }
         catch (std::bad_alloc const &)
         {  // out of memory
-            printf("Paru: Out of memory: curHeap\n");
-#pragma omp atomic update
+            PRLEVEL(1, ("Paru: Out of memory: curHeap\n"));
+            #pragma omp atomic update
             out_of_memory += 1;
         }
-        // printf("%%Heap allocated %p id=%ld \n", curHeap, e);
 
         curHeap->push_back(e);
 
@@ -472,8 +468,8 @@ ParU_Ret paru_init_rowFronts(
             (paru_tuple *)paru_alloc(slackRow * nrows, sizeof(paru_tuple));
         if (RowList[row].list == NULL)
         {  // out of memory
-            printf("Paru: out of memory, RowList[row].list \n");
-#pragma omp atomic update
+            PRLEVEL(1, ("Paru: out of memory, RowList[row].list \n"));
+            #pragma omp atomic update
             out_of_memory += 1;
         }
         RowList[row].numTuple = 0;
@@ -484,17 +480,14 @@ ParU_Ret paru_init_rowFronts(
         rowTuple.f = 0;
         if (paru_add_rowTuple(RowList, row, rowTuple))
         {
-            printf("Paru: out of memory, add_rowTuple \n");
-#pragma omp atomic update
+            PRLEVEL(1, ("Paru: out of memory, add_rowTuple \n"));
+            #pragma omp atomic update
             out_of_memory += 1;
         }
 
         // Allocating elements
         Int *el_colrowIndex = colIndex_pointer(curEl);
         double *el_colrowNum = numeric_pointer(curEl);
-
-        // printf("el_colrowIndex =%p, el_colrowNum = %p \n",
-        // el_colrowIndex, el_colrowNum);
 
         Int j = 0;  // Index inside an element
         for (Int p = Sp[row]; p < Sp[row + 1]; p++)

@@ -21,7 +21,7 @@ ParU_Ret paru_pivotal(std::vector<Int> &pivotal_elements,
 {
     DEBUGLEVEL(0);
     PARU_DEFINE_PRLEVEL;
-    ParU_Symbolic *Sym =  Work->Sym;
+    ParU_Symbolic *Sym = Work->Sym;
     Int *snM = Sym->super2atree;
     std::vector<Int> **heapList = Work->heapList;
     Int eli = snM[f];
@@ -352,9 +352,8 @@ ParU_Ret paru_pivotal(std::vector<Int> &pivotal_elements,
 
     if (pivotalFront == NULL || frowList == NULL)
     {
-        printf(
-            "Paru: 0ut of memory when tried to allocate for pivotal part %ld\n",
-            f);
+        PRLEVEL(1, ("Paru: 0ut of memory when tried to allocate for pivotal "
+                    "part %ld\n", f));
         return PARU_OUT_OF_MEMORY;
     }
 

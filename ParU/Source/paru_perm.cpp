@@ -65,7 +65,7 @@ ParU_Ret paru_perm(ParU_Symbolic *Sym, ParU_Numeric *Num)
     PRLEVEL(1, ("%% Inside Perm\n"));
     if (Pfin == NULL || Ps == NULL)
     {
-        printf("Paru: memory problem inside perm\n");
+        PRLEVEL(1, ("Paru: memory problem inside perm\n"));
         return PARU_OUT_OF_MEMORY;
     }
 

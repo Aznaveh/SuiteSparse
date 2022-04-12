@@ -21,7 +21,7 @@ ParU_Ret ParU_Solve(ParU_Symbolic *Sym, ParU_Numeric *Num, double *b,
     Int m = Sym->m;
     if (Num->res == PARU_SINGULAR)
     {
-        printf("Paru: the matrix is singular; cannot be solved.\n");
+        PRLEVEL(1, ("Paru: the matrix is singular; cannot be solved.\n"));
         return PARU_SINGULAR;
     }
 #ifndef NTIME
@@ -31,7 +31,7 @@ ParU_Ret ParU_Solve(ParU_Symbolic *Sym, ParU_Numeric *Num, double *b,
     double *x = (double *)paru_alloc(m, sizeof(double));
     if (x == NULL)
     {
-        printf("Paru: memory problem inside solve\n");
+        PRLEVEL(1, ("Paru: memory problem inside solve\n"));
         return PARU_OUT_OF_MEMORY;
     }
     // making copy of user input and check it
@@ -71,7 +71,7 @@ ParU_Ret ParU_Solve(ParU_Symbolic *Sym, ParU_Numeric *Num, double *b, double *x,
 {
     if (Num->res == PARU_SINGULAR)
     {
-        printf("Paru: the matrix is singular; cannot be solved.\n");
+        PRLEVEL(1, ("Paru: the matrix is singular; cannot be solved.\n"));
         return PARU_SINGULAR;
     }
     ParU_Control my_Control = *user_Control;
@@ -109,7 +109,7 @@ ParU_Ret ParU_Solve(ParU_Symbolic *Sym, ParU_Numeric *Num, Int nrhs, double *B,
     Int m = Sym->m;
     if (Num->res == PARU_SINGULAR)
     {
-        printf("Paru: the matrix is singular; cannot be solved.\n");
+        PRLEVEL(1, ("Paru: the matrix is singular; cannot be solved.\n"));
         return PARU_SINGULAR;
     }
 #ifndef NTIME
@@ -118,7 +118,7 @@ ParU_Ret ParU_Solve(ParU_Symbolic *Sym, ParU_Numeric *Num, Int nrhs, double *B,
     double *X = (double *)paru_alloc(m * nrhs, sizeof(double));
     if (X == NULL)
     {
-        printf("Paru: memory problem inside Solve\n");
+        PRLEVEL(1, ("Paru: memory problem inside Solve\n"));
         return PARU_OUT_OF_MEMORY;
     }
 
@@ -161,7 +161,7 @@ ParU_Ret ParU_Solve(ParU_Symbolic *Sym, ParU_Numeric *Num, Int nrhs, double *B,
 {
     if (Num->res == PARU_SINGULAR)
     {
-        printf("Paru: the matrix is singular; cannot be solved.\n");
+        PRLEVEL(1, ("Paru: the matrix is singular; cannot be solved.\n"));
         return PARU_SINGULAR;
     }
     ParU_Control my_Control = *user_Control;

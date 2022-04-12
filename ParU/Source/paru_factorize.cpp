@@ -182,13 +182,13 @@ ParU_Ret ParU_Factorize(cholmod_sparse *A, ParU_Symbolic *Sym,
 #endif
     if (A == NULL)
     {
-        printf("Paru: input matrix is invalid\n");
+        PRLEVEL(1, ("Paru: input matrix is invalid\n"));
         return PARU_INVALID;
     }
 
     if (A->xtype != CHOLMOD_REAL)
     {
-        printf("Paru: input matrix must be real\n");
+        PRLEVEL(1, ("Paru: input matrix must be real\n"));
         return PARU_INVALID;
     }
 
@@ -287,17 +287,18 @@ ParU_Ret ParU_Factorize(cholmod_sparse *A, ParU_Symbolic *Sym,
     //            [&Depth, &task_map](const Int &t1, const Int &t2)-> bool
     //            {return Depth[task_map[t1]+1] > Depth[task_map[t2]+1];});
 
-    double chainess = 2;
     Work->resq = task_Q.size();
-    printf("ntasks=%ld task_Q.size=%ld\n", ntasks, task_Q.size());
+
+#ifndef NDEBUG
+    double chainess = 2;
+    PRLEVEL(1, ("ntasks=%ld task_Q.size=%ld\n", ntasks, task_Q.size()));
     if (ntasks > 0)
     {
         // chainess = (task_depth[task_Q[0]] + 1) / (double)nf;
         chainess = 1 - (task_Q.size() / (double)ntasks);
-        printf("nf = %ld, deepest = %ld, chainess = %lf \n", nf,
-               task_depth[task_Q[0]], chainess);
+        PRLEVEL(1, ("nf = %ld, deepest = %ld, chainess = %lf \n", nf,
+               task_depth[task_Q[0]], chainess));
     }
-#ifndef NDEBUG
     Work->actual_alloc_LUs = Work->actual_alloc_Us = 0;
     Work->actual_alloc_row_int = Work->actual_alloc_col_int = 0;
     PR = 1;
@@ -312,11 +313,10 @@ ParU_Ret ParU_Factorize(cholmod_sparse *A, ParU_Symbolic *Sym,
     PRLEVEL(PR, ("\n"));
 #endif
 
-    // if (task_Q.size() > 1 && ntasks*2 > Control->paru_max_threads )
     if ((Int)task_Q.size() * 2 > Control->paru_max_threads)
     // if (1)
     {
-        printf("Parallel\n");
+        PRLEVEL(1, ("Parallel\n"));
         // chekcing user input
         PRLEVEL(2, ("Control: max_th=%ld scale=%ld piv_toler=%lf "
                     "diag_toler=%lf trivial =%ld worthwhile_dgemm=%ld "
@@ -353,7 +353,6 @@ ParU_Ret ParU_Factorize(cholmod_sparse *A, ParU_Symbolic *Sym,
             // for (Int i = 0; i < (Int)task_Q.size(); i++)
             {
                 Int t = task_Q[i];
-                // printf("poping %ld \n", f);
                 Int d = task_depth[t];
 #pragma omp task mergeable priority(d)
                 {
@@ -389,9 +388,9 @@ ParU_Ret ParU_Factorize(cholmod_sparse *A, ParU_Symbolic *Sym,
         {
             PRLEVEL(1, ("%% factorization has some problem\n"));
             if (info == PARU_OUT_OF_MEMORY)
-                printf("Paru: out of memory during factorization\n");
+                PRLEVEL(1, ("Paru: out of memory during factorization\n"));
             else if (info == PARU_SINGULAR)
-                printf("Paru: Input matrix is singular\n");
+                PRLEVEL(1, ("Paru: Input matrix is singular\n"));
             return info;
         }
     }
@@ -400,7 +399,7 @@ ParU_Ret ParU_Factorize(cholmod_sparse *A, ParU_Symbolic *Sym,
     // The following code can be substituted in a sequential case
     else
     {
-        printf("Sequential\n");
+        PRLEVEL(1, ("Sequential\n"));
         Work->naft = 1;
         for (Int i = 0; i < nf; i++)
         {
@@ -421,7 +420,8 @@ ParU_Ret ParU_Factorize(cholmod_sparse *A, ParU_Symbolic *Sym,
 
     if (info == PARU_OUT_OF_MEMORY)
     {
-        printf("Paru: memory problem after factorizaiton, in perumutaion.\n");
+        PRLEVEL(
+            1, ("Paru: memory problem after factorizaiton, in perumutaion.\n"));
         return info;
     }
 
@@ -431,7 +431,7 @@ ParU_Ret ParU_Factorize(cholmod_sparse *A, ParU_Symbolic *Sym,
     PRLEVEL(-1, ("Flop count = %.17g\n", flop_count));
 #endif
     Int max_rc = 0, max_cc = 0;
-    double min_udiag = 1, max_udiag = -1; // not to fail for nf ==0
+    double min_udiag = 1, max_udiag = -1;  // not to fail for nf ==0
     // using the first value of the first front just to initialize
     if (nf > 0)
     {
