@@ -59,6 +59,7 @@ int main(int argc, char **argv)
         cholmod_l_finish(cc);
         return info;
     }
+    printf("In: %ldx%ld nnz = %ld \n", Sym->m, Sym->n, Sym->anz);
     printf("Paru: Symbolic factorization is done!\n");
     ParU_Numeric *Num;
     info = ParU_Factorize(A, Sym, &Num, &Control);
