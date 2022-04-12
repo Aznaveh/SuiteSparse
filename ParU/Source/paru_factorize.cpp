@@ -119,7 +119,7 @@ ParU_Ret paru_exec_tasks(Int t, Int *task_num_child, Int &chain_task,
     {
         if (num_original_children != 1)
         {
-#pragma omp atomic capture
+            #pragma omp atomic capture
             {
                 task_num_child[daddy]--;
                 num_rem_children = task_num_child[daddy];
@@ -133,7 +133,7 @@ ParU_Ret paru_exec_tasks(Int t, Int *task_num_child, Int &chain_task,
                 PRLEVEL(1,
                         ("%% task %ld executing its parent %ld\n", t, daddy));
                 Int resq;
-#pragma omp atomic read
+                #pragma omp atomic read
                 resq = Work->resq;
                 if (resq == 1)
                 {
@@ -154,8 +154,9 @@ ParU_Ret paru_exec_tasks(Int t, Int *task_num_child, Int &chain_task,
             PRLEVEL(1, ("%% task %ld only child executing its parent %ld\n", t,
                         daddy));
             Int resq;
-#pragma omp atomic read
+            #pragma omp atomic read
             resq = Work->resq;
+
             if (resq == 1)
             {
                 chain_task = daddy;
@@ -346,17 +347,17 @@ ParU_Ret ParU_Factorize(cholmod_sparse *A, ParU_Symbolic *Sym,
             if (start >= size) break;
             Int end = start + steps > size ? size : start + steps;
             PRLEVEL(1, ("%% doing Queue tasks <%ld,%ld>\n", start, end));
-#pragma omp parallel proc_bind(spread)
-#pragma omp single nowait
-#pragma omp task untied  // clang might seg fault on untied
+            #pragma omp parallel proc_bind(spread)
+            #pragma omp single nowait
+            #pragma omp task untied  // clang might seg fault on untied
             for (Int i = start; i < end; i++)
             // for (Int i = 0; i < (Int)task_Q.size(); i++)
             {
                 Int t = task_Q[i];
                 Int d = task_depth[t];
-#pragma omp task mergeable priority(d)
+                #pragma omp task mergeable priority(d)
                 {
-#pragma omp atomic update
+                    #pragma omp atomic update
                     Work->naft++;
 
                     ParU_Ret myInfo =
@@ -365,13 +366,13 @@ ParU_Ret ParU_Factorize(cholmod_sparse *A, ParU_Symbolic *Sym,
                                         Num);
                     if (myInfo != PARU_SUCCESS)
                     {
-#pragma omp atomic write
+                        #pragma omp atomic write
                         info = myInfo;
                     }
-#pragma omp atomic update
+                    #pragma omp atomic update
                     Work->naft--;
 
-#pragma omp atomic update
+                    #pragma omp atomic update
                     Work->resq--;
                 }
             }
@@ -437,6 +438,7 @@ ParU_Ret ParU_Factorize(cholmod_sparse *A, ParU_Symbolic *Sym,
     {
         ParU_Factors *LUs = Num->partial_LUs;
         max_udiag = min_udiag = fabs(*(LUs[0].p));
+        #pragma omp parallel for reduction(max:max_rc) reduction(max: max_cc)
         for (Int f = 0; f < nf; f++)
         {
             Int rowCount = Num->frowCount[f];
@@ -448,6 +450,8 @@ ParU_Ret ParU_Factorize(cholmod_sparse *A, ParU_Symbolic *Sym,
             max_rc = MAX(max_rc, rowCount);
             max_cc = MAX(max_cc, colCount + fp);
             double *A = LUs[f].p;
+            #pragma omp parallel for reduction(min:min_udiag) \
+                    reduction(max: max_udiag)
             for (Int i = 0; i < fp; i++)
             {
                 double udiag = fabs(A[rowCount * i + i]);

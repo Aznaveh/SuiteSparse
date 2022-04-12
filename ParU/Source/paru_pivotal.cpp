@@ -143,7 +143,6 @@ ParU_Ret paru_pivotal(std::vector<Int> &pivotal_elements,
 
     Int *frowList = Num->frowList[f];
     Int rowCount = 0;
-    // Int zero_piv_rows = 0;
 
     /*************** finding set of rows in current front *********************/
     for (Int i = 0; i < (Int)pivotal_elements.size(); i++)
@@ -314,6 +313,11 @@ ParU_Ret paru_pivotal(std::vector<Int> &pivotal_elements,
     }
 
     Num->frowCount[f] = rowCount;
+    // No support for max and min in OpenMP C++
+    //pragma omp atomic capture 
+    //{
+    //    Num->max_row_count = MAX(Num->max_row_count, rowCount);
+    //}
 
 #ifndef NDEBUG /* Checking if pivotal rows are correct */
     PRLEVEL(PR, ("%% panel_row: \n %%"));

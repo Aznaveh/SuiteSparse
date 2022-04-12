@@ -5,24 +5,29 @@
 // ParU, Mohsen Aznaveh and Timothy A. Davis, (c) 2022, All Rights Reserved.
 // SPDX-License-Identifier: GNU GPL 3.0
 
-// This is ParU.hpp file. All user callable routines are here and they start
-// with ParU_*. This file must be included in all user code that use Paru.
-// Paru is a parallel sparse direct solver. This package uses OpenMP tasking for
-// parallelism. Paru calls UMFPACK for symbolic analysis phase, after that some
-// symbolic analysis is done by Paru itself and  then numeric phase starts. The
-// numeric computation is a task parallel phase using OpenMP.  Each task may
-// call parallel BLAS, therefore we have a nested parallism. The performance of
-// BLAS has a heavy impact on the performance of Paru.
+// This is ParU.hpp file. All user callable routines are in this file and all of
+// them start with ParU_*. This file must be included in all user code that use
+// Paru. 
 //
+// Paru is a parallel sparse direct solver. This package uses OpenMP
+// tasking for parallelism. Paru calls UMFPACK for symbolic analysis phase,
+// after that some symbolic analysis is done by Paru itself and  then numeric
+// phase starts. The numeric computation is a task parallel phase using OpenMP
+// and each task calls parallel BLAS; i.e. nested parallism. 
+//
+// The performance of BLAS has a heavy impact on the performance of Paru.
+// However, depending on the input problem performance of parallelsim in BLAS 
+// is sometimes not have effects in Paru.
+// 
 //                  General Usage for solving Ax = b
 //          A is a sparse matrix in matrix market format with double entries
-//          and b is a dense vector of double 
+//          and b is a dense vector of double
 //          (or a dense matrix B for multiple rhs)
 //
 //               info = ParU_Analyze(A, &Sym, &Control);
 //               info = ParU_Factorize(A, Sym, &Num, &Control);
 //               info = ParU_Solve(Sym, Num, b, x, &Control);
-//               See paru_demo for more examples
+//               //See paru_demo for more examples
 
 #ifndef PARU_H
 #define PARU_H
@@ -288,14 +293,14 @@ enum ParU_Ret
 
 struct ParU_Numeric
 {
-    Int m, n;  // size of the sumbatrix(S) that is factorized
-    Int sym_m; // number of rows of original matrix; a copy of Sym->m
+    Int m, n;   // size of the sumbatrix(S) that is factorized
+    Int sym_m;  // number of rows of original matrix; a copy of Sym->m
 
-    Int nf;  // number of fronts copy of Sym->nf
+    Int nf;      // number of fronts copy of Sym->nf
     double *Rs;  // the array for row scaling based on original matrix
                  // size = m
 
-    Int snz; //nnz in S; copy of Sym->snz
+    Int snz;     // nnz in S; copy of Sym->snz
     double *Sx;  // size snz = Sp [n], numeric values of (scaled) S;
                  // Sp and Sj must be initialized in Symbolic phase
     Int sunz;
@@ -315,8 +320,8 @@ struct ParU_Numeric
     ParU_Factors *partial_Us;   // size nf   size(Us)= fp*colCount[f]
     ParU_Factors *partial_LUs;  // size nf   size(LUs)= rowCount[f]*fp
 
-    Int max_row_count;      // maximum number of rows/cols for all the fronts
-    Int max_col_count;      // it is initalized after factorization
+    Int max_row_count;  // maximum number of rows/cols for all the fronts
+    Int max_col_count;  // it is initalized after factorization
 
     double rcond;
     double min_udiag;
@@ -328,7 +333,7 @@ struct ParU_Numeric
 // ParU_Analyze: Symbolic analysis is done in this routine. UMFPACK is called
 // here and after that some more speciallized symbolic computation is done for
 // Paru. ParU_Analyze can be called once and used for differen ParU_Factorize
-// calls. You cannot free Symbolic before Numeric.
+// calls. 
 //------------------------------------------------------------------------------
 ParU_Ret ParU_Analyze(
     // input:
@@ -414,8 +419,6 @@ ParU_Ret ParU_Residual(
 //------------------------------------------------------------------------------
 //------------ Free routines----------------------------------------------------
 //------------------------------------------------------------------------------
-// Num must be freed with corresponding Sym and Sym cannot be freed befor
-// corresponding Num
 ParU_Ret ParU_Freenum(ParU_Numeric **Num_handle, ParU_Control *Control);
 
 ParU_Ret ParU_Freesym(ParU_Symbolic **Sym_handle, ParU_Control *Control);
