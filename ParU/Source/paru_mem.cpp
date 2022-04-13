@@ -371,7 +371,7 @@ ParU_Ret ParU_Freesym(ParU_Symbolic **Sym_handle, ParU_Control *Control)
 {
     DEBUGLEVEL(0);
     if (Sym_handle == NULL || *Sym_handle == NULL)
-        // nothing to do; caller probably ran out of memory
+        // nothing to do
         return PARU_SUCCESS;
 
     ParU_Symbolic *Sym;

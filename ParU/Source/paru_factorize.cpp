@@ -265,13 +265,16 @@ ParU_Ret ParU_Factorize(cholmod_sparse *A, ParU_Symbolic *Sym,
     Int *task_depth = Sym->task_depth;
     std::vector<Int> task_Q;
     // This vector changes during factorization
-    // std::vector<Int> task_num_child(ntasks);
-    // paru_emcpy ( &task_num_child[0] , Sym->task_num_child,
-    //        ntasks * sizeof(Int));
+    std::vector<Int> task_num_child(ntasks);
+    paru_memcpy ( &task_num_child[0] , Sym->task_num_child,
+           ntasks * sizeof(Int), Control);
 
-    Int task_num_child[ntasks];
-    paru_memcpy(task_num_child, Sym->task_num_child, ntasks * sizeof(Int),
-                Control);
+    
+    // This line won't work with -Werror=vla ISO C++ forbids variable length 
+    // array
+    //Int task_num_child[ntasks];
+    //paru_memcpy(task_num_child, Sym->task_num_child, ntasks * sizeof(Int),
+    //            Control);
 
     for (Int t = 0; t < ntasks; t++)
     {
@@ -361,9 +364,10 @@ ParU_Ret ParU_Factorize(cholmod_sparse *A, ParU_Symbolic *Sym,
                     Work->naft++;
 
                     ParU_Ret myInfo =
-                        // paru_exec_tasks(t, &task_num_child[0], Num);
-                        paru_exec_tasks(t, task_num_child, chain_task, Work,
-                                        Num);
+                        paru_exec_tasks(t, &task_num_child[0], chain_task, Work,
+                                Num);
+                        //paru_exec_tasks(t, task_num_child, chain_task, Work,
+                        //    Num);
                     if (myInfo != PARU_SUCCESS)
                     {
                         #pragma omp atomic write
@@ -383,7 +387,9 @@ ParU_Ret ParU_Factorize(cholmod_sparse *A, ParU_Symbolic *Sym,
         {
             Work->naft = 1;
             PRLEVEL(1, ("Chain_taskd %ld has remained\n", chain_task));
-            info = paru_exec_tasks_seq(chain_task, task_num_child, Work, Num);
+            //info = paru_exec_tasks_seq(chain_task, task_num_child, Work, Num);
+            info = paru_exec_tasks_seq(chain_task, 
+                    &task_num_child[0], Work, Num);
         }
         if (info != PARU_SUCCESS)
         {
@@ -450,10 +456,10 @@ ParU_Ret ParU_Factorize(cholmod_sparse *A, ParU_Symbolic *Sym,
                 Int fp = col2 - col1;
                 max_rc = MAX(max_rc, rowCount);
                 max_cc = MAX(max_cc, colCount + fp);
-                double *A = LUs[f].p;
+                double *X = LUs[f].p;
                 for (Int i = 0; i < fp; i++)
                 {
-                    double udiag = fabs(A[rowCount * i + i]);
+                    double udiag = fabs(X[rowCount * i + i]);
                     min_udiag = MIN(min_udiag, udiag);
                     max_udiag = MAX(max_udiag, udiag);
                 }
@@ -481,12 +487,12 @@ ParU_Ret ParU_Factorize(cholmod_sparse *A, ParU_Symbolic *Sym,
                 Int col1 = Super[f];
                 Int col2 = Super[f + 1];
                 Int fp = col2 - col1;
-                double *A = LUs[f].p;
+                double *X = LUs[f].p;
                 #pragma omp parallel for reduction(min:min_udiag)\
                 reduction(max: max_udiag) 
                 for (Int i = 0; i < fp; i++)
                 {
-                    double udiag = fabs(A[rowCount * i + i]);
+                    double udiag = fabs(X[rowCount * i + i]);
                     min_udiag = MIN(min_udiag, udiag);
                     max_udiag = MAX(max_udiag, udiag);
                 }
