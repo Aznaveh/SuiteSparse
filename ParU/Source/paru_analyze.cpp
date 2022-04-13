@@ -1121,7 +1121,9 @@ ParU_Ret ParU_Analyze(cholmod_sparse *A, ParU_Symbolic **S_handle,
                     {
                         Int diag_col = inv_Diag_map[newrow];
                         if (diag_col < n1)
+                        {
                             PRLEVEL(0, ("diag_col= %ld\n", diag_col));
+                        }
                         // This assertions is not correct because
                         // sometimes singltones can steal diagonals
                         // ASSERT(diag_col >= n1);

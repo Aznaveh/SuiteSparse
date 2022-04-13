@@ -395,9 +395,13 @@ ParU_Ret ParU_Factorize(cholmod_sparse *A, ParU_Symbolic *Sym,
         {
             PRLEVEL(1, ("%% factorization has some problem\n"));
             if (info == PARU_OUT_OF_MEMORY)
+            {
                 PRLEVEL(1, ("Paru: out of memory during factorization\n"));
+            }
             else if (info == PARU_SINGULAR)
+            {
                 PRLEVEL(1, ("Paru: Input matrix is singular\n"));
+            }
             return info;
         }
     }

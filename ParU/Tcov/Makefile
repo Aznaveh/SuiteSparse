@@ -1,47 +1,52 @@
 #===============================================================================
-# ParU/Lib/Makefile
+# ParU/Tcov/Makefile
 #===============================================================================
 
-LIBRARY = libparu
-VERSION = 0.0.1
-SO_VERSION = 0
 
-default: library
-
-ccode: all
+default: all
 
 include ../../SuiteSparse_config/SuiteSparse_config.mk
 
+CLIB = $(LDFLAGS) -L../../lib -lumfpack -lsuitesparseconfig -lcholmod -lamd \
+        -lcolamd $(LIB_WITH_PARTITION)  $(LDLIBS)
+FLIB = $(LAPACK) $(BLAS)
 
-# ParU depends on SPQR, CHOLMOD, AMD, COLAMD, LAPACK, the BLAS and 
-# SuiteSparse_config
-#LDLIBS += -lspqr -lamd -lcolamd -lcholmod -lsuitesparseconfig $(LAPACK) $(BLAS)
-#
-# newer version  of ParU depends on UMFPACK, CHOLMOD, AMD, COLAMD  
-# the BLAS and SuiteSparse_config
-LDLIBS += -lumfpack -lamd -lcolamd -lcholmod -lsuitesparseconfig \
-		  $(LAPACK) $(BLAS)
 
-# compile and install in SuiteSparse/lib
-library:
-	$(MAKE) install INSTALL=$(SUITESPARSE)
+I = -I../../include  -I ../Include -I../../UMFPACK/Source -I../../AMD/Include
+
+
+C = $(CXX) $(CF) $(UMFPACK_CONFIG) $(CONFIG_PARTITION) $(CONFIG_GPU) $(I) \
+	$(CHOLMOD_CONFIG)
+
+LIBS = $(CLIB) $(FLIB) $(TBB) $(GPULIB) 
+#-lasan
+
+
+print-%  : ; @echo $* = $($*)
+
+# for statement coverage (with gcov; see go) and picky compiler warnings
+# Aznaveh: I took out -Wredundant-decls because I overloade new and delete
+CF = -pg \
+	-O0 -g -fprofile-arcs -ftest-coverage \
+	-Wall -W -Wshadow -Winline -Wno-unused-parameter \
+	 -Wdisabled-optimization \
+	-fexceptions -fopenmp 
+
+# Using an optimized BLAS can cause problems in Valgrind
+# FLIB = -llapack_plain -lblas_plain -lgfortran
+# FLIB = -llapack_plain -lblas_plain -lgfortran -lg2c
+  FLIB = $(LAPACK) $(BLAS)
+
+
+all: parutest
+	
+
 
 #-------------------------------------------------------------------------------
-
-all: library
-
-purge: distclean
-
-distclean: clean
-	- $(RM) -r $(PURGE)
-
-clean:
-	- $(RM) -r $(CLEAN)
-
 INC = ../Include/ParU.hpp 
-
 C11 = -std=c++11
 CC11 = -std=c11
+
 
 OBJ = \
     paru_mem.o \
@@ -83,14 +88,13 @@ OBJ = \
 	paru_tasked_dgemm.o \
 	paru_tasked_trsm.o \
 
+
 $(OBJ): $(INC)
 
-I = -I../../UMFPACK/Source -I../../UMFPACK/Include -I../../CHOLMOD/Include\
-	-I../../AMD/Include  -I../../SuiteSparse_config -I../Include
+I = -I ../../UMFPACK/Source -I../../UMFPACK/Include -I ../../CHOLMOD/Include\
+	-I ../../AMD/Include  -I ../../SuiteSparse_config -I../Include
 
-FLAG = -Wno-write-strings   -Wall  -Werror -Wnull-dereference -Wl,--verbose\
-          -Wpedantic -Wshadow -Wnon-virtual-dtor #-Wextra #development
-
+FLAG = -Wno-write-strings
 
 ifeq ($(DEBUG),yes)
 	#to compile with -g options use 'make DBUG=yes'
@@ -103,20 +107,18 @@ ifeq ($(PROF),yes)
 endif
 
 
-
 #C = $(CXX) $(CF) $(SPQR_CONFIG) $(CHOLMOD_CONFIG) $(CONFIG_PARTITION) $(I)
 C = $(CXX) $(CF)  $(CHOLMOD_CONFIG) $(CONFIG_PARTITION) $(I) $(FLAG) $(C11)
 C2 = $(CC) $(CF)  $(CHOLMOD_CONFIG) $(CONFIG_PARTITION) $(I) $(FLAG) $(CC11)
 #-------------------------------------------------------------------------------
 
-static: $(AR_TARGET)
-
-$(AR_TARGET): $(OBJ)
-	$(ARCHIVE) $@ $^
-	- $(RANLIB) $@
-
 #-------------------------------------------------------------------------------
+parutest: libraries $(INC) $(OBJ) 
+	$(C)  paru_demo.cpp -o x_demo $(OBJ) $(LIBS)
 
+go: parutest
+	- ./x_demo < ../Matrix/west0067.mtx
+#-------------------------------------------------------------------------------
 paru_mem.o: ../Source/paru_mem.cpp
 	$(C) -c $<
 
@@ -231,32 +233,37 @@ paru_tasked_dgemm.o: ../Source/paru_tasked_dgemm.cpp
 paru_tasked_trsm.o: ../Source/paru_tasked_trsm.cpp
 	$(C) -c $<
 
+
+#-------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------
+# libraries compiled without test coverage
 #-------------------------------------------------------------------------------
 
-# install PARU
-install: $(AR_TARGET) $(INSTALL_LIB)/$(SO_TARGET)
+libraries:
+	( cd ../.. && $(MAKE) metis )
+	( cd ../../SuiteSparse_config ; $(MAKE) library TCOV=yes )
+	( cd ../../AMD && $(MAKE) library TCOV=yes )
+	( cd ../../COLAMD && $(MAKE) library TCOV=yes )
+	( cd ../../CCOLAMD && $(MAKE) library TCOV=yes )
+	( cd ../../CAMD && $(MAKE) library TCOV=yes )
+	( cd ../../CHOLMOD && $(MAKE) library TCOV=yes )
+	( cd ../../UMFPACK && $(MAKE) library TCOV=yes )
 
-$(INSTALL_LIB)/$(SO_TARGET): $(OBJ)
-	@mkdir -p $(INSTALL_LIB)
-	@mkdir -p $(INSTALL_INCLUDE)
-	@mkdir -p $(INSTALL_DOC)
-	$(C) $(SO_OPTS) $^ -o $@ $(LDLIBS)
-	( cd $(INSTALL_LIB) ; ln -sf $(SO_TARGET) $(SO_PLAIN) )
-	( cd $(INSTALL_LIB) ; ln -sf $(SO_TARGET) $(SO_MAIN) )
-	$(CP) ../Include/ParU.hpp $(INSTALL_INCLUDE)
-	$(CP) ../Doc/paru_user_guide.pdf $(INSTALL_DOC)
-	$(CP) ../README.md $(INSTALL_DOC)/PARU_README.md
-	chmod 755 $(INSTALL_LIB)/$(SO_TARGET)
-	chmod 644 $(INSTALL_INCLUDE)/ParU.hpp
-#	chmod 644 $(INSTALL_DOC)/paru_user_guide.pdf
-	chmod 744 $(INSTALL_DOC)/paru_user_guide.pdf
-	chmod 644 $(INSTALL_DOC)/PARU_README.md
+#-------------------------------------------------------------------------------
+#
 
-# uninstall PARU
-uninstall:
-	$(RM) $(INSTALL_LIB)/$(SO_TARGET)
-	$(RM) $(INSTALL_LIB)/$(SO_PLAIN)
-	$(RM) $(INSTALL_LIB)/$(SO_MAIN)
-	$(RM) $(INSTALL_INCLUDE)/ParU.hpp
-	$(RM) $(INSTALL_DOC)/paru_user_guide.pdf
-	$(RM) $(INSTALL_DOC)/PARU_README.md
+
+#-------------------------------------------------------------------------------
+
+purge: distclean
+
+distclean: clean
+	- $(RM) x_demo
+	- $(RM) analysis.txt tcov gprof
+	- $(RM) gprof.o vprof gmon.out callgrind.out.*
+	- $(RM) paneltest
+	- $(RM) *.dot pfile tfile
+	- $(RM) -r $(PURGE)
+
+clean:
+	- $(RM) -r $(CLEAN)
