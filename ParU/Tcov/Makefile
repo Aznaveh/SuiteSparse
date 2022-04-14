@@ -3,7 +3,11 @@
 #===============================================================================
 
 
-default: all
+default: go
+
+valgrind: vgo
+
+ccode: all
 
 include ../../SuiteSparse_config/SuiteSparse_config.mk
 
@@ -96,16 +100,6 @@ I = -I ../../UMFPACK/Source -I../../UMFPACK/Include -I ../../CHOLMOD/Include\
 
 FLAG = -Wno-write-strings
 
-ifeq ($(DEBUG),yes)
-	#to compile with -g options use 'make DBUG=yes'
-	FLAG = -Wno-write-strings -g
-endif
-
-ifeq ($(PROF),yes)
-	#to compile with -g options use 'make DBUG=yes'
-	FLAG = -Wno-write-strings -no-pie -g -pg 
-endif
-
 
 #C = $(CXX) $(CF) $(SPQR_CONFIG) $(CHOLMOD_CONFIG) $(CONFIG_PARTITION) $(I)
 C = $(CXX) $(CF)  $(CHOLMOD_CONFIG) $(CONFIG_PARTITION) $(I) $(FLAG) $(C11)
@@ -113,11 +107,18 @@ C2 = $(CC) $(CF)  $(CHOLMOD_CONFIG) $(CONFIG_PARTITION) $(I) $(FLAG) $(CC11)
 #-------------------------------------------------------------------------------
 
 #-------------------------------------------------------------------------------
-parutest: libraries $(INC) $(OBJ) 
-	$(C)  paru_demo.cpp -o x_demo $(OBJ) $(LIBS)
+parutest: libraries paru_test.cpp $(INC) $(OBJ) 
+	$(C)  paru_test.cpp -o x_test $(OBJ) $(LIBS) -lm
 
 go: parutest
-	- ./x_demo < ../Matrix/west0067.mtx
+	- ./x_test < ../Matrix/west0067.mtx > parutest_out.txt
+	- ./cov
+
+vgo: parutest
+	- ./x_test < ../Matrix/west0067.mtx > parutest_out.txt
+	#- ./cov
+
+
 #-------------------------------------------------------------------------------
 paru_mem.o: ../Source/paru_mem.cpp
 	$(C) -c $<
@@ -258,7 +259,8 @@ libraries:
 purge: distclean
 
 distclean: clean
-	- $(RM) x_demo
+	- $(RM) x_test
+	- $(RM) parutest_out.txt
 	- $(RM) analysis.txt tcov gprof
 	- $(RM) gprof.o vprof gmon.out callgrind.out.*
 	- $(RM) paneltest
