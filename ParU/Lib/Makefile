@@ -82,14 +82,15 @@ OBJ = \
 	paru_full_summed.o \
 	paru_tasked_dgemm.o \
 	paru_tasked_trsm.o \
+	paru_version.o \
 
 $(OBJ): $(INC)
 
 I = -I../../UMFPACK/Source -I../../UMFPACK/Include -I../../CHOLMOD/Include\
 	-I../../AMD/Include  -I../../SuiteSparse_config -I../Include
 
-FLAG = -Wno-write-strings   -Wall  -Werror -Wnull-dereference -Wl,--verbose\
-          -Wpedantic -Wshadow -Wnon-virtual-dtor #-Wextra #development
+FLAG = -Wno-write-strings   -Wall  #-Werror -Wnull-dereference -Wl,--verbose\
+          -Wpedantic -Wshadow -Wnon-virtual-dtor -Wextra #development
 
 
 ifeq ($(DEBUG),yes)
@@ -229,6 +230,9 @@ paru_tasked_dgemm.o: ../Source/paru_tasked_dgemm.cpp
 	$(C) -c $<
 
 paru_tasked_trsm.o: ../Source/paru_tasked_trsm.cpp
+	$(C) -c $<
+
+paru_version.o: ../Source/paru_version.cpp
 	$(C) -c $<
 
 #-------------------------------------------------------------------------------

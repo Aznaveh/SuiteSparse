@@ -47,6 +47,11 @@ int main(int argc, char **argv)
     }
 
     //~~~~~~~~~~~~~~~~~~~Starting computation~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    int ver[3]; char date[128];
+    ParU_Version (ver ,date);
+    printf("Paru %d.%d.%d",ver[0],ver[1],ver[2]);
+    printf(" %s\n",date);
+
     double my_start_time = omp_get_wtime();
 
     ParU_Control Control;

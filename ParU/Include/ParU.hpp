@@ -32,6 +32,16 @@
 #ifndef PARU_H
 #define PARU_H
 
+// ============================================================================/
+// ======================= ParU version =======================================/
+// ============================================================================/
+
+#define PARU_DATE "Apr 15, 2022"
+#define PARU_VERSION_MAJOR 0
+#define PARU_VERSION_MINOR 1
+#define PARU_VERSION_UPDATE 2
+
+
 #define CHOLMOD_BLAS_H
 #ifdef BLAS_INT
 #undef BLAS_INT
@@ -291,14 +301,6 @@ enum ParU_Ret
     PARU_SINGULAR
 };
 
-// see LAGraph.  version 0.1.2, apr 22
-#define PARU_DATE "Apr 22, 2022"
-#define PARU_VERSION_MAJOR 0
-#define PARU_VERSION_MINOR 1
-#define PARU_VERSION_UPDATE 2
-
-//ParU_Ret ParU_Version (int ver [3], char date [128]) { ... }
-//
 //ParU_Ret ParU_Environment (int )
 //{
 //    // sets the KMP_AFFINITY to compact, or none
@@ -342,6 +344,7 @@ struct ParU_Numeric
     ParU_Ret res;  // returning value of numeric phase
 };
 
+ParU_Ret ParU_Version (int ver [3], char date [128]);
 //------------------------------------------------------------------------------
 // ParU_Analyze: Symbolic analysis is done in this routine. UMFPACK is called
 // here and after that some more speciallized symbolic computation is done for
