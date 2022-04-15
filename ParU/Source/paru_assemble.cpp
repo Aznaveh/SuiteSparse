@@ -33,7 +33,7 @@ void paru_assemble_all(Int e, Int f, std::vector<Int> &colHash,
     if (PR <= 0) paru_print_element(e, Work, Num);
 
     PRLEVEL(PR, ("%% %ld :\n", eli));
-    if (PR <= 0) paru_print_element(eli Work, Num);
+    if (PR <= 0) paru_print_element(eli, Work, Num);
     PR = 1;
 #endif
 

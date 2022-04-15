@@ -31,9 +31,7 @@ run:
 	./x_paru_demo < ../Matrix/b1_ss.mtx  	#7x7
 
 VGFLAGS = --leak-check=yes  --log-file="valgrindlogfile.log"\
-		   --show-leak-kinds=all --track-origins=yes 
-
-			#comment leak-check=yes or full
+		   --show-leak-kinds=all --track-origins=yes  #comment leak-check=yes or full
 
 val:
 

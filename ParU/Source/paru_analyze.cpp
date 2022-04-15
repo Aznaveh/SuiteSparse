@@ -424,17 +424,16 @@ ParU_Ret ParU_Analyze(cholmod_sparse *A, ParU_Symbolic **S_handle,
         umfpack_dl_paru_free_sw(&SW);
         return PARU_OUT_OF_MEMORY;
     }
-
     
+    n1 = Sym_umf->n1;
+    Int anz = Sym_umf->nz;
+    nfr = Sym_umf->nfr;
 #ifndef NDEBUG
     Int nr = Sym_umf->n_row;
     Int nc = Sym_umf->n_col;
     PRLEVEL(1, ("In: %ldx%ld nnz = %ld \n", nr, nc, anz));
 #endif
 
-    n1 = Sym_umf->n1;
-    Int anz = Sym_umf->nz;
-    nfr = Sym_umf->nfr;
     // nchains = Sym_umf->nchains;
     Int cs1 = Sym_umf->n1c;
     Int rs1 = Sym_umf->n1r;

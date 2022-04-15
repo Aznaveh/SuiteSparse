@@ -75,7 +75,7 @@ ParU_Ret ParU_Residual(cholmod_sparse *A, double *X, double *B, Int m, Int nrhs,
     for (Int k = 0; k < m; k++)
     {
         PRLEVEL(1, ("%%"));
-        for (Int l = 0; l < n; l++)
+        for (Int l = 0; l < nrhs; l++)
         {
             PRLEVEL(1, (" %.2lf, ", B[l * m + k]));
             // PRLEVEL(1, (" %.2lf, ", B[k*n+l])); B row-major

@@ -224,7 +224,7 @@ ParU_Ret paru_pivotal(std::vector<Int> &pivotal_elements,
                     zero_piv_rows++;
                     rowRelIndex[rEl] = -1;
 #ifndef NDEBUG
-                    if (PR <= 0) paru_print_element(Num, e);
+                    if (PR <= 0) paru_print_element(e, Work, Num);
 #endif
                     continue;  // Not adding the row
                 }

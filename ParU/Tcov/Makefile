@@ -100,6 +100,10 @@ I = -I ../../UMFPACK/Source -I../../UMFPACK/Include -I ../../CHOLMOD/Include\
 
 FLAG = -Wno-write-strings
 
+VFLAGS = --leak-check=yes  --log-file="valgrindlogfile.log"\
+		   --show-leak-kinds=all --track-origins=yes 
+
+
 
 #C = $(CXX) $(CF) $(SPQR_CONFIG) $(CHOLMOD_CONFIG) $(CONFIG_PARTITION) $(I)
 C = $(CXX) $(CF)  $(CHOLMOD_CONFIG) $(CONFIG_PARTITION) $(I) $(FLAG) $(C11)
@@ -112,11 +116,13 @@ parutest: libraries paru_test.cpp $(INC) $(OBJ)
 
 go: parutest
 	- ./x_test < ../Matrix/west0067.mtx > parutest_out.txt
+	- ./x_test < ../Matrix/ParUTst/494_bus/494_bus.mtx > parutest_out.txt
+	- ./x_test < ../Matrix/ParUTst/1138_bus/1138_bus.mtx > parutest_out.txt
 	- ./cov
 
 vgo: parutest
-	- ./x_test < ../Matrix/west0067.mtx > parutest_out.txt
-	#- ./cov
+	- valgrind  ./x_test < ../Matrix/west0067.mtx > parutest_out.txt
+	- ./cov
 
 
 #-------------------------------------------------------------------------------
