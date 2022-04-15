@@ -1,3 +1,7 @@
+NOTE: This is an unofficial copy of SuiteSparse to develop ParU. 
+Other than ParU, UMFPACK is also a little bit different in this copy. 
+Eventually this copy of ParU is going to merge in official SuiteSparse.
+
 SuiteSparse:  A Suite of Sparse matrix packages at http://www.suitesparse.com
 
 Mar 30, 2017.  SuiteSparse VERSION 4.5.5 (draft for parallel UMFPACK)
