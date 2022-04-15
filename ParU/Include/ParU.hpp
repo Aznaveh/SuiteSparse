@@ -291,6 +291,19 @@ enum ParU_Ret
     PARU_SINGULAR
 };
 
+// see LAGraph.  version 0.1.2, apr 22
+#define PARU_DATE "Apr 22, 2022"
+#define PARU_VERSION_MAJOR 0
+#define PARU_VERSION_MINOR 1
+#define PARU_VERSION_UPDATE 2
+
+//ParU_Ret ParU_Version (int ver [3], char date [128]) { ... }
+//
+//ParU_Ret ParU_Environment (int )
+//{
+//    // sets the KMP_AFFINITY to compact, or none
+//}
+
 struct ParU_Numeric
 {
     Int m, n;   // size of the sumbatrix(S) that is factorized
