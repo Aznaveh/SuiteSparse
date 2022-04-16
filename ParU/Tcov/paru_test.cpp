@@ -12,7 +12,7 @@
 #include <math.h>
 #include <omp.h>
 
-#include "ParU.hpp"
+#include "paru_cov.hpp"
 
 int main(int argc, char **argv)
 {
@@ -115,83 +115,7 @@ int main(int argc, char **argv)
 #endif
 
     //~~~~~~~~~~~~~~~~~~~End computation~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    Int max_threads = omp_get_max_threads();
-    BLAS_set_num_threads(max_threads);
 
-    //~~~~~~~~~~~~~~~~~~~Calling umfpack~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    double umf_time = 0;
-
-#if 1
-    double umf_start_time = omp_get_wtime();
-    double status,           // Info [UMFPACK_STATUS]
-        Info[UMFPACK_INFO],  // Contains statistics about the symbolic analysis
-
-        umf_Control[UMFPACK_CONTROL];  // it is set in umfpack_dl_defaults and
-    // is used in umfpack_dl_symbolic; if
-    // passed NULL it will use the defaults
-    umfpack_dl_defaults(umf_Control);
-    umf_Control[UMFPACK_ORDERING] = UMFPACK_ORDERING_METIS;
-    // umf_Control [UMFPACK_STRATEGY] =   UMFPACK_STRATEGY_UNSYMMETRIC;
-
-    Int *Ap = (Int *)A->p;
-    Int *Ai = (Int *)A->i;
-    double *Ax = (double *)A->x;
-    // Int m = A->nrow;
-    Int n = A->ncol;
-    void *Symbolic, *Numeric;  // Output argument in umf_dl_symbolc;
-
-    status =
-        umfpack_dl_symbolic(n, n, Ap, Ai, Ax, &Symbolic, umf_Control, Info);
-    if (status < 0)
-    {
-        umfpack_dl_report_info(umf_Control, Info);
-        umfpack_dl_report_status(umf_Control, status);
-        printf("umfpack_dl_symbolic failed\n");
-        exit(0);
-    }
-    status =
-        umfpack_dl_numeric(Ap, Ai, Ax, Symbolic, &Numeric, umf_Control, Info);
-    if (status < 0)
-    {
-        umfpack_dl_report_info(umf_Control, Info);
-        umfpack_dl_report_status(umf_Control, status);
-        printf("umfpack_dl_numeric failed\n");
-    }
-
-    umf_time = omp_get_wtime() - umf_start_time;
-
-    double *b = (double *)malloc(m * sizeof(double));
-    double *x = (double *)malloc(m * sizeof(double));
-    for (Int i = 0; i < m; ++i) b[i] = i + 1;
-
-    double solve_start = omp_get_wtime();
-    status = umfpack_dl_solve(UMFPACK_A, Ap, Ai, Ax, x, b, Numeric, umf_Control,
-                              Info);
-    double solve_time = omp_get_wtime() - solve_start;
-    free(x);
-    free(b);
-
-    umfpack_dl_free_symbolic(&Symbolic);
-    umfpack_dl_free_numeric(&Numeric);
-
-    // Writing results to a file
-    if (info == PARU_SUCCESS)
-    {
-        FILE *res_file;
-        char res_name[] = "../Demo/Res/res.txt";
-        res_file = fopen(res_name, "a");
-        if (res_file == NULL)
-        {
-            printf("Par: error in making %s to write the results!\n", res_name);
-        }
-        fprintf(res_file, "%ld %ld %lf %lf %lf\n", Sym->m, Sym->anz, my_time,
-                umf_time, my_time / umf_time);
-        fclose(res_file);
-    }
-    printf("my_time = %lf umf_time=%lf umf_solv_t = %lf ratio = %lf\n", my_time,
-           umf_time, solve_time, my_time / umf_time);
-
-#endif
     //~~~~~~~~~~~~~~~~~~~Free Everything~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     ParU_Freenum(&Num, &Control);
     ParU_Freesym(&Sym, &Control);

@@ -16,8 +16,6 @@ CLIB = $(LDFLAGS) -L../../lib -lumfpack -lsuitesparseconfig -lcholmod -lamd \
 FLIB = $(LAPACK) $(BLAS)
 
 
-I = -I../../include  -I ../Include -I../../UMFPACK/Source -I../../AMD/Include
-
 
 C = $(CXX) $(CF) $(UMFPACK_CONFIG) $(CONFIG_PARTITION) $(CONFIG_GPU) $(I) \
 	$(CHOLMOD_CONFIG)
@@ -96,8 +94,9 @@ OBJ = \
 
 $(OBJ): $(INC)
 
-I = -I ../../UMFPACK/Source -I../../UMFPACK/Include -I ../../CHOLMOD/Include\
-	-I ../../AMD/Include  -I ../../SuiteSparse_config -I../Include
+I = -I../../UMFPACK/Source -I../../UMFPACK/Include -I../../CHOLMOD/Include\
+	-I../../AMD/Include  -I../../SuiteSparse_config -I../Include -I../Source
+
 
 FLAG = -Wno-write-strings
 
@@ -244,7 +243,6 @@ paru_tasked_trsm.o: ../Source/paru_tasked_trsm.cpp
 paru_version.o: ../Source/paru_version.cpp
 	$(C) -c $<
 
-
 #-------------------------------------------------------------------------------
 #-------------------------------------------------------------------------------
 # libraries compiled without test coverage
@@ -269,7 +267,7 @@ libraries:
 purge: distclean
 
 distclean: clean
-	- $(RM) x_test
+	- $(RM) x_test cov.out
 	- $(RM) parutest_out.txt
 	- $(RM) analysis.txt tcov gprof
 	- $(RM) gprof.o vprof gmon.out callgrind.out.*
