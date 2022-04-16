@@ -91,6 +91,7 @@ OBJ = \
 	paru_full_summed.o \
 	paru_tasked_dgemm.o \
 	paru_tasked_trsm.o \
+	paru_version.o \
 
 
 $(OBJ): $(INC)
@@ -238,6 +239,9 @@ paru_tasked_dgemm.o: ../Source/paru_tasked_dgemm.cpp
 	$(C) -c $<
 
 paru_tasked_trsm.o: ../Source/paru_tasked_trsm.cpp
+	$(C) -c $<
+
+paru_version.o: ../Source/paru_version.cpp
 	$(C) -c $<
 
 
