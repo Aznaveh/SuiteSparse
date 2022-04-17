@@ -11,6 +11,8 @@
  *
  */
 
+#include "paru_internal.hpp"
+
 #ifdef PARU_ALLOC_TESTING
 // global variables
 bool paru_malloc_tracking = false;
@@ -68,7 +70,6 @@ Int paru_get_nmalloc(void)
 
 #endif
 
-#include "paru_internal.hpp"
 //  Wrapper around malloc routine
 //
 //  Uses a pointer to the malloc routine.

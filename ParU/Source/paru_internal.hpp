@@ -29,11 +29,15 @@
 #define NTIME
 #endif
 
-#ifdef Int  // defined in amd
-#undef Int
+#define DLONG
+#ifdef Int  // Int defined in amd as int without DLONG
+#undef Int  // and I need inside of amd because of UMFPACK
 #endif
 
-#define DLONG
+#ifdef PARU_ALLOC_TESTING 
+#undef PARU_ALLOC_TESTING 
+#endif
+
 extern "C"
 {
 #include "cholmod_blas.h"
@@ -46,6 +50,7 @@ extern "C"
 //#undef NDEBUG  //<<2>>
 // uncomment the following line to turn on OpenMP timing
 //#undef NTIME   //<<3>>
+#define PARU_ALLOC_TESTING // for coverage test allocations
 
 // uncomment if you want to count hardware flops
 //#define COUNT_FLOPS
