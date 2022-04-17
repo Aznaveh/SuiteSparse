@@ -10,21 +10,26 @@
 #include "paru_internal.hpp"
 
 #ifdef PARU_ALLOC_TESTING
-#define BRUTAL_ALLOC_TEST(info, method)            \
-    {                                              \
-        paru_set_malloc_tracking(true);            \
-        for (Int nmalloc = 0;; nmalloc++)          \
-        {                                          \
-            paru_set_nmalloc(nmalloc);             \
-            info = method;                         \
-            if (info != PARU_OUT_OF_MEMORY) break; \
-            if (nmalloc > 1000000)                 \
-            {                                      \
-                printf("ParU: test failure\n");    \
-                break;                             \
-            }                                      \
-        }                                          \
-        paru_set_malloc_tracking(false);           \
+#define BRUTAL_ALLOC_TEST(info, method)         \
+    {                                           \
+        paru_set_malloc_tracking(true);         \
+        for (Int nmalloc = 0;; nmalloc++)       \
+        {                                       \
+            paru_set_nmalloc(nmalloc);          \
+            info = method;                      \
+            if (info != PARU_OUT_OF_MEMORY)     \
+            {                                   \
+                printf("nmalloc=%ld\n",nmalloc);\
+                break;                          \
+            }                                   \
+            if (nmalloc > 1000000)              \
+            {                                   \
+                printf("ParU: test failure\n"); \
+                break;                          \
+            }                                   \
+        }                                       \
+        printf("ParU: test failure\n");         \
+        paru_set_malloc_tracking(false);        \
     }
 #else
 #define BRUTAL_ALLOC_TEST(info, method) \

@@ -55,14 +55,17 @@
 ParU_Ret ParU_Analyze(cholmod_sparse *A, ParU_Symbolic **S_handle,
                       ParU_Control *user_Control)
 {
-    DEBUGLEVEL(0);
+    DEBUGLEVEL(1);
     PARU_DEFINE_PRLEVEL;
 #ifndef NTIME
     double start_time = PARU_OPENMP_GET_WTIME;
 #endif
     ParU_Symbolic *Sym;
     Sym = (ParU_Symbolic *)paru_alloc(1, sizeof(ParU_Symbolic));
-    if (!Sym) return PARU_INVALID;
+    if (!Sym) 
+    {
+        return PARU_OUT_OF_MEMORY;
+    }
     *S_handle = Sym;
 
     Int m = A->nrow;
@@ -90,6 +93,11 @@ ParU_Ret ParU_Analyze(cholmod_sparse *A, ParU_Symbolic **S_handle,
     Sym->ustons.Sup = Sym->lstons.Slp = NULL;
     Sym->ustons.Suj = Sym->lstons.Sli = NULL;
     Sym->task_map = Sym->task_parent = Sym->task_num_child = NULL;
+    Sym->Super = Sym->Depth = NULL;
+    Sym->Pinit = Sym->Pinv = NULL;
+    Sym->task_depth = NULL;
+    Sym->n1 = -1;
+ 
 
     //############  Calling UMFPACK and retrieving data structure ##############
 
@@ -402,8 +410,10 @@ ParU_Ret ParU_Analyze(cholmod_sparse *A, ParU_Symbolic **S_handle,
     /* ---------------------------------------------------------------------- */
     SymbolicType *Sym_umf = (SymbolicType *)Symbolic;  // just an alias
     // temp amalgamation data structure
-    Int *fmap = (Int *)paru_alloc((n + 1), sizeof(Int));
-    Int *newParent = (Int *)paru_alloc((n + 1), sizeof(Int));
+    Int *fmap = NULL;
+    Int *newParent = NULL;
+    fmap = (Int *)paru_alloc((n + 1), sizeof(Int));
+    newParent = (Int *)paru_alloc((n + 1), sizeof(Int));
     if (Sym->strategy == PARU_STRATEGY_SYMMETRIC)
         Diag_map = Sym_umf->Diagonal_map;
     else
@@ -425,6 +435,7 @@ ParU_Ret ParU_Analyze(cholmod_sparse *A, ParU_Symbolic **S_handle,
         return PARU_OUT_OF_MEMORY;
     }
     
+    PRLEVEL(1, ("Paru: Analyze just started!\n"));
     n1 = Sym_umf->n1;
     Int anz = Sym_umf->nz;
     nfr = Sym_umf->nfr;
@@ -572,8 +583,8 @@ ParU_Ret ParU_Analyze(cholmod_sparse *A, ParU_Symbolic **S_handle,
 
     // Making Super data structure
     // like SPQR: Super[f]<= pivotal columns of (f) < Super[f+1]
-    Int *Super = Sym->Super = NULL;
-    Int *Depth = Sym->Depth = NULL;
+    Int *Super = NULL;
+    Int *Depth = NULL;
     if (nf > 0)
     {
         Super = Sym->Super = (Int *)paru_alloc((nf + 1), sizeof(Int));

@@ -1,5 +1,5 @@
 //  =========================================================================  /
-// =======================  paru_demo =======================================  /
+// =======================  paru_test =======================================  /
 // ==========================================================================  /
 // ParU, Mohsen Aznaveh and Timothy A. Davis, (c) 2022, All Rights Reserved.
 // SPDX-License-Identifier: GNU GPL 3.0
@@ -57,8 +57,29 @@ int main(int argc, char **argv)
     ParU_Control Control;
     ParU_Ret info;
 
-    BRUTAL_ALLOC_TEST(info, ParU_Analyze(A, &Sym, &Control) );
-    info = ParU_Analyze(A, &Sym, &Control);
+    //RUTAL_ALLOC_TEST(info, ParU_Analyze(A, &Sym, &Control) );
+    //info = ParU_Analyze(A, &Sym, &Control);
+    {                                           
+        paru_set_malloc_tracking(true);         
+        for (Int nmalloc = 0;; nmalloc++)       
+        {                                       
+            printf("#####nmalloc=%ld\n",nmalloc);
+            paru_set_nmalloc(nmalloc);          
+            info = ParU_Analyze(A, &Sym, &Control);
+            if (info != PARU_OUT_OF_MEMORY)     
+            {                                   
+                printf("nmalloc=%ld\n",nmalloc);
+                break;                          
+            }                                   
+            if (nmalloc > 100)              
+            {                                   
+                printf("ParU: too much malloc\n"); 
+                break;                          
+            }                                   
+        }                                       
+        printf("ParU: test failure\n");         
+        paru_set_malloc_tracking(false);        
+    }
     if (info != PARU_SUCCESS)
     {
         cholmod_l_free_sparse(&A, cc);
@@ -73,11 +94,11 @@ int main(int argc, char **argv)
     if (info != PARU_SUCCESS)
     {
         printf("Paru: factorization was NOT successfull in %lf seconds.\n",
-               my_time);
+                my_time);
     }
     else
         printf("Paru: factorization was successfull in %lf seconds.\n",
-               my_time);
+                my_time);
 
     //~~~~~~~~~~~~~~~~~~~Test the results ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     Int m = Sym->m;

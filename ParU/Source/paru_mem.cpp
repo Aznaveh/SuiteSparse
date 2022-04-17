@@ -37,12 +37,14 @@ void paru_set_malloc_tracking(bool track)
     }
 }
 
-void paru_set_nmalloc(bool nmalloc)
+void paru_set_nmalloc(Int nmalloc)
 {
 #pragma omp critical (paru_malloc_testing)
     {
         paru_nmalloc = nmalloc;
     }
+    //printf("inside set nmalloc=%ld",nmalloc);
+    PRLEVEL(1, ("inside set nmalloc=%ld",nmalloc));
 }
 
 Int paru_decr_nmalloc(void)
@@ -55,6 +57,8 @@ Int paru_decr_nmalloc(void)
             nmalloc = paru_nmalloc--;
         }
     }
+    //printf("inside decr nmalloc=%ld",nmalloc);
+    PRLEVEL(1, ("inside decr nmalloc=%ld",nmalloc));
     return (nmalloc);
 }
 
@@ -65,6 +69,8 @@ Int paru_get_nmalloc(void)
     {
         nmalloc = paru_nmalloc;
     }
+    //printf("inside get nmalloc=%ld",nmalloc);
+    PRLEVEL(1, ("inside get nmalloc=%ld",nmalloc));
     return (nmalloc);
 }
 
