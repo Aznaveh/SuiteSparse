@@ -20,7 +20,7 @@ Int paru_nmalloc = 0;
 bool paru_get_malloc_tracking(void)
 {
     bool track;
-#pragma omp critical paru_malloc_testing
+#pragma omp critical (paru_malloc_testing)
     {
         track = paru_malloc_tracking;
     }
@@ -29,7 +29,7 @@ bool paru_get_malloc_tracking(void)
 
 void paru_set_malloc_tracking(bool track)
 {
-#pragma omp critical paru_malloc_testing
+#pragma omp critical (paru_malloc_testing)
     {
         paru_malloc_tracking = track;
     }
@@ -37,7 +37,7 @@ void paru_set_malloc_tracking(bool track)
 
 void paru_set_nmalloc(bool nmalloc)
 {
-#pragma omp critical paru_malloc_testing
+#pragma omp critical (paru_malloc_testing)
     {
         paru_nmalloc = nmalloc;
     }
@@ -46,7 +46,7 @@ void paru_set_nmalloc(bool nmalloc)
 Int paru_decr_nmalloc(void)
 {
     Int nmalloc = 0;
-#pragma omp critical paru_malloc_testing
+#pragma omp critical (paru_malloc_testing)
     {
         if (paru_nmalloc > 0)
         {
@@ -59,7 +59,7 @@ Int paru_decr_nmalloc(void)
 Int paru_get_nmalloc(void)
 {
     Int nmalloc = 0;
-#pragma omp critical paru_malloc_testing
+#pragma omp critical (paru_malloc_testing)
     {
         nmalloc = paru_nmalloc;
     }
