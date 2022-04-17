@@ -8,10 +8,32 @@
 #define PARU_COVERAGE_H
 
 #include "paru_internal.hpp"
-//!
-//  internal libraries that are not visible to the user
-//  @author Aznaveh
-//
+
+#ifdef PARU_ALLOC_TESTING
+#define BRUTAL_ALLOC_TEST(info, method)            \
+    {                                              \
+        paru_set_malloc_tracking(true);            \
+        for (Int nmalloc = 0;; nmalloc++)          \
+        {                                          \
+            paru_set_nmalloc(nmalloc);             \
+            info = method;                         \
+            if (info != PARU_OUT_OF_MEMORY) break; \
+            if (nmalloc > 1000000)                 \
+            {                                      \
+                printf("ParU: test failure\n");    \
+                break;                             \
+            }                                      \
+        }                                          \
+        paru_set_malloc_tracking(false);           \
+    }
+#else
+#define BRUTAL_ALLOC_TEST(info, method) \
+    {                                   \
+        info = method;                  \
+    }
+#endif
+
+#endif
 
 /* sample usage:
 
@@ -69,4 +91,3 @@
     #endif
 */
 
-#endif

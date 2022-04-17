@@ -267,12 +267,9 @@ libraries:
 purge: distclean
 
 distclean: clean
-	- $(RM) x_test cov.out
-	- $(RM) parutest_out.txt
+	- $(RM) x_test cov.out parutest_out.txt
 	- $(RM) analysis.txt tcov gprof
 	- $(RM) gprof.o vprof gmon.out callgrind.out.*
-	- $(RM) paneltest
-	- $(RM) *.dot pfile tfile
 	- $(RM) -r $(PURGE)
 
 clean:

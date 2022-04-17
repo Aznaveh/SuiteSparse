@@ -57,6 +57,7 @@ int main(int argc, char **argv)
     ParU_Control Control;
     ParU_Ret info;
 
+    BRUTAL_ALLOC_TEST(info, ParU_Analyze(A, &Sym, &Control) );
     info = ParU_Analyze(A, &Sym, &Control);
     if (info != PARU_SUCCESS)
     {
