@@ -51,6 +51,27 @@
  *              the augmented tree does not
  * @author Aznaveh
  * */
+// =============================================================================
+
+#define FREE_WORK \
+        paru_free(1, sizeof(ParU_Symbolic), Sym); \
+        paru_free((n + 1), sizeof(Int), fmap);  \
+        paru_free((n + 1), sizeof(Int), newParent); \
+        paru_free(n, sizeof(Int), inv_Diag_map); \
+        paru_free((n + 1), sizeof(Int), Front_parent); \
+        paru_free((n + 1), sizeof(Int), Front_npivcol); \
+        paru_free((m + 1), sizeof(Int), Pinit); \
+        paru_free((m - n1), sizeof(Int), Ps); \
+        paru_free((MAX(m, n) + 2), sizeof(Int), Work); \
+        paru_free((cs1 + 1), sizeof(Int), Sup);    \
+        paru_free((cs1 + 1), sizeof(Int), cSup);   \
+        paru_free((rs1 + 1), sizeof(Int), Slp);   \
+        paru_free((rs1 + 1), sizeof(Int), cSlp);   \
+        ParU_Freesym(&Sym, Control); \
+        umfpack_dl_free_symbolic(&Symbolic);\
+        umfpack_dl_paru_free_sw(&SW); 
+
+// =============================================================================
 #include "paru_internal.hpp"
 ParU_Ret ParU_Analyze(cholmod_sparse *A, ParU_Symbolic **S_handle,
                       ParU_Control *user_Control)
@@ -349,7 +370,7 @@ ParU_Ret ParU_Analyze(cholmod_sparse *A, ParU_Symbolic **S_handle,
 
     /* performing the symbolic analysis */
 
-    void *SW;
+    void *SW = NULL;
     status = umfpack_dl_paru_symbolic(m, n, Ap, Ai, Ax,
                                      NULL,   // user provided ordering
                                      FALSE,  // No user ordering
@@ -360,10 +381,13 @@ ParU_Ret ParU_Analyze(cholmod_sparse *A, ParU_Symbolic **S_handle,
 
     if (status < 0)
     {
+#ifndef NDEBUG
         umfpack_dl_report_info(umf_Control, Info);
         umfpack_dl_report_status(umf_Control, status);
+#endif
         PRLEVEL(1, ("Paru: umfpack_dl_symbolic failed\n"));
         umfpack_dl_free_symbolic(&Symbolic);
+        ///XXX add paru_free_sw
         paru_free(1, sizeof(ParU_Symbolic), Sym);
         return PARU_INVALID;
     }
@@ -462,10 +486,10 @@ ParU_Ret ParU_Analyze(cholmod_sparse *A, ParU_Symbolic **S_handle,
         inv_Diag_map = NULL;
     if (!fmap || !newParent || (!Diag_map != !inv_Diag_map))
     {
+        PRLEVEL(1, ("Paru: out of memory\n"));
         paru_free((n + 1), sizeof(Int), fmap);
         paru_free((n + 1), sizeof(Int), newParent);
         paru_free(n, sizeof(Int), inv_Diag_map);
-        PRLEVEL(1, ("Paru: out of memory\n"));
         ParU_Freesym(&Sym, Control);
         umfpack_dl_free_symbolic(&Symbolic);
         umfpack_dl_paru_free_sw(&SW);
@@ -603,6 +627,7 @@ ParU_Ret ParU_Analyze(cholmod_sparse *A, ParU_Symbolic **S_handle,
     // Parent size is nf+1 potentially smaller than what UMFPACK allocate
     size_t size = n + 1;
     Parent = (Int *)paru_realloc(nf + 1, sizeof(Int), Front_parent, &size);
+    Sym->Parent = Parent;
     ASSERT(size <= (size_t)n + 1);
     if (Parent == NULL)
     {  // should not happen anyway it is always shrinking
@@ -616,7 +641,6 @@ ParU_Ret ParU_Analyze(cholmod_sparse *A, ParU_Symbolic **S_handle,
         umfpack_dl_paru_free_sw(&SW);
         return PARU_OUT_OF_MEMORY;
     }
-    Sym->Parent = Parent;
 
     // Making Super data structure
     // like SPQR: Super[f]<= pivotal columns of (f) < Super[f+1]
