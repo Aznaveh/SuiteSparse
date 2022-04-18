@@ -49,7 +49,7 @@ Int paru_usolve(double *x, ParU_Symbolic *Sym, ParU_Numeric *Num,
     Int nf = Sym->nf;
 
     Int n1 = Sym->n1;   // row+col singletons
-    Int *Ps = Sym->Ps;  // row permutation
+    Int *Ps = Num->Ps;  // row permutation
 
     ParU_Factors *LUs = Num->partial_LUs;
     ParU_Factors *Us = Num->partial_Us;
@@ -204,7 +204,7 @@ Int paru_usolve(double *X, Int n, ParU_Symbolic *Sym, ParU_Numeric *Num,
     double start_time = PARU_OPENMP_GET_WTIME;
 #endif
     Int n1 = Sym->n1;   // row+col singletons
-    Int *Ps = Sym->Ps;  // row permutation
+    Int *Ps = Num->Ps;  // row permutation
 
     ParU_Factors *LUs = Num->partial_LUs;
     ParU_Factors *Us = Num->partial_Us;

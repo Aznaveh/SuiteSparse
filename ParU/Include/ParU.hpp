@@ -147,9 +147,6 @@ struct ParU_Symbolic
     Int *Diag_map;  // size n,
     // UMFPACK computes it and I use it to find original diags out of it
 
-    Int *Ps;  // size m, row permutation.
-    // Permutation from S to LU. needed for lsolve and usolve
-
     Int *Sleft;  // size n-n1+2.  The list of rows of S whose
     // leftmost column index is j is given by
     // Sleft [j] ... Sleft [j+1]-1.  This can be empty (that is, Sleft
@@ -311,27 +308,30 @@ struct ParU_Numeric
     Int nf;      // number of fronts copy of Sym->nf
     double *Rs;  // the array for row scaling based on original matrix
                  // size = m
-                 
+
+    // Permutations are computed after all the factorization
+    Int *Ps;  // size m, row permutation.
+    // Permutation from S to LU. needed for lsolve and usolve
     Int *Pfin;  // size m, row permutation.
     // ParU final permutation.
 
     Int snz;     // nnz in S; copy of Sym->snz
     double *Sx;  // size snz = Sp [n], numeric values of (scaled) S;
-                 // Sp and Sj must be initialized in Symbolic phase
+    // Sp and Sj must be initialized in Symbolic phase
     Int sunz;
     double *Sux;  // Numeric values u singletons, Sup Suj are in symbolic
     Int slnz;
     double *Slx;  // Numeric values l singletons, Slp Sli are in symbolic
 
     ParU_Control *Control;  // a copy of controls for internal use
-                            // it is freed after factorize
+    // it is freed after factorize
 
     // Computed parts of each front
     Int *frowCount;  // size nf   size(CB) = rowCount[f]x
     Int *fcolCount;  // size nf                        colCount[f]
     Int **frowList;  // size nf   frowList[f] is rows of the matrix S
     Int **fcolList;  // size nf   colList[f] is non pivotal cols of the
-                     //   matrix S
+    //   matrix S
     ParU_Factors *partial_Us;   // size nf   size(Us)= fp*colCount[f]
     ParU_Factors *partial_LUs;  // size nf   size(LUs)= rowCount[f]*fp
 
@@ -352,12 +352,12 @@ ParU_Ret ParU_Version (int ver [3], char date [128]);
 // calls. 
 //------------------------------------------------------------------------------
 ParU_Ret ParU_Analyze(
-    // input:
-    cholmod_sparse *A,  // input matrix to analyze ...
-    // output:
-    ParU_Symbolic **Sym_handle,  // output, symbolic analysis
-    // control:
-    ParU_Control *Control);
+        // input:
+        cholmod_sparse *A,  // input matrix to analyze ...
+        // output:
+        ParU_Symbolic **Sym_handle,  // output, symbolic analysis
+        // control:
+        ParU_Control *Control);
 
 //------------------------------------------------------------------------------
 // ParU_Factorize: Numeric factorization is done in this routine. Scaling and

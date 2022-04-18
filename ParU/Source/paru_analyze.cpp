@@ -85,7 +85,7 @@ ParU_Ret ParU_Analyze(cholmod_sparse *A, ParU_Symbolic **S_handle,
     // Sym->Chain_start = Sym->Chain_maxrows = Sym->Chain_maxcols = NULL;
     Sym->Parent = Sym->Super = Sym->Child = Sym->Childp = NULL;
     Sym->Qfill = Sym->Pinit = Sym->Diag_map = NULL;
-    Sym->Sp = Sym->Sj = Sym->Sleft = Sym->Ps = NULL;
+    Sym->Sp = Sym->Sj = Sym->Sleft = NULL;
     Sym->Fm = Sym->Cm = NULL;
     Sym->aParent = Sym->aChildp = Sym->aChild = Sym->row2atree = NULL;
     Sym->super2atree = Sym->first = NULL;

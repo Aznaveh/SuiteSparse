@@ -57,7 +57,7 @@ ParU_Ret paru_perm(ParU_Symbolic *Sym, ParU_Numeric *Num)
     Int *Pinit = Sym->Pinit;
 
     Num->Pfin = Pfin = (Int *)paru_alloc(m, sizeof(Int));
-    Sym->Ps = Ps = (Int *)paru_alloc(m, sizeof(Int));
+    Num->Ps = Ps = (Int *)paru_alloc(m, sizeof(Int));
 
     PRLEVEL(1, ("%% Inside Perm\n"));
     if (Pfin == NULL || Ps == NULL)

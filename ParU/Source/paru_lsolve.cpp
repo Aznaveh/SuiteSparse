@@ -57,7 +57,7 @@ Int paru_lsolve(double *x, ParU_Symbolic *Sym, ParU_Numeric *Num,
     double start_time = PARU_OPENMP_GET_WTIME;
 #endif
     Int n1 = Sym->n1;   // row+col singletons
-    Int *Ps = Sym->Ps;  // row permutation S->LU
+    Int *Ps = Num->Ps;  // row permutation S->LU
 
     PRLEVEL(1, ("%%Working on singletons if any\n%%"));
     // singletons
@@ -220,7 +220,7 @@ Int paru_lsolve(double *X, Int n, ParU_Symbolic *Sym, ParU_Numeric *Num,
 #endif
 
     Int n1 = Sym->n1;   // row+col singletons
-    Int *Ps = Sym->Ps;  // row permutation S->LU
+    Int *Ps = Num->Ps;  // row permutation S->LU
 
     // singletons
     Int rs1 = Sym->rs1;
