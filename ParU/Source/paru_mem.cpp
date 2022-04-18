@@ -344,7 +344,6 @@ ParU_Ret ParU_Freesym(ParU_Symbolic **Sym_handle, ParU_Control *Control)
     paru_free(n, sizeof(Int), Sym->Qfill);
     paru_free(n, sizeof(Int), Sym->Diag_map);
     paru_free(m, sizeof(Int), Sym->Ps);
-    paru_free(m, sizeof(Int), Sym->Pfin);
     paru_free((m + 1), sizeof(Int), Sym->Pinit);
     paru_free(nf + 1, sizeof(Int), Sym->Fm);
     paru_free(nf + 1, sizeof(Int), Sym->Cm);
@@ -525,7 +524,8 @@ ParU_Ret ParU_Freenum(ParU_Numeric **Num_handle, ParU_Control *Control)
         paru_free(Num->slnz, sizeof(double), Num->Slx);
     }
 
-    paru_free(Num->sym_m, sizeof(Int), Num->Rs);  // HERE: sym_m
+    paru_free(Num->sym_m, sizeof(Int), Num->Rs);  
+    paru_free(Num->sym_m, sizeof(Int), Num->Pfin);
 
     // free the factors
     ParU_Factors *LUs = Num->partial_LUs;

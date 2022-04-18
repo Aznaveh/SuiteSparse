@@ -150,9 +150,6 @@ struct ParU_Symbolic
     Int *Ps;  // size m, row permutation.
     // Permutation from S to LU. needed for lsolve and usolve
 
-    Int *Pfin;  // size m, row permutation.
-    // ParU final permutation.
-
     Int *Sleft;  // size n-n1+2.  The list of rows of S whose
     // leftmost column index is j is given by
     // Sleft [j] ... Sleft [j+1]-1.  This can be empty (that is, Sleft
@@ -314,6 +311,9 @@ struct ParU_Numeric
     Int nf;      // number of fronts copy of Sym->nf
     double *Rs;  // the array for row scaling based on original matrix
                  // size = m
+                 
+    Int *Pfin;  // size m, row permutation.
+    // ParU final permutation.
 
     Int snz;     // nnz in S; copy of Sym->snz
     double *Sx;  // size snz = Sp [n], numeric values of (scaled) S;

@@ -49,7 +49,7 @@ ParU_Ret ParU_Solve(ParU_Symbolic *Sym, ParU_Numeric *Num, double *b,
     ParU_Control *Control = &my_Control;
 
     paru_memcpy(x, b, m * sizeof(double), Control);
-    paru_apply_perm_scale(Sym->Pfin, Num->Rs, b, x, m);
+    paru_apply_perm_scale(Num->Pfin, Num->Rs, b, x, m);
 
     PRLEVEL(1, ("%% lsolve\n"));
     paru_lsolve(x, Sym, Num, Control);  // x = L\x
@@ -137,7 +137,7 @@ ParU_Ret ParU_Solve(ParU_Symbolic *Sym, ParU_Numeric *Num, Int nrhs, double *B,
     ParU_Control *Control = &my_Control;
 
     paru_memcpy(X, B, m * nrhs * sizeof(double), Control);
-    paru_apply_perm_scale(Sym->Pfin, Num->Rs, B, X, m, nrhs);
+    paru_apply_perm_scale(Num->Pfin, Num->Rs, B, X, m, nrhs);
 
     PRLEVEL(1, ("%%mRHS lsolve\n"));
     paru_lsolve(X, nrhs, Sym, Num, Control);  // X = L\X

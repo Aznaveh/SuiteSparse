@@ -46,10 +46,7 @@ ParU_Ret paru_perm(ParU_Symbolic *Sym, ParU_Numeric *Num)
     DEBUGLEVEL(0);
     PARU_DEFINE_PRLEVEL;
 
-    if (Sym->Pfin != NULL)  // it must have been computed
-        return PARU_SUCCESS;
     Int nf = Sym->nf;
-
     Int m = Sym->m;
 
     Int *Super = Sym->Super;
@@ -59,7 +56,7 @@ ParU_Ret paru_perm(ParU_Symbolic *Sym, ParU_Numeric *Num)
     Int *Ps = NULL;
     Int *Pinit = Sym->Pinit;
 
-    Sym->Pfin = Pfin = (Int *)paru_alloc(m, sizeof(Int));
+    Num->Pfin = Pfin = (Int *)paru_alloc(m, sizeof(Int));
     Sym->Ps = Ps = (Int *)paru_alloc(m, sizeof(Int));
 
     PRLEVEL(1, ("%% Inside Perm\n"));
