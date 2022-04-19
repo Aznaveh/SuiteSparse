@@ -388,7 +388,7 @@ ParU_Ret paru_init_rowFronts(paru_work *Work,
     if (Diag_map)
     {
         #pragma omp taskloop default(none) shared(Sym, Diag_map, inv_Diag_map) \
-            grainsize(512)
+        grainsize(512)
         for (Int i = 0; i < Sym->n; i++)
         {
             // paru_memcpy(Diag_map, Sym->Diag_map, (Sym->n) * sizeof(Int));
@@ -445,28 +445,13 @@ ParU_Ret paru_init_rowFronts(paru_work *Work,
             out_of_memory += 1;
         }
         else
-        {
-            rowMark[e] = 0;
-
-            // My new is calling paru_alloc
-            std::vector<Int> *curHeap;
             try
             {
-                curHeap = Work->heapList[e] = new std::vector<Int>;
-            }
-            catch (std::bad_alloc const &)
-            {  // out of memory
-                PRLEVEL(1, ("Paru: Out of memory: curHeap\n"));
-                #pragma omp atomic update
-                out_of_memory += 1;
-            }
+                rowMark[e] = 0;
 
-            Int out_mem = 0;
-            #pragma omp atomic read
-            out_mem = out_of_memory;
-
-            if (out_mem < 1)
-            {
+                // My new is calling paru_alloc
+                std::vector<Int> *curHeap = Work->heapList[e] =
+                    new std::vector<Int>;
 
                 curHeap->push_back(e);
 
@@ -475,7 +460,7 @@ ParU_Ret paru_init_rowFronts(paru_work *Work,
 
                 // Allocating Rowlist and updating its tuples
                 RowList[row].list = (paru_tuple *)paru_alloc(
-                        slackRow * nrows, sizeof(paru_tuple));
+                    slackRow * nrows, sizeof(paru_tuple));
                 if (RowList[row].list == NULL)
                 {  // out of memory
                     PRLEVEL(1, ("Paru: out of memory, RowList[row].list \n"));
@@ -515,7 +500,12 @@ ParU_Ret paru_init_rowFronts(paru_work *Work,
                     }
                 }
             }
-        }
+            catch (std::bad_alloc const &)
+            {  // out of memory
+                PRLEVEL(1, ("Paru: Out of memory: curHeap\n"));
+                #pragma omp atomic update
+                out_of_memory += 1;
+            }
     }
     if (out_of_memory)
         info = PARU_OUT_OF_MEMORY;
