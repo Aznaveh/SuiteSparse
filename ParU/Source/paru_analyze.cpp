@@ -617,21 +617,16 @@ ParU_Ret ParU_Analyze(cholmod_sparse *A, ParU_Symbolic **S_handle,
     size_t size = n + 1;
     Parent = (Int *)paru_realloc(nf + 1, sizeof(Int), Front_parent, &size);
     Sym->Parent = Parent;
-    Front_parent = NULL;
     ASSERT(size <= (size_t)n + 1);
     if (Parent == NULL)
     {  // should not happen anyway it is always shrinking
         PRLEVEL(1, ("Paru: out of memory\n"));
-        // free memory
-        //paru_free((n + 1), sizeof(Int), Front_npivcol);
-        //paru_free((n + 1), sizeof(Int), Front_parent);
-        //paru_free((m + 1), sizeof(Int), Pinit);
-        //paru_free(n, sizeof(Int), inv_Diag_map);
         ParU_Freesym(&Sym, Control);
         umfpack_dl_paru_free_sw(&SW);
         FREE_WORK;
         return PARU_OUT_OF_MEMORY;
     }
+    Front_parent = NULL;
 
     // Making Super data structure
     // like SPQR: Super[f]<= pivotal columns of (f) < Super[f+1]
@@ -735,7 +730,18 @@ ParU_Ret ParU_Analyze(cholmod_sparse *A, ParU_Symbolic **S_handle,
 
     // newParent size is newF+1 potentially smaller than nf
 
+    Int *tmp_newParent = newParent; //keeping newParent in case of failure
     newParent = (Int *)paru_realloc(newF + 1, sizeof(Int), newParent, &size);
+    if (newParent == NULL)
+    {
+        PRLEVEL(1, ("Paru: out of memory\n"));
+        newParent = tmp_newParent;
+        ParU_Freesym(&Sym, Control);
+        umfpack_dl_paru_free_sw(&SW);
+        FREE_WORK;
+        return PARU_OUT_OF_MEMORY;
+
+    }
     ASSERT(newF <= nf);
 
     for (Int oldf = 0; oldf < nf; oldf++)
