@@ -480,7 +480,7 @@ ParU_Ret paru_init_rowFronts(paru_work *Work,
         paru_tuple rowTuple;
         rowTuple.e = e;
         rowTuple.f = 0;
-        if (paru_add_rowTuple(RowList, row, rowTuple))
+        if (paru_add_rowTuple(RowList, row, rowTuple) == PARU_OUT_OF_MEMORY)
         {
             PRLEVEL(1, ("Paru: out of memory, add_rowTuple \n"));
             #pragma omp atomic update

@@ -296,7 +296,7 @@ Int paru_get_nmalloc (void) ;
 #endif
 
 /* add tuple functions defintions */
-Int paru_add_rowTuple(paru_tupleList *RowList, Int row, paru_tuple T);
+ParU_Ret  paru_add_rowTuple(paru_tupleList *RowList, Int row, paru_tuple T);
 
 Int paru_dgetrf(double *F, Int *frowList, Int m, Int n, BLAS_INT *ipiv);
 

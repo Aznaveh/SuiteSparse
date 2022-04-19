@@ -575,7 +575,8 @@ ParU_Ret paru_front(Int f,  // front need to be assembled
         paru_tuple rowTuple;
         rowTuple.e = eli;
         rowTuple.f = locIndx;
-        if (paru_add_rowTuple(RowList, frowList[i], rowTuple))
+        if (paru_add_rowTuple(RowList, frowList[i], rowTuple) 
+                == PARU_OUT_OF_MEMORY )
         {
             PRLEVEL(1, ("Paru: out of memory: add_rowTuple \n"));
             return PARU_OUT_OF_MEMORY;

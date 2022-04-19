@@ -15,7 +15,7 @@
  * @author Aznaveh
  */
 #include "paru_internal.hpp"
-Int paru_add_rowTuple(paru_tupleList *RowList, Int row, paru_tuple T)
+ParU_Ret paru_add_rowTuple(paru_tupleList *RowList, Int row, paru_tuple T)
 {
     DEBUGLEVEL(0);
     PRLEVEL(1, ("row =%ld, (%ld,%ld)\n", row, T.e, T.f));
@@ -32,7 +32,7 @@ Int paru_add_rowTuple(paru_tupleList *RowList, Int row, paru_tuple T)
         paru_tuple *newList =
             (paru_tuple *)paru_alloc(newLen, sizeof(paru_tuple));
         if (newList == NULL)  // Error in allocating memory
-            return 1;
+            return PARU_OUT_OF_MEMORY;
         for (Int i = 0; i < cur->numTuple; ++i)  // copy old to new
             newList[i] = cur->list[i];
         paru_free(cur->len, sizeof(paru_tuple), cur->list);
@@ -40,5 +40,5 @@ Int paru_add_rowTuple(paru_tupleList *RowList, Int row, paru_tuple T)
         cur->list = newList;
         cur->list[cur->numTuple++] = T;
     }
-    return 0;
+    return PARU_SUCCESS;
 }
