@@ -43,7 +43,7 @@ ParU_Ret paru_init_rowFronts(paru_work *Work,
     }
 
     // initializing Numeric
-    ParU_Numeric *Num;
+    ParU_Numeric *Num = NULL;
     Num = (ParU_Numeric *)paru_alloc(1, sizeof(ParU_Numeric));
     if (Num == NULL)
     {  // out of memory
@@ -71,6 +71,8 @@ ParU_Ret paru_init_rowFronts(paru_work *Work,
     Num->Sux = NULL;
     Num->Slx = NULL;
     Num->Rs = NULL;
+    Num->Ps = NULL;
+    Num->Pfin = NULL;
 
     // Workd DS
     Int *rowMark = Work->rowMark = NULL;
