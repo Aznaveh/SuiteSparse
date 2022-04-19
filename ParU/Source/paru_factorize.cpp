@@ -402,12 +402,10 @@ ParU_Ret ParU_Factorize(cholmod_sparse *A, ParU_Symbolic *Sym,
             {
                 PRLEVEL(1, ("Paru: Input matrix is singular\n"));
             }
+            paru_free_work(Sym, Work);   // free the work DS
             return info;
         }
     }
-
-    //////////////// Making task tree ///End////////////////////////////////////
-    // The following code can be substituted in a sequential case
     else
     {
         PRLEVEL(1, ("Sequential\n"));
@@ -420,6 +418,7 @@ ParU_Ret ParU_Factorize(cholmod_sparse *A, ParU_Symbolic *Sym,
             if (info != PARU_SUCCESS)
             {
                 PRLEVEL(1, ("%% A problem happend in %ld\n", i));
+                paru_free_work(Sym, Work);   // free the work DS
                 return info;
             }
         }
