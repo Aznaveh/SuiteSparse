@@ -388,7 +388,7 @@ ParU_Ret paru_init_rowFronts(paru_work *Work,
     if (Diag_map)
     {
         #pragma omp taskloop default(none) shared(Sym, Diag_map, inv_Diag_map) \
-        grainsize(512)
+            grainsize(512)
         for (Int i = 0; i < Sym->n; i++)
         {
             // paru_memcpy(Diag_map, Sym->Diag_map, (Sym->n) * sizeof(Int));
@@ -444,61 +444,78 @@ ParU_Ret paru_init_rowFronts(paru_work *Work,
             #pragma omp atomic update
             out_of_memory += 1;
         }
-
-        rowMark[e] = 0;
-
-        // My new is calling paru_alloc
-        std::vector<Int> *curHeap;
-        try
+        else
         {
-            curHeap = Work->heapList[e] = new std::vector<Int>;
+            rowMark[e] = 0;
+
+            // My new is calling paru_alloc
+            std::vector<Int> *curHeap;
+            try
+            {
+                curHeap = Work->heapList[e] = new std::vector<Int>;
+            }
+            catch (std::bad_alloc const &)
+            {  // out of memory
+                PRLEVEL(1, ("Paru: Out of memory: curHeap\n"));
+                #pragma omp atomic update
+                out_of_memory += 1;
+            }
+
+            Int out_mem = 0;
+            #pragma omp atomic read
+            out_mem = out_of_memory;
+
+            if (out_mem < 1)
+            {
+
+                curHeap->push_back(e);
+
+                // constants for initialzing lists
+                Int slackRow = 2;
+
+                // Allocating Rowlist and updating its tuples
+                RowList[row].list = (paru_tuple *)paru_alloc(
+                        slackRow * nrows, sizeof(paru_tuple));
+                if (RowList[row].list == NULL)
+                {  // out of memory
+                    PRLEVEL(1, ("Paru: out of memory, RowList[row].list \n"));
+                    #pragma omp atomic update
+                    out_of_memory += 1;
+                }
+                else
+                {
+                    RowList[row].numTuple = 0;
+                    RowList[row].len = slackRow;
+
+                    paru_tuple rowTuple;
+                    rowTuple.e = e;
+                    rowTuple.f = 0;
+                    if (paru_add_rowTuple(RowList, row, rowTuple) ==
+                        PARU_OUT_OF_MEMORY)
+                    {
+                        PRLEVEL(1, ("Paru: out of memory, add_rowTuple \n"));
+                        #pragma omp atomic update
+                        out_of_memory += 1;
+                    }
+                    else
+                    {
+                        // Allocating elements
+                        Int *el_colrowIndex = colIndex_pointer(curEl);
+                        double *el_colrowNum = numeric_pointer(curEl);
+
+                        Int j = 0;  // Index inside an element
+                        for (Int p = Sp[row]; p < Sp[row + 1]; p++)
+                        {
+                            el_colrowIndex[j] = Sj[p];
+                            el_colrowNum[j++] = Sx[p];
+                        }
+                        el_colrowIndex[j++] =
+                            row;  // initializing element row index
+                        Work->lacList[e] = lac_el(elementList, e);
+                    }
+                }
+            }
         }
-        catch (std::bad_alloc const &)
-        {  // out of memory
-            PRLEVEL(1, ("Paru: Out of memory: curHeap\n"));
-            #pragma omp atomic update
-            out_of_memory += 1;
-        }
-
-        curHeap->push_back(e);
-
-        // constants for initialzing lists
-        Int slackRow = 2;
-
-        // Allocating Rowlist and updating its tuples
-        RowList[row].list =
-            (paru_tuple *)paru_alloc(slackRow * nrows, sizeof(paru_tuple));
-        if (RowList[row].list == NULL)
-        {  // out of memory
-            PRLEVEL(1, ("Paru: out of memory, RowList[row].list \n"));
-            #pragma omp atomic update
-            out_of_memory += 1;
-        }
-        RowList[row].numTuple = 0;
-        RowList[row].len = slackRow;
-
-        paru_tuple rowTuple;
-        rowTuple.e = e;
-        rowTuple.f = 0;
-        if (paru_add_rowTuple(RowList, row, rowTuple) == PARU_OUT_OF_MEMORY)
-        {
-            PRLEVEL(1, ("Paru: out of memory, add_rowTuple \n"));
-            #pragma omp atomic update
-            out_of_memory += 1;
-        }
-
-        // Allocating elements
-        Int *el_colrowIndex = colIndex_pointer(curEl);
-        double *el_colrowNum = numeric_pointer(curEl);
-
-        Int j = 0;  // Index inside an element
-        for (Int p = Sp[row]; p < Sp[row + 1]; p++)
-        {
-            el_colrowIndex[j] = Sj[p];
-            el_colrowNum[j++] = Sx[p];
-        }
-        el_colrowIndex[j++] = row;  // initializing element row index
-        Work->lacList[e] = lac_el(elementList, e);
     }
     if (out_of_memory)
         info = PARU_OUT_OF_MEMORY;
