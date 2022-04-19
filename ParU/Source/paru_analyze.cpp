@@ -54,21 +54,16 @@
 // =============================================================================
 
 #define FREE_WORK \
-        paru_free(1, sizeof(ParU_Symbolic), Sym); \
         paru_free((n + 1), sizeof(Int), fmap);  \
         paru_free((n + 1), sizeof(Int), newParent); \
         paru_free(n, sizeof(Int), inv_Diag_map); \
         paru_free((n + 1), sizeof(Int), Front_parent); \
         paru_free((n + 1), sizeof(Int), Front_npivcol); \
-        paru_free((m + 1), sizeof(Int), Pinit); \
         paru_free((m - n1), sizeof(Int), Ps); \
         paru_free((MAX(m, n) + 2), sizeof(Int), Work); \
-        paru_free((cs1 + 1), sizeof(Int), Sup);    \
         paru_free((cs1 + 1), sizeof(Int), cSup);   \
-        paru_free((rs1 + 1), sizeof(Int), Slp);   \
         paru_free((rs1 + 1), sizeof(Int), cSlp);   \
-        ParU_Freesym(&Sym, Control); \
-        umfpack_dl_free_symbolic(&Symbolic);\
+        umfpack_dl_free_symbolic(&Symbolic); \
         umfpack_dl_paru_free_sw(&SW); 
 
 // =============================================================================
@@ -110,6 +105,8 @@ ParU_Ret ParU_Analyze(cholmod_sparse *A, ParU_Symbolic **S_handle,
     Sym->Super = Sym->Depth = NULL;
     Sym->Pinit = NULL;
     Sym->n1 = -1;
+    Int cs1 = -1;
+    Int rs1 = -1;
 
     Int *Cm = Sym->Cm = NULL;
     Int *Fm = Sym->Fm = NULL;
@@ -137,14 +134,11 @@ ParU_Ret ParU_Analyze(cholmod_sparse *A, ParU_Symbolic **S_handle,
     Int *first = Sym->first = NULL;      // first descendent in the tree
     // augmented tree size nf+1
 
-
     Int *fmap = NULL;  //temp amalgamation data structure
     Int *newParent = NULL;
     Int *Super = NULL;
     Int *Depth = NULL;
     Int *Work = NULL;
-    
-
     Int *Ps = NULL;  // new row permutation for just the Submatrix part
     Int *Sup = NULL;   // Singlton u p
     Int *cSup = NULL;  // copy of Singlton u p
@@ -152,10 +146,6 @@ ParU_Ret ParU_Analyze(cholmod_sparse *A, ParU_Symbolic **S_handle,
     Int *cSlp = NULL;  // copy Singlton l p
     Int *Suj = NULL;
     Int *Sli = NULL;
- 
-
-
-
 
     //############  Calling UMFPACK and retrieving data structure ##############
 
@@ -164,7 +154,7 @@ ParU_Ret ParU_Analyze(cholmod_sparse *A, ParU_Symbolic **S_handle,
     /* ---------------------------------------------------------------------- */
 
 
-    Int n1,  // The number of pivots with zero Markowitz cost.
+    Int n1 = 0,  // The number of pivots with zero Markowitz cost.
         // Info[UMFPACK_COL_SINGLETONS]+Info[UMFPACK_ROW_SINGLETONS]
         // They apper first in the output permutations P and Q
         //
@@ -387,8 +377,7 @@ ParU_Ret ParU_Analyze(cholmod_sparse *A, ParU_Symbolic **S_handle,
 #endif
         PRLEVEL(1, ("Paru: umfpack_dl_symbolic failed\n"));
         umfpack_dl_free_symbolic(&Symbolic);
-        ///XXX add paru_free_sw
-        paru_free(1, sizeof(ParU_Symbolic), Sym);
+        FREE_WORK;
         return PARU_INVALID;
     }
     /* ---------------------------------------------------------------------- */
@@ -487,12 +476,10 @@ ParU_Ret ParU_Analyze(cholmod_sparse *A, ParU_Symbolic **S_handle,
     if (!fmap || !newParent || (!Diag_map != !inv_Diag_map))
     {
         PRLEVEL(1, ("Paru: out of memory\n"));
-        paru_free((n + 1), sizeof(Int), fmap);
-        paru_free((n + 1), sizeof(Int), newParent);
-        paru_free(n, sizeof(Int), inv_Diag_map);
         ParU_Freesym(&Sym, Control);
         umfpack_dl_free_symbolic(&Symbolic);
         umfpack_dl_paru_free_sw(&SW);
+        FREE_WORK;
         return PARU_OUT_OF_MEMORY;
     }
     
@@ -506,12 +493,14 @@ ParU_Ret ParU_Analyze(cholmod_sparse *A, ParU_Symbolic **S_handle,
 #endif
 
     // nchains = Sym_umf->nchains;
-    Int cs1 = Sym_umf->n1c;
-    Int rs1 = Sym_umf->n1r;
+    cs1 = Sym_umf->n1c;
+    rs1 = Sym_umf->n1r;
 
     //brain transplant
 
     Pinit = Sym_umf->Rperm_init;
+    Sym->Pinit = Pinit;
+ 
     Qinit = Sym_umf->Cperm_init;
     Front_npivcol = Sym_umf->Front_npivcol;
     Front_parent = Sym_umf->Front_parent;
@@ -628,17 +617,19 @@ ParU_Ret ParU_Analyze(cholmod_sparse *A, ParU_Symbolic **S_handle,
     size_t size = n + 1;
     Parent = (Int *)paru_realloc(nf + 1, sizeof(Int), Front_parent, &size);
     Sym->Parent = Parent;
+    Front_parent = NULL;
     ASSERT(size <= (size_t)n + 1);
     if (Parent == NULL)
     {  // should not happen anyway it is always shrinking
         PRLEVEL(1, ("Paru: out of memory\n"));
         // free memory
-        paru_free((n + 1), sizeof(Int), Front_npivcol);
-        paru_free((n + 1), sizeof(Int), Front_parent);
-        paru_free((m + 1), sizeof(Int), Pinit);
-        paru_free(n, sizeof(Int), inv_Diag_map);
+        //paru_free((n + 1), sizeof(Int), Front_npivcol);
+        //paru_free((n + 1), sizeof(Int), Front_parent);
+        //paru_free((m + 1), sizeof(Int), Pinit);
+        //paru_free(n, sizeof(Int), inv_Diag_map);
         ParU_Freesym(&Sym, Control);
         umfpack_dl_paru_free_sw(&SW);
+        FREE_WORK;
         return PARU_OUT_OF_MEMORY;
     }
 
@@ -651,10 +642,9 @@ ParU_Ret ParU_Analyze(cholmod_sparse *A, ParU_Symbolic **S_handle,
         if (Super == NULL || Depth == NULL)
         {
             PRLEVEL(1, ("Paru: out of memory\n"));
-            paru_free((m + 1), sizeof(Int), Pinit);
-            paru_free(n, sizeof(Int), inv_Diag_map);
             ParU_Freesym(&Sym, Control);
             umfpack_dl_paru_free_sw(&SW);
+            FREE_WORK;
             return PARU_OUT_OF_MEMORY;
         }
 
@@ -774,9 +764,10 @@ ParU_Ret ParU_Analyze(cholmod_sparse *A, ParU_Symbolic **S_handle,
     if (Fm == NULL || Cm == NULL)
     {
         PRLEVEL(1, ("Paru: out of memory\n"));
-        paru_free(n, sizeof(Int), inv_Diag_map);
+        //paru_free(n, sizeof(Int), inv_Diag_map);
         ParU_Freesym(&Sym, Control);
         umfpack_dl_paru_free_sw(&SW);
+        FREE_WORK;
         return PARU_OUT_OF_MEMORY;
     }
 
@@ -849,16 +840,14 @@ ParU_Ret ParU_Analyze(cholmod_sparse *A, ParU_Symbolic **S_handle,
 #endif
     paru_free(nf + 1, sizeof(Int), Sym->Parent);
     Sym->Parent = Parent = newParent;
+    newParent = NULL;
     nf = Sym->nf = newNf;
 
     umfpack_dl_paru_free_sw(&SW);
-    paru_free((n + 1), sizeof(Int), Front_npivcol);
-    paru_free((n + 1), sizeof(Int), fmap);
-
+    SW = NULL;
     //////////////////////end of relaxed amalgamation//////////////////////////
 
     //////////////////////computing the depth of each front ///////////////////
-    //
 #ifndef NDEBUG
     PR = 1;
 #endif
@@ -914,10 +903,8 @@ ParU_Ret ParU_Analyze(cholmod_sparse *A, ParU_Symbolic **S_handle,
     if (Childp == NULL)
     {
         PRLEVEL(1, ("Paru: out of memory\n"));
-        paru_free((m + 1), sizeof(Int), Pinit);
         ParU_Freesym(&Sym, Control);
-        paru_free(n, sizeof(Int), inv_Diag_map);
-        // umfpack_dl_paru_free_sw (&SW);
+        FREE_WORK;
         return PARU_OUT_OF_MEMORY;
     }
 
@@ -964,10 +951,8 @@ ParU_Ret ParU_Analyze(cholmod_sparse *A, ParU_Symbolic **S_handle,
     if (Child == NULL)
     {
         PRLEVEL(1, ("Paru: out of memory\n"));
-        paru_free((m + 1), sizeof(Int), Pinit);
         ParU_Freesym(&Sym, Control);
-        paru_free(n, sizeof(Int), inv_Diag_map);
-        // umfpack_dl_paru_free_sw (&SW);
+        FREE_WORK;
         return PARU_OUT_OF_MEMORY;
     }
 
@@ -977,11 +962,8 @@ ParU_Ret ParU_Analyze(cholmod_sparse *A, ParU_Symbolic **S_handle,
     if (cChildp == NULL)
     {
         PRLEVEL(1, ("Paru: out of memory\n"));
-        paru_free((m + 1), sizeof(Int), Pinit);
-        paru_free((MAX(m, n) + 2), sizeof(Int), Work);
         ParU_Freesym(&Sym, Control);
-        paru_free(n, sizeof(Int), inv_Diag_map);
-        // umfpack_dl_paru_free_sw (&SW);
+        FREE_WORK;
         return PARU_OUT_OF_MEMORY;
     }
 
@@ -1009,15 +991,11 @@ ParU_Ret ParU_Analyze(cholmod_sparse *A, ParU_Symbolic **S_handle,
     if (Sp == NULL || Sleft == NULL || Pinv == NULL)
     {
         PRLEVEL(1, ("Paru: out of memory\n"));
-        paru_free((m + 1), sizeof(Int), Pinit);
-        paru_free((MAX(m, n) + 2), sizeof(Int), Work);
-
         ParU_Freesym(&Sym, Control);
-        // umfpack_dl_paru_free_sw (&SW);
-
-        paru_free(n, sizeof(Int), inv_Diag_map);
+        FREE_WORK;
         return PARU_OUT_OF_MEMORY;
     }
+    Sym->Pinv = Pinv;
 
     //-------- computing the inverse permutation for P and Diag_map
 #pragma omp taskloop default(none) shared(m, Pinv, Pinit) grainsize(512)
@@ -1081,17 +1059,8 @@ ParU_Ret ParU_Analyze(cholmod_sparse *A, ParU_Symbolic **S_handle,
         ((Sup == NULL || cSup == NULL) && cs1 != 0) || Ps == NULL)
     {
         PRLEVEL(1, ("Paru: rs1=%ld cs1=%ld memory problem\n", rs1, cs1));
-        paru_free((cs1 + 1), sizeof(Int), Sup);
-        paru_free((cs1 + 1), sizeof(Int), cSup);
-
-        paru_free((rs1 + 1), sizeof(Int), Slp);
-        paru_free((rs1 + 1), sizeof(Int), cSlp);
-
-        paru_free((m + 1), sizeof(Int), Pinit);
-        paru_free((MAX(m, n) + 2), sizeof(Int), Work);
-        paru_free(n, sizeof(Int), inv_Diag_map);
-        // umfpack_dl_paru_free_sw (&SW);
         ParU_Freesym(&Sym, Control);
+        FREE_WORK;
         return PARU_OUT_OF_MEMORY;
     }
     Int sunz = 0;  // U nnz: singlteton nnzero of s
@@ -1208,7 +1177,6 @@ ParU_Ret ParU_Analyze(cholmod_sparse *A, ParU_Symbolic **S_handle,
     }
     Sleft[n - n1 + 1] = m - n1 - rowcount;  // empty rows of S if any
     Sym->snz = snz;
-    paru_free(n, sizeof(Int), inv_Diag_map);
 
 #ifndef NDEBUG
     PR = 1;
@@ -1255,12 +1223,8 @@ ParU_Ret ParU_Analyze(cholmod_sparse *A, ParU_Symbolic **S_handle,
             }
         }
 #endif
-        paru_free((m - n1), sizeof(Int), Ps);
-        paru_free((m + 1), sizeof(Int), Pinit);
-        paru_free((MAX(m, n) + 2), sizeof(Int), Work);
-
         ParU_Freesym(&Sym, Control);
-        // umfpack_dl_paru_free_sw (&SW);
+        FREE_WORK;
         return PARU_SINGULAR;
     }
     ASSERT(rowcount == m - n1);
@@ -1391,7 +1355,7 @@ ParU_Ret ParU_Analyze(cholmod_sparse *A, ParU_Symbolic **S_handle,
     {
         PRLEVEL(1, ("Paru: out of memory\n"));
         ParU_Freesym(&Sym, Control);
-        // umfpack_dl_paru_free_sw (&SW);
+        FREE_WORK;
         return PARU_OUT_OF_MEMORY;
     }
 
@@ -1459,10 +1423,6 @@ ParU_Ret ParU_Analyze(cholmod_sparse *A, ParU_Symbolic **S_handle,
             }
         }
     }
-    if (cs1 > 0) paru_free((cs1 + 1), sizeof(Int), cSup);
-    if (rs1 > 0) paru_free((rs1 + 1), sizeof(Int), cSlp);
-
-    paru_free((m - n1), sizeof(Int), Ps);
     PRLEVEL(PR, ("Constructing Sj and singletons finished here\n"));
 #ifndef NDEBUG
     PR = 1;
@@ -1514,7 +1474,7 @@ ParU_Ret ParU_Analyze(cholmod_sparse *A, ParU_Symbolic **S_handle,
         ASSERT(cSp[i] == Sp[i + 1]);
     }
 #endif
-    paru_free((MAX(m, n) + 2), sizeof(Int), Work);
+    //paru_free((MAX(m, n) + 2), sizeof(Int), Work);
 
     /* ---------------------------------------------------------------------- */
     /*    computing the augmented tree and the data structures related        */
@@ -1561,6 +1521,7 @@ ParU_Ret ParU_Analyze(cholmod_sparse *A, ParU_Symbolic **S_handle,
     {
         PRLEVEL(1, ("Paru: Out of memory in symbolic phase"));
         ParU_Freesym(&Sym, Control);
+        FREE_WORK;
         return PARU_OUT_OF_MEMORY;
     }
     // initialization
@@ -1678,8 +1639,8 @@ ParU_Ret ParU_Analyze(cholmod_sparse *A, ParU_Symbolic **S_handle,
     }
 
     ////////////////    computing task tree and such ///////////////////////////
-    //XXX
-    std::vector<Int> task_helper(nf);
+    //std::vector<Int> task_helper(nf); //use Work instead of a new vector
+    Int *task_helper = Work; //just use first nf of the Work
     const double flop_thresh = 1024;
     Int ntasks = 0;
 
@@ -1721,6 +1682,7 @@ ParU_Ret ParU_Analyze(cholmod_sparse *A, ParU_Symbolic **S_handle,
     {
         PRLEVEL(1, ("Paru: Out of memory in symbolic phase"));
         ParU_Freesym(&Sym, Control);
+        FREE_WORK;
         return PARU_OUT_OF_MEMORY;
     }
     task_map[0] = -1;
@@ -1784,7 +1746,7 @@ ParU_Ret ParU_Analyze(cholmod_sparse *A, ParU_Symbolic **S_handle,
 
     PR = 1;
     PRLEVEL(PR, ("%% Task tree helper:\n"));
-    for (Int i = 0; i < (Int)task_helper.size(); i++)
+    for (Int i = 0; i < nf; i++)
         PRLEVEL(PR, ("%ld)%ld ", i, task_helper[i]));
     PRLEVEL(PR, ("\n%% tasknodes map (%ld):\n", ntasks));
     for (Int i = 0; i <= ntasks; i++) PRLEVEL(PR, ("%ld ", task_map[i]));
@@ -1870,5 +1832,6 @@ ParU_Ret ParU_Analyze(cholmod_sparse *A, ParU_Symbolic **S_handle,
     time -= start_time;
     PRLEVEL(1, ("%% mRHS paru_apply_inv_perm %lf seconds\n", time));
 #endif
-    return PARU_SUCCESS;
+   FREE_WORK;
+   return PARU_SUCCESS;
 }
