@@ -264,28 +264,27 @@ ParU_Ret ParU_Factorize(cholmod_sparse *A, ParU_Symbolic *Sym,
     Int ntasks = Sym->ntasks;
     Int *task_depth = Sym->task_depth;
     std::vector<Int> task_Q;
-    // This vector changes during factorization
-    printf("init finished\n"); //XXX bad_alloc thrown here
     
     Int *task_num_child = Work->task_num_child;
     paru_memcpy(task_num_child, Sym->task_num_child, ntasks * sizeof(Int),
                 Control);
-
-    for (Int t = 0; t < ntasks; t++)
+    try
     {
-        if (task_num_child[t] == 0) task_Q.push_back(t);
+        for (Int t = 0; t < ntasks; t++)
+        {
+            if (task_num_child[t] == 0) task_Q.push_back(t);
+        }
     }
-
+    catch (std::bad_alloc const &)
+    {  // out of memory
+        PRLEVEL(1, ("Paru: Out of memory: task_Q\n"));
+        paru_free_work(Sym, Work);   // free the work DS
+        return PARU_OUT_OF_MEMORY;
+    }
     std::sort(task_Q.begin(), task_Q.end(),
-              [&task_depth](const Int &t1, const Int &t2) -> bool {
-                  return task_depth[t1] > task_depth[t2];
-              });
-
-    // Int *Depth = Sym->Depth;
-    //    std::sort(task_Q.begin(), task_Q.end(),
-    //            [&Depth, &task_map](const Int &t1, const Int &t2)-> bool
-    //            {return Depth[task_map[t1]+1] > Depth[task_map[t2]+1];});
-
+            [&task_depth](const Int &t1, const Int &t2) -> bool {
+            return task_depth[t1] > task_depth[t2];
+            });
     Work->resq = task_Q.size();
 
 #ifndef NDEBUG
@@ -296,7 +295,7 @@ ParU_Ret ParU_Factorize(cholmod_sparse *A, ParU_Symbolic *Sym,
         // chainess = (task_depth[task_Q[0]] + 1) / (double)nf;
         chainess = 1 - (task_Q.size() / (double)ntasks);
         PRLEVEL(1, ("nf = %ld, deepest = %ld, chainess = %lf \n", nf,
-               task_depth[task_Q[0]], chainess));
+                    task_depth[task_Q[0]], chainess));
     }
     Work->actual_alloc_LUs = Work->actual_alloc_Us = 0;
     Work->actual_alloc_row_int = Work->actual_alloc_col_int = 0;
@@ -307,13 +306,13 @@ ParU_Ret ParU_Factorize(cholmod_sparse *A, ParU_Symbolic *Sym,
     {
         Int t = task_Q[i];
         PRLEVEL(PR, ("%ld[%ld-%ld](%ld) ", t, task_map[t] + 1, task_map[t + 1],
-                     task_depth[t]));
+                    task_depth[t]));
     }
     PRLEVEL(PR, ("\n"));
 #endif
-
+    printf("task_q finished\n"); 
     if ((Int)task_Q.size() * 2 > Control->paru_max_threads)
-    // if (1)
+        // if (1)
     {
         PRLEVEL(1, ("Parallel\n"));
         // chekcing user input
