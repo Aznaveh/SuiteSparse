@@ -57,15 +57,28 @@ int main(int argc, char **argv)
     ParU_Control Control;
     ParU_Ret info;
 
-    //RUTAL_ALLOC_TEST(info, ParU_Analyze(A, &Sym, &Control) );
     //info = ParU_Analyze(A, &Sym, &Control);
+    BRUTAL_ALLOC_TEST(info, ParU_Analyze(A, &Sym, &Control) );
+    if (info != PARU_SUCCESS)
+    {
+        printf ("Paru: some problem detected during symbolic analysis\n");
+        cholmod_l_free_sparse(&A, cc);
+        cholmod_l_finish(cc);
+        return info;
+    }
+    printf("In: %ldx%ld nnz = %ld \n", Sym->m, Sym->n, Sym->anz);
+    printf("Paru: Symbolic factorization is done!\n");
+    ParU_Numeric *Num;
+
+    //info = ParU_Factorize(A, Sym, &Num, &Control);
+    //BRUTAL_ALLOC_TEST(info, ParU_Analyze(A, &Sym, &Control) );
     {                                           
         paru_set_malloc_tracking(true);         
         for (Int nmalloc = 0;; nmalloc++)       
         {                                       
             printf("#####nmalloc=%ld\n",nmalloc);
             paru_set_nmalloc(nmalloc);          
-            info = ParU_Analyze(A, &Sym, &Control);
+            info = ParU_Factorize(A, Sym, &Num, &Control);
             if (info != PARU_OUT_OF_MEMORY)     
             {                                   
                 printf("nmalloc=%ld\n",nmalloc);
@@ -77,19 +90,9 @@ int main(int argc, char **argv)
                 break;                          
             }                                   
         }                                       
-        printf("ParU: test failure\n");         
         paru_set_malloc_tracking(false);        
     }
-    if (info != PARU_SUCCESS)
-    {
-        cholmod_l_free_sparse(&A, cc);
-        cholmod_l_finish(cc);
-        return info;
-    }
-    printf("In: %ldx%ld nnz = %ld \n", Sym->m, Sym->n, Sym->anz);
-    printf("Paru: Symbolic factorization is done!\n");
-    ParU_Numeric *Num;
-    info = ParU_Factorize(A, Sym, &Num, &Control);
+
     double my_time = omp_get_wtime() - my_start_time;
     if (info != PARU_SUCCESS)
     {
