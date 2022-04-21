@@ -222,6 +222,9 @@ struct paru_work
     // its own. The list of heaps are initialized by nullptr
     std::vector<Int> **heapList;  // size m+nf+1, initialized with nullptr
 
+    Int *task_num_child; // a copy of task_num_child of sym
+    // this copy changes during factorization
+
     Int naft;  // number of actvie frontal tasks
     Int resq;  // number of remainig ready tasks in the queue
 };

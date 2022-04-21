@@ -85,6 +85,7 @@ ParU_Ret paru_init_rowFronts(paru_work *Work,
     Int *inv_Diag_map = Work->inv_Diag_map = NULL;
     paru_element **elementList = Work->elementList = NULL;
     Work->lacList = NULL;
+    Work->task_num_child = NULL;
     std::vector<Int> **heapList = Work->heapList = NULL;
     Int *row_degree_bound = Work->row_degree_bound = NULL;
 
@@ -110,7 +111,7 @@ ParU_Ret paru_init_rowFronts(paru_work *Work,
             (ParU_Factors *)paru_calloc(1, nf * sizeof(ParU_Factors));
 
         Work->time_stamp = (Int *)paru_alloc(1, nf * sizeof(Int));
-
+        Work->task_num_child = (Int *)paru_alloc(Sym->ntasks, sizeof(Int));
         heapList = Work->heapList = (std::vector<Int> **)paru_calloc(
             1, (m + nf + 1) * sizeof(std::vector<Int> *));
         elementList = Work->elementList =  // Initialize with NULL
@@ -167,9 +168,9 @@ ParU_Ret paru_init_rowFronts(paru_work *Work,
           rowSize == NULL || Work->lacList == NULL || RowList == NULL ||
           row_degree_bound == NULL || elementList == NULL ||
           Num->frowCount == NULL || Num->fcolCount == NULL ||
-          Num->frowList == NULL || Num->fcolList == NULL ||
+          Num->frowList == NULL || Num->fcolList == NULL || heapList == NULL ||
           Num->partial_Us == NULL || Num->partial_LUs == NULL ||
-          Work->time_stamp == NULL || heapList == NULL ||
+          Work->time_stamp == NULL || Work->task_num_child == NULL ||
           (Sym->strategy == PARU_STRATEGY_SYMMETRIC &&
            (Diag_map == NULL || inv_Diag_map == NULL)))) ||
 

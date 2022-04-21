@@ -431,6 +431,7 @@ ParU_Ret paru_free_work(ParU_Symbolic *Sym, paru_work *Work)
     paru_free(m + nf + 1, sizeof(Int), Work->rowMark);
     paru_free(m + nf, sizeof(Int), Work->elRow);
     paru_free(m + nf, sizeof(Int), Work->elCol);
+    paru_free(Sym->ntasks, sizeof(Int), Work->task_num_child);
 
     paru_free(1, nf * sizeof(Int), Work->time_stamp);
 

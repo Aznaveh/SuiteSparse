@@ -265,16 +265,11 @@ ParU_Ret ParU_Factorize(cholmod_sparse *A, ParU_Symbolic *Sym,
     Int *task_depth = Sym->task_depth;
     std::vector<Int> task_Q;
     // This vector changes during factorization
-    std::vector<Int> task_num_child(ntasks);
-    paru_memcpy ( &task_num_child[0] , Sym->task_num_child,
-           ntasks * sizeof(Int), Control);
-
+    printf("init finished\n"); //XXX bad_alloc thrown here
     
-    // This line won't work with -Werror=vla ISO C++ forbids variable length 
-    // array
-    //Int task_num_child[ntasks];
-    //paru_memcpy(task_num_child, Sym->task_num_child, ntasks * sizeof(Int),
-    //            Control);
+    Int *task_num_child = Work->task_num_child;
+    paru_memcpy(task_num_child, Sym->task_num_child, ntasks * sizeof(Int),
+                Control);
 
     for (Int t = 0; t < ntasks; t++)
     {
@@ -364,10 +359,8 @@ ParU_Ret ParU_Factorize(cholmod_sparse *A, ParU_Symbolic *Sym,
                     Work->naft++;
 
                     ParU_Ret myInfo =
-                        paru_exec_tasks(t, &task_num_child[0], chain_task, Work,
-                                Num);
-                        //paru_exec_tasks(t, task_num_child, chain_task, Work,
-                        //    Num);
+                        paru_exec_tasks(t, task_num_child, chain_task, Work,
+                            Num);
                     if (myInfo != PARU_SUCCESS)
                     {
                         #pragma omp atomic write
@@ -387,9 +380,7 @@ ParU_Ret ParU_Factorize(cholmod_sparse *A, ParU_Symbolic *Sym,
         {
             Work->naft = 1;
             PRLEVEL(1, ("Chain_taskd %ld has remained\n", chain_task));
-            //info = paru_exec_tasks_seq(chain_task, task_num_child, Work, Num);
-            info = paru_exec_tasks_seq(chain_task, 
-                    &task_num_child[0], Work, Num);
+            info = paru_exec_tasks_seq(chain_task, task_num_child, Work, Num);
         }
         if (info != PARU_SUCCESS)
         {
