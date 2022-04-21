@@ -99,7 +99,7 @@ ParU_Ret paru_init_rowFronts(paru_work *Work,
         row_degree_bound = Work->row_degree_bound =
             (Int *)paru_alloc(m, sizeof(Int));
         RowList = Work->RowList =
-            (paru_tupleList *)paru_alloc(1, m * sizeof(paru_tupleList));
+            (paru_tupleList *)paru_calloc(1, m * sizeof(paru_tupleList));
         Work->lacList = (Int *)paru_alloc(m + nf, sizeof(Int));
         Num->frowCount = (Int *)paru_alloc(1, nf * sizeof(Int));
         Num->fcolCount = (Int *)paru_alloc(1, nf * sizeof(Int));

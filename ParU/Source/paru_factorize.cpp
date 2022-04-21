@@ -310,7 +310,6 @@ ParU_Ret ParU_Factorize(cholmod_sparse *A, ParU_Symbolic *Sym,
     }
     PRLEVEL(PR, ("\n"));
 #endif
-    printf("task_q finished\n"); 
     if ((Int)task_Q.size() * 2 > Control->paru_max_threads)
         // if (1)
     {
