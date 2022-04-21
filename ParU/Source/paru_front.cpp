@@ -61,8 +61,6 @@ ParU_Ret paru_front(Int f,  // front need to be assembled
         // Needs to be initialized in my new algorithm
 
         std::vector<Int> panel_row(num_panels, 0);
-        printf("%%~~~~~~~  Assemble Front %ld start ~~%.0lf~~~~~~~(%d)\n", f,
-                Sym->stree_flop_bound[f], omp_get_thread_num());
         Int *snM = Sym->super2atree;
         Int eli = snM[f];
 
