@@ -544,6 +544,7 @@ ParU_Ret ParU_Freenum(ParU_Numeric **Num_handle, ParU_Control *Control)
             paru_free(Num->fcolCount[i], sizeof(Int), Num->fcolList[i]);
 
         if (Us)
+        {
             if (Us[i].p != NULL)
             {
                 PRLEVEL(1, ("%% Freeing Us=%p\n", Us[i].p));
@@ -551,7 +552,10 @@ ParU_Ret ParU_Freenum(ParU_Numeric **Num_handle, ParU_Control *Control)
                 Int nn = Us[i].n;
                 paru_free(mm * nn, sizeof(double), Us[i].p);
             }
+        }
+
         if (LUs)
+        {
             if (LUs[i].p != NULL)
             {
                 PRLEVEL(1, ("%% Freeing LUs=%p\n", LUs[i].p));
@@ -559,6 +563,7 @@ ParU_Ret ParU_Freenum(ParU_Numeric **Num_handle, ParU_Control *Control)
                 Int nn = LUs[i].n;
                 paru_free(mm * nn, sizeof(double), LUs[i].p);
             }
+        }
     }
 
     PRLEVEL(1, ("%% Done LUs\n"));

@@ -115,14 +115,16 @@ parutest: libraries paru_test.cpp $(INC) $(OBJ)
 	$(C)  paru_test.cpp -o x_test $(OBJ) $(LIBS) -lm
 
 go: parutest
-	 - ./x_test < ../Matrix/b1_ss.mtx > parutest_out.txt
-	# - ./x_test < ../Matrix/west0067.mtx > parutest_out.txt
+	 #- ./x_test < ../Matrix/b1_ss.mtx > parutest_out.txt
+	 - ./x_test < ../Matrix/west0067.mtx > parutest_out.txt
 	#- ./x_test < ../Matrix/ParUTst/494_bus/494_bus.mtx > parutest_out.txt
 	#- ./x_test < ../Matrix/ParUTst/1138_bus/1138_bus.mtx > parutest_out.txt
 	- ./cov
 
 vgo: parutest
-	- valgrind --leak-check=yes ./x_test < ../Matrix/b1_ss.mtx > parutest_out.txt
+	#- valgrind --leak-check=yes --track-origins=yes -s ./x_test < ../Matrix/b1_ss.mtx > parutest_out.txt
+	-  valgrind --leak-check=yes --track-origins=yes -s ./x_test < ../Matrix/west0067.mtx > parutest_out.txt
+	#- valgrind --leak-check=yes --show-leak-kinds=all --track-origins=yes -s ./x_test < ../Matrix/b1_ss.mtx > parutest_out.txt
 	#- valgrind  ./x_test < ../Matrix/west0067.mtx > parutest_out.txt
 	- ./cov
 

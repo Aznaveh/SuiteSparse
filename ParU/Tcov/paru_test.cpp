@@ -47,21 +47,20 @@ int main(int argc, char **argv)
     }
 
     //~~~~~~~~~~~~~~~~~~~Starting computation~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    int ver[3]; char date[128];
-    ParU_Version (ver ,date);
-    printf("Paru %d.%d.%d",ver[0],ver[1],ver[2]);
-    printf(" %s\n",date);
- 
-    double my_start_time = omp_get_wtime();
+    int ver[3];
+    char date[128];
+    ParU_Version(ver, date);
+    printf("Paru %d.%d.%d", ver[0], ver[1], ver[2]);
+    printf(" %s\n", date);
 
     ParU_Control Control;
     ParU_Ret info;
 
-    //info = ParU_Analyze(A, &Sym, &Control);
-    BRUTAL_ALLOC_TEST(info, ParU_Analyze(A, &Sym, &Control) );
+    // info = ParU_Analyze(A, &Sym, &Control);
+    BRUTAL_ALLOC_TEST(info, ParU_Analyze(A, &Sym, &Control));
     if (info != PARU_SUCCESS)
     {
-        printf ("Paru: some problem detected during symbolic analysis\n");
+        printf("Paru: some problem detected during symbolic analysis\n");
         cholmod_l_free_sparse(&A, cc);
         cholmod_l_finish(cc);
         return info;
@@ -70,45 +69,18 @@ int main(int argc, char **argv)
     printf("Paru: Symbolic factorization is done!\n");
     ParU_Numeric *Num;
 
-    //info = ParU_Factorize(A, Sym, &Num, &Control);
-    //BRUTAL_ALLOC_TEST(info, ParU_Analyze(A, &Sym, &Control) );
-    {                                           
-        paru_set_malloc_tracking(true);         
-        for (Int nmalloc = 0;; nmalloc++)       
-        {                                       
-            printf("#####nmalloc=%ld\n",nmalloc);
-            paru_set_nmalloc(nmalloc);          
-            info = ParU_Factorize(A, Sym, &Num, &Control);
-            if (info != PARU_OUT_OF_MEMORY)     
-            {                                   
-                printf("nmalloc=%ld\n",nmalloc);
-                break;                          
-            }                                   
-            else 
-            {
-                if (nmalloc > 21)              
-                {                                   
-                    printf("ParU: too much malloc\n"); 
-                    break;                          
-                }                                   
-            }
-        }                                       
-        paru_set_malloc_tracking(false);        
-    }
-
-    double my_time = omp_get_wtime() - my_start_time;
+    // info = ParU_Factorize(A, Sym, &Num, &Control);
+    BRUTAL_ALLOC_TEST(info, ParU_Factorize(A, Sym, &Num, &Control));
     if (info != PARU_SUCCESS)
     {
-        printf("Paru: factorization was NOT successfull in %lf seconds.\n",
-                my_time);
+        printf("Paru: factorization was NOT successfull.\n");
         cholmod_l_free_sparse(&A, cc);
         cholmod_l_finish(cc);
         ParU_Freesym(&Sym, &Control);
         return info;
     }
     else
-        printf("Paru: factorization was successfull in %lf seconds.\n",
-                my_time);
+        printf("Paru: factorization was successfull.\n");
 
     //~~~~~~~~~~~~~~~~~~~Test the results ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     Int m = Sym->m;
@@ -118,16 +90,12 @@ int main(int argc, char **argv)
         double *b = (double *)malloc(m * sizeof(double));
         double *xx = (double *)malloc(m * sizeof(double));
         for (Int i = 0; i < m; ++i) b[i] = i + 1;
-        double my_solve_time_start = omp_get_wtime();
         info = ParU_Solve(Sym, Num, b, xx, &Control);
-        double my_solve_time = omp_get_wtime() - my_solve_time_start;
-        printf("Solve time is %lf seconds.\n", my_solve_time);
-        my_start_time = omp_get_wtime();
         double resid, anorm;
         ParU_Residual(A, xx, b, m, resid, anorm, &Control);
 
         printf("Residual is |%.2lf| and anorm is %.2e and rcond is %.2e.\n",
-                resid == 0 ? 0 : log10(resid), anorm, Num->rcond);
+               resid == 0 ? 0 : log10(resid), anorm, Num->rcond);
 
         free(b);
         free(xx);

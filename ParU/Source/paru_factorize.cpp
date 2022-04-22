@@ -426,6 +426,7 @@ ParU_Ret ParU_Factorize(cholmod_sparse *A, ParU_Symbolic *Sym,
     {
         PRLEVEL(
             1, ("Paru: memory problem after factorizaiton, in perumutaion.\n"));
+        ParU_Freenum(&Num, Control);
         return info;
     }
 
