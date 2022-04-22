@@ -481,24 +481,22 @@ ParU_Ret paru_free_work(ParU_Symbolic *Sym, paru_work *Work)
     paru_free(m + nf, sizeof(Int), Work->lacList);
 
     // in practice each parent should deal with the memory for the children
-#ifndef NDEBUG
     std::vector<Int> **heapList = Work->heapList;
     // freeing memory of heaps.
     if (heapList != NULL)
     {
         for (Int eli = 0; eli < m + nf + 1; eli++)
         {
-            if (heapList[eli] != nullptr)
+            if (heapList[eli] != NULL)
             {
                 PRLEVEL(1,
                         ("%% %ld has not been freed %p\n", eli, heapList[eli]));
                 delete heapList[eli];
-                heapList[eli] = nullptr;
+                heapList[eli] = NULL;
             }
-            ASSERT(heapList[eli] == nullptr);
+            ASSERT(heapList[eli] == NULL);
         }
     }
-#endif
     paru_free(1, (m + nf + 1) * sizeof(std::vector<Int> **), Work->heapList);
     paru_free(m, sizeof(Int), Work->row_degree_bound);
 
@@ -514,7 +512,6 @@ ParU_Ret ParU_Freenum(ParU_Numeric **Num_handle, ParU_Control *Control)
         return PARU_SUCCESS;
     }
 
-    printf("Inside ParU_Freenum\n");
     ParU_Numeric *Num;
     Num = *Num_handle;
 

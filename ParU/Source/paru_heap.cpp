@@ -75,7 +75,7 @@ ParU_Ret paru_make_heap(Int f, Int start_fac,
     {
         // shallow copy of the biggest child
         std::vector<Int> *curHeap = heapList[eli] = heapList[biggest_Child_id];
-        heapList[biggest_Child_id] = nullptr;
+        heapList[biggest_Child_id] = NULL;
 
         // O(n) heapify of all children or O(klgn) add to the biggest child
         if (log2(biggest_Child_size) >
@@ -86,7 +86,7 @@ ParU_Ret paru_make_heap(Int f, Int start_fac,
             {
                 Int chelid = aChild[i];  // element id of the child
                 std::vector<Int> *chHeap = heapList[chelid];
-                if (chHeap == nullptr) continue;
+                if (chHeap == NULL) continue;
                 // concatening the child and freeing the memory
                 for (Int k = 0; k < (Int)chHeap->size(); k++)
                 {
@@ -104,7 +104,7 @@ ParU_Ret paru_make_heap(Int f, Int start_fac,
                     }
                 }
                 delete heapList[chelid];
-                heapList[chelid] = nullptr;
+                heapList[chelid] = NULL;
             }
 
             for (Int i = 0; i < (Int)pivotal_elements.size(); i++)
@@ -130,7 +130,7 @@ ParU_Ret paru_make_heap(Int f, Int start_fac,
             {
                 Int chelid = aChild[i];  // element id of the child
                 std::vector<Int> *chHeap = heapList[chelid];
-                if (chHeap == nullptr) continue;
+                if (chHeap == NULL) continue;
                 // concatening the child and freeing the memory
 
                 // curHeap->insert(curHeap->end(),
@@ -148,7 +148,7 @@ ParU_Ret paru_make_heap(Int f, Int start_fac,
                 PRLEVEL(1,
                         ("%%Heap free %p id=%ld\n", heapList[chelid], chelid));
                 delete heapList[chelid];
-                heapList[chelid] = nullptr;
+                heapList[chelid] = NULL;
             }
             // adding pivotal elements and the current element
             curHeap->insert(curHeap->end(), pivotal_elements.begin(),
@@ -243,7 +243,7 @@ ParU_Ret paru_make_heap_empty_el(Int f, std::vector<Int> &pivotal_elements,
     {
         // shallow copy of the biggest child
         std::vector<Int> *curHeap = heapList[eli] = heapList[biggest_Child_id];
-        heapList[biggest_Child_id] = nullptr;
+        heapList[biggest_Child_id] = NULL;
 
         // O(n) heapify of all children or O(klgn) add to the biggest child
         if (log2(biggest_Child_size) >
@@ -254,7 +254,7 @@ ParU_Ret paru_make_heap_empty_el(Int f, std::vector<Int> &pivotal_elements,
             {
                 Int chelid = aChild[i];  // element id of the child
                 std::vector<Int> *chHeap = heapList[chelid];
-                if (chHeap == nullptr) continue;
+                if (chHeap == NULL) continue;
                 // concatening the child and freeing the memory
                 for (Int k = 0; k < (Int)chHeap->size(); k++)
                 {
@@ -267,7 +267,7 @@ ParU_Ret paru_make_heap_empty_el(Int f, std::vector<Int> &pivotal_elements,
                     }
                 }
                 delete heapList[chelid];
-                heapList[chelid] = nullptr;
+                heapList[chelid] = NULL;
             }
 
             for (Int i = 0; i < (Int)pivotal_elements.size(); i++)
@@ -289,7 +289,7 @@ ParU_Ret paru_make_heap_empty_el(Int f, std::vector<Int> &pivotal_elements,
             {
                 Int chelid = aChild[i];  // element id of the child
                 std::vector<Int> *chHeap = heapList[chelid];
-                if (chHeap == nullptr) continue;
+                if (chHeap == NULL) continue;
                 // concatening the child and freeing the memory
 
                 // curHeap->insert(curHeap->end(),
@@ -305,7 +305,7 @@ ParU_Ret paru_make_heap_empty_el(Int f, std::vector<Int> &pivotal_elements,
                 PRLEVEL(1,
                         ("%%Heap free %p id=%ld\n", heapList[chelid], chelid));
                 delete heapList[chelid];
-                heapList[chelid] = nullptr;
+                heapList[chelid] = NULL;
             }
             // adding pivotal elements and the current element
             curHeap->insert(curHeap->end(), pivotal_elements.begin(),

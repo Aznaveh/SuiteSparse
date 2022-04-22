@@ -86,7 +86,7 @@ int main(int argc, char **argv)
             }                                   
             else 
             {
-                if (nmalloc > 1)              
+                if (nmalloc > 21)              
                 {                                   
                     printf("ParU: too much malloc\n"); 
                     break;                          

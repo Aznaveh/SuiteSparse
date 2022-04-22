@@ -24,18 +24,16 @@
             }                                   \
             if (nmalloc > 1000000)              \
             {                                   \
-                printf("ParU: test failure\n"); \
                 break;                          \
             }                                   \
         }                                       \
-        printf("ParU: test failure\n");         \
         paru_set_malloc_tracking(false);        \
     }
 #else
 #define BRUTAL_ALLOC_TEST(info, method) \
     {                                   \
         info = method;                  \
-    }
+    
 #endif
 
 #endif

@@ -429,7 +429,13 @@ ParU_Ret paru_init_rowFronts(paru_work *Work,
 
     ParU_Ret info;
     Int out_of_memory = 0;
-    #pragma omp taskloop grainsize(512)
+
+    //XXX weird situation here:
+    //   with omp parallel for I can see correct out_of_memory but not with 
+    //   taskloop; However I don't see any leaks with either
+
+    //pragma omp taskloop grainsize(512)
+    #pragma omp parallel for
     for (Int row = 0; row < m; row++)
     {
         Int e = Sym->row2atree[row];
@@ -509,8 +515,10 @@ ParU_Ret paru_init_rowFronts(paru_work *Work,
                 out_of_memory += 1;
             }
     }
-    if (out_of_memory)
+    if (out_of_memory > 0)
+    {
         info = PARU_OUT_OF_MEMORY;
+    }
     else
         info = PARU_SUCCESS;
 

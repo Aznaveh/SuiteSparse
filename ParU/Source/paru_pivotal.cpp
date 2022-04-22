@@ -61,7 +61,7 @@ ParU_Ret paru_pivotal(std::vector<Int> &pivotal_elements,
         PRLEVEL(PR, ("%% chelid = %ld\n", chelid));
         std::vector<Int> *curHeap = heapList[chelid];
 
-        if (curHeap == nullptr) continue;
+        if (curHeap == NULL) continue;
 
         while (curHeap->size() > 0)
         // pop from the heap and put it in pivotal_elements
@@ -86,7 +86,7 @@ ParU_Ret paru_pivotal(std::vector<Int> &pivotal_elements,
         if (curHeap->empty())
         {
             delete heapList[chelid];
-            heapList[chelid] = nullptr;
+            heapList[chelid] = NULL;
         }
         else
         {
