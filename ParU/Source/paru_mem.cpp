@@ -508,6 +508,7 @@ ParU_Ret ParU_Freenum(ParU_Numeric **Num_handle, ParU_Control *Control)
         return PARU_SUCCESS;
     }
 
+    printf("Inside ParU_Freenum\n");
     ParU_Numeric *Num;
     Num = *Num_handle;
 
@@ -534,24 +535,27 @@ ParU_Ret ParU_Freenum(ParU_Numeric **Num_handle, ParU_Control *Control)
 
     for (Int i = 0; i < nf; i++)
     {
-        paru_free(Num->frowCount[i], sizeof(Int), Num->frowList[i]);
+        if (Num->frowList)
+            paru_free(Num->frowCount[i], sizeof(Int), Num->frowList[i]);
+        if (Num->fcolList)
+            paru_free(Num->fcolCount[i], sizeof(Int), Num->fcolList[i]);
 
-        paru_free(Num->fcolCount[i], sizeof(Int), Num->fcolList[i]);
-
-        PRLEVEL(1, ("%% Freeing Us=%p\n", Us[i].p));
-        if (Us[i].p != NULL)
-        {
-            Int mm = Us[i].m;
-            Int nn = Us[i].n;
-            paru_free(mm * nn, sizeof(double), Us[i].p);
-        }
-        PRLEVEL(1, ("%% Freeing LUs=%p\n", LUs[i].p));
-        if (LUs[i].p != NULL)
-        {
-            Int mm = LUs[i].m;
-            Int nn = LUs[i].n;
-            paru_free(mm * nn, sizeof(double), LUs[i].p);
-        }
+        if (Us)
+            if (Us[i].p != NULL)
+            {
+                PRLEVEL(1, ("%% Freeing Us=%p\n", Us[i].p));
+                Int mm = Us[i].m;
+                Int nn = Us[i].n;
+                paru_free(mm * nn, sizeof(double), Us[i].p);
+            }
+        if (LUs)
+            if (LUs[i].p != NULL)
+            {
+                PRLEVEL(1, ("%% Freeing LUs=%p\n", LUs[i].p));
+                Int mm = LUs[i].m;
+                Int nn = LUs[i].n;
+                paru_free(mm * nn, sizeof(double), LUs[i].p);
+            }
     }
 
     PRLEVEL(1, ("%% Done LUs\n"));
