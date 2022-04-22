@@ -122,7 +122,7 @@ go: parutest
 	- ./cov
 
 vgo: parutest
-	- valgrind  ./x_test < ../Matrix/b1_ss.mtx > parutest_out.txt
+	- valgrind --leak-check=yes ./x_test < ../Matrix/b1_ss.mtx > parutest_out.txt
 	#- valgrind  ./x_test < ../Matrix/west0067.mtx > parutest_out.txt
 	- ./cov
 

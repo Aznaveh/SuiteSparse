@@ -257,6 +257,8 @@ ParU_Ret ParU_Factorize(cholmod_sparse *A, ParU_Symbolic *Sym,
     if (info != PARU_SUCCESS)
     {
         PRLEVEL(1, ("%% init_row has a problem\n"));
+        paru_free_work(Sym, Work);   // free the work DS
+        ParU_Freenum(&Num, Control);
         return info;
     }
     Int nf = Sym->nf;
@@ -279,6 +281,7 @@ ParU_Ret ParU_Factorize(cholmod_sparse *A, ParU_Symbolic *Sym,
     {  // out of memory
         PRLEVEL(1, ("Paru: Out of memory: task_Q\n"));
         paru_free_work(Sym, Work);   // free the work DS
+        ParU_Freenum(&Num, Control);
         return PARU_OUT_OF_MEMORY;
     }
     std::sort(task_Q.begin(), task_Q.end(),
@@ -392,6 +395,7 @@ ParU_Ret ParU_Factorize(cholmod_sparse *A, ParU_Symbolic *Sym,
                 PRLEVEL(1, ("Paru: Input matrix is singular\n"));
             }
             paru_free_work(Sym, Work);   // free the work DS
+            ParU_Freenum(&Num, Control);
             return info;
         }
     }
@@ -408,6 +412,7 @@ ParU_Ret ParU_Factorize(cholmod_sparse *A, ParU_Symbolic *Sym,
             {
                 PRLEVEL(1, ("%% A problem happend in %ld\n", i));
                 paru_free_work(Sym, Work);   // free the work DS
+                ParU_Freenum(&Num, Control);
                 return info;
             }
         }

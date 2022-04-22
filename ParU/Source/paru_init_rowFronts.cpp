@@ -42,6 +42,22 @@ ParU_Ret paru_init_rowFronts(paru_work *Work,
         return PARU_INVALID;
     }
 
+    // initializing Work
+    Work->Sym = Sym;
+    Int *rowMark = Work->rowMark = NULL;
+    Int *elRow = Work->elRow = NULL;
+    Int *elCol = Work->elCol = NULL;
+    Int *rowSize = Work->rowSize = NULL;
+    Work->time_stamp = NULL;
+    paru_tupleList *RowList = Work->RowList = NULL;
+    Int *Diag_map = Work->Diag_map = NULL;
+    Int *inv_Diag_map = Work->inv_Diag_map = NULL;
+    paru_element **elementList = Work->elementList = NULL;
+    Work->lacList = NULL;
+    Work->task_num_child = NULL;
+    std::vector<Int> **heapList = Work->heapList = NULL;
+    Int *row_degree_bound = Work->row_degree_bound = NULL;
+   
     // initializing Numeric
     ParU_Numeric *Num = NULL;
     Num = (ParU_Numeric *)paru_alloc(1, sizeof(ParU_Numeric));
@@ -49,12 +65,12 @@ ParU_Ret paru_init_rowFronts(paru_work *Work,
     {  // out of memory
         PRLEVEL(1, ("Paru: out of memory, Num\n"));
         // Nothing to be freed
+        *Num_handle = NULL;
         return PARU_OUT_OF_MEMORY;
     }
     *Num_handle = Num;
 
     Int m, nf;
-    Work->Sym = Sym;
     Num->sym_m = Sym->m;
     m = Num->m = Sym->m - Sym->n1;
     nf = Num->nf = Sym->nf;
@@ -73,21 +89,6 @@ ParU_Ret paru_init_rowFronts(paru_work *Work,
     Num->Rs = NULL;
     Num->Ps = NULL;
     Num->Pfin = NULL;
-
-    // Workd DS
-    Int *rowMark = Work->rowMark = NULL;
-    Int *elRow = Work->elRow = NULL;
-    Int *elCol = Work->elCol = NULL;
-    Int *rowSize = Work->rowSize = NULL;
-    Work->time_stamp = NULL;
-    paru_tupleList *RowList = Work->RowList = NULL;
-    Int *Diag_map = Work->Diag_map = NULL;
-    Int *inv_Diag_map = Work->inv_Diag_map = NULL;
-    paru_element **elementList = Work->elementList = NULL;
-    Work->lacList = NULL;
-    Work->task_num_child = NULL;
-    std::vector<Int> **heapList = Work->heapList = NULL;
-    Int *row_degree_bound = Work->row_degree_bound = NULL;
 
     if (nf != 0)
     {

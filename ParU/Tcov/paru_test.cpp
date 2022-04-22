@@ -84,11 +84,14 @@ int main(int argc, char **argv)
                 printf("nmalloc=%ld\n",nmalloc);
                 break;                          
             }                                   
-            if (nmalloc > 100)              
-            {                                   
-                printf("ParU: too much malloc\n"); 
-                break;                          
-            }                                   
+            else 
+            {
+                if (nmalloc > 1)              
+                {                                   
+                    printf("ParU: too much malloc\n"); 
+                    break;                          
+                }                                   
+            }
         }                                       
         paru_set_malloc_tracking(false);        
     }
@@ -98,6 +101,10 @@ int main(int argc, char **argv)
     {
         printf("Paru: factorization was NOT successfull in %lf seconds.\n",
                 my_time);
+        cholmod_l_free_sparse(&A, cc);
+        cholmod_l_finish(cc);
+        ParU_Freesym(&Sym, &Control);
+        return info;
     }
     else
         printf("Paru: factorization was successfull in %lf seconds.\n",
@@ -120,7 +127,7 @@ int main(int argc, char **argv)
         ParU_Residual(A, xx, b, m, resid, anorm, &Control);
 
         printf("Residual is |%.2lf| and anorm is %.2e and rcond is %.2e.\n",
-               resid == 0 ? 0 : log10(resid), anorm, Num->rcond);
+                resid == 0 ? 0 : log10(resid), anorm, Num->rcond);
 
         free(b);
         free(xx);

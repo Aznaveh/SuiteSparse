@@ -438,10 +438,13 @@ ParU_Ret paru_free_work(ParU_Symbolic *Sym, paru_work *Work)
     paru_tupleList *RowList = Work->RowList;
     PRLEVEL(1, ("%% RowList =%p\n", RowList));
 
-    for (Int row = 0; row < m; row++)
+    if (RowList)
     {
-        Int len = RowList[row].len;
-        paru_free(len, sizeof(paru_tuple), RowList[row].list);
+        for (Int row = 0; row < m; row++)
+        {
+            Int len = RowList[row].len;
+            paru_free(len, sizeof(paru_tuple), RowList[row].list);
+        }
     }
     paru_free(1, m * sizeof(paru_tupleList), RowList);
 
@@ -456,18 +459,21 @@ ParU_Ret paru_free_work(ParU_Symbolic *Sym, paru_work *Work)
 
     PRLEVEL(1, ("%% Sym = %p\n", Sym));
     PRLEVEL(1, ("%% freeing initialized elements:\n"));
-    for (Int i = 0; i < m; i++)
-    {                               // freeing all row elements
-        Int e = Sym->row2atree[i];  // element number in augmented tree
-        PRLEVEL(1, ("%% e =%ld\t", e));
-        paru_free_el(e, elementList);
-    }
+    if (elementList)
+    {
+        for (Int i = 0; i < m; i++)
+        {                               // freeing all row elements
+            Int e = Sym->row2atree[i];  // element number in augmented tree
+            PRLEVEL(1, ("%% e =%ld\t", e));
+            paru_free_el(e, elementList);
+        }
 
-    PRLEVEL(1, ("\n%% freeing CB elements:\n"));
-    for (Int i = 0; i < nf; i++)
-    {                                 // freeing all other elements
-        Int e = Sym->super2atree[i];  // element number in augmented tree
-        paru_free_el(e, elementList);
+        PRLEVEL(1, ("\n%% freeing CB elements:\n"));
+        for (Int i = 0; i < nf; i++)
+        {                                 // freeing all other elements
+            Int e = Sym->super2atree[i];  // element number in augmented tree
+            paru_free_el(e, elementList);
+        }
     }
 
     paru_free(1, (m + nf + 1) * sizeof(paru_element), elementList);
