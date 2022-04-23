@@ -89,6 +89,8 @@ ParU_Ret ParU_Analyze(cholmod_sparse *A, ParU_Symbolic **S_handle,
     if (m != n)
     {
         PRLEVEL(1, ("Paru: Input matrix is not square!\n"));
+        paru_free(1, sizeof(ParU_Symbolic), Sym);
+        *S_handle = NULL;
         return PARU_INVALID;
     }
 
@@ -378,6 +380,8 @@ ParU_Ret ParU_Analyze(cholmod_sparse *A, ParU_Symbolic **S_handle,
         PRLEVEL(1, ("Paru: umfpack_dl_symbolic failed\n"));
         umfpack_dl_free_symbolic(&Symbolic);
         FREE_WORK;
+        paru_free(1, sizeof(ParU_Symbolic), Sym);
+        *S_handle = NULL;
         return PARU_INVALID;
     }
     /* ---------------------------------------------------------------------- */
