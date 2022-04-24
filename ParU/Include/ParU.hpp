@@ -264,7 +264,7 @@ struct ParU_Control
     // Numeric controls
     Int scale = 1;         // if 1 matrix will be scaled using max_row
     Int panel_width = 32;  // width of panel for dense factorizaiton
-    Int paru_strategy = PARU_STRATEGY_AUTO;  // the same stratey umfpack used
+    Int paru_strategy = PARU_STRATEGY_AUTO;  // the same strategy umfpack used
 
     double piv_toler = 0.1;     // tolerance for accepting sparse pivots
     double diag_toler = 0.001;  // tolerance for accepting symmetric pivots

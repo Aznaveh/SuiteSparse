@@ -344,6 +344,14 @@ ParU_Ret ParU_Analyze(cholmod_sparse *A, ParU_Symbolic **S_handle,
                 MIN(max_threads, my_Control.paru_max_threads);
         else
             my_Control.paru_max_threads = max_threads;
+        Int threshold = my_Control.relaxed_amalgamation_threshold;
+        if (threshold < 0 || threshold > 512)
+            my_Control.relaxed_amalgamation_threshold = 32;
+        Int paru_strategy = my_Control.paru_strategy;
+        if (paru_strategy != UMFPACK_STRATEGY_AUTO &&
+            paru_strategy != UMFPACK_STRATEGY_SYMMETRIC &&
+            paru_strategy != UMFPACK_STRATEGY_UNSYMMETRIC)
+            my_Control.paru_strategy = PARU_STRATEGY_AUTO;
     }
     ParU_Control *Control = &my_Control;
 

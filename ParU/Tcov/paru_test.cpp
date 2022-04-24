@@ -54,6 +54,14 @@ int main(int argc, char **argv)
     printf(" %s\n", date);
 
     ParU_Control Control;
+    // puting Control lines to work
+    Control.mem_chunk = 1;
+    Control.umfpack_ordering = 23;
+    Control.umfpack_strategy = 23;
+    Control.paru_max_threads = -1;
+    Control.relaxed_amalgamation_threshold = -1;
+    Control.paru_strategy = 23;
+
     ParU_Ret info;
 
     // info = ParU_Analyze(A, &Sym, &Control);
