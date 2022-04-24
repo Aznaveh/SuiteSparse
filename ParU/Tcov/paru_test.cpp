@@ -61,6 +61,13 @@ int main(int argc, char **argv)
     Control.paru_max_threads = -1;
     Control.relaxed_amalgamation_threshold = -1;
     Control.paru_strategy = 23;
+    Control.scale = -1;
+    Control.panel_width = -1;
+    Control.piv_toler = -1;
+    Control.diag_toler = -1;
+    Control.trivial = -1;
+    Control.worthwhile_dgemm = -2;
+    Control.worthwhile_trsm = -1;
 
     ParU_Ret info;
 
@@ -118,9 +125,25 @@ int main(int argc, char **argv)
         //    }                                       
         //    paru_set_malloc_tracking(false);        
         //}
+        if (info != PARU_SUCCESS)
+        {
+            printf("Paru: Solve has a problem.\n");
+            cholmod_l_free_sparse(&A, cc);
+            cholmod_l_finish(cc);
+            ParU_Freesym(&Sym, &Control);
+            return info;
+        }
 
         double resid, anorm;
-        ParU_Residual(A, xx, b, m, resid, anorm, &Control);
+        info = ParU_Residual(A, xx, b, m, resid, anorm, &Control);
+        if (info != PARU_SUCCESS)
+        {
+            printf("Paru: Residual has a problem.\n");
+            cholmod_l_free_sparse(&A, cc);
+            cholmod_l_finish(cc);
+            ParU_Freesym(&Sym, &Control);
+            return info;
+        }
 
         printf("Residual is |%.2lf| and anorm is %.2e and rcond is %.2e.\n",
                 resid == 0 ? 0 : log10(resid), anorm, Num->rcond);
@@ -134,7 +157,26 @@ int main(int argc, char **argv)
             for (Int j = 0; j < nrhs; ++j) B[j * m + i] = (double)(i + j + 1);
 
         info = ParU_Solve(Sym, Num, nrhs, B, X, &Control);
-        ParU_Residual(A, X, B, m, nrhs, resid, anorm, &Control);
+        if (info != PARU_SUCCESS)
+        {
+            printf("Paru: mRhs Solve has a problem.\n");
+            cholmod_l_free_sparse(&A, cc);
+            cholmod_l_finish(cc);
+            ParU_Freesym(&Sym, &Control);
+            return info;
+        }
+ 
+        info = ParU_Residual(A, X, B, m, nrhs, resid, anorm, &Control);
+        if (info != PARU_SUCCESS)
+        {
+            printf("Paru: mRhs Residual has a problem.\n");
+            cholmod_l_free_sparse(&A, cc);
+            cholmod_l_finish(cc);
+            ParU_Freesym(&Sym, &Control);
+            return info;
+        }
+
+
         printf("mRhs Residual is |%.2lf|\n", resid == 0 ? 0 : log10(resid));
 
         free(B);

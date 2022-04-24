@@ -92,14 +92,30 @@ int main(int argc, char **argv)
         for (Int i = 0; i < m; ++i) b[i] = i + 1;
         double my_solve_time_start = omp_get_wtime();
         info = ParU_Solve(Sym, Num, b, xx, &Control);
+        if (info != PARU_SUCCESS)
+        {
+            printf("Paru: Solve has a problem.\n");
+            cholmod_l_free_sparse(&A, cc);
+            cholmod_l_finish(cc);
+            ParU_Freesym(&Sym, &Control);
+            return info;
+        }
         double my_solve_time = omp_get_wtime() - my_solve_time_start;
         printf("Solve time is %lf seconds.\n", my_solve_time);
         my_start_time = omp_get_wtime();
         double resid, anorm;
-        ParU_Residual(A, xx, b, m, resid, anorm, &Control);
+        info = ParU_Residual(A, xx, b, m, resid, anorm, &Control);
+        if (info != PARU_SUCCESS)
+        {
+            printf("Paru: Residual has a problem.\n");
+            cholmod_l_free_sparse(&A, cc);
+            cholmod_l_finish(cc);
+            ParU_Freesym(&Sym, &Control);
+            return info;
+        }
 
         printf("Residual is |%.2lf| and anorm is %.2e and rcond is %.2e.\n",
-               resid == 0 ? 0 : log10(resid), anorm, Num->rcond);
+                resid == 0 ? 0 : log10(resid), anorm, Num->rcond);
 
         free(b);
         free(xx);
@@ -110,7 +126,24 @@ int main(int argc, char **argv)
             for (Int j = 0; j < nrhs; ++j) B[j * m + i] = (double)(i + j + 1);
 
         info = ParU_Solve(Sym, Num, nrhs, B, X, &Control);
-        ParU_Residual(A, X, B, m, nrhs, resid, anorm, &Control);
+        if (info != PARU_SUCCESS)
+        {
+            printf("Paru: mRhs Solve has a problem.\n");
+            cholmod_l_free_sparse(&A, cc);
+            cholmod_l_finish(cc);
+            ParU_Freesym(&Sym, &Control);
+            return info;
+        }
+        info = ParU_Residual(A, X, B, m, nrhs, resid, anorm, &Control);
+        if (info != PARU_SUCCESS)
+        {
+            printf("Paru: mRhs Residual has a problem.\n");
+            cholmod_l_free_sparse(&A, cc);
+            cholmod_l_finish(cc);
+            ParU_Freesym(&Sym, &Control);
+            return info;
+        }
+
         printf("mRhs Residual is |%.2lf|\n", resid == 0 ? 0 : log10(resid));
 
         free(B);
@@ -128,9 +161,9 @@ int main(int argc, char **argv)
 #if 1
     double umf_start_time = omp_get_wtime();
     double status,           // Info [UMFPACK_STATUS]
-        Info[UMFPACK_INFO],  // Contains statistics about the symbolic analysis
+           Info[UMFPACK_INFO],  // Contains statistics about the symbolic analysis
 
-        umf_Control[UMFPACK_CONTROL];  // it is set in umfpack_dl_defaults and
+           umf_Control[UMFPACK_CONTROL];  // it is set in umfpack_dl_defaults and
     // is used in umfpack_dl_symbolic; if
     // passed NULL it will use the defaults
     umfpack_dl_defaults(umf_Control);
