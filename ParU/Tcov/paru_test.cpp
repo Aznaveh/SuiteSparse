@@ -107,26 +107,10 @@ int main(int argc, char **argv)
         for (Int i = 0; i < m; ++i) b[i] = i + 1;
         //info = ParU_Solve(Sym, Num, b, xx, &Control);
         BRUTAL_ALLOC_TEST(info, ParU_Solve(Sym, Num, b, xx, &Control));
-        //{                                           
-        //    paru_set_malloc_tracking(true);         
-        //    for (Int nmalloc = 0;; nmalloc++)       
-        //    {                                       
-        //        paru_set_nmalloc(nmalloc);          
-        //        info = ParU_Solve(Sym, Num, b, xx, &Control);
-        //        if (info != PARU_OUT_OF_MEMORY)     
-        //        {                                   
-        //            printf("nmalloc=%ld\n",nmalloc);
-        //            break;                          
-        //        }                                   
-        //        if (nmalloc > 15040)              
-        //        {                                   
-        //            break;                          
-        //        }                                   
-        //    }                                       
-        //    paru_set_malloc_tracking(false);        
-        //}
         if (info != PARU_SUCCESS)
         {
+            free(b);
+            free(xx);
             printf("Paru: Solve has a problem.\n");
             cholmod_l_free_sparse(&A, cc);
             cholmod_l_finish(cc);
@@ -135,9 +119,13 @@ int main(int argc, char **argv)
         }
 
         double resid, anorm;
-        info = ParU_Residual(A, xx, b, m, resid, anorm, &Control);
-        if (info != PARU_SUCCESS)
+        //info = ParU_Residual(A, xx, b, m, resid, anorm, &Control);
+        BRUTAL_ALLOC_TEST(info, 
+                ParU_Residual(A, xx, b, m, resid, anorm, &Control));
+       if (info != PARU_SUCCESS)
         {
+            free(b);
+            free(xx);
             printf("Paru: Residual has a problem.\n");
             cholmod_l_free_sparse(&A, cc);
             cholmod_l_finish(cc);
@@ -156,20 +144,27 @@ int main(int argc, char **argv)
         for (Int i = 0; i < m; ++i)
             for (Int j = 0; j < nrhs; ++j) B[j * m + i] = (double)(i + j + 1);
 
-        info = ParU_Solve(Sym, Num, nrhs, B, X, &Control);
+        //info = ParU_Solve(Sym, Num, nrhs, B, X, &Control);
+        BRUTAL_ALLOC_TEST(info, ParU_Solve(Sym, Num, nrhs, B, X, &Control));
         if (info != PARU_SUCCESS)
         {
             printf("Paru: mRhs Solve has a problem.\n");
+            free(B);
+            free(X);
             cholmod_l_free_sparse(&A, cc);
             cholmod_l_finish(cc);
             ParU_Freesym(&Sym, &Control);
             return info;
         }
- 
-        info = ParU_Residual(A, X, B, m, nrhs, resid, anorm, &Control);
+
+        //info = ParU_Residual(A, X, B, m, nrhs, resid, anorm, &Control);
+        BRUTAL_ALLOC_TEST(info, 
+                ParU_Residual(A, X, B, m, nrhs, resid, anorm, &Control));
         if (info != PARU_SUCCESS)
         {
             printf("Paru: mRhs Residual has a problem.\n");
+            free(B);
+            free(X);
             cholmod_l_free_sparse(&A, cc);
             cholmod_l_finish(cc);
             ParU_Freesym(&Sym, &Control);

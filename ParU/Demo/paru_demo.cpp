@@ -95,6 +95,8 @@ int main(int argc, char **argv)
         if (info != PARU_SUCCESS)
         {
             printf("Paru: Solve has a problem.\n");
+            free(b);
+            free(xx);
             cholmod_l_free_sparse(&A, cc);
             cholmod_l_finish(cc);
             ParU_Freesym(&Sym, &Control);
@@ -108,6 +110,8 @@ int main(int argc, char **argv)
         if (info != PARU_SUCCESS)
         {
             printf("Paru: Residual has a problem.\n");
+            free(b);
+            free(xx);
             cholmod_l_free_sparse(&A, cc);
             cholmod_l_finish(cc);
             ParU_Freesym(&Sym, &Control);
@@ -129,6 +133,8 @@ int main(int argc, char **argv)
         if (info != PARU_SUCCESS)
         {
             printf("Paru: mRhs Solve has a problem.\n");
+            free(B);
+            free(X);
             cholmod_l_free_sparse(&A, cc);
             cholmod_l_finish(cc);
             ParU_Freesym(&Sym, &Control);
@@ -138,6 +144,8 @@ int main(int argc, char **argv)
         if (info != PARU_SUCCESS)
         {
             printf("Paru: mRhs Residual has a problem.\n");
+            free(B);
+            free(X);
             cholmod_l_free_sparse(&A, cc);
             cholmod_l_finish(cc);
             ParU_Freesym(&Sym, &Control);
