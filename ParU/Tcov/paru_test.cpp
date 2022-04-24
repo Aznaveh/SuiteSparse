@@ -73,7 +73,7 @@ int main(int argc, char **argv)
     BRUTAL_ALLOC_TEST(info, ParU_Factorize(A, Sym, &Num, &Control));
     if (info != PARU_SUCCESS)
     {
-        printf("Paru: factorization was NOT successfull.\n");
+        printf("Paru: factorization was NOT succssfull.\n");
         cholmod_l_free_sparse(&A, cc);
         cholmod_l_finish(cc);
         ParU_Freesym(&Sym, &Control);
@@ -90,12 +90,32 @@ int main(int argc, char **argv)
         double *b = (double *)malloc(m * sizeof(double));
         double *xx = (double *)malloc(m * sizeof(double));
         for (Int i = 0; i < m; ++i) b[i] = i + 1;
-        info = ParU_Solve(Sym, Num, b, xx, &Control);
+        //info = ParU_Solve(Sym, Num, b, xx, &Control);
+        BRUTAL_ALLOC_TEST(info, ParU_Solve(Sym, Num, b, xx, &Control));
+        //{                                           
+        //    paru_set_malloc_tracking(true);         
+        //    for (Int nmalloc = 0;; nmalloc++)       
+        //    {                                       
+        //        paru_set_nmalloc(nmalloc);          
+        //        info = ParU_Solve(Sym, Num, b, xx, &Control);
+        //        if (info != PARU_OUT_OF_MEMORY)     
+        //        {                                   
+        //            printf("nmalloc=%ld\n",nmalloc);
+        //            break;                          
+        //        }                                   
+        //        if (nmalloc > 15040)              
+        //        {                                   
+        //            break;                          
+        //        }                                   
+        //    }                                       
+        //    paru_set_malloc_tracking(false);        
+        //}
+
         double resid, anorm;
         ParU_Residual(A, xx, b, m, resid, anorm, &Control);
 
         printf("Residual is |%.2lf| and anorm is %.2e and rcond is %.2e.\n",
-               resid == 0 ? 0 : log10(resid), anorm, Num->rcond);
+                resid == 0 ? 0 : log10(resid), anorm, Num->rcond);
 
         free(b);
         free(xx);

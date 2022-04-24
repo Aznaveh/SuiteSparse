@@ -344,23 +344,47 @@ ParU_Ret paru_pivotal(std::vector<Int> &pivotal_elements,
     Int fm = Sym->Fm[f]; /* Upper bound number of rows of F */
     ASSERT(fm >= rowCount);
 
-    // freeing extra space for rows
+//////////////---------------->>>>>>>
+    //XXX 
+    //
+    //  realloc version  has some wierd leak in brutal mode
+    //Int *tmp_frowList = frowList;
+    //// freeing extra space for rows
+    //if (rowCount != fm)
+    //{
+    //    //size_t sz = sizeof(Int) * fm;
+    //    size_t sz = fm;
+    //    frowList = 
+    //        (Int *)paru_realloc(rowCount, sizeof(Int), frowList, &sz);
+    //}
+    //if (frowList == NULL)
+    //{
+    //    Num->frowList[f] = tmp_frowList;
+    //    PRLEVEL(1, ("Paru: 0ut of memory when tried to reallocate for frowList"
+    //                "part %ld\n", f));
+    //    return PARU_OUT_OF_MEMORY;
+
+    //}
+
+    /////////---------------->>>>>>>alloc and memcpy version
     if (rowCount != fm)
     {
-        size_t sz = sizeof(Int) * fm;
-        frowList = (Int *)paru_realloc(rowCount, sizeof(Int), frowList, &sz);
-        Num->frowList[f] = frowList;
+        Int *tmp_frowList = (Int *)paru_alloc(rowCount, sizeof(Int));
+        if (tmp_frowList == NULL)
+            return PARU_OUT_OF_MEMORY;
+        paru_memcpy(tmp_frowList, frowList, rowCount * sizeof(Int), Control);
+        paru_free (fm, sizeof(Int), frowList);
+        Num->frowList[f] = frowList = tmp_frowList;
     }
-
+//////////////---------------->>>>>>>
     double *pivotalFront = (double *)paru_calloc(rowCount * fp, sizeof(double));
 
-    if (pivotalFront == NULL || frowList == NULL)
+    if (pivotalFront == NULL)
     {
         PRLEVEL(1, ("Paru: 0ut of memory when tried to allocate for pivotal "
                     "part %ld\n", f));
         return PARU_OUT_OF_MEMORY;
     }
-
 #ifndef NDEBUG
     Work->actual_alloc_LUs += rowCount * fp;
     Work->actual_alloc_row_int += rowCount;
@@ -368,9 +392,9 @@ ParU_Ret paru_pivotal(std::vector<Int> &pivotal_elements,
     PRLEVEL(PR, ("%% LUs=%ld ", Work->actual_alloc_LUs));
     PRLEVEL(PR, ("%% pivotalFront = %p size=%ld", pivotalFront, rowCount * fp));
     Int act = Work->actual_alloc_LUs + Work->actual_alloc_Us +
-              Work->actual_alloc_row_int;
+        Work->actual_alloc_row_int;
     Int upp = Sym->Us_bound_size + Sym->LUs_bound_size + Sym->row_Int_bound +
-              Sym->col_Int_bound;
+        Sym->col_Int_bound;
     PRLEVEL(PR, ("%% MEM=%ld percent=%lf%%", act, 100.0 * act / upp));
     PRLEVEL(PR, ("%% MEM=%ld percent=%lf%%\n", act, 100.0 * act / upp));
 #endif

@@ -405,13 +405,13 @@ void paru_tasked_trsm(Int f, int m, int n, double alpha, double *a, int lda,
 
 ParU_Ret paru_free_work(ParU_Symbolic *Sym, paru_work *Work);
 // lsolve and usolve
-Int paru_lsolve(double *x, ParU_Symbolic *Sym, ParU_Numeric *Num,
+ParU_Ret paru_lsolve(double *x, ParU_Symbolic *Sym, ParU_Numeric *Num,
                 ParU_Control *Control);
-Int paru_lsolve(double *X, Int n, ParU_Symbolic *Sym, ParU_Numeric *Num,
+ParU_Ret paru_lsolve(double *X, Int n, ParU_Symbolic *Sym, ParU_Numeric *Num,
                 ParU_Control *Control);
-Int paru_usolve(double *x, ParU_Symbolic *Sym, ParU_Numeric *Num,
+ParU_Ret paru_usolve(double *x, ParU_Symbolic *Sym, ParU_Numeric *Num,
                 ParU_Control *Control);
-Int paru_usolve(double *X, Int n, ParU_Symbolic *Sym, ParU_Numeric *Num,
+ParU_Ret paru_usolve(double *X, Int n, ParU_Symbolic *Sym, ParU_Numeric *Num,
                 ParU_Control *Control);
 
 // not user-callable: for testing only

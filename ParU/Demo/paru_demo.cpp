@@ -73,6 +73,10 @@ int main(int argc, char **argv)
     {
         printf("Paru: factorization was NOT successfull in %lf seconds.\n",
                my_time);
+        cholmod_l_free_sparse(&A, cc);
+        cholmod_l_finish(cc);
+        ParU_Freesym(&Sym, &Control);
+        return info;
     }
     else
         printf("Paru: factorization was successfull in %lf seconds.\n",

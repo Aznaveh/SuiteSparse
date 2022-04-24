@@ -51,10 +51,23 @@ ParU_Ret ParU_Solve(ParU_Symbolic *Sym, ParU_Numeric *Num, double *b,
     paru_memcpy(x, b, m * sizeof(double), Control);
     paru_apply_perm_scale(Num->Pfin, Num->Rs, b, x, m);
 
+    ParU_Ret info;
     PRLEVEL(1, ("%% lsolve\n"));
-    paru_lsolve(x, Sym, Num, Control);  // x = L\x
+    info = paru_lsolve(x, Sym, Num, Control);  // x = L\x
+    if (info != PARU_SUCCESS)
+    {
+        PRLEVEL(1, ("%% Problems in lsolve\n"));
+        paru_free(m, sizeof(Int), x);
+        return info;
+    }
     PRLEVEL(1, ("%% usolve\n"));
-    paru_usolve(x, Sym, Num, Control);              // x = U\x
+    info = paru_usolve(x, Sym, Num, Control);              // x = U\x
+    if (info != PARU_SUCCESS)
+    {
+        PRLEVEL(1, ("%% Problems in usolve\n"));
+        paru_free(m, sizeof(Int), x);
+        return info;
+    }
     paru_apply_inv_perm(Sym->Qfill, x, b, m);  // b(q) = x
 
     paru_free(m, sizeof(Int), x);
@@ -139,10 +152,23 @@ ParU_Ret ParU_Solve(ParU_Symbolic *Sym, ParU_Numeric *Num, Int nrhs, double *B,
     paru_memcpy(X, B, m * nrhs * sizeof(double), Control);
     paru_apply_perm_scale(Num->Pfin, Num->Rs, B, X, m, nrhs);
 
+    ParU_Ret info;
     PRLEVEL(1, ("%%mRHS lsolve\n"));
-    paru_lsolve(X, nrhs, Sym, Num, Control);  // X = L\X
+    info = paru_lsolve(X, nrhs, Sym, Num, Control);  // X = L\X
+    if (info != PARU_SUCCESS)
+    {
+        PRLEVEL(1, ("%% Problems in mRHS lsolve\n"));
+        paru_free(m * nrhs, sizeof(Int), X);
+        return info;
+    }
     PRLEVEL(1, ("%%mRHS usolve\n"));
-    paru_usolve(X, nrhs, Sym, Num, Control);              // X = U\X
+    info = paru_usolve(X, nrhs, Sym, Num, Control);              // X = U\X
+    if (info != PARU_SUCCESS)
+    {
+        PRLEVEL(1, ("%% Problems in mRHS usolve\n"));
+        paru_free(m * nrhs, sizeof(Int), X);
+        return info;
+    }
     paru_apply_inv_perm(Sym->Qfill, X, B, m, nrhs);  // B(q) = X
 
     paru_free(m * nrhs, sizeof(Int), X);

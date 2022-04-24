@@ -36,12 +36,12 @@
  * */
 
 #include "paru_internal.hpp"
-Int paru_usolve(double *x, ParU_Symbolic *Sym, ParU_Numeric *Num,
-                ParU_Control *Control)
+ParU_Ret paru_usolve(double *x, ParU_Symbolic *Sym, ParU_Numeric *Num,
+                     ParU_Control *Control)
 {
     DEBUGLEVEL(0);
     // check if input is read
-    if (!x) return (0);
+    if (!x) return PARU_INVALID;
     PARU_DEFINE_PRLEVEL;
 #ifndef NTIME
     double start_time = PARU_OPENMP_GET_WTIME;
@@ -57,7 +57,12 @@ Int paru_usolve(double *x, ParU_Symbolic *Sym, ParU_Numeric *Num,
 
     const Int max_threads = Control->paru_max_threads;
     BLAS_set_num_threads(max_threads);
-    std::vector<double> work(Num->max_col_count);
+    double *work = (double *)paru_alloc((Num->max_col_count), sizeof(double));
+    if (work == NULL)
+    {
+        PRLEVEL(1, ("Paru: out of memory lsolve\n"));
+        return PARU_OUT_OF_MEMORY;
+    }
 
     for (Int f = nf - 1; f >= 0; --f)
     {
@@ -173,16 +178,17 @@ Int paru_usolve(double *x, ParU_Symbolic *Sym, ParU_Numeric *Num,
     }
     PRLEVEL(1, (" \n"));
 #endif
-    return (1);
+    paru_free (Num->max_col_count, sizeof(double), work);
+    return PARU_SUCCESS;
 }
 ///////////////////////////////// paru_usolve ///multiple
 /// mRHS///////////////////
-Int paru_usolve(double *X, Int n, ParU_Symbolic *Sym, ParU_Numeric *Num,
-                ParU_Control *Control)
+ParU_Ret paru_usolve(double *X, Int n, ParU_Symbolic *Sym, ParU_Numeric *Num,
+                     ParU_Control *Control)
 {
     DEBUGLEVEL(0);
     // check if input is read
-    if (!X) return (0);
+    if (!X) return PARU_INVALID;
     PARU_DEFINE_PRLEVEL;
     Int m = Sym->m;
     Int nf = Sym->nf;
@@ -212,7 +218,13 @@ Int paru_usolve(double *X, Int n, ParU_Symbolic *Sym, ParU_Numeric *Num,
 
     const Int max_threads = Control->paru_max_threads;
     BLAS_set_num_threads(max_threads);
-    std::vector<double> work(Num->max_col_count * n);
+    double *work =
+        (double *)paru_alloc((Num->max_col_count * n), sizeof(double));
+    if (work == NULL)
+    {
+        PRLEVEL(1, ("Paru: out of memory lsolve\n"));
+        return PARU_OUT_OF_MEMORY;
+    }
 
     for (Int f = nf - 1; f >= 0; --f)
     {
@@ -339,5 +351,6 @@ Int paru_usolve(double *X, Int n, ParU_Symbolic *Sym, ParU_Numeric *Num,
     }
     PRLEVEL(1, (" \n"));
 #endif
-    return (1);
+    paru_free (Num->max_col_count * n, sizeof(double), work);
+    return PARU_SUCCESS;
 }

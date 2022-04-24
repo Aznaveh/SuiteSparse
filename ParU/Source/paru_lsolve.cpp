@@ -36,11 +36,11 @@
  * @author Aznaveh
  * */
 #include "paru_internal.hpp"
-Int paru_lsolve(double *x, ParU_Symbolic *Sym, ParU_Numeric *Num,
-                ParU_Control *Control)
+ParU_Ret paru_lsolve(double *x, ParU_Symbolic *Sym, ParU_Numeric *Num,
+                     ParU_Control *Control)
 {
     DEBUGLEVEL(0);
-    if (!x) return (0);
+    if (!x) return PARU_INVALID;
     PARU_DEFINE_PRLEVEL;
     Int nf = Sym->nf;
 
@@ -100,7 +100,12 @@ Int paru_lsolve(double *x, ParU_Symbolic *Sym, ParU_Numeric *Num,
     const Int max_threads = Control->paru_max_threads;
     BLAS_set_num_threads(max_threads);
     // gather scatter space for dgemm
-    std::vector<double> work(Num->max_row_count);
+    double *work = (double *)paru_alloc((Num->max_row_count), sizeof(double));
+    if (work == NULL)
+    {
+        PRLEVEL(1, ("Paru: out of memory lsolve\n"));
+        return PARU_OUT_OF_MEMORY;
+    }
 
     ParU_Factors *LUs = Num->partial_LUs;
     Int *Super = Sym->Super;
@@ -152,7 +157,7 @@ Int paru_lsolve(double *x, ParU_Symbolic *Sym, ParU_Numeric *Num,
             BLAS_INT m = (BLAS_INT)(rowCount - fp);
             BLAS_INT n = (BLAS_INT)fp;
             cblas_dgemv(CblasColMajor, CblasNoTrans, m, n, 1, A + fp, lda,
-                        x + n1 + col1, 1, 0, &work[0], 1);
+                        x + n1 + col1, 1, 0, work, 1);
         }
 
         // don't use parallel loop if using dgemv
@@ -187,16 +192,17 @@ Int paru_lsolve(double *x, ParU_Symbolic *Sym, ParU_Numeric *Num,
     }
     PRLEVEL(1, (" \n"));
 #endif
-    return (1);
+    paru_free (Num->max_row_count, sizeof(double), work);
+    return PARU_SUCCESS;
 }
 ///////////////////////////////// paru_lsolve ///multiple
 /// mRHS///////////////////
-Int paru_lsolve(double *X, Int n, ParU_Symbolic *Sym, ParU_Numeric *Num,
-                ParU_Control *Control)
+ParU_Ret paru_lsolve(double *X, Int n, ParU_Symbolic *Sym, ParU_Numeric *Num,
+                     ParU_Control *Control)
 {
     DEBUGLEVEL(1);
     PARU_DEFINE_PRLEVEL;
-    if (!X) return (0);
+    if (!X) return PARU_INVALID;
     Int m = Sym->m;
     Int nf = Sym->nf;
 
@@ -277,7 +283,13 @@ Int paru_lsolve(double *X, Int n, ParU_Symbolic *Sym, ParU_Numeric *Num,
     const Int max_threads = Control->paru_max_threads;
     BLAS_set_num_threads(max_threads);
     // gather scatter space for dgemm
-    std::vector<double> work(Num->max_row_count * n);
+    double *work =
+        (double *)paru_alloc((Num->max_row_count * n), sizeof(double));
+    if (work == NULL)
+    {
+        PRLEVEL(1, ("Paru: out of memory lsolve\n"));
+        return PARU_OUT_OF_MEMORY;
+    }
 
     ParU_Factors *LUs = Num->partial_LUs;
     Int *Super = Sym->Super;
@@ -339,7 +351,7 @@ Int paru_lsolve(double *X, Int n, ParU_Symbolic *Sym, ParU_Numeric *Num,
             BLAS_INT ldb = (BLAS_INT)m;
             BLAS_INT ldc = (BLAS_INT)(rowCount - fp);
             cblas_dgemm(CblasColMajor, CblasNoTrans, CblasNoTrans, mm, nn, kk,
-                        1, A + fp, lda, X + n1 + col1, ldb, 0, &work[0], ldc);
+                        1, A + fp, lda, X + n1 + col1, ldb, 0, work, ldc);
         }
 
         // don't use parallel loop if using dgemm
@@ -383,5 +395,6 @@ Int paru_lsolve(double *X, Int n, ParU_Symbolic *Sym, ParU_Numeric *Num,
     }
     PRLEVEL(1, (" \n"));
 #endif
-    return (1);
+    paru_free (Num->max_row_count * n, sizeof(double), work);
+    return PARU_SUCCESS;
 }
