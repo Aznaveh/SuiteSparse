@@ -197,33 +197,32 @@ void *paru_calloc(size_t n, size_t size)
 //
 //  Uses a pointer to the realloc routine.
 void *paru_realloc(
-    size_t newsize,     // requested size
+    size_t nnew,     // requested # of items
     size_t size_Entry,  // size of each Entry
-    void *oldP,         // pointer to the old allocated space
-    size_t *size)       // a single number, input: old size, output: new size
+    void *p,         // block memory to realloc
+    size_t *n)       // current size on input, nnew output if successful 
 {
     DEBUGLEVEL(0);
 #ifndef NDEBUG
     static Int realloc_count = 0;
 #endif
-    void *p = NULL;
-    if (*size == 0)
+    void *pnew;
+    if (size_Entry == 0)
     {
-        PRLEVEL(1, ("Paru: size must be > 0\n"));
-        return NULL;
+        PRLEVEL(1, ("Paru: sizeof(entry)  must be > 0\n"));
+        p = NULL;
     }
-    else if (oldP == NULL)
+    else if (p == NULL)
     {  // A new alloc
-        p = paru_alloc(newsize, size_Entry);
-        *size = (p == NULL) ? 0 : newsize * size_Entry;
+        p = paru_alloc(nnew, size_Entry);
+        *n = (pnew == NULL) ? 0 : nnew;
     }
-    else if (newsize == *size)
+    else if (nnew == *n )
     {
-        PRLEVEL(1, ("%% reallocating nothing %ld, %ld in %p \n", newsize, *size,
-                    oldP));
-        p = oldP;
+        PRLEVEL(1, ("%% reallocating nothing %ld, %ld in %p \n", nnew, *n,
+                    p));
     }
-    else if (newsize >= (Size_max / size_Entry) || newsize >= INT_MAX)
+    else if (nnew >= (Size_max / size_Entry) || nnew >= INT_MAX)
     {
         // object is too big to allocate without causing integer overflow
         PRLEVEL(1, ("Paru: problem too large\n"));
@@ -231,7 +230,7 @@ void *paru_realloc(
 
     else
     {  // The object exists, and is changing to some other nonzero size.
-        PRLEVEL(1, ("realloc : %ld to %ld, %ld\n", *size, newsize, size_Entry));
+        PRLEVEL(1, ("realloc : %ld to %ld, %ld\n", *n, nnew, size_Entry));
         int ok = TRUE;
 
 #ifdef PARU_ALLOC_TESTING
@@ -241,7 +240,7 @@ void *paru_realloc(
             Int nmalloc = paru_decr_nmalloc();
             if (nmalloc > 0)
             {
-                p = SuiteSparse_realloc(newsize, *size, size_Entry, oldP, &ok);
+                pnew = SuiteSparse_realloc(nnew, *n, size_Entry, p, &ok);
             }
             else
             {
@@ -251,21 +250,22 @@ void *paru_realloc(
         }
         else
         {
-            p = SuiteSparse_realloc(newsize, *size, size_Entry, oldP, &ok);
+            pnew = SuiteSparse_realloc(nnew, *n, size_Entry, p, &ok);
         }
 #else
         // in production
-        p = SuiteSparse_realloc(newsize, *size, size_Entry, oldP, &ok);
+        pnew = SuiteSparse_realloc(nnew, *n, size_Entry, p, &ok);
 #endif
 
         if (ok)
         {
 #ifndef NDEBUG
-            realloc_count += newsize * size_Entry - *size;
+            realloc_count += nnew * size_Entry - *n;
             PRLEVEL(1, ("%% reallocated %ld in %p and freed %p total= %ld\n",
-                        newsize * size_Entry, p, oldP, realloc_count));
+                        nnew* size_Entry, pnew, p, realloc_count));
 #endif
-            *size = newsize;
+	    p = pnew ;
+        *n = nnew;
         }
     }
     return p;

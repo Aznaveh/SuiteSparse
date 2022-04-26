@@ -629,10 +629,12 @@ ParU_Ret ParU_Analyze(cholmod_sparse *A, ParU_Symbolic **S_handle,
     size_t size = n + 1;
     Parent = (Int *)paru_realloc(nf + 1, sizeof(Int), Front_parent, &size);
     Sym->Parent = Parent;
-    ASSERT(size <= (size_t)n + 1);
-    if (Parent == NULL)
+    ASSERT(size <= (size_t) n + 1);
+    //if (Parent == NULL)
+    if (size != (size_t) nf+1)
     {  // should not happen anyway it is always shrinking
         PRLEVEL(1, ("Paru: out of memory\n"));
+        Sym->Parent = NULL;
         ParU_Freesym(&Sym, Control);
         umfpack_dl_paru_free_sw(&SW);
         FREE_WORK;
@@ -742,12 +744,13 @@ ParU_Ret ParU_Analyze(cholmod_sparse *A, ParU_Symbolic **S_handle,
 
     // newParent size is newF+1 potentially smaller than nf
 
-    Int *tmp_newParent = newParent; //keeping newParent in case of failure
+    //Int *tmp_newParent = newParent; //keeping newParent in case of failure
     newParent = (Int *)paru_realloc(newF + 1, sizeof(Int), newParent, &size);
-    if (newParent == NULL)
+    //if (newParent == NULL)
+    if (size != (size_t) newF+1)
     {
         PRLEVEL(1, ("Paru: out of memory\n"));
-        newParent = tmp_newParent;
+        //newParent = tmp_newParent;
         ParU_Freesym(&Sym, Control);
         umfpack_dl_paru_free_sw(&SW);
         FREE_WORK;
