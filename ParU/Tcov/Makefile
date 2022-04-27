@@ -67,11 +67,9 @@ OBJ = \
 	paru_assemble_row2U.o\
 	paru_trsm.o\
 	paru_dgemm.o\
-	paru_print.o\
 	paru_init_rel.o\
 	paru_update_rowDeg.o\
 	paru_update_rel_ind.o\
-	paru_write.o\
 	paru_cumsum.o\
 	paru_intersection.o\
 	paru_bin_search.o\
@@ -90,6 +88,8 @@ OBJ = \
 	paru_tasked_dgemm.o \
 	paru_tasked_trsm.o \
 	paru_version.o \
+#	paru_print.o\   # These methods are used only in debug mode
+#	paru_write.o\
 
 
 $(OBJ): $(INC)
@@ -115,15 +115,19 @@ parutest: libraries paru_test.cpp $(INC) $(OBJ)
 	$(C)  paru_test.cpp -o x_test $(OBJ) $(LIBS) -lm
 
 go: parutest
-	 #- ./x_test < ../Matrix/b1_ss.mtx > parutest_out.txt
-	 - ./x_test < ../Matrix/west0067.mtx > parutest_out.txt
+	- ./x_test < ../Matrix/b1_ss.mtx > parutest_out.txt
+	#- ./x_test < ../Matrix/ParUTst/curtis54/curtis54.mtx > parutest_out.txt
+	#- ./x_test < ../Matrix/west0067.mtx > parutest_out.txt
+	#- ./x_test < ../Matrix/s32.mtx > parutest_out.txt
 	#- ./x_test < ../Matrix/ParUTst/494_bus/494_bus.mtx > parutest_out.txt
 	#- ./x_test < ../Matrix/ParUTst/1138_bus/1138_bus.mtx > parutest_out.txt
 	- ./cov
 
 vgo: parutest
-	#- valgrind --leak-check=yes --track-origins=yes -s ./x_test < ../Matrix/b1_ss.mtx > parutest_out.txt
-	-  valgrind --leak-check=yes --track-origins=yes -s ./x_test < ../Matrix/west0067.mtx > parutest_out.txt
+	- valgrind --leak-check=yes --track-origins=yes -s ./x_test < ../Matrix/b1_ss.mtx > parutest_out.txt
+	#- valgrind --leak-check=yes --track-origins=yes -s ./x_test < ../Matrix/west0067.mtx > parutest_out.txt
+	#- valgrind --leak-check=yes --track-origins=yes -s ./x_test < ../Matrix/ParUTst/494_bus/494_bus.mtx> parutest_out.txt
+	#- valgrind --leak-check=yes --track-origins=yes -s ./x_test < ../Matrix/ParUTst/1138_bus/1138_bus.mtx > parutest_out.txt
 	#- valgrind --leak-check=yes --show-leak-kinds=all --track-origins=yes -s ./x_test < ../Matrix/b1_ss.mtx > parutest_out.txt
 	#- valgrind  ./x_test < ../Matrix/west0067.mtx > parutest_out.txt
 	- ./cov

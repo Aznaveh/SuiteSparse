@@ -51,6 +51,7 @@ extern "C"
 // uncomment the following line to turn on OpenMP timing
 //#undef NTIME   //<<3>>
 #define PARU_ALLOC_TESTING // for coverage test allocations
+                           // it shouldn't be called with NDEBUG
 
 // uncomment if you want to count hardware flops
 //#define COUNT_FLOPS
@@ -298,6 +299,12 @@ Int paru_decr_nmalloc (void) ;
 Int paru_get_nmalloc (void) ;
 #endif
 
+#ifndef NDEBUG
+void paru_write(int scale, char *id, paru_work *Work, ParU_Numeric *Num);
+void paru_print_element(Int e, paru_work *Work, ParU_Numeric *Num);
+void paru_print_paru_tupleList(paru_tupleList *listSet, Int index);
+#endif
+
 /* add tuple functions defintions */
 ParU_Ret  paru_add_rowTuple(paru_tupleList *RowList, Int row, paru_tuple T);
 
@@ -320,8 +327,6 @@ Int paru_trsm(Int f, double *pF, double *uPart, Int fp, Int rowCount,
 Int paru_dgemm(Int f, double *pF, double *uPart, double *el, Int fp,
                Int rowCount, Int colCount, paru_work *Work, ParU_Numeric *Num);
 
-void paru_print_element(Int e, paru_work *Work, ParU_Numeric *Num);
-void paru_print_paru_tupleList(paru_tupleList *listSet, Int index);
 void paru_init_rel(Int f, paru_work *Work);
 
 void paru_update_rel_ind_col(Int e, Int f, std::vector<Int> &colHash,
@@ -377,7 +382,6 @@ ParU_Ret paru_make_heap(Int f, Int start_fac,
 ParU_Ret paru_make_heap_empty_el(Int f, std::vector<Int> &pivotal_elements,
                                  heaps_info &hi, paru_work *Work,
                                  ParU_Numeric *Num);
-
 // hash related
 void paru_insert_hash(Int key, Int value, std::vector<Int> &colHash);
 Int paru_find_hash(Int key, std::vector<Int> &colHash, Int *fcolList);
@@ -399,10 +403,8 @@ void paru_tasked_dgemm(Int f, BLAS_INT m, BLAS_INT n, BLAS_INT k, double *A,
                        BLAS_INT lda, double *B, BLAS_INT ldb, double beta,
                        double *C, BLAS_INT ldc, paru_work *Work,
                        ParU_Numeric *Num);
-
 void paru_tasked_trsm(Int f, int m, int n, double alpha, double *a, int lda,
                       double *b, int ldb, paru_work *Work, ParU_Numeric *Num);
-
 ParU_Ret paru_free_work(ParU_Symbolic *Sym, paru_work *Work);
 // lsolve and usolve
 ParU_Ret paru_lsolve(double *x, ParU_Symbolic *Sym, ParU_Numeric *Num,
@@ -413,11 +415,8 @@ ParU_Ret paru_usolve(double *x, ParU_Symbolic *Sym, ParU_Numeric *Num,
                 ParU_Control *Control);
 ParU_Ret paru_usolve(double *X, Int n, ParU_Symbolic *Sym, ParU_Numeric *Num,
                 ParU_Control *Control);
-
 // not user-callable: for testing only
 ParU_Ret paru_backward(double *x1, double &resid, double &norm,
                        cholmod_sparse *A, ParU_Symbolic *Sym, ParU_Numeric *Num,
                        ParU_Control *Control);
-
-void paru_write(int scale, char *id, paru_work *Work, ParU_Numeric *Num);
 #endif
