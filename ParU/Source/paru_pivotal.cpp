@@ -344,10 +344,6 @@ ParU_Ret paru_pivotal(std::vector<Int> &pivotal_elements,
     Int fm = Sym->Fm[f]; /* Upper bound number of rows of F */
     ASSERT(fm >= rowCount);
 
-//////////////---------------->>>>>>>
-    //XXX 
-    //
-    //  realloc version  has some wierd leak in brutal mode
     // freeing extra space for rows
     size_t sz = (size_t) fm;
     if (rowCount != fm)
@@ -362,17 +358,7 @@ ParU_Ret paru_pivotal(std::vector<Int> &pivotal_elements,
         return PARU_OUT_OF_MEMORY;
     }
 
-    /////////---------------->>>>>>>alloc and memcpy version
-    //if (fm - rowCount > 128)
-    //{
-    //    Int *tmp_frowList = (Int *)paru_alloc(rowCount, sizeof(Int));
-    //    if (tmp_frowList == NULL)
-    //        return PARU_OUT_OF_MEMORY;
-    //    paru_memcpy(tmp_frowList, frowList, rowCount * sizeof(Int), Control);
-    //    paru_free (fm, sizeof(Int), frowList);
-    //    Num->frowList[f] = frowList = tmp_frowList;
-    //}
-//////////////---------------->>>>>>>
+    Num->frowList[f] = frowList ;
     double *pivotalFront = (double *)paru_calloc(rowCount * fp, sizeof(double));
 
     if (pivotalFront == NULL)
