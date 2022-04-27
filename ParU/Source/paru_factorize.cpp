@@ -346,7 +346,8 @@ ParU_Ret ParU_Factorize(cholmod_sparse *A, ParU_Symbolic *Sym,
             if (start >= size) break;
             Int end = start + steps > size ? size : start + steps;
             PRLEVEL(1, ("%% doing Queue tasks <%ld,%ld>\n", start, end));
-            #pragma omp parallel proc_bind(spread)
+            #pragma omp parallel proc_bind(spread)                             \
+            num_threads(Control->paru_max_threads)
             #pragma omp single nowait
             #pragma omp task untied  // clang might seg fault on untied
             for (Int i = start; i < end; i++)
@@ -466,8 +467,9 @@ ParU_Ret ParU_Factorize(cholmod_sparse *A, ParU_Symbolic *Sym,
         else 
         { //Parallel
             Int *Super = Sym->Super;
-            #pragma omp parallel for reduction(max:max_rc) \
-            reduction(max: max_cc) if (nf > 65536)
+            #pragma omp parallel for reduction(max:max_rc)                     \
+            reduction(max: max_cc) if (nf > 65536)                             \
+            num_threads(Control->paru_max_threads)
             for (Int f = 0; f < nf; f++)
             {
                 Int rowCount = Num->frowCount[f];
@@ -487,7 +489,7 @@ ParU_Ret ParU_Factorize(cholmod_sparse *A, ParU_Symbolic *Sym,
                 Int fp = col2 - col1;
                 double *X = LUs[f].p;
                 #pragma omp parallel for reduction(min:min_udiag)\
-                reduction(max: max_udiag) 
+                reduction(max: max_udiag) num_threads(Control->paru_max_threads)
                 for (Int i = 0; i < fp; i++)
                 {
                     double udiag = fabs(X[rowCount * i + i]);

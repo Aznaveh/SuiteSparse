@@ -29,7 +29,8 @@ Int paru_cumsum(Int n, Int *X, ParU_Control *Control)
     }
     Int mid = n/2;
     Int sum = 0;
-    #pragma omp parallel shared(sum, n, X, Control) firstprivate(mid)
+    #pragma omp parallel shared(sum, n, X, Control) firstprivate(mid)          \
+    num_threads(Control->paru_max_threads)
     {
         #pragma omp single
         {

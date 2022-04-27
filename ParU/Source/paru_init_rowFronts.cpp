@@ -390,7 +390,7 @@ ParU_Ret paru_init_rowFronts(paru_work *Work,
     if (Diag_map)
     {
         #pragma omp taskloop default(none) shared(Sym, Diag_map, inv_Diag_map) \
-        grainsize(512)
+        grainsize(512) 
         for (Int i = 0; i < Sym->n; i++)
         {
             // paru_memcpy(Diag_map, Sym->Diag_map, (Sym->n) * sizeof(Int));
@@ -435,7 +435,7 @@ ParU_Ret paru_init_rowFronts(paru_work *Work,
     //   taskloop; However I don't see any leaks with either
 
     //pragma omp taskloop grainsize(512)
-    #pragma omp parallel for
+    #pragma omp parallel for num_threads(Control->paru_max_threads)
     for (Int row = 0; row < m; row++)
     {
         Int e = Sym->row2atree[row];

@@ -226,7 +226,7 @@ void paru_assemble_all(Int e, Int f, std::vector<Int> &colHash,
             }
             PRLEVEL(1, ("el->lac=%ld nEl=%ld ntasks=%ld task_size=%ld\n",
                         el->lac, nEl, ntasks, task_size));
-            #pragma omp parallel proc_bind(close)
+            #pragma omp parallel proc_bind(close) num_threads(ntasks)
             #pragma omp single
             #pragma omp task
             for (Int t = 0; t < ntasks; t++)
