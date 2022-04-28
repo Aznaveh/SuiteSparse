@@ -106,7 +106,7 @@ int main(int argc, char **argv)
         double *b = (double *)malloc(m * sizeof(double));
         double *xx = (double *)malloc(m * sizeof(double));
         for (Int i = 0; i < m; ++i) b[i] = i + 1;
-        //info = ParU_Solve(Sym, Num, b, xx, &Control);
+        // info = ParU_Solve(Sym, Num, b, xx, &Control);
         BRUTAL_ALLOC_TEST(info, ParU_Solve(Sym, Num, b, xx, &Control));
         if (info != PARU_SUCCESS)
         {
@@ -120,10 +120,10 @@ int main(int argc, char **argv)
         }
 
         double resid, anorm;
-        //info = ParU_Residual(A, xx, b, m, resid, anorm, &Control);
-        BRUTAL_ALLOC_TEST(info, 
-                ParU_Residual(A, xx, b, m, resid, anorm, &Control));
-       if (info != PARU_SUCCESS)
+        // info = ParU_Residual(A, xx, b, m, resid, anorm, &Control);
+        BRUTAL_ALLOC_TEST(info,
+                          ParU_Residual(A, xx, b, m, resid, anorm, &Control));
+        if (info != PARU_SUCCESS)
         {
             free(b);
             free(xx);
@@ -135,7 +135,22 @@ int main(int argc, char **argv)
         }
 
         printf("Residual is |%.2lf| and anorm is %.2e and rcond is %.2e.\n",
-                resid == 0 ? 0 : log10(resid), anorm, Num->rcond);
+               resid == 0 ? 0 : log10(resid), anorm, Num->rcond);
+
+        for (Int i = 0; i < m; ++i) b[i] = i + 1;
+        // info = paru_backward(b, resid, anorm, A, Sym, Num, &Control);
+        BRUTAL_ALLOC_TEST(
+            info, paru_backward(b, resid, anorm, A, Sym, Num, &Control));
+        if (info != PARU_SUCCESS)
+        {
+            free(b);
+            free(xx);
+            printf("Paru: backward has a problem.\n");
+            cholmod_l_free_sparse(&A, cc);
+            cholmod_l_finish(cc);
+            ParU_Freesym(&Sym, &Control);
+            return info;
+        }
 
         free(b);
         free(xx);
@@ -145,7 +160,7 @@ int main(int argc, char **argv)
         for (Int i = 0; i < m; ++i)
             for (Int j = 0; j < nrhs; ++j) B[j * m + i] = (double)(i + j + 1);
 
-        //info = ParU_Solve(Sym, Num, nrhs, B, X, &Control);
+        // info = ParU_Solve(Sym, Num, nrhs, B, X, &Control);
         BRUTAL_ALLOC_TEST(info, ParU_Solve(Sym, Num, nrhs, B, X, &Control));
         if (info != PARU_SUCCESS)
         {
@@ -158,9 +173,9 @@ int main(int argc, char **argv)
             return info;
         }
 
-        //info = ParU_Residual(A, X, B, m, nrhs, resid, anorm, &Control);
-        BRUTAL_ALLOC_TEST(info, 
-                ParU_Residual(A, X, B, m, nrhs, resid, anorm, &Control));
+        // info = ParU_Residual(A, X, B, m, nrhs, resid, anorm, &Control);
+        BRUTAL_ALLOC_TEST(
+            info, ParU_Residual(A, X, B, m, nrhs, resid, anorm, &Control));
         if (info != PARU_SUCCESS)
         {
             printf("Paru: mRhs Residual has a problem.\n");
@@ -171,7 +186,6 @@ int main(int argc, char **argv)
             ParU_Freesym(&Sym, &Control);
             return info;
         }
-
 
         printf("mRhs Residual is |%.2lf|\n", resid == 0 ? 0 : log10(resid));
 
