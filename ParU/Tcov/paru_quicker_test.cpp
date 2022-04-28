@@ -1,11 +1,11 @@
 //  =========================================================================  /
-// =======================  paru_test =======================================  /
+// =======================  paru_quicker_test.cpp  ==========================  /
 // ==========================================================================  /
 // ParU, Mohsen Aznaveh and Timothy A. Davis, (c) 2022, All Rights Reserved.
 // SPDX-License-Identifier: GNU GPL 3.0
 
 /*
- * @brief    test to see how to call umfpack symbolic analysis
+ * @brief    for coverage test of bigger matrices
  *
  * @author Aznaveh
  * */
@@ -71,8 +71,7 @@ int main(int argc, char **argv)
 
     ParU_Ret info;
 
-    // info = ParU_Analyze(A, &Sym, &Control);
-    BRUTAL_ALLOC_TEST(info, ParU_Analyze(A, &Sym, &Control));
+    info = ParU_Analyze(A, &Sym, &Control);
     if (info != PARU_SUCCESS)
     {
         printf("Paru: some problem detected during symbolic analysis\n");
@@ -84,8 +83,7 @@ int main(int argc, char **argv)
     printf("Paru: Symbolic factorization is done!\n");
     ParU_Numeric *Num;
 
-    // info = ParU_Factorize(A, Sym, &Num, &Control);
-    BRUTAL_ALLOC_TEST(info, ParU_Factorize(A, Sym, &Num, &Control));
+    info = ParU_Factorize(A, Sym, &Num, &Control);
     if (info != PARU_SUCCESS)
     {
         printf("Paru: factorization was NOT succssfull.\n");
@@ -105,8 +103,7 @@ int main(int argc, char **argv)
         double *b = (double *)malloc(m * sizeof(double));
         double *xx = (double *)malloc(m * sizeof(double));
         for (Int i = 0; i < m; ++i) b[i] = i + 1;
-        //info = ParU_Solve(Sym, Num, b, xx, &Control);
-        BRUTAL_ALLOC_TEST(info, ParU_Solve(Sym, Num, b, xx, &Control));
+        info = ParU_Solve(Sym, Num, b, xx, &Control);
         if (info != PARU_SUCCESS)
         {
             free(b);
@@ -119,9 +116,7 @@ int main(int argc, char **argv)
         }
 
         double resid, anorm;
-        //info = ParU_Residual(A, xx, b, m, resid, anorm, &Control);
-        BRUTAL_ALLOC_TEST(info, 
-                ParU_Residual(A, xx, b, m, resid, anorm, &Control));
+        info = ParU_Residual(A, xx, b, m, resid, anorm, &Control);
        if (info != PARU_SUCCESS)
         {
             free(b);
@@ -144,8 +139,7 @@ int main(int argc, char **argv)
         for (Int i = 0; i < m; ++i)
             for (Int j = 0; j < nrhs; ++j) B[j * m + i] = (double)(i + j + 1);
 
-        //info = ParU_Solve(Sym, Num, nrhs, B, X, &Control);
-        BRUTAL_ALLOC_TEST(info, ParU_Solve(Sym, Num, nrhs, B, X, &Control));
+        info = ParU_Solve(Sym, Num, nrhs, B, X, &Control);
         if (info != PARU_SUCCESS)
         {
             printf("Paru: mRhs Solve has a problem.\n");
@@ -157,9 +151,7 @@ int main(int argc, char **argv)
             return info;
         }
 
-        //info = ParU_Residual(A, X, B, m, nrhs, resid, anorm, &Control);
-        BRUTAL_ALLOC_TEST(info, 
-                ParU_Residual(A, X, B, m, nrhs, resid, anorm, &Control));
+        info = ParU_Residual(A, X, B, m, nrhs, resid, anorm, &Control);
         if (info != PARU_SUCCESS)
         {
             printf("Paru: mRhs Residual has a problem.\n");

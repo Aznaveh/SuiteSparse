@@ -40,7 +40,9 @@ CF = -pg \
   FLIB = $(LAPACK) $(BLAS)
 
 
-all: parutest
+all: 
+	paru_quicker_test
+	paru_brutal_test 
 	
 
 
@@ -111,27 +113,32 @@ C2 = $(CC) $(CF)  $(CHOLMOD_CONFIG) $(CONFIG_PARTITION) $(I) $(FLAG) $(CC11)
 #-------------------------------------------------------------------------------
 
 #-------------------------------------------------------------------------------
-parutest: libraries paru_test.cpp $(INC) $(OBJ) 
-	$(C)  paru_test.cpp -o x_test $(OBJ) $(LIBS) -lm
+paru_brutal_test: libraries paru_brutal_test.cpp $(INC) $(OBJ) 
+	$(C)  paru_brutal_test.cpp -o x_brutal_test $(OBJ) $(LIBS) -lm
 
-go: parutest
-	- ./x_test < ../Matrix/b1_ss.mtx > parutest_out.txt
-	#- ./x_test < ../Matrix/ParUTst/curtis54/curtis54.mtx > parutest_out.txt
-	#- ./x_test < ../Matrix/west0067.mtx > parutest_out.txt
-	#- ./x_test < ../Matrix/s32.mtx > parutest_out.txt
-	#- ./x_test < ../Matrix/ParUTst/494_bus/494_bus.mtx > parutest_out.txt
-	#- ./x_test < ../Matrix/ParUTst/1138_bus/1138_bus.mtx > parutest_out.txt
+paru_quicker_test: libraries paru_quicker_test.cpp $(INC) $(OBJ) 
+	$(C)  paru_quicker_test.cpp -o x_quick_test $(OBJ) $(LIBS) -lm
+
+go: paru_brutal_test paru_quicker_test
+	- ./x_brutal_test < ../Matrix/b1_ss.mtx > parutest_out.txt
+	#- ./x_brutal_test < ../Matrix/ParUTst/curtis54/curtis54.mtx > parutest_out.txt
+	#- ./x_brutal_test < ../Matrix/west0067.mtx > parutest_out.txt
+	#- ./x_brutal_test < ../Matrix/s32.mtx > parutest_out.txt
+	#- ./x_brutal_test < ../Matrix/ParUTst/494_bus/494_bus.mtx > parutest_out.txt
+	#- ./x_brutal_test < ../Matrix/ParUTst/1138_bus/1138_bus.mtx > parutest_out.txt
 	- ./cov
 
-vgo: parutest
-	- valgrind --leak-check=yes --track-origins=yes -s ./x_test < ../Matrix/b1_ss.mtx > parutest_out.txt
-	#- valgrind --leak-check=yes --track-origins=yes -s ./x_test < ../Matrix/west0067.mtx > parutest_out.txt
-	#- valgrind --leak-check=yes --track-origins=yes -s ./x_test < ../Matrix/ParUTst/494_bus/494_bus.mtx> parutest_out.txt
-	#- valgrind --leak-check=yes --track-origins=yes -s ./x_test < ../Matrix/ParUTst/1138_bus/1138_bus.mtx > parutest_out.txt
+vgo: paru_brutal_test
+	- valgrind --leak-check=yes --track-origins=yes -s ./x_brutal_test < ../Matrix/b1_ss.mtx > parutest_out.txt
+	#- valgrind --leak-check=yes --track-origins=yes -s ./x_brutal_test < ../Matrix/west0067.mtx > parutest_out.txt
+	#- valgrind --leak-check=yes --track-origins=yes -s ./x_brutal_test < ../Matrix/ParUTst/494_bus/494_bus.mtx> parutest_out.txt
+	#- valgrind --leak-check=yes --track-origins=yes -s ./x_brutal_test < ../Matrix/ParUTst/1138_bus/1138_bus.mtx > parutest_out.txt
 	#- valgrind --leak-check=yes --show-leak-kinds=all --track-origins=yes -s ./x_test < ../Matrix/b1_ss.mtx > parutest_out.txt
-	#- valgrind  ./x_test < ../Matrix/west0067.mtx > parutest_out.txt
 	- ./cov
 
+qgo:
+	- ./x_quick_test < ../Matrix/b1_ss.mtx > parutest_out.txt
+	- ./cov
 
 #-------------------------------------------------------------------------------
 paru_mem.o: ../Source/paru_mem.cpp
@@ -275,7 +282,7 @@ libraries:
 purge: distclean
 
 distclean: clean
-	- $(RM) x_test cov.out parutest_out.txt
+	- $(RM) x_* cov.out parutest_out.txt
 	- $(RM) analysis.txt tcov gprof
 	- $(RM) gprof.o vprof gmon.out callgrind.out.*
 	- $(RM) -r $(PURGE)
