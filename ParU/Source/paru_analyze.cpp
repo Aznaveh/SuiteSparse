@@ -53,18 +53,18 @@
  * */
 // =============================================================================
 
-#define FREE_WORK \
-        paru_free((n + 1), sizeof(Int), fmap);  \
-        paru_free((n + 1), sizeof(Int), newParent); \
-        paru_free(n, sizeof(Int), inv_Diag_map); \
-        paru_free((n + 1), sizeof(Int), Front_parent); \
-        paru_free((n + 1), sizeof(Int), Front_npivcol); \
-        paru_free((m - n1), sizeof(Int), Ps); \
-        paru_free((MAX(m, n) + 2), sizeof(Int), Work); \
-        paru_free((cs1 + 1), sizeof(Int), cSup);   \
-        paru_free((rs1 + 1), sizeof(Int), cSlp);   \
-        umfpack_dl_free_symbolic(&Symbolic); \
-        umfpack_dl_paru_free_sw(&SW); 
+#define FREE_WORK                                   \
+    paru_free((n + 1), sizeof(Int), fmap);          \
+    paru_free((n + 1), sizeof(Int), newParent);     \
+    paru_free(n, sizeof(Int), inv_Diag_map);        \
+    paru_free((n + 1), sizeof(Int), Front_parent);  \
+    paru_free((n + 1), sizeof(Int), Front_npivcol); \
+    paru_free((m - n1), sizeof(Int), Ps);           \
+    paru_free((MAX(m, n) + 2), sizeof(Int), Work);  \
+    paru_free((cs1 + 1), sizeof(Int), cSup);        \
+    paru_free((rs1 + 1), sizeof(Int), cSlp);        \
+    umfpack_dl_free_symbolic(&Symbolic);            \
+    umfpack_dl_paru_free_sw(&SW);
 
 // =============================================================================
 #include "paru_internal.hpp"
@@ -78,7 +78,7 @@ ParU_Ret ParU_Analyze(cholmod_sparse *A, ParU_Symbolic **S_handle,
 #endif
     ParU_Symbolic *Sym;
     Sym = (ParU_Symbolic *)paru_alloc(1, sizeof(ParU_Symbolic));
-    if (!Sym) 
+    if (!Sym)
     {
         return PARU_OUT_OF_MEMORY;
     }
@@ -125,9 +125,8 @@ ParU_Ret ParU_Analyze(cholmod_sparse *A, ParU_Symbolic **S_handle,
     Int *task_num_child = Sym->task_num_child = NULL;
     Int *task_depth = Sym->task_depth = NULL;
     Int *Pinv = Sym->Pinv = NULL;
-        
 
-    // for computing augmented tree 
+    // for computing augmented tree
     Int *aParent = Sym->aParent = NULL;  // augmented tree size m+nf
     Int *aChildp = Sym->aChildp = NULL;  // size m+nf+2
     Int *aChild = Sym->aChild = NULL;    // size m+nf+1
@@ -136,12 +135,12 @@ ParU_Ret ParU_Analyze(cholmod_sparse *A, ParU_Symbolic **S_handle,
     Int *first = Sym->first = NULL;      // first descendent in the tree
     // augmented tree size nf+1
 
-    Int *fmap = NULL;  //temp amalgamation data structure
+    Int *fmap = NULL;  // temp amalgamation data structure
     Int *newParent = NULL;
     Int *Super = NULL;
     Int *Depth = NULL;
     Int *Work = NULL;
-    Int *Ps = NULL;  // new row permutation for just the Submatrix part
+    Int *Ps = NULL;    // new row permutation for just the Submatrix part
     Int *Sup = NULL;   // Singlton u p
     Int *cSup = NULL;  // copy of Singlton u p
     Int *Slp = NULL;   // Singlton l p
@@ -155,58 +154,63 @@ ParU_Ret ParU_Analyze(cholmod_sparse *A, ParU_Symbolic **S_handle,
     /*    The varialbes are needed for the UMFPACK symbolic analysis phase    */
     /* ---------------------------------------------------------------------- */
 
-
     Int n1 = 0,  // The number of pivots with zero Markowitz cost.
-        // Info[UMFPACK_COL_SINGLETONS]+Info[UMFPACK_ROW_SINGLETONS]
-        // They apper first in the output permutations P and Q
-        //
-        //
-        //  --- Copied from UMFPACK
-        //  ---   x x x x x x x x x
-        //  ---   . x x x x x x x x
-        //  ---   . . x x x x x x x
-        //  ---   . . . x . . . . .
-        //  ---   . . . x x . . . .
-        //  ---   . . . x x s s s s
-        //  ---   . . . x x s s s s
-        //  ---   . . . x x s s s s
-        //  ---   . . . x x s s s s
-        //
-        //  ---   The above example has 3 column singletons (the first three
-        //  ---   columns and their corresponding pivot rows) and 2 row
-        //  ---   singletons.  The singletons are ordered first, because they
-        //  ---   have zero Markowitz cost. The LU factorization for these first
-        //  ---   five rows and columns is free - there is no work to do (except
-        //  ---   to scale the pivot columns for the 2 row singletons), and no
-        //  ---   fill-in occurs.  The remaining submatrix (4-by-4 in the above
-        //  ---   example) has no rows or columns with degree one.  It may have
-        //  ---   empty rows or columns.
-        //
-        //
-        //        _______________
-        //       |\**************r
-        //       |  \************r -> UMFPACK_COL_SINGLETONS
-        //       |   \***********r
-        //       |    *\         |
-        //       |    ***\       |
-        //       |    ***xx\xxxxx|            |
-        //       |    ***xxxx\xxx|            +   = n1
-        //       -----ccc--------            /
-        //             |
-        //            UMFPACK_ROW_SINGLETONS
+                 // Info[UMFPACK_COL_SINGLETONS]+Info[UMFPACK_ROW_SINGLETONS]
+                 // They apper first in the output permutations P and Q
+                 //
+                 //
+                 //  --- Copied from UMFPACK
+                 //  ---   x x x x x x x x x
+                 //  ---   . x x x x x x x x
+                 //  ---   . . x x x x x x x
+                 //  ---   . . . x . . . . .
+                 //  ---   . . . x x . . . .
+                 //  ---   . . . x x s s s s
+                 //  ---   . . . x x s s s s
+                 //  ---   . . . x x s s s s
+                 //  ---   . . . x x s s s s
+                 //
+                 //  ---   The above example has 3 column singletons (the first
+                 //  three
+                 //  ---   columns and their corresponding pivot rows) and 2 row
+                 //  ---   singletons.  The singletons are ordered first,
+                 //  because they
+                 //  ---   have zero Markowitz cost. The LU factorization for
+                 //  these first
+                 //  ---   five rows and columns is free - there is no work to
+                 //  do (except
+                 //  ---   to scale the pivot columns for the 2 row singletons),
+                 //  and no
+                 //  ---   fill-in occurs.  The remaining submatrix (4-by-4 in
+                 //  the above
+                 //  ---   example) has no rows or columns with degree one.  It
+                 //  may have
+                 //  ---   empty rows or columns.
+                 //
+                 //
+                 //        _______________
+                 //       |\**************r
+                 //       |  \************r -> UMFPACK_COL_SINGLETONS
+                 //       |   \***********r
+                 //       |    *\         |
+                 //       |    ***\       |
+                 //       |    ***xx\xxxxx|            |
+                 //       |    ***xxxx\xxx|            +   = n1
+                 //       -----ccc--------            /
+                 //             |
+                 //            UMFPACK_ROW_SINGLETONS
 
         nfr,  // The number of frontam matrices; nf in SPQR analysis
 
-        // nchains,  // The frontal matrices are related to one another by the
-        // supernodal column elimination tree. Each nod in this tree
-        // is one frontal matrix. The tree is partitioned into a set
-        // of disjoint paths, and a frontal matrix chaing is one path
-        // in this tree.  UMFPACK uses unifrontal technique to
-        // factroize chains, with a single working array that holds
-        // each frontal matrix in the chain, one at a time. nchains is
-        // in the range 0 to nfr
+            // nchains,  // The frontal matrices are related to one another by
+            // the supernodal column elimination tree. Each nod in this tree is
+            // one frontal matrix. The tree is partitioned into a set of
+            // disjoint paths, and a frontal matrix chaing is one path in this
+            // tree.  UMFPACK uses unifrontal technique to factroize chains,
+            // with a single working array that holds each frontal matrix in the
+            // chain, one at a time. nchains is in the range 0 to nfr
 
-        *Pinit = NULL,  
+                *Pinit = NULL,
         // The inital row permutation. If P [k] = i, then this means
         // that row i is the kth row in the pre-ordered matrix.
         // For the unsymmetric strategy, P defines the row-merge
@@ -224,7 +228,7 @@ ParU_Ret ParU_Analyze(cholmod_sparse *A, ParU_Symbolic **S_handle,
         // an invert permutation that I have to compute the direct
         // permutation in paru_write.
 
-        *Qinit = NULL,  
+                    *Qinit = NULL,
         // The inital column permutation. If Q [k] = j, then this
         // means that column j is the kth pivot column in pre-ordered
         // matrix. Q is not necessearily the same as final column
@@ -237,17 +241,17 @@ ParU_Ret ParU_Analyze(cholmod_sparse *A, ParU_Symbolic **S_handle,
         // staircase structure and that is the column permutation for
         // paru also.
 
-        *Diag_map = NULL,
+                        *Diag_map = NULL,
         // Diag_map[newcol] = newrow; It is how UMFPACK see it
         // it should be updated during makding staircase structure
         // my Diag_map would be Diag_map[col_s] = row_s
         // col_s = newcol - n1, row_s comes from staircase structure
         // I have to make initial Diag_map inverse to be able to compute mine
-        *inv_Diag_map = NULL,
+                            *inv_Diag_map = NULL,
         // it will be freed in symbolic anyway but I will make another copy
         // in paru_init_rowFronts; that copy can be updated
 
-        *Front_npivcol = NULL, 
+                                *Front_npivcol = NULL,
         // size = n_col +1;  actual size = nfr+1
         // NOTE: This is not the case for SPQR
         // I think SPQR is easier:
@@ -258,8 +262,8 @@ ParU_Ret ParU_Analyze(cholmod_sparse *A, ParU_Symbolic **S_handle,
         // Front_parent [nfr+1] is a place holder for columns
         // with no entries
 
-        *Front_parent = NULL;  
-        // size = n_col +1;  actual size = nfr+1
+                                    *Front_parent = NULL;
+    // size = n_col +1;  actual size = nfr+1
     // NOTE: This is not the case for SPQR
     // Parent is the one I should use instead.
 
@@ -372,12 +376,12 @@ ParU_Ret ParU_Analyze(cholmod_sparse *A, ParU_Symbolic **S_handle,
 
     void *SW = NULL;
     status = umfpack_dl_paru_symbolic(m, n, Ap, Ai, Ax,
-                                     NULL,   // user provided ordering
-                                     FALSE,  // No user ordering
-                                     NULL,   // user params
-                                     &Symbolic,
-                                     &SW,  // new in/out
-                                     umf_Control, Info);
+                                      NULL,   // user provided ordering
+                                      FALSE,  // No user ordering
+                                      NULL,   // user params
+                                      &Symbolic,
+                                      &SW,  // new in/out
+                                      umf_Control, Info);
 
     if (status < 0)
     {
@@ -494,7 +498,7 @@ ParU_Ret ParU_Analyze(cholmod_sparse *A, ParU_Symbolic **S_handle,
         FREE_WORK;
         return PARU_OUT_OF_MEMORY;
     }
-    
+
     n1 = Sym_umf->n1;
     Int anz = Sym_umf->nz;
     nfr = Sym_umf->nfr;
@@ -508,11 +512,11 @@ ParU_Ret ParU_Analyze(cholmod_sparse *A, ParU_Symbolic **S_handle,
     cs1 = Sym_umf->n1c;
     rs1 = Sym_umf->n1r;
 
-    //brain transplant
+    // brain transplant
 
     Pinit = Sym_umf->Rperm_init;
     Sym->Pinit = Pinit;
- 
+
     Qinit = Sym_umf->Cperm_init;
     Front_npivcol = Sym_umf->Front_npivcol;
     Front_parent = Sym_umf->Front_parent;
@@ -629,8 +633,8 @@ ParU_Ret ParU_Analyze(cholmod_sparse *A, ParU_Symbolic **S_handle,
     size_t size = n + 1;
     Parent = (Int *)paru_realloc(nf + 1, sizeof(Int), Front_parent, &size);
     Sym->Parent = Parent;
-    ASSERT(size <= (size_t) n + 1);
-    if (size != (size_t) nf+1)
+    ASSERT(size <= (size_t)n + 1);
+    if (size != (size_t)nf + 1)
     {  // should not happen anyway it is always shrinking
         PRLEVEL(1, ("Paru: out of memory\n"));
         Sym->Parent = NULL;
@@ -712,16 +716,16 @@ ParU_Ret ParU_Analyze(cholmod_sparse *A, ParU_Symbolic **S_handle,
         // amalgamate till number of pivot columns is small
         PRLEVEL(PR, ("%% repr = %ld Parent =%ld\n", repr, Parent[repr]));
         PRLEVEL(PR, ("%%size of Potential pivot= %ld\n",
-                    Super[Parent[repr] + 1] - Super[f]));
+                     Super[Parent[repr] + 1] - Super[f]));
         while (Super[Parent[repr] + 1] - Super[f] < threshold &&
-                Parent[repr] != -1)
+               Parent[repr] != -1)
         {
             repr = Parent[repr];
             PRLEVEL(PR, ("%%Middle stage f= %ld repr = %ld\n", f, repr));
             PRLEVEL(PR, ("%%number of pivot cols= %ld\n",
-                        Super[repr + 1] - Super[f]));
+                         Super[repr + 1] - Super[f]));
             PRLEVEL(PR, ("%%number of pivot cols if Parent collapsed= %ld\n",
-                        Super[Parent[repr] + 1] - Super[f]));
+                         Super[Parent[repr] + 1] - Super[f]));
         }
         // if (Parent[repr] == -1) num_roots++;
 
@@ -746,16 +750,16 @@ ParU_Ret ParU_Analyze(cholmod_sparse *A, ParU_Symbolic **S_handle,
 
     // newParent size is newF+1 potentially smaller than nf
     if (newF > 0)
-        newParent = (Int *)paru_realloc(newF + 1, sizeof(Int), newParent, &size);
-    if (size != (size_t) newF+1)
+        newParent =
+            (Int *)paru_realloc(newF + 1, sizeof(Int), newParent, &size);
+    if (size != (size_t)newF + 1)
     {
         PRLEVEL(1, ("Paru: out of memory\n"));
-        //newParent = tmp_newParent;
+        // newParent = tmp_newParent;
         ParU_Freesym(&Sym, Control);
         umfpack_dl_paru_free_sw(&SW);
         FREE_WORK;
         return PARU_OUT_OF_MEMORY;
-
     }
     ASSERT(newF <= nf);
 
@@ -787,7 +791,7 @@ ParU_Ret ParU_Analyze(cholmod_sparse *A, ParU_Symbolic **S_handle,
         if (Fm == NULL || Cm == NULL)
         {
             PRLEVEL(1, ("Paru: out of memory\n"));
-            //paru_free(n, sizeof(Int), inv_Diag_map);
+            // paru_free(n, sizeof(Int), inv_Diag_map);
             ParU_Freesym(&Sym, Control);
             umfpack_dl_paru_free_sw(&SW);
             FREE_WORK;
@@ -970,14 +974,14 @@ ParU_Ret ParU_Analyze(cholmod_sparse *A, ParU_Symbolic **S_handle,
     Sym->col_Int_bound = col_Int_bound;
     PR = 1;
     PRLEVEL(PR, ("%%row_Int_bound=%ld, col_Int_bound=%ld", row_Int_bound,
-                col_Int_bound));
+                 col_Int_bound));
     PRLEVEL(PR,
             ("%%-Us_bound_size = %ld LUs_bound_size = %ld sum = %ld\n",
              Us_bound_size, LUs_bound_size,
              row_Int_bound + col_Int_bound + Us_bound_size + LUs_bound_size));
     PR = 1;
     PRLEVEL(PR, ("%%%%-Chidlp-----"));
-    if(Childp)
+    if (Childp)
     {
         for (Int f = 0; f < nf + 2; f++) PRLEVEL(PR, ("%ld ", Childp[f]));
         PRLEVEL(PR, ("\n"));
@@ -1008,16 +1012,21 @@ ParU_Ret ParU_Analyze(cholmod_sparse *A, ParU_Symbolic **S_handle,
 
     if (nf > 0)
         paru_memcpy(cChildp, Childp, (nf + 2) * sizeof(Int), Control);
+    else
+        cChildp = NULL;
 
     for (Int f = 0; f < nf; f++)
     {
         if (Parent[f] > 0) Child[cChildp[Parent[f]]++] = f;
     }
 #ifndef NDEBUG
-    PR = 1;
-    PRLEVEL(PR, ("%%%%_cChidlp_____"));
-    for (Int f = 0; f < nf + 2; f++) PRLEVEL(PR, ("%ld ", cChildp[f]));
-    PRLEVEL(PR, ("\n"));
+    if (cChildp)
+    {
+        PR = 1;
+        PRLEVEL(PR, ("%%%%_cChidlp_____"));
+        for (Int f = 0; f < nf + 2; f++) PRLEVEL(PR, ("%ld ", cChildp[f]));
+        PRLEVEL(PR, ("\n"));
+    }
 #endif
 
     /* ---------------------------------------------------------------------- */
@@ -1051,8 +1060,8 @@ ParU_Ret ParU_Analyze(cholmod_sparse *A, ParU_Symbolic **S_handle,
         for (Int i = 0; i < m; i++)
         {
             Int newrow = Diag_map[i];  // Diag_map[newcol] = newrow
-            // it can be confusing while it is a mapping
-            // from col to row and vice verse
+                                       // it can be confusing while it is a
+                                       // mapping from col to row and vice verse
             inv_Diag_map[newrow] = i;
         }
     }
@@ -1286,11 +1295,18 @@ ParU_Ret ParU_Analyze(cholmod_sparse *A, ParU_Symbolic **S_handle,
 
     ///////////////////////////////////////////////////////////////
     Int *cSp = Work;
-#pragma omp taskloop default(none) shared(m, n1, cSp, Sp, Ps) grainsize(512)
-    for (Int i = n1; i < m; i++)
+    if (n1 == m)
+    {  // no fronts
+        cSp[0] = 0;
+    }
+    else
     {
-        Int row = i - n1;
-        cSp[row + 1] = Sp[Ps[row] + 1];
+#pragma omp taskloop default(none) shared(m, n1, cSp, Sp, Ps) grainsize(512)
+        for (Int i = n1; i < m; i++)
+        {
+            Int row = i - n1;
+            cSp[row + 1] = Sp[Ps[row] + 1];
+        }
     }
 
 #ifndef NDEBUG
@@ -1518,7 +1534,7 @@ ParU_Ret ParU_Analyze(cholmod_sparse *A, ParU_Symbolic **S_handle,
     /*    computing the augmented tree and the data structures related        */
     /* ---------------------------------------------------------------------- */
 
-    #ifndef NDEBUG
+#ifndef NDEBUG
     PR = 1;
     // print fronts
     for (Int f = 0; f < nf; f++)
@@ -1555,9 +1571,9 @@ ParU_Ret ParU_Analyze(cholmod_sparse *A, ParU_Symbolic **S_handle,
         Sym->stree_flop_bound = stree_flop_bound =
             (double *)paru_calloc(nf + 1, sizeof(double));
 
-        if (aParent == NULL || aChild == NULL || aChildp == NULL || rM == NULL 
-                || snM == NULL || first == NULL || front_flop_bound == NULL ||
-                stree_flop_bound == NULL)
+        if (aParent == NULL || aChild == NULL || aChildp == NULL ||
+            rM == NULL || snM == NULL || first == NULL ||
+            front_flop_bound == NULL || stree_flop_bound == NULL)
         {
             PRLEVEL(1, ("Paru: Out of memory in symbolic phase"));
             ParU_Freesym(&Sym, Control);
@@ -1576,32 +1592,31 @@ ParU_Ret ParU_Analyze(cholmod_sparse *A, ParU_Symbolic **S_handle,
         aChildp[0] = 0;
     }
     Int offset = 0;  // number of rows visited in each iteration orig front+
-    // rows
+                     // rows
     Int lastChildFlag = 0;
     Int childpointer = 0;
     // Int root_count = 0;
-
 
     for (Int f = 0; f < nf; f++)
     {
 #ifndef NDEBUG
         PRLEVEL(PR, ("%% Front %ld\n", f));
         PRLEVEL(PR, ("%% pivot columns [ %ld to %ld ] n: %ld \n", Super[f],
-                    Super[f + 1] - 1, ns));
+                     Super[f + 1] - 1, ns));
 #endif
 
         // computing works in each front
         Int fp = Super[f + 1] - Super[f];  // k
         Int fm = Sym->Fm[f];               // m
         Int fn = Sym->Cm[f];               // n Upper bound number of cols of f
-        // if (Parent[f] == -1) roots[root_count++] = f;
+                              // if (Parent[f] == -1) roots[root_count++] = f;
         front_flop_bound[f] = (double)(fp * fm * fn + fp * fm + fp * fn);
         stree_flop_bound[f] += front_flop_bound[f];
         for (Int i = Childp[f]; i <= Childp[f + 1] - 1; i++)
         {
             stree_flop_bound[f] += stree_flop_bound[Child[i]];
             PRLEVEL(PR, ("%% child=%ld fl=%lf ", Child[i],
-                        front_flop_bound[Child[i]]));
+                         front_flop_bound[Child[i]]));
         }
         PRLEVEL(PR, ("%% flops bound= %lf\n ", front_flop_bound[f]));
         PRLEVEL(PR, ("%% %ld %ld %ld\n ", fp, fm, fn));
@@ -1622,7 +1637,7 @@ ParU_Ret ParU_Analyze(cholmod_sparse *A, ParU_Symbolic **S_handle,
                 ASSERT(snM[c] < ms + nf + 1);
                 aParent[snM[c]] = offset + numRow;
                 PRLEVEL(PR, ("%% aParent[%ld] =%ld\n", aParent[snM[c]],
-                            offset + numRow));
+                             offset + numRow));
                 ASSERT(childpointer < ms + nf + 1);
                 aChild[childpointer++] = snM[c];
             }
@@ -1656,7 +1671,7 @@ ParU_Ret ParU_Analyze(cholmod_sparse *A, ParU_Symbolic **S_handle,
         ASSERT(aChildp[offset] == -1);
         aChildp[offset] = aChildp[offset - 1] + numRow + numoforiginalChild;
         PRLEVEL(
-                1, ("\n %% f=%ld numoforiginalChild=%ld\n", f, numoforiginalChild));
+            1, ("\n %% f=%ld numoforiginalChild=%ld\n", f, numoforiginalChild));
 
         if (Parent[f] == f + 1)
         {  // last child due to staircase
@@ -1681,8 +1696,8 @@ ParU_Ret ParU_Analyze(cholmod_sparse *A, ParU_Symbolic **S_handle,
     }
 
     ////////////////    computing task tree and such ///////////////////////////
-    //std::vector<Int> task_helper(nf); //use Work instead of a new vector
-    Int *task_helper = Work; //just use first nf of the Work
+    // std::vector<Int> task_helper(nf); //use Work instead of a new vector
+    Int *task_helper = Work;  // just use first nf of the Work
     const double flop_thresh = 1024;
     Int ntasks = 0;
 
@@ -1713,7 +1728,7 @@ ParU_Ret ParU_Analyze(cholmod_sparse *A, ParU_Symbolic **S_handle,
 
     PRLEVEL(1, ("%% ntasks = %ld\n", ntasks));
     Sym->ntasks = ntasks;
-    if (nf >0 )
+    if (nf > 0)
     {
         Sym->task_map = task_map = (Int *)paru_alloc(ntasks + 1, sizeof(Int));
         Sym->task_parent = task_parent = (Int *)paru_alloc(ntasks, sizeof(Int));
@@ -1722,7 +1737,7 @@ ParU_Ret ParU_Analyze(cholmod_sparse *A, ParU_Symbolic **S_handle,
         Sym->task_depth = task_depth = (Int *)paru_calloc(ntasks, sizeof(Int));
 
         if (task_map == NULL || task_parent == NULL || task_num_child == NULL ||
-                task_depth == NULL)
+            task_depth == NULL)
         {
             PRLEVEL(1, ("Paru: Out of memory in symbolic phase"));
             ParU_Freesym(&Sym, Control);
@@ -1788,79 +1803,103 @@ ParU_Ret ParU_Analyze(cholmod_sparse *A, ParU_Symbolic **S_handle,
     // PRLEVEL(1, ("max_chain = %ld\n", max_chain));
 
 #ifndef NDEBUG
+    if (ntasks > 0)
+    {
+        PR = 1;
+        PRLEVEL(PR, ("%% Task tree helper:\n"));
+        for (Int i = 0; i < nf; i++)
+            PRLEVEL(PR, ("%ld)%ld ", i, task_helper[i]));
+        PRLEVEL(PR, ("\n%% tasknodes map (%ld):\n", ntasks));
+        for (Int i = 0; i <= ntasks; i++) PRLEVEL(PR, ("%ld ", task_map[i]));
+        PR = -1;
+        PRLEVEL(PR, ("\n%% tasktree :\n"));
+        for (Int i = 0; i < ntasks; i++) PRLEVEL(PR, ("%ld ", task_parent[i]));
+        PRLEVEL(PR, ("\n"));
+        PR = 1;
+        PRLEVEL(PR, ("\n%% task_num_child:\n"));
+        for (Int i = 0; i < ntasks; i++)
+            PRLEVEL(PR, ("%ld ", task_num_child[i]));
+        PRLEVEL(PR, ("\n"));
+        PRLEVEL(PR, ("\n%% %ld tasks:\n", ntasks));
+        for (Int t = 0; t < ntasks; t++)
+        {
+            PRLEVEL(PR, ("%ld[%ld-%ld] ", t, task_map[t] + 1, task_map[t + 1]));
+        }
+        PRLEVEL(PR, ("\n%% task depth:\n"));
+        for (Int t = 0; t < ntasks; t++)
+        {
+            PRLEVEL(PR, ("%ld ", task_depth[t]));
+        }
+        PRLEVEL(PR, ("\n"));
+    }
 
-    PR = 1;
-    PRLEVEL(PR, ("%% Task tree helper:\n"));
-    for (Int i = 0; i < nf; i++)
-        PRLEVEL(PR, ("%ld)%ld ", i, task_helper[i]));
-    PRLEVEL(PR, ("\n%% tasknodes map (%ld):\n", ntasks));
-    for (Int i = 0; i <= ntasks; i++) PRLEVEL(PR, ("%ld ", task_map[i]));
     PR = -1;
-    PRLEVEL(PR, ("\n%% tasktree :\n"));
-    for (Int i = 0; i < ntasks; i++) PRLEVEL(PR, ("%ld ", task_parent[i]));
-    PRLEVEL(PR, ("\n"));
-    PR = 1;
-    PRLEVEL(PR, ("\n%% task_num_child:\n"));
-    for (Int i = 0; i < ntasks; i++) PRLEVEL(PR, ("%ld ", task_num_child[i]));
-    PRLEVEL(PR, ("\n"));
-    PRLEVEL(PR, ("\n%% %ld tasks:\n", ntasks));
-    for (Int t = 0; t < ntasks; t++)
-    {
-        PRLEVEL(PR, ("%ld[%ld-%ld] ", t, task_map[t] + 1, task_map[t + 1]));
-    }
-    PRLEVEL(PR, ("\n%% task depth:\n"));
-    for (Int t = 0; t < ntasks; t++)
-    {
-        PRLEVEL(PR, ("%ld ", task_depth[t]));
-    }
-    PRLEVEL(PR, ("\n"));
-
-    PR = 1;
     PRLEVEL(PR, ("%% super node mapping ,snM (and rows): "));
     for (Int f = 0; f < nf; f++)
     {
         ASSERT(snM[f] != -1);
         PRLEVEL(PR, ("%ld (%ld) ", snM[f], Sleft[Super[f]]));
     }
-    PRLEVEL(PR, ("- (%ld) ", Sleft[Super[nf]]));
-    PRLEVEL(PR, ("\n"));
-
-    PR = 1;
-    PRLEVEL(PR, ("%% row mapping (rM): "));
-    for (Int i = 0; i < ms; i++)
+    if (nf > 0)
     {
-        ASSERT(rM[i] != -1);
-        PRLEVEL(PR, ("%ld ", rM[i]));
-    }
-    PRLEVEL(PR, ("\n"));
-
-    PRLEVEL(PR, ("%% aParent: "));
-    for (Int i = 0; i < ms + nf; i++) PRLEVEL(PR, ("%ld ", aParent[i]));
-    PRLEVEL(PR, ("%% \n"));
-
-    PRLEVEL(PR, ("%% aChildp: "));
-    for (Int i = 0; i < ms + nf + 2; i++) PRLEVEL(PR, ("%ld ", aChildp[i]));
-    PRLEVEL(PR, ("\n"));
-
-    PRLEVEL(PR, ("%% aChild: "));
-    for (Int i = 0; i < ms + nf + 1; i++) PRLEVEL(PR, ("%ld ", aChild[i]));
-    PRLEVEL(PR, ("\n"));
-
-    PR = 1;
-    for (Int i = 0; i < ms + nf; i++)
-    {
-        if (aChildp[i] == aChildp[i + 1]) continue;
-        PRLEVEL(PR, ("%% anode:%ld", i));
-        for (Int c = aChildp[i]; c < aChildp[i + 1]; c++)
-            PRLEVEL(PR, (" %ld,", aChild[c]));
+        PRLEVEL(PR, ("- (%ld) ", Sleft[Super[nf]]));
         PRLEVEL(PR, ("\n"));
     }
+
+    PR = 1;
+    if (rM)
+    {
+        PRLEVEL(PR, ("%% row mapping (rM): "));
+        for (Int i = 0; i < ms; i++)
+        {
+            ASSERT(rM[i] != -1);
+            PRLEVEL(PR, ("%ld ", rM[i]));
+        }
+        PRLEVEL(PR, ("\n"));
+    }
+
+    if (aParent)
+    {
+        PRLEVEL(PR, ("%% aParent: "));
+        for (Int i = 0; i < ms + nf; i++) PRLEVEL(PR, ("%ld ", aParent[i]));
+        PRLEVEL(PR, ("%% \n"));
+    }
+
+    if (aChildp)
+    {
+        PRLEVEL(PR, ("%% aChildp: "));
+        for (Int i = 0; i < ms + nf + 2; i++) PRLEVEL(PR, ("%ld ", aChildp[i]));
+        PRLEVEL(PR, ("\n"));
+    }
+
+    if (aChild)
+    {
+        PRLEVEL(PR, ("%% aChild: "));
+        for (Int i = 0; i < ms + nf + 1; i++) PRLEVEL(PR, ("%ld ", aChild[i]));
+        PRLEVEL(PR, ("\n"));
+    }
+
+    PR = 1;
+    if (aChild && aChildp)
+    {
+        for (Int i = 0; i < ms + nf; i++)
+        {
+            if (aChildp[i] == aChildp[i + 1]) continue;
+            PRLEVEL(PR, ("%% anode:%ld", i));
+            for (Int c = aChildp[i]; c < aChildp[i + 1]; c++)
+                PRLEVEL(PR, (" %ld,", aChild[c]));
+            PRLEVEL(PR, ("\n"));
+        }
+    }
     PR = 1;
 
-    PRLEVEL(PR, ("%% first: "));
-    for (Int i = 0; i < nf + 1; i++)
-        PRLEVEL(PR, ("first[%ld]=%ld ", i, first[i]));
-    PRLEVEL(PR, ("\n"));
+    if (first)
+    {
+        PRLEVEL(PR, ("%% first: "));
+        for (Int i = 0; i < nf + 1; i++)
+            PRLEVEL(PR, ("first[%ld]=%ld ", i, first[i]));
+        PRLEVEL(PR, ("\n"));
+    }
 
     PR = 1;
     //    PRLEVEL(PR, ("%%%% roots:\n"));
