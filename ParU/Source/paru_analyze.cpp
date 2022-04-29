@@ -492,7 +492,7 @@ ParU_Ret ParU_Analyze(cholmod_sparse *A, ParU_Symbolic **S_handle,
     if (!fmap || !newParent || (!Diag_map != !inv_Diag_map))
     {
         PRLEVEL(1, ("Paru: out of memory\n"));
-        ParU_Freesym(&Sym, Control);
+        ParU_Freesym(S_handle, Control);
         umfpack_dl_free_symbolic(&Symbolic);
         umfpack_dl_paru_free_sw(&SW);
         FREE_WORK;
@@ -638,7 +638,7 @@ ParU_Ret ParU_Analyze(cholmod_sparse *A, ParU_Symbolic **S_handle,
     {  // should not happen anyway it is always shrinking
         PRLEVEL(1, ("Paru: out of memory\n"));
         Sym->Parent = NULL;
-        ParU_Freesym(&Sym, Control);
+        ParU_Freesym(S_handle, Control);
         umfpack_dl_paru_free_sw(&SW);
         FREE_WORK;
         return PARU_OUT_OF_MEMORY;
@@ -654,7 +654,7 @@ ParU_Ret ParU_Analyze(cholmod_sparse *A, ParU_Symbolic **S_handle,
         if (Super == NULL || Depth == NULL)
         {
             PRLEVEL(1, ("Paru: out of memory\n"));
-            ParU_Freesym(&Sym, Control);
+            ParU_Freesym(S_handle, Control);
             umfpack_dl_paru_free_sw(&SW);
             FREE_WORK;
             return PARU_OUT_OF_MEMORY;
@@ -756,7 +756,7 @@ ParU_Ret ParU_Analyze(cholmod_sparse *A, ParU_Symbolic **S_handle,
     {
         PRLEVEL(1, ("Paru: out of memory\n"));
         // newParent = tmp_newParent;
-        ParU_Freesym(&Sym, Control);
+        ParU_Freesym(S_handle, Control);
         umfpack_dl_paru_free_sw(&SW);
         FREE_WORK;
         return PARU_OUT_OF_MEMORY;
@@ -792,7 +792,7 @@ ParU_Ret ParU_Analyze(cholmod_sparse *A, ParU_Symbolic **S_handle,
         {
             PRLEVEL(1, ("Paru: out of memory\n"));
             // paru_free(n, sizeof(Int), inv_Diag_map);
-            ParU_Freesym(&Sym, Control);
+            ParU_Freesym(S_handle, Control);
             umfpack_dl_paru_free_sw(&SW);
             FREE_WORK;
             return PARU_OUT_OF_MEMORY;
@@ -940,7 +940,7 @@ ParU_Ret ParU_Analyze(cholmod_sparse *A, ParU_Symbolic **S_handle,
         if (Childp == NULL)
         {
             PRLEVEL(1, ("Paru: out of memory\n"));
-            ParU_Freesym(&Sym, Control);
+            ParU_Freesym(S_handle, Control);
             FREE_WORK;
             return PARU_OUT_OF_MEMORY;
         }
@@ -994,7 +994,7 @@ ParU_Ret ParU_Analyze(cholmod_sparse *A, ParU_Symbolic **S_handle,
         if (Child == NULL)
         {
             PRLEVEL(1, ("Paru: out of memory\n"));
-            ParU_Freesym(&Sym, Control);
+            ParU_Freesym(S_handle, Control);
             FREE_WORK;
             return PARU_OUT_OF_MEMORY;
         }
@@ -1005,7 +1005,7 @@ ParU_Ret ParU_Analyze(cholmod_sparse *A, ParU_Symbolic **S_handle,
     if (cChildp == NULL)
     {
         PRLEVEL(1, ("Paru: out of memory\n"));
-        ParU_Freesym(&Sym, Control);
+        ParU_Freesym(S_handle, Control);
         FREE_WORK;
         return PARU_OUT_OF_MEMORY;
     }
@@ -1040,7 +1040,7 @@ ParU_Ret ParU_Analyze(cholmod_sparse *A, ParU_Symbolic **S_handle,
     if (Sp == NULL || Sleft == NULL || Pinv == NULL)
     {
         PRLEVEL(1, ("Paru: out of memory\n"));
-        ParU_Freesym(&Sym, Control);
+        ParU_Freesym(S_handle, Control);
         FREE_WORK;
         return PARU_OUT_OF_MEMORY;
     }
@@ -1108,7 +1108,7 @@ ParU_Ret ParU_Analyze(cholmod_sparse *A, ParU_Symbolic **S_handle,
         ((Sup == NULL || cSup == NULL) && cs1 != 0) || Ps == NULL)
     {
         PRLEVEL(1, ("Paru: rs1=%ld cs1=%ld memory problem\n", rs1, cs1));
-        ParU_Freesym(&Sym, Control);
+        ParU_Freesym(S_handle, Control);
         FREE_WORK;
         return PARU_OUT_OF_MEMORY;
     }
@@ -1272,8 +1272,10 @@ ParU_Ret ParU_Analyze(cholmod_sparse *A, ParU_Symbolic **S_handle,
             }
         }
 #endif
-        ParU_Freesym(&Sym, Control);
+        printf("Inside Analyze before free Sym=%p\n", Sym);
+        ParU_Freesym(S_handle, Control);
         FREE_WORK;
+        printf("Inside Analyze Sym=%p\n", Sym);
         return PARU_SINGULAR;
     }
     ASSERT(rowcount == m - n1);
@@ -1410,7 +1412,7 @@ ParU_Ret ParU_Analyze(cholmod_sparse *A, ParU_Symbolic **S_handle,
     if (Sj == NULL || (cs1 > 0 && Suj == NULL) || (rs1 > 0 && Sli == NULL))
     {
         PRLEVEL(1, ("Paru: out of memory\n"));
-        ParU_Freesym(&Sym, Control);
+        ParU_Freesym(S_handle, Control);
         FREE_WORK;
         return PARU_OUT_OF_MEMORY;
     }
@@ -1576,7 +1578,7 @@ ParU_Ret ParU_Analyze(cholmod_sparse *A, ParU_Symbolic **S_handle,
             front_flop_bound == NULL || stree_flop_bound == NULL)
         {
             PRLEVEL(1, ("Paru: Out of memory in symbolic phase"));
-            ParU_Freesym(&Sym, Control);
+            ParU_Freesym(S_handle, Control);
             FREE_WORK;
             return PARU_OUT_OF_MEMORY;
         }
@@ -1740,7 +1742,7 @@ ParU_Ret ParU_Analyze(cholmod_sparse *A, ParU_Symbolic **S_handle,
             task_depth == NULL)
         {
             PRLEVEL(1, ("Paru: Out of memory in symbolic phase"));
-            ParU_Freesym(&Sym, Control);
+            ParU_Freesym(S_handle, Control);
             FREE_WORK;
             return PARU_OUT_OF_MEMORY;
         }
