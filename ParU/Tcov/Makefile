@@ -130,6 +130,7 @@ go: paru_brutal_test paru_quicker_test
 
 vgo: paru_brutal_test
 	- valgrind --leak-check=yes --track-origins=yes -s ./x_brutal_test < ../Matrix/b1_ss.mtx > parutest_out.txt
+	#- valgrind --leak-check=yes --track-origins=yes -s ./x_brutal_test < ../Matrix/Ragusa16.mtx
 	#- valgrind --leak-check=yes --track-origins=yes -s ./x_brutal_test < ../Matrix/west0067.mtx > parutest_out.txt
 	#- valgrind --leak-check=yes --track-origins=yes -s ./x_brutal_test < ../Matrix/ParUTst/494_bus/494_bus.mtx> parutest_out.txt
 	#- valgrind --leak-check=yes --track-origins=yes -s ./x_brutal_test < ../Matrix/ParUTst/1138_bus/1138_bus.mtx > parutest_out.txt

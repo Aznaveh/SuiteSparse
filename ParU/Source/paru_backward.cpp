@@ -22,6 +22,9 @@ ParU_Ret paru_backward(double *x1, double &resid, double &norm,
 {
     DEBUGLEVEL(0);
     PRLEVEL(1, ("%% inside backward\n"));
+    if(Sym == NULL || Num == NULL || x1 == NULL || A == NULL)
+        return PARU_INVALID;
+
     Int m = Sym->m;
 #ifndef NDEBUG
     Int PR = 1;
@@ -53,6 +56,7 @@ ParU_Ret paru_backward(double *x1, double &resid, double &norm,
     if (info != PARU_SUCCESS)
     {
         PRLEVEL(1, ("%% A problem happend during factorization\n"));
+        paru_free(m, sizeof(Int), b);
         return info;
     }
 
