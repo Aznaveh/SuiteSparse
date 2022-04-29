@@ -74,14 +74,15 @@ int main(int argc, char **argv)
 
     // info = ParU_Analyze(A, &Sym, &Control);
     BRUTAL_ALLOC_TEST(info, ParU_Analyze(A, &Sym, &Control));
-    if (info != PARU_SUCCESS)
+    if (info == PARU_OUT_OF_MEMORY)
     {
         printf("Paru: some problem detected during symbolic analysis\n");
         cholmod_l_free_sparse(&A, cc);
         cholmod_l_finish(cc);
         return info;
     }
-    printf("In: %ldx%ld nnz = %ld \n", Sym->m, Sym->n, Sym->anz);
+    if (Sym != NULL)
+        printf("In: %ldx%ld nnz = %ld \n", Sym->m, Sym->n, Sym->anz);
     printf("Paru: Symbolic factorization is done!\n");
     ParU_Numeric *Num;
 
@@ -102,6 +103,7 @@ int main(int argc, char **argv)
     Int m = Sym->m;
 #if 1
     if (info == PARU_SUCCESS)
+    if (info == PARU_OUT_OF_MEMORY)
     {
         double *b = (double *)malloc(m * sizeof(double));
         double *xx = (double *)malloc(m * sizeof(double));

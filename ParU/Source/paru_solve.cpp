@@ -18,6 +18,12 @@ ParU_Ret ParU_Solve(ParU_Symbolic *Sym, ParU_Numeric *Num, double *b,
 {
     DEBUGLEVEL(0);
     PRLEVEL(1, ("%% inside solve\n"));
+    if (Sym == NULL || Num == NULL)
+    {
+        return PARU_INVALID;
+    }
+
+
     Int m = Sym->m;
     if (Num->res == PARU_SINGULAR)
     {
@@ -82,6 +88,11 @@ ParU_Ret ParU_Solve(ParU_Symbolic *Sym, ParU_Numeric *Num, double *b,
 ParU_Ret ParU_Solve(ParU_Symbolic *Sym, ParU_Numeric *Num, double *b, double *x,
                     ParU_Control *user_Control)
 {
+    if (Sym == NULL || Num == NULL)
+    {
+        return PARU_INVALID;
+    }
+
     if (Num->res == PARU_SINGULAR)
     {
         PRLEVEL(1, ("Paru: the matrix is singular; cannot be solved.\n"));
@@ -119,6 +130,10 @@ ParU_Ret ParU_Solve(ParU_Symbolic *Sym, ParU_Numeric *Num, Int nrhs, double *B,
 {
     DEBUGLEVEL(0);
     PRLEVEL(1, ("%% mRHS inside Solve\n"));
+    if (Sym == NULL || Num == NULL)
+    {
+        return PARU_INVALID;
+    }
     Int m = Sym->m;
     if (Num->res == PARU_SINGULAR)
     {
@@ -185,6 +200,10 @@ ParU_Ret ParU_Solve(ParU_Symbolic *Sym, ParU_Numeric *Num, Int nrhs, double *B,
 ParU_Ret ParU_Solve(ParU_Symbolic *Sym, ParU_Numeric *Num, Int nrhs, double *B,
         double *X, ParU_Control *user_Control)
 {
+    if (Sym == NULL || Num == NULL)
+    {
+        return PARU_INVALID;
+    }
     if (Num->res == PARU_SINGULAR)
     {
         PRLEVEL(1, ("Paru: the matrix is singular; cannot be solved.\n"));

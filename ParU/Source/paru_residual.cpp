@@ -20,6 +20,11 @@
 {
     DEBUGLEVEL(0);
     PRLEVEL(1, ("%% inside residual\n"));
+    if (Sym == NULL || Num == NULL || A == NULL || x == NULL || b == NULL)
+    {
+        return PARU_INVALID;
+    }
+
 #ifndef NDEBUG
     Int PR = 1;
     PRLEVEL(PR, ("%% before everything b is:\n%%"));
@@ -69,6 +74,12 @@ ParU_Ret ParU_Residual(cholmod_sparse *A, double *X, double *B, Int m, Int nrhs,
 {
     DEBUGLEVEL(0);
     PRLEVEL(1, ("%% mRHS inside residual\n"));
+    if (Sym == NULL || Num == NULL || A == NULL || X == NULL || B == NULL)
+    {
+        return PARU_INVALID;
+    }
+
+
 #ifndef NDEBUG
     Int PR = 1;
     PRLEVEL(PR, ("%% mRHS before everything B is:\n%%"));
