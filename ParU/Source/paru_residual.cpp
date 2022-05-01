@@ -24,6 +24,11 @@
     {
         return PARU_INVALID;
     }
+    if ( (Int) A->nrow != m)
+    {
+        return PARU_INVALID;
+    }
+ 
 
 #ifndef NDEBUG
     Int PR = 1;
@@ -78,7 +83,11 @@ ParU_Ret ParU_Residual(cholmod_sparse *A, double *X, double *B, Int m, Int nrhs,
     {
         return PARU_INVALID;
     }
-
+    if ( (Int) A->nrow != m)
+    {
+        return PARU_INVALID;
+    }
+ 
 
 #ifndef NDEBUG
     Int PR = 1;

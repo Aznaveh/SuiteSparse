@@ -1272,10 +1272,8 @@ ParU_Ret ParU_Analyze(cholmod_sparse *A, ParU_Symbolic **S_handle,
             }
         }
 #endif
-        printf("Inside Analyze before free Sym=%p\n", Sym);
         ParU_Freesym(S_handle, Control);
         FREE_WORK;
-        printf("Inside Analyze Sym=%p\n", Sym);
         return PARU_SINGULAR;
     }
     ASSERT(rowcount == m - n1);

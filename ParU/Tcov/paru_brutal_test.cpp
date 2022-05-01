@@ -88,7 +88,7 @@ int main(int argc, char **argv)
 
     // info = ParU_Factorize(A, Sym, &Num, &Control);
     BRUTAL_ALLOC_TEST(info, ParU_Factorize(A, Sym, &Num, &Control));
-    if (info != PARU_SUCCESS)
+    if (info == PARU_OUT_OF_MEMORY)
     {
         printf("Paru: factorization was NOT succssfull.\n");
         cholmod_l_free_sparse(&A, cc);
@@ -100,59 +100,28 @@ int main(int argc, char **argv)
         printf("Paru: factorization was successfull.\n");
 
     //~~~~~~~~~~~~~~~~~~~Test the results ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    Int m = Sym->m;
 #if 1
-    if (info == PARU_SUCCESS)
+    if (info != PARU_OUT_OF_MEMORY)
     {
+        Int m = 0;
+        if (Sym) m = Sym->m;
+        printf("Testing the resutls\n");
         double *b = (double *)malloc(m * sizeof(double));
         double *xx = (double *)malloc(m * sizeof(double));
         for (Int i = 0; i < m; ++i) b[i] = i + 1;
         // info = ParU_Solve(Sym, Num, b, xx, &Control);
+        printf("Testing Solve\n");
         BRUTAL_ALLOC_TEST(info, ParU_Solve(Sym, Num, b, xx, &Control));
-        if (info != PARU_SUCCESS)
-        {
-            free(b);
-            free(xx);
-            printf("Paru: Solve has a problem.\n");
-            cholmod_l_free_sparse(&A, cc);
-            cholmod_l_finish(cc);
-            ParU_Freesym(&Sym, &Control);
-            return info;
-        }
-
         double resid, anorm;
         // info = ParU_Residual(A, xx, b, m, resid, anorm, &Control);
+        printf("Testing Residual\n");
         BRUTAL_ALLOC_TEST(info,
                           ParU_Residual(A, xx, b, m, resid, anorm, &Control));
-        if (info != PARU_SUCCESS)
-        {
-            free(b);
-            free(xx);
-            printf("Paru: Residual has a problem.\n");
-            cholmod_l_free_sparse(&A, cc);
-            cholmod_l_finish(cc);
-            ParU_Freesym(&Sym, &Control);
-            return info;
-        }
-
-        printf("Residual is |%.2lf| and anorm is %.2e and rcond is %.2e.\n",
-               resid == 0 ? 0 : log10(resid), anorm, Num->rcond);
-
         for (Int i = 0; i < m; ++i) b[i] = i + 1;
         // info = paru_backward(b, resid, anorm, A, Sym, Num, &Control);
+        printf("Testing backward\n");
         BRUTAL_ALLOC_TEST(
             info, paru_backward(b, resid, anorm, A, Sym, Num, &Control));
-        if (info != PARU_SUCCESS)
-        {
-            free(b);
-            free(xx);
-            printf("Paru: backward has a problem.\n");
-            cholmod_l_free_sparse(&A, cc);
-            cholmod_l_finish(cc);
-            ParU_Freesym(&Sym, &Control);
-            return info;
-        }
-
         free(b);
         free(xx);
         const Int nrhs = 16;  // number of right handsides
@@ -162,33 +131,13 @@ int main(int argc, char **argv)
             for (Int j = 0; j < nrhs; ++j) B[j * m + i] = (double)(i + j + 1);
 
         // info = ParU_Solve(Sym, Num, nrhs, B, X, &Control);
+        printf("Testing mRHS Solve\n");
         BRUTAL_ALLOC_TEST(info, ParU_Solve(Sym, Num, nrhs, B, X, &Control));
-        if (info != PARU_SUCCESS)
-        {
-            printf("Paru: mRhs Solve has a problem.\n");
-            free(B);
-            free(X);
-            cholmod_l_free_sparse(&A, cc);
-            cholmod_l_finish(cc);
-            ParU_Freesym(&Sym, &Control);
-            return info;
-        }
-
-        // info = ParU_Residual(A, X, B, m, nrhs, resid, anorm, &Control);
+            // info = ParU_Residual(A, X, B, m, nrhs, resid, anorm, &Control);
+        printf("Testing mRHS Residual\n");
         BRUTAL_ALLOC_TEST(
             info, ParU_Residual(A, X, B, m, nrhs, resid, anorm, &Control));
-        if (info != PARU_SUCCESS)
-        {
-            printf("Paru: mRhs Residual has a problem.\n");
-            free(B);
-            free(X);
-            cholmod_l_free_sparse(&A, cc);
-            cholmod_l_finish(cc);
-            ParU_Freesym(&Sym, &Control);
-            return info;
-        }
-
-        printf("mRhs Residual is |%.2lf|\n", resid == 0 ? 0 : log10(resid));
+            printf("mRhs Residual is |%.2lf|\n", resid == 0 ? 0 : log10(resid));
 
         free(B);
         free(X);
@@ -198,6 +147,7 @@ int main(int argc, char **argv)
     //~~~~~~~~~~~~~~~~~~~End computation~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     //~~~~~~~~~~~~~~~~~~~Free Everything~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    printf("freeing stuff\n");
     ParU_Freenum(&Num, &Control);
     ParU_Freesym(&Sym, &Control);
 
