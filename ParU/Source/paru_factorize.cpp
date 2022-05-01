@@ -187,6 +187,12 @@ ParU_Ret ParU_Factorize(cholmod_sparse *A, ParU_Symbolic *Sym,
         return PARU_INVALID;
     }
 
+    if (!A->packed)
+    {
+        PRLEVEL(1, ("Paru: A is not packed; Wrong format \n"));
+        return PARU_INVALID;
+    }
+
     if (A->xtype != CHOLMOD_REAL)
     {
         PRLEVEL(1, ("Paru: input matrix must be real\n"));

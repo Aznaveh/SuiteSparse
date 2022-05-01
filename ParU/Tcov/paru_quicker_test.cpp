@@ -28,21 +28,10 @@ int main(int argc, char **argv)
 
     // A = mread (stdin) ; read in the sparse matrix A
     A = (cholmod_sparse *)cholmod_l_read_matrix(stdin, 1, &mtype, cc);
-    if (A == NULL)
-    {
-        printf("Paru: input matrix is invalid\n");
-        exit(1);
-    }
 
     if (mtype != CHOLMOD_SPARSE)
     {
         printf("Paru: input matrix must be sparse\n");
-        exit(1);
-    }
-
-    if (A->xtype != CHOLMOD_REAL)
-    {
-        printf("Paru: input matrix must be real\n");
         exit(1);
     }
 
@@ -93,6 +82,8 @@ int main(int argc, char **argv)
     printf("Paru: Symbolic factorization is done!\n");
     ParU_Numeric *Num;
 
+    info = ParU_Factorize(NULL, Sym, &Num, &Control);
+    info = ParU_Factorize(A, NULL, &Num, &Control);
     info = ParU_Factorize(A, Sym, &Num, &Control);
     if (info != PARU_SUCCESS)
     {
@@ -127,7 +118,7 @@ int main(int argc, char **argv)
 
         double resid, anorm;
         info = ParU_Residual(A, xx, b, m, resid, anorm, &Control);
-       if (info != PARU_SUCCESS)
+        if (info != PARU_SUCCESS)
         {
             free(b);
             free(xx);
@@ -139,7 +130,7 @@ int main(int argc, char **argv)
         }
 
         printf("Residual is |%.2lf| and anorm is %.2e and rcond is %.2e.\n",
-                resid == 0 ? 0 : log10(resid), anorm, Num->rcond);
+               resid == 0 ? 0 : log10(resid), anorm, Num->rcond);
 
         for (Int i = 0; i < m; ++i) b[i] = i + 1;
         info = paru_backward(b, resid, anorm, NULL, Sym, Num, &Control);
@@ -174,7 +165,6 @@ int main(int argc, char **argv)
             ParU_Freesym(&Sym, &Control);
             return info;
         }
-
 
         printf("mRhs Residual is |%.2lf|\n", resid == 0 ? 0 : log10(resid));
 

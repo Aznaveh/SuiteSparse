@@ -30,18 +30,6 @@ ParU_Ret paru_init_rowFronts(paru_work *Work,
     DEBUGLEVEL(0);
     PARU_DEFINE_PRLEVEL;
 
-    if (!A->packed)
-    {
-        PRLEVEL(1, ("Paru: A is not packed; Wrong format \n"));
-        return PARU_INVALID;
-    }
-
-    if (Sym == NULL)
-    {
-        PRLEVEL(1, ("Paru: Sym is NULL\n"));
-        return PARU_INVALID;
-    }
-
     // initializing Work
     Work->Sym = Sym;
     Int *rowMark = Work->rowMark = NULL;
