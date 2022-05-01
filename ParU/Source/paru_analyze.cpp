@@ -148,7 +148,7 @@ ParU_Ret ParU_Analyze(cholmod_sparse *A, ParU_Symbolic **S_handle,
     Int *Suj = NULL;
     Int *Sli = NULL;
 
-    //############  Calling UMFPACK and retrieving data structure ##############
+    //~~~~~~~~~~~~  Calling UMFPACK and retrieving data structure ~~~~~~~~~~~~~~
 
     /* ---------------------------------------------------------------------- */
     /*    The varialbes are needed for the UMFPACK symbolic analysis phase    */

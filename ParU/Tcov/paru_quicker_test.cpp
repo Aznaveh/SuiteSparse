@@ -58,7 +58,7 @@ int main(int argc, char **argv)
     Control.mem_chunk = 1;
     Control.umfpack_ordering = 23;
     Control.umfpack_strategy = 23;
-    Control.paru_max_threads = -1;
+    Control.paru_max_threads = 4;
     Control.relaxed_amalgamation_threshold = -1;
     Control.paru_strategy = 23;
     Control.scale = -1;
@@ -68,9 +68,19 @@ int main(int argc, char **argv)
     Control.trivial = -1;
     Control.worthwhile_dgemm = -2;
     Control.worthwhile_trsm = -1;
+    Control.paru_strategy = PARU_STRATEGY_SYMMETRIC;
 
     ParU_Ret info;
 
+    info = ParU_Analyze(A, &Sym, &Control);
+    if (info != PARU_SUCCESS)
+    {
+        printf("Paru: some problem detected during symbolic analysis\n");
+        cholmod_l_free_sparse(&A, cc);
+        cholmod_l_finish(cc);
+        return info;
+    }
+    Control.paru_strategy = PARU_STRATEGY_AUTO;
     info = ParU_Analyze(A, &Sym, &Control);
     if (info != PARU_SUCCESS)
     {
@@ -131,6 +141,8 @@ int main(int argc, char **argv)
         printf("Residual is |%.2lf| and anorm is %.2e and rcond is %.2e.\n",
                 resid == 0 ? 0 : log10(resid), anorm, Num->rcond);
 
+        for (Int i = 0; i < m; ++i) b[i] = i + 1;
+        info = paru_backward(b, resid, anorm, NULL, Sym, Num, &Control);
         free(b);
         free(xx);
         const Int nrhs = 16;  // number of right handsides

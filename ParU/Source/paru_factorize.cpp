@@ -467,8 +467,8 @@ ParU_Ret ParU_Factorize(cholmod_sparse *A, ParU_Symbolic *Sym,
         //else 
         //{ //Parallel
         //    Int *Super = Sym->Super;
-        //    #pragma omp parallel for reduction(max:max_rc)                     \
-        //    reduction(max: max_cc) if (nf > 65536)                             \
+        //    pragma omp parallel for reduction(max:max_rc)               
+        //    reduction(max: max_cc) if (nf > 65536)                     
         //    num_threads(Control->paru_max_threads)
         //    for (Int f = 0; f < nf; f++)
         //    {
@@ -488,8 +488,9 @@ ParU_Ret ParU_Factorize(cholmod_sparse *A, ParU_Symbolic *Sym,
         //        Int col2 = Super[f + 1];
         //        Int fp = col2 - col1;
         //        double *X = LUs[f].p;
-        //        #pragma omp parallel for reduction(min:min_udiag)\
-        //        reduction(max: max_udiag) num_threads(Control->paru_max_threads)
+        //        pragma omp parallel for reduction(min:min_udiag)
+        //        reduction(max: max_udiag)
+        //        num_threads(Control->paru_max_threads)
         //        for (Int i = 0; i < fp; i++)
         //        {
         //            double udiag = fabs(X[rowCount * i + i]);
