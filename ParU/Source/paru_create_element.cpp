@@ -19,7 +19,7 @@
  * @author Aznaveh
  *  */
 #include "paru_internal.hpp"
-paru_element *paru_create_element(Int nrows, Int ncols, Int init)
+paru_element *paru_create_element(Int nrows, Int ncols)
 {
     DEBUGLEVEL(0);
 
@@ -28,14 +28,7 @@ paru_element *paru_create_element(Int nrows, Int ncols, Int init)
     size_t tot_size = sizeof(paru_element) +
                       sizeof(Int) * (2 * (nrows + ncols)) +
                       sizeof(double) * nrows * ncols;
-    if (init)
-    {
-        curEl = (paru_element *)paru_calloc(1, tot_size);
-    }
-    else
-    {
-        curEl = (paru_element *)paru_alloc(1, tot_size);
-    }
+    curEl = (paru_element *)paru_alloc(1, tot_size);
     if (curEl == NULL) return NULL;  // do not do error checking
 
     PRLEVEL(1, (" with size of %ld in %p\n", tot_size, curEl));

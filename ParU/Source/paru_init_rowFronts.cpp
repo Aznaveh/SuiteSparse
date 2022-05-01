@@ -445,7 +445,7 @@ ParU_Ret paru_init_rowFronts(paru_work *Work,
         row_degree_bound[row] = ncols;  // Initialzing row degree
 
         paru_element *curEl = elementList[e] =
-            paru_create_element(nrows, ncols, 0);
+            paru_create_element(nrows, ncols);
         if (curEl == NULL)
         {  // out of memory
             PRLEVEL(1, ("Paru: Out of memory: curEl\n"));

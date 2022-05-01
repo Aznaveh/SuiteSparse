@@ -482,9 +482,9 @@ ParU_Ret paru_front(Int f,  // front need to be assembled
         PRLEVEL(1, ("%% curEl is %ld by %ld\n", rowCount - fp, colCount));
         if (fp < rowCount)
         {
-            curEl = elementList[eli] = paru_create_element(
-                    rowCount - fp, colCount,
-                    0);  // allocating an un-initialized part of memory
+            // allocating an un-initialized part of memory
+            curEl = elementList[eli] = 
+                paru_create_element( rowCount - fp, colCount);
 
             // While insided the DGEMM BETA == 0
             if (curEl == NULL)

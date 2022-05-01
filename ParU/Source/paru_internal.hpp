@@ -316,7 +316,7 @@ Int paru_factorize_full_summed(Int f, Int start_fac,
                                std::vector<Int> &pivotal_elements,
                                paru_work *Work, ParU_Numeric *Num);
 
-paru_element *paru_create_element(Int nrows, Int ncols, Int init);
+paru_element *paru_create_element(Int nrows, Int ncols);
 
 void paru_assemble_row_2U(Int e, Int f, Int sR, Int dR,
                           std::vector<Int> &colHash, paru_work *Work,
