@@ -44,7 +44,7 @@ int main(int argc, char **argv)
 
     ParU_Control Control;
     // puting Control lines to work
-    Control.mem_chunk = 1;
+    Control.mem_chunk = 1024;
     Control.umfpack_ordering = 23;
     Control.umfpack_strategy = 23;
     Control.paru_max_threads = 4;

@@ -16,7 +16,7 @@ Int paru_cumsum(Int n, Int *X, ParU_Control *Control)
 {  // n is size, X is size n and in/out
     Int tot = 0;
     if (X == NULL) return tot;
-    
+
     Int mem_chunk = Control->mem_chunk;
     if (n < mem_chunk)
     {
@@ -27,24 +27,24 @@ Int paru_cumsum(Int n, Int *X, ParU_Control *Control)
         }
         return tot;
     }
-    Int mid = n/2;
+    Int mid = n / 2;
     Int sum = 0;
-    #pragma omp parallel shared(sum, n, X, Control) firstprivate(mid)          \
+    #pragma omp parallel shared(sum, n, X, Control) firstprivate(mid) \
     num_threads(Control->paru_max_threads)
     {
         #pragma omp single
         {
-            #pragma omp task 
+            #pragma omp task
             sum = paru_cumsum(mid, X, Control);
-            #pragma omp task 
-            paru_cumsum(n - mid, X+mid, Control);
-            #pragma omp taskwait 
-            #pragma omp taskloop 
-            for (int i = mid; i < n; i ++)
+            #pragma omp task
+            paru_cumsum(n - mid, X + mid, Control);
+            #pragma omp taskwait
+            #pragma omp taskloop
+            for (int i = mid; i < n; i++)
             {
                 X[i] += sum;
             }
         }
     }
-    return X[n-1];
+    return X[n - 1];
 }

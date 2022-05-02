@@ -15,7 +15,8 @@
         paru_set_malloc_tracking(true);         \
         for (Int nmalloc = 0;; nmalloc++)       \
         {                                       \
-            paru_set_nmalloc(nmalloc);          \
+            if (!paru_get_nmalloc() )           \
+                paru_set_nmalloc(nmalloc);      \
             info = method;                      \
             if (info != PARU_OUT_OF_MEMORY)     \
             {                                   \
