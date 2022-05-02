@@ -35,6 +35,14 @@ int main(int argc, char **argv)
         exit(1);
     }
 
+    //covering alloc lines
+    Int *t = NULL;
+    t = (Int *)paru_alloc(1, sizeof(Int)*0); 
+    t = (Int *)paru_alloc(Size_max, sizeof(Int)); 
+    size_t size = 0;
+    t = (Int *)paru_realloc(10, sizeof(Int), t, &size); 
+    paru_free(10, sizeof(Int), t);
+    
     //~~~~~~~~~~~~~~~~~~~Starting computation~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     int ver[3];
     char date[128];
