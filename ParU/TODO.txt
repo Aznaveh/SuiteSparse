@@ -1,5 +1,5 @@
 
-documentation
+documentation (user guide)
 ACM TOMS paper
 HPEC'22 paper
 SIAM CSE conf paper?
@@ -14,10 +14,8 @@ test coverage
 
 Demo: cleanup
 
-source: take out tabs DONE
-
-decide about: (*resid) = 4 or resid = ...
-
 C wrapper
 
 compare with SuperLU and MUMPS
+
+merge updates into UMFPACK 5.8.0

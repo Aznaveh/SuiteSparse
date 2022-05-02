@@ -449,7 +449,12 @@ ParU_Ret ParU_Factorize(cholmod_sparse *A, ParU_Symbolic *Sym,
     {
         ParU_Factors *LUs = Num->partial_LUs;
         max_udiag = min_udiag = fabs(*(LUs[0].p));
-        //if (Num-> m < 65536)
+        #ifdef PARU_COVERAGE
+        #define M1 1000
+        #else
+        #define M1 65536 
+        #endif
+        if (Num-> m < M1)
         { //Serial
             for (Int f = 0; f < nf; f++)
             {
