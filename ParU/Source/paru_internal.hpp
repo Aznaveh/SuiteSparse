@@ -38,6 +38,11 @@
 #undef PARU_ALLOC_TESTING 
 #endif
 
+#ifdef PARU_COVERAGE
+#undef PARU_COVERAGE
+#endif
+
+
 extern "C"
 {
 #include "cholmod_blas.h"
@@ -50,8 +55,12 @@ extern "C"
 //#undef NDEBUG  //<<2>>
 // uncomment the following line to turn on OpenMP timing
 //#undef NTIME   //<<3>>
+
+
+
 #define PARU_ALLOC_TESTING // for coverage test allocations
                            // it shouldn't be called with NDEBUG
+#define PARU_COVERAGE
 
 // uncomment if you want to count hardware flops
 //#define COUNT_FLOPS
