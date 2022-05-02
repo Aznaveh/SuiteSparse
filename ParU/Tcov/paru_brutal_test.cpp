@@ -18,7 +18,7 @@
 int main(int argc, char **argv)
 {
     cholmod_common Common, *cc;
-    cholmod_sparse *A;
+    cholmod_sparse *A = NULL;
     ParU_Symbolic *Sym = NULL;
 
     //~~~~~~~~~Reading the input matrix and test if the format is OK~~~~~~~~~~~~
@@ -84,7 +84,7 @@ int main(int argc, char **argv)
     if (Sym != NULL)
         printf("In: %ldx%ld nnz = %ld \n", Sym->m, Sym->n, Sym->anz);
     printf("Paru: Symbolic factorization is done!\n");
-    ParU_Numeric *Num;
+    ParU_Numeric *Num = NULL;
 
     // info = ParU_Factorize(A, Sym, &Num, &Control);
     BRUTAL_ALLOC_TEST(info, ParU_Factorize(A, Sym, &Num, &Control));
@@ -99,7 +99,8 @@ int main(int argc, char **argv)
     else
         printf("Paru: factorization was successfull.\n");
 
-    //~~~~~~~~~~~~~~~~~~~Test the results ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        //~~~~~~~~~~~~~~~~~~~Test the results~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #if 1
     if (info != PARU_OUT_OF_MEMORY)
     {
@@ -133,11 +134,11 @@ int main(int argc, char **argv)
         // info = ParU_Solve(Sym, Num, nrhs, B, X, &Control);
         printf("Testing mRHS Solve\n");
         BRUTAL_ALLOC_TEST(info, ParU_Solve(Sym, Num, nrhs, B, X, &Control));
-            // info = ParU_Residual(A, X, B, m, nrhs, resid, anorm, &Control);
+        // info = ParU_Residual(A, X, B, m, nrhs, resid, anorm, &Control);
         printf("Testing mRHS Residual\n");
         BRUTAL_ALLOC_TEST(
             info, ParU_Residual(A, X, B, m, nrhs, resid, anorm, &Control));
-            printf("mRhs Residual is |%.2lf|\n", resid == 0 ? 0 : log10(resid));
+        printf("mRhs Residual is |%.2lf|\n", resid == 0 ? 0 : log10(resid));
 
         free(B);
         free(X);
