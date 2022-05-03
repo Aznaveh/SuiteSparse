@@ -115,7 +115,10 @@ ParU_Ret paru_pivotal(std::vector<Int> &pivotal_elements,
     rowMarkp[eli] = rowMark;
 
     Int *isRowInFront = Work->rowSize;
-    if (++rowMark < 0)
+    ++rowMark; 
+
+    #ifndef PARU_COVERAGE  //overflow is very hard to test in coverage 
+    if (rowMark < 0)
     // just look at the children
     {  // in rare case of overflow
         Int *Sleft = Sym->Sleft;
@@ -124,6 +127,7 @@ ParU_Ret paru_pivotal(std::vector<Int> &pivotal_elements,
             isRowInFront[i] = -1;
         rowMark = rowMarkp[eli] = 1;
     }
+    #endif
     rowMarkp[eli] = rowMark;
     PRLEVEL(1, ("%% rowMark=%ld;\n", rowMark));
 
