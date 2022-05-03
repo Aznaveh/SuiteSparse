@@ -25,11 +25,7 @@ ParU_Ret ParU_Solve(ParU_Symbolic *Sym, ParU_Numeric *Num, double *b,
 
 
     Int m = Sym->m;
-    if (Num->res == PARU_SINGULAR)
-    {
-        PRLEVEL(1, ("Paru: the matrix is singular; cannot be solved.\n"));
-        return PARU_SINGULAR;
-    }
+    //if (Num->res == PARU_SINGULAR)  //THIS Won't happen because Num is freed
 #ifndef NTIME
     double start_time = PARU_OPENMP_GET_WTIME;
 #endif
@@ -93,11 +89,6 @@ ParU_Ret ParU_Solve(ParU_Symbolic *Sym, ParU_Numeric *Num, double *b, double *x,
         return PARU_INVALID;
     }
 
-    if (Num->res == PARU_SINGULAR)
-    {
-        PRLEVEL(1, ("Paru: the matrix is singular; cannot be solved.\n"));
-        return PARU_SINGULAR;
-    }
     ParU_Control my_Control = *user_Control;
     {
         Int mem_chunk = my_Control.mem_chunk;
@@ -135,11 +126,6 @@ ParU_Ret ParU_Solve(ParU_Symbolic *Sym, ParU_Numeric *Num, Int nrhs, double *B,
         return PARU_INVALID;
     }
     Int m = Sym->m;
-    if (Num->res == PARU_SINGULAR)
-    {
-        PRLEVEL(1, ("Paru: the matrix is singular; cannot be solved.\n"));
-        return PARU_SINGULAR;
-    }
 #ifndef NTIME
     double start_time = PARU_OPENMP_GET_WTIME;
 #endif
@@ -203,11 +189,6 @@ ParU_Ret ParU_Solve(ParU_Symbolic *Sym, ParU_Numeric *Num, Int nrhs, double *B,
     if (Sym == NULL || Num == NULL)
     {
         return PARU_INVALID;
-    }
-    if (Num->res == PARU_SINGULAR)
-    {
-        PRLEVEL(1, ("Paru: the matrix is singular; cannot be solved.\n"));
-        return PARU_SINGULAR;
     }
     ParU_Control my_Control = *user_Control;
     {

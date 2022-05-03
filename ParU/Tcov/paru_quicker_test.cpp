@@ -190,27 +190,7 @@ int main(int argc, char **argv)
         free(B);
         free(X);
     }
-    else if (info == PARU_SINGULAR)  // to have a better coverage on solve
-    {
-        printf("Singular matrix\n");
-        double *b = (double *)malloc(m * sizeof(double));
-        double *xx = (double *)malloc(m * sizeof(double));
-        for (Int i = 0; i < m; ++i) b[i] = i + 1;
-        info = ParU_Solve(Sym, Num, b, &Control);
-        info = ParU_Solve(Sym, Num, b, xx, &Control);
-        free(b);
-        free(xx);
-        const Int nrhs = 16;  // number of right handsides
-        double *B = (double *)malloc(m * nrhs * sizeof(double));
-        double *X = (double *)malloc(m * nrhs * sizeof(double));
-        for (Int i = 0; i < m; ++i)
-            for (Int j = 0; j < nrhs; ++j) B[j * m + i] = (double)(i + j + 1);
-
-        info = ParU_Solve(Sym, Num, nrhs, B, &Control);
-        info = ParU_Solve(Sym, Num, nrhs, B, X, &Control);
-        free(B);
-        free(X);
-    }
+    
 #endif
 
     //~~~~~~~~~~~~~~~~~~~End computation~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
