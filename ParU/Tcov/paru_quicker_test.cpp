@@ -40,8 +40,11 @@ int main(int argc, char **argv)
     t = (Int *)paru_alloc(1, sizeof(Int)*0); 
     t = (Int *)paru_alloc(Size_max, sizeof(Int)); 
     size_t size = 0;
+    t = (Int *)paru_realloc(10, sizeof(Int)*0, t, &size); 
     t = (Int *)paru_realloc(10, sizeof(Int), t, &size); 
     paru_free(10, sizeof(Int), t);
+    Int *test_new = new Int[0];
+    delete[] test_new;
     
     //~~~~~~~~~~~~~~~~~~~Starting computation~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     int ver[3];
