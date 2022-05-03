@@ -299,7 +299,7 @@ ParU_Ret paru_make_heap_empty_el(Int f, std::vector<Int> &pivotal_elements,
                     Int e = (*chHeap)[k];
                     if (elementList[e] != NULL)
                     {
-                        if (elementList[e] != NULL) curHeap->push_back(e);
+                        curHeap->push_back(e);
                     }
                 }
                 PRLEVEL(1,
