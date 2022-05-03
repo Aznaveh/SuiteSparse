@@ -35,17 +35,17 @@ int main(int argc, char **argv)
         exit(1);
     }
 
-    //covering alloc lines
+    // covering alloc lines
     Int *t = NULL;
-    t = (Int *)paru_alloc(1, sizeof(Int)*0); 
-    t = (Int *)paru_alloc(Size_max, sizeof(Int)); 
+    t = (Int *)paru_alloc(1, sizeof(Int) * 0);
+    t = (Int *)paru_alloc(Size_max, sizeof(Int));
     size_t size = 0;
-    t = (Int *)paru_realloc(10, sizeof(Int)*0, t, &size); 
-    t = (Int *)paru_realloc(10, sizeof(Int), t, &size); 
+    t = (Int *)paru_realloc(10, sizeof(Int) * 0, t, &size);
+    t = (Int *)paru_realloc(10, sizeof(Int), t, &size);
     paru_free(10, sizeof(Int), t);
     Int *test_new = new Int[0];
     delete[] test_new;
-    
+
     //~~~~~~~~~~~~~~~~~~~Starting computation~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     int ver[3];
     char date[128];
@@ -115,6 +115,8 @@ int main(int argc, char **argv)
         double *b = (double *)malloc(m * sizeof(double));
         double *xx = (double *)malloc(m * sizeof(double));
         for (Int i = 0; i < m; ++i) b[i] = i + 1;
+        info = ParU_Solve(Sym, NULL, b, xx, &Control);  // coverage
+        info = ParU_Solve(Sym, NULL, b, &Control);      // coverage
         info = ParU_Solve(Sym, Num, b, xx, &Control);
         if (info != PARU_SUCCESS)
         {
@@ -128,6 +130,8 @@ int main(int argc, char **argv)
         }
 
         double resid, anorm;
+        info =
+            ParU_Residual(A, xx, NULL, m, resid, anorm, &Control);  // coverage
         info = ParU_Residual(A, xx, b, m, resid, anorm, &Control);
         if (info != PARU_SUCCESS)
         {
@@ -153,6 +157,8 @@ int main(int argc, char **argv)
         for (Int i = 0; i < m; ++i)
             for (Int j = 0; j < nrhs; ++j) B[j * m + i] = (double)(i + j + 1);
 
+        info = ParU_Solve(Sym, NULL, nrhs, B, X, &Control);  // for coverage
+        info = ParU_Solve(Sym, NULL, nrhs, B, &Control);     // for coverage
         info = ParU_Solve(Sym, Num, nrhs, B, X, &Control);
         if (info != PARU_SUCCESS)
         {
@@ -164,6 +170,8 @@ int main(int argc, char **argv)
             ParU_Freesym(&Sym, &Control);
             return info;
         }
+        // This one is just for more coverage
+        info = ParU_Residual(A, X, NULL, m, nrhs, resid, anorm, &Control);
 
         info = ParU_Residual(A, X, B, m, nrhs, resid, anorm, &Control);
         if (info != PARU_SUCCESS)
@@ -179,6 +187,27 @@ int main(int argc, char **argv)
 
         printf("mRhs Residual is |%.2lf|\n", resid == 0 ? 0 : log10(resid));
 
+        free(B);
+        free(X);
+    }
+    else if (info == PARU_SINGULAR)  // to have a better coverage on solve
+    {
+        printf("Singular matrix\n");
+        double *b = (double *)malloc(m * sizeof(double));
+        double *xx = (double *)malloc(m * sizeof(double));
+        for (Int i = 0; i < m; ++i) b[i] = i + 1;
+        info = ParU_Solve(Sym, Num, b, &Control);
+        info = ParU_Solve(Sym, Num, b, xx, &Control);
+        free(b);
+        free(xx);
+        const Int nrhs = 16;  // number of right handsides
+        double *B = (double *)malloc(m * nrhs * sizeof(double));
+        double *X = (double *)malloc(m * nrhs * sizeof(double));
+        for (Int i = 0; i < m; ++i)
+            for (Int j = 0; j < nrhs; ++j) B[j * m + i] = (double)(i + j + 1);
+
+        info = ParU_Solve(Sym, Num, nrhs, B, &Control);
+        info = ParU_Solve(Sym, Num, nrhs, B, X, &Control);
         free(B);
         free(X);
     }

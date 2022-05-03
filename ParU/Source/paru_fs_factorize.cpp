@@ -357,7 +357,7 @@ Int paru_panel_factorize(Int f, Int m, Int n, const Int panel_width,
     return 1;
 }
 
-Int paru_factorize_full_summed(Int f, Int start_fac,
+void paru_factorize_full_summed(Int f, Int start_fac,
                                std::vector<Int> &panel_row,
                                std::set<Int> &stl_colSet,
                                std::vector<Int> &pivotal_elements,
@@ -566,5 +566,4 @@ Int paru_factorize_full_summed(Int f, Int start_fac,
         }
 #endif
     }
-    return 0;
 }

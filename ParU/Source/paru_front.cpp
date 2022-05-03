@@ -186,7 +186,7 @@ ParU_Ret paru_front(Int f,  // front need to be assembled
         Int start_fac = Work->time_stamp[f];
         PRLEVEL(1, ("%% start_fac= %ld\n", start_fac));
 
-        Int fac = paru_factorize_full_summed(f, start_fac, panel_row, 
+        paru_factorize_full_summed(f, start_fac, panel_row, 
                 stl_colSet, pivotal_elements, Work, Num);
         ++Work->time_stamp[f];
 
@@ -201,12 +201,6 @@ ParU_Ret paru_front(Int f,  // front need to be assembled
 
         PRLEVEL(0, ("%% num_panels = %ld\n", num_panels));
         PRLEVEL(0, ("%% After free num_panels = %ld\n", num_panels));
-
-        if (fac < 0)
-        {
-            PRLEVEL(1, ("Paru: Some problem in factorization \n"));
-            return PARU_INVALID;
-        }
 
 #ifndef NDEBUG  // Printing the list of rows
         PRLEVEL(PR, ("%% After factorization (inside assemble): \n"));

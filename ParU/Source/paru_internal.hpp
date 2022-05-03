@@ -319,7 +319,7 @@ ParU_Ret  paru_add_rowTuple(paru_tupleList *RowList, Int row, paru_tuple T);
 
 Int paru_dgetrf(double *F, Int *frowList, Int m, Int n, BLAS_INT *ipiv);
 
-Int paru_factorize_full_summed(Int f, Int start_fac,
+void paru_factorize_full_summed(Int f, Int start_fac,
                                std::vector<Int> &panel_row,
                                std::set<Int> &stl_colSet,
                                std::vector<Int> &pivotal_elements,
