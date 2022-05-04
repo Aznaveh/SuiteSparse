@@ -68,8 +68,8 @@ echo "========rajat19.mtx========"
 #./x_brutal_test <$MAT_PATH/Matrix/ParUTst/cage15/cage15.mtx
 #echo "========west0989.mtx========"
 #./x_brutal_test <$MAT_PATH/Matrix/ParUTst/west0989/west0989.mtx
-#echo "========west0497.mtx========"
-#./x_brutal_test <$MAT_PATH/Matrix/ParUTst/west0497/west0497.mtx
+echo "========west0497.mtx========"
+./x_brutal_test <$MAT_PATH/Matrix/ParUTst/west0497/west0497.mtx
 #echo "========west0167.mtx========"
 #./x_brutal_test <$MAT_PATH/Matrix/ParUTst/west0167/west0167.mtx
 #echo "========Trefethen_20b.mtx========"

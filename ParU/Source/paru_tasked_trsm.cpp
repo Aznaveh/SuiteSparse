@@ -17,6 +17,9 @@ void paru_tasked_trsm(Int f, int m, int n, double alpha, double *a, int lda,
     Int naft;
     ParU_Control *Control = Num->Control;
     Int L = Control->worthwhile_trsm;
+    #ifdef PARU_COVERAGE
+    L = 32;
+    #endif
     #pragma omp atomic read
     naft = Work->naft;
     const Int max_threads = Control->paru_max_threads;
