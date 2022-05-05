@@ -36,9 +36,7 @@ int paru_intersection(Int e, paru_element **elementList,
     // find the intersection between columns of e and
     Int intersection = 0;
     // conditions for early stop
-    if (el_colIndex[el->lac] > *stl_newColSet.end()) return 0;
-    if (el_colIndex[nEl - 1] > 0 &&
-        *stl_newColSet.begin() > el_colIndex[nEl - 1])
+    if (el_colIndex[el->lac] > *stl_newColSet.end()) 
         return 0;
 
     PRLEVEL(PR, ("%% newColSet.size = %ld\n", stl_newColSet.size()));
