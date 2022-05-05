@@ -170,8 +170,13 @@ void paru_update_rowDeg(Int panel_num, Int row_end, Int f, Int start_fac,
                 if (curCol < 0)  // already deleted
                     continue;
 
-                if (curCol < col2 && curCol >= col1) /*is a pivotal col */
-                    continue;
+                
+                //Found this in coverage test
+                //It also makes sense while the pivotal columns have been 
+                //already deleted
+                ////is a pivotal col 
+                //if (curCol < col2 && curCol >= col1) continue;
+                ASSERT(curCol >= col2 || curCol < col1); 
 
                 if (stl_colSet.find(curCol) == stl_colSet.end())
                 {
@@ -268,18 +273,23 @@ void paru_update_rowDeg(Int panel_num, Int row_end, Int f, Int start_fac,
     PR = 1;
 #endif
     PRLEVEL(1, ("%%Inside pivotal_elements\n"));
-    Int ii = 0;
     for (Int i = 0; i < (Int)pivotal_elements.size(); i++)
     {
         Int e = pivotal_elements[i];
         paru_element *el = elementList[e];
-        if (el == NULL)
-        {  // removing the  element from the list
-            PRLEVEL(1, ("%% eli = %ld, element= %ld  \n", eli, e));
-            continue;
-        }
+        //Found this in coverage test
+        //It seems that I keep pivotal_elements really clean before this
+        //if (el == NULL)
+        //{  // removing the  element from the list
+        //    PRLEVEL(1, ("%% eli = %ld, element= %ld  \n", eli, e));
+        //    continue;
+        //}
+        //This next lines are also extra; I didn't have resize after them
+        //There is no NULL inside pivotal_elements here.
         // keeping other elements inside the list
-        pivotal_elements[ii++] = pivotal_elements[i];
+        //pivotal_elements[ii++] = pivotal_elements[i];
+        
+        ASSERT(el != NULL);
 
 #ifndef NDEBUG
         PRLEVEL(PR, ("%% pivotal element= %ld lac=%ld colsleft=%ld \n", e,

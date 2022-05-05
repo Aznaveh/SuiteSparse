@@ -200,7 +200,7 @@ ParU_Ret paru_lsolve(double *x, ParU_Symbolic *Sym, ParU_Numeric *Num,
 ParU_Ret paru_lsolve(double *X, Int n, ParU_Symbolic *Sym, ParU_Numeric *Num,
                      ParU_Control *Control)
 {
-    DEBUGLEVEL(1);
+    DEBUGLEVEL(0);
     PARU_DEFINE_PRLEVEL;
     if (!X) return PARU_INVALID;
     Int m = Sym->m;

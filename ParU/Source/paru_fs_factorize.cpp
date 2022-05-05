@@ -239,7 +239,7 @@ Int paru_panel_factorize(Int f, Int m, Int n, const Int panel_width,
                         row_piv));
         }
         PRLEVEL(1, ("%% piv value= %2.4lf row_deg=%ld\n", piv, row_deg_sp));
-        PRLEVEL(-1, ("%% piv value= %e \n", piv));
+        PRLEVEL(1, ("%% piv value= %e \n", piv));
         // swap rows
         PRLEVEL(1, ("%% Swaping rows j=%ld, row_piv=%ld\n", j, row_piv));
         swap_rows(F, frowList, m, n, j, row_piv, Num);

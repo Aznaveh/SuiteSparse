@@ -613,8 +613,11 @@ void paru_assemble_rows(Int e, Int f, std::vector<Int> &colHash,
     if (PR <= 0) paru_print_element(e, Work, Num);
 #endif
 
-    if (el->cValid != Work->time_stamp[f])
-        paru_update_rel_ind_col(e, f, colHash, Work, Num);
+    //This never happpens I found it in test coverage
+    //It is obviouse when I look at the caller
+    //if (el->cValid != Work->time_stamp[f])
+    //    paru_update_rel_ind_col(e, f, colHash, Work, Num);
+    ASSERT(el->cValid == Work->time_stamp[f]);
 
     Int ncolsSeen = nEl;
 

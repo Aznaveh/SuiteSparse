@@ -71,7 +71,7 @@
 ParU_Ret ParU_Analyze(cholmod_sparse *A, ParU_Symbolic **S_handle,
                       ParU_Control *user_Control)
 {
-    DEBUGLEVEL(2);
+    DEBUGLEVEL(0);
     PARU_DEFINE_PRLEVEL;
 #ifndef NTIME
     double start_time = PARU_OPENMP_GET_WTIME;
@@ -867,11 +867,9 @@ ParU_Ret ParU_Analyze(cholmod_sparse *A, ParU_Symbolic **S_handle,
     PRLEVEL(PR, ("\n"));
 
     PR = -1;
-
     PRLEVEL(PR, ("%%%% newParent:\n"));
-    for (Int k = 0; k < newNf; k++) PRLEVEL(PR, ("  %ld", newParent[k]));
+    for (Int k = 0; k < newNf; k++) PRLEVEL(PR, ("%ld ", newParent[k]));
     PRLEVEL(PR, ("\n"));
-
 #endif
     paru_free(nf + 1, sizeof(Int), Sym->Parent);
     Sym->Parent = Parent = newParent;
@@ -1812,7 +1810,7 @@ ParU_Ret ParU_Analyze(cholmod_sparse *A, ParU_Symbolic **S_handle,
         PRLEVEL(PR, ("\n%% tasknodes map (%ld):\n", ntasks));
         for (Int i = 0; i <= ntasks; i++) PRLEVEL(PR, ("%ld ", task_map[i]));
         PR = -1;
-        PRLEVEL(PR, ("\n%% tasktree :\n"));
+        PRLEVEL(PR, ("%% tasktree :\n"));
         for (Int i = 0; i < ntasks; i++) PRLEVEL(PR, ("%ld ", task_parent[i]));
         PRLEVEL(PR, ("\n"));
         PR = 1;
