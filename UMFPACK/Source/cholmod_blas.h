@@ -2,11 +2,6 @@
 /* === Include/cholmod_blas.h =============================================== */
 /* ========================================================================== */
 
-/* -----------------------------------------------------------------------------
- * CHOLMOD/Include/cholmod_blas.h.
- * Copyright (C) 2005-2006, Univ. of Florida.  Author: Timothy A. Davis
- * -------------------------------------------------------------------------- */
-
 /* This does not need to be included in the user's program. */
 
 #ifndef CHOLMOD_BLAS_H
@@ -75,7 +70,32 @@
 
 /* Prototypes for the various versions of the BLAS.  */
 
-#if defined (BLAS_NO_UNDERSCORE)
+/* Determine if the 64-bit Sun Performance BLAS is to be used */
+#if defined(CHOLMOD_SOL2) && !defined(NSUNPERF) && defined(BLAS64)
+#define SUN64
+#endif
+
+#ifdef SUN64
+
+#define BLAS_DTRSV dtrsv_64_
+#define BLAS_DGEMV dgemv_64_
+#define BLAS_DTRSM dtrsm_64_
+#define BLAS_DGEMM dgemm_64_
+#define BLAS_DSYRK dsyrk_64_
+#define BLAS_DGER  dger_64_
+#define BLAS_DSCAL dscal_64_
+#define LAPACK_DPOTRF dpotrf_64_
+
+#define BLAS_ZTRSV ztrsv_64_
+#define BLAS_ZGEMV zgemv_64_
+#define BLAS_ZTRSM ztrsm_64_
+#define BLAS_ZGEMM zgemm_64_
+#define BLAS_ZHERK zherk_64_
+#define BLAS_ZGER  zgeru_64_
+#define BLAS_ZSCAL zscal_64_
+#define LAPACK_ZPOTRF zpotrf_64_
+
+#elif defined (BLAS_NO_UNDERSCORE)
 
 #define BLAS_DTRSV dtrsv
 #define BLAS_DGEMV dgemv

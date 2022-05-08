@@ -17,7 +17,7 @@
 
 /* These global debugging variables and arrays do not exist if debugging */
 /* is disabled at compile time (which is the default). */
-GLOBAL Int UMF_debug = -999 ; // -999 ;   FIXME
+GLOBAL Int UMF_debug = -999 ;
 GLOBAL Int UMF_allocfail = FALSE ;
 GLOBAL double UMF_gprob = -1.0 ;
 
@@ -713,7 +713,7 @@ GLOBAL void UMF_dump_memory
 	return ;
     }
 
-    DEBUG6 (("S: %p\n", Numeric)) ;
+    DEBUG6 (("S: "ID"\n", (Int) Numeric)) ;
     DEBUG6 (("S->ihead           : "ID"\n", Numeric->ihead)) ;
     DEBUG6 (("S->itail           : "ID"\n", Numeric->itail)) ;
     DEBUG6 (("S->size            : "ID"\n", Numeric->size)) ;
@@ -810,7 +810,7 @@ GLOBAL void UMF_dump_packed_memory
 	DEBUG6 (("No memory space S allocated\n")) ;
 	return ;
     }
-    DEBUG6 (("S: %p\n", Numeric)) ;
+    DEBUG6 (("S: "ID"\n", (Int) Numeric)) ;
     DEBUG6 (("S->ihead           : "ID"\n", Numeric->ihead)) ;
     DEBUG6 (("S->itail           : "ID"\n", Numeric->itail)) ;
     DEBUG6 (("S->size            : "ID"\n", Numeric->size)) ;
@@ -1050,7 +1050,7 @@ GLOBAL void UMF_dump_start
     AMD_debug_init ("from umfpack") ;
 
     /* get the debug print level from the "debug.umf" file, if it exists */
-    UMF_debug = 0 ; // -999 ;   FIXME
+    UMF_debug = -999 ;
     ff = fopen ("debug.umf", "r") ;
     if (ff)
     {

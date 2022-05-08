@@ -38,7 +38,6 @@ GLOBAL void UMF_blas3_update
 	return ;
     }
 
-    //Aznaveh count flops here
     m = Work->fnrows ;
     n = Work->fncols ;
 
@@ -50,7 +49,6 @@ GLOBAL void UMF_blas3_update
     L =	Work->Flblock ;	    /* ldl is fnr_curr */
     U = Work->Fublock ;	    /* ldu is fnc_curr, stored by rows */
     LU = Work->Flublock ;   /* nb-by-nb */
-
 
 #ifndef NDEBUG
     DEBUG5 (("DO RANK-NB UPDATE of frontal:\n")) ;
@@ -130,14 +128,6 @@ GLOBAL void UMF_blas3_update
 
 	/* rank-k outer product to update the C block */
 	/* C = C - L*U' (U is stored by rows, not columns) */
-
-    /* Aznaveh */
-    /*
-    printf ("%ld  %lf ",1, 0.0);
-    printf ("%ld %ld %ld ", m, n, k);
-    printf ("%ld %ld %ld\n", d, dc, d);
-    */
-
 
 #ifndef NBLAS
 	BLAS_GEMM (m, n, k, L, U, dc, C, d) ;

@@ -672,8 +672,8 @@ typedef struct	/* SymbolicType */
 	*Esize,
 	dense_row_threshold,
 	n1,			/* number of singletons */
-        n1r,                    /* number of row singletons */
-        n1c,                    /* number of column singletons */
+    n1r,                    /* number of row singletons */
+    n1c,                    /* number of column singletons */
 	nempty,			/* MIN (nempty_row, nempty_col) */
 	*Diagonal_map,		/* initial "diagonal" */
 	esize,			/* size of Esize array */

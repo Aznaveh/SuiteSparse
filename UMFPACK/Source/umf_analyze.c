@@ -30,26 +30,6 @@
 #include "umf_apply_order.h"
 #include "umf_fsize.h"
 
-/* Aznaveh: here changed for printing fronts info */
-/*
-#undef DEBUG1
-#undef DEBUG2
-#undef DEBUG3
-#undef ASSERT
-#define DEBUG1(param) 
-#define DEBUG2(param)
-#define DEBUG3(param) 
-#define ASSERT(param)
-*/
-
-/* Aznaveh: uncomment this to see the info*/
-//#define DEBUG1(param) printf param
-//#define DEBUG2(param) printf param
-//#define DEBUG3(param) printf param
-//#define ASSERT(param)
-
-
-
 /* ========================================================================== */
 
 GLOBAL Int UMF_analyze
@@ -465,10 +445,6 @@ GLOBAL Int UMF_analyze
 	    {
 		break ;
 	    }
-        /* Aznaveh */
-        /*
-        if (j2-j+1 > 1024) break ;
-        */
 	}
 
 	/* the loop above terminated with j2 at the first non-supernode */

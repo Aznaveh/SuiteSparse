@@ -591,10 +591,6 @@ PRIVATE void combine_ordering
 {
     Int k, oldcol, newcol, knew ;
 
-    //printf ("UMFPACK combine_ordering, n1: "ID" nempty_col "ID" n_col "ID
-    //    "\n", n1, nempty_col, n_col) ;
-    //printf ("UMF_debug %d\n", UMF_debug) ;
-
     /* combine the singleton ordering with Qinv */
 #ifndef NDEBUG
     for (k = 0 ; k < n_col ; k++)

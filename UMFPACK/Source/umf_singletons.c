@@ -704,7 +704,7 @@ PRIVATE Int finish_permutation
     for (k = 0 ; k < nx ; k++)
     {
 	x = (Xuser != (Int *) NULL) ? Xuser [k] : k ;
-	DEBUG1 (("finish perm k "ID" x "ID" nx "ID"\n", k, x, nx)) ;
+	DEBUG0 (("finish perm k "ID" x "ID" nx "ID"\n", k, x, nx)) ;
 	deg = Xdeg [x] ;
 	if (deg == 0)
 	{
@@ -897,14 +897,6 @@ GLOBAL Int UMF_singletons
      * 4.2.4 in a 64-bit Linux environment.  The bug is a compiler bug, not a
      * an UMFPACK bug.  It is fixed in gcc version 4.3.2.  However, as a
      * workaround for the compiler, the code below has been "fixed". */
-
-    /*
-    if (n1 > 0)
-    {
-        is_sym = FALSE ;
-    }
-    else
-    */
 
     if (n_row == n_col && nempty_row == nempty_col)
     {
