@@ -35,6 +35,8 @@ int main(int argc, char **argv)
         exit(1);
     }
 
+    /////This part is for covering the codes that cannot be covered through
+    ///// factorizing 
     // covering alloc lines
     Int *t = NULL;
     t = (Int *)paru_alloc(1, sizeof(Int) * 0);
@@ -45,6 +47,11 @@ int main(int argc, char **argv)
     paru_free(10, sizeof(Int), t);
     Int *test_new = new Int[0];
     delete[] test_new;
+    // covering elementList
+    paru_element* elementList[] = {NULL};
+    Int lac_0 = lac_el(elementList, 0);
+    if (lac_0 != LONG_MAX)
+        printf ("Some problem happend\n");
 
     //~~~~~~~~~~~~~~~~~~~Starting computation~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     int ver[3];
