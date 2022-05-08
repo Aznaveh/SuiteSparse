@@ -171,21 +171,15 @@ ParU_Ret ParU_Analyze(cholmod_sparse *A, ParU_Symbolic **S_handle,
                  //  ---   . . . x x s s s s
                  //
                  //  ---   The above example has 3 column singletons (the first
-                 //  three
-                 //  ---   columns and their corresponding pivot rows) and 2 row
-                 //  ---   singletons.  The singletons are ordered first,
-                 //  because they
-                 //  ---   have zero Markowitz cost. The LU factorization for
-                 //  these first
-                 //  ---   five rows and columns is free - there is no work to
-                 //  do (except
-                 //  ---   to scale the pivot columns for the 2 row singletons),
-                 //  and no
-                 //  ---   fill-in occurs.  The remaining submatrix (4-by-4 in
-                 //  the above
-                 //  ---   example) has no rows or columns with degree one.  It
-                 //  may have
-                 //  ---   empty rows or columns.
+                 //  ---  three   columns and their corresponding pivot rows) 
+                 //  ---  and 2 row   singletons.  The singletons are ordered 
+                 //  ---  first, because they  have zero Markowitz cost. The LU
+                 //  ---  factorization for these first five rows and columns is
+                 //  ---  free - there is no work to do (except to scale the 
+                 //  ---  pivot columns for the 2 row singletons), and no 
+                 //  ---  fill-in occurs.  The remaining submatrix (4-by-4 in 
+                 //  ---  the above example) has no rows or columns with degree 
+                 //  ---  one.  It may have empty rows or columns.
                  //
                  //
                  //        _______________
@@ -210,7 +204,7 @@ ParU_Ret ParU_Analyze(cholmod_sparse *A, ParU_Symbolic **S_handle,
             // with a single working array that holds each frontal matrix in the
             // chain, one at a time. nchains is in the range 0 to nfr
 
-                *Pinit = NULL,
+        *Pinit = NULL,
         // The inital row permutation. If P [k] = i, then this means
         // that row i is the kth row in the pre-ordered matrix.
         // For the unsymmetric strategy, P defines the row-merge
@@ -228,7 +222,7 @@ ParU_Ret ParU_Analyze(cholmod_sparse *A, ParU_Symbolic **S_handle,
         // an invert permutation that I have to compute the direct
         // permutation in paru_write.
 
-                    *Qinit = NULL,
+        *Qinit = NULL,
         // The inital column permutation. If Q [k] = j, then this
         // means that column j is the kth pivot column in pre-ordered
         // matrix. Q is not necessearily the same as final column
@@ -241,17 +235,17 @@ ParU_Ret ParU_Analyze(cholmod_sparse *A, ParU_Symbolic **S_handle,
         // staircase structure and that is the column permutation for
         // paru also.
 
-                        *Diag_map = NULL,
+        *Diag_map = NULL,
         // Diag_map[newcol] = newrow; It is how UMFPACK see it
         // it should be updated during makding staircase structure
         // my Diag_map would be Diag_map[col_s] = row_s
         // col_s = newcol - n1, row_s comes from staircase structure
         // I have to make initial Diag_map inverse to be able to compute mine
-                            *inv_Diag_map = NULL,
+        *inv_Diag_map = NULL,
         // it will be freed in symbolic anyway but I will make another copy
         // in paru_init_rowFronts; that copy can be updated
 
-                                *Front_npivcol = NULL,
+        *Front_npivcol = NULL,
         // size = n_col +1;  actual size = nfr+1
         // NOTE: This is not the case for SPQR
         // I think SPQR is easier:
@@ -262,7 +256,7 @@ ParU_Ret ParU_Analyze(cholmod_sparse *A, ParU_Symbolic **S_handle,
         // Front_parent [nfr+1] is a place holder for columns
         // with no entries
 
-                                    *Front_parent = NULL;
+        *Front_parent = NULL;
     // size = n_col +1;  actual size = nfr+1
     // NOTE: This is not the case for SPQR
     // Parent is the one I should use instead.
@@ -871,6 +865,11 @@ ParU_Ret ParU_Analyze(cholmod_sparse *A, ParU_Symbolic **S_handle,
     for (Int k = 0; k < newNf; k++) PRLEVEL(PR, ("%ld ", newParent[k]));
     PRLEVEL(PR, ("\n"));
 #endif
+    // This prints my etree; I keep it in comments to find it easily
+    // printf ("%%%% newParent:\n");
+    // for (Int k = 0; k < newNf; k++) printf("%ld ", newParent[k]);
+    // printf("\n");
+
     paru_free(nf + 1, sizeof(Int), Sym->Parent);
     Sym->Parent = Parent = newParent;
     newParent = NULL;
@@ -1909,6 +1908,12 @@ ParU_Ret ParU_Analyze(cholmod_sparse *A, ParU_Symbolic **S_handle,
     PRLEVEL(PR, ("\n"));
 
 #endif
+
+    // This prints the task tree; I keep it in comments to find it easily
+    // printf ("%% tasktree :\n");
+    // for (Int i = 0; i < ntasks; i++) printf("%ld ", task_parent[i]);
+    // printf ("\n");
+
 #ifndef NTIME
     double time = PARU_OPENMP_GET_WTIME;
     time -= start_time;
