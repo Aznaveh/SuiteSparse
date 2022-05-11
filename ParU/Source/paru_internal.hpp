@@ -58,9 +58,9 @@ extern "C"
 
 
 
-#define PARU_ALLOC_TESTING // for coverage test allocations
-                           // it shouldn't be called with NDEBUG
-#define PARU_COVERAGE
+//#define PARU_ALLOC_TESTING // for coverage test allocations
+//                           // it shouldn't be called with NDEBUG
+//#define PARU_COVERAGE
 
 // uncomment if you want to count hardware flops
 //#define COUNT_FLOPS

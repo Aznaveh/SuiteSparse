@@ -1058,7 +1058,7 @@ PRIVATE Int symbolic_analysis
 
     DEBUG0 (("Symbolic UMF_malloc_count - init_count = "ID"\n",
 	UMF_malloc_count - init_count)) ;
-//  ASSERT (UMF_malloc_count == init_count + 17) ;
+    ASSERT (UMF_malloc_count == init_count + 18) ;
 
     /* ---------------------------------------------------------------------- */
     /* find the row and column singletons */
@@ -1830,8 +1830,8 @@ PRIVATE Int symbolic_analysis
     }
     DEBUG0 (("Symbolic UMF_malloc_count - init_count = "ID"\n",
 	UMF_malloc_count - init_count)) ;
-//  ASSERT (UMF_malloc_count == init_count + 21
-//	+ (Symbolic->Esize != (Int *) NULL)) ;
+    ASSERT (UMF_malloc_count == init_count + 22
+  	+ (Symbolic->Esize != (Int *) NULL)) ;
 
     Front_npivcol = Symbolic->Front_npivcol ;
     Front_parent = Symbolic->Front_parent ;
