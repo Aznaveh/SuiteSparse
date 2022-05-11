@@ -215,7 +215,7 @@ void *paru_realloc(
     else if (p == NULL)
     {  // A new alloc
         p = paru_alloc(nnew, size_Entry);
-        *n = (pnew == NULL) ? 0 : nnew;
+        *n = (p == NULL) ? 0 : nnew;
     }
     else if (nnew == *n )
     {
