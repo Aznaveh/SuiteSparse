@@ -52,36 +52,9 @@ are supported.
 \label{intro}
 %-------------------------------------------------------------------------------
 
-The algorithms used in SuiteSparseQR are discussed in a companion paper,
-\cite{Davis08a}, and an overview of how to use the software is given in
-\cite{Davis08b}.  This document gives detailed information on the installation
+The algorithms used in ParU will be discussed in a companion paper,
+?. This document gives detailed information on the installation
 and use of SuiteSparseQR.
-
-%-------------------------------------------------------------------------------
-\section{Using SuiteSparseQR in MATLAB}
-%-------------------------------------------------------------------------------
-
-The simplest way to use SuiteSparseQR is via MATLAB.  Its syntax includes every
-feature of the MATLAB \verb'qr' in version R2009a and earlier
-\cite{GilbertMolerSchreiber}, plus additional features not available in MATLAB.
-It is also a replacement for \verb'x=A\b' for least-squares problems and
-underdetermined systems.  In addition to substantial gains in performance (10x
-to 100x is not uncommon, up to 10,000x has been observed), SuiteSparseQR adds
-new capabilities that are not present in MATLAB.  For example, it provides an
-efficient method for finding the minimum 2-norm solution to an underdetermined
-system.
-
-%-------------------------------------------------------------------------------
-\subsection{Installing SuiteSparseQR for use in MATLAB}
-%-------------------------------------------------------------------------------
-
-All packages in SuiteSparse, including SuiteSparseQR and the codes it relies on
-(AMD, COLAMD, CHOLMOD, METIS, CCAMD, and CCOLAMD) are compiled with a single
-command typed into the MATLAB Command Window.  SuiteSparseQR uses the LAPACK
-and BLAS libraries provided with MATLAB; you do not need to do anything to use
-these.  Below are step-by-step instructions for compiling all of SuiteSparse
-(including SuiteSparseQR), and optional instructions on using METIS and/or
-Intel's Threading Building Blocks (TBB).
 
 %-------------------------------------------------------------------------------
 \subsubsection{Required instructions for Windows}
@@ -111,115 +84,6 @@ than rows (SuiteSparseQR does not use METIS, by default, for those systems).
 This (rare) faulty behavior has been confirmed with valid inputs to the METIS
 test programs themselves; it is not a bug in the SuiteSparse interface to
 METIS.  Use METIS at your own risk.
-
-%-------------------------------------------------------------------------------
-\subsubsection{Optional instructions for using TBB on Linux/Unix/Mac}
-%-------------------------------------------------------------------------------
-
-If you are using a Debian-based Linux system (such as Ubuntu), you're in luck!
-You can install TBB via the Synaptic Package Manager.  Just search for TBB,
-select it, and click Apply.  This will place the right files in \verb'/usr/lib'
-and it will create the \verb'/usr/include/tbb' directory.  It's by far the
-simplest way to install TBB.  If you do this, skip the rest of this section.
-
-Alternatively, obtain a copy of TBB from
-\htmladdnormallink{http://www.threadingbuildingblocks.org}{http://www.threadingbuildingblocks.org}
-as a \verb'tbb*.tgz' file appropriate for your version of Linux/Unix.  If you
-install via the \verb'tbb_*.tgz' file, make sure the \verb'libtbb*.so*' and
-\verb'libtbbmalloc*.so*' files are placed in the \verb'/usr/lib' directory.
-Make sure the \verb'tbb' directory containing all of the include files is
-placed in \verb'/usr/include' (for example, the
-\verb'/usr/include/tbb/task_scheduler_init.h' file must exist).
-
-If you do not have permission to install TBB properly into the \verb'/usr/lib'
-and \verb'/usr/include' directories, you can place it in your own directory and
-modify the \verb'tbb_path' variable in \verb'spqr_make.m' to specify
-the location of your own copy of TBB (refer to that file for instructions).
-You must also set your \verb'LD_LIBRARY_PATH' environment variable to include
-the directory containing the \verb'libtbb*so' files.  You need to first
-determine which subdirectory of the TBB distribution contains the libraries
-appropriate for your system; in the examples below this is just called
-\verb'/path'.  It must be an absolute path, starting with the \verb'/'
-character.  There must be no spaces in the path name.
-
-For Linux use this command at the system command line before starting MATLAB,
-where \verb'/path' should be replaced with the actual full path of the TBB
-\verb'lib' directory:
-
-\begin{verbatim}
-    setenv LD_LIBRARY_PATH /path:$LD_LIBRARY_PATH
-\end{verbatim}
-
-If you use the \verb'csh' shell, place the command in your \verb'~/.cshrc'
-file so you don't have to type it each time you start MATLAB.
-
-For the Mac, edit the \verb'/etc/profile' file and add this line to the end of
-the file:
-
-\begin{verbatim}
-    export DYLD_LIBRARY_PATH=/path:$DYLD_LIBRARY_PATH
-\end{verbatim}
-
-For example, using the 64-bit Linux version placed in my home directory, this
-command would be placed in my \verb'~/.cshrc' file, prior to starting MATLAB.
-
-{\scriptsize
-\begin{verbatim}
-    setenv LD_LIBRARY_PATH /home/davis/tbb21_009oss/em64t/cc4.1.0_libc2.4_kernel2.6.16.21/lib:$LD_LIBRARY_PATH
-\end{verbatim}
-}
-
-Then, before starting MATLAB, make sure this variable is set by typing this
-command at the system command line (you only have to do this for this session;
-whenever you start a new command shell this will be done automatically): 
-
-\begin{verbatim}
-    source ~/.cshrc
-\end{verbatim}
-
-For this example, my \verb'spqr_make.m' file would contain this line:
-
-\begin{verbatim}
-    tbb_path = '/home/davis/tbb21_009oss' ;
-\end{verbatim}
-
-%-------------------------------------------------------------------------------
-\subsubsection{Optional instructions for using TBB on Windows}
-%-------------------------------------------------------------------------------
-
-Obtain a copy of TBB from
-\htmladdnormallink{http://www.threadingbuildingblocks.org}{http://www.threadingbuildingblocks.org}
-; for TBB Version 2.1 this file is \verb'tbb21_009oss_win.zip'.
-
-Create a folder and place the \verb'tbb21_009oss_win.zip' file there, and
-extract the file.  In the example below, I extracted to
-\verb'C:\TBB\tbb21_009oss' (if you do the same then you do not have to edit
-\verb'spqr_make.m').  There should be no spaces in the path (for example,
-placing TBB under the \verb'Program Files' directory will not work).
-
-In Windows XP, right-click \verb'My Computer' and select \verb'Properties'.
-Click the \verb'Advanced' tab.  Click \verb'Environment Variables'.  Under
-\verb'System' variables, edit the \verb'Path' to append the name of the folder
-containing the TBB \verb'bin' folder appropriate for your system, preceded by a
-semicolon.  For example, in a 32-bit Windows system if TBB is installed in
-\verb'C:\TBB' you would append the string
-\verb';C:\TBB\tbb21_009oss\ia32\vc9\bin\' to the end of your system \verb'Path'
-variable.
-
-For Vista, the instructions are the same, except that you choose
-\verb'Computer' instead of \verb'My Computer', and you click the
-\verb'Advanced System Settings' tab instead of the \verb'Advanced' tab.
-
-Next, edit the \verb'SPQR\MATLAB\spqr_make.m' file.  Change the \verb'tbb_path'
-variable to point to your copy of TBB.  For example, if you installed TBB into
-\verb'C:\TBB' your \verb'spqr_make.m' file would contain this line:
-
-\begin{verbatim}
-    tbb_path = 'C:\TBB\tbb21_009oss' ;
-\end{verbatim}
-
-That line is already in \verb'spqr_make.m', so if you choose to install TBB
-in that location, you do not have to edit the file.
 
 %-------------------------------------------------------------------------------
 \subsubsection{Now you're ready to compile (on any operating system)}
