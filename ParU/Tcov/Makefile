@@ -1,5 +1,7 @@
 #===============================================================================
 # ParU/Tcov/Makefile
+# Remember to activate coverage in ../Source/paru_internal.hpp to cover all the 
+# 	lines
 #===============================================================================
 
 
