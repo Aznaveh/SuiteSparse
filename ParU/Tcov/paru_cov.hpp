@@ -34,7 +34,7 @@
 #define BRUTAL_ALLOC_TEST(info, method) \
     {                                   \
         info = method;                  \
-    
+    }
 #endif
 
 #endif
