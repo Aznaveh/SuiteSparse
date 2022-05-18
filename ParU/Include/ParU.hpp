@@ -343,7 +343,10 @@ struct ParU_Numeric
     double max_udiag;
     ParU_Ret res;  // returning value of numeric phase
 };
-
+//------------------------------------------------------------------------------
+// ParU_Version: 
+// print out the version
+//------------------------------------------------------------------------------
 ParU_Ret ParU_Version (int ver [3], char date [128]);
 //------------------------------------------------------------------------------
 // ParU_Analyze: Symbolic analysis is done in this routine. UMFPACK is called
