@@ -1,3 +1,6 @@
+#package minted is need for ParU user guide therfore python3-pygments must 
+#  be installed
+
 
 default: paru_user_guide.pdf
 

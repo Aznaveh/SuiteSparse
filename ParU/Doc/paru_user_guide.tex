@@ -225,22 +225,27 @@ can do:
 
 \begin{enumerate}
 
-    \item \mintinline{c}{ParU_Version}: return the version of the ParU package 
+    \item \verb'ParU_Version': return the version of the ParU package 
         you are using.
 
-    \item \verb'SuiteSparseQR_factorize': performs both the symbolic and
-    numeric factorizations and returns a QR factorization object such that
-    \verb'A*P=Q*R'.  It always exploits singletons.
+    \item \verb'ParU_Analyze': Symbolic analysis is done in this routine. 
+        UMFPACK is called here and after that some more speciallized symbolic
+        computation is done for ParU. 
+        \verb'ParU_Analyze' called once and used for differen 
+        \verb'ParU_Factorize'
+        calls.
+    \item \verb'ParU_Factorize': 
+        Numeric factorization is done in this routine. Scaling and
+        making Sx matrix, computing factors and permutations is here. 
+        \verb'ParU_Symbolic' structure is computed \verb'ParU_Analyze' 
+        and is an input in this routine.
 
-    \item \verb'SuiteSparseQR_symbolic': performs the symbolic factorization
-    and returns a QR factorization object to be passed to
-    \verb'SuiteSparseQR_numeric'.  It does not exploit singletons.
+    \item \verb'ParU_Solve':  
+        Using symbolic analysis and factorization phase output to solve $Ax=b$.
+        In all the solve routines Num structure must come with the same 
+        Sym struct that comes from \verb'ParU_Factorize'. 
+        This routin is overloaded and can solve differently.
 
-    \item \verb'SuiteSparseQR_numeric': performs the numeric factorization on a
-    QR factorization object, either one constructed by
-    \verb'SuiteSparseQR_symbolic', or reusing one from a prior call to
-    \verb'SuiteSparseQR_numeric' for a matrix \verb'A' with the same pattern as
-    the first one, but with different numerical values.
 
     \item \verb'SuiteSparseQR_solve': solves a linear system using the object
     returned by \newline \verb'SuiteSparseQR_factorize' or
