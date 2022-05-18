@@ -30,26 +30,26 @@ int main(int argc, char **argv)
     A = (cholmod_sparse *)cholmod_l_read_matrix(stdin, 1, &mtype, cc);
     if (A == NULL)
     {
-        printf("Paru: input matrix is invalid\n");
+        printf("ParU: input matrix is invalid\n");
         exit(1);
     }
 
     if (mtype != CHOLMOD_SPARSE)
     {
-        printf("Paru: input matrix must be sparse\n");
+        printf("ParU: input matrix must be sparse\n");
         exit(1);
     }
 
     if (A->xtype != CHOLMOD_REAL)
     {
-        printf("Paru: input matrix must be real\n");
+        printf("ParU: input matrix must be real\n");
         exit(1);
     }
 
     //~~~~~~~~~~~~~~~~~~~Starting computation~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     int ver[3]; char date[128];
     ParU_Version (ver ,date);
-    printf("Paru %d.%d.%d",ver[0],ver[1],ver[2]);
+    printf("ParU %d.%d.%d",ver[0],ver[1],ver[2]);
     printf(" %s\n",date);
 
     double my_start_time = omp_get_wtime();
@@ -65,13 +65,13 @@ int main(int argc, char **argv)
         return info;
     }
     printf("In: %ldx%ld nnz = %ld \n", Sym->m, Sym->n, Sym->anz);
-    printf("Paru: Symbolic factorization is done!\n");
+    printf("ParU: Symbolic factorization is done!\n");
     ParU_Numeric *Num;
     info = ParU_Factorize(A, Sym, &Num, &Control);
     double my_time = omp_get_wtime() - my_start_time;
     if (info != PARU_SUCCESS)
     {
-        printf("Paru: factorization was NOT successfull in %lf seconds.\n",
+        printf("ParU: factorization was NOT successfull in %lf seconds.\n",
                my_time);
         cholmod_l_free_sparse(&A, cc);
         cholmod_l_finish(cc);
@@ -79,7 +79,7 @@ int main(int argc, char **argv)
         return info;
     }
     else
-        printf("Paru: factorization was successfull in %lf seconds.\n",
+        printf("ParU: factorization was successfull in %lf seconds.\n",
                my_time);
 
     //~~~~~~~~~~~~~~~~~~~Test the results ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -94,7 +94,7 @@ int main(int argc, char **argv)
         info = ParU_Solve(Sym, Num, b, xx, &Control);
         if (info != PARU_SUCCESS)
         {
-            printf("Paru: Solve has a problem.\n");
+            printf("ParU: Solve has a problem.\n");
             free(b);
             free(xx);
             cholmod_l_free_sparse(&A, cc);
@@ -109,7 +109,7 @@ int main(int argc, char **argv)
         info = ParU_Residual(A, xx, b, m, resid, anorm, &Control);
         if (info != PARU_SUCCESS)
         {
-            printf("Paru: Residual has a problem.\n");
+            printf("ParU: Residual has a problem.\n");
             free(b);
             free(xx);
             cholmod_l_free_sparse(&A, cc);
@@ -132,7 +132,7 @@ int main(int argc, char **argv)
         info = ParU_Solve(Sym, Num, nrhs, B, X, &Control);
         if (info != PARU_SUCCESS)
         {
-            printf("Paru: mRhs Solve has a problem.\n");
+            printf("ParU: mRhs Solve has a problem.\n");
             free(B);
             free(X);
             cholmod_l_free_sparse(&A, cc);
@@ -143,7 +143,7 @@ int main(int argc, char **argv)
         info = ParU_Residual(A, X, B, m, nrhs, resid, anorm, &Control);
         if (info != PARU_SUCCESS)
         {
-            printf("Paru: mRhs Residual has a problem.\n");
+            printf("ParU: mRhs Residual has a problem.\n");
             free(B);
             free(X);
             cholmod_l_free_sparse(&A, cc);

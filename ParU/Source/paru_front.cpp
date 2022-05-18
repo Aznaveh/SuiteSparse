@@ -71,7 +71,7 @@ ParU_Ret paru_front(Int f,  // front need to be assembled
         Int *frowList = (Int *)paru_alloc(fm, sizeof(Int));
         if (frowList == NULL)
         {
-            PRLEVEL(1, ("Paru: out of memory when tried to allocate"
+            PRLEVEL(1, ("ParU: out of memory when tried to allocate"
                         " for frowList %ld\n",
                         f));
             return PARU_OUT_OF_MEMORY;
@@ -131,7 +131,7 @@ ParU_Ret paru_front(Int f,  // front need to be assembled
         if (res_pivotal == PARU_OUT_OF_MEMORY)
         {
             PRLEVEL(1,
-                    ("Paru: out of memory making pivotal of front %ld\n", f));
+                    ("ParU: out of memory making pivotal of front %ld\n", f));
             return PARU_OUT_OF_MEMORY;
         }
         PRLEVEL(1, ("%% Done: work on pivotal column assembly\n"));
@@ -176,7 +176,7 @@ ParU_Ret paru_front(Int f,  // front need to be assembled
 
         if (rowCount < fp)
         {
-            PRLEVEL(1, ("Paru: singular, structural problem on %ld: %ldx%ld\n"
+            PRLEVEL(1, ("ParU: singular, structural problem on %ld: %ldx%ld\n"
                         , f, rowCount, fp));
 #pragma omp atomic write
             Num->res = PARU_SINGULAR;
@@ -263,7 +263,7 @@ ParU_Ret paru_front(Int f,  // front need to be assembled
 
             if (fcolList == NULL)
             {
-                PRLEVEL(1, ("Paru: out of memory when tried to allocate for"
+                PRLEVEL(1, ("ParU: out of memory when tried to allocate for"
                             " fcolList=%ld with the size %ld\n",
                             f, fn));
                 return PARU_OUT_OF_MEMORY;
@@ -344,7 +344,7 @@ ParU_Ret paru_front(Int f,  // front need to be assembled
         double *uPart = (double *)paru_calloc(fp * colCount, sizeof(double));
         if (uPart == NULL)
         {
-            PRLEVEL(1, ("Paru: out of memory when tried to"
+            PRLEVEL(1, ("ParU: out of memory when tried to"
                         " allocate for U part %ld\n", f));
             return PARU_OUT_OF_MEMORY;
         }
@@ -483,7 +483,7 @@ ParU_Ret paru_front(Int f,  // front need to be assembled
             // While insided the DGEMM BETA == 0
             if (curEl == NULL)
             {
-                PRLEVEL(1, ("Paru: out of memory when tried to allocate" 
+                PRLEVEL(1, ("ParU: out of memory when tried to allocate" 
                             " current CB %ld\n", eli));
                 return PARU_OUT_OF_MEMORY;
             }
@@ -584,7 +584,7 @@ ParU_Ret paru_front(Int f,  // front need to be assembled
             if (paru_add_rowTuple(RowList, frowList[i], rowTuple) 
                     == PARU_OUT_OF_MEMORY )
             {
-                PRLEVEL(1, ("Paru: out of memory: add_rowTuple \n"));
+                PRLEVEL(1, ("ParU: out of memory: add_rowTuple \n"));
                 return PARU_OUT_OF_MEMORY;
             }
         }
@@ -604,7 +604,7 @@ ParU_Ret paru_front(Int f,  // front need to be assembled
 
     catch (std::bad_alloc const &)
     {  // out of memory
-        PRLEVEL(1, ("Paru: Out of memory, bad_alloc in front\n"));
+        PRLEVEL(1, ("ParU: Out of memory, bad_alloc in front\n"));
         return PARU_OUT_OF_MEMORY;
     }
     return PARU_SUCCESS;

@@ -13,8 +13,8 @@ paru_user_guide.pdf: paru_user_guide.tex paru_user_guide.bib Makefile
 distclean: purge
 
 clean:
-	- $(RM) -r $(CLEAN) *.out
+	- $(RM) -r $(CLEAN) 
 
 purge: clean
-	- $(RM) -r $(PURGE)
+	- $(RM) -r $(PURGE) *.out paru_user_guide.pdf
 

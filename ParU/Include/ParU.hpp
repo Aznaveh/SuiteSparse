@@ -7,17 +7,17 @@
 
 // This is ParU.hpp file. All user callable routines are in this file and all of
 // them start with ParU_*. This file must be included in all user code that use
-// Paru. 
+// ParU. 
 //
-// Paru is a parallel sparse direct solver. This package uses OpenMP
-// tasking for parallelism. Paru calls UMFPACK for symbolic analysis phase,
-// after that some symbolic analysis is done by Paru itself and  then numeric
+// ParU is a parallel sparse direct solver. This package uses OpenMP
+// tasking for parallelism. ParU calls UMFPACK for symbolic analysis phase,
+// after that some symbolic analysis is done by ParU itself and  then numeric
 // phase starts. The numeric computation is a task parallel phase using OpenMP
 // and each task calls parallel BLAS; i.e. nested parallism. 
 //
-// The performance of BLAS has a heavy impact on the performance of Paru.
+// The performance of BLAS has a heavy impact on the performance of ParU.
 // However, depending on the input problem performance of parallelsim in BLAS 
-// is sometimes not have effects in Paru.
+// is sometimes not have effects in ParU.
 // 
 //                  General Usage for solving Ax = b
 //          A is a sparse matrix in matrix market format with double entries
@@ -234,7 +234,7 @@ struct ParU_Symbolic
     double *front_flop_bound;  // bound on m*n*k for each front size nf+1
     double *stree_flop_bound;  // flop bound for front and descendents size nf+1
 
-    // data structure related to Paru tasks
+    // data structure related to ParU tasks
     Int ntasks;        // number of tasks; at most nf
     Int *task_map;     // each task does the fronts
                        // from task_map[i]+1 to task_map[i+1]; task_map[0] is -1
@@ -348,7 +348,7 @@ ParU_Ret ParU_Version (int ver [3], char date [128]);
 //------------------------------------------------------------------------------
 // ParU_Analyze: Symbolic analysis is done in this routine. UMFPACK is called
 // here and after that some more speciallized symbolic computation is done for
-// Paru. ParU_Analyze can be called once and used for differen ParU_Factorize
+// ParU. ParU_Analyze can be called once and used for differen ParU_Factorize
 // calls. 
 //------------------------------------------------------------------------------
 ParU_Ret ParU_Analyze(

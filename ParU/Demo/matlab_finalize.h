@@ -31,7 +31,7 @@ void matlab_finalize (Int nf)
     //PRLEVEL (p, ("matlabErr = norm(S(p,:)-l*u,'fro')\n" ));
     PRLEVEL (p, ("matlabErr = lu_normest(S(p,:),l,u)\n" ));
     PRLEVEL (p, ("nnzMat= nnz(l)+nnz(u) \n" ));
-    PRLEVEL (p, ("fprintf('Paru\\n');\n"));
+    PRLEVEL (p, ("fprintf('ParU\\n');\n"));
     //PRLEVEL (p, ("myErr = norm(S(oldR,c)-L*U,'fro')\n" ));
     PRLEVEL (p, ("myErr = lu_normest(S(oldR,c),L,U)\n" ));
     PRLEVEL (p, ("mynnz= nnz(L)+nnz(U) \n" ));

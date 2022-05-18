@@ -33,7 +33,7 @@ ParU_Ret ParU_Solve(ParU_Symbolic *Sym, ParU_Numeric *Num, double *b,
     double *x = (double *)paru_alloc(m, sizeof(double));
     if (x == NULL)
     {
-        PRLEVEL(1, ("Paru: memory problem inside solve\n"));
+        PRLEVEL(1, ("ParU: memory problem inside solve\n"));
         return PARU_OUT_OF_MEMORY;
     }
     // making copy of user input and check it
@@ -132,7 +132,7 @@ ParU_Ret ParU_Solve(ParU_Symbolic *Sym, ParU_Numeric *Num, Int nrhs, double *B,
     double *X = (double *)paru_alloc(m * nrhs, sizeof(double));
     if (X == NULL)
     {
-        PRLEVEL(1, ("Paru: memory problem inside Solve\n"));
+        PRLEVEL(1, ("ParU: memory problem inside Solve\n"));
         return PARU_OUT_OF_MEMORY;
     }
 

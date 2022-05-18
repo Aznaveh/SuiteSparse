@@ -103,7 +103,7 @@ ParU_Ret paru_lsolve(double *x, ParU_Symbolic *Sym, ParU_Numeric *Num,
     double *work = (double *)paru_alloc((Num->max_row_count), sizeof(double));
     if (work == NULL)
     {
-        PRLEVEL(1, ("Paru: out of memory lsolve\n"));
+        PRLEVEL(1, ("ParU: out of memory lsolve\n"));
         return PARU_OUT_OF_MEMORY;
     }
 
@@ -287,7 +287,7 @@ ParU_Ret paru_lsolve(double *X, Int n, ParU_Symbolic *Sym, ParU_Numeric *Num,
         (double *)paru_alloc((Num->max_row_count * n), sizeof(double));
     if (work == NULL)
     {
-        PRLEVEL(1, ("Paru: out of memory lsolve\n"));
+        PRLEVEL(1, ("ParU: out of memory lsolve\n"));
         return PARU_OUT_OF_MEMORY;
     }
 

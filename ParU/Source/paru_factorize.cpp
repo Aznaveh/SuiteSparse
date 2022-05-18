@@ -183,13 +183,13 @@ ParU_Ret ParU_Factorize(cholmod_sparse *A, ParU_Symbolic *Sym,
 #endif
     if (A == NULL)
     {
-        PRLEVEL(1, ("Paru: input matrix is invalid\n"));
+        PRLEVEL(1, ("ParU: input matrix is invalid\n"));
         return PARU_INVALID;
     }
 
     if (A->xtype != CHOLMOD_REAL)
     {
-        PRLEVEL(1, ("Paru: input matrix must be real\n"));
+        PRLEVEL(1, ("ParU: input matrix must be real\n"));
         return PARU_INVALID;
     }
 
@@ -279,7 +279,7 @@ ParU_Ret ParU_Factorize(cholmod_sparse *A, ParU_Symbolic *Sym,
     }
     catch (std::bad_alloc const &)
     {  // out of memory
-        PRLEVEL(1, ("Paru: Out of memory: task_Q\n"));
+        PRLEVEL(1, ("ParU: Out of memory: task_Q\n"));
         paru_free_work(Sym, Work);   // free the work DS
         ParU_Freenum(Num_handle, Control);
         return PARU_OUT_OF_MEMORY;
@@ -389,11 +389,11 @@ ParU_Ret ParU_Factorize(cholmod_sparse *A, ParU_Symbolic *Sym,
             PRLEVEL(1, ("%% factorization has some problem\n"));
             if (info == PARU_OUT_OF_MEMORY)
             {
-                PRLEVEL(1, ("Paru: out of memory during factorization\n"));
+                PRLEVEL(1, ("ParU: out of memory during factorization\n"));
             }
             else if (info == PARU_SINGULAR)
             {
-                PRLEVEL(1, ("Paru: Input matrix is singular\n"));
+                PRLEVEL(1, ("ParU: Input matrix is singular\n"));
             }
             paru_free_work(Sym, Work);   // free the work DS
             ParU_Freenum(Num_handle, Control);
@@ -426,7 +426,7 @@ ParU_Ret ParU_Factorize(cholmod_sparse *A, ParU_Symbolic *Sym,
     if (info == PARU_OUT_OF_MEMORY)
     {
         PRLEVEL(
-            1, ("Paru: memory problem after factorizaiton, in perumutaion.\n"));
+            1, ("ParU: memory problem after factorizaiton, in perumutaion.\n"));
         ParU_Freenum(Num_handle, Control);
         return info;
     }

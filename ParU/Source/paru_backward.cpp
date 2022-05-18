@@ -38,7 +38,7 @@ ParU_Ret paru_backward(double *x1, double &resid, double &norm,
     double *b = (double *)paru_calloc(m, sizeof(double));
     if (b == NULL)
     {
-        PRLEVEL(1, ("Paru: memory problem inside backward\n"));
+        PRLEVEL(1, ("ParU: memory problem inside backward\n"));
         return PARU_OUT_OF_MEMORY;
     }
     paru_gaxpy(A, x1, b, 1);

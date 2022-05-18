@@ -357,7 +357,7 @@ ParU_Ret paru_pivotal(std::vector<Int> &pivotal_elements,
     }
     if (sz != (size_t) rowCount)
     {
-        PRLEVEL(1, ("Paru: 0ut of memory when tried to reallocate for frowList"
+        PRLEVEL(1, ("ParU: 0ut of memory when tried to reallocate for frowList"
                     "part %ld\n", f));
         return PARU_OUT_OF_MEMORY;
     }
@@ -367,7 +367,7 @@ ParU_Ret paru_pivotal(std::vector<Int> &pivotal_elements,
 
     if (pivotalFront == NULL)
     {
-        PRLEVEL(1, ("Paru: 0ut of memory when tried to allocate for pivotal "
+        PRLEVEL(1, ("ParU: 0ut of memory when tried to allocate for pivotal "
                     "part %ld\n", f));
         return PARU_OUT_OF_MEMORY;
     }

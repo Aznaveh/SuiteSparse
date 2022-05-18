@@ -54,7 +54,17 @@ are supported.
 
 The algorithms used in ParU will be discussed in a companion paper,
 ?. This document gives detailed information on the installation
-and use of SuiteSparseQR.
+and use of ParU.
+ParU is a parallel sparse direct solver. This package uses OpenMP
+tasking for parallelism. ParU calls UMFPACK for symbolic analysis phase,
+after that some symbolic analysis is done by ParU itself and  then numeric
+phase starts. The numeric computation is a task parallel phase using OpenMP
+and each task calls parallel BLAS; i.e. nested parallism. 
+
+The performance of BLAS has a heavy impact on the performance of ParU.
+However, depending on the input problem performance of parallelsim in BLAS 
+is sometimes not have effects in ParU.
+
 
 %-------------------------------------------------------------------------------
 \subsubsection{Optional instructions on using METIS}

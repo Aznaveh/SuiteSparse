@@ -88,13 +88,13 @@ void *paru_alloc(size_t n, size_t size)
     void *p = NULL;
     if (size == 0)
     {
-        PRLEVEL(1, ("Paru: size must be > 0\n"));
+        PRLEVEL(1, ("ParU: size must be > 0\n"));
         return NULL;
     }
     else if (n >= (Size_max / size) || n >= INT_MAX)
     {
         // object is too big to allocate without causing integer overflow
-        PRLEVEL(1, ("Paru: problem too large\n"));
+        PRLEVEL(1, ("ParU: problem too large\n"));
         p = NULL;
     }
     else
@@ -121,7 +121,7 @@ void *paru_alloc(size_t n, size_t size)
         if (p == NULL)
         {
             // out of memory
-            PRLEVEL(1, ("Paru: out of memory\n"));
+            PRLEVEL(1, ("ParU: out of memory\n"));
         }
         else
         {
@@ -148,12 +148,12 @@ void *paru_calloc(size_t n, size_t size)
     void *p = NULL;
     if (size == 0)
     {
-        PRLEVEL(1, ("Paru: size must be > 0\n"));
+        PRLEVEL(1, ("ParU: size must be > 0\n"));
     }
     else if (n >= (Size_max / size) || n >= INT_MAX)
     {
         // object is too big to allocate without causing integer overflow
-        PRLEVEL(1, ("Paru: problem too large\n"));
+        PRLEVEL(1, ("ParU: problem too large\n"));
     }
     else
     {
@@ -179,7 +179,7 @@ void *paru_calloc(size_t n, size_t size)
         if (p == NULL)
         {
             // out of memory
-            PRLEVEL(1, ("Paru: out of memory\n"));
+            PRLEVEL(1, ("ParU: out of memory\n"));
         }
         else
         {
@@ -209,7 +209,7 @@ void *paru_realloc(
     void *pnew;
     if (size_Entry == 0)
     {
-        PRLEVEL(1, ("Paru: sizeof(entry)  must be > 0\n"));
+        PRLEVEL(1, ("ParU: sizeof(entry)  must be > 0\n"));
         p = NULL;
     }
     else if (p == NULL)
@@ -225,7 +225,7 @@ void *paru_realloc(
     else if (nnew >= (Size_max / size_Entry) || nnew >= INT_MAX)
     {
         // object is too big to allocate without causing integer overflow
-        PRLEVEL(1, ("Paru: problem too large\n"));
+        PRLEVEL(1, ("ParU: problem too large\n"));
     }
 
     else

@@ -31,19 +31,19 @@ int main(int argc, char **argv)
     A = (cholmod_sparse *)cholmod_l_read_matrix(stdin, 1, &mtype, cc);
     if (A == NULL)
     {
-        printf("Paru: input matrix is invalid\n");
+        printf("ParU: input matrix is invalid\n");
         exit(1);
     }
 
     if (mtype != CHOLMOD_SPARSE)
     {
-        printf("Paru: input matrix must be sparse\n");
+        printf("ParU: input matrix must be sparse\n");
         exit(1);
     }
 
     if (A->xtype != CHOLMOD_REAL)
     {
-        printf("Paru: input matrix must be real\n");
+        printf("ParU: input matrix must be real\n");
         exit(1);
     }
 
@@ -51,7 +51,7 @@ int main(int argc, char **argv)
     int ver[3];
     char date[128];
     ParU_Version(ver, date);
-    printf("Paru %d.%d.%d", ver[0], ver[1], ver[2]);
+    printf("ParU %d.%d.%d", ver[0], ver[1], ver[2]);
     printf(" %s\n", date);
 
     ParU_Control Control;
@@ -76,28 +76,28 @@ int main(int argc, char **argv)
     BRUTAL_ALLOC_TEST(info, ParU_Analyze(A, &Sym, &Control));
     if (info == PARU_OUT_OF_MEMORY)
     {
-        printf("Paru: some problem detected during symbolic analysis\n");
+        printf("ParU: some problem detected during symbolic analysis\n");
         cholmod_l_free_sparse(&A, cc);
         cholmod_l_finish(cc);
         return info;
     }
     if (Sym != NULL)
         printf("In: %ldx%ld nnz = %ld \n", Sym->m, Sym->n, Sym->anz);
-    printf("Paru: Symbolic factorization is done!\n");
+    printf("ParU: Symbolic factorization is done!\n");
     ParU_Numeric *Num = NULL;
 
     // info = ParU_Factorize(A, Sym, &Num, &Control);
     BRUTAL_ALLOC_TEST(info, ParU_Factorize(A, Sym, &Num, &Control));
     if (info == PARU_OUT_OF_MEMORY)
     {
-        printf("Paru: factorization was NOT succssfull.\n");
+        printf("ParU: factorization was NOT succssfull.\n");
         cholmod_l_free_sparse(&A, cc);
         cholmod_l_finish(cc);
         ParU_Freesym(&Sym, &Control);
         return info;
     }
     else
-        printf("Paru: factorization was successfull.\n");
+        printf("ParU: factorization was successfull.\n");
 
         //~~~~~~~~~~~~~~~~~~~Test the results~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

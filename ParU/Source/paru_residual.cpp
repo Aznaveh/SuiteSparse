@@ -42,7 +42,7 @@
     double *ax_b = (double *)paru_alloc(m, sizeof(double));
     if (ax_b == NULL)
     {
-        PRLEVEL(1, ("Paru: memory problem inside residual\n"));
+        PRLEVEL(1, ("ParU: memory problem inside residual\n"));
         return PARU_OUT_OF_MEMORY;
     }
     paru_memcpy(ax_b, b, m * sizeof(double), Control);
@@ -107,7 +107,7 @@ ParU_Ret ParU_Residual(cholmod_sparse *A, double *X, double *B, Int m, Int nrhs,
     double *AX_B = (double *)paru_alloc(m * nrhs, sizeof(double));
     if (AX_B == NULL)
     {
-        PRLEVEL(1, ("Paru: memory problem inside mRHS residual\n"));
+        PRLEVEL(1, ("ParU: memory problem inside mRHS residual\n"));
         return PARU_OUT_OF_MEMORY;
     }
     paru_memcpy(AX_B, B, m * nrhs * sizeof(double), Control);

@@ -51,7 +51,7 @@ ParU_Ret paru_init_rowFronts(paru_work *Work,
     Num = (ParU_Numeric *)paru_alloc(1, sizeof(ParU_Numeric));
     if (Num == NULL)
     {  // out of memory
-        PRLEVEL(1, ("Paru: out of memory, Num\n"));
+        PRLEVEL(1, ("ParU: out of memory, Num\n"));
         // Nothing to be freed
         *Num_handle = NULL;
         return PARU_OUT_OF_MEMORY;
@@ -276,7 +276,7 @@ ParU_Ret paru_init_rowFronts(paru_work *Work,
             PRLEVEL(PR, ("%lf ", Rs[k]));
             if (Rs[k] <= 0)
             {
-                PRLEVEL(1, ("Paru: Matrix is singular, row %ld is zero\n", k));
+                PRLEVEL(1, ("ParU: Matrix is singular, row %ld is zero\n", k));
                 Num->res = PARU_SINGULAR;
                 return PARU_SINGULAR;
             }
@@ -436,7 +436,7 @@ ParU_Ret paru_init_rowFronts(paru_work *Work,
             paru_create_element(nrows, ncols);
         if (curEl == NULL)
         {  // out of memory
-            PRLEVEL(1, ("Paru: Out of memory: curEl\n"));
+            PRLEVEL(1, ("ParU: Out of memory: curEl\n"));
             #pragma omp atomic update
             out_of_memory += 1;
         }
@@ -459,7 +459,7 @@ ParU_Ret paru_init_rowFronts(paru_work *Work,
                     slackRow * nrows, sizeof(paru_tuple));
                 if (RowList[row].list == NULL)
                 {  // out of memory
-                    PRLEVEL(1, ("Paru: out of memory, RowList[row].list \n"));
+                    PRLEVEL(1, ("ParU: out of memory, RowList[row].list \n"));
                     #pragma omp atomic update
                     out_of_memory += 1;
                 }
@@ -474,7 +474,7 @@ ParU_Ret paru_init_rowFronts(paru_work *Work,
                     if (paru_add_rowTuple(RowList, row, rowTuple) ==
                         PARU_OUT_OF_MEMORY)
                     {
-                        PRLEVEL(1, ("Paru: out of memory, add_rowTuple \n"));
+                        PRLEVEL(1, ("ParU: out of memory, add_rowTuple \n"));
                         #pragma omp atomic update
                         out_of_memory += 1;
                     }
@@ -498,7 +498,7 @@ ParU_Ret paru_init_rowFronts(paru_work *Work,
             }
             catch (std::bad_alloc const &)
             {  // out of memory
-                PRLEVEL(1, ("Paru: Out of memory: curHeap\n"));
+                PRLEVEL(1, ("ParU: Out of memory: curHeap\n"));
                 #pragma omp atomic update
                 out_of_memory += 1;
             }
