@@ -156,31 +156,15 @@ For more options, see the {\tt SuiteSparse/README.txt} file.
 The C++ interface is written using only real matrices.  
 The simplest function computes the MATLAB equivalent of
 \verb'x=A\b' and is almost as simple:
-{\footnotesize
-\begin{verbatim}
-    #include "SuiteSparseQR.hpp"
-    X = SuiteSparseQR <double> (A, B, cc) ;
-\end{verbatim}
-}
-The C version of this function is almost identical:
-{\footnotesize
-\begin{verbatim}
-    #include "SuiteSparseQR_C.h"
-    X = SuiteSparseQR_C_backslash_default (A, B, cc) ;
-\end{verbatim}
-}
-
-Below is a simple C++ program that illustrates the use of SuiteSparseQR.  The
-program reads in a least-squares problem from \verb'stdin' in MatrixMarket
+Below is a simple C++ program that illustrates the use of ParU.  The
+program reads in a problem from \verb'stdin' in MatrixMarket
 format \cite{BoisvertPozoRemingtonBarrettDongarra97}, solves it, and prints the
-norm of the residual and the estimated rank of \verb'A'.  The comments reflect
-the MATLAB equivalent statements.  The C version of this program is identical
-except for the \verb'#include' statement and call to SuiteSparseQR which are
-replaced with the C version of the statement above, and C-style comments.
-
+norm of \verb'A' and the residual. 
+Some error testing code is omited to only show how the program works. The full 
+program can be found in 
+\verb'Paru/Demo/paru_demo.cpp'
 \begin{minted}{c}
 #include "ParU.hpp"
-
 int main(int argc, char **argv)
 {
     cholmod_common Common, *cc;
@@ -195,51 +179,13 @@ int main(int argc, char **argv)
 
     // A = mread (stdin) ; read in the sparse matrix A
     A = (cholmod_sparse *)cholmod_l_read_matrix(stdin, 1, &mtype, cc);
-    if (A == NULL)
-    {
-        printf("ParU: input matrix is invalid\n");
-        exit(1);
-    }
-
-    if (mtype != CHOLMOD_SPARSE)
-    {
-        printf("ParU: input matrix must be sparse\n");
-        exit(1);
-    }
-
-    if (A->xtype != CHOLMOD_REAL)
-    {
-        printf("ParU: input matrix must be real\n");
-        exit(1);
-    }
-
     //~~~~~~~~~~~~~~~~~~~Starting computation~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     ParU_Control Control;
     ParU_Ret info;
     info = ParU_Analyze(A, &Sym, &Control);
-    if (info != PARU_SUCCESS)
-    {
-        cholmod_l_free_sparse(&A, cc);
-        cholmod_l_finish(cc);
-        return info;
-    }
-    printf("In: %ldx%ld nnz = %ld \n", Sym->m, Sym->n, Sym->anz);
-    printf("ParU: Symbolic factorization is done!\n");
     ParU_Numeric *Num;
     info = ParU_Factorize(A, Sym, &Num, &Control);
     double my_time = omp_get_wtime() - my_start_time;
-    if (info != PARU_SUCCESS)
-    {
-        printf("ParU: factorization was NOT successfull in %lf seconds.\n",
-               my_time);
-        cholmod_l_free_sparse(&A, cc);
-        cholmod_l_finish(cc);
-        ParU_Freesym(&Sym, &Control);
-        return info;
-    }
-    else
-        printf("ParU: factorization was successfull in %lf seconds.\n",
-               my_time);
     //~~~~~~~~~~~~~~~~~~~Test the results ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     Int m = Sym->m;
     if (info == PARU_SUCCESS)
@@ -248,36 +194,15 @@ int main(int argc, char **argv)
         double *xx = (double *)malloc(m * sizeof(double));
         for (Int i = 0; i < m; ++i) b[i] = i + 1;
         info = ParU_Solve(Sym, Num, b, xx, &Control);
-        if (info != PARU_SUCCESS)
-        {
-            printf("ParU: Solve has a problem.\n");
-            free(b);
-            free(xx);
-            cholmod_l_free_sparse(&A, cc);
-            cholmod_l_finish(cc);
-            ParU_Freesym(&Sym, &Control);
-            return info;
-        }
         printf("Solve time is %lf seconds.\n", my_solve_time);
         double resid, anorm;
         info = ParU_Residual(A, xx, b, m, resid, anorm, &Control);
-        if (info != PARU_SUCCESS)
-        {
-            printf("ParU: Residual has a problem.\n");
-            free(b);
-            free(xx);
-            cholmod_l_free_sparse(&A, cc);
-            cholmod_l_finish(cc);
-            ParU_Freesym(&Sym, &Control);
-            return info;
-        }
-
         printf("Residual is |%.2lf| and anorm is %.2e and rcond is %.2e.\n",
                 resid == 0 ? 0 : log10(resid), anorm, Num->rcond);
-
         free(b);
         free(xx);
-            //~~~~~~~~~~~~~~~~~~~End computation~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    }
+    //~~~~~~~~~~~~~~~~~~~End computation~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     Int max_threads = omp_get_max_threads();
     BLAS_set_num_threads(max_threads);
 
@@ -288,51 +213,8 @@ int main(int argc, char **argv)
     cholmod_l_free_sparse(&A, cc);
     cholmod_l_finish(cc);
 }
-
 \end{minted}
 
-
-{\footnotesize
-\begin{verbatim}
-    #include "SuiteSparseQR.hpp"
-    int main (int argc, char **argv)
-    {
-        cholmod_common Common, *cc ;
-        cholmod_sparse *A ;
-        cholmod_dense *X, *B, *Residual ;
-        double rnorm, one [2] = {1,0}, minusone [2] = {-1,0} ;
-        int mtype ;
-
-        // start CHOLMOD
-        cc = &Common ;
-        cholmod_l_start (cc) ;
-
-        // load A
-        A = (cholmod_sparse *) cholmod_l_read_matrix (stdin, 1, &mtype, cc) ;
-
-        // B = ones (size (A,1),1)
-        B = cholmod_l_ones (A->nrow, 1, A->xtype, cc) ;
-
-        // X = A\B
-        X = SuiteSparseQR <double> (A, B, cc) ;
-
-        // rnorm = norm (B-A*X)
-        Residual = cholmod_l_copy_dense (B, cc) ;
-        cholmod_l_sdmult (A, 0, minusone, one, X, Residual, cc) ;
-        rnorm = cholmod_l_norm_dense (Residual, 2, cc) ;
-        printf ("2-norm of residual: %8.1e\n", rnorm) ;
-        printf ("rank %ld\n", cc->SPQR_istat [4]) ;
-
-        // free everything and finish CHOLMOD
-        cholmod_l_free_dense (&Residual, cc) ;
-        cholmod_l_free_sparse (&A, cc) ;
-        cholmod_l_free_dense (&X, cc) ;
-        cholmod_l_free_dense (&B, cc) ;
-        cholmod_l_finish (cc) ;
-        return (0) ;
-    }
-\end{verbatim}
-}
 
 %-------------------------------------------------------------------------------
 \subsection{C++ Syntax}
