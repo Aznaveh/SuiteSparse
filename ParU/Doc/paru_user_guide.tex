@@ -1,5 +1,6 @@
 \documentclass[12pt]{article}
 \usepackage{hyperref}
+\usepackage{minted}
 
 \topmargin -0.5in
 \textheight 9.0in
@@ -176,6 +177,84 @@ norm of the residual and the estimated rank of \verb'A'.  The comments reflect
 the MATLAB equivalent statements.  The C version of this program is identical
 except for the \verb'#include' statement and call to SuiteSparseQR which are
 replaced with the C version of the statement above, and C-style comments.
+
+\begin{minted}{c}
+#include <math.h>
+#include <omp.h>
+
+#include "ParU.hpp"
+
+int main(int argc, char **argv)
+{
+    cholmod_common Common, *cc;
+    cholmod_sparse *A;
+    ParU_Symbolic *Sym = NULL;
+
+    //~~~~~~~~~Reading the input matrix and test if the format is OK~~~~~~~~~~~~
+    // start CHOLMOD
+    cc = &Common;
+    int mtype;
+    cholmod_l_start(cc);
+
+    // A = mread (stdin) ; read in the sparse matrix A
+    A = (cholmod_sparse *)cholmod_l_read_matrix(stdin, 1, &mtype, cc);
+    if (A == NULL)
+    {
+        printf("ParU: input matrix is invalid\n");
+        exit(1);
+    }
+
+    if (mtype != CHOLMOD_SPARSE)
+    {
+        printf("ParU: input matrix must be sparse\n");
+        exit(1);
+    }
+
+    if (A->xtype != CHOLMOD_REAL)
+    {
+        printf("ParU: input matrix must be real\n");
+        exit(1);
+    }
+
+    //~~~~~~~~~~~~~~~~~~~Starting computation~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    int ver[3]; char date[128];
+    ParU_Version (ver ,date);
+    printf("ParU %d.%d.%d",ver[0],ver[1],ver[2]);
+    printf(" %s\n",date);
+
+    double my_start_time = omp_get_wtime();
+
+    ParU_Control Control;
+    ParU_Ret info;
+
+    info = ParU_Analyze(A, &Sym, &Control);
+    if (info != PARU_SUCCESS)
+    {
+        cholmod_l_free_sparse(&A, cc);
+        cholmod_l_finish(cc);
+        return info;
+    }
+    printf("In: %ldx%ld nnz = %ld \n", Sym->m, Sym->n, Sym->anz);
+    printf("ParU: Symbolic factorization is done!\n");
+    ParU_Numeric *Num;
+    info = ParU_Factorize(A, Sym, &Num, &Control);
+    double my_time = omp_get_wtime() - my_start_time;
+    if (info != PARU_SUCCESS)
+    {
+        printf("ParU: factorization was NOT successfull in %lf seconds.\n",
+               my_time);
+        cholmod_l_free_sparse(&A, cc);
+        cholmod_l_finish(cc);
+        ParU_Freesym(&Sym, &Control);
+        return info;
+    }
+    else
+        printf("ParU: factorization was successfull in %lf seconds.\n",
+               my_time);
+}
+
+\end{minted}
+
 
 {\footnotesize
 \begin{verbatim}
