@@ -179,9 +179,6 @@ except for the \verb'#include' statement and call to SuiteSparseQR which are
 replaced with the C version of the statement above, and C-style comments.
 
 \begin{minted}{c}
-#include <math.h>
-#include <omp.h>
-
 #include "ParU.hpp"
 
 int main(int argc, char **argv)
@@ -217,16 +214,8 @@ int main(int argc, char **argv)
     }
 
     //~~~~~~~~~~~~~~~~~~~Starting computation~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    int ver[3]; char date[128];
-    ParU_Version (ver ,date);
-    printf("ParU %d.%d.%d",ver[0],ver[1],ver[2]);
-    printf(" %s\n",date);
-
-    double my_start_time = omp_get_wtime();
-
     ParU_Control Control;
     ParU_Ret info;
-
     info = ParU_Analyze(A, &Sym, &Control);
     if (info != PARU_SUCCESS)
     {
@@ -251,6 +240,53 @@ int main(int argc, char **argv)
     else
         printf("ParU: factorization was successfull in %lf seconds.\n",
                my_time);
+    //~~~~~~~~~~~~~~~~~~~Test the results ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    Int m = Sym->m;
+    if (info == PARU_SUCCESS)
+    {
+        double *b = (double *)malloc(m * sizeof(double));
+        double *xx = (double *)malloc(m * sizeof(double));
+        for (Int i = 0; i < m; ++i) b[i] = i + 1;
+        info = ParU_Solve(Sym, Num, b, xx, &Control);
+        if (info != PARU_SUCCESS)
+        {
+            printf("ParU: Solve has a problem.\n");
+            free(b);
+            free(xx);
+            cholmod_l_free_sparse(&A, cc);
+            cholmod_l_finish(cc);
+            ParU_Freesym(&Sym, &Control);
+            return info;
+        }
+        printf("Solve time is %lf seconds.\n", my_solve_time);
+        double resid, anorm;
+        info = ParU_Residual(A, xx, b, m, resid, anorm, &Control);
+        if (info != PARU_SUCCESS)
+        {
+            printf("ParU: Residual has a problem.\n");
+            free(b);
+            free(xx);
+            cholmod_l_free_sparse(&A, cc);
+            cholmod_l_finish(cc);
+            ParU_Freesym(&Sym, &Control);
+            return info;
+        }
+
+        printf("Residual is |%.2lf| and anorm is %.2e and rcond is %.2e.\n",
+                resid == 0 ? 0 : log10(resid), anorm, Num->rcond);
+
+        free(b);
+        free(xx);
+            //~~~~~~~~~~~~~~~~~~~End computation~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    Int max_threads = omp_get_max_threads();
+    BLAS_set_num_threads(max_threads);
+
+    //~~~~~~~~~~~~~~~~~~~Free Everything~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    ParU_Freenum(&Num, &Control);
+    ParU_Freesym(&Sym, &Control);
+
+    cholmod_l_free_sparse(&A, cc);
+    cholmod_l_finish(cc);
 }
 
 \end{minted}
