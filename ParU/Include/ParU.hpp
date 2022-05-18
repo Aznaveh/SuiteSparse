@@ -17,7 +17,7 @@
 //
 // The performance of BLAS has a heavy impact on the performance of ParU.
 // However, depending on the input problem performance of parallelsim in BLAS 
-// is sometimes not have effects in ParU.
+// sometimes does not have effects in ParU.
 // 
 //                  General Usage for solving Ax = b
 //          A is a sparse matrix in matrix market format with double entries

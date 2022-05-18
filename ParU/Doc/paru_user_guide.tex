@@ -60,24 +60,25 @@ tasking for parallelism. ParU calls UMFPACK for symbolic analysis phase,
 after that some symbolic analysis is done by ParU itself and  then numeric
 phase starts. The numeric computation is a task parallel phase using OpenMP
 and each task calls parallel BLAS; i.e. nested parallism. 
-
 The performance of BLAS has a heavy impact on the performance of ParU.
 However, depending on the input problem performance of parallelsim in BLAS 
-is sometimes not have effects in ParU.
+sometimes does not have effects in ParU.
 
 
 %-------------------------------------------------------------------------------
-\subsubsection{Optional instructions on using METIS}
+\subsubsection{Instructions on using METIS}
 %-------------------------------------------------------------------------------
 
-SuiteSparse now relies on METIS 5.1.0, which is distributed along with
+SuiteSparse now on METIS 5.1.0, which is distributed along with
 SuiteSparse itself.  Its use is optional, however. ParU is using METIS as the 
 default ordering. METIS tends to give orderings that are good for the 
-parallelism.
-Note however that METIS is not bug-free; it can occasionally cause segmentation 
+parallelism. You can compile and run your code without using METIS; We recommend 
+using METIS along with ParU.
+
+Note that METIS is not bug-free; it can occasionally cause segmentation 
 faults, particularly if used when finding basic solutions to underdetermined 
-systems with many more columns than rows (ParU do not solve such 
-systems anyway).
+systems with many more columns than rows .ParU do not solve such 
+systems anyway but you might see some problems with other SuiteSparse packages.
 
 %-------------------------------------------------------------------------------
 \section{Using ParU in C and C++}
@@ -94,25 +95,21 @@ analysis.
 \subsection{Installing the C/C++ library on Linux/Unix}
 %-------------------------------------------------------------------------------
 
-Before you compile the SuiteSparseQR library and demo programs, you may wish to
-edit the \verb'SuiteSparse/SuiteSparse_config/SuiteSparse_config.mk' configuration file.  The
-defaults should be fine on most Linux/Unix systems and on the Mac.
+Before you compile the ParU library and demo programs, you may wish to
+edit the 
+
+\verb'SuiteSparse/SuiteSparse_config/SuiteSparse_config.mk' 
+configuration file.  The defaults should be fine on most Linux/Unix systems and 
+on the Mac.
 It automatically detects what system you have and sets compile parameters
 accordingly.
-
-Next, type \verb'make' at
-the Linux/Unix command line, in either the \verb'SuiteSparse' directory (which
-compiles all of SuiteSparse) or in the \verb'SuiteSparse/SPQR' directory (which
-just compiles SuiteSparseQR and the libraries it requires).  SuiteSparseQR will
-be compiled, and a set of simple demos will be run (including the one in the
-next section).
 
 The configuration file defines where the LAPACK and BLAS libraries are to be
 found.  Selecting the right BLAS is critical.  There is no standard naming
 scheme for the name and location of these libraries.  The defaults in the
-\verb'SuiteSparse_config.mk' file use \verb'-llapack' and \verb'-lblas'; the latter may
-link against the standard Fortran reference BLAS, which will not provide
-optimal performance.  For best results, you should use the OpenBLAS
+\verb'SuiteSparse_config.mk' file use \verb'-llapack' and \verb'-lblas';
+the latter may link against the standard Fortran reference BLAS, which will not 
+provide optimal performance.  For best results, you should use the OpenBLAS
 at openblas.net
 (based on the Goto BLAS)
 \cite{GotoVanDeGeijn08}, or high-performance vendor-supplied BLAS such as the
@@ -120,27 +117,31 @@ Intel MKL, AMD ACML, or the Sun Performance Library.  Selection of LAPACK and
 the BLAS is done with the \verb'LAPACK=' and \verb'BLAS=' lines in the
 \verb'SuiteSparse_config.mk' file.
 
-Four compile-time options can be used to modify how SuiteSparseQR is compiled.
-Select these via the \verb'SPQR_CONFIG=' line in the \verb'SuiteSparse_config.mk' file.
+There are two parts that are important in chosing the compiler and 
+\verb'BLAS' library.
 
-\begin{itemize}
 
-    \item \verb'-DNPARTITION': do not compile with METIS, CAMD, or CCOLAMD.
-    These packages are included by default.
+\verb 'AUTOCC ?= yes' This line let \verb'SuiteSparse_config' choose the 
+compiler automitcally. If there is intel compiler avialable it will be chose. 
+If you change \verb'yes' to \verb'no' then GCC will be used for the compilation.
 
-    \item \verb'-DNEXPERT': do not compile with the ``expert'' routines in
-    \verb'SuiteSparseQR_expert.cpp'.  The expert routines are included by
-    default.
 
-    \item \verb'-DHAVE_TBB': enable the Intel Threading Building Blocks, TBB.
-    The use of TBB is disabled by default.  It is disabled because not all
-    installations have TBB available.  The use of TBB is recommended, however,
-    if you have a multicore computer.
+\verb 'BLAS ?= -lopenblas' This line let \verb'SuiteSparse_config' choose the 
+\verb'BLAS' library. By default ParU uses  \verb'openBLAS'. If you comment out
+this line ParU will look for Intel Math Kernel library. 
 
-\end{itemize}
+After you decide about the compiler and \verb'BLAS' library, type \verb'make' at 
+the Linux/Unix command line, in either the 
+\verb'SuiteSparse' directory (which compiles all of SuiteSparse) or in the 
+\verb'SuiteSparse/ParU' directory (which just compiles ParU and the 
+libraries it requires)???.  ParU will be compiled, and a set of simple demos 
+will be run (including the one in the next section).
 
-To fully test 100\% of the lines of SuiteSparseQR, go to the \verb'Tcov'
-directory and type \verb'make'.  This will work for Linux only.
+To  test the lines of ParU, go to the \verb'Tcov'
+directory and type \verb'make'.  To fully test 100\% of the lines of ParU you 
+should define \verb'PARU_ALLOC_TESTING' and \verb'PARU_COVERAGE' in
+\verb'ParU\Source\paru_internal.hpp'.
+This will work for Linux only.
 
 To install the shared library
 into /usr/local/lib and /usr/local/include, do {\tt make install}.
@@ -151,8 +152,8 @@ For more options, see the {\tt SuiteSparse/README.txt} file.
 \subsection{C/C++ Example}
 %-------------------------------------------------------------------------------
 
-The C++ interface is written using templates for handling both real and complex
-matrices.  The simplest function computes the MATLAB equivalent of
+The C++ interface is written using only real matrices.  
+The simplest function computes the MATLAB equivalent of
 \verb'x=A\b' and is almost as simple:
 {\footnotesize
 \begin{verbatim}
