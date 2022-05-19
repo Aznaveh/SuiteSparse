@@ -57,12 +57,12 @@ The algorithms used in ParU will be discussed in a companion paper,
 ?. This document gives detailed information on the installation
 and use of ParU.
 ParU is a parallel sparse direct solver. This package uses OpenMP
-tasking for parallelism. ParU calls UMFPACK for symbolic analysis phase,
-after that some symbolic analysis is done by ParU itself and  then numeric
+tasking for parallelism. ParU calls UMFPACK for the symbolic analysis phase,
+after that some symbolic analysis is done by ParU itself and  then the numeric
 phase starts. The numeric computation is a task parallel phase using OpenMP
-and each task calls parallel BLAS; i.e. nested parallism. 
+and each task calls parallel BLAS; i.e. nested parallelism. 
 The performance of BLAS has a heavy impact on the performance of ParU.
-However, depending on the input problem performance of parallelsim in BLAS 
+However, depending on the input problem performance of parallelism in BLAS 
 sometimes does not have effects in ParU.
 
 
@@ -70,7 +70,7 @@ sometimes does not have effects in ParU.
 \subsubsection{Instructions on using METIS}
 %-------------------------------------------------------------------------------
 
-SuiteSparse now on METIS 5.1.0, which is distributed along with
+SuiteSparse is now on METIS 5.1.0, which is distributed along with
 SuiteSparse itself.  Its use is optional, however. ParU is using METIS as the 
 default ordering. METIS tends to give orderings that are good for the 
 parallelism. You can compile and run your code without using METIS; We recommend 
@@ -78,7 +78,7 @@ using METIS along with ParU.
 
 Note that METIS is not bug-free; it can occasionally cause segmentation 
 faults, particularly if used when finding basic solutions to underdetermined 
-systems with many more columns than rows .ParU do not solve such 
+systems with many more columns than rows. ParU does not solve such 
 systems anyway but you might see some problems with other SuiteSparse packages.
 
 %-------------------------------------------------------------------------------
@@ -123,13 +123,13 @@ There are two parts that are important in chosing the compiler and
 
 
 \verb 'AUTOCC ?= yes' This line let \verb'SuiteSparse_config' choose the 
-compiler automitcally. If there is intel compiler avialable it will be chose. 
+compiler automatically. If there is an Intel compiler available it will be chosen. 
 If you change \verb'yes' to \verb'no' then GCC will be used for the compilation.
 
 
 \verb 'BLAS ?= -lopenblas' This line let \verb'SuiteSparse_config' choose the 
 \verb'BLAS' library. By default ParU uses  \verb'openBLAS'. If you comment out
-this line ParU will look for Intel Math Kernel library. 
+this line ParU will look for the Intel Math Kernel Library. 
 
 After you decide about the compiler and \verb'BLAS' library, type \verb'make' at 
 the Linux/Unix command line, in either the 
@@ -229,9 +229,9 @@ can do:
         you are using.
 
     \item \verb'ParU_Analyze': Symbolic analysis is done in this routine. 
-        UMFPACK is called here and after that some more speciallized symbolic
+        UMFPACK is called here and after that, some more specialized symbolic
         computation is done for ParU. 
-        \verb'ParU_Analyze' called once and used for differen 
+        \verb'ParU_Analyze' called once and used for different 
         \verb'ParU_Factorize'
         calls.
     \item \verb'ParU_Factorize': 
@@ -244,9 +244,9 @@ can do:
         Using symbolic analysis and factorization phase output to solve $Ax=b$.
         In all the solve routines Num structure must come with the same 
         Sym struct that comes from \verb'ParU_Factorize'. 
-        This routin is overloaded and can solve differently. It has versions 
-        that keep a copy of x or overwrite on it. Also it can solve multiple 
-        right hand side problems.
+        This routine is overloaded and can solve differently. It has versions 
+        that keep a copy of x or overwrite it. Also, it can solve multiple 
+        right-hand side problems.
 
     \item \verb'ParU_Freenum':  frees the numerical part of factorization.
 
@@ -259,7 +259,7 @@ can do:
 \subsection{Details of the C/C++ Syntax}
 %-------------------------------------------------------------------------------
 
-For further details of how to use the C/C++ syntax, please refer to the
+For further details on how to use the C/C++ syntax, please refer to the
 definitions and descriptions in the following files:
 
 \begin{enumerate}
@@ -274,7 +274,7 @@ the C-callable functions.
 
 There are C/C++ options to control ParU which is an input argument to several 
 routines. When you make \verb'ParU_Control' object it is initialized with 
-default values. The user can change the values. Here are the list of control 
+default values. The user can change the values. Here is the list of control 
 options:
 
 
@@ -309,15 +309,15 @@ Output statistics include:
 }
 \vspace{0.1in}
 
-The first row of the options are used in symbolic analysis. In the symbolic 
-analysis phase only the pattern of the matrix and numerical values are not 
-probed. The second row have impact on numerical analysis.
+The first row of the options is used in the symbolic analysis. In the symbolic 
+analysis phase, only the pattern of the matrix and numerical values are not 
+probed. The second row has an impact on numerical analysis.
 
 \verb'paru_max_threads' is initalized by \verb'omp_max_threads' if the user do 
 not provide a smaller number.
 If \verb'paru_strategy' is set to \verb'PARU_STRATEGY_AUTO' ParU uses the same 
-strategy as UMFPACK, however user can ask UMFPACK for a unsymmteric strategy 
-but use a symmteric strategy for ParU.
+strategy as UMFPACK, however the user can ask UMFPACK for a unsymmetric strategy 
+but use a symmetric strategy for ParU.
     
 %-------------------------------------------------------------------------------
 \section{Requirements and Availability}
@@ -337,21 +337,9 @@ Sun Performance Library) or other high-performance BLAS such as those of
 \cite{GotoVanDeGeijn08}. Note that while ParU uses nested parallelism heavily
 the right options for BLAS library must be chosen.
 
-The use of Intel's Threading Building Blocks is optional \cite{Reinders07}, but
+The use of OpenMP tasking is optional, but
 without it, only parallelism within the BLAS can be exploited (if available).
-Suite\-SparseQR can optionally use METIS 4.0.1 \cite{KarypisKumar98e} and two
-constrained minimum degree ordering algorithms, CCOLAMD and CAMD
-\cite{ChenDavisHagerRajamanickam09}, for its fill-reducing ordering options.
-SuiteSparseQR can be compiled without these ordering methods and without TBB.
-
-In addition to appearing as Collected Algorithm 8xx of the ACM, SuiteSparseQR
-is available at
-\htmladdnormallink{http://www.suitesparse.com}{http://www.suitesparse.com}
-and at MATLAB Central
-in the user-contributed File Exchange (
-\htmladdnormallink{http://www.mathworks.com/matlabcentral}{http://www.mathworks.com/matlabcentral}
-).
-See SPQR/Doc/License.txt for the license.
+See ParU/Doc/LICENSE for the license.
 Alternative licenses are also
 available; contact the author for details.
 
@@ -362,4 +350,3 @@ available; contact the author for details.
 \bibliographystyle{plain}
 \bibliography{paru_user_guide}
 \end{document}
-
