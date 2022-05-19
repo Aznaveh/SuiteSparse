@@ -19,5 +19,5 @@ clean:
 	- $(RM) -r $(CLEAN) 
 
 purge: clean
-	- $(RM) -r $(PURGE) *.out paru_user_guide.pdf
+	- $(RM) -r $(PURGE) *.out paru_user_guide.pdf _minted-paru_*
 

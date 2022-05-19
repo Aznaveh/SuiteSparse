@@ -272,7 +272,7 @@ struct ParU_Control
     Int worthwhile_dgemm = 512;  // dgemms bigger than worthwhile are tasked
     Int worthwhile_trsm = 4096;  // trsm bigger than worthwhile are tasked
     Int paru_max_threads = 0;    // It will be initialized with omp_max_threads
-                                 // if the user did not provide
+                                 // if the user do not provide a smaller number
 };
 // =============================================================================
 // =========================== ParU_Numeric ====================================
