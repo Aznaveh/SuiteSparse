@@ -63,7 +63,7 @@ phase starts. The numeric computation is a task parallel phase using OpenMP
 and each task calls parallel BLAS; i.e. nested parallelism. 
 The performance of BLAS has a heavy impact on the performance of ParU.
 However, depending on the input problem performance of parallelism in BLAS 
-sometimes does not have effects in ParU.
+sometimes can have less effects in ParU.
 
 
 %-------------------------------------------------------------------------------
@@ -87,9 +87,8 @@ systems anyway but you might see some problems with other SuiteSparse packages.
 
 ParU relies on CHOLMOD for its basic sparse matrix data structure, a compressed 
 sparse column format.  CHOLMOD provides interfaces to the AMD, COLAMD, and METIS
-ordering methods, writing a matrix to a file, and many other
-functions. ParU also relies on UMFPACK Version 6.0 or higher for symbolic 
-analysis. 
+ordering methods, and many other functions. ParU also relies on UMFPACK Version 
+6.0 or higher for symbolic analysis. 
 
 
 %-------------------------------------------------------------------------------
@@ -105,20 +104,17 @@ on the Mac.
 It automatically detects what system you have and sets compile parameters
 accordingly.
 
-The configuration file defines where the LAPACK and BLAS libraries are to be
+The configuration file defines where the BLAS libraries are to be
 found.  Selecting the right BLAS is critical.  There is no standard naming
 scheme for the name and location of these libraries.  The defaults in the
-\verb'SuiteSparse_config.mk' file use \verb'-llapack' and \verb'-lblas';
-the latter may link against the standard Fortran reference BLAS, which will not 
-provide optimal performance.  For best results, you should use the OpenBLAS
-at openblas.net
-(based on the Goto BLAS)
-\cite{GotoVanDeGeijn08}, or high-performance vendor-supplied BLAS such as the
-Intel MKL, AMD ACML, or the Sun Performance Library.  Selection of LAPACK and
-the BLAS is done with the \verb'LAPACK=' and \verb'BLAS=' lines in the
+\verb'SuiteSparse_config.mk' file use \verb'-lblas';
+For best results, you should use the OpenBLAS at openblas.net (based on the 
+Goto BLAS) \cite{GotoVanDeGeijn08}, or high-performance vendor-supplied BLAS 
+such as the Intel MKL, AMD ACML, or the Sun Performance Library.  Selection of 
+the BLAS is done with the \verb'BLAS=' lines in the
 \verb'SuiteSparse_config.mk' file.
 
-There are two parts that are important in chosing the compiler and 
+There are two parts that are important in chosing the compiler and the
 \verb'BLAS' library.
 
 
@@ -139,7 +135,7 @@ libraries it requires)???.  ParU will be compiled, and a set of simple demos
 will be run (including the one in the next section).
 
 To  test the lines of ParU, go to the \verb'Tcov'
-directory and type \verb'make'.  To fully test 100\% of the lines of ParU you 
+directory and type \verb'make'.  To fully test the lines of ParU you 
 should define \verb'PARU_ALLOC_TESTING' and \verb'PARU_COVERAGE' in
 \verb'ParU\Source\paru_internal.hpp'.
 This will work for Linux only.
@@ -160,8 +156,8 @@ Below is a simple C++ program that illustrates the use of ParU.  The
 program reads in a problem from \verb'stdin' in MatrixMarket
 format \cite{BoisvertPozoRemingtonBarrettDongarra97}, solves it, and prints the
 norm of \verb'A' and the residual. 
-Some error testing code is omited to only show how the program works. The full 
-program can be found in 
+Some error testing code is omited to simplify showing how the program works. 
+The full program can be found in 
 \verb'Paru/Demo/paru_demo.cpp'
 \begin{minted}{c}
 #include "ParU.hpp"
@@ -220,7 +216,9 @@ int main(int argc, char **argv)
 \subsection{C/C++ Syntax}
 %-------------------------------------------------------------------------------
 \verb'ParU_Ret' is the output structure of all ParU routines. The user must 
-check the output before continuing and using the result of prior routine.
+check the output before continuing and computing further the result of prior
+routine. You can see the user callable routines in 
+\verb'Paru/Include/ParU.hpp'.
 The following is a list of user-callable C++ functions and what they
 can do:
 
@@ -232,22 +230,21 @@ can do:
     \item \verb'ParU_Analyze': Symbolic analysis is done in this routine. 
         UMFPACK is called here and after that, some more specialized symbolic
         computation is done for ParU. 
-        \verb'ParU_Analyze' called once and used for different 
-        \verb'ParU_Factorize'
-        calls.
+        \verb'ParU_Analyze' called once and can be used for different 
+        \verb'ParU_Factorize' calls for the matrices that have the same pattern.
     \item \verb'ParU_Factorize': 
         Numeric factorization is done in this routine. Scaling and
-        making Sx matrix, computing factors and permutations is here. 
-        \verb'ParU_Symbolic' structure is computed \verb'ParU_Analyze' 
-        and is an input in this routine.
+        making $Sx$ (scaled and stair case structure) matrix, computing factors 
+        and permutations is here. \verb'ParU_Symbolic' structure which is 
+        computed in \verb'ParU_Analyze' is an input in this routine.
 
     \item \verb'ParU_Solve':  
         Using symbolic analysis and factorization phase output to solve $Ax=b$.
         In all the solve routines Num structure must come with the same 
         Sym struct that comes from \verb'ParU_Factorize'. 
-        This routine is overloaded and can solve differently. It has versions 
-        that keep a copy of x or overwrite it. Also, it can solve multiple 
-        right-hand side problems.
+        This routine is overloaded and can solve different systems. It has 
+        versions that keep a copy of x or overwrite it. Also, it can solve 
+        multiple right-hand side problems.
 
     \item \verb'ParU_Freenum':  frees the numerical part of factorization.
 
@@ -278,13 +275,6 @@ routines. When you make \verb'ParU_Control' object it is initialized with
 default values. The user can change the values. Here is the list of control 
 options:
 
-
-Other parameters, such as \verb'opts.ordering' and \verb'opts.tol',
-are input parameters to the various C/C++ functions.  Others such as
-\verb"opts.solution='min2norm'" are separate functions in the C/C++
-interface.  Refer to the files listed above for details.
-Output statistics include:
-
 \vspace{0.1in}
 {\footnotesize
 \begin{tabular}{|lll|}
@@ -311,14 +301,18 @@ Output statistics include:
 \vspace{0.1in}
 
 The first row of the options is used in the symbolic analysis. In the symbolic 
-analysis phase, only the pattern of the matrix and numerical values are not 
-probed. The second row has an impact on numerical analysis.
+analysis phase, only the pattern of the matrix are probed. 
+The second row of control options show those that has an impact on numerical 
+analysis.
 
 \verb'paru_max_threads' is initalized by \verb'omp_max_threads' if the user do 
 not provide a smaller number.
+
 If \verb'paru_strategy' is set to \verb'PARU_STRATEGY_AUTO' ParU uses the same 
-strategy as UMFPACK, however the user can ask UMFPACK for a unsymmetric strategy 
-but use a symmetric strategy for ParU.
+strategy as UMFPACK, however the user can ask UMFPACK for a unsymmetric 
+strategy but use a symmetric strategy for ParU. Usually UMFPACK choses a good 
+ordering, however there might be cases that user prefer unsymmetric ordering on
+UMFPACK but symmetric computation on ParU.
     
 %-------------------------------------------------------------------------------
 \section{Requirements and Availability}

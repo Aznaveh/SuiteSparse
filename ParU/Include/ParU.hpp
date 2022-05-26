@@ -351,8 +351,8 @@ ParU_Ret ParU_Version (int ver [3], char date [128]);
 //------------------------------------------------------------------------------
 // ParU_Analyze: Symbolic analysis is done in this routine. UMFPACK is called
 // here and after that some more speciallized symbolic computation is done for
-// ParU. ParU_Analyze can be called once and used for differen ParU_Factorize
-// calls. 
+// ParU. ParU_Analyze can be called once and can be used for differen 
+// ParU_Factorize calls. 
 //------------------------------------------------------------------------------
 ParU_Ret ParU_Analyze(
         // input:
