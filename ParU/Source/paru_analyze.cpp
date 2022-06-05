@@ -860,7 +860,7 @@ ParU_Ret ParU_Analyze(cholmod_sparse *A, ParU_Symbolic **S_handle,
     for (Int k = 0; k <= nf; k++) PRLEVEL(PR, ("  %ld", fmap[k]));
     PRLEVEL(PR, ("\n"));
 
-    PR = -1;
+    PR = 1;
     PRLEVEL(PR, ("%%%% newParent:\n"));
     for (Int k = 0; k < newNf; k++) PRLEVEL(PR, ("%ld ", newParent[k]));
     PRLEVEL(PR, ("\n"));
@@ -1830,7 +1830,7 @@ ParU_Ret ParU_Analyze(cholmod_sparse *A, ParU_Symbolic **S_handle,
         PRLEVEL(PR, ("\n"));
     }
 
-    PR = -1;
+    PR = 1;
     PRLEVEL(PR, ("%% super node mapping ,snM (and rows): "));
     for (Int f = 0; f < nf; f++)
     {

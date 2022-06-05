@@ -28,7 +28,7 @@ void paru_assemble_all(Int e, Int f, std::vector<Int> &colHash,
                  PARU_OPENMP_GET_THREAD_ID));
 
 #ifndef NDEBUG
-    PR = 0;
+    PR = 1;
     PRLEVEL(PR, ("%% %ld :\n", e));
     if (PR <= 0) paru_print_element(e, Work, Num);
 
@@ -268,7 +268,7 @@ void paru_assemble_all(Int e, Int f, std::vector<Int> &colHash,
     }
     paru_free_el(e, elementList);
 #ifndef NDEBUG
-    PR = 0;
+    PR = 1;
     PRLEVEL(PR, ("%% after assembly %ld :\n", eli));
     if (PR <= 0) paru_print_element(eli, Work, Num);
     PR = 1;

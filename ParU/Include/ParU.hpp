@@ -85,7 +85,7 @@ extern "C"
 #define UMFPACK_ORDERING_BEST 4         // try many orderings, pick best
 #define UMFPACK_ORDERING_NONE 5         // natural ordering 
 //#define UMFPACK_ORDERING_USER 6         // user-provided function 
-/* AMD/COLAMD means: use AMD for symmetric strategy, COLAMD for unsymmetric */
+// AMD/COLAMD means: use AMD for symmetric strategy, COLAMD for unsymmetric 
 
 
 // =============================================================================

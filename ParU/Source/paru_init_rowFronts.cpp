@@ -249,7 +249,7 @@ ParU_Ret paru_init_rowFronts(paru_work *Work,
     Int *Qinit = Sym->Qfill;
     Int *Pinv = Sym->Pinv;
 #ifndef NDEBUG
-    PR = -1;
+    PR = 1;
     PRLEVEL(PR, ("Iniit Pinv =\n"));
     for (Int i = 0; i < m; i++) PRLEVEL(PR, ("%ld ", Pinv[i]));
     PRLEVEL(PR, ("\n"));
