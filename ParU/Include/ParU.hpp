@@ -76,6 +76,18 @@ extern "C"
 #define PARU_STRATEGY_UNSYMMETRIC 1  // COLAMD(A), metis, ...
 #define PARU_STRATEGY_SYMMETRIC 3    // prefer diagonal
 
+//copied from umfpack.h
+// Control [UMFPACK_ORDERING] and Info [UMFPACK_ORDERING_USED] are one of 
+#define UMFPACK_ORDERING_CHOLMOD 0      // use CHOLMOD (AMD/COLAMD then METIS)
+#define UMFPACK_ORDERING_AMD 1          // use AMD/COLAMD 
+//#define UMFPACK_ORDERING_GIVEN 2        // user-provided Qinit 
+#define UMFPACK_ORDERING_METIS 3        // use METIS 
+#define UMFPACK_ORDERING_BEST 4         // try many orderings, pick best
+#define UMFPACK_ORDERING_NONE 5         // natural ordering 
+//#define UMFPACK_ORDERING_USER 6         // user-provided function 
+/* AMD/COLAMD means: use AMD for symmetric strategy, COLAMD for unsymmetric */
+
+
 // =============================================================================
 // =========================== ParU_Symbolic ===================================
 // =============================================================================
