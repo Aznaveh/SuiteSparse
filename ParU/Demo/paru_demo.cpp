@@ -57,7 +57,10 @@ int main(int argc, char **argv)
     ParU_Control Control;
     ParU_Ret info;
 
+    //Control.umfpack_ordering = UMFPACK_ORDERING_AMD;
+    //Control.paru_max_threads = 6;
     info = ParU_Analyze(A, &Sym, &Control);
+    double my_time_analyze = omp_get_wtime() - my_start_time;
     if (info != PARU_SUCCESS)
     {
         cholmod_l_free_sparse(&A, cc);
@@ -65,22 +68,32 @@ int main(int argc, char **argv)
         return info;
     }
     printf("In: %ldx%ld nnz = %ld \n", Sym->m, Sym->n, Sym->anz);
-    printf("ParU: Symbolic factorization is done!\n");
+    printf("ParU: Symbolic factorization is done in %lfs!\n", my_time_analyze);
     ParU_Numeric *Num;
+    double my_start_time_fac = omp_get_wtime();
     info = ParU_Factorize(A, Sym, &Num, &Control);
+    double my_time_fac = omp_get_wtime() - my_start_time_fac;
     double my_time = omp_get_wtime() - my_start_time;
     if (info != PARU_SUCCESS)
     {
-        printf("ParU: factorization was NOT successfull in %lf seconds.\n",
+        printf("ParU: factorization was NOT successfull in %lf seconds!",
                my_time);
+        if (info == PARU_OUT_OF_MEMORY)
+            printf("\nOut of memory\n");
+        if (info == PARU_INVALID)
+            printf("\nInvalid!\n");
+        if (info == PARU_SINGULAR)
+            printf("\nSingular!\n");
         cholmod_l_free_sparse(&A, cc);
         cholmod_l_finish(cc);
         ParU_Freesym(&Sym, &Control);
         return info;
     }
     else
+    {
         printf("ParU: factorization was successfull in %lf seconds.\n",
                my_time);
+    }
 
     //~~~~~~~~~~~~~~~~~~~Test the results ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     Int m = Sym->m;
@@ -176,6 +189,7 @@ int main(int argc, char **argv)
     // passed NULL it will use the defaults
     umfpack_dl_defaults(umf_Control);
     umf_Control[UMFPACK_ORDERING] = UMFPACK_ORDERING_METIS;
+    //umf_Control[UMFPACK_ORDERING] = UMFPACK_ORDERING_AMD;
     // umf_Control [UMFPACK_STRATEGY] =   UMFPACK_STRATEGY_UNSYMMETRIC;
 
     Int *Ap = (Int *)A->p;
@@ -194,6 +208,8 @@ int main(int argc, char **argv)
         printf("umfpack_dl_symbolic failed\n");
         exit(0);
     }
+    double umf_symbolic = omp_get_wtime() - umf_start_time;
+    double umf_fac_start= omp_get_wtime();
     status =
         umfpack_dl_numeric(Ap, Ai, Ax, Symbolic, &Numeric, umf_Control, Info);
     if (status < 0)
@@ -204,6 +220,7 @@ int main(int argc, char **argv)
     }
 
     umf_time = omp_get_wtime() - umf_start_time;
+    double umf_time_fac = omp_get_wtime() - umf_fac_start;
 
     double *b = (double *)malloc(m * sizeof(double));
     double *x = (double *)malloc(m * sizeof(double));
@@ -212,7 +229,7 @@ int main(int argc, char **argv)
     double solve_start = omp_get_wtime();
     status = umfpack_dl_solve(UMFPACK_A, Ap, Ai, Ax, x, b, Numeric, umf_Control,
                               Info);
-    double solve_time = omp_get_wtime() - solve_start;
+    double umf_solve_time = omp_get_wtime() - solve_start;
     free(x);
     free(b);
 
@@ -229,12 +246,13 @@ int main(int argc, char **argv)
         {
             printf("Par: error in making %s to write the results!\n", res_name);
         }
-        fprintf(res_file, "%ld %ld %lf %lf %lf\n", Sym->m, Sym->anz, my_time,
-                umf_time, my_time / umf_time);
+        fprintf(res_file, "%ld %ld %lf %lf %lf %lf %lf %lf\n", Sym->m, Sym->anz, 
+                my_time_analyze, my_time_fac, my_time,
+                umf_symbolic, umf_time_fac, umf_time);
         fclose(res_file);
     }
     printf("my_time = %lf umf_time=%lf umf_solv_t = %lf ratio = %lf\n", my_time,
-           umf_time, solve_time, my_time / umf_time);
+           umf_time, umf_solve_time, my_time / umf_time);
 
 #endif
     //~~~~~~~~~~~~~~~~~~~Free Everything~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
