@@ -506,13 +506,15 @@ ParU_Ret paru_front(Int f,  // front need to be assembled
             }
             else
             {
-                delete curHeap;
-                Work->heapList[eli] = NULL;
-                PRLEVEL(1, ("%%(2)Heap freed inside front %p id=%ld\n"
-                            , curHeap, eli));
-                PRLEVEL(1, ("%% pivotalFront =%p\n", pivotalFront));
-                PRLEVEL(-2, ("%%~~~~~~~Assemble Front %ld finished~~~4\n", f));
-                return PARU_SUCCESS;
+                return 
+                    paru_make_heap_empty_el(f, pivotal_elements, hi, Work, Num);
+                //delete curHeap;
+                //Work->heapList[eli] = NULL;
+                //PRLEVEL(1, ("%%(2)Heap freed inside front %p id=%ld\n"
+                //            , curHeap, eli));
+                //PRLEVEL(1, ("%% pivotalFront =%p\n", pivotalFront));
+                //PRLEVEL(-2, ("%%~~~~~~~Assemble Front %ld finished~~~4\n", f));
+                //return PARU_SUCCESS;
             }
         }
 
