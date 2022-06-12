@@ -43,7 +43,7 @@ ParU_Ret paru_front(Int f,  // front need to be assembled
 
     paru_element **elementList = Work->elementList;
 
-    PRLEVEL(1, ("%% fp=%ld pivotal columns:clo1=%ld...col2=%ld\n", fp, col1,
+    PRLEVEL(-1, ("%% fp=%ld pivotal columns:clo1=%ld...col2=%ld\n", fp, col1,
                 col2 - 1));
     ASSERT(fp > 0);
 
@@ -176,7 +176,7 @@ ParU_Ret paru_front(Int f,  // front need to be assembled
 
         if (rowCount < fp)
         {
-            PRLEVEL(1, ("ParU: singular, structural problem on %ld: %ldx%ld\n"
+            PRLEVEL(-1, ("ParU: singular, structural problem on %ld: %ldx%ld\n"
                         , f, rowCount, fp));
 #pragma omp atomic write
             Num->res = PARU_SINGULAR;
@@ -199,8 +199,8 @@ ParU_Ret paru_front(Int f,  // front need to be assembled
          * The next part is to find columns of nonfully summed then rows
          * the rest of the matrix and doing TRSM and GEMM,                    */
 
-        PRLEVEL(0, ("%% num_panels = %ld\n", num_panels));
-        PRLEVEL(0, ("%% After free num_panels = %ld\n", num_panels));
+        PRLEVEL(1, ("%% num_panels = %ld\n", num_panels));
+        PRLEVEL(1, ("%% After free num_panels = %ld\n", num_panels));
 
 #ifndef NDEBUG  // Printing the list of rows
         PRLEVEL(PR, ("%% After factorization (inside assemble): \n"));
@@ -220,6 +220,7 @@ ParU_Ret paru_front(Int f,  // front need to be assembled
 #endif
 
 #ifndef NDEBUG  // Printing the pivotal front
+        PR = -1;
         PRLEVEL(PR, ("%%L part:\n"));
 
         // col permutatin
@@ -240,11 +241,12 @@ ParU_Ret paru_front(Int f,  // front need to be assembled
         {
             PRLEVEL(PR, (" "));
             for (Int c = col1; c < col2; c++)
-                PRLEVEL(PR, (" %.16g ", 
+                PRLEVEL(PR, (" %.1g ", 
                             pivotalFront[(c - col1) * rowCount + r]));
             PRLEVEL(PR, (";\n   "));
         }
         PRLEVEL(PR, ("];\n"));
+        PR = 1;
         // just in cases that there is no U for MATLAB
         PRLEVEL(PR, ("Us{%ld} =[];\n", f + 1));
         PRLEVEL(PR, ("Ucols{%ld}=[];\n", f + 1));
@@ -278,7 +280,9 @@ ParU_Ret paru_front(Int f,  // front need to be assembled
         // EXIT point HERE
         if (colCount == 0)
         {  // there is no CB, Nothing to be done
-            if (zero_piv_rows > 0)
+            Num->fcolCount[f] = 0;
+            //if (zero_piv_rows > 0 )
+            if (zero_piv_rows > 0 || rowCount > fp)
             {
                 // make the heap and return
                 PRLEVEL(-2, ("%%~~~~~~~Assemble Front %ld finished~~~1\n", f));
@@ -287,7 +291,6 @@ ParU_Ret paru_front(Int f,  // front need to be assembled
             }
             else
             {
-                Num->fcolCount[f] = 0;
                 PRLEVEL(1, 
                        ("%%Heap freed inside front %p id=%ld\n", curHeap, eli));
                 delete curHeap;
@@ -425,6 +428,7 @@ ParU_Ret paru_front(Int f,  // front need to be assembled
         }
 
 #ifndef NDEBUG  // Printing the  U part
+        PR = -1;
         PRLEVEL(PR, ("%% U part Before TRSM: %ld x %ld\n", fp, colCount));
         PRLEVEL(PR, ("%% U\t"));
         for (Int i = 0; i < colCount; i++) 

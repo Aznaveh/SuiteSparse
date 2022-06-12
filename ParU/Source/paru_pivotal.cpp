@@ -489,6 +489,7 @@ ParU_Ret paru_pivotal(std::vector<Int> &pivotal_elements,
     }
 
 #ifndef NDEBUG
+    PR = 2;
     PRLEVEL(PR, ("%% pivotal columns eli(%ld) after resizing: ", eli));
     for (Int i = 0; i < (Int)pivotal_elements.size(); i++)
         PRLEVEL(PR, ("%ld ", pivotal_elements[i]));
@@ -506,6 +507,7 @@ ParU_Ret paru_pivotal(std::vector<Int> &pivotal_elements,
             PRLEVEL(PR, (" %2.5lf\t", pivotalFront[(c - col1) * rowCount + r]));
         PRLEVEL(PR, ("\n"));
     }
+    PRLEVEL(PR, (" %% %ld*%ld\n", rowCount, fp));
     PR = 2;
     PRLEVEL(PR, ("x%ld = [ \t", f));
     for (Int r = 0; r < rowCount; r++)

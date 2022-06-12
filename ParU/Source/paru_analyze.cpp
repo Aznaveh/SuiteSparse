@@ -353,6 +353,7 @@ ParU_Ret ParU_Analyze(cholmod_sparse *A, ParU_Symbolic **S_handle,
     }
     ParU_Control *Control = &my_Control;
 
+    //umf_Control[UMFPACK_SINGLETONS] = 0;
     umf_Control[UMFPACK_ORDERING] = Control->umfpack_ordering;
     // umf_Control[UMFPACK_ORDERING] = UMFPACK_ORDERING_METIS;
     umf_Control[UMFPACK_FIXQ] = -1;
@@ -860,8 +861,8 @@ ParU_Ret ParU_Analyze(cholmod_sparse *A, ParU_Symbolic **S_handle,
     for (Int k = 0; k <= nf; k++) PRLEVEL(PR, ("  %ld", fmap[k]));
     PRLEVEL(PR, ("\n"));
 
-    PR = 1;
-    PRLEVEL(PR, ("%%%% newParent:\n"));
+    PR = -1;
+    PRLEVEL(PR, ("%%%% newParent(%ld):\n", newNf));
     for (Int k = 0; k < newNf; k++) PRLEVEL(PR, ("%ld ", newParent[k]));
     PRLEVEL(PR, ("\n"));
 #endif

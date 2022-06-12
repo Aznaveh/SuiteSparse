@@ -111,7 +111,7 @@ ParU_Ret paru_perm(ParU_Symbolic *Sym, ParU_Numeric *Num)
         PRLEVEL(PR, (" %ld, ", Ps[k]));
     }
     PRLEVEL(PR, (" \n"));
-    PR = 0;
+    PR = 1;
     PRLEVEL(PR, ("%% n1=%ld Final row permutaion is:\n%%", n1));
     for (Int k = 0; k < MIN(77, m); k++) PRLEVEL(PR, ("%ld ", Pfin[k]));
     PRLEVEL(PR, (" \n"));
