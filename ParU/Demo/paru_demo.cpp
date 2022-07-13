@@ -58,7 +58,9 @@ int main(int argc, char **argv)
     ParU_Ret info;
 
     //Control.umfpack_ordering = UMFPACK_ORDERING_AMD;
-    //Control.paru_max_threads = 6;
+    //Control.umfpack_strategy = UMFPACK_STRATEGY_UNSYMMETRIC;
+    //Control.umfpack_strategy = UMFPACK_STRATEGY_SYMMETRIC;
+    Control.paru_max_threads = 6;
     info = ParU_Analyze(A, &Sym, &Control);
     double my_time_analyze = omp_get_wtime() - my_start_time;
     if (info != PARU_SUCCESS)
@@ -73,11 +75,10 @@ int main(int argc, char **argv)
     double my_start_time_fac = omp_get_wtime();
     info = ParU_Factorize(A, Sym, &Num, &Control);
     double my_time_fac = omp_get_wtime() - my_start_time_fac;
-    double my_time = omp_get_wtime() - my_start_time;
     if (info != PARU_SUCCESS)
     {
         printf("ParU: factorization was NOT successfull in %lf seconds!",
-               my_time);
+               my_time_fac);
         if (info == PARU_OUT_OF_MEMORY)
             printf("\nOut of memory\n");
         if (info == PARU_INVALID)
@@ -92,11 +93,12 @@ int main(int argc, char **argv)
     else
     {
         printf("ParU: factorization was successfull in %lf seconds.\n",
-               my_time);
+               my_time_fac);
     }
 
     //~~~~~~~~~~~~~~~~~~~Test the results ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     Int m = Sym->m;
+    double my_time, my_solve_time;
 #if 1
     if (info == PARU_SUCCESS)
     {
@@ -115,9 +117,9 @@ int main(int argc, char **argv)
             ParU_Freesym(&Sym, &Control);
             return info;
         }
-        double my_solve_time = omp_get_wtime() - my_solve_time_start;
+        my_solve_time = omp_get_wtime() - my_solve_time_start;
+        my_time = omp_get_wtime() - my_start_time;
         printf("Solve time is %lf seconds.\n", my_solve_time);
-        my_start_time = omp_get_wtime();
         double resid, anorm;
         info = ParU_Residual(A, xx, b, m, resid, anorm, &Control);
         if (info != PARU_SUCCESS)
@@ -188,9 +190,11 @@ int main(int argc, char **argv)
     // is used in umfpack_dl_symbolic; if
     // passed NULL it will use the defaults
     umfpack_dl_defaults(umf_Control);
-    umf_Control[UMFPACK_ORDERING] = UMFPACK_ORDERING_METIS;
+    //umf_Control[UMFPACK_ORDERING] = UMFPACK_ORDERING_METIS;
     //umf_Control[UMFPACK_ORDERING] = UMFPACK_ORDERING_AMD;
-    // umf_Control [UMFPACK_STRATEGY] =   UMFPACK_STRATEGY_UNSYMMETRIC;
+    //umf_Control [UMFPACK_STRATEGY] =   UMFPACK_STRATEGY_UNSYMMETRIC;
+    //umf_Control [UMFPACK_STRATEGY] =   UMFPACK_STRATEGY_SYMMETRIC;
+    //umf_Control[UMFPACK_SINGLETONS] = 0;
 
     Int *Ap = (Int *)A->p;
     Int *Ai = (Int *)A->i;
@@ -201,6 +205,7 @@ int main(int argc, char **argv)
 
     status =
         umfpack_dl_symbolic(n, n, Ap, Ai, Ax, &Symbolic, umf_Control, Info);
+    umfpack_dl_report_info(umf_Control, Info);
     if (status < 0)
     {
         umfpack_dl_report_info(umf_Control, Info);
@@ -212,6 +217,10 @@ int main(int argc, char **argv)
     double umf_fac_start= omp_get_wtime();
     status =
         umfpack_dl_numeric(Ap, Ai, Ax, Symbolic, &Numeric, umf_Control, Info);
+    //umf_Control[UMFPACK_PRL] = 2;
+    //umfpack_dl_report_info(umf_Control, Info);
+    //umfpack_dl_report_status(umf_Control, status);
+    //umf_Control[UMFPACK_PRL] = 1;
     if (status < 0)
     {
         umfpack_dl_report_info(umf_Control, Info);
@@ -219,7 +228,6 @@ int main(int argc, char **argv)
         printf("umfpack_dl_numeric failed\n");
     }
 
-    umf_time = omp_get_wtime() - umf_start_time;
     double umf_time_fac = omp_get_wtime() - umf_fac_start;
 
     double *b = (double *)malloc(m * sizeof(double));
@@ -230,6 +238,13 @@ int main(int argc, char **argv)
     status = umfpack_dl_solve(UMFPACK_A, Ap, Ai, Ax, x, b, Numeric, umf_Control,
                               Info);
     double umf_solve_time = omp_get_wtime() - solve_start;
+    umf_time = omp_get_wtime() - umf_start_time;
+    double umf_resid, umf_anorm;
+    info = ParU_Residual(A, x, b, m, umf_resid, umf_anorm, &Control);
+    printf("UMFPACK Residual is |%.2lf| and anorm is %.2e and rcond is %.2e.\n",
+            umf_resid == 0 ? 0 : log10(umf_resid), umf_anorm, Num->rcond);
+
+
     free(x);
     free(b);
 
@@ -246,13 +261,14 @@ int main(int argc, char **argv)
         {
             printf("Par: error in making %s to write the results!\n", res_name);
         }
-        fprintf(res_file, "%ld %ld %lf %lf %lf %lf %lf %lf\n", Sym->m, Sym->anz, 
-                my_time_analyze, my_time_fac, my_time,
-                umf_symbolic, umf_time_fac, umf_time);
+        fprintf(res_file, "%ld %ld %lf %lf %lf %lf %lf %lf %lf %lf\n", 
+                Sym->m, Sym->anz, 
+                my_time_analyze, my_time_fac, my_solve_time, my_time,
+                umf_symbolic, umf_time_fac, umf_solve_time, umf_time);
         fclose(res_file);
     }
     printf("my_time = %lf umf_time=%lf umf_solv_t = %lf ratio = %lf\n", my_time,
-           umf_time, umf_solve_time, my_time / umf_time);
+            umf_time, umf_solve_time, my_time / umf_time);
 
 #endif
     //~~~~~~~~~~~~~~~~~~~Free Everything~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
