@@ -60,6 +60,7 @@ int main(int argc, char **argv)
     //Control.umfpack_ordering = UMFPACK_ORDERING_AMD;
     //Control.umfpack_strategy = UMFPACK_STRATEGY_UNSYMMETRIC;
     //Control.umfpack_strategy = UMFPACK_STRATEGY_SYMMETRIC;
+    //Control.umfpack_default_singleton = 0;
     Control.paru_max_threads = 6;
     info = ParU_Analyze(A, &Sym, &Control);
     double my_time_analyze = omp_get_wtime() - my_start_time;
@@ -194,7 +195,7 @@ int main(int argc, char **argv)
     umf_Control[UMFPACK_ORDERING] = UMFPACK_ORDERING_AMD;
     //umf_Control [UMFPACK_STRATEGY] =   UMFPACK_STRATEGY_UNSYMMETRIC;
     //umf_Control [UMFPACK_STRATEGY] =   UMFPACK_STRATEGY_SYMMETRIC;
-    umf_Control[UMFPACK_SINGLETONS] = 0;
+    umf_Control[UMFPACK_SINGLETONS] = Control.umfpack_default_singleton;
 
     Int *Ap = (Int *)A->p;
     Int *Ai = (Int *)A->i;

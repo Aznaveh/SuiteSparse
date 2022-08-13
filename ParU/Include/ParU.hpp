@@ -268,6 +268,7 @@ struct ParU_Control
     // Symbolic controls
     Int umfpack_ordering = UMFPACK_ORDERING_METIS;
     Int umfpack_strategy = UMFPACK_STRATEGY_AUTO;  // symmetric or unsymmetric
+    Int umfpack_default_singleton = 1; //filter singletons if true
 
     Int relaxed_amalgamation_threshold =
         32;  // symbolic analysis tries that each front have more pivot columns
