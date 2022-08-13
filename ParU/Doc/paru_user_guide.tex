@@ -70,11 +70,12 @@ sometimes can have less effects in ParU.
 \subsubsection{Instructions on using METIS}
 %-------------------------------------------------------------------------------
 
-SuiteSparse is now on METIS 5.1.0, which is distributed along with
-SuiteSparse itself.  Its use is optional, however. ParU is using METIS as the 
-default ordering. METIS tends to give orderings that are good for the 
-parallelism. You can compile and run your code without using METIS; We recommend 
-using METIS along with ParU.
+SuiteSparse is now on METIS 5.1.0, distributed along with SuiteSparse itself.
+Its use is optional, however. ParU is using AMD as the default ordering. METIS
+tends to give orderings that are good for parallelism. However, the METIS itself
+can be slow. As a result, the symbolic analysis using METIS can be slow, but
+usually, the factorization is faster. Therefore, depending on your use case,
+either use METIS, or you can compile and run your code without using METIS.
 
 Note that METIS is not bug-free; it can occasionally cause segmentation 
 faults, particularly if used when finding basic solutions to underdetermined 
@@ -282,7 +283,7 @@ options:
     \verb'ParU_Control' & default value & explanation  \\
 \hline\hline
 \verb'mem_chunk' & $1024*1024$ & chunk size for memset and memcpy\\
-\verb'umfpack_ordering' & \verb'UMFPACK_ORDERING_METIS' & default UMFPACK ordering\\
+\verb'umfpack_ordering' & \verb'UMFPACK_ORDERING_AMD' & default UMFPACK ordering\\
 \verb'umfpack_strategy' & \verb'UMFPACK_STRATEGY_AUTO'& default UMFPACK strategy\\
 \verb'umfpack_default_singleton' & $1$ & default filter singletons if true\\
 \verb'relaxed_amalgamation_threshold' & 32 & threshold for relaxed amalgamation \\

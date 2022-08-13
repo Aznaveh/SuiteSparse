@@ -57,7 +57,7 @@ int main(int argc, char **argv)
     ParU_Control Control;
     ParU_Ret info;
 
-    //Control.umfpack_ordering = UMFPACK_ORDERING_AMD;
+    Control.umfpack_ordering = UMFPACK_ORDERING_AMD;
     //Control.umfpack_strategy = UMFPACK_STRATEGY_UNSYMMETRIC;
     //Control.umfpack_strategy = UMFPACK_STRATEGY_SYMMETRIC;
     //Control.umfpack_default_singleton = 0;
@@ -191,8 +191,8 @@ int main(int argc, char **argv)
     // is used in umfpack_dl_symbolic; if
     // passed NULL it will use the defaults
     umfpack_dl_defaults(umf_Control);
+    //umf_Control[UMFPACK_ORDERING] = UMFPACK_ORDERING_AMD;
     //umf_Control[UMFPACK_ORDERING] = UMFPACK_ORDERING_METIS;
-    umf_Control[UMFPACK_ORDERING] = UMFPACK_ORDERING_AMD;
     //umf_Control [UMFPACK_STRATEGY] =   UMFPACK_STRATEGY_UNSYMMETRIC;
     //umf_Control [UMFPACK_STRATEGY] =   UMFPACK_STRATEGY_SYMMETRIC;
     umf_Control[UMFPACK_SINGLETONS] = Control.umfpack_default_singleton;

@@ -329,7 +329,8 @@ ParU_Ret ParU_Analyze(cholmod_sparse *A, ParU_Symbolic **S_handle,
             umfpack_ordering != UMFPACK_ORDERING_CHOLMOD &&
             umfpack_ordering != UMFPACK_ORDERING_BEST &&
             umfpack_ordering != UMFPACK_ORDERING_NONE)
-            my_Control.umfpack_ordering = UMFPACK_ORDERING_METIS;
+            //my_Control.umfpack_ordering = UMFPACK_ORDERING_METIS;
+            my_Control.umfpack_ordering = UMFPACK_ORDERING_AMD;
         Int umfpack_strategy = my_Control.umfpack_strategy;
         // I dont support UMFPACK_ORDERING_GIVEN or UMFPACK_ORDERING_USER now
         if (umfpack_strategy != UMFPACK_STRATEGY_AUTO &&
