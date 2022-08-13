@@ -61,7 +61,7 @@ int main(int argc, char **argv)
     //Control.umfpack_strategy = UMFPACK_STRATEGY_UNSYMMETRIC;
     //Control.umfpack_strategy = UMFPACK_STRATEGY_SYMMETRIC;
     //Control.umfpack_default_singleton = 0;
-    Control.paru_max_threads = 6;
+    //Control.paru_max_threads = 6;
     info = ParU_Analyze(A, &Sym, &Control);
     double my_time_analyze = omp_get_wtime() - my_start_time;
     if (info != PARU_SUCCESS)
