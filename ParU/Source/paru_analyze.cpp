@@ -351,7 +351,7 @@ ParU_Ret ParU_Analyze(cholmod_sparse *A, ParU_Symbolic **S_handle,
             paru_strategy != UMFPACK_STRATEGY_UNSYMMETRIC)
             my_Control.paru_strategy = PARU_STRATEGY_AUTO;
         Int umfpack_default_singleton = my_Control.umfpack_default_singleton;
-        if (umfpack_default_singleton != 0 || umfpack_default_singleton != 1)
+        if (umfpack_default_singleton != 0 && umfpack_default_singleton != 1)
             my_Control.umfpack_default_singleton = 1;
     }
     ParU_Control *Control = &my_Control;
