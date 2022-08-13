@@ -191,10 +191,10 @@ int main(int argc, char **argv)
     // passed NULL it will use the defaults
     umfpack_dl_defaults(umf_Control);
     //umf_Control[UMFPACK_ORDERING] = UMFPACK_ORDERING_METIS;
-    //umf_Control[UMFPACK_ORDERING] = UMFPACK_ORDERING_AMD;
+    umf_Control[UMFPACK_ORDERING] = UMFPACK_ORDERING_AMD;
     //umf_Control [UMFPACK_STRATEGY] =   UMFPACK_STRATEGY_UNSYMMETRIC;
     //umf_Control [UMFPACK_STRATEGY] =   UMFPACK_STRATEGY_SYMMETRIC;
-    //umf_Control[UMFPACK_SINGLETONS] = 0;
+    umf_Control[UMFPACK_SINGLETONS] = 0;
 
     Int *Ap = (Int *)A->p;
     Int *Ai = (Int *)A->i;
@@ -205,7 +205,8 @@ int main(int argc, char **argv)
 
     status =
         umfpack_dl_symbolic(n, n, Ap, Ai, Ax, &Symbolic, umf_Control, Info);
-    umfpack_dl_report_info(umf_Control, Info);
+    //umf_Control[UMFPACK_PRL] = 0;
+    //umfpack_dl_report_info(umf_Control, Info);
     if (status < 0)
     {
         umfpack_dl_report_info(umf_Control, Info);
@@ -220,7 +221,6 @@ int main(int argc, char **argv)
     //umf_Control[UMFPACK_PRL] = 2;
     //umfpack_dl_report_info(umf_Control, Info);
     //umfpack_dl_report_status(umf_Control, status);
-    //umf_Control[UMFPACK_PRL] = 1;
     if (status < 0)
     {
         umfpack_dl_report_info(umf_Control, Info);
