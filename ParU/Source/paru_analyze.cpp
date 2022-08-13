@@ -342,11 +342,7 @@ ParU_Ret ParU_Analyze(cholmod_sparse *A, ParU_Symbolic **S_handle,
             my_Control.paru_max_threads =
                 MIN(max_threads, my_Control.paru_max_threads);
         else
-#ifdef MKLROOT
             my_Control.paru_max_threads = max_threads/4;
-#else
-            my_Control.paru_max_threads = max_threads;
-#endif
 
         Int threshold = my_Control.relaxed_amalgamation_threshold;
         if (threshold < 0 || threshold > 512)
