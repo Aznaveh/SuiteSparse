@@ -275,6 +275,10 @@ int get_all_options
         {
             Control [UMFPACK_ORDERING] = UMFPACK_ORDERING_METIS ;
         }
+        else if (MATCH (s, "metis_guard"))
+        {
+            Control [UMFPACK_ORDERING] = UMFPACK_ORDERING_METIS_GUARD ;
+        }
         else if (MATCH (s, "cholmod"))
         {
             Control [UMFPACK_ORDERING] = UMFPACK_ORDERING_CHOLMOD ;
@@ -517,10 +521,13 @@ mxArray *umfpack_mx_info_details    /* return a struct with info statistics */
         "omega2",
         "solve_flops",
         "solve_time",
-        "solve_walltime"
+        "solve_walltime",
+
+        "control_tsym",
+        "control_tdiag",
     } ;
 
-    info = mxCreateStructMatrix (1, 1, 100, info_struct) ;
+    info = mxCreateStructMatrix (1, 1, 102, info_struct) ;
 
     XFIELD (Control [UMFPACK_PRL]) ;
     XFIELD (Control [UMFPACK_DENSE_ROW]) ;
@@ -545,6 +552,7 @@ mxArray *umfpack_mx_info_details    /* return a struct with info statistics */
         case UMFPACK_ORDERING_NONE:     SFIELD ("none") ;    break ;
         case UMFPACK_ORDERING_AMD:      SFIELD ("amd") ;     break ;
         case UMFPACK_ORDERING_METIS:    SFIELD ("metis") ;   break ;
+        case UMFPACK_ORDERING_METIS_GUARD: SFIELD ("metis_guard") ; break ;
         default:
         case UMFPACK_ORDERING_CHOLMOD:  SFIELD ("cholmod") ; break ;
         case UMFPACK_ORDERING_BEST:     SFIELD ("best") ;    break ;
@@ -651,16 +659,26 @@ mxArray *umfpack_mx_info_details    /* return a struct with info statistics */
     switch ((int) Info [UMFPACK_STRATEGY_USED])
     {
         default:
-        case UMFPACK_STRATEGY_UNSYMMETRIC: SFIELD ("unsymmetric") ;  break ;
-        case UMFPACK_STRATEGY_SYMMETRIC:   SFIELD ("symmetric") ;    break ;
-    }
-
-    switch ((int) Info [UMFPACK_ORDERING_USED])
-    {
-        case UMFPACK_ORDERING_AMD:      SFIELD ("amd") ;     break ;
-        case UMFPACK_ORDERING_METIS:    SFIELD ("metis") ;   break ;
-        case UMFPACK_ORDERING_GIVEN:    SFIELD ("given") ;   break ;
-        default:                        SFIELD ("none") ;    break ;
+        case UMFPACK_STRATEGY_UNSYMMETRIC:
+            SFIELD ("unsymmetric") ;
+            switch ((int) Info [UMFPACK_ORDERING_USED])
+            {
+                case UMFPACK_ORDERING_AMD:      SFIELD ("colamd") ;   break ;
+                case UMFPACK_ORDERING_METIS:    SFIELD ("metis(A'A)") ; break ;
+                case UMFPACK_ORDERING_GIVEN:    SFIELD ("given") ; break ;
+                default:                        SFIELD ("none") ;  break ;
+            }
+            break ;
+        case UMFPACK_STRATEGY_SYMMETRIC:
+            SFIELD ("symmetric") ;
+            switch ((int) Info [UMFPACK_ORDERING_USED])
+            {
+                case UMFPACK_ORDERING_AMD:      SFIELD ("amd") ;   break ;
+                case UMFPACK_ORDERING_METIS:    SFIELD ("metis(A+A')") ; break ;
+                case UMFPACK_ORDERING_GIVEN:    SFIELD ("given") ; break ;
+                default:                        SFIELD ("none") ;  break ;
+            }
+            break ;
     }
 
     SFIELD (YESNO (Info [UMFPACK_QFIXED])) ;
@@ -742,6 +760,8 @@ mxArray *umfpack_mx_info_details    /* return a struct with info statistics */
     XFIELD (Info [UMFPACK_SOLVE_TIME]) ;
     XFIELD (Info [UMFPACK_SOLVE_WALLTIME]) ;
 
+    XFIELD (Control [UMFPACK_STRATEGY_THRESH_SYM]) ;
+    XFIELD (Control [UMFPACK_STRATEGY_THRESH_NNZDIAG]) ;
     return (info) ;
 }
 
@@ -786,16 +806,26 @@ mxArray *umfpack_mx_info_user    /* return a struct with info statistics */
     switch ((int) Info [UMFPACK_STRATEGY_USED])
     {
         default:
-        case UMFPACK_STRATEGY_UNSYMMETRIC: SFIELD ("unsymmetric") ;  break ;
-        case UMFPACK_STRATEGY_SYMMETRIC:   SFIELD ("symmetric") ;    break ;
-    }
-
-    switch ((int) Info [UMFPACK_ORDERING_USED])
-    {
-        case UMFPACK_ORDERING_AMD:      SFIELD ("amd") ;     break ;
-        case UMFPACK_ORDERING_METIS:    SFIELD ("metis") ;   break ;
-        case UMFPACK_ORDERING_GIVEN:    SFIELD ("given") ;   break ;
-        default:                        SFIELD ("none") ;    break ;
+        case UMFPACK_STRATEGY_UNSYMMETRIC:
+            SFIELD ("unsymmetric") ;
+            switch ((int) Info [UMFPACK_ORDERING_USED])
+            {
+                case UMFPACK_ORDERING_AMD:      SFIELD ("colamd") ;   break ;
+                case UMFPACK_ORDERING_METIS:    SFIELD ("metis(A'A)") ; break ;
+                case UMFPACK_ORDERING_GIVEN:    SFIELD ("given") ; break ;
+                default:                        SFIELD ("none") ;  break ;
+            }
+            break ;
+        case UMFPACK_STRATEGY_SYMMETRIC:
+            SFIELD ("symmetric") ;
+            switch ((int) Info [UMFPACK_ORDERING_USED])
+            {
+                case UMFPACK_ORDERING_AMD:      SFIELD ("amd") ;   break ;
+                case UMFPACK_ORDERING_METIS:    SFIELD ("metis(A+A')") ; break ;
+                case UMFPACK_ORDERING_GIVEN:    SFIELD ("given") ; break ;
+                default:                        SFIELD ("none") ;  break ;
+            }
+            break ;
     }
 
     XFIELD (Info [UMFPACK_PEAK_MEMORY] * sizeof_unit) ;
@@ -1836,7 +1866,7 @@ void mexFunction
 	    status = umfpack_zl_get_symbolic (&ignore1, &ignore2, &ignore3,
 	        &nz, &nfronts, &nchains, P, Q, Front_npivcol,
 	        Front_parent, Front_1strow, Front_leftmostdesc,
-	        Chain_start, Chain_maxrows, Chain_maxcols, Symbolic) ;
+	        Chain_start, Chain_maxrows, Chain_maxcols, NULL, Symbolic) ;
 	    umfpack_zl_free_symbolic (&Symbolic) ;
 	}
 	else
@@ -1844,7 +1874,7 @@ void mexFunction
 	    status = umfpack_dl_get_symbolic (&ignore1, &ignore2, &ignore3,
 	        &nz, &nfronts, &nchains, P, Q, Front_npivcol,
 	        Front_parent, Front_1strow, Front_leftmostdesc,
-	        Chain_start, Chain_maxrows, Chain_maxcols, Symbolic) ;
+	        Chain_start, Chain_maxrows, Chain_maxcols, NULL, Symbolic) ;
 	    umfpack_dl_free_symbolic (&Symbolic) ;
 	}
 

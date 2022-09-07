@@ -94,6 +94,7 @@ int UMF_cholmod
             cm.postorder = TRUE ;
             break ;
 
+        case UMFPACK_ORDERING_METIS_GUARD:
         case UMFPACK_ORDERING_METIS:
             /* metis on A+A' if symmetric, A'A otherwise */
             cm.nmethods = 1 ;
