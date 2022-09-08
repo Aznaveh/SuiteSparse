@@ -76,6 +76,11 @@ tends to give orderings that are good for parallelism. However, the METIS itself
 can be slow. As a result, the symbolic analysis using METIS can be slow, but
 usually, the factorization is faster. Therefore, depending on your use case,
 either use METIS, or you can compile and run your code without using METIS.
+If you are using METIS on an unsymetric case, UMFPACK has to form the Matrix
+$A^{T}A$. This matrix can be a dense matrix and takes a lot of resources to form
+it. To avoid such conditions you can use ordering strategy
+\verb'UMFPACK_ORDERING_METIS_GUARD' that is introduced in UMFPACK version 6.0.
+This ordering strategy use COLAMD instead of METIS on those cases.
 
 Note that METIS is not bug-free; it can occasionally cause segmentation 
 faults, particularly if used when finding basic solutions to underdetermined 
