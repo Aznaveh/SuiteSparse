@@ -366,6 +366,7 @@ ParU_Ret ParU_Analyze(cholmod_sparse *A, ParU_Symbolic **S_handle,
     // umf_Control[UMFPACK_STRATEGY] = UMFPACK_STRATEGY_AUTO;
     // umf_Control[UMFPACK_STRATEGY] = UMFPACK_STRATEGY_UNSYMMETRIC;
     // umf_Control[UMFPACK_STRATEGY] = UMFPACK_STRATEGY_SYMMETRIC;
+    umf_Control[UMFPACK_STRATEGY_THRESH_SYM] = 0.3;
 
 #ifndef NDEBUG
     /* print the control parameters */
