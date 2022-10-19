@@ -1383,7 +1383,7 @@ PRIVATE Int symbolic_analysis
                 // pruned matrix is empty: use COLAMD instead of METIS
                 ordering_option = UMFPACK_ORDERING_AMD ;
                 // FIXME: remove this printf
-                printf ("METIS_GUARD: pruned matrix is empty, using colamd\n") ;
+                //printf ("METIS_GUARD: pruned matrix is empty, using colamd\n") ;
             }
             else
             {
@@ -1404,9 +1404,9 @@ PRIVATE Int symbolic_analysis
                     ordering_option = UMFPACK_ORDERING_METIS ;
                 }
                 // FIXME: remove this printf
-                printf ("METIS_GUARD: max_rdeg "ID", metis_guard "ID", ordering : %s\n",
-                    max_rdeg, metis_guard,
-                    (ordering_option == UMFPACK_ORDERING_METIS) ? "metis" : "colamd") ;
+                //printf ("METIS_GUARD: max_rdeg "ID", metis_guard "ID", ordering : %s\n",
+                //    max_rdeg, metis_guard,
+                //    (ordering_option == UMFPACK_ORDERING_METIS) ? "metis" : "colamd") ;
             }
         }
 
