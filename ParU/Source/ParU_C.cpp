@@ -32,7 +32,12 @@ ParU_Ret ParU_C_Analyze(
         // output:
         ParU_C_Symbolic **Sym_handle,  // output, symbolic analysis
         // control:
-        ParU_C_Control *Control){}
+        ParU_C_Control *Control)
+{ 
+    //TODO: copy the inside of the Control and then 
+    // make a new symbolic object
+    // call the Cpp ParU_Analyze
+}
 
 //------------------------------------------------------------------------------
 // ParU_Factorize: Numeric factorization is done in this routine. Scaling and
@@ -45,7 +50,12 @@ ParU_Ret ParU_C_Factorize(
         // output:
         ParU_C_Numeric **Num_handle,
         // control:
-    ParU_C_Control *Control){}
+    ParU_C_Control *Control)
+{ 
+    //TODO: copy the inside of the Control and then 
+    // make a new numeric object
+    // call the Cpp ParU_Factorize
+}
 
 //------------------------------------------------------------------------------
 //--------------------- Solve routines -----------------------------------------
@@ -67,7 +77,13 @@ ParU_Ret ParU_C_Solve_Axb(
     // output
     double *x,
     // control:
-    ParU_C_Control *user_Control){}
+    ParU_C_Control *user_Control)
+{ 
+    //TODO: copy the inside of the Control and then 
+    // call the Cpp ParU_Solve
+}
+
+
 //-------- AX = B  (X is overwritten on B, multiple rhs)------------------------
 ParU_Ret ParU_C_Solve_AXX(
     // input
@@ -75,7 +91,13 @@ ParU_Ret ParU_C_Solve_AXX(
     // input/output:
     double *B,  // m(num_rows of A) x nrhs
     // control:
-    ParU_C_Control *Control){}
+    ParU_C_Control *Control)
+{ 
+    //TODO: copy the inside of the Control and then 
+    // call the Cpp ParU_Solve
+}
+
+
 //-------- AX = B  (multiple rhs)-----------------------------------------------
 ParU_Ret ParU_C_Solve_AXB(
     // input
@@ -83,7 +105,11 @@ ParU_Ret ParU_C_Solve_AXB(
     // output:
     double *X,
     // control:
-    ParU_C_Control *Control){}
+    ParU_C_Control *Control)
+{ 
+    //TODO: copy the inside of the Control and then 
+    // call the Cpp ParU_Solve
+}
 
 //------------------------------------------------------------------------------
 //-------------- computing residual --------------------------------------------
@@ -96,7 +122,12 @@ ParU_Ret ParU_C_Residual_bAx(
     // output:
     double &resid, double &anorm,
     // control:
-    ParU_C_Control *Control){}
+    ParU_C_Control *Control)
+{ 
+    //TODO: copy the inside of the Control and then 
+    // call the Cpp ParU_Solve
+}
+
 
 // resid = norm1(B-A*X) / norm1(A) (multiple rhs)
 ParU_Ret ParU_C_Residual_BAX(
@@ -105,13 +136,27 @@ ParU_Ret ParU_C_Residual_BAX(
     // output:
     double &resid, double &anorm,
     // control:
-    ParU_C_Control *Control){}
+    ParU_C_Control *Control)
+{ 
+    //TODO: copy the inside of the Control and then 
+    // call the Cpp ParU_Solve
+}
 
 //------------------------------------------------------------------------------
 //------------ Free routines----------------------------------------------------
 //------------------------------------------------------------------------------
-ParU_Ret ParU_C_Freenum(ParU_C_Numeric **Num_handle, ParU_C_Control *Control){}
-
-ParU_Ret ParU_C_Freesym(ParU_C_Symbolic **Sym_handle, ParU_C_Control *Control){}
-
+ParU_Ret ParU_C_Freenum(ParU_C_Numeric **Num_handle, ParU_C_Control *Control)
+{ 
+    //TODO: // No need to copy the inside of the Control and then 
+    // free the numeric object
 }
+
+
+ParU_Ret ParU_C_Freesym(ParU_C_Symbolic **Sym_handle, ParU_C_Control *Control)
+{ 
+    //TODO: // No need to copy the inside of the Control and then 
+    // free the symblic object
+}
+
+
+} //extern c
