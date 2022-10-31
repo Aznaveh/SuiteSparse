@@ -43,6 +43,7 @@
 
 
 #define CHOLMOD_BLAS_H
+
 #ifdef BLAS_INT
 #undef BLAS_INT
 #endif
@@ -58,7 +59,7 @@
 #include <cblas.h>
 #define BLAS_set_num_threads(n) openblas_set_num_threads(n)
 #define BLAS_INT int
-#endif
+#endif //MKLROOT
 
 extern "C"
 {
@@ -454,4 +455,4 @@ ParU_Ret ParU_Residual(
 ParU_Ret ParU_Freenum(ParU_Numeric **Num_handle, ParU_Control *Control);
 
 ParU_Ret ParU_Freesym(ParU_Symbolic **Sym_handle, ParU_Control *Control);
-#endif
+#endif //PARU_H
