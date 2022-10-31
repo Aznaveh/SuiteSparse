@@ -60,6 +60,13 @@ extern "C"
 #define UMFPACK_ORDERING_NONE 5         // natural ordering 
 //#define UMFPACK_ORDERING_USER 6         // user-provided function 
 // AMD/COLAMD means: use AMD for symmetric strategy, COLAMD for unsymmetric 
-
+//
+enum ParU_Ret
+{
+    PARU_SUCCESS,
+    PARU_OUT_OF_MEMORY,
+    PARU_INVALID,
+    PARU_SINGULAR
+};
 
 #endif

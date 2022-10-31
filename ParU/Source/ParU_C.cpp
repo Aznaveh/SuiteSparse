@@ -1,74 +1,25 @@
-// ============================================================================/
-// ======================= ParU_C.h ===========================================/
-// ============================================================================/
+////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////// ParU_C.cpp ///////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 
+// ParU, Mohsen Aznaveh and Timothy A. Davis, (c) 2022, All Rights Reserved.
+// SPDX-License-Identifier: GNU GPL 3.0
+//
+/*! @brief  This C++ file provides a set of C-callable wrappers so that a C
+ *  program can call ParU.
+ *
+ *  @author Aznaveh
+ */
+#include "ParU_C.h"
 
-//------------------------------------------------------------------------------
-#ifndef PARU_C_H
-#define PARU_C_H
+#include "paru_internal.hpp"
 
-#ifdef __cplusplus
-extern "C" {
-#endif 
-
-
-
-// =============================================================================
-// ========================= ParU_C_Control ====================================
-// =============================================================================
-// Just like ParU_Control the only difference is the initialization whic is 
-// handled in the C interface
-typedef struct ParU_C_Control_struct
+extern "C"
 {
-    Int mem_chunk;  // chunk size for memset and memcpy
-
-    // Symbolic controls
-    Int umfpack_ordering;
-    Int umfpack_strategy;  // symmetric or unsymmetric
-    Int umfpack_default_singleton; //filter singletons if true
-
-    Int relaxed_amalgamation_threshold;
-    // symbolic analysis tries that each front have more pivot columns
-    // than this threshold
-
-    // Numeric controls
-    Int scale;         // if 1 matrix will be scaled using max_row
-    Int panel_width;  // width of panel for dense factorizaiton
-    Int paru_strategy;  // the same strategy umfpack used
-
-    double piv_toler;     // tolerance for accepting sparse pivots
-    double diag_toler;  // tolerance for accepting symmetric pivots
-    Int trivial;  // dgemms with sizes less than trivial doesn't call BLAS
-    Int worthwhile_dgemm;  // dgemms bigger than worthwhile are tasked
-    Int worthwhile_trsm;  // trsm bigger than worthwhile are tasked
-    Int paru_max_threads;    // It will be initialized with omp_max_threads
-    // if the user do not provide a smaller number
-} ParU_C_Control;
-
-// =============================================================================
-// ========================= ParU_C_Symbolic ===================================
-// =============================================================================
-// just a carrier for the C++ data structure
-typedef struct ParU_C_Symbolic_struct
-{
-    void *sym_handle;
-} ParU_C_Symbolic;
-
-// =============================================================================
-// ========================= ParU_C_Numeric ====================================
-// =============================================================================
-// just a carrier for the C++ data structure
-typedef struct ParU_C_Numeric_struct
-{
-    void *num_handle;
-} ParU_C_Numeric;
-
-
-
 // ParU_Version: 
 // print out the version
 //------------------------------------------------------------------------------
-ParU_Ret ParU_C_Version (int ver [3], char date [128]);
+ParU_Ret ParU_C_Version (int ver [3], char date [128]){}
 //------------------------------------------------------------------------------
 // ParU_Analyze: Symbolic analysis is done in this routine. UMFPACK is called
 // here and after that some more speciallized symbolic computation is done for
@@ -81,7 +32,7 @@ ParU_Ret ParU_C_Analyze(
         // output:
         ParU_C_Symbolic **Sym_handle,  // output, symbolic analysis
         // control:
-        ParU_C_Control *Control);
+        ParU_C_Control *Control){}
 
 //------------------------------------------------------------------------------
 // ParU_Factorize: Numeric factorization is done in this routine. Scaling and
@@ -94,7 +45,7 @@ ParU_Ret ParU_C_Factorize(
         // output:
         ParU_C_Numeric **Num_handle,
         // control:
-    ParU_C_Control *Control);
+    ParU_C_Control *Control){}
 
 //------------------------------------------------------------------------------
 //--------------------- Solve routines -----------------------------------------
@@ -116,7 +67,7 @@ ParU_Ret ParU_C_Solve_Axb(
     // output
     double *x,
     // control:
-    ParU_C_Control *user_Control);
+    ParU_C_Control *user_Control){}
 //-------- AX = B  (X is overwritten on B, multiple rhs)------------------------
 ParU_Ret ParU_C_Solve_AXX(
     // input
@@ -124,7 +75,7 @@ ParU_Ret ParU_C_Solve_AXX(
     // input/output:
     double *B,  // m(num_rows of A) x nrhs
     // control:
-    ParU_C_Control *Control);
+    ParU_C_Control *Control){}
 //-------- AX = B  (multiple rhs)-----------------------------------------------
 ParU_Ret ParU_C_Solve_AXB(
     // input
@@ -132,7 +83,7 @@ ParU_Ret ParU_C_Solve_AXB(
     // output:
     double *X,
     // control:
-    ParU_C_Control *Control);
+    ParU_C_Control *Control){}
 
 //------------------------------------------------------------------------------
 //-------------- computing residual --------------------------------------------
@@ -145,7 +96,7 @@ ParU_Ret ParU_C_Residual_bAx(
     // output:
     double &resid, double &anorm,
     // control:
-    ParU_C_Control *Control);
+    ParU_C_Control *Control){}
 
 // resid = norm1(B-A*X) / norm1(A) (multiple rhs)
 ParU_Ret ParU_C_Residual_BAX(
@@ -154,17 +105,13 @@ ParU_Ret ParU_C_Residual_BAX(
     // output:
     double &resid, double &anorm,
     // control:
-    ParU_C_Control *Control);
+    ParU_C_Control *Control){}
 
 //------------------------------------------------------------------------------
 //------------ Free routines----------------------------------------------------
 //------------------------------------------------------------------------------
-ParU_Ret ParU_C_Freenum(ParU_C_Numeric **Num_handle, ParU_C_Control *Control);
+ParU_Ret ParU_C_Freenum(ParU_C_Numeric **Num_handle, ParU_C_Control *Control){}
 
-ParU_Ret ParU_C_Freesym(ParU_C_Symbolic **Sym_handle, ParU_C_Control *Control);
+ParU_Ret ParU_C_Freesym(ParU_C_Symbolic **Sym_handle, ParU_C_Control *Control){}
 
-#ifdef __cplusplus
 }
-#endif 
-
-#endif //PARU_C_H

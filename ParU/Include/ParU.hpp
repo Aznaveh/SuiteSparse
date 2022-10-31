@@ -301,6 +301,7 @@ struct ParU_Factors
     double *p;  //  point to factorized parts
 };
 
+//FIXME: remove it after saved it inside defintions
 enum ParU_Ret
 {
     PARU_SUCCESS,
