@@ -1,15 +1,8 @@
-// ParU_C.h
+// ============================================================================/
+// ======================= ParU_C.h ===========================================/
+// ============================================================================/
 
-// C wrappers defined here
-// TODO: I am not sure if I should have a defintion file or not
-// but it might be a good idea
-//
-// I am not sure how to initialize ParU_C_Control and even how to control it in C
-// Unsure how to control ParU_Ret
-//
-//
-// Also unsure if I can send Symbolic data structure in C
-//
+
 //------------------------------------------------------------------------------
 #ifndef PARU_C_H
 #define PARU_C_H
