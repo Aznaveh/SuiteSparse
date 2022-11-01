@@ -21,6 +21,31 @@ extern "C"
 //------------------------------------------------------------------------------
 ParU_Ret ParU_C_Version (int ver [3], char date [128])
     {return ParU_Version (ver ,date);}
+
+//initialize C_Control with the default values
+void  init_control (ParU_C_Control *Control_C)
+{
+    Control_C->mem_chunk = 1024 * 1024;  // chunk size for memset and memcpy
+
+    Control_C->umfpack_ordering =  UMFPACK_ORDERING_METIS;
+    Control_C->umfpack_strategy = 
+        UMFPACK_STRATEGY_AUTO;  // symmetric or unsymmetric
+    Control_C->umfpack_default_singleton = 1;
+
+    Control_C->relaxed_amalgamation_threshold = 32;
+
+    Control_C->scale = 1;
+    Control_C->panel_width = 32;
+    Control_C->paru_strategy = PARU_STRATEGY_AUTO;
+
+
+    Control_C->piv_toler = .1;
+    Control_C->diag_toler = .001;
+    Control_C->trivial = 4;
+    Control_C->worthwhile_dgemm = 512;
+    Control_C->worthwhile_trsm = 4096;
+    Control_C->paru_max_threads = 0;
+}
 // copy the inside of the C structrue to the Cpp structure
 void  cp_control (ParU_Control *Control, ParU_C_Control *Control_C)
 {
