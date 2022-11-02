@@ -86,10 +86,18 @@ ParU_Ret ParU_C_Analyze(
 { 
     ParU_Control Control;
     cp_control (Control, Control_C);
-    ParU_Symbolic *Sym = NULL;
+    ParU_Symbolic *Sym;
     ParU_Ret info;
     info = ParU_Analyze(A, &Sym, &Control);
     *Sym_handle_C = (ParU_C_Symbolic *) Sym;
+
+    // If ParU_C_Symbolic is not defined as void what I can do is to alloc a new
+    // ParU_C_Symbolic and store the pointers in the write place
+    //   ParU_C_Symbolic p_Sym = paru_alloc(sizeof(ParU_C_Symbolic))
+    //   //update inside the data structrue
+    //   p_Sym->Sym = Sym; ...
+    //   *Sym_handle_C = (ParU_C_Symbolic *) Sym;
+    //   
     return info;
 }
 
@@ -106,9 +114,14 @@ ParU_Ret ParU_C_Factorize (
         // control:
     ParU_C_Control *Control_C)
 { 
-    //TODO: copy the inside of the Control and then 
-    // make a new numeric object
-    // call the Cpp ParU_Factorize
+    ParU_Control Control;
+    cp_control (Control, Control_C);
+    ParU_Symbolic *Sym = (ParU_C_Symbolic *) Sym_C;
+    ParU_Numeric *Num;
+    ParU_Ret info;
+    info = ParU_Factorize(A, Sym, &Num, &Control);
+    *Num_handle_C = (ParU_C_Numeric *) Num;
+    return info;
 }
 
 //------------------------------------------------------------------------------
@@ -123,7 +136,13 @@ ParU_Ret ParU_C_Solve_Axx (
     // input/output:
     double *b,
     // control:
-    ParU_C_Control *Control_C);
+    ParU_C_Control *Control_C)
+{
+    ParU_Control Control;
+    cp_control (Control, Control_C);
+    return ParU_Solve 
+       ((ParU_C_Symbolic *) Sym_C, (ParU_Numeric *)ParU_C_Numeric, b, Control);
+}
 //-------- Ax = b --------------------------------------------------------------
 ParU_Ret ParU_C_Solve_Axb (
     // input:
@@ -133,8 +152,10 @@ ParU_Ret ParU_C_Solve_Axb (
     // control:
     ParU_C_Control *user_Control_C)
 { 
-    //TODO: copy the inside of the Control and then 
-    // call the Cpp ParU_Solve
+    ParU_Control Control;
+    cp_control (Control, Control_C);
+    return ParU_Solve ((ParU_C_Symbolic *) Sym_C, 
+            (ParU_Numeric *)ParU_C_Numeric, b, x,  Control);
 }
 
 
@@ -147,8 +168,11 @@ ParU_Ret ParU_C_Solve_AXX (
     // control:
     ParU_C_Control *Control_C)
 { 
-    //TODO: copy the inside of the Control and then 
-    // call the Cpp ParU_Solve
+    ParU_Control Control;
+    cp_control (Control, Control_C);
+    return ParU_Solve 
+        ((ParU_C_Symbolic *) Sym_C, 
+         (ParU_Numeric *)ParU_C_Numeric , B, Control);
 }
 
 
@@ -161,6 +185,9 @@ ParU_Ret ParU_C_Solve_AXB (
     // control:
     ParU_C_Control *Control_C)
 { 
+    ParU_Control Control;
+    cp_control (Control, Control_C);
+ 
     //TODO: copy the inside of the Control and then 
     // call the Cpp ParU_Solve
 }
@@ -178,6 +205,9 @@ ParU_Ret ParU_C_Residual_bAx (
     // control:
     ParU_C_Control *Control_C)
 { 
+    ParU_Control Control;
+    cp_control (Control, Control_C);
+ 
     //TODO: copy the inside of the Control and then 
     // call the Cpp ParU_Solve
 }
@@ -192,6 +222,8 @@ ParU_Ret ParU_C_Residual_BAX (
     // control:
     ParU_C_Control *Control_C)
 { 
+    ParU_Control Control;
+    cp_control (Control, Control_C);
     //TODO: copy the inside of the Control and then 
     // call the Cpp ParU_Solve
 }
@@ -202,6 +234,9 @@ ParU_Ret ParU_C_Residual_BAX (
 ParU_Ret ParU_C_Freenum (
         ParU_C_Numeric **Num_handle_C, ParU_C_Control *Control_C)
 { 
+    ParU_Control Control;
+    cp_control (Control, Control_C);
+    
     //TODO: // No need to copy the inside of the Control and then 
     // free the numeric object
 }
@@ -209,7 +244,10 @@ ParU_Ret ParU_C_Freenum (
  
 ParU_Ret ParU_C_Freesym (
         ParU_C_Symbolic **Sym_handle_C, ParU_C_Control *Control_C)
-{ 
+{
+    ParU_Control Control;
+    cp_control (Control, Control_C);
+  
     //TODO: // No need to copy the inside of the Control and then 
     // free the symblic object
 }

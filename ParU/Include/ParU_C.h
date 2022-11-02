@@ -45,24 +45,25 @@ typedef struct ParU_C_Control_struct
     // if the user do not provide a smaller number
 } ParU_C_Control;
 
-// =============================================================================
-// ========================= ParU_C_Symbolic ===================================
-// =============================================================================
-// just a carrier for the C++ data structure
-typedef struct ParU_C_Symbolic_struct
-{
-    void *sym_handle;
-} ParU_C_Symbolic;
-
-// =============================================================================
-// ========================= ParU_C_Numeric ====================================
-// =============================================================================
-// just a carrier for the C++ data structure
-typedef struct ParU_C_Numeric_struct
-{
-    void *num_handle;
-} ParU_C_Numeric;
-
+//  // =========================================================================
+//  // ========================= ParU_C_Symbolic ===============================
+//  // =========================================================================
+//  // just a carrier for the C++ data structure
+//  typedef struct ParU_C_Symbolic_struct
+//  {
+//      void *sym_handle;
+//  } ParU_C_Symbolic;
+//  
+//  // =========================================================================
+//  // ========================= ParU_C_Numeric ================================
+//  // =========================================================================
+//  // just a carrier for the C++ data structure
+//  typedef struct ParU_C_Numeric_struct
+//  {
+//      void *num_handle;
+//  } ParU_C_Numeric;
+#define ParU_C_Symbolic void
+#define ParU_C_Numeric void
 
 
 // ParU_Version: 
