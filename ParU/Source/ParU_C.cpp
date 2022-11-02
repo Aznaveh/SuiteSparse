@@ -84,12 +84,13 @@ ParU_Ret ParU_C_Analyze(
         // control:
         ParU_C_Control *Control_C)
 { 
-    //TODO: copy the inside of the Control and then 
     ParU_Control Control;
-    //TODO:  make a new symbolic object
-
+    cp_control (Control, Control_C);
+    ParU_Symbolic *Sym = NULL;
     ParU_Ret info;
-    return info = ParU_Analyze(A, &Sym, &Control);
+    info = ParU_Analyze(A, &Sym, &Control);
+    *Sym_handle_C = (ParU_C_Symbolic *) Sym;
+    return info;
 }
 
 //------------------------------------------------------------------------------
